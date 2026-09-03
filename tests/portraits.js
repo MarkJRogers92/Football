@@ -92,3 +92,23 @@ test('an old save with no portrait data is migrated, not broken',async()=>{
  }
  for(const t of u.teams){assert.match(t.primary,/^#[0-9a-f]{6}$/,'migration backfills school colours')}
 });
+
+// The header, the status line and the page title have drifted apart before —
+// v0.9.3 shipped with portraits while still calling itself v0.9.2. The build
+// now refuses to produce a mismatched page; this keeps `npm test` honest too.
+test('every version source agrees',()=>{
+ const fs=require('fs'),path=require('path'),root=path.join(__dirname,'..');
+ const rd=f=>fs.readFileSync(path.join(root,f),'utf8');
+ const version=rd('VERSION.txt').trim().replace(/^Dynasty Lab\s*/,'').replace(/^v/,'');
+ assert.match(version,/^\d+\.\d+\.\d+$/,`VERSION.txt should hold a bare semver, got "${version}"`);
+ const appVersion=(rd('app.js').match(/APP_VERSION='([^']+)'/)||[])[1];
+ assert.equal(appVersion,version,'app.js APP_VERSION matches VERSION.txt');
+ assert.equal(JSON.parse(rd('package.json')).version,version,'package.json matches VERSION.txt');
+ // The header must be a build-filled placeholder, never a literal that can rot.
+ assert.match(rd('body.html'),/<span data-app-version>/,'header carries a version placeholder');
+ // And the built artifact must actually show it in all three places.
+ const built=rd('index.html');
+ assert.ok(built.includes(`<title>Dynasty Lab v${version}</title>`),'built title shows the version');
+ assert.ok(built.includes(`<span data-app-version>v${version}</span>`),'built header shows the version');
+ assert.ok(built.includes(`APP_VERSION='${version}'`),'built script carries the version');
+});
