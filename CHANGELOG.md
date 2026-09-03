@@ -88,14 +88,14 @@ saves continue to load through `normalizeUniverse()`.
 
 ### Performance
 
-Measured in Chromium at iPhone viewport, first season:
+Measured in Chromium at iPhone viewport, first season, median of three runs:
 
 | Action | v0.8 | v0.8.1 |
 | --- | --- | --- |
-| Sim one week | 691 ms | 223 ms |
-| Sim rest of season | 7,381 ms | 1,299 ms |
-| Twelve-season save | 162 MB | 78 MB |
-| Save growth per season | 11.7 MB | 4.6 MB |
+| Sim one week | 734 ms | 306 ms |
+| Sim rest of season | 6,384 ms | 2,066 ms |
+| Twelve-season save | 162 MB | 74 MB |
+| Save growth per season | 11.7 MB | 4.3 MB |
 
 - `ranked()` and `confStand()` called `rankingScore()` — which profiles an
   entire roster — from inside a sort comparator, evaluating it about thirteen
@@ -105,6 +105,10 @@ Measured in Chromium at iPhone viewport, first season:
   renders the visible tab plus the shared chrome.
 - Recruiting shuffled all 120 teams with `sort(() => Math.random() - .5)` for
   every recruit every week, and re-derived positional need each time.
+- `makeRoleDepth()` re-rated every player on every comparison, across
+  twenty-four roles per team.
+- `recruitDistance()` recomputed a great-circle distance between fixed
+  coordinates for every team a recruit considered, every week, twice.
 - Archive rows were full player clones. They now keep only the fields the
   archive and records screens read, and stat blocks serialize sparsely.
 
