@@ -23,17 +23,17 @@ jobs:
         run: python3 tools/v094_patch.py
       - name: Install test dependencies
         run: npm install --no-package-lock
-      - name: Engine and persistence tests
-        run: npm test
       - name: Build standalone
         run: npm run build
+      - name: Engine and persistence tests
+        run: npm test
       - name: Browser UI tests
         shell: bash
         run: |
           CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
           if [ -z "$CHROME" ]; then
             npx playwright-core install chromium
-            CHROME="$(find "$HOME/.cache/ms-playwright" -type f -name chrome -o -name chromium | head -1)"
+            CHROME="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
           fi
           test -n "$CHROME"
           echo "Using Chromium: $CHROME"
@@ -42,7 +42,7 @@ jobs:
         shell: bash
         run: |
           CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          if [ -z "$CHROME" ]; then CHROME="$(find "$HOME/.cache/ms-playwright" -type f -name chrome -o -name chromium | head -1)"; fi
+          if [ -z "$CHROME" ]; then CHROME="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"; fi
           CHROMIUM_PATH="$CHROME" npm run test:browser-storage
       - name: Short simulation audit
         run: SEASONS=2 npm run audit
