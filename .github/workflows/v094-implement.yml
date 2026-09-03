@@ -1,0 +1,60 @@
+name: v094 coaching implementation
+
+on:
+  push:
+    branches:
+      - codex/v094-coaching-careers
+
+permissions:
+  contents: write
+
+jobs:
+  implement:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Apply bounded v0.9.4 patch
+        run: python3 tools/v094_patch.py
+      - name: Install test dependencies
+        run: npm install --no-package-lock
+      - name: Engine and persistence tests
+        run: npm test
+      - name: Build standalone
+        run: npm run build
+      - name: Browser UI tests
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then
+            npx playwright-core install chromium
+            CHROME="$(find "$HOME/.cache/ms-playwright" -type f -name chrome -o -name chromium | head -1)"
+          fi
+          test -n "$CHROME"
+          echo "Using Chromium: $CHROME"
+          CHROMIUM_PATH="$CHROME" npm run test:browser
+      - name: Browser IndexedDB tests
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then CHROME="$(find "$HOME/.cache/ms-playwright" -type f -name chrome -o -name chromium | head -1)"; fi
+          CHROMIUM_PATH="$CHROME" npm run test:browser-storage
+      - name: Short simulation audit
+        run: SEASONS=2 npm run audit
+      - name: Remove one-shot workflows and commit validated source
+        shell: bash
+        run: |
+          rm -f .github/workflows/v094-inspect.yml .github/workflows/v094-implement.yml
+          git config user.name "Dynasty Lab CI"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git status --short
+          git commit -m "Add persistent coaching careers for v0.9.4"
+          git push origin HEAD:codex/v094-coaching-careers
+      - name: Publish review preview
+        run: npm run publish:preview -- v094-coaching-careers
