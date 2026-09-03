@@ -6,6 +6,7 @@ on:
       - codex/v098-recruit-portraits
     paths:
       - .release-v098
+      - .github/workflows/release-v098.yml
 
 permissions:
   contents: write
