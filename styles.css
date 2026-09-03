@@ -52,3 +52,28 @@ main{max-width:1280px;margin:auto;padding:20px}.tab{display:none}.tab.active{dis
 .dev-rise{color:var(--good)}.dev-fall{color:var(--bad)}.dev-flat{color:var(--muted)}.transition-tag{color:var(--warn)}
 .training-focus{min-width:145px}.camp-disabled{opacity:.55}.staff-note{max-width:300px}.scout-range{white-space:nowrap}.growth-arrow{font-weight:800}
 @media(max-width:700px){.position-change-grid{grid-template-columns:1fr}.position-change-grid button{width:100%}.staff-note{max-width:none}}
+
+/* v0.8.1 mobile: an eleven-column roster table showed five columns on a phone
+   and hid the ratings behind a horizontal scroll. Below 700px each row becomes
+   a card with its column names inline. */
+@media(max-width:700px){
+  .stacked-table table{min-width:0;width:100%}
+  .stacked-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .stacked-table tr{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2px 10px;padding:11px 12px;border-bottom:1px solid var(--line)}
+  .stacked-table tr:last-child{border-bottom:0}
+  .stacked-table td{display:flex;justify-content:space-between;align-items:baseline;gap:8px;border:0;padding:2px 0;min-width:0}
+  .stacked-table td::before{content:attr(data-label);font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);flex:0 0 auto}
+  .stacked-table td[data-label="Player"]{grid-column:1/-1;display:block;margin-bottom:5px}
+  .stacked-table td[data-label="Player"]::before{display:none}
+  .stacked-table td[data-label="Style"]{grid-column:1/-1;display:block}
+  .stacked-table td[data-label="Style"]::before{display:block;margin-bottom:3px}
+  .stacked-table .table-wrap,.stacked-table{overflow:visible}
+  .stacked-table td>span,.stacked-table td>.pill{text-align:right;min-width:0}
+}
+
+/* The tab strip scrolls horizontally with no hint that it does. Fade the right
+   edge so the off-screen tabs are discoverable. */
+.tabs{position:relative;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs-shell{position:relative}
+.tabs-shell::after{content:"";position:absolute;top:0;right:0;bottom:0;width:34px;pointer-events:none;background:linear-gradient(90deg,rgba(17,22,30,0),#11161e)}
