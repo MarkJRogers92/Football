@@ -80,6 +80,19 @@ const path = require('path');
     await page.waitForTimeout(120);
     check(`[${label}] player profile opens`,
       await page.$eval('#playerDialog', el => el.hasAttribute('open')));
+
+    // Portraits paint after the row markup lands; confirm they actually filled.
+    const portraits = await page.evaluate(() => {
+      const cs = [...document.querySelectorAll('canvas[data-portrait]')];
+      return { total: cs.length, painted: cs.filter(c => c.dataset.portraitPainted === '1').length,
+               failed: cs.filter(c => c.dataset.portraitPainted === 'error').length };
+    });
+    check(`[${label}] roster portraits paint (${portraits.painted}/${portraits.total})`,
+      portraits.total > 0 && portraits.painted === portraits.total && portraits.failed === 0,
+      JSON.stringify(portraits));
+    const dialogPortrait = await page.evaluate(() =>
+      document.querySelector('#playerDialogPortrait canvas')?.dataset.portraitPainted);
+    check(`[${label}] profile portrait paints`, dialogPortrait === '1', String(dialogPortrait));
     await page.evaluate(() => document.querySelector('#playerDialog').close());
 
     // Mobile layout must not scroll horizontally.

@@ -80,6 +80,7 @@ globalThis.__ENGINE__ = {
   generateRecruitPool, generatePlayer, generateRoster, conditionRating,
   roleFit, unit, starter, roleStarter, participants, eligibilityBase,
   transferRisk, draftProjection, seasonScore, normalizeUniverse, recruitPitch,
+  ensurePortrait, portraitSeedFor, jerseyFor, schoolColors, ensureSchoolColors, PORTRAIT_VERSION,
   T, findPlayer, rebuildIndexes, packUniverse, packPlayer,
   setRecruitPromise, commitRecruit, signPlayerPromise, auditPlayerPromises, auditPromises, normalizePromiseState,
   recordPromiseTraining, recordPromisePositionChange, promisePenalty, archiveRecord, rememberCoach, promiseHubItems,

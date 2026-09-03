@@ -80,3 +80,17 @@ main{max-width:1280px;margin:auto;padding:20px}.tab{display:none}.tab.active{dis
 .tabs-shell::after{content:"";position:absolute;top:0;right:0;bottom:0;width:34px;pointer-events:none;background:linear-gradient(90deg,rgba(17,22,30,0),#11161e)}
 
 .game-dialog{width:min(1050px,96vw);max-width:96vw;box-sizing:border-box}.game-dialog .dialog-shell{min-width:0}.game-dialog h2{font-size:24px;overflow-wrap:anywhere}.game-dialog h3{margin:20px 0 10px}.game-dialog h4{margin:16px 0 8px}.game-table{max-width:100%;margin:10px 0}.game-table table{min-width:520px}.game-link{text-align:left;font-size:12px}.game-dialog .active{border-color:var(--good);color:var(--good)}#gameHistoryYear{margin:12px 0}@media(max-width:600px){.game-dialog .dialog-shell{padding:12px}.game-dialog h2{font-size:19px}.game-dialog .dialog-head{gap:8px}#gameTabs{gap:4px}#gameTabs button{padding:8px;font-size:12px}}
+
+/* v0.9.3 player portraits. Canvases are painted after markup lands, so they
+   need a reserved box to avoid reflowing the row on first paint. */
+.portrait{display:block;border-radius:8px;background:var(--panel2);flex:0 0 auto}
+.portrait-list{width:44px;height:44px}
+.portrait-profile{width:112px;height:112px;border-radius:12px}
+.player-cell{display:flex;align-items:center;gap:10px;min-width:0}
+.player-cell-text{min-width:0}
+.dialog-identity{display:flex;align-items:flex-start;gap:14px;min-width:0}
+.dialog-portrait{flex:0 0 auto}
+@media(max-width:700px){
+  .stacked-table .player-cell{align-items:center}
+  .portrait-profile{width:88px;height:88px}
+}
