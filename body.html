@@ -24,6 +24,7 @@
     <button data-tab="staff">Staff & Schemes</button>
     <button data-tab="gamelab">Game Lab</button>
     <button data-tab="season">Season</button>
+    <button data-tab="newsletter">Newsletter</button>
     <button data-tab="stats">Stats</button>
     <button data-tab="recruiting">Recruiting</button>
     <button data-tab="program">Program Lab</button>
@@ -96,6 +97,21 @@
       <div id="coachMarket"></div>
       <div class="card"><h3>Scheme-Fit Leaders</h3><div id="schemeFitLeaders"></div></div>
       <div class="card"><h3>Former Coaches & Career History</h3><div class="muted" style="margin-bottom:8px">Coaches remain part of the dynasty after they leave. Open a name to see the same career across jobs.</div><div id="coachHistoryList"></div></div>
+    </section>
+
+    <section id="newsletter" class="panel tab">
+      <div class="section-head"><div><h2>Weekly Newsletter</h2><div class="muted">Recaps written from the archived box scores. Nothing here is invented — every number comes from the game record.</div></div></div>
+      <div class="card">
+        <div class="editor-grid">
+          <label>Week<select id="newsWeek"></select></label>
+          <label>Coverage<select id="newsScope">
+            <option value="team">My program</option>
+            <option value="conference" selected>My conference</option>
+            <option value="national">National</option>
+          </select></label>
+        </div>
+      </div>
+      <div id="newsletterBody"></div>
     </section>
 
     <section id="gamelab" class="panel tab">

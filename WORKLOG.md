@@ -1,5 +1,35 @@
 # WORKLOG
 
+## v0.9.7 — game recaps and the weekly newsletter
+
+Plan: turn the v0.9.2 permanent box scores into readable prose, then aggregate
+a week of them into a newsletter scoped to the program, the conference or the
+nation.
+
+Decisions:
+- Template generation, not a language model. The game is a single offline
+  page with no server, and a recap attached to a permanent archived game has
+  to read identically every time it is opened years later.
+- Derived on demand, never stored. Recaps cost nothing in the save file and
+  appear retroactively for every game in an existing dynasty. The trade is
+  recomputation per render, which is trivial next to the box score already
+  being rendered beside it.
+- Recap wording comes from a stream seeded by the game ID, never
+  `Math.random`. If it drew from the shared stream, merely opening a recap
+  would shift every future simulated result. A test asserts zero draws.
+- The prose may only claim what the record supports. The engine stores no
+  clock or quarters, so recaps never say "late in the fourth" or invent
+  attendance; a test bans that vocabulary outright.
+- Notability bars are deliberately high. A first pass mentioned an
+  interception and an injury in nearly every game, because one of each
+  happens in nearly every game, and the recaps all read the same. Sacks now
+  need 2+, interceptions 2+ (or 1 with real tackle volume), and injuries 3+
+  weeks before they count as news.
+
+Validation: `npm test` (47/47, including the new `tests/recaps.js`) and
+`npm run test:browser` (89/89, covering the Newsletter tab, both coverage
+scopes and the recap in the Game Center summary).
+
 ## v0.9.6 — coaching market
 
 Plan: turn the v0.9.5 carousel's instant AI-only auto-fill into a real, bounded

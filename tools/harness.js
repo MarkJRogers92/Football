@@ -75,6 +75,7 @@ globalThis.__ENGINE__ = {
   get universe(){ return universe }, set universe(v){ universe = v },
   get schools(){ return schools },
   loadSchools, initUniverse, buildSchedule, ranked, rankingScore, profiles,
+  gameRecap, recapFacts, recapPicker, weeklyNewsletter, newsWeight, newsGames, newsWeeks,
   gameSim, detailedGame, simulateUserDetailed, gameBoxHTML, gameSummaryHTML, renderGameArchive, showGameCenter, simWeek, simSeason, simConferenceChampionships, simPlayoff, runOffseason,
   runSpringCamp, runFallCamp, advanceRecruiting, finalizeRecruiting,
   generateRecruitPool, generatePlayer, generateRoster, conditionRating,

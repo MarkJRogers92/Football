@@ -150,3 +150,13 @@ stint machinery as every other coach (`openCoachStint`/`closeCoachStint`), so no
 parallel identity system was introduced; a hired candidate keeps the coach ID they
 already had if they came from another program (`coachId` on the candidate record),
 or is minted once via `generateCoach` if they were a fresh/off-market hire.
+
+## v0.9.7 additions
+
+None. Game recaps and the weekly newsletter are computed from the existing
+immutable `gameArchive` records at render time and are never persisted, so the
+save format, IndexedDB schema and archive chunks are all unchanged. This is
+deliberate: a stored recap would bloat every save and would go stale if the
+prose were ever improved, and deriving it means recaps also appear for games
+archived long before v0.9.7. Recap wording is seeded from the game ID rather
+than `Math.random`, so rendering history never perturbs the simulation stream.

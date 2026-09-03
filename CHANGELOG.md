@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.9.9 — Game recaps and the weekly newsletter
+
+- Every archived game now writes its own recap paragraph: who won and by how much, how they won it (yardage, turnover margin, ground vs. air, sacks, shutouts), the star lines, and colour like a player facing his former school or a multi-week injury.
+- Recaps are derived from the stored box score on demand and never saved, so they appear immediately for every game already in an existing dynasty and add nothing to save size.
+- Wording is drawn from a stream seeded by the game ID: a saved game always reads the same way, and generating recaps never touches the simulation RNG, so reading history can never change what happens next.
+- Recaps state only what the box score supports. With no clock or quarters in the model, the prose never invents timing, attendance or late-game drama — a test enforces this.
+- New Newsletter tab: pick a week and a coverage level (your program, your conference, or national). It leads with the most newsworthy game in scope — ranked matchups, upsets, one-score finishes, title games — then lists the rest, with a line tracking your own record.
+- The Game Center Summary now opens with the same recap.
+
 ## v0.9.8 — Recruit Portrait Integration
 
 - Extended the frozen deterministic Portrait V1 renderer to recruits without changing face identity generation.

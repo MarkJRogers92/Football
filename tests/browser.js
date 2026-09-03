@@ -114,6 +114,30 @@ const path = require('path');
     check(`[${label}] sending the offer hires the coach and clears the interim tag`,
       !hireResult.interim && hireResult.hired, JSON.stringify(hireResult));
 
+    // Weekly newsletter: recaps derived from the archived box scores.
+    await page.click('.tabs button[data-tab="newsletter"]');
+    await page.waitForTimeout(120);
+    const news = await page.evaluate(() => ({
+      weeks: document.querySelector('#newsWeek').options.length,
+      lead: document.querySelector('#newsletterBody .news-lead .recap')?.textContent || '',
+      items: document.querySelectorAll('#newsletterBody .news-item').length,
+    }));
+    check(`[${label}] newsletter lists played weeks`, news.weeks > 0, JSON.stringify(news.weeks));
+    check(`[${label}] newsletter writes a lead recap`, news.lead.length > 80 && /\d+–\d+/.test(news.lead), news.lead.slice(0, 80));
+    await page.selectOption('#newsScope', 'team');
+    await page.waitForTimeout(120);
+    const teamLead = await page.$eval('#newsletterBody .news-lead .recap', el => el.textContent);
+    const teamName = await page.$eval('#teamName', el => el.textContent);
+    check(`[${label}] program coverage leads with the controlled team`, teamLead.includes(teamName.trim()), teamLead.slice(0, 80));
+
+    // Game Center summary opens with the same generated recap.
+    await page.click('.tabs button[data-tab="season"]');
+    await page.click('#teamSchedule [data-game]');
+    await page.waitForTimeout(120);
+    const summaryRecap = await page.$eval('#gameDialogBody .recap', el => el.textContent);
+    check(`[${label}] Game Center summary opens with a recap`, summaryRecap.length > 80, summaryRecap.slice(0, 80));
+    await page.getByRole('button',{name:'Close Game Center',exact:true}).click();
+
     // Player profile dialog.
     await page.click('.tabs button[data-tab="roster"]');
     await page.waitForTimeout(80);

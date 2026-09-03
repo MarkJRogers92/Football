@@ -95,3 +95,4 @@ main{max-width:1280px;margin:auto;padding:20px}.tab{display:none}.tab.active{dis
   .stacked-table .player-cell{align-items:center}
   .portrait-profile{width:88px;height:88px}
 }
+.recap{line-height:1.55;margin:0 0 10px}.news-lead h3{margin:4px 0 8px}.news-item{padding:10px 0;border-bottom:1px solid var(--line)}.news-item:last-of-type{border-bottom:0}.news-item .compact{margin:3px 0 5px;line-height:1.5}
