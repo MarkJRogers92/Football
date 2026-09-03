@@ -30,10 +30,18 @@ Give the existing deep v0.9.6 game a more finished sports-management presentatio
 - Detailed-game score and Season result/schedule rows receive a presentation polish pass.
 - All enhancements read already-rendered DOM and do not touch `app.js` game state or the portrait renderer.
 
+### Recruiting / signing-day slice
+- Added `recruit-presentation.css` and `recruit-presentation.js`.
+- Recruiting gets a dedicated Signing Class board with current class rank, commitment count, blue-chip count and a 30-slot class meter.
+- Board-visible committed/wavering prospects become collectible-style signing cards with national rank, stars, position, location and commitment state.
+- A new weekly `COMMITMENT` or `FLIP` item is promoted into a larger team-branded recruiting headline graphic.
+- Recruit Profile is progressively enhanced into a prospect hero with identity graphic, position, national rank, interest and prospect/committed/wavering status.
+- The presentation layer intentionally does not access private universe state. Overall class count/rank remain sourced from the existing class summary; individual class cards are generated from committed prospects currently present in the rendered board. This avoids modifying recruiting mechanics or save state.
+
 ### Browser coverage
-- Added `tests/visual.js` for desktop and iPhone layout checks.
-- `npm run test:browser` now runs the existing full browser suite followed by the focused visual suite.
-- Checks cover the dashboard broadcast desk, Game Lab matchup card, player hero, portrait retention, post-sim next-matchup promotion, mobile overflow and browser console errors.
+- Added `tests/visual.js` for desktop and iPhone sports-layout checks.
+- Added `tests/recruit-visual.js` for the Signing Class board, commitment card path, recruit hero, mobile overflow and console errors.
+- `npm run test:browser` now runs the existing full browser suite followed by both focused visual suites.
 
 ### Build wiring
 `tools/build.js` now composes, in order:
@@ -42,9 +50,11 @@ Give the existing deep v0.9.6 game a more finished sports-management presentatio
 - `team-branding.css`
 - `sports-presentation.css`
 - `sports-layout.css`
+- `recruit-presentation.css`
 - existing body / portrait renderer / storage / app logic
 - `visual-identity.js`
 - `sports-presentation.js`
+- `recruit-presentation.js`
 
 ## Guardrails
 
@@ -55,7 +65,7 @@ Give the existing deep v0.9.6 game a more finished sports-management presentatio
 
 ## Validation status
 
-The new presentation JavaScript was syntax-reviewed before commit and the committed files/build wiring were re-inspected from GitHub. Full repository/Playwright execution could not be run from the current local runtime because outbound GitHub access is blocked there. The branch therefore must still pass the normal project validation before preview/promotion:
+The new recruiting presentation JavaScript passed a local `node --check` syntax pass. Full repository/Playwright execution still cannot be run from the current local runtime because outbound GitHub access is blocked there. The branch therefore must still pass the normal project validation before preview/promotion:
 
 ```bash
 npm install
@@ -71,7 +81,7 @@ Then publish a preview, not production:
 npm run publish:preview -- v097-visual-identity
 ```
 
-Review desktop and phone layouts, especially Dashboard, Game Lab, player profile, Roster, Recruiting and Staff.
+Review desktop and phone layouts, especially Dashboard, Game Lab, Player Profile, Recruiting, Recruit Profile, Roster and Staff.
 
 ## Vercel status note
 
@@ -79,6 +89,6 @@ GitHub reports a failing Vercel deployment status on this work. The untouched v0
 
 ## Recommended next slice after visual review
 
-1. Add recruit commitment/signing-day graphics using Portrait V1 and the same team-mark system.
-2. Add a more visual weekly results/news surface using the existing Game Center/archive data.
+1. Add a more visual weekly results/news surface using the existing Game Center/archive data.
+2. If recruit portraits are desired on signing cards, expose a narrow read-only presentation hook from recruiting rather than coupling this layer to the simulation internals.
 3. After the visual language is approved, consider explicit school logo/color editing and persistent school brand data.
