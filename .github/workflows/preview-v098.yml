@@ -1,0 +1,104 @@
+name: Publish Dynasty Lab v0.9.8 preview
+
+on:
+  push:
+    branches:
+      - codex/v098-recruit-portraits
+    paths:
+      - .github/workflows/preview-v098.yml
+
+permissions:
+  contents: write
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Prepare v0.9.8 preview metadata
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          version = '0.9.8'
+
+          app = Path('app.js')
+          text = app.read_text()
+          old = "const APP_VERSION='0.9.7';"
+          new = "const APP_VERSION='0.9.8';"
+          if new not in text:
+              if old not in text:
+                  raise SystemExit('APP_VERSION 0.9.7 marker not found')
+              app.write_text(text.replace(old, new, 1))
+
+          pkg_path = Path('package.json')
+          pkg = json.loads(pkg_path.read_text())
+          pkg['version'] = version
+          pkg_path.write_text(json.dumps(pkg, indent=2) + '\n')
+          Path('VERSION.txt').write_text(version + '\n')
+
+          readme = Path('README.md')
+          r = readme.read_text()
+          if '- v0.9.8 (preview) — recruit portraits across recruiting surfaces' not in r:
+              marker = '- v0.9.7 — Visual Identity V1 presentation layer\n'
+              if marker in r:
+                  r = r.replace(marker, marker + '- v0.9.8 (preview) — recruit portraits across recruiting surfaces\n', 1)
+          readme.write_text(r)
+
+          changelog = Path('CHANGELOG.md')
+          c = changelog.read_text()
+          heading = '## v0.9.8 — Recruit Portrait Integration\n'
+          if heading not in c:
+              entry = '''## v0.9.8 — Recruit Portrait Integration\n\n- Extended the frozen deterministic Portrait V1 renderer to recruits without changing face identity generation.\n- Added recruit portrait thumbnails to the Recruiting board, portrait-led signing cards, commitment/flip spotlight art and a full Recruit Profile portrait.\n- Uncommitted prospects use a neutral scouting uniform; committed prospects switch presentation to the committed school's colors while keeping the same face.\n- Reused the recruit portrait seed already preserved into the signed player object, so recruit → roster continuity remains deterministic.\n- Added lazy near-viewport painting for recruiting-board portraits to avoid eagerly rendering the entire 220-row board on mobile.\n- Added desktop and iPhone-layout browser checks for recruit list, signing-card and profile portrait painting. No IndexedDB schema change.\n\n'''
+              c = c.replace('# Changelog\n\n', '# Changelog\n\n' + entry, 1)
+              changelog.write_text(c)
+
+          continuation = '''# Dynasty Lab — v0.9.8 recruit portrait preview\n\nRepository: https://github.com/MarkJRogers92/Football\nCurrent source branch: `codex/v098-recruit-portraits`\nProduction branch: `gh-pages`\nProduction remains v0.9.7 at https://markjrogers92.github.io/Football/ until this preview is reviewed.\n\n## Preview scope\n\nv0.9.8 is a bounded presentation/identity milestone on top of v0.9.7.\n\n- Recruiting board rows now show deterministic Portrait V1 thumbnails.\n- Signing Class cards use the recruit's actual generated portrait rather than initials.\n- Commitment/flip spotlights use the recruit portrait when the recruit can be resolved from the current board.\n- Recruit Profile uses a large portrait hero.\n- Uncommitted prospects render in a neutral scouting uniform; committed recruits render in their committed program colors without changing face identity.\n- Recruiting-board portraits paint lazily near the viewport for mobile performance.\n- The existing recruit `portraitSeed` continues into the signed player object, preserving the same face after signing.\n\n## Validation\n\nThe implementation branch passed the full pre-version pipeline before this preview: build, engine/persistence tests, desktop+iPhone browser/visual tests including new recruit portrait checks, real-browser IndexedDB regression checks and simulation audit. This preview workflow reruns the full suite after the 0.9.8 version metadata is applied.\n\n## Storage guardrail\n\nNo IndexedDB schema change. Existing recruit portrait seed/version fields are reused. For older in-memory recruits missing a seed, the renderer assigns a stable recruit-id fallback before signing so continuity is retained.\n\nProduction and preview paths share the same GitHub Pages origin, so export a portable JSON backup before saving from a preview when a dynasty matters.\n\n## Next step\n\nReview Recruiting on desktop and actual iPhone Safari, especially scrolling performance, Signing Class cards, commitment spotlights and Recruit Profile. Promote only after visual review.\n'''
+          Path('CONTINUATION.md').write_text(continuation)
+          PY
+
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Build standalone
+        run: npm run build
+      - name: Engine and persistence tests
+        run: npm test
+      - name: Browser UI and recruit portrait tests
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then
+            npx playwright-core install chromium
+            CHROME="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$CHROME"
+          CHROMIUM_PATH="$CHROME" npm run test:browser
+      - name: Browser IndexedDB regression check
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then CHROME="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"; fi
+          test -n "$CHROME"
+          CHROMIUM_PATH="$CHROME" npm run test:browser-storage
+      - name: Simulation audit
+        run: npm run audit
+
+      - name: Commit v0.9.8 preview checkpoint
+        shell: bash
+        run: |
+          git config user.name "Dynasty Lab Release"
+          git config user.email "136272503+MarkJRogers92@users.noreply.github.com"
+          git add app.js package.json VERSION.txt README.md CHANGELOG.md CONTINUATION.md index.html
+          git diff --cached --quiet || git commit -m "Prepare Dynasty Lab v0.9.8 recruit portrait preview"
+          git push origin HEAD:codex/v098-recruit-portraits
+
+      - name: Publish preview to gh-pages
+        run: npm run publish:preview -- v098-recruit-portraits
