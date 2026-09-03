@@ -1,37 +1,32 @@
-# Dynasty Lab — v0.9.7 checkpoint
+# Dynasty Lab — v0.9.8 recruit portrait preview
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `codex/v097-visual-identity`
+Current source branch: `codex/v098-recruit-portraits`
 Production branch: `gh-pages`
-Production: v0.9.7 at https://markjrogers92.github.io/Football/
+Production remains v0.9.7 at https://markjrogers92.github.io/Football/ until this preview is reviewed.
 
-## Current release
+## Preview scope
 
-v0.9.7 is the Visual Identity V1 release built directly on the validated v0.9.6 Coaching Market. It is intentionally presentation-only.
+v0.9.8 is a bounded presentation/identity milestone on top of v0.9.7.
 
-- darker broadcast-style global shell and stronger information hierarchy;
-- deterministic controlled-school palettes and monograms;
-- sports-network Dashboard and Game Lab presentation;
-- portrait-led Player Profile hero;
-- Recruiting Signing Class board, commitment cards and Recruit Profile hero;
-- mobile fixes for Game Center, recruiting cards/profile and narrow-screen controls.
+- Recruiting board rows now show deterministic Portrait V1 thumbnails.
+- Signing Class cards use the recruit's actual generated portrait rather than initials.
+- Commitment/flip spotlights use the recruit portrait when the recruit can be resolved from the current board.
+- Recruit Profile uses a large portrait hero.
+- Uncommitted prospects render in a neutral scouting uniform; committed recruits render in their committed program colors without changing face identity.
+- Recruiting-board portraits paint lazily near the viewport for mobile performance.
+- The existing recruit `portraitSeed` continues into the signed player object, preserving the same face after signing.
 
-No simulation, recruiting, coaching, portrait identity, save architecture, migration or IndexedDB schema behavior was intentionally changed by this visual milestone.
+## Validation
 
-## Validation checkpoint
-
-Before promotion, the full branch release workflow passed build, engine/persistence tests, desktop+iPhone-layout browser/visual regression tests, real-browser IndexedDB regression checks and the simulation audit. The earlier targeted recruiting mobile overflow test also passed after the final containment fixes.
-
-Actual iPhone Safari remains a manual device check; automated phone coverage is Chromium at an iPhone-sized viewport.
+The implementation branch passed the full pre-version pipeline before this preview: build, engine/persistence tests, desktop+iPhone browser/visual tests including new recruit portrait checks, real-browser IndexedDB regression checks and simulation audit. This preview workflow reruns the full suite after the 0.9.8 version metadata is applied.
 
 ## Storage guardrail
 
-Read `STORAGE.md` before altering save behavior. v0.9.7 adds no new save fields or storage migrations beyond v0.9.6. Production and preview paths share the same GitHub Pages origin, so export a portable JSON backup before switching builds when a dynasty matters.
+No IndexedDB schema change. Existing recruit portrait seed/version fields are reused. For older in-memory recruits missing a seed, the renderer assigns a stable recruit-id fallback before signing so continuity is retained.
 
-## Next steps
+Production and preview paths share the same GitHub Pages origin, so export a portable JSON backup before saving from a preview when a dynasty matters.
 
-Do not fold unrelated gameplay work into this visual release. Pick the next remaining v0.9 gameplay/story slice as a bounded milestone, branch from this validated source, and preserve the standing test/publish discipline.
+## Next step
 
-## Resume prompt
-
-Continue Dynasty Lab from `MarkJRogers92/Football`, using `codex/v097-visual-identity` / its promoted successor as the v0.9.7 source checkpoint. Read `CONTINUATION.md`, `STORAGE.md`, `CHANGELOG.md`, `ROADMAP_V09.md` and `VISUAL_IDENTITY.md`. Do not redo Promises, Transfers, Game Center, Portrait V1, persistent coaching careers, coach relationship portability, Coaching Market or Visual Identity V1. Keep the next milestone bounded, validate fully, and publish only after the branch is green.
+Review Recruiting on desktop and actual iPhone Safari, especially scrolling performance, Signing Class cards, commitment spotlights and Recruit Profile. Promote only after visual review.

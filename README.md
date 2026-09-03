@@ -46,6 +46,7 @@ Completed v0.9 slices:
 - v0.9.5 — coach relationship portability and recruiting/player fallout
 - v0.9.6 — Coaching Market
 - v0.9.7 — Visual Identity V1 presentation layer
+- v0.9.8 (preview) — recruit portraits across recruiting surfaces
 
 See `CHANGELOG.md` and `CONTINUATION.md` for the current checkpoint and next
 bounded milestone.

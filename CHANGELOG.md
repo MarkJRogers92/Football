@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.9.8 — Recruit Portrait Integration
+
+- Extended the frozen deterministic Portrait V1 renderer to recruits without changing face identity generation.
+- Added recruit portrait thumbnails to the Recruiting board, portrait-led signing cards, commitment/flip spotlight art and a full Recruit Profile portrait.
+- Uncommitted prospects use a neutral scouting uniform; committed prospects switch presentation to the committed school's colors while keeping the same face.
+- Reused the recruit portrait seed already preserved into the signed player object, so recruit → roster continuity remains deterministic.
+- Added lazy near-viewport painting for recruiting-board portraits to avoid eagerly rendering the entire 220-row board on mobile.
+- Added desktop and iPhone-layout browser checks for recruit list, signing-card and profile portrait painting. No IndexedDB schema change.
+
 ## v0.9.7 — Visual Identity V1
 
 - Added a presentation-only visual identity layer on top of the validated v0.9.6 game: darker broadcast-style shell, stronger information hierarchy, elevated cards/tables, refined tabs/buttons and more polished profile dialogs.
