@@ -2,6 +2,13 @@
 .sports-player-dialog .dialog-head{grid-template-columns:minmax(0,1fr);gap:14px;padding-right:78px}
 .sports-player-dialog .dialog-close{position:absolute;right:16px;top:16px;z-index:3}
 .sports-player-dialog .player-hero-rail{width:min(520px,calc(100% - 129px));margin:-2px 0 0 129px}
+/* Recruit identity is enhanced in-place: the avatar plus the existing eyebrow,
+   name and metadata are all direct grid children. Pin the avatar to column one
+   and keep every text row in column two instead of letting auto-placement put
+   the player name beneath the avatar on narrow screens. */
+.recruit-hero-identity>.recruit-hero-avatar{grid-column:1;grid-row:1 / span 3}
+.recruit-hero-identity>.eyebrow,.recruit-hero-identity>#recruitDialogName,.recruit-hero-identity>#recruitDialogMeta{grid-column:2;min-width:0}
+.recruit-hero-identity>#recruitDialogName{overflow-wrap:anywhere}
 @media(max-width:720px){.sports-player-dialog .dialog-head{padding-right:18px}.sports-player-dialog .player-hero-rail{width:100%;margin:0}.sports-player-dialog .dialog-close{right:12px;top:12px}}
 /* The base Game Center uses 12px mobile shell padding; keep the branded
    negative header margin aligned to that inset so the dialog itself never
