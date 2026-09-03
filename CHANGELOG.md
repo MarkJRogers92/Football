@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.9.5 — Coaches take relationships with them (preview batch)
+
+- Recruits now keep a stable primary-recruiter coach ID plus coach-specific relationship values separate from school interest.
+- When a coach changes schools, the same relationship follows the coach: the old school loses that relationship boost and the new school gains recruiting/transfer pressure. Commitments are never auto-flipped by coach movement.
+- Current players with strong ties to a departing recruiter receive a bounded transfer-risk bump; the coach's new school receives extra destination weight. Firing/retirement can create fallout without a destination.
+- The offseason carousel now runs before portal decisions and can produce a capped number of real coordinator-to-coordinator moves, allowing players to react in the same offseason without building the full hiring market.
+- Weekly/Preseason Hub surfaces recruiting fallout. Old saves infer existing recorded recruiter relationships additively from recruiting memory; no IndexedDB schema change.
+
 ## v0.9.4 — Persistent coaching careers (preview batch)
 
 - Coaches now keep one durable identity across jobs, role changes and retirement, with persistent career stints and season-by-season team records.

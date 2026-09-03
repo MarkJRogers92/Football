@@ -1,51 +1,51 @@
-# Dynasty Lab — v0.9.4 preview checkpoint
+# Dynasty Lab — v0.9.5 preview checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
-Development branch: `codex/v094-coaching-careers`
+Development branch: `codex/v095-coach-relationships`
 Production branch: `gh-pages`
 Production remains v0.9.3 at https://markjrogers92.github.io/Football/
 
 ## This bounded batch
 
-v0.9.4 adds persistent coaching careers on top of the completed v0.9.0 promises, v0.9.1 transfers, v0.9.2 Game Center and v0.9.3 Portrait V1.
+v0.9.5 makes coach relationships portable on top of v0.9.4 persistent coaching careers.
 
-- Active coaches keep stable IDs, school/role identity, specialties, season rows and career stints.
-- Completed seasons are recorded before staff turnover, including real tracked wins/losses, conference titles, national titles and Coach of the Year.
-- Fired, departed and retired coaches are preserved rather than deleted.
-- A bounded internal coordinator-to-HC promotion path exercises role continuity without building the full market.
-- A stable-ID `moveCoach()` foundation supports later cross-school hiring and verifies that player/recruit coach references survive a move.
-- Staff and former-coach names open a career profile with descriptive traits and timeline; hidden personality numbers remain hidden.
-- Old saves normalize additively. Unknown past results are not invented. Portable JSON keeps coach careers/archive.
+- recruits store a stable primary recruiter and coach-specific relationship map;
+- school interest remains separate from coach relationship;
+- relationship boost follows a stable coach ID when the coach changes schools;
+- commitments receive pressure only and are never auto-flipped by movement;
+- current players tied to a departing coach receive bounded transfer risk;
+- the coach's new school gains transfer-destination pressure;
+- firing/retirement can create fallout even when there is no new school;
+- the existing carousel can produce a capped number of real cross-school coordinator moves;
+- Preseason/Weekly Hub surfaces recruiting fallout;
+- old saves migrate additively from existing recruiting memory.
 
-## Explicitly not in v0.9.4
+## Explicitly not in v0.9.5
 
-No interviews, candidate market, competing offers, salary negotiation, staff budgets, broad poaching system, or recruit/player relationship portability. Those remain later slices.
-
-## Validation / release rule
-
-The branch implementation must pass the existing engine/storage/persistence/promise/transfer/game/portrait suites plus new coach tests, build successfully, and pass desktop + 390px browser UI checks. Publish only a preview for review. Do not promote production automatically. Actual iPhone Safari remains separate real-device validation.
+No user interviews, candidate market, competing offers, salary negotiation, staff
+budgets or open-job state machine. Those are the v0.9.6 coaching-market slice.
+No coach move directly flips a committed recruit.
 
 ## Storage guardrail
 
-Read `STORAGE.md` before altering saves. Game archives remain in the core save and were previously measured at about 6.6 MB per full 745-game season; 30–50-year mobile performance is not proven. This coaching batch does not change IndexedDB schema or prune history.
+Read `STORAGE.md` before altering saves. v0.9.5 adds only fields to existing
+recruit/player records and ordinary dynasty events. IndexedDB remains schema 2.
 
 ## Next roadmap sequence
-
-### v0.9.5 — Coaches take relationships with them
-- primary recruiter links
-- tuned portable recruit relationship when a coach changes schools
-- current-player transfer-risk / destination pressure toward recruiter
-- new school gains pressure, never an automatic flip
-- Weekly Hub recruiting fallout
 
 ### v0.9.6 — Coaching market
 - openings and candidate pool
 - interviews and offers
-- salary/years/role/play-calling authority
+- salary / years / role / play-calling authority
 - internal promotions and AI hiring based on fit
 
-Then continue scholarship scarcity/pulled offers, scheme-change hangover, position-change willingness, record chases, high-school feedback and story-surface work. Preserve the existing decommit/flip implementation rather than rebuilding it.
+Then scholarship scarcity/pulled offers, scheme-change hangover, position-change
+willingness, record chases, high-school feedback and story-surface work.
 
 ## Resume prompt
 
-Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`, `STORAGE.md`, `CHANGELOG.md` and `ROADMAP_V09.md`. v0.9.4 persistent coaching careers is the current preview milestone; do not redo promises, transfers, Game Center or Portrait V1. Review/validate the v0.9.4 preview before production. The next new gameplay slice is v0.9.5 coach relationship portability.
+Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
+`STORAGE.md`, `CHANGELOG.md` and `ROADMAP_V09.md`. v0.9.5 coach relationship
+portability is the current preview milestone; do not redo promises, transfers,
+Game Center, Portrait V1 or persistent coach careers. Validate the v0.9.5 preview
+before production. The next new gameplay slice is v0.9.6 coaching market.

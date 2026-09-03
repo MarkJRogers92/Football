@@ -127,3 +127,12 @@ not establish 30–50-season performance. Future work should separate immutable
 boxes into indexed, deferred chunks with atomic revision/archive checks, preserving
 full portable JSON and all old game IDs. Never prune silently. Full play logs are
 optional/temporary; boxes and drive summaries remain permanent.
+
+## v0.9.5 additions
+
+Primary recruiter IDs, coach-specific relationship maps and bounded coach-departure
+pressure live on the existing recruit/player records. Archived players retain the
+same fields through `ARCHIVE_FIELDS`. Relationship fallout is stored as ordinary
+core dynasty events; no IndexedDB schema change, archive rewrite or new network
+dependency is introduced. Old saves use their already-recorded
+`recruitingMemory.recruiterCoachId`/relationship as the additive migration source.

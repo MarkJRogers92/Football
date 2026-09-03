@@ -238,3 +238,21 @@ Portal players with no seat remain outside rosters, searchable and exportable,
 and retry next offseason; no off-campus development/aging simulation is added.
 
 User budget agreement: publish this one batch and stop. Next: v0.9.2 Game Center.
+
+## v0.9.5 — coach relationship portability
+
+Plan: keep school interest and coach relationship separate, attach one stable
+primary recruiter to commitments, then let that coach-specific relationship
+follow stable coach IDs through the existing `moveCoach()` path.
+
+Decisions:
+- coach movement creates pressure, never an automatic commitment flip;
+- the full hiring/interview/offer market stays deferred to v0.9.6;
+- actual cross-school movement is bounded to coordinator jobs in the existing
+  offseason carousel so the feature appears in normal saves;
+- carousel timing moves ahead of portal decisions so current players can react
+  to a coach move in the same offseason;
+- no save-schema change; old recorded recruiter memory is the only migration
+  evidence used.
+
+Validation is performed by the one-shot v0.9.5 workflow before preview publish.
