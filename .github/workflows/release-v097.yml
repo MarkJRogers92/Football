@@ -1,0 +1,117 @@
+name: Publish Dynasty Lab v0.9.7
+
+on:
+  push:
+    branches:
+      - codex/v097-visual-identity
+    paths:
+      - .release-v097
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Prepare v0.9.7 release metadata
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          version = '0.9.7'
+
+          app = Path('app.js')
+          text = app.read_text()
+          old = "const APP_VERSION='0.9.6';"
+          new = "const APP_VERSION='0.9.7';"
+          if new not in text:
+              if old not in text:
+                  raise SystemExit('APP_VERSION 0.9.6 marker not found')
+              text = text.replace(old, new, 1)
+              app.write_text(text)
+
+          pkg_path = Path('package.json')
+          pkg = json.loads(pkg_path.read_text())
+          pkg['version'] = version
+          pkg_path.write_text(json.dumps(pkg, indent=2) + '\n')
+
+          Path('VERSION.txt').write_text(version + '\n')
+
+          readme = Path('README.md')
+          r = readme.read_text()
+          r = r.replace('The live release is **v0.9.5**.', 'The live release is **v0.9.7**.')
+          if '- v0.9.6 — Coaching Market' not in r:
+              r = r.replace('- v0.9.5 — coach relationship portability and recruiting/player fallout\n', '- v0.9.5 — coach relationship portability and recruiting/player fallout\n- v0.9.6 — Coaching Market\n- v0.9.7 — Visual Identity V1 presentation layer\n')
+          r = r.replace('The next planned gameplay slice is **v0.9.6 Coaching Market**: open jobs,\ncandidates, interviews/offers, contracts, internal promotions and AI hiring by\nfit. Keep it bounded; scholarship scarcity and scheme-change consequences come\nlater.\n', 'v0.9.7 is a presentation-only release on top of the validated v0.9.6 Coaching Market.\nThe next gameplay milestone should remain bounded and be chosen from the remaining\nv0.9 roadmap rather than mixed into this visual release.\n')
+          readme.write_text(r)
+
+          changelog = Path('CHANGELOG.md')
+          c = changelog.read_text()
+          heading = '## v0.9.7 — Visual Identity V1\n'
+          if heading not in c:
+              entry = '''## v0.9.7 — Visual Identity V1\n\n- Added a presentation-only visual identity layer on top of the validated v0.9.6 game: darker broadcast-style shell, stronger information hierarchy, elevated cards/tables, refined tabs/buttons and more polished profile dialogs.\n- Added deterministic controlled-school branding and monograms without adding brand fields to universe/save data.\n- Added sports-network presentation for the Dashboard and Game Lab plus a larger portrait-led Player Profile while preserving existing game mechanics and data sources.\n- Added a Recruiting Signing Class board, collectible-style commitment cards, commitment/flip spotlight and Recruit Profile hero treatment, all progressively enhanced from already-rendered recruiting data.\n- Fixed narrow-screen regressions discovered during release validation, including Game Center header width, Signing Class decoration containment, recruit hero layout and mobile recruiting control overflow.\n- No simulation rules, recruiting/coaching mechanics, player portrait identity logic, save migrations or IndexedDB schema changed in this release.\n\n'''
+              c = c.replace('# Changelog\n\n', '# Changelog\n\n' + entry, 1)
+              changelog.write_text(c)
+
+          continuation = '''# Dynasty Lab — v0.9.7 checkpoint\n\nRepository: https://github.com/MarkJRogers92/Football\nCurrent source branch: `codex/v097-visual-identity`\nProduction branch: `gh-pages`\nProduction: v0.9.7 at https://markjrogers92.github.io/Football/\n\n## Current release\n\nv0.9.7 is the Visual Identity V1 release built directly on the validated v0.9.6 Coaching Market. It is intentionally presentation-only.\n\n- darker broadcast-style global shell and stronger information hierarchy;\n- deterministic controlled-school palettes and monograms;\n- sports-network Dashboard and Game Lab presentation;\n- portrait-led Player Profile hero;\n- Recruiting Signing Class board, commitment cards and Recruit Profile hero;\n- mobile fixes for Game Center, recruiting cards/profile and narrow-screen controls.\n\nNo simulation, recruiting, coaching, portrait identity, save architecture, migration or IndexedDB schema behavior was intentionally changed by this visual milestone.\n\n## Validation checkpoint\n\nBefore promotion, the full branch release workflow passed build, engine/persistence tests, desktop+iPhone-layout browser/visual regression tests, real-browser IndexedDB regression checks and the simulation audit. The earlier targeted recruiting mobile overflow test also passed after the final containment fixes.\n\nActual iPhone Safari remains a manual device check; automated phone coverage is Chromium at an iPhone-sized viewport.\n\n## Storage guardrail\n\nRead `STORAGE.md` before altering save behavior. v0.9.7 adds no new save fields or storage migrations beyond v0.9.6. Production and preview paths share the same GitHub Pages origin, so export a portable JSON backup before switching builds when a dynasty matters.\n\n## Next steps\n\nDo not fold unrelated gameplay work into this visual release. Pick the next remaining v0.9 gameplay/story slice as a bounded milestone, branch from this validated source, and preserve the standing test/publish discipline.\n\n## Resume prompt\n\nContinue Dynasty Lab from `MarkJRogers92/Football`, using `codex/v097-visual-identity` / its promoted successor as the v0.9.7 source checkpoint. Read `CONTINUATION.md`, `STORAGE.md`, `CHANGELOG.md`, `ROADMAP_V09.md` and `VISUAL_IDENTITY.md`. Do not redo Promises, Transfers, Game Center, Portrait V1, persistent coaching careers, coach relationship portability, Coaching Market or Visual Identity V1. Keep the next milestone bounded, validate fully, and publish only after the branch is green.\n'''
+          Path('CONTINUATION.md').write_text(continuation)
+          PY
+
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Build standalone
+        run: npm run build
+      - name: Engine and persistence tests
+        run: npm test
+      - name: Browser UI and visual regression tests
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then
+            npx playwright-core install chromium
+            CHROME="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$CHROME"
+          CHROMIUM_PATH="$CHROME" npm run test:browser
+      - name: Browser IndexedDB regression check
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then CHROME="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"; fi
+          test -n "$CHROME"
+          CHROMIUM_PATH="$CHROME" npm run test:browser-storage
+      - name: Simulation audit
+        run: npm run audit
+
+      - name: Commit v0.9.7 source checkpoint
+        shell: bash
+        run: |
+          git config user.name "Dynasty Lab Release"
+          git config user.email "136272503+MarkJRogers92@users.noreply.github.com"
+          git add app.js package.json VERSION.txt README.md CHANGELOG.md CONTINUATION.md index.html
+          git diff --cached --quiet || git commit -m "Release Dynasty Lab v0.9.7 visual identity"
+          git push origin HEAD:codex/v097-visual-identity
+
+      - name: Publish production to gh-pages
+        shell: bash
+        run: |
+          SOURCE_INDEX="$PWD/index.html"
+          git fetch origin gh-pages
+          rm -rf /tmp/dynasty-pages
+          git worktree add /tmp/dynasty-pages origin/gh-pages
+          cd /tmp/dynasty-pages
+          git checkout -B gh-pages origin/gh-pages
+          cp "$SOURCE_INDEX" index.html
+          git add index.html
+          git diff --cached --quiet || git commit -m "Publish Dynasty Lab v0.9.7"
+          git push origin gh-pages
