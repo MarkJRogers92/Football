@@ -125,3 +125,42 @@ Measured in Chromium at iPhone viewport, first season, median of three runs:
 - `tools/harness.js` runs the engine headless in Node behind a DOM shim.
 - `tests/smoke.js` — 46 engine checks. `tests/browser.js` — 43 Chromium checks
   across desktop and iPhone viewports. Both pass.
+
+### Follow-through on the review's own work list
+
+Everything below is additive to v0.8.1; `APP_VERSION` is unchanged and no
+existing save needs anything beyond the migration path `normalizeUniverse()`
+already provides.
+
+- **Mobile cards extended to Recruiting and Development.** Same treatment
+  the roster table got in the review pass: `stacked-table` + `data-label`
+  per cell. The Stats tab needed nothing — its leaderboards were already
+  stacked `div` rows, not a `<table>`.
+- **The Weekly Command Center is clickable.** Every hub item that names a
+  screen (a result, a ranking move, an injury, a commitment, the next
+  opponent, a transfer-risk flag, a hot target) now jumps to that tab and,
+  where relevant, opens the player or recruit dialog, through a new
+  `goToTab()` helper. Older saves' stored hub items simply have no
+  destination and render as plain cards.
+- **Decommits and flips.** The single largest gap the review named:
+  `r.committed` was permanent. Committed recruits are now re-pressured every
+  week against the field; a sustained pitch advantage from a challenger
+  gives a small, tuned weekly chance of a flip. Measured at 4–5% of
+  in-season commits per cycle (`npm run audit`) — a story beat, not churn.
+  The user's attention (target/relationship/visits/promise) both defends a
+  commit and wins a flip; the AI never flips a recruit to the user
+  unprompted. New `universe.decommitLog` (capped at 80) and
+  `universe.recruitCycle` back the hub alerts and the audit line.
+- **`T()` and `findPlayer()` are now Map-indexed** instead of scanning the
+  team list / every roster / the archive on every call, as the review's
+  performance section recommended. Self-validating rather than
+  instrumented at every mutation site: a hit is checked against the
+  universe's current shape, and a miss triggers exactly one rebuild.
+  Measured: `findPlayer` on a live player, 2000 lookups, 218ms → 5ms; on an
+  archived player, 500 lookups, 121ms → 2ms; `T()`, 20000 lookups,
+  19ms → 1ms.
+
+Not attempted: moving `playerArchive` into its own IndexedDB store. It is
+the highest-value remaining item from the review's save section but the
+riskiest, since it touches save/export/import directly — see
+`DYNASTY_LAB_GPT_HANDOFF.md` for what it needs.

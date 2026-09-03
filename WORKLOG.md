@@ -117,3 +117,19 @@ index so a New Universe doesn't reuse a prior game's stale Maps.
 
 Outcome: done. `npm test` 51/51 (three new checks: archived lookup, live
 lookup after roster turnover, T() over all 120 teams), browser 45/45.
+
+---
+
+## Session status — stopped after item 4
+
+Items 1–4 are complete, committed, and tested (`npm test` 51/51, `npm run
+test:browser` 45/45, `npm run build` produces no diff — tree is clean).
+
+**Item 5 (move `playerArchive` into its own IndexedDB store) was not
+started.** The work list marked it explicit risk — "do not start it unless
+you can finish and keep npm test green" — and it is the one item that
+touches save/load/export/import directly, three surfaces the project's own
+guardrails say must never lose compatibility without a migration path.
+Stopping before it, rather than leaving it half-built, is the safer place to
+hand off. See `DYNASTY_LAB_GPT_HANDOFF.md` at the repo root for what item 5
+would need and everything else a follow-up session should know.
