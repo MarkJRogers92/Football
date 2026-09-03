@@ -49,6 +49,7 @@
 }
 
 .topbar>div:first-child::before{
+  content:attr(data-team-mark);
   border-color:color-mix(in srgb,var(--team-secondary) 55%,#39516e);
   background:linear-gradient(145deg,color-mix(in srgb,var(--team-primary) 78%,#203b5d),#101b29);
   box-shadow:inset 0 1px rgba(255,255,255,.10),0 8px 22px rgba(0,0,0,.28),0 0 20px rgba(var(--team-rgb),.08);
