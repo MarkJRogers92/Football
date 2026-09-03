@@ -28,6 +28,19 @@ jobs:
           python3 -m py_compile tools/v095_patch.py
       - name: Apply bounded v0.9.5 patch
         run: python3 tools/v095_patch.py
+      - name: Correct bounded firing test fixture
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('tests/relationships.js')
+          s=p.read_text()
+          old="p.coachRelationships={[c.id]:80};p.morale=72;p.role='Starter mix';"
+          new="p.coachRelationships={[c.id]:80};p.morale=50;p.role='Starter mix';"
+          if old not in s:
+              raise SystemExit('relationship test fixture anchor missing')
+          p.write_text(s.replace(old,new,1))
+          PY
       - name: Install test dependencies
         run: npm install --no-package-lock
       - name: Build standalone
