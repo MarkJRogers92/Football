@@ -39,3 +39,30 @@ v0.8.1 — see `CHANGELOG.md`. Saves from v0.7 and v0.8 are migrated by
 Read `CONTINUATION.md` before continuing in another chat. The active continuation
 is based on v0.8.1 and keeps production unchanged. `STORAGE.md` documents the
 browser save upgrade, compatibility, limitations and required validation.
+
+## Publishing
+
+The game is served by GitHub Pages from the `gh-pages` branch of
+`MarkJRogers92/Property-Lookup`. Production and previews share one Pages site,
+so there is a single host to reason about.
+
+```
+npm run publish                        # -> /            (production)
+npm run publish:preview -- v094        # -> /preview/v094/
+node tools/publish.js --list           # what is published right now
+node tools/publish.js --remove v094    # delete a preview
+```
+
+| | URL |
+| --- | --- |
+| Production | https://markjrogers92.github.io/Property-Lookup/ |
+| Previews | https://markjrogers92.github.io/Property-Lookup/preview/ |
+
+`tools/publish.js` builds first, copies the result into a checkout of the Pages
+branch (`../property-lookup`, or `PAGES_REPO`), regenerates the preview index
+from whatever folders exist, then commits and pushes. Pages serves the new
+build within about a minute.
+
+Each preview runs from the same origin as production, so **they share browser
+save storage**. Export a save before switching between builds if a dynasty
+matters.

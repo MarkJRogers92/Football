@@ -10,7 +10,9 @@
     "audit": "node tools/audit.js",
     "longrun": "SEASONS=12 node tools/longrun.js",
     "test:storage": "node --test tests/storage.js tests/persistence.js tests/promises.js tests/transfers.js tests/games.js tests/portraits.js",
-    "test:browser-storage": "node tests/browser-storage.js"
+    "test:browser-storage": "node tests/browser-storage.js",
+    "publish": "node tools/publish.js",
+    "publish:preview": "node tools/publish.js --preview"
   },
   "devDependencies": {
     "fake-indexeddb": "^6.2.5",
