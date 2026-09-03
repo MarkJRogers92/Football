@@ -2,7 +2,8 @@
 
 A fictional college-football dynasty simulator: 120 D-I programs, hidden player
 ability, role-based depth charts, recruiting with real geography, development
-and camp, awards, records and a draft.
+and camp, permanent game history, persistent transfers/promises, and procedural
+player portraits.
 
 ## Source layout
 
@@ -15,39 +16,55 @@ The deployable artifact is a single standalone HTML file, but it is **generated*
 | `storage.js` | IndexedDB archive persistence; included in the standalone build. |
 | `styles.css` | Stylesheet. Source of truth. |
 | `body.html` | Page markup. Source of truth. |
+| `portraits/renderer-v1.js` | Frozen deterministic Portrait V1 renderer. |
 | `index.html` | Generated standalone build. Rebuild with `npm run build`. |
 
-```
-npm run build          # regenerate index.html from the source files
-npm test               # engine (52 checks) + persistence (10 scenarios)
-npm run test:browser   # Chromium UI test, desktop + iPhone viewport (45 checks)
-npm run test:browser-storage # real IndexedDB save/load/export/import UI
-npm run audit          # 5-season distribution report
-npm run longrun        # 12-season drift and save-growth report
+```bash
+npm run build
+npm test
+npm run test:browser
+npm run test:browser-storage
+npm run audit
+npm run longrun
 ```
 
-`tools/harness.js` loads `app.js` in Node behind a small DOM shim so the engine
-can be exercised and measured without a browser.
+`tools/harness.js` loads the engine in Node behind a small DOM shim so the
+simulation can be exercised and measured without a browser.
 
 ## Version
 
-v0.8.1 — see `CHANGELOG.md`. Saves from v0.7 and v0.8 are migrated by
-`normalizeUniverse()`.
+The live release is **v0.9.3**. `VERSION.txt` is the single release-version
+source and the build/test pipeline checks it against the application/package
+version so mismatched labels fail before publishing.
+
+Completed v0.9 slices:
+- v0.9.0 — Promises Become Debts + stable coach identity/event foundation
+- v0.9.1 — transfer destinations and persistent transfer memory
+- v0.9.2 — permanent Game Center / historical box scores
+- v0.9.3 — deterministic Portrait V1 integration
+
+See `CHANGELOG.md` and `CONTINUATION.md` for the current checkpoint and next
+bounded milestone.
 
 ## Continuation checkpoint
 
-Read `CONTINUATION.md` before continuing in another chat. The active continuation
-is based on v0.8.1 and keeps production unchanged. `STORAGE.md` documents the
-browser save upgrade, compatibility, limitations and required validation.
+Read `CONTINUATION.md` and `STORAGE.md` before changing game/save behavior.
+The canonical development source is this repository; `gh-pages` is deployment
+output only. Do not resume from the old Property-Lookup deployment or treat the
+historical `codex/v081-save-continuation` branch as the current release head.
+
+The next planned gameplay slice is **v0.9.4 persistent coaching careers**,
+followed by coach relationship fallout and the coaching market in later bounded
+iterations.
 
 ## Publishing
 
 The game is served by GitHub Pages from this repository's `gh-pages` branch.
-Production and previews share one Pages site, so there is a single host.
+Production and previews share one Pages site.
 
-```
+```bash
 npm run publish                        # -> /            (production)
-npm run publish:preview -- v094        # -> /preview/v094/
+npm run publish:preview -- v094       # -> /preview/v094/
 node tools/publish.js --list           # what is published right now
 node tools/publish.js --remove v094    # delete a preview
 ```
@@ -57,15 +74,14 @@ node tools/publish.js --remove v094    # delete a preview
 | Production | https://markjrogers92.github.io/Football/ |
 | Previews | https://markjrogers92.github.io/Football/preview/ |
 
-`tools/publish.js` builds first, then copies the result into a `gh-pages`
-worktree at `.pages/` (override with `PAGES_WORKTREE`), regenerates the preview
-index from whatever folders exist, commits and pushes. Pages serves the new
-build within about a minute.
+`tools/publish.js` builds first, then copies the generated result into a
+`gh-pages` worktree at `.pages/` (override with `PAGES_WORKTREE`), regenerates
+the preview index from the folders that actually exist, commits and pushes.
 
-`gh-pages` holds only what the site serves — `index.html`, `.nojekyll`, and
-`preview/`. The source lives on the working branch; the site branch is not a
-mirror of it.
+`gh-pages` holds only what the site serves. The source lives on the development
+branch; the site branch is not a source mirror and should not be hand-edited as
+the canonical game.
 
-Each preview runs on the same origin as production, so **they share browser
-save storage**. Export a save before switching between builds if a dynasty
-matters.
+Each preview runs on the same origin as production, so **previews and production
+share browser save storage**. Export a JSON backup before switching builds when
+a dynasty matters.
