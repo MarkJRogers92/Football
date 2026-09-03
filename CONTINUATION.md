@@ -1,13 +1,14 @@
-# Dynasty Lab — v0.9.5 preview checkpoint
+# Dynasty Lab — v0.9.5 production checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
-Development branch: `codex/v095-coach-relationships`
+Current source branch: `codex/v095-coach-relationships`
 Production branch: `gh-pages`
-Production remains v0.9.3 at https://markjrogers92.github.io/Football/
+Production: v0.9.5 at https://markjrogers92.github.io/Football/
 
-## This bounded batch
+## Current release
 
-v0.9.5 makes coach relationships portable on top of v0.9.4 persistent coaching careers.
+v0.9.5 is validated and promoted to production. It builds on v0.9.4 persistent
+coaching careers by making coach relationships portable across schools.
 
 - recruits store a stable primary recruiter and coach-specific relationship map;
 - school interest remains separate from coach relationship;
@@ -19,6 +20,16 @@ v0.9.5 makes coach relationships portable on top of v0.9.4 persistent coaching c
 - the existing carousel can produce a capped number of real cross-school coordinator moves;
 - Preseason/Weekly Hub surfaces recruiting fallout;
 - old saves migrate additively from existing recruiting memory.
+
+## Validation checkpoint
+
+The v0.9.5 validation run completed successfully before production promotion:
+- 52/52 engine smoke checks;
+- 31/31 Node persistence/game/portrait/promise/transfer/coach/relationship tests;
+- 69/69 desktop + iPhone-layout browser checks;
+- 6 real-browser IndexedDB persistence scenarios;
+- two-season simulation audit;
+- successful GitHub Pages production deployment.
 
 ## Explicitly not in v0.9.5
 
@@ -33,19 +44,26 @@ recruit/player records and ordinary dynasty events. IndexedDB remains schema 2.
 
 ## Next roadmap sequence
 
-### v0.9.6 — Coaching market
-- openings and candidate pool
-- interviews and offers
-- salary / years / role / play-calling authority
-- internal promotions and AI hiring based on fit
+### v0.9.6 — Coaching Market
+- openings and candidate pool;
+- interviews and offers;
+- salary / years / role / play-calling authority;
+- internal promotions and AI hiring based on fit;
+- old stint closes and new stint opens without duplicating coach identity.
 
-Then scholarship scarcity/pulled offers, scheme-change hangover, position-change
-willingness, record chases, high-school feedback and story-surface work.
+Keep this bounded. Do not fold scholarship scarcity, pulled offers, scheme-change
+hangover or position-change agency into the same milestone.
+
+Then proceed to scholarship scarcity/pulled offers, scheme-change hangover,
+position-change willingness, record chases, high-school feedback and broader
+story-surface work.
 
 ## Resume prompt
 
 Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
 `STORAGE.md`, `CHANGELOG.md` and `ROADMAP_V09.md`. v0.9.5 coach relationship
-portability is the current preview milestone; do not redo promises, transfers,
-Game Center, Portrait V1 or persistent coach careers. Validate the v0.9.5 preview
-before production. The next new gameplay slice is v0.9.6 coaching market.
+portability is the current production release; do not redo promises, transfers,
+Game Center, Portrait V1, persistent coach careers or coach relationship
+portability. The next new gameplay slice is v0.9.6 Coaching Market. Work in a
+new bounded branch, validate fully, publish a preview first, then promote only
+after review.
