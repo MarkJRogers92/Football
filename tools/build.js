@@ -1,5 +1,5 @@
 // Builds the standalone HTML from the real source files, so app.js / styles.css
-// / body.html stay the single source of truth and the deployable artifact is
+// / body.html / storage.js stay the single source of truth and the deployable artifact is
 // always a byte-for-byte function of them.
 const fs = require('fs');
 const path = require('path');
@@ -15,8 +15,8 @@ const html = `<!doctype html><html lang="en"><head><meta charset="utf-8">` +
   read('styles.css') +
   `</style></head><body>\n` +
   read('body.html') +
-  `<script>` + read('app.js') + `</script></body></html>`;
+  `<script>` + read('storage.js') + '\n' + read('app.js') + `</script></body></html>`;
 
 const out = process.argv[2] || 'index.html';
 fs.writeFileSync(path.join(root, out), html);
-console.log(`built ${out} (${(html.length / 1024).toFixed(0)} KB) from app.js + styles.css + body.html`);
+console.log(`built ${out} (${(html.length / 1024).toFixed(0)} KB) from app.js + storage.js + styles.css + body.html`);

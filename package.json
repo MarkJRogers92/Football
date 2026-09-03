@@ -5,12 +5,15 @@
   "description": "Fictional college-football dynasty simulator.",
   "scripts": {
     "build": "node tools/build.js",
-    "test": "node tests/smoke.js",
+    "test": "node tests/smoke.js && node --test tests/storage.js tests/persistence.js",
     "test:browser": "node tests/browser.js",
     "audit": "node tools/audit.js",
-    "longrun": "SEASONS=12 node tools/longrun.js"
+    "longrun": "SEASONS=12 node tools/longrun.js",
+    "test:storage": "node --test tests/storage.js tests/persistence.js",
+    "test:browser-storage": "node tests/browser-storage.js"
   },
   "devDependencies": {
+    "fake-indexeddb": "^6.2.5",
     "playwright-core": "^1.49.0"
   }
 }

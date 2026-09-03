@@ -45,8 +45,10 @@ function installDom() {
  * Loads app.js with its bootstrap replaced by an export hook, so tests can
  * reach the engine internals (initUniverse, simWeek, universe, ...).
  */
-function loadEngine({ seed, stubRender = true } = {}) {
+function loadEngine({ seed, stubRender = true, indexedDB } = {}) {
   const els = installDom();
+  if (indexedDB) global.indexedDB = indexedDB;
+  global.DynastyStorage = require('../storage.js');
   if (seed !== undefined) {
     // Deterministic xorshift so runs are reproducible across measurements.
     let s = seed >>> 0 || 1;
@@ -78,7 +80,8 @@ globalThis.__ENGINE__ = {
   generateRecruitPool, generatePlayer, generateRoster, conditionRating,
   roleFit, unit, starter, roleStarter, participants, eligibilityBase,
   transferRisk, draftProjection, seasonScore, normalizeUniverse, recruitPitch,
-  T, findPlayer, rebuildIndexes,
+  T, findPlayer, rebuildIndexes, packUniverse, packPlayer,
+  saveBrowser, loadBrowser, exportSave, importSave, installSave, ensureArchiveLoaded, archiveIsDeferred,
   POS, POS_COUNTS, ROLE_DEFS, OFF_SCHEMES, DEF_SCHEMES, GROWTH_CURVES,
   render: () => {},
 };

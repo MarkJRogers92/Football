@@ -93,7 +93,7 @@ function report(e, year) {
 
   // Recruiting distribution after the last offseason.
   const u = e.universe;
-  const counts = u.teams.map(t => t.roster.filter(p => p.origin?.includes('star recruit')).length);
+  const counts = u.teams.map(t => u.recruitCycle.signeesByTeam[t.name] || 0);
   console.log('recruiting: signees/team this cycle min=%d mean=%s max=%d',
     Math.min(...counts), f(mean(counts)), Math.max(...counts));
   const rc = u.recruitCycle || {};

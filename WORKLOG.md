@@ -133,3 +133,35 @@ guardrails say must never lose compatibility without a migration path.
 Stopping before it, rather than leaving it half-built, is the safer place to
 hand off. See `DYNASTY_LAB_GPT_HANDOFF.md` at the repo root for what item 5
 would need and everything else a follow-up session should know.
+
+## Continuation milestone 1 — archive persistence and recruiting audit
+
+Base `ea4c324`; working branch `codex/v081-save-continuation`. User requested
+continuing from the newest v0.8.1 and completing work in resumable chunks.
+
+Decision: preserve the complete single-file JSON export and every archived
+career. Split only browser persistence. Add `storage.js`, a dependency-free
+IndexedDB adapter with atomic two-store saves, append-only archive chunks,
+revision checks and explicit errors. Integrate deferred loading at archive UI,
+export and offseason boundaries. Keep the app version 0.8.1 and production
+unchanged. The store upgrade does not itself cap history growth; full archive
+hydration/export remains a known limitation documented in `STORAGE.md`.
+
+The recruiting audit suggestion needed correction: `seasonCommits` is a league
+scalar. Record final `signeesByTeam` before rollover instead, and test it against
+the actual finalized recruit pool. One-season result: 15–30, mean 23.3, rather
+than counting all veterans with recruit origin strings.
+
+The old harness did not export `packUniverse`, so its round-trip test silently
+used the raw universe fallback. Expose the real packer and test that path.
+
+Validation: 52 engine checks and 10 storage/integration scenarios; 45 Chromium
+UI checks and 4 real-IndexedDB UI persistence scenarios; one-season audit and
+standalone build. All passed. Engine integration preserves histories across two
+seasons, versioned old JSON fixtures, export/import, failed imports and new
+universe replacement. Failure tests cover quota-style write failure, explicit
+transaction abort, stale tabs, missing chunks, blocked upgrade and unsupported
+storage version. Tests use disposable DBs/profiles, not user saves.
+
+Actual iOS Safari remains untested. No production or default branch changes.
+The next operator should start with `CONTINUATION.md` and its next-chunk list.

@@ -103,9 +103,11 @@ const mean = a => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0);
     `${archiveBytes} vs ${liveBytes} bytes`);
   check('transfers happened', u.teams.flatMap(t => t.roster).some(p => p.origin?.startsWith('Transfer')));
   check('signees joined', u.teams.flatMap(t => t.roster).some(p => p.origin?.includes('star recruit')));
-  const classSizes = u.teams.map(t => t.roster.filter(p => p.origin?.includes('star recruit') && p.year === 'FR').length);
+  const classSizes = u.teams.map(t => u.recruitCycle.signeesByTeam[t.name] || 0);
+  check('recorded signing counts match the completed recruiting pool',
+    u.teams.every(t => u.recruitCycle.signeesByTeam[t.name] === (perTeam[t.name] || 0)));
   check('recruiting classes are in range',
-    Math.min(...classSizes) >= 5 && Math.max(...classSizes) <= 30,
+    Math.min(...classSizes) >= 15 && Math.max(...classSizes) <= 30,
     `min ${Math.min(...classSizes)} max ${Math.max(...classSizes)}`);
 
   // --- save round-trip ----------------------------------------------------

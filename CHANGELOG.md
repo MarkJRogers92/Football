@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.8.1 — archive persistence continuation (unreleased)
+
+- Browser saves separate archived careers from the main dynasty record, loading
+  history only when required. Existing careers are written once; later saves
+  append new departures. Every career and portable JSON export is retained.
+- Save and archive writes commit atomically; stale loaded tabs cannot overwrite
+  newer saves. Blocked upgrades, failed writes and missing archive chunks are
+  reported instead of silently losing data. Invalid imports preserve the open game.
+- IndexedDB schema advances to 2; game version remains 0.8.1. See `STORAGE.md`
+  for migration and rollback details. No production deployment is included.
+- Recruiting audits now use final per-team signee counts recorded before pool
+  rollover. The previous origin-string count included veteran roster players.
+- The harness now tests actual `packUniverse()` sparse serialization. Added
+  storage failure tests, engine persistence integration, and a real-browser
+  save/load/history/export/import test. Storage tests are part of `npm test`.
+- The generated standalone includes `storage.js`; new universes carry the
+  current app version instead of the stale 0.8 value.
+
 ## v0.8.1 — review pass
 
 Behaviour-preserving where possible; every change below is either a defect fix,
