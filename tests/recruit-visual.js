@@ -11,13 +11,20 @@ const path = require('path');
   await page.click('.tabs button[data-tab="recruiting"]');await page.waitForSelector('#recruitBody tr');await page.waitForSelector('#signingClassFeature .signing-class-board');
   check(`[${label}] signing-class board renders`,/SIGNING CLASS/.test(await page.locator('#signingClassFeature').innerText()));
   check(`[${label}] signing-class meter renders`,await page.locator('#signingClassFeature .signing-meter').count()===1);
+  check(`[${label}] recruiting list has portrait canvases`,await page.locator('#recruitBody canvas[data-portrait-kind="recruit"]').count()>0);
+  const firstPortrait=page.locator('#recruitBody canvas[data-portrait-kind="recruit"]').first();await firstPortrait.scrollIntoViewIfNeeded();await page.waitForFunction(()=>document.querySelector('#recruitBody canvas[data-portrait-kind="recruit"]')?.dataset.portraitPainted==='1',{timeout:10000});
+  check(`[${label}] visible recruit portrait paints`,await firstPortrait.getAttribute('data-portrait-painted')==='1');
   // Presentation is DOM-driven. Mark one rendered row committed to verify the card path without altering game state.
   await page.evaluate(()=>{const row=document.querySelector('#recruitBody tr');const interest=row?.querySelector('[data-label="Interest"]');if(interest)interest.textContent='COMMITTED'});
   await page.waitForSelector('#signingClassFeature .signing-card');
   check(`[${label}] committed recruit becomes signing card`,await page.locator('#signingClassFeature .signing-card').count()>=1);
+  await page.waitForFunction(()=>document.querySelector('#signingClassFeature .signing-card canvas[data-portrait-kind="recruit"]')?.dataset.portraitPainted==='1',{timeout:10000});
+  check(`[${label}] signing card uses painted recruit portrait`,await page.locator('#signingClassFeature .signing-card canvas[data-portrait-kind="recruit"][data-portrait-painted="1"]').count()>=1);
   await page.click('#signingClassFeature .signing-card');await page.waitForSelector('#recruitDialog[open] .recruit-hero-rail');
   check(`[${label}] recruit profile gets hero rail`,await page.locator('#recruitDialog .recruit-hero-rail > *').count()===4);
   check(`[${label}] recruit hero has identity graphic`,await page.locator('#recruitDialog .recruit-hero-avatar').count()===1);
+  await page.waitForFunction(()=>document.querySelector('#recruitDialog .recruit-hero-avatar canvas[data-portrait-kind="recruit"]')?.dataset.portraitPainted==='1',{timeout:10000});
+  check(`[${label}] recruit profile portrait paints`,await page.locator('#recruitDialog .recruit-hero-avatar canvas[data-portrait-painted="1"]').count()===1);
   if(label==='iphone'){
    const info=await page.evaluate(()=>{const root=document.documentElement,overflow=root.scrollWidth-root.clientWidth,vw=root.clientWidth,dlg=document.querySelector('#recruitDialog'),dr=dlg?.getBoundingClientRect();const offenders=[...document.querySelectorAll('body *')].map(el=>{const r=el.getBoundingClientRect(),p=el.parentElement;return {tag:el.tagName.toLowerCase(),id:el.id||'',cls:String(el.className||'').slice(0,70),text:(el.textContent||'').trim().replace(/\s+/g,' ').slice(0,45),parent:p?`${p.tagName.toLowerCase()}#${p.id||''}.${String(p.className||'').slice(0,45)}`:'',left:Math.round(r.left),right:Math.round(r.right),width:Math.round(r.width),sw:el.scrollWidth,cw:el.clientWidth}}).filter(x=>x.right>vw+1||x.left<-1||x.sw>x.cw+1).sort((a,b)=>Math.max(b.right-vw,b.sw-b.cw)-Math.max(a.right-vw,a.sw-a.cw)).slice(0,14);return {overflow,dialog:dr&&{left:Math.round(dr.left),right:Math.round(dr.right),width:Math.round(dr.width),sw:dlg.scrollWidth,cw:dlg.clientWidth},offenders}});
    check(`[${label}] recruiting visuals have no horizontal overflow`,info.overflow<=1,`${info.overflow}px ${JSON.stringify(info)}`)

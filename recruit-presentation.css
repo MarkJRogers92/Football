@@ -9,3 +9,8 @@
 @media(max-width:760px){.signing-class-head{align-items:flex-start}.signing-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.commitment-spotlight{grid-template-columns:auto minmax(0,1fr);gap:10px}.commitment-stamp{grid-column:1/-1;justify-self:start}.commitment-copy strong{white-space:normal;font-size:17px}.commitment-spotlight button{grid-column:1/-1;justify-self:start}.sports-recruit-dialog{max-width:calc(100vw - 12px);overflow-x:hidden}.sports-recruit-dialog .dialog-shell{min-width:0;max-width:100%;overflow-x:hidden}.sports-recruit-dialog .dialog-head{grid-template-columns:1fr}.recruit-hero-rail{grid-template-columns:repeat(4,minmax(0,1fr));margin-right:0}.sports-recruit-dialog .dialog-close{position:absolute;right:15px;top:15px}.sports-recruit-dialog .dialog-head h2{padding-right:62px}.sports-recruit-profile-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:460px){.signing-card-grid{grid-template-columns:1fr 1fr}.signing-card{min-height:132px}.recruit-hero-identity{grid-template-columns:62px minmax(0,1fr)}.recruit-hero-avatar{width:62px;height:62px}.recruit-hero-rail{grid-template-columns:repeat(2,minmax(0,1fr))}.commitment-avatar{width:52px;height:52px}.signing-class-count strong{font-size:24px}}
 @media(prefers-reduced-motion:reduce){.signing-class-feature *{transition:none!important}}
+
+/* v0.9.8 recruit portrait canvases */
+.signing-card-avatar,.commitment-avatar,.recruit-hero-avatar{overflow:hidden}
+.signing-card-avatar canvas,.commitment-avatar canvas,.recruit-hero-avatar canvas{display:block;width:100%;height:100%;border-radius:inherit}
+.signing-card-avatar:has(canvas),.commitment-avatar:has(canvas),.recruit-hero-avatar:has(canvas){padding:0}
