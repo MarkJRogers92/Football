@@ -70,6 +70,13 @@ const mean = a => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0);
   check('fall camp runs', u.developmentState.fallRun);
   check('scouting confidence tightens', mean(u.teams.flatMap(t => t.roster).map(p => p.scoutConfidence)) > mean(conf));
 
+  const perTeam = {};
+  u.recruits.forEach(r => { if (r.committed) perTeam[r.committed] = (perTeam[r.committed] || 0) + 1; });
+  check('class counts match committed recruits',
+    u.teams.every(t => (perTeam[t.name] || 0) === (u.recruitClassCounts?.[t.name] || 0) && (t.commits || []).length === (perTeam[t.name] || 0)));
+  const flips = (u.decommitLog || []).length, commitsNow = Object.values(perTeam).reduce((a, b) => a + b, 0);
+  check('decommits happen but stay a story beat', flips > 0 && flips < commitsNow * .12, `${flips} of ${commitsNow}`);
+
   const beforeYear = u.year;
   e.runOffseason();
   check('year advances', u.year === beforeYear + 1);

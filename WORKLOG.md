@@ -45,3 +45,45 @@ Decisions:
 - Browser test gains a check that clicking a hub link activates its tab.
 
 Outcome: done. `npm test` 46/46, `npm run test:browser` 45/45 (two new checks).
+
+## Item 3 — decommits and flips
+
+Plan: committed recruits are no longer skipped in `advanceRecruiting`. A new
+`pressureCommit(r,u)` scores the committed school against the best
+challenger from a 12-team sample (the user's pitch gains the same
+targeted/relationship/visit/promise boosts it gets for open recruits, so
+attention both attacks other schools' commits and defends your own). A
+positive gap gives a small weekly decommit chance; the recruit flips to the
+challenger if it has room, otherwise reopens. `decommitRecruit(r)` reverses
+`commitRecruit` (class count, team.commits, commitWeek) and records the event
+in `universe.decommitLog` (bounded to the last 80).
+
+Decisions:
+- Commits are safe for their first two weeks (`commitWeek+2`) so a fresh
+  commitment is never undone the next week.
+- Weekly chance = clamp(.003 + gap*.0022, 0, .045) and only from week 6, so
+  the outcome is a story beat, not churn. Target 3–8% of commits per cycle;
+  `npm run audit` now prints the measured rate.
+- A recruit flipping to the user requires `r.targeted` — the AI never gifts
+  the user a flip. AI-to-AI flips need no attention.
+- The recruiting table shows Target/Visit controls for other schools'
+  commits (previously hidden) so the user can actually chase a flip.
+- Hub: DECOMMIT (lost), FLIP (gained), WAVERING (own commit under the most
+  pressure) items, all linked to the recruiting tab + recruit dialog.
+- A recruit's `flippedFrom` is appended to the player's `origin` string on
+  signing so the story survives into the roster and archive.
+
+Tuning (measured with a one-season harness run, seed 7): the committed
+school is the best of a 20-team sample plus a +6 incumbency bonus, so the
+challenger gap is almost always negative (median −21, 90th pct −11, only 1%
+positive). A linear hazard on positive gap produced 1 decommit per cycle.
+Replaced with a logistic hazard `.07/(1+exp(-(gap+11)/4))`, ignored below
+gap −30: median commit ≈0.6%/week, 90th-pct commit ≈3.4%/week.
+Result: 80 decommits of 1,613 in-season commits (5.0%); multi-season audit
+4.2%. Nearly all are flips because the challenger is by construction a school
+with room. `universe.recruitCycle` records the cycle's totals for the audit.
+
+Outcome: done. `npm test` 48/48 (two new checks), browser 45/45, audit
+rosters still 85–105. Note: the audit's existing "signees/team" line is
+meaningless — it counts every roster player whose origin says "star recruit",
+which is everyone generated — mean 90 per team. Not fixed; out of scope.

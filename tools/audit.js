@@ -96,6 +96,8 @@ function report(e, year) {
   const counts = u.teams.map(t => t.roster.filter(p => p.origin?.includes('star recruit')).length);
   console.log('recruiting: signees/team this cycle min=%d mean=%s max=%d',
     Math.min(...counts), f(mean(counts)), Math.max(...counts));
-  const unsigned = (u.history.length ? 0 : 0);
+  const rc = u.recruitCycle || {};
+  console.log('recruiting: decommits last cycle=%d (%d flips) of %d in-season commits = %s%%',
+    rc.decommits || 0, rc.flips || 0, rc.seasonCommits || 0, f(100 * (rc.decommits || 0) / Math.max(1, rc.seasonCommits || 0)));
   console.log('timings:', JSON.stringify(timings));
 })();
