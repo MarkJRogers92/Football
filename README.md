@@ -2,8 +2,8 @@
 
 A fictional college-football dynasty simulator: 120 D-I programs, hidden player
 ability, role-based depth charts, recruiting with real geography, development
-and camp, permanent game history, persistent transfers/promises, and procedural
-player portraits.
+and camp, permanent game history, persistent transfers/promises, procedural
+player portraits, persistent coaching careers and portable coach relationships.
 
 ## Source layout
 
@@ -33,7 +33,7 @@ simulation can be exercised and measured without a browser.
 
 ## Version
 
-The live release is **v0.9.3**. `VERSION.txt` is the single release-version
+The live release is **v0.9.5**. `VERSION.txt` is the single release-version
 source and the build/test pipeline checks it against the application/package
 version so mismatched labels fail before publishing.
 
@@ -42,10 +42,8 @@ Completed v0.9 slices:
 - v0.9.1 — transfer destinations and persistent transfer memory
 - v0.9.2 — permanent Game Center / historical box scores
 - v0.9.3 — deterministic Portrait V1 integration
-
-Current development preview:
 - v0.9.4 — persistent coaching careers
-- v0.9.5 — coach relationship portability (stable stints, retirement/archive and coach profiles)
+- v0.9.5 — coach relationship portability and recruiting/player fallout
 
 See `CHANGELOG.md` and `CONTINUATION.md` for the current checkpoint and next
 bounded milestone.
@@ -57,9 +55,10 @@ The canonical development source is this repository; `gh-pages` is deployment
 output only. Do not resume from the old Property-Lookup deployment or treat the
 historical `codex/v081-save-continuation` branch as the current release head.
 
-The next planned gameplay slice is **v0.9.4 persistent coaching careers**,
-followed by coach relationship fallout and the coaching market in later bounded
-iterations.
+The next planned gameplay slice is **v0.9.6 Coaching Market**: open jobs,
+candidates, interviews/offers, contracts, internal promotions and AI hiring by
+fit. Keep it bounded; scholarship scarcity and scheme-change consequences come
+later.
 
 ## Publishing
 
