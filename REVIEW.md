@@ -49,7 +49,7 @@ Ordered by severity. Status is what I did about it on the branch.
 | 2 | **Rushing yards double-counted.** Role shares were not merged, so a back listed at both `RB1` and `3DRB` was credited each role's split separately. | **112 of 120 teams** had such an overlap; average 1.63 unique players across 3 rushing roles. League rushing leader: **5,586 yards**. | **Fixed** — shares merged and capped. Leader now 1,582. |
 | 3 | **Development curves inert.** Growth was ~0.8 raw points per phase against noise of σ≈1.4, then `Math.round`ed, destroying the signal. | Career growth by hidden profile: late 4.1, steady 4.5, volatile 4.7, physical 4.8, early 4.9. Breakouts (+15): **0%**. | **Fixed** — fractional carry between phases + magnitude scaled to real headroom. |
 | 4 | **Recruit stars carried no information.** Generic `stars()` thresholds applied to a pool centred at 58 put the median recruit on the 1-star boundary. | Pool: 1,370 one-stars (49%), **7 five-stars nationally**. Elite programs signed 0.6 blue-chips per class. | **Fixed** — bands calibrated to the generator's percentiles. |
-| 5 | **No depth in the box score.** Only role starters accumulated stats; backups accrued wear and injuries but never a snap. | **23% of all players** had ≥1 game. Exactly 120 quarterbacks threw a pass all year. | **Fixed** — rotation for RB/WR/TE, DL, LB, DB, and the backup QB in blowouts. Now ~40%. |
+| 5 | **No depth in the box score.** Only role starters accumulated stats; backups accrued wear and injuries but never a snap. | **23% of all players** had ≥1 game. Exactly 120 quarterbacks — one per team — attempted more than 100 passes. | **Fixed** — rotation for RB/WR/TE, DL, LB, DB, and the backup QB in blowouts. Now ~40%. |
 | 6 | **Universe-wide prestige deflation.** Expected wins were anchored at prestige 50 while the league averages 66, so a typical program lost prestige every year. | Mean prestige 65.8 → 60.9 over 12 seasons, monotonic; spread compressing 16.7 → 15.7. Extrapolates to ~45 by season 50. | **Fixed** — anchored on the league's own centre. Flat at 66.4 across 12 seasons. |
 | 7 | **A JSON save round-trip splits the schedule.** `universe.schedule` and `team.schedule` share objects in memory; JSON turns them into independent copies. | After Export → Import, results written via the league schedule never reach team schedules. The Season tab and the weekly hub silently disagree forever. | **Fixed** — relinked in `normalizeUniverse()`; covered by a test. |
 | 8 | **`ranked()` was quadratic in roster size.** `rankingScore()` profiles an entire roster and was called from inside a sort comparator. | One `ranked()` call: **124 ms**. It is called 24+ times per season. | **Fixed** — score once, then sort. 124 ms → 12 ms. |
@@ -251,16 +251,16 @@ tell you:
   errors, and the page does not scroll horizontally.
 - **`<dialog>.showModal()` is guarded** with a `setAttribute('open')` fallback,
   which is correct for older iOS.
-- Nothing in the codebase uses a syntax newer than optional chaining, `??=` and
-  `Array.at()` — all Safari 15.4+. `crypto.randomUUID` requires a secure context
-  and there is already a fallback. No `structuredClone`, no top-level `await`.
+- Nothing in the codebase uses syntax newer than optional chaining, `??=` and
+  `Array.at()`; the newest of those is `Array.at()`, which needs Safari 15.4
+  (March 2022). No `structuredClone`, no `toSorted`/`findLast`/`Object.groupBy`. `crypto.randomUUID` requires a secure context
+  and there is already a fallback.
 
 ---
 
 ## 7. Specific code changes made
 
-All on `claude/review-improvement-dwjemy`, four commits, each independently
-revertable. `CHANGELOG.md` carries the full list; the material ones:
+All on `claude/review-improvement-dwjemy`, each commit independently revertable. `CHANGELOG.md` carries the full list; the material ones:
 
 | Area | Change |
 |---|---|
@@ -361,8 +361,9 @@ In priority order.
 - **The uncertainty presentation.** Scout ranges with confidence meters do
   exactly what the design document asks. Do not replace them with a number.
 - **Division II.** Your own guardrail is right: D-I is not deep enough yet.
-- **A rewrite into a framework or a component library.** `app.js` is 3,600
-  dense lines and it works. The build split plus a test suite gives you most of
+- **A rewrite into a framework or a component library.** `app.js` is 146 KB in
+  333 lines — density, not length, is what makes it hard to work in — and it
+  works. The build split plus a test suite gives you most of
   the maintainability benefit at a fraction of the risk. Revisit only if
   v0.9–v0.11 make the single file genuinely unworkable.
 - **Compressed saves.** Fix what is *in* the save first. Compressing a 162 MB
