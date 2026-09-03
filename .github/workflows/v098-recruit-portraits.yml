@@ -1,0 +1,59 @@
+name: v098 recruit portrait validation
+
+on:
+  push:
+    branches:
+      - codex/v098-recruit-portraits
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Apply recruit portrait integration
+        run: node tools/apply-v098-recruit-portraits.js
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Build standalone
+        run: npm run build
+      - name: Engine and persistence tests
+        run: npm test
+      - name: Browser UI and recruit portrait tests
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then
+            npx playwright-core install chromium
+            CHROME="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$CHROME"
+          CHROMIUM_PATH="$CHROME" npm run test:browser
+      - name: Browser IndexedDB regression check
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then CHROME="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"; fi
+          test -n "$CHROME"
+          CHROMIUM_PATH="$CHROME" npm run test:browser-storage
+      - name: Simulation audit
+        run: npm run audit
+      - name: Commit integration when patch changed source
+        shell: bash
+        run: |
+          if git diff --quiet -- app.js recruit-presentation.js recruit-presentation.css tests/recruit-visual.js index.html; then
+            echo "No generated source changes to commit."
+            exit 0
+          fi
+          git config user.name "Dynasty Lab CI"
+          git config user.email "136272503+MarkJRogers92@users.noreply.github.com"
+          git add app.js recruit-presentation.js recruit-presentation.css tests/recruit-visual.js index.html
+          git commit -m "Add recruit portraits across recruiting surfaces"
+          git push origin HEAD:codex/v098-recruit-portraits
