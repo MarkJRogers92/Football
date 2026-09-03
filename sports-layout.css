@@ -9,7 +9,14 @@
 .recruit-hero-identity>.recruit-hero-avatar{grid-column:1;grid-row:1 / span 3}
 .recruit-hero-identity>.eyebrow,.recruit-hero-identity>#recruitDialogName,.recruit-hero-identity>#recruitDialogMeta{grid-column:2;min-width:0}
 .recruit-hero-identity>#recruitDialogName{overflow-wrap:anywhere}
-@media(max-width:720px){.sports-player-dialog .dialog-head{padding-right:18px}.sports-player-dialog .player-hero-rail{width:100%;margin:0}.sports-player-dialog .dialog-close{right:12px;top:12px}}
+@media(max-width:720px){
+ .sports-player-dialog .dialog-head{padding-right:18px}.sports-player-dialog .player-hero-rail{width:100%;margin:0}.sports-player-dialog .dialog-close{right:12px;top:12px}
+ /* Stacked mobile table cells are flex rows with a generated label. Native
+    selects otherwise keep the width of their longest option and can push the
+    recruiting page wider than the viewport. Let controls take only the space
+    remaining after the label. */
+ .stacked-table td>select,.stacked-table td>input{width:0;min-width:0;max-width:100%;flex:1 1 0}
+}
 /* The base Game Center uses 12px mobile shell padding; keep the branded
    negative header margin aligned to that inset so the dialog itself never
    becomes horizontally scrollable on narrow screens. */
