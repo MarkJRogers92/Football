@@ -1,6 +1,6 @@
 # WORKLOG
 
-## v0.9.7 — game recaps and the weekly newsletter
+## v0.9.9 — game recaps and the weekly newsletter
 
 Plan: turn the v0.9.2 permanent box scores into readable prose, then aggregate
 a week of them into a newsletter scoped to the program, the conference or the

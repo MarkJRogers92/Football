@@ -110,8 +110,8 @@ test('recaps work on an archived game from a save that predates them',async()=>{
  // Recaps are derived, never stored, so a round-tripped save still reads.
  const e=await playedSeason(978,3),u=e.universe,before=e.gameRecap(u.gameArchive[0]).body;
  const portable=JSON.parse(JSON.stringify(e.packUniverse(u)));
- // Strip anything a v0.9.6 save would not have carried.
+ // Strip anything a v0.9.8 save would not have carried.
  for(const g of portable.gameArchive)delete g.recap;
- e.installSave({version:'0.9.6',userTeam:'Chicago Metropolitan',universe:portable});
+ e.installSave({version:'0.9.8',userTeam:'Chicago Metropolitan',universe:portable});
  assert.equal(e.gameRecap(e.universe.gameArchive[0]).body,before,'an older save must produce the same recap');
 });
