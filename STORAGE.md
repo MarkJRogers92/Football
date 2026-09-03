@@ -160,3 +160,18 @@ deliberate: a stored recap would bloat every save and would go stale if the
 prose were ever improved, and deriving it means recaps also appear for games
 archived long before v0.9.9. Recap wording is seeded from the game ID rather
 than `Math.random`, so rendering history never perturbs the simulation stream.
+
+## v0.9.10 additions
+
+`team.schemeTransition` ({off, def}, each null or a
+{from, to, side, startSeason, familiarity, reason} record) and
+`coach.preferredScheme` are new core fields, both backfilled by
+`normalizeCoachState()`. The migration is deliberately conservative: an
+inherited coordinator is recorded as preferring the scheme his program
+already runs, so loading a v0.9.9 dynasty never starts an installation the
+player did not ask for. Player records are unchanged — scheme cost is
+computed in `playerSchemeFit` from the team's transition state rather than
+stored per player, so nothing is written into the roster or the archive and
+no IndexedDB version bump is needed. Position-change willingness is likewise
+derived at call time from existing fields (role, staffTrust, versatility,
+promises) and never persisted.

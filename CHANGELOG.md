@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.9.10 — Scheme installation and position-change agency
+
+- Coordinators now run a system of their own. Hiring an OC or DC who prefers a different scheme replaces yours and starts an installation, so the coaching market is a strategic choice rather than a pick-the-highest-rating exercise. Candidate cards say up front what a coach runs and warn when hiring him will change your system.
+- Installing a scheme costs fit, never ratings. Year one bites hardest; spring and fall camp install it, and the drag fades over roughly three seasons. Players who suited the old system pay the steepest transitional price and settle below where they were — they are square pegs now, not worse players.
+- A roster that no longer fits its system is likelier to leave: scheme mismatch feeds transfer risk, and only for the side of the ball that actually changed.
+- The Staff tab shows what is being installed, from what, and how far along it is.
+- Position changes are now a conversation. Players weigh body fit, playing time, staff trust, versatility and any standing Position Lock promise, landing on Eager / Open to it / Reluctant / Refuses. A refusal blocks the move; forcing a reluctant player through it costs morale and staff trust. The preview tells you which you are dealing with before you commit.
+- Old saves keep the system they already run — migration never invents an installation, and inherited coordinators are recorded as running what their program runs.
+
 ## v0.9.9 — Game recaps and the weekly newsletter
 
 - Every archived game now writes its own recap paragraph: who won and by how much, how they won it (yardage, turnover margin, ground vs. air, sacks, shutouts), the star lines, and colour like a player facing his former school or a multi-week injury.

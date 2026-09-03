@@ -1,5 +1,41 @@
 # WORKLOG
 
+## v0.9.10 — scheme installation and position-change agency
+
+Plan: close the last simulation gap on the roadmap. The v0.9.6 coaching
+market made hiring a coordinator easy and frequent, but a new coordinator's
+scheme installed instantly and for free, so the hire carried no systemic
+consequence.
+
+Decisions:
+- Schemes were never changed after world creation, so a transition system
+  alone would never have fired. Coordinators therefore carry a
+  `preferredScheme` and install it on arrival. That is what makes the
+  coaching market a real decision, and it is the connective tissue the
+  milestone was worth building for.
+- The cost is fit, not ratings. `playerSchemeFit` carries the whole effect,
+  which means it propagates correctly to role fit, camp reports, recruiting
+  pitch and the scheme-fit leaderboard from one place, and no player's
+  stored attributes are ever touched.
+- First attempt got the curve backwards. Blending old-scheme fit into
+  new-scheme fit by familiarity made the change painless in year one and
+  progressively worse as it installed — the opposite of installing a system.
+  Replaced with an installation drag that is largest at low familiarity and
+  scales with how much a given player has to unlearn, so a scheme change
+  hurts most immediately, eases as it goes in, and leaves old-system
+  veterans permanently below where they were without ever touching a rating.
+- Migration is conservative by design: inherited coordinators are recorded
+  as running their program's current scheme, so no existing dynasty wakes up
+  mid-installation.
+- Position changes became a conversation rather than an order. A live
+  Position Lock promise is close to a veto, which finally gives that promise
+  type teeth outside the audit.
+
+Validation: `npm test` (55/55, including the new `tests/schemes.js`),
+`npm run test:browser` (123/123 across all three suites) and a six-season
+longrun showing prestige spread and mean ratings unmoved, confirming
+league-wide coordinator churn does not destabilise the simulation.
+
 ## v0.9.9 — game recaps and the weekly newsletter
 
 Plan: turn the v0.9.2 permanent box scores into readable prose, then aggregate

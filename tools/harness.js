@@ -75,6 +75,7 @@ globalThis.__ENGINE__ = {
   get universe(){ return universe }, set universe(v){ universe = v },
   get schools(){ return schools },
   loadSchools, initUniverse, buildSchedule, ranked, rankingScore, profiles,
+  setTeamScheme, schemeTransition, schemeFamiliarity, advanceSchemeInstall, schemeFitFor, schemeDefFor, schemeFitPressure, applyCoachScheme, ensureCoachScheme, positionChangeWillingness, positionTransitionFit, applyPositionChangeCost, playerSchemeFit, SCHEME_SIDE,
   gameRecap, recapFacts, recapPicker, weeklyNewsletter, newsWeight, newsGames, newsWeeks,
   gameSim, detailedGame, simulateUserDetailed, gameBoxHTML, gameSummaryHTML, renderGameArchive, showGameCenter, simWeek, simSeason, simConferenceChampionships, simPlayoff, runOffseason,
   runSpringCamp, runFallCamp, advanceRecruiting, finalizeRecruiting,
@@ -90,7 +91,7 @@ globalThis.__ENGINE__ = {
   teamStaffBudget, teamStaffSpend, candidateFitScore, generateCandidatePool, createOpening, interviewCandidate, candidateAcceptChance, extendOffer, hireCandidate, coachOpeningHubItems, COACH_SLOT_ROLES,
   captureRecruitment, transferFit, chooseTransferDestination, placeTransfer, familiarFaceItems, releasePlayerPromises, transferHistoryHTML, archivePlayerSeason,
   saveBrowser, loadBrowser, exportSave, importSave, installSave, ensureArchiveLoaded, archiveIsDeferred,
-  POS, POS_COUNTS, ROLE_DEFS, OFF_SCHEMES, DEF_SCHEMES, GROWTH_CURVES,
+  POS, POS_COUNTS, ROLE_DEFS, OFF_SCHEMES, DEF_SCHEMES, GROWTH_CURVES, OFF_POS,
   render: () => {},
 };
 })();`;

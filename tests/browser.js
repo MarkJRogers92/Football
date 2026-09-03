@@ -114,6 +114,22 @@ const path = require('path');
     check(`[${label}] sending the offer hires the coach and clears the interim tag`,
       !hireResult.interim && hireResult.hired, JSON.stringify(hireResult));
 
+    // Scheme installation surfaces on the Staff tab while it is in progress.
+    await page.click('.tabs button[data-tab="staff"]');
+    const schemeInstall = await page.evaluate(() => {
+      const { selected, setTeamScheme, renderStaff } = window.__DL_TEST__;
+      const t = selected(), from = t.offScheme;
+      const list = ['Tempo Spread','Ground Pressure','Option Motion','Vertical Strike'];
+      const target = list.find(s => s !== from);
+      setTeamScheme(t, 'off', target, 'browser test');
+      renderStaff();
+      return { from, target, card: document.querySelector('#schemeCard').textContent,
+               bar: !!document.querySelector('#schemeCard .bar > span') };
+    });
+    check(`[${label}] a scheme installation shows its progress on the Staff tab`,
+      /Installing/.test(schemeInstall.card) && schemeInstall.card.includes(schemeInstall.from) && schemeInstall.bar,
+      schemeInstall.card.slice(0, 120));
+
     // Weekly newsletter: recaps derived from the archived box scores.
     await page.click('.tabs button[data-tab="newsletter"]');
     await page.waitForTimeout(120);
