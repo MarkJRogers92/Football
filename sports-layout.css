@@ -3,3 +3,7 @@
 .sports-player-dialog .dialog-close{position:absolute;right:16px;top:16px;z-index:3}
 .sports-player-dialog .player-hero-rail{width:min(520px,calc(100% - 129px));margin:-2px 0 0 129px}
 @media(max-width:720px){.sports-player-dialog .dialog-head{padding-right:18px}.sports-player-dialog .player-hero-rail{width:100%;margin:0}.sports-player-dialog .dialog-close{right:12px;top:12px}}
+/* The base Game Center uses 12px mobile shell padding; keep the branded
+   negative header margin aligned to that inset so the dialog itself never
+   becomes horizontally scrollable on narrow screens. */
+@media(max-width:600px){.game-dialog .dialog-head{margin:-12px -12px 15px}}
