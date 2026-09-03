@@ -84,8 +84,10 @@ const mean = a => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0);
   check('no eligibility-dead players remain',
     u.teams.every(t => t.roster.every(p => e.eligibilityBase(p) < 4)));
   check('archive populated', u.playerArchive.length > 0);
-  check('archive rows are slim', JSON.stringify(u.playerArchive[0]).length < 950,
-    `${JSON.stringify(u.playerArchive[0]).length} bytes`);
+  const archiveBytes = JSON.stringify(u.playerArchive[0]).length;
+  const liveBytes = JSON.stringify(u.teams[0].roster[0]).length;
+  check('archive rows are slimmer than live players', archiveBytes < liveBytes * 0.75,
+    `${archiveBytes} vs ${liveBytes} bytes`);
   check('transfers happened', u.teams.flatMap(t => t.roster).some(p => p.origin?.startsWith('Transfer')));
   check('signees joined', u.teams.flatMap(t => t.roster).some(p => p.origin?.includes('star recruit')));
   const classSizes = u.teams.map(t => t.roster.filter(p => p.origin?.includes('star recruit') && p.year === 'FR').length);

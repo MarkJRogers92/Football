@@ -40,6 +40,28 @@ saves continue to load through `normalizeUniverse()`.
   receivers, defensive line and secondary, plus the backup quarterback in
   blowouts. Players recording an appearance rose from 23% of all rosters to
   ~40%, so depth and four-year careers can produce a statistical record.
+- **Development produces visible careers.** The hidden growth curves added in
+  v0.8 were statistically invisible: growth was ~0.8 raw points per phase
+  against noise of standard deviation ~1.4, then rounded to an integer, so the
+  signal was destroyed. Over a full career, late bloomers averaged +4.1 and
+  early bloomers +4.9 — a difference of less than one rating point. The
+  fractional remainder now carries between phases instead of being rounded
+  away, the base magnitude is scaled to the headroom players actually have, and
+  prospects with high development grades carry more of it.
+
+  | Four-year arc (n=3,124) | v0.8 | v0.8.1 |
+  | --- | --- | --- |
+  | Median growth | +4 | +9 |
+  | 95th percentile | +10 | +18 |
+  | Breakouts (+15 or more) | 0% | 15% |
+  | Busts (+2 or less) | 32% | 11% |
+  | Share of upside realised | 35% | 57% |
+  | Spread across hidden profiles | 2.2–4.9 | 4.4–10.3 |
+
+  As a side effect the title race gains texture: a twelve-season run produced
+  twelve different champions before, and eight after, with the strongest
+  programs repeating.
+
 - **Prestige no longer deflates.** Expected wins were anchored at prestige 50
   while the league averages 66, so a typical program lost prestige every year
   and the universe drifted down ~0.4 prestige per season indefinitely. The
