@@ -33,7 +33,7 @@ simulation can be exercised and measured without a browser.
 
 ## Version
 
-The live release is **v0.9.5**. `VERSION.txt` is the single release-version
+The live release is **v0.9.7**. `VERSION.txt` is the single release-version
 source and the build/test pipeline checks it against the application/package
 version so mismatched labels fail before publishing.
 
@@ -44,6 +44,8 @@ Completed v0.9 slices:
 - v0.9.3 — deterministic Portrait V1 integration
 - v0.9.4 — persistent coaching careers
 - v0.9.5 — coach relationship portability and recruiting/player fallout
+- v0.9.6 — Coaching Market
+- v0.9.7 — Visual Identity V1 presentation layer
 
 See `CHANGELOG.md` and `CONTINUATION.md` for the current checkpoint and next
 bounded milestone.
@@ -55,10 +57,9 @@ The canonical development source is this repository; `gh-pages` is deployment
 output only. Do not resume from the old Property-Lookup deployment or treat the
 historical `codex/v081-save-continuation` branch as the current release head.
 
-The next planned gameplay slice is **v0.9.6 Coaching Market**: open jobs,
-candidates, interviews/offers, contracts, internal promotions and AI hiring by
-fit. Keep it bounded; scholarship scarcity and scheme-change consequences come
-later.
+v0.9.7 is a presentation-only release on top of the validated v0.9.6 Coaching Market.
+The next gameplay milestone should remain bounded and be chosen from the remaining
+v0.9 roadmap rather than mixed into this visual release.
 
 ## Publishing
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.9.7 — Visual Identity V1
+
+- Added a presentation-only visual identity layer on top of the validated v0.9.6 game: darker broadcast-style shell, stronger information hierarchy, elevated cards/tables, refined tabs/buttons and more polished profile dialogs.
+- Added deterministic controlled-school branding and monograms without adding brand fields to universe/save data.
+- Added sports-network presentation for the Dashboard and Game Lab plus a larger portrait-led Player Profile while preserving existing game mechanics and data sources.
+- Added a Recruiting Signing Class board, collectible-style commitment cards, commitment/flip spotlight and Recruit Profile hero treatment, all progressively enhanced from already-rendered recruiting data.
+- Fixed narrow-screen regressions discovered during release validation, including Game Center header width, Signing Class decoration containment, recruit hero layout and mobile recruiting control overflow.
+- No simulation rules, recruiting/coaching mechanics, player portrait identity logic, save migrations or IndexedDB schema changed in this release.
+
 ## v0.9.6 — Coaching Market
 
 - Firing, retiring or losing a coach on the controlled team no longer auto-fills the slot: it opens a search. A weaker interim coach holds the role (staff ratings docked ~18%, half salary) until the user acts, so leaving a search unfilled has a real, visible cost. AI-controlled teams are unaffected and keep resolving vacancies instantly, exactly as before.

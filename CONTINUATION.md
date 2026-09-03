@@ -1,79 +1,37 @@
-# Dynasty Lab — v0.9.6 checkpoint
+# Dynasty Lab — v0.9.7 checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `codex/v096-coaching-market`
+Current source branch: `codex/v097-visual-identity`
 Production branch: `gh-pages`
-Production: v0.9.5 at https://markjrogers92.github.io/Football/ (v0.9.6 is validated on this branch but not yet published — see Next steps)
+Production: v0.9.7 at https://markjrogers92.github.io/Football/
 
-## Current release (this branch, not yet promoted)
+## Current release
 
-v0.9.6 adds the Coaching Market on top of v0.9.5's coach relationship
-portability.
+v0.9.7 is the Visual Identity V1 release built directly on the validated v0.9.6 Coaching Market. It is intentionally presentation-only.
 
-- a vacancy on the controlled team opens a search instead of auto-filling; a
-  weaker interim coach (ratings docked, half salary) holds the slot until the
-  user acts, so an ignored search has a real, visible cost;
-- AI-controlled teams are unaffected and keep resolving their own vacancies
-  instantly, exactly as in v0.9.5;
-- each opening gets a candidate market: two fresh candidates, up to two
-  poachable coordinators/HCs from other programs, and (for Head Coach
-  openings only) the team's own OC/DC as internal-promotion candidates;
-- a candidate must be interviewed before an offer can be made; offers set
-  salary, years and play-calling authority (full vs. shared) and are capped
-  by a new per-team athletic department budget;
-- hiring an external coach closes their old stint (their old program
-  auto-fills its own vacancy immediately) and opens a new one under the same
-  coach identity — no duplicated coach objects; promoting internally opens a
-  follow-on search for the slot they vacated rather than leaving it unfilled;
-- openings and the candidate market are core, portable universe state; old
-  saves migrate additively, no IndexedDB schema change.
+- darker broadcast-style global shell and stronger information hierarchy;
+- deterministic controlled-school palettes and monograms;
+- sports-network Dashboard and Game Lab presentation;
+- portrait-led Player Profile hero;
+- Recruiting Signing Class board, commitment cards and Recruit Profile hero;
+- mobile fixes for Game Center, recruiting cards/profile and narrow-screen controls.
+
+No simulation, recruiting, coaching, portrait identity, save architecture, migration or IndexedDB schema behavior was intentionally changed by this visual milestone.
 
 ## Validation checkpoint
 
-- 52/52 engine smoke checks;
-- 39/39 Node persistence/game/portrait/promise/transfer/coach/relationship/
-  coaching-market tests;
-- 79/79 desktop + iPhone-layout browser checks, including a real
-  interview → offer → hire click path through the Staff tab UI;
-- 12-season `npm run longrun` audit, stable;
-- a separate 8-season run with zero user interaction, confirming an ignored
-  opening never duplicates, never silently auto-resolves, and the interim
-  penalty persists as designed.
+Before promotion, the full branch release workflow passed build, engine/persistence tests, desktop+iPhone-layout browser/visual regression tests, real-browser IndexedDB regression checks and the simulation audit. The earlier targeted recruiting mobile overflow test also passed after the final containment fixes.
 
-## Explicitly not in v0.9.6
-
-No scholarship scarcity, pulled offers, scheme-change hangover, position-change
-agency, competing-offer bidding wars between AI programs, or multi-week
-negotiation — offers resolve immediately on submission. Those stay out of this
-milestone per the v0.9.5 handoff's own "keep this bounded" note.
+Actual iPhone Safari remains a manual device check; automated phone coverage is Chromium at an iPhone-sized viewport.
 
 ## Storage guardrail
 
-Read `STORAGE.md` before altering saves. v0.9.6 adds `universe.openings` and
-`universe.candidateMarket` as new top-level core fields (both migrated
-additively by `normalizeCoachState()`), plus an optional `interim` flag and
-`playCallAuthority` on coach objects. IndexedDB schema is unchanged.
+Read `STORAGE.md` before altering save behavior. v0.9.7 adds no new save fields or storage migrations beyond v0.9.6. Production and preview paths share the same GitHub Pages origin, so export a portable JSON backup before switching builds when a dynasty matters.
 
 ## Next steps
 
-This branch (`codex/v096-coaching-market`) is validated but **not yet
-published**. Per the standing workflow: publish a preview build first
-(`npm run publish:preview -- v096-coaching-market`), have it reviewed, and
-only then promote to production (`npm run publish`) and fast-forward the
-main working branch.
-
-### v0.9.7 and beyond (not started)
-
-Proceed to scholarship scarcity/pulled offers, scheme-change hangover,
-position-change willingness, record chases, high-school feedback and broader
-story-surface work — pick one bounded slice at a time, same as v0.9.4–v0.9.6.
+Do not fold unrelated gameplay work into this visual release. Pick the next remaining v0.9 gameplay/story slice as a bounded milestone, branch from this validated source, and preserve the standing test/publish discipline.
 
 ## Resume prompt
 
-Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `ROADMAP_V09.md`. v0.9.6 Coaching Market is
-validated on `codex/v096-coaching-market` but production is still v0.9.5 until
-it is previewed and promoted. Do not redo promises, transfers, Game Center,
-Portrait V1, persistent coach careers, coach relationship portability or the
-coaching market. Work in a new bounded branch, validate fully, publish a
-preview first, then promote only after review.
+Continue Dynasty Lab from `MarkJRogers92/Football`, using `codex/v097-visual-identity` / its promoted successor as the v0.9.7 source checkpoint. Read `CONTINUATION.md`, `STORAGE.md`, `CHANGELOG.md`, `ROADMAP_V09.md` and `VISUAL_IDENTITY.md`. Do not redo Promises, Transfers, Game Center, Portrait V1, persistent coaching careers, coach relationship portability, Coaching Market or Visual Identity V1. Keep the next milestone bounded, validate fully, and publish only after the branch is green.
