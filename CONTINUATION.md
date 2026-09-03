@@ -1,75 +1,102 @@
-# Dynasty Lab — v0.9.2 Game Center checkpoint
+# Dynasty Lab — v0.9.3 live checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
-Canonical branch: `codex/v081-save-continuation`
-Base: `939ae9f90ff6c31c39cb62186eab806d1bd06a3b` (v0.9.1)
+Canonical development branch: `claude/review-improvement-dwjemy`
+Housekeeping branch: `codex/v0931-housekeeping`
+Live site branch: `gh-pages`
+Production: https://markjrogers92.github.io/Football/
 
-## Completed
+## Current state
 
-Permanent Game Center on top of v0.9.1 transfers, v0.9.0 promises, and v0.8.1
-safe player archive persistence. Do not redo those milestones.
+The live game is **Dynasty Lab v0.9.3**. Football is now both the canonical source repository and the GitHub Pages host; the old Property-Lookup deployment is no longer part of the normal workflow.
 
-- Every newly completed regular-season/postseason game gets a permanent game ID.
-- Pregame school IDs/names, rankings/records, venue/context, final score, actual
-  team statistics, sparse per-player game deltas and injuries are snapshotted.
-- Open results from Schedule, Latest Results, Weekly Hub, Game Lab and the
-  selected school's History game archive. History filters to one season.
-- Summary, Box Score, Drives and Play-by-Play sections fit desktop/phone layouts.
-  Passing/rushing/receiving/defense/kicking/punting show only recorded fields.
-- Detailed games permanently retain 24 drive outcomes. Game summaries show
-  scoring drives, leaders, new injuries and former-player appearances.
-- Game events carry stable game IDs, school IDs and participating former-player
-  IDs. Championship games have CHAMPIONSHIP_WON events.
-- Snapshots survive roster/ranking changes, rollover, browser Save/Load and
-  complete JSON Export/Import. Unknown future game-archive versions fail closed.
+Completed milestones that must not be redone:
 
-## Play and resume
+- **v0.8.1** — safe incremental browser archive persistence, complete portable JSON export/import, deferred historical-player hydration, migration/failure handling, recruiting audit correction, and v0.8.1 simulation/performance fixes.
+- **v0.9.0** — Promises Become Debts, stable coach identity, promise audits/consequences, and dynasty event-ledger foundation.
+- **v0.9.1** — transfer destinations and memory. The same player object moves, keeps one career, and retains recruiting/coach context and transfer history.
+- **v0.9.2** — permanent Game Center and historical box scores with stable game IDs, team/player snapshots, drive summaries, injuries, leaders, history links, and portable save support.
+- **v0.9.3** — Portrait V1 integration. Players/recruits receive deterministic portrait identity; recruit-to-signee identity survives signing, saves, transfers, and archive. School jersey colors are deterministic. Roster/profile portraits render through the frozen renderer. Version handling was also single-sourced through `VERSION.txt` so release labels cannot silently drift again.
 
-Use the latest preview URL in the task or outputs/VERCEL_PREVIEW_CHECKPOINT.md.
-Production remains unchanged. Export from an older preview and Import here to
-move saves between origins, or start fresh. Simulate a week, open Season, click
-the completed score. Reopen previous years from History → Game archive.
-Older saves' preexisting games have no recoverable player box scores; new games
-are archived from v0.9.2 onward. Never reconstruct old results by simulating again.
+## v0.9.3 validation already completed
 
-## Validation
+Portrait integration was validated with 52 engine checks, 21 storage/persistence/promise/transfer/game/portrait test groups, and 63 desktop/390px browser checks. The follow-up single-source-version change reported 52 engine checks, 22 test groups, and 63 browser checks.
 
-52 engine checks including eight seasons, 16 Node test groups (new game tests
-rerun after fixing signed-zero comparisons), 59 desktop/390px browser checks,
-and six real-browser persistence scenarios. Checks cover all 745 games/season,
-team/player production sums, drive points plus explicit score adjustments,
-no double simulation after a detailed game, stable IDs, pregame snapshots,
-former-player event links, season rollover, real IndexedDB, JSON import/export,
-missing optional data, unsupported future archive version and dialog width.
-Build/syntax/diff checks passed. Real iPhone Safari remains untested.
+The GitHub Pages publishing workflow was moved entirely into this repository and round-tripped against the live `gh-pages` branch: production publish, preview publish, preview listing, preview removal, and preview-index cleanup all worked.
 
-## Honest engine and storage limits
+Actual iPhone Safari remains a separate real-device validation item; responsive Chromium/iPhone-width testing is not the same thing.
 
-Quarter scores, clock, attendance, drive yardage, possession, conversions, long
-plays and other untracked stats are not invented. Existing home-field/tie points
-are labeled as simulation adjustments rather than fabricated scoring plays.
-The detailed engine names primary players in its text log while allocating box
-production across the rotation; the UI explains this existing discrepancy.
-The latest detailed game's last 160 text entries remain temporary, as before.
-Permanent archives retain box scores and drive/scoring summaries, not full logs.
+## Publishing and rollback
 
-Game archive format 1 lives in the core save; IndexedDB stays schema 2. A seeded
-full season adds about 6.6 MB (745 games) of compact game records. No history is
-pruned; no decade of full play logs is loaded. Game boxes are not yet stored in
-separate lazy chunks, so very long dynasties will need a later storage batch.
-Do not claim 30–50-year mobile performance. Read STORAGE.md before modifying saves.
+Source changes belong on a development branch. `gh-pages` contains only the generated site.
 
-## Next batch and budget agreement
+Production publish:
 
-STOP after this playable milestone. User had roughly $4.50 remaining at start;
-keep future work bounded, no subagents, publish a usable preview and refresh this
-handoff after every agreed step. Preserve future saves; old personal saves are
-expendable. Do not promote production or modify the default Claude branch.
-Next roadmap milestone is v0.9.3 persistent coaching careers. Start with coach
-identity/career records and a small playable slice, then deeper coaching market
-work later. Football repo is canonical, not ZIP handoffs.
+```bash
+npm run publish
+```
 
-Resume prompt: Continue Dynasty Lab from Football branch
-codex/v081-save-continuation. Read CONTINUATION.md and STORAGE.md. v0.9.2 Game
-Center is complete. Agree one small coaching-career batch, preserve history,
-verify, commit, publish a Vercel preview, update the handoff, then stop.
+Preview publish:
+
+```bash
+npm run publish:preview -- NAME
+```
+
+List/remove previews:
+
+```bash
+node tools/publish.js --list
+node tools/publish.js --remove NAME
+```
+
+Production URL: https://markjrogers92.github.io/Football/
+Preview index: https://markjrogers92.github.io/Football/preview/
+
+Do not hand-edit generated `gh-pages` files as the development source. To roll back production, republish the last known-good source commit/build rather than rewriting save data.
+
+## Important storage limits
+
+The permanent Game Center currently keeps compact game archives in the core save. A seeded 745-game season was measured around 6.6 MB of game records. Full play logs are not permanently retained; box scores and drive/scoring summaries are. Long 30–50-year mobile scalability is not yet proven.
+
+Read `STORAGE.md` before changing browser save/archive behavior. Do not prune careers or historical games without an explicit user decision.
+
+## Next roadmap sequence
+
+Because v0.9.3 was used for Portrait V1 rather than the originally planned coaching-career milestone, shift the coaching roadmap forward instead of pretending it already shipped.
+
+### v0.9.4 — Persistent coaching careers
+
+Build one bounded coaching-career slice first:
+- durable coach identities and full career stints
+- age/role/school/scheme/specialty history
+- coordinator/head-coach movement history
+- visible career profile/history without exposing hidden personality numbers
+- persistent player/recruit links to coach IDs
+- retirement/archive path rather than deleting coaches
+
+Do **not** build the entire coaching market in this same chunk.
+
+### v0.9.5 — Coaches take relationships with them
+
+- primary recruiter links
+- departing coach carries a tuned share of recruit relationship
+- current players he recruited receive transfer-risk/interest effects
+- new school receives relationship pressure, not automatic flips
+- Weekly Hub surfaces recruiting fallout
+
+### v0.9.6 — Coaching market
+
+- openings
+- candidate pool
+- interviews/offers
+- salary/years/role/play-calling authority
+- internal promotions
+- AI hiring based on fit rather than raw rating only
+
+### Later v0.9 batches
+
+Then continue with scholarship scarcity/pulled offers and recruiting pressure, scheme-change hangover, position-change willingness, record chases, high-school relationship feedback, and the broader story-surface pass. Preserve the existing decommit/flip system already shipped in the v0.8.1 follow-through rather than rebuilding it from scratch.
+
+## Resume prompt
+
+Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`, `STORAGE.md`, `CHANGELOG.md`, and `ROADMAP_V09.md` before editing. The live release is v0.9.3 at `https://markjrogers92.github.io/Football/`; v0.9.0 promises, v0.9.1 transfers, v0.9.2 Game Center, and v0.9.3 Portrait V1 are complete. Do not redo them. Implement only one bounded v0.9.4 persistent-coaching-career slice, preserve save/history compatibility, test it, commit it on a development branch, publish a preview first, update the handoff, and stop for review before production promotion.
