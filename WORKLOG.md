@@ -24,3 +24,24 @@ Decisions:
   fields on the card.
 
 Outcome: done. `npm test` 46/46, `npm run test:browser` 43/43 (desktop + iPhone).
+
+## Item 2 — Weekly Command Center items link to their tab
+
+Plan: hub items built in `buildWeeklyHub`/`buildPreseasonHub` carry a `tab`
+(and optionally `player`/`recruit` id). `renderWeeklyHub` renders those as
+clickable cards (`.hub-link`, keyboard-operable) that call `goToTab(tab)`
+and open the player/recruit profile dialog when an id is attached.
+
+Decisions:
+- `goToTab(id)` is a new helper that does what the nav button click handler
+  does (toggle nav + section `.active`, `setActiveTab`) so hub links behave
+  exactly like clicking the tab. Use it for any future deep link.
+- Mapping: FINAL/RANKINGS → season; MEDICAL/LOCKER ROOM → roster + player
+  dialog; COMMITMENT/TOP TARGET → recruiting + recruit dialog; NEXT UP →
+  gamelab; preseason ROSTER → depth, RECRUITING → recruiting, REDSHIRTS →
+  roster.
+- Hub items persisted in older saves have no `tab` and simply render
+  non-clickable; nothing to migrate.
+- Browser test gains a check that clicking a hub link activates its tab.
+
+Outcome: done. `npm test` 46/46, `npm run test:browser` 45/45 (two new checks).

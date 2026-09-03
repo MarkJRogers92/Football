@@ -49,6 +49,15 @@ const path = require('path');
     check(`[${label}] sim week advances the UI (${simMs}ms)`, true);
     check(`[${label}] sim week is responsive`, simMs < 4000, `${simMs}ms`);
 
+    // Weekly hub items link to the tab they describe.
+    const hubTab = await page.$eval('#weeklyHub .hub-link', el => el.dataset.tab);
+    await page.click('#weeklyHub .hub-link');
+    await page.waitForTimeout(120);
+    check(`[${label}] hub item opens its tab (${hubTab})`,
+      await page.$eval('.tabs button.active', el => el.dataset.tab) === hubTab
+      && await page.$eval(`#${hubTab}`, el => el.classList.contains('active')));
+    await page.evaluate(() => document.querySelectorAll('dialog[open]').forEach(d => d.close()));
+
     // Player profile dialog.
     await page.click('.tabs button[data-tab="roster"]');
     await page.waitForTimeout(80);
