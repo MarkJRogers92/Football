@@ -1,0 +1,38 @@
+(() => {
+'use strict';
+
+// Recruiting presentation only. This reads the already-rendered recruiting DOM and
+// never mutates recruit/team/universe state.
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function initials(name){const parts=String(name||'R').trim().split(/\s+/).filter(Boolean);return parts.length<2?(parts[0]||'R').slice(0,2).toUpperCase():(parts[0][0]+parts.at(-1)[0]).toUpperCase()}
+function team(){const n=document.querySelector('#teamName')?.textContent?.trim();const p=document.querySelector('#userTeam');return n&&n!=='—'?n:(p?.options[p.selectedIndex]?.text||'Program').trim()}
+function cell(row,label){return row?.querySelector(`[data-label="${label}"]`)}
+function rankOf(row){const n=(cell(row,'Rank')?.textContent||'').match(/#(\d+)/);return n?+n[1]:9999}
+function recruitRows(){return [...document.querySelectorAll('#recruitBody tr')].map(row=>{const b=row.querySelector('[data-recruit]');if(!b)return null;const home=cell(row,'Hometown / HS'),interest=cell(row,'Interest');return {row,id:b.dataset.recruit,name:b.textContent.trim(),pos:(cell(row,'Pos')?.textContent||'').trim(),rank:rankOf(row),stars:(cell(row,'Stars')?.textContent||'').trim(),home:[...home?.childNodes||[]].find(n=>n.nodeType===3)?.textContent?.trim()||'',hs:home?.querySelector('.small')?.textContent?.trim()||'',status:(interest?.textContent||'').trim()}}).filter(Boolean)}
+function recentCommitment(){return [...document.querySelectorAll('#weeklyHub .hub-item')].find(x=>['COMMITMENT','FLIP'].includes((x.querySelector('.hub-kicker')?.textContent||'').trim().toUpperCase()))}
+function findRecruitIdByHeadline(text,rows){return rows.find(r=>String(text||'').includes(r.name))?.id||''}
+
+function renderSigningClass(){
+ const tab=document.querySelector('#recruiting'),summary=document.querySelector('#classSummary'),body=document.querySelector('#recruitBody');if(!tab||!summary||!body)return;
+ const rows=recruitRows(),commits=rows.filter(r=>/COMMITTED|WAVERING/.test(r.status.toUpperCase())).sort((a,b)=>a.rank-b.rank),count=+(summary.textContent.match(/(\d+)\s+commitments?/i)?.[1]||commits.length),classRank=summary.textContent.match(/#\d+\s+recruiting class/i)?.[0]||'Recruiting class',blue=+(summary.textContent.match(/(\d+)\s+blue chips?/i)?.[1]||0),recent=recentCommitment();
+ let feature=document.querySelector('#signingClassFeature');if(!feature){feature=document.createElement('section');feature.id='signingClassFeature';feature.className='signing-class-feature';const head=tab.querySelector('.section-head');(head||summary).after(feature)}
+ const sig=[count,classRank,blue,commits.slice(0,6).map(r=>r.id+':'+r.status).join(','),recent?.textContent||''].join('|');if(feature.dataset.signature===sig)return;feature.dataset.signature=sig;
+ let spotlight='';if(recent){const kicker=(recent.querySelector('.hub-kicker')?.textContent||'COMMITMENT').trim(),main=(recent.querySelector('.hub-main')?.textContent||'').trim(),sub=(recent.querySelector('.hub-sub')?.textContent||'').trim(),rid=findRecruitIdByHeadline(main,rows);spotlight=`<article class="commitment-spotlight"><div class="commitment-stamp">${esc(kicker)}</div><div class="commitment-avatar">${esc(initials(main.replace(/[★]/g,'').replace(/^\s*[A-Z]{1,4}\s+/,'').trim()))}</div><div class="commitment-copy"><span>DYNASTY LAB RECRUITING</span><strong>${esc(main)}</strong><small>${esc(sub)}</small></div><div class="commitment-school"><b>${esc(initials(team()))}</b><span>${esc(team())}</span></div>${rid?`<button type="button" data-signing-recruit="${esc(rid)}">View recruit</button>`:''}</article>`}
+ const cards=commits.slice(0,6).map(r=>`<button type="button" class="signing-card${/WAVERING/.test(r.status.toUpperCase())?' is-wavering':''}" data-signing-recruit="${esc(r.id)}"><span class="signing-card-rank">#${r.rank}</span><span class="signing-card-avatar">${esc(initials(r.name))}</span><span class="signing-card-stars">${esc(r.stars)}</span><strong>${esc(r.name)}</strong><span>${esc(r.pos)} · ${esc(r.home||r.hs)}</span><em>${/WAVERING/.test(r.status.toUpperCase())?'WAVERING':'COMMITTED'}</em></button>`).join('');
+ feature.innerHTML=`${spotlight}<div class="signing-class-board"><div class="signing-class-head"><div><span class="signing-kicker">SIGNING CLASS</span><h3>${esc(classRank)}</h3><p>${count} commitment${count===1?'':'s'} · ${blue} blue chip${blue===1?'':'s'}</p></div><div class="signing-class-count"><strong>${count}</strong><span>of 30 slots</span></div></div><div class="signing-meter" aria-label="${count} of 30 signing slots"><i style="width:${Math.min(100,Math.round(count/30*100))}%"></i></div>${cards?`<div class="signing-card-grid">${cards}</div>`:`<div class="signing-empty"><strong>No commitments yet.</strong><span>Your first commitment will become a collectible-style signing card here.</span></div>`}</div>`;
+ feature.querySelectorAll('[data-signing-recruit]').forEach(b=>b.onclick=()=>document.querySelector(`#recruitBody [data-recruit="${CSS.escape(b.dataset.signingRecruit)}"]`)?.click());
+}
+
+function renderRecruitHero(){
+ const dlg=document.querySelector('#recruitDialog');if(!dlg?.hasAttribute('open'))return;const head=dlg.querySelector('.dialog-head'),body=document.querySelector('#recruitDialogBody'),name=document.querySelector('#recruitDialogName')?.textContent?.trim(),meta=document.querySelector('#recruitDialogMeta')?.textContent?.trim();if(!head||!body||!name||!meta)return;
+ const row=recruitRows().find(r=>r.name===name),stats=[...body.querySelectorAll('.profile-grid .profile-stat')],interest=stats.find(x=>/Interest/i.test(x.querySelector('.small')?.textContent||''))?.querySelector('.v')?.textContent||'—',stars=meta.match(/★+/)?.[0]||'',national=meta.match(/#\d+\s+national/i)?.[0]||'',pos=meta.split('·')[0]?.trim()||'RECRUIT',status=row&&/COMMITTED|WAVERING/.test(row.status.toUpperCase())?row.status.toUpperCase():'PROSPECT',key=[name,meta,status,interest].join('|');if(dlg.dataset.recruitHeroKey===key)return;dlg.dataset.recruitHeroKey=key;dlg.classList.add('sports-recruit-dialog');
+ const identity=head.firstElementChild;identity?.classList.add('recruit-hero-identity');identity?.querySelector('.recruit-hero-avatar')?.remove();head.querySelector('.recruit-hero-rail')?.remove();
+ if(identity){const avatar=document.createElement('div');avatar.className='recruit-hero-avatar';avatar.innerHTML=`<span>${esc(initials(name))}</span><small>${esc(stars||'PROSPECT')}</small>`;identity.prepend(avatar)}
+ const rail=document.createElement('div');rail.className='recruit-hero-rail';rail.innerHTML=`<div class="recruit-position-chip">${esc(pos)}</div><div><span>NATIONAL</span><strong>${esc(national.replace(/\s+national/i,'')||'—')}</strong></div><div><span>INTEREST</span><strong>${esc(interest)}</strong></div><div class="recruit-status ${status==='WAVERING'?'warn':''}"><span>STATUS</span><strong>${esc(status)}</strong></div>`;head.insertBefore(rail,head.querySelector('.dialog-close'));body.querySelector('.profile-grid')?.classList.add('sports-recruit-profile-grid')
+}
+
+let queued=false;function run(){queued=false;renderSigningClass();renderRecruitHero()}function queue(){if(queued)return;queued=true;(window.requestAnimationFrame||setTimeout)(run)}
+document.addEventListener('click',()=>setTimeout(queue,0));document.querySelector('#userTeam')?.addEventListener('change',()=>setTimeout(queue,0));
+if(window.MutationObserver){for(const [sel,attrs] of [['#recruitBody',false],['#classSummary',false],['#weeklyHub',false],['#recruitDialog',true]]){const el=document.querySelector(sel);if(el)new MutationObserver(queue).observe(el,{childList:true,subtree:true,characterData:true,attributes:attrs})}}
+queue();
+})();
