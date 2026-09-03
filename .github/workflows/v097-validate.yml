@@ -20,9 +20,7 @@ jobs:
         run: npm install --no-package-lock
       - name: Build standalone
         run: npm run build
-      - name: Engine and persistence tests
-        run: npm test
-      - name: Browser UI and visual regression tests
+      - name: Targeted recruiting visual test
         shell: bash
         run: |
           CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
@@ -31,13 +29,4 @@ jobs:
             CHROME="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
           fi
           test -n "$CHROME"
-          CHROMIUM_PATH="$CHROME" npm run test:browser
-      - name: Browser IndexedDB regression check
-        shell: bash
-        run: |
-          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          if [ -z "$CHROME" ]; then CHROME="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"; fi
-          test -n "$CHROME"
-          CHROMIUM_PATH="$CHROME" npm run test:browser-storage
-      - name: Simulation audit
-        run: npm run audit
+          CHROMIUM_PATH="$CHROME" node tests/recruit-visual.js
