@@ -92,3 +92,11 @@ a release gate; desktop Chromium at an iPhone viewport is not iOS validation.
 Transaction design follows the event-lifetime rules documented at
 https://developer.mozilla.org/en-US/docs/Web/API/IDBTransaction and blocked-upgrade
 handling at https://developer.mozilla.org/en-US/docs/Web/API/IDBOpenDBRequest/blocked_event.
+
+## v0.9.0 additions
+
+Roster promises, training evidence, coach IDs, event counters/events and departed
+coach snapshots are part of the core portable universe. Archived player promises
+are retained by ARCHIVE_FIELDS and travel through existing archive chunks.
+No new IndexedDB version or loader. Active obligations resolve before retiring
+players, so already stored append-only archive rows never need rewriting.

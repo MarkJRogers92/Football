@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.9.0 — Promises Become Debts (preview batch)
+
+- Recruiting offers now retain school and recruiter identity; signed players carry
+  first-season obligations. A rival signing never inherits another school's offer.
+- Early Role uses actual appearances (eight, reduced by recorded injury weeks);
+  No Redshirt respects major injury exceptions; Position Lock remembers forced
+  changes; Development Plan requires actual Technique training in both camps.
+  NIL Priority is recorded passively.
+- One-time offseason audits change morale, staff trust and transfer risk, append
+  structured events, and retain results in active/archived profiles and exports.
+  Significant breaches appear in the Weekly Hub. Transfer penalties follow the
+  original school for one subsequent season, not the player's destination.
+- Existing coach IDs remain stable; missing IDs are assigned once and departing
+  coaches are archived. Legacy promise labels are retained without invented terms
+  or retroactive penalties. IndexedDB remains schema 2.
+- Checks: 52 engine checks, 12 persistence/promise test groups, 45 browser checks,
+  five browser persistence scenarios. Recruiting audit: 15–30 signees per school,
+  mean 23.3, flips 4.8%. Actual iPhone Safari remains untested.
+
 ## v0.8.1 — archive persistence continuation (unreleased)
 
 - Browser saves separate archived careers from the main dynasty record, loading

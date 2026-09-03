@@ -165,3 +165,31 @@ storage version. Tests use disposable DBs/profiles, not user saves.
 
 Actual iOS Safari remains untested. No production or default branch changes.
 The next operator should start with `CONTINUATION.md` and its next-chunk list.
+
+## v0.9.0 — Promises Become Debts (preview batch)
+
+- Recruiting offers now retain school and recruiter identity; signed players carry
+  first-season obligations. A rival signing never inherits another school's offer.
+- Early Role uses actual appearances (eight, reduced by recorded injury weeks);
+  No Redshirt respects major injury exceptions; Position Lock remembers forced
+  changes; Development Plan requires actual Technique training in both camps.
+  NIL Priority is recorded passively.
+- One-time offseason audits change morale, staff trust and transfer risk, append
+  structured events, and retain results in active/archived profiles and exports.
+  Significant breaches appear in the Weekly Hub. Transfer penalties follow the
+  original school for one subsequent season, not the player's destination.
+- Existing coach IDs remain stable; missing IDs are assigned once and departing
+  coaches are archived. Legacy promise labels are retained without invented terms
+  or retroactive penalties. IndexedDB remains schema 2.
+- Checks: 52 engine checks, 12 persistence/promise test groups, 45 browser checks,
+  five browser persistence scenarios. Recruiting audit: 15–30 signees per school,
+  mean 23.3, flips 4.8%. Actual iPhone Safari remains untested.
+
+Design boundaries: no coaching market, AI promise generation, recruiting-credibility
+or high-school relationship tuning in this batch. Promises use official position,
+not a guaranteed depth-chart slot; development delivery is camp-based. The existing
+transfer and roster-cut mechanisms are otherwise unchanged. Obligations cut before
+their first playing season remain recorded but have no season to audit yet.
+
+User preference: conserve usage, finish one bounded batch, publish a playable
+preview, then stop. Old saves are expendable; reliable future saves are the priority.
