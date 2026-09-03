@@ -84,6 +84,7 @@ globalThis.__ENGINE__ = {
   setRecruitPromise, commitRecruit, signPlayerPromise, auditPlayerPromises, auditPromises, normalizePromiseState,
   recordPromiseTraining, recordPromisePositionChange, promisePenalty, archiveRecord, rememberCoach, promiseHubItems,
   generateCoach, promiseHTML, applyDevelopmentPhase,
+  captureRecruitment, transferFit, chooseTransferDestination, placeTransfer, familiarFaceItems, releasePlayerPromises, transferHistoryHTML, archivePlayerSeason,
   saveBrowser, loadBrowser, exportSave, importSave, installSave, ensureArchiveLoaded, archiveIsDeferred,
   POS, POS_COUNTS, ROLE_DEFS, OFF_SCHEMES, DEF_SCHEMES, GROWTH_CURVES,
   render: () => {},

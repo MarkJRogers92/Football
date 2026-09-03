@@ -87,6 +87,10 @@ function report(e, year) {
     e.runFallCamp();
     e.runOffseason();
     const tOff = Date.now() - to;
+    const moved=e.universe.events.filter(x=>x.type==='TRANSFER_COMPLETED'&&x.season===y);
+    const causes=Object.fromEntries(['BROKEN_PROMISE','PLAYING_TIME','FRESH_START'].map(reason=>[reason,moved.filter(x=>x.metadata.reason===reason).length]));
+    console.log(`  transfers=${moved.length} perTeam=${f(moved.length/120)} pending=${e.universe.transferPortal.length} causes=${JSON.stringify(causes)}`);
+
     timings.push({ y, tSeason, tOff });
     console.log(`  timing   season=${tSeason}ms offseason=${tOff}ms archive=${e.universe.playerArchive.length}\n`);
   }

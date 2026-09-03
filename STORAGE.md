@@ -100,3 +100,13 @@ coach snapshots are part of the core portable universe. Archived player promises
 are retained by ARCHIVE_FIELDS and travel through existing archive chunks.
 No new IndexedDB version or loader. Active obligations resolve before retiring
 players, so already stored append-only archive rows never need rewriting.
+
+## v0.9.1 additions
+
+Transfer history, recruiting memory and coach relationships are retained on active
+and archived players. Transfers reset only current-season totals, after the
+completed season was added to career history. Destination records store stable
+school IDs plus name snapshots. A capacity-blocked transfer stays in the core
+`transferPortal` array as the same player's full record; it is never silently cut.
+The portal queue and transfer events travel in portable JSON and browser saves.
+No database version change or archive rewrite is introduced.

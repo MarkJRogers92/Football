@@ -55,6 +55,7 @@ const assert=require('node:assert/strict');
   // Imported historical promises must survive the archive store and render safely.
   const promise={id:'PR_browser',type:'EARLY_ROLE',status:'BROKEN',expectedGames:8,firstSeason:2027,resolvedSeason:2027,result:'0 appearances; 8 required.',coachName:'Coach <Test>'};
   exported.universe.playerArchive[0].promises=[promise];
+  exported.universe.playerArchive[0].transferHistory=[{season:2027,fromSchool:'Chicago Metropolitan',toSchool:'Wisconsin Commonwealth',reason:'BROKEN_PROMISE'}];
   await page.locator('#playerDialog button').filter({hasText:'Close'}).click();
   await tab('dashboard');
   await page.locator('#importFile').setInputFiles({name:'promise-save.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(exported))});await status('^Imported');
@@ -63,8 +64,10 @@ const assert=require('node:assert/strict');
   assert.match(await page.textContent('#playerDialogBody'),/Early Role · BROKEN/);
   assert.match(await page.textContent('#playerDialogBody'),/Coach <Test>/);
   assert.match(await page.textContent('#playerDialogBody'),/0 appearances; 8 required/);
+  assert.match(await page.textContent('#playerDialogBody'),/Chicago Metropolitan → Wisconsin Commonwealth/);
+  assert.match(await page.textContent('#playerDialogBody'),/Broken promise/);
   assert.deepEqual(errors,[]);
-  console.log('PASS historical promise survives browser Save/Load and renders in profile');
+  console.log('PASS historical promise and transfer survive browser Save/Load and render in profile');
   console.log('5 browser persistence scenarios passed; no console errors');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

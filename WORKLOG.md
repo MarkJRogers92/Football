@@ -193,3 +193,35 @@ their first playing season remain recorded but have no season to audit yet.
 
 User preference: conserve usage, finish one bounded batch, publish a playable
 preview, then stop. Old saves are expendable; reliable future saves are the priority.
+
+## v0.9.1 — Transfer destinations and memory (preview batch)
+
+- Transfer destinations now weigh recruiting finalists/known offers, playing
+  opportunity, scheme, geography, prestige, pipelines and retained coach ties.
+  A weighted choice preserves variation; full rosters and the current school
+  are excluded. No destination causes the player to remain in a saved portal queue.
+- Moves preserve the same player, eligibility/redshirt record, injury history,
+  hidden development profile, promises and career history. Season totals reset
+  after archival, fixing transfer statistics being counted again the next year.
+- Persistent transfer records and events retain origin/destination IDs and names,
+  year, reason and coach references. Profiles show transfer history; the Weekly
+  Hub flags upcoming matchups involving former players without claiming a start.
+- Uncompleted obligations are explicitly released on roster cuts/portal departures.
+  Existing broken promise history remains intact.
+- Checks: 52 engine checks, 14 storage/promise/transfer test groups, 45 browser
+  checks and five browser persistence scenarios. Three-season audit: 55/45/59
+  transfers, zero unplaced players, bounded rosters; final recruiting flips 4.3%.
+  Actual iPhone Safari testing remains outstanding.
+
+Destination calibration is intentionally narrow: transfer-entry frequency is
+unchanged (~0.4–0.5 transfers/team/season in this audit). No AI promises were
+issued by the audit, so it does not calibrate broken-promise transfer rates.
+The top-five snapshot is saved at commitment (updated on flips), not fabricated
+for old players. Known offers are the accepted school and the explicit promise
+school; there is no separate scholarship-offer UI yet. Initial rosters without
+recruiting geography use their departing campus for proximity. Existing coach
+movement is limited; scoring supports stable coach IDs at a future new employer.
+Portal players with no seat remain outside rosters, searchable and exportable,
+and retry next offseason; no off-campus development/aging simulation is added.
+
+User budget agreement: publish this one batch and stop. Next: v0.9.2 Game Center.
