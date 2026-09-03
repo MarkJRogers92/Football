@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0e1116"><title>Dynasty Lab v0.9.6</title><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.9.7</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -95,12 +95,570 @@ main{max-width:1280px;margin:auto;padding:20px}.tab{display:none}.tab.active{dis
   .stacked-table .player-cell{align-items:center}
   .portrait-profile{width:88px;height:88px}
 }
+
+/* Dynasty Lab visual identity layer
+   Presentation-only overrides. Keep simulation, save state, and game logic out of this file. */
+
+:root{
+  --bg:#090d12;
+  --panel:#111821;
+  --panel2:#17212d;
+  --line:#29384a;
+  --text:#f3f6fb;
+  --muted:#93a2b6;
+  --accent:#edf4ff;
+  --accent2:#72a7ff;
+  --good:#69d39c;
+  --warn:#f2c66d;
+  --bad:#ef7f86;
+  --dl-surface:#101720;
+  --dl-surface-raised:#151f2b;
+  --dl-surface-soft:#1b2735;
+  --dl-border:#2b3a4e;
+  --dl-border-strong:#3c526d;
+  --dl-ink:#f5f7fb;
+  --dl-muted:#92a2b7;
+  --dl-blue:#73a8ff;
+  --dl-blue-soft:rgba(115,168,255,.13);
+  --dl-gold:#e7bc62;
+  --dl-green:#65d39a;
+  --dl-red:#ef7d85;
+  --dl-shadow:0 16px 46px rgba(0,0,0,.26);
+  --dl-shadow-soft:0 8px 24px rgba(0,0,0,.18);
+  --dl-radius:14px;
+  --dl-radius-sm:10px;
+}
+
+html{color-scheme:dark;background:var(--bg)}
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 12% -8%,rgba(65,112,180,.14),transparent 34rem),
+    radial-gradient(circle at 88% 4%,rgba(34,82,120,.10),transparent 30rem),
+    linear-gradient(180deg,#0a0f15 0,#090d12 34rem,#090d12 100%);
+  font-size:15px;
+  letter-spacing:.002em;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:.18;
+  background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.014) 1px,transparent 1px);
+  background-size:36px 36px;
+  mask-image:linear-gradient(to bottom,black,transparent 68%);
+  z-index:-1;
+}
+
+.topbar{
+  min-height:82px;
+  padding:17px max(22px,calc((100vw - 1440px)/2 + 22px));
+  border-bottom:1px solid rgba(105,139,180,.28);
+  background:linear-gradient(180deg,rgba(13,19,27,.97),rgba(10,15,21,.94));
+  box-shadow:0 10px 32px rgba(0,0,0,.18);
+  backdrop-filter:blur(16px);
+}
+.topbar::after{
+  content:"";
+  position:absolute;
+  left:0;right:0;bottom:-1px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(115,168,255,.45),transparent);
+  pointer-events:none;
+}
+.topbar>div:first-child{position:relative;padding-left:48px}
+.topbar>div:first-child::before{
+  content:"DL";
+  position:absolute;
+  left:0;top:50%;
+  width:36px;height:36px;
+  transform:translateY(-50%);
+  display:grid;place-items:center;
+  border:1px solid #48688f;
+  border-radius:9px;
+  color:#f6f9ff;
+  background:linear-gradient(145deg,#1d3451,#101b29);
+  box-shadow:inset 0 1px rgba(255,255,255,.10),0 8px 22px rgba(0,0,0,.28);
+  font-size:11px;font-weight:900;letter-spacing:.12em;
+}
+.topbar h1{font-size:23px;line-height:1.05;letter-spacing:-.025em}
+.topbar h1 span{
+  display:inline-flex;
+  vertical-align:middle;
+  margin-left:6px;
+  padding:3px 7px;
+  border:1px solid #314359;
+  border-radius:999px;
+  background:#121c27;
+  color:#aebed2;
+  font-size:10px;
+  letter-spacing:.04em;
+}
+.eyebrow,.small.muted,.hub-kicker{
+  color:#8395ab;
+  font-weight:750;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.header-actions{align-items:center}
+.header-actions select{min-width:185px;font-weight:650}
+
+button,select,.wide-input,.editor-grid input,.editor-grid select,.offer-form input,.offer-form select{
+  border-color:#304157;
+  background:linear-gradient(180deg,#182331,#141d28);
+  box-shadow:inset 0 1px rgba(255,255,255,.025);
+}
+button{
+  font-weight:690;
+  transition:border-color .15s ease,background .15s ease,transform .15s ease,box-shadow .15s ease;
+}
+button:hover:not(:disabled){
+  border-color:#587497;
+  background:linear-gradient(180deg,#1c2a3a,#172231);
+  box-shadow:0 5px 14px rgba(0,0,0,.16);
+}
+button:active:not(:disabled){transform:translateY(1px)}
+#simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason{
+  border-color:#4a75ad;
+  background:linear-gradient(180deg,#234875,#193754);
+  color:#f7fbff;
+}
+#simWeek:hover:not(:disabled),#simSeason:hover:not(:disabled),#hubAdvance:hover:not(:disabled),#seasonWeek:hover:not(:disabled),#simDetailedGame:hover:not(:disabled),#autoTarget:hover:not(:disabled),#applyProgramEdit:hover:not(:disabled),#runOffseason:hover:not(:disabled){
+  border-color:#6d9fe0;
+  background:linear-gradient(180deg,#2b5688,#20466d);
+}
+
+.save-status{
+  padding:6px max(22px,calc((100vw - 1440px)/2 + 22px));
+  background:#0b1118;
+  border-bottom:1px solid #202d3c;
+  color:#71839a;
+}
+.tabs-shell{
+  border-bottom:1px solid #233244;
+  background:rgba(10,15,21,.94);
+  box-shadow:0 8px 24px rgba(0,0,0,.12);
+}
+.tabs{
+  max-width:1472px;
+  margin:auto;
+  padding:9px 16px;
+  gap:4px;
+  border:0;
+  background:transparent;
+}
+.tabs button{
+  position:relative;
+  padding:8px 10px;
+  border-color:transparent;
+  border-radius:8px;
+  color:#9aaabd;
+  font-size:12px;
+  font-weight:720;
+  background:transparent;
+  box-shadow:none;
+}
+.tabs button:hover{color:#dbe6f4;background:#121c27;border-color:#223247;box-shadow:none}
+.tabs button.active{
+  color:#f7f9fd;
+  background:#172333;
+  border-color:#30445e;
+  box-shadow:inset 0 1px rgba(255,255,255,.035);
+}
+.tabs button.active::after{
+  content:"";
+  position:absolute;
+  height:2px;
+  left:10px;right:10px;bottom:-10px;
+  border-radius:999px;
+  background:var(--dl-blue);
+  box-shadow:0 0 14px rgba(115,168,255,.55);
+}
+
+main{max-width:1440px;padding:26px 22px 48px}
+.tab>.section-head:first-child{padding:2px 2px 4px}
+.section-head h2{font-size:22px;letter-spacing:-.02em}
+.section-head h3,.card>h3{letter-spacing:-.012em}
+.muted{color:var(--dl-muted)}
+
+.card,.depth-card{
+  position:relative;
+  border-color:var(--dl-border);
+  border-radius:var(--dl-radius);
+  background:linear-gradient(180deg,rgba(20,29,40,.96),rgba(15,23,32,.98));
+  box-shadow:var(--dl-shadow-soft),inset 0 1px rgba(255,255,255,.025);
+}
+.card{padding:18px;margin-bottom:18px}
+.card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  border-radius:inherit;
+  background:linear-gradient(135deg,rgba(255,255,255,.018),transparent 35%);
+}
+.card h3{font-size:15px;margin-bottom:10px;color:#e9eef6}
+
+.hero-grid{grid-template-columns:minmax(0,1.42fr) minmax(320px,.78fr);gap:18px}
+#dashboard>.hero-grid>.card:first-child{
+  overflow:hidden;
+  min-height:184px;
+  padding:24px;
+  border-color:#39516e;
+  background:
+    radial-gradient(circle at 92% 16%,rgba(115,168,255,.12),transparent 18rem),
+    linear-gradient(135deg,#172536 0%,#111b27 58%,#101720 100%);
+}
+#dashboard>.hero-grid>.card:first-child::after{
+  content:"";
+  position:absolute;
+  width:310px;height:310px;
+  right:-165px;bottom:-238px;
+  border:1px solid rgba(115,168,255,.14);
+  border-radius:50%;
+  box-shadow:0 0 0 35px rgba(115,168,255,.025),0 0 0 70px rgba(115,168,255,.018);
+}
+#teamName{margin:4px 0 3px;font-size:31px;line-height:1.05;letter-spacing:-.035em}
+#teamMeta{font-size:13px}
+#dashboard>.hero-grid>.card:nth-child(2){
+  min-height:184px;
+  padding:24px;
+  border-color:#34465e;
+  background:linear-gradient(155deg,#121d29,#0f161f);
+}
+#recordBig{
+  margin:8px 0 2px;
+  font-size:56px;
+  font-weight:850;
+  letter-spacing:-.065em;
+  font-variant-numeric:tabular-nums;
+  color:#f8fafc;
+  text-shadow:0 10px 28px rgba(0,0,0,.3);
+}
+#rankLine{color:#c7d4e5;font-weight:680}
+#weekLine{margin-bottom:14px}
+.metric-grid{gap:9px;margin-top:20px}
+.metric{
+  min-height:69px;
+  padding:10px 11px;
+  border:1px solid #26384b;
+  border-radius:10px;
+  background:rgba(8,14,21,.44);
+  box-shadow:inset 0 1px rgba(255,255,255,.02);
+}
+.metric .v{font-size:22px;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
+.metric .small{color:#8293a9;text-transform:uppercase;letter-spacing:.08em;font-size:9px;font-weight:760}
+
+.command-center{
+  padding:20px;
+  border-color:#3a5272;
+  background:
+    linear-gradient(90deg,rgba(115,168,255,.055),transparent 24%),
+    linear-gradient(180deg,#151f2b,#101821);
+  box-shadow:var(--dl-shadow);
+}
+.command-center .section-head{padding-bottom:12px;border-bottom:1px solid #27384b}
+.hub-grid{gap:11px}
+.hub-item{
+  min-height:94px;
+  border-color:#2c3d52;
+  border-radius:11px;
+  padding:12px 13px;
+  background:linear-gradient(180deg,#172331,#131d28);
+  box-shadow:inset 0 1px rgba(255,255,255,.022);
+}
+.hub-item.action{border-left-color:var(--dl-blue)}
+.hub-item.alert{border-left-color:var(--dl-gold)}
+.hub-item.good-news{border-left-color:var(--dl-green)}
+.hub-item.bad-news{border-left-color:var(--dl-red)}
+.hub-main{font-size:13px;line-height:1.32}
+.hub-sub{font-size:11px;line-height:1.4}
+.hub-item.hub-link:hover,.hub-item.hub-link:focus-visible{
+  background:linear-gradient(180deg,#1a2a3b,#152332);
+  outline:1px solid #4d6f96;
+  transform:translateY(-1px);
+}
+
+.table-wrap{
+  border-color:#2a3a4e;
+  border-radius:13px;
+  background:#101720;
+  box-shadow:var(--dl-shadow-soft);
+}
+table{font-variant-numeric:tabular-nums}
+th{
+  padding:10px 11px;
+  color:#8193a9;
+  background:#151f2b;
+  border-bottom-color:#34465c;
+  font-size:9px;
+  letter-spacing:.085em;
+}
+td{padding:10px 11px;border-bottom-color:#213042}
+tbody tr{transition:background .12s ease}
+tbody tr:hover{background:rgba(115,168,255,.04)}
+.pill,.scheme-badge,.battle-school{
+  border-color:#34475d;
+  background:#151f2b;
+  box-shadow:inset 0 1px rgba(255,255,255,.02);
+}
+.rankrow,.resultrow,.historyrow,.lineitem{padding:9px 8px;border-bottom-color:#223145}
+.rank{color:#76889f;font-weight:740}
+.target{background:rgba(115,168,255,.075)}
+
+.player-button{font-weight:760;color:#eaf1fa}
+.player-button:hover,.player-button:focus{color:#fff;text-decoration-color:#6fa5ec}
+.bar,.confidence-meter{background:#223043}
+.bar>span,.confidence-meter>i{background:linear-gradient(90deg,#558ee0,#83b4ff)}
+
+.player-dialog{
+  width:min(880px,calc(100% - 28px));
+  max-height:90vh;
+  border-color:#3a506c;
+  border-radius:17px;
+  background:#0f161f;
+  box-shadow:0 34px 100px rgba(0,0,0,.58),inset 0 1px rgba(255,255,255,.03);
+}
+.player-dialog::backdrop{background:rgba(2,5,9,.80);backdrop-filter:blur(4px)}
+.dialog-shell{padding:21px}
+.dialog-head{
+  margin:-21px -21px 18px;
+  padding:20px 21px 17px;
+  border-bottom-color:#2c3d52;
+  border-radius:17px 17px 0 0;
+  background:
+    radial-gradient(circle at 12% -50%,rgba(115,168,255,.16),transparent 18rem),
+    linear-gradient(180deg,#172333,#111923);
+}
+.dialog-identity{display:flex;align-items:center;gap:14px;min-width:0}
+.dialog-portrait{
+  width:88px;height:88px;flex:0 0 88px;
+  border:1px solid #456284;
+  border-radius:13px;
+  overflow:hidden;
+  background:linear-gradient(145deg,#1d2b3b,#0f171f);
+  box-shadow:0 10px 26px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.035);
+}
+.dialog-portrait canvas,.dialog-portrait img{display:block;width:100%;height:100%;object-fit:cover}
+.dialog-head h2{font-size:25px;letter-spacing:-.03em}
+.profile-stat{
+  min-height:66px;
+  border:1px solid #28394d;
+  border-radius:10px;
+  background:#151f2b;
+}
+.profile-stat .v{font-size:19px;letter-spacing:-.03em}
+.timeline{border-left-color:#354a64}
+
+.candidate-card{
+  border:1px solid #2d4056;
+  background:linear-gradient(180deg,#182432,#141e29);
+  box-shadow:inset 0 1px rgba(255,255,255,.02);
+}
+.depth-card{padding:14px}
+.coach-card,.battle-card,.award-card{border-bottom-color:#253448}
+
+.good,.trend-up,.pitch-positive,.staff-rec,.dev-rise{color:#72dda8}
+.warn,.transition-tag{color:#f2ca76}
+.bad,.trend-down,.pitch-negative,.dev-fall{color:#f08a91}
+
+@media(max-width:900px){
+  main{padding:20px 16px 40px}
+  .topbar{padding-inline:16px}
+  .save-status{padding-inline:16px}
+  .hero-grid{grid-template-columns:1fr}
+  #dashboard>.hero-grid>.card:nth-child(2){min-height:auto}
+  #recordBig{font-size:48px}
+}
+
+@media(max-width:700px){
+  body{font-size:14px}
+  .topbar{min-height:auto;padding-block:14px}
+  .topbar>div:first-child{padding-left:43px}
+  .topbar>div:first-child::before{width:33px;height:33px}
+  .topbar h1{font-size:21px}
+  .tabs{padding-inline:10px}
+  .tabs button{font-size:11px;padding:7px 9px}
+  .tabs button.active::after{bottom:-9px}
+  main{padding:16px 12px 34px}
+  .card{padding:15px}
+  #dashboard>.hero-grid>.card:first-child,#dashboard>.hero-grid>.card:nth-child(2){padding:18px;min-height:auto}
+  #teamName{font-size:27px}
+  #recordBig{font-size:44px}
+  .metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hub-grid{grid-template-columns:1fr}
+  .dialog-shell{padding:16px}
+  .dialog-head{margin:-16px -16px 15px;padding:16px}
+  .dialog-portrait{width:72px;height:72px;flex-basis:72px}
+}
+
+@media(max-width:480px){
+  .topbar>div:first-child{padding-left:0}
+  .topbar>div:first-child::before{display:none}
+  .header-actions{gap:6px}
+  .header-actions button,.header-actions select{padding:8px 9px}
+  #teamName{font-size:25px}
+  #recordBig{font-size:40px}
+  .player-dialog{width:calc(100% - 12px)}
+  .dialog-head h2{font-size:21px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+}
+
+/* Team branding skin. Values are supplied by visual-identity.js and are intentionally
+   presentation-only so old/new saves and the simulation model remain untouched. */
+:root{
+  --team-primary:#234875;
+  --team-secondary:#73a8ff;
+  --team-rgb:115,168,255;
+  --team-ink:#f7fbff;
+}
+
+#dashboard>.hero-grid>.card:first-child{
+  border-color:color-mix(in srgb,var(--team-secondary) 42%,#26384b);
+  background:
+    radial-gradient(circle at 92% 15%,rgba(var(--team-rgb),.18),transparent 20rem),
+    linear-gradient(135deg,color-mix(in srgb,var(--team-primary) 55%,#142131) 0%,#111b27 58%,#101720 100%);
+}
+#dashboard>.hero-grid>.card:first-child::after{
+  border-color:rgba(var(--team-rgb),.20);
+  box-shadow:0 0 0 35px rgba(var(--team-rgb),.035),0 0 0 70px rgba(var(--team-rgb),.02);
+}
+#teamName{
+  color:var(--team-ink);
+  text-shadow:0 0 28px rgba(var(--team-rgb),.12);
+}
+#teamMeta::before{
+  content:"";
+  display:inline-block;
+  width:7px;height:7px;
+  margin:0 7px 1px 0;
+  border-radius:50%;
+  background:var(--team-secondary);
+  box-shadow:0 0 12px rgba(var(--team-rgb),.55);
+}
+
+.tabs button.active::after{background:var(--team-secondary);box-shadow:0 0 14px rgba(var(--team-rgb),.55)}
+.player-button:hover,.player-button:focus{color:#fff;text-decoration-color:var(--team-secondary)}
+.hub-item.action{border-left-color:var(--team-secondary)}
+.hub-item.hub-link .hub-kicker::after{color:var(--team-secondary)}
+.hub-item.hub-link:hover,.hub-item.hub-link:focus-visible{outline-color:color-mix(in srgb,var(--team-secondary) 58%,#39516e)}
+.pipeline-dot{background:var(--team-secondary)}
+.bar>span,.confidence-meter>i{background:linear-gradient(90deg,var(--team-primary),var(--team-secondary))}
+
+#simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason{
+  border-color:color-mix(in srgb,var(--team-secondary) 58%,#29405b);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--team-primary) 78%,#203f66),color-mix(in srgb,var(--team-primary) 88%,#142b45));
+}
+#simWeek:hover:not(:disabled),#simSeason:hover:not(:disabled),#hubAdvance:hover:not(:disabled),#seasonWeek:hover:not(:disabled),#simDetailedGame:hover:not(:disabled),#autoTarget:hover:not(:disabled),#applyProgramEdit:hover:not(:disabled),#runOffseason:hover:not(:disabled){
+  border-color:var(--team-secondary);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--team-primary) 70%,var(--team-secondary)),var(--team-primary));
+}
+
+.topbar>div:first-child::before{
+  content:attr(data-team-mark);
+  border-color:color-mix(in srgb,var(--team-secondary) 55%,#39516e);
+  background:linear-gradient(145deg,color-mix(in srgb,var(--team-primary) 78%,#203b5d),#101b29);
+  box-shadow:inset 0 1px rgba(255,255,255,.10),0 8px 22px rgba(0,0,0,.28),0 0 20px rgba(var(--team-rgb),.08);
+}
+.topbar::after{background:linear-gradient(90deg,transparent,rgba(var(--team-rgb),.45),transparent)}
+
+.command-center{
+  border-color:color-mix(in srgb,var(--team-secondary) 32%,#344a64);
+  background:
+    linear-gradient(90deg,rgba(var(--team-rgb),.065),transparent 25%),
+    linear-gradient(180deg,#151f2b,#101821);
+}
+
+.player-dialog{
+  border-color:color-mix(in srgb,var(--team-secondary) 30%,#3a506c);
+}
+.dialog-head{
+  background:
+    radial-gradient(circle at 12% -50%,rgba(var(--team-rgb),.18),transparent 18rem),
+    linear-gradient(180deg,#172333,#111923);
+}
+.dialog-portrait{border-color:color-mix(in srgb,var(--team-secondary) 46%,#344a64)}
+
+@supports not (color:color-mix(in srgb,red,blue)){
+  #dashboard>.hero-grid>.card:first-child{border-color:#39516e}
+  #simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason{border-color:#4a75ad}
+}
+
+/* Sports-presentation components. Progressive visual enhancement only. */
+.broadcast-feature{display:grid;grid-template-columns:minmax(0,2.1fr) minmax(240px,.72fr);gap:14px;margin:0 0 18px}
+.broadcast-feature-main,.broadcast-result{position:relative;overflow:hidden;border:1px solid #30445c;border-radius:14px;background:linear-gradient(155deg,#111b27,#0c131c);box-shadow:0 12px 32px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.025)}
+.broadcast-feature-main{padding:17px 18px 15px;background:radial-gradient(circle at 13% -40%,rgba(var(--team-rgb),.15),transparent 22rem),linear-gradient(155deg,#14202e,#0e1620 62%,#0c121a)}
+.broadcast-feature-main:after{content:"";position:absolute;width:240px;height:240px;right:-135px;top:-155px;border:1px solid rgba(var(--team-rgb),.12);border-radius:50%;box-shadow:0 0 0 28px rgba(var(--team-rgb),.022),0 0 0 56px rgba(var(--team-rgb),.016);pointer-events:none}
+.broadcast-kicker,.matchup-label{color:#7f91a7;font-size:9px;font-weight:850;letter-spacing:.14em;text-transform:uppercase}
+.broadcast-matchup{display:grid;grid-template-columns:minmax(0,1fr) 90px minmax(0,1fr);gap:12px;align-items:center;margin-top:10px}
+.broadcast-team{display:grid;grid-template-columns:auto minmax(0,1fr);gap:11px;align-items:center;min-width:0}.broadcast-team.opponent{direction:rtl;text-align:right}.broadcast-team.opponent>div:last-child{direction:ltr}
+.broadcast-team strong{display:block;overflow:hidden;color:#f5f8fc;font-size:16px;line-height:1.16;letter-spacing:-.025em;text-overflow:ellipsis}.broadcast-team span{display:block;color:#8395aa;font-size:10px;line-height:1.35}.broadcast-team-role{margin-bottom:2px;color:#a6b5c7!important;font-size:8px!important;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.sports-mark{--mark-primary:#24486f;--mark-secondary:#78aef1;--mark-rgb:120,174,241;display:grid;width:38px;height:38px;place-items:center;flex:0 0 auto;border:1px solid color-mix(in srgb,var(--mark-secondary) 55%,#31475f);border-radius:10px;color:#fff;background:linear-gradient(145deg,color-mix(in srgb,var(--mark-primary) 82%,#1b2d43),color-mix(in srgb,var(--mark-primary) 94%,#0d151f));box-shadow:inset 0 1px rgba(255,255,255,.08),0 7px 18px rgba(0,0,0,.24),0 0 18px rgba(var(--mark-rgb),.07);font-size:10px;font-weight:900;letter-spacing:.08em}.sports-mark.large{width:48px;height:48px;border-radius:12px;font-size:12px}.sports-mark.xl{width:62px;height:62px;border-radius:14px;font-size:15px}
+.broadcast-versus,.matchup-center{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;color:#64768c;text-align:center}.broadcast-versus b,.matchup-center b{color:#f2f5fa;font-size:20px;letter-spacing:-.05em}.broadcast-versus span,.matchup-center span{margin-top:1px;font-size:7px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.broadcast-actions{display:flex;align-items:center;gap:12px;margin-top:12px;padding-top:11px;border-top:1px solid #26374a}.broadcast-actions button{padding:7px 10px;border-color:color-mix(in srgb,var(--team-secondary) 45%,#30445c);background:linear-gradient(180deg,color-mix(in srgb,var(--team-primary) 78%,#1e3a58),var(--team-primary));font-size:11px}.broadcast-actions span{color:#71849b;font-size:10px}
+.broadcast-result{display:flex;flex-direction:column;justify-content:center;gap:5px;min-height:132px;padding:16px}.broadcast-result:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--team-secondary);opacity:.75}.broadcast-result strong{color:#f3f6fa;font-size:17px;line-height:1.25}.broadcast-result>span{color:#8294aa;font-size:11px}.broadcast-result button{align-self:flex-start;margin-top:4px;padding:6px 9px;font-size:10px}
+.broadcast-final{display:flex;align-items:center;gap:12px;margin-top:12px}.broadcast-final strong{display:block;color:#f5f8fc;font-size:22px;line-height:1.12;letter-spacing:-.035em}.broadcast-final span{display:block;margin-top:3px;color:#8496ab;font-size:11px}
+
+/* Portrait-driven player hero */
+.sports-player-dialog .dialog-head{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;min-height:148px;padding-top:22px;padding-bottom:22px}.sports-player-dialog .dialog-identity{align-items:center;gap:17px}.sports-player-dialog .dialog-portrait{width:112px;height:112px;flex-basis:112px;border-radius:15px;border-color:color-mix(in srgb,var(--team-secondary) 40%,#405773);box-shadow:0 14px 32px rgba(0,0,0,.32),0 0 26px rgba(var(--team-rgb),.07)}.sports-player-dialog .dialog-head h2{max-width:410px;font-size:31px;line-height:1;letter-spacing:-.045em}.sports-player-dialog #playerDialogMeta{max-width:470px;margin-top:6px;color:#a5b4c7;font-size:11px;line-height:1.45}
+.player-hero-team-mark{display:flex;align-items:center;gap:7px;margin-top:9px}.player-hero-team-mark span{display:grid;width:25px;height:25px;place-items:center;border:1px solid color-mix(in srgb,var(--mark-secondary) 48%,#30455d);border-radius:7px;background:linear-gradient(145deg,var(--mark-primary),#101823);color:#fff;font-size:8px;font-weight:900;letter-spacing:.06em}.player-hero-team-mark small{color:#8395aa;font-size:9px;font-weight:720}
+.player-hero-rail{display:grid;grid-template-columns:auto repeat(3,minmax(70px,auto));gap:7px;align-items:stretch;margin-right:4px}.player-position-chip,.player-hero-rating{display:flex;flex-direction:column;justify-content:center;min-height:58px;padding:7px 9px;border:1px solid #33485f;border-radius:10px;background:rgba(7,12,18,.48)}.player-position-chip{min-width:48px;align-items:center;color:var(--team-secondary);font-size:15px;font-weight:900;letter-spacing:-.03em}.player-hero-rating span{color:#7e91a8;font-size:7px;font-weight:850;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}.player-hero-rating strong{margin-top:2px;color:#eef3fa;font-size:18px;line-height:1;letter-spacing:-.04em}.player-hero-rating.primary{border-color:color-mix(in srgb,var(--team-secondary) 44%,#344a62);background:rgba(var(--team-rgb),.075)}
+.sports-player-dialog .sports-profile-grid .profile-stat:nth-child(-n+3){display:none}.sports-player-dialog .sports-profile-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.sports-player-dialog .sports-profile-grid .profile-stat{min-height:72px;border:1px solid #2b3d52;background:linear-gradient(180deg,#17222f,#121b25)}
+
+/* Game Lab broadcast matchup */
+#nextGameCard:has(.matchup-shell){padding:0;overflow:hidden;border-color:#354b66;background:#0e151e}#nextGameCard:has(.matchup-shell):before{display:none}.matchup-shell{padding:17px 18px 13px}.matchup-board{display:grid;grid-template-columns:minmax(0,1fr) 92px minmax(0,1fr);gap:14px;align-items:center;margin-top:12px;padding:14px 0 13px;border-top:1px solid #27384b;border-bottom:1px solid #27384b}.matchup-team{display:flex;flex-direction:column;align-items:center;min-width:0;text-align:center}.matchup-team strong{display:block;width:100%;margin-top:8px;overflow:hidden;color:#f5f8fc;font-size:17px;line-height:1.15;letter-spacing:-.025em;text-overflow:ellipsis}.matchup-team>span{margin-top:3px;color:#8295ab;font-size:10px}.matchup-team.is-user .sports-mark{border-color:color-mix(in srgb,var(--team-secondary) 62%,#344a61);box-shadow:inset 0 1px rgba(255,255,255,.08),0 7px 18px rgba(0,0,0,.24),0 0 24px rgba(var(--team-rgb),.12)}.matchup-footer{display:flex;justify-content:space-between;gap:14px;padding-top:10px;color:#6f8298;font-size:9px}.matchup-footer strong{color:#b5c3d3;letter-spacing:.08em}
+#detailedBox .sports-scoreline{margin:12px 0;padding:14px 12px;border:1px solid #33485f;border-radius:11px;background:linear-gradient(180deg,#111d2a,#0d151e);color:#f6f8fb;font-size:31px;letter-spacing:-.045em;text-align:center}
+#latestResults .resultrow{margin-bottom:6px;padding:10px 11px;border:1px solid #26384c;border-radius:9px;background:#111a24}#latestResults .resultrow:last-child{margin-bottom:0;border-bottom:1px solid #26384c}#teamSchedule .resultrow{padding:9px 10px;border-left:2px solid transparent}#teamSchedule .resultrow:hover{border-left-color:var(--team-secondary);background:rgba(var(--team-rgb),.045)}
+
+@media(max-width:980px){.broadcast-feature{grid-template-columns:1fr}.sports-player-dialog .dialog-head{grid-template-columns:1fr}.player-hero-rail{margin-right:0}.sports-player-dialog .dialog-close{position:absolute;right:16px;top:16px}}
+@media(max-width:720px){.broadcast-matchup,.matchup-board{grid-template-columns:1fr}.broadcast-team,.broadcast-team.opponent{direction:ltr;text-align:left}.broadcast-actions{align-items:flex-start;flex-direction:column}.sports-player-dialog .dialog-portrait{width:92px;height:92px;flex-basis:92px}.sports-player-dialog .dialog-head h2{padding-right:64px;font-size:25px}.player-hero-rail{grid-template-columns:repeat(4,minmax(0,1fr))}.player-position-chip,.player-hero-rating{min-width:0;padding:7px 6px}.sports-player-dialog .sports-profile-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:500px){.sports-player-dialog .dialog-identity{display:grid;grid-template-columns:78px minmax(0,1fr);gap:11px}.sports-player-dialog .dialog-portrait{width:78px;height:78px;flex-basis:78px}.player-hero-rail{grid-template-columns:repeat(2,minmax(0,1fr))}.broadcast-feature-main,.broadcast-result{border-radius:12px}}
+@media(prefers-reduced-motion:reduce){.broadcast-feature *,#nextGameCard *{transition:none!important}}
+
+/* Final layout rules for the sports presentation layer. */
+.sports-player-dialog .dialog-head{grid-template-columns:minmax(0,1fr);gap:14px;padding-right:78px}
+.sports-player-dialog .dialog-close{position:absolute;right:16px;top:16px;z-index:3}
+.sports-player-dialog .player-hero-rail{width:min(520px,calc(100% - 129px));margin:-2px 0 0 129px}
+/* Recruit identity is enhanced in-place: the avatar plus the existing eyebrow,
+   name and metadata are all direct grid children. Pin the avatar to column one
+   and keep every text row in column two instead of letting auto-placement put
+   the player name beneath the avatar on narrow screens. */
+.recruit-hero-identity>.recruit-hero-avatar{grid-column:1;grid-row:1 / span 3}
+.recruit-hero-identity>.eyebrow,.recruit-hero-identity>#recruitDialogName,.recruit-hero-identity>#recruitDialogMeta{grid-column:2;min-width:0}
+.recruit-hero-identity>#recruitDialogName{overflow-wrap:anywhere}
+@media(max-width:720px){
+ .sports-player-dialog .dialog-head{padding-right:18px}.sports-player-dialog .player-hero-rail{width:100%;margin:0}.sports-player-dialog .dialog-close{right:12px;top:12px}
+ /* Stacked mobile table cells are flex rows with a generated label. Native
+    selects otherwise keep the width of their longest option and can push the
+    recruiting page wider than the viewport. Let controls take only the space
+    remaining after the label. */
+ .stacked-table td>select,.stacked-table td>input{width:0;min-width:0;max-width:100%;flex:1 1 0}
+}
+/* The base Game Center uses 12px mobile shell padding; keep the branded
+   negative header margin aligned to that inset so the dialog itself never
+   becomes horizontally scrollable on narrow screens. */
+@media(max-width:600px){.game-dialog .dialog-head{margin:-12px -12px 15px}}
+
+/* Recruiting / signing-day presentation. Progressive enhancement only. */
+.signing-class-feature{display:grid;gap:12px;margin:0 0 18px}.signing-class-board,.commitment-spotlight{position:relative;overflow:hidden;border:1px solid #30445c;border-radius:14px;background:linear-gradient(155deg,#121c28,#0d151e);box-shadow:0 12px 32px rgba(0,0,0,.19),inset 0 1px rgba(255,255,255,.025)}
+.signing-class-board{padding:16px 17px 17px;background:radial-gradient(circle at 96% -20%,rgba(var(--team-rgb),.12),transparent 20rem),linear-gradient(155deg,#131e2a,#0d151e 65%,#0b1219)}.signing-class-board:after{content:"";position:absolute;width:230px;height:230px;right:8px;bottom:-175px;border:1px solid rgba(var(--team-rgb),.10);border-radius:50%;box-shadow:0 0 0 28px rgba(var(--team-rgb),.018),0 0 0 56px rgba(var(--team-rgb),.012);pointer-events:none}.signing-class-head{display:flex;justify-content:space-between;gap:18px;align-items:center}.signing-kicker{color:#7e91a8;font-size:8px;font-weight:850;letter-spacing:.15em;text-transform:uppercase}.signing-class-head h3{margin:2px 0 2px;color:#f3f7fb;font-size:19px;letter-spacing:-.03em}.signing-class-head p{margin:0;color:#8396ac;font-size:10px}.signing-class-count{display:flex;flex-direction:column;align-items:flex-end;min-width:70px}.signing-class-count strong{color:#f6f9fc;font-size:28px;line-height:1;letter-spacing:-.055em}.signing-class-count span{margin-top:3px;color:#71859c;font-size:8px;text-transform:uppercase;letter-spacing:.08em}.signing-meter{height:4px;margin:12px 0 13px;overflow:hidden;border-radius:999px;background:#223043}.signing-meter i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--team-primary),var(--team-secondary));box-shadow:0 0 12px rgba(var(--team-rgb),.25)}
+.signing-card-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;position:relative;z-index:1}.signing-card{display:flex;position:relative;min-width:0;min-height:142px;flex-direction:column;align-items:flex-start;padding:11px 10px 10px;border:1px solid #2c3e53;border-radius:11px;background:linear-gradient(180deg,#182431,#111a24);box-shadow:inset 0 1px rgba(255,255,255,.025);text-align:left}.signing-card:hover{border-color:color-mix(in srgb,var(--team-secondary) 52%,#344a62);background:linear-gradient(180deg,#1b2a39,#14202c);transform:translateY(-1px)}.signing-card.is-wavering{border-color:#7c6036;background:linear-gradient(180deg,#282316,#171a1c)}.signing-card-rank{position:absolute;right:9px;top:8px;color:#6f8298;font-size:8px;font-weight:800}.signing-card-avatar{display:grid;width:38px;height:38px;place-items:center;margin-bottom:8px;border:1px solid color-mix(in srgb,var(--team-secondary) 46%,#354b63);border-radius:10px;color:#fff;background:linear-gradient(145deg,var(--team-primary),#101923);box-shadow:0 6px 15px rgba(0,0,0,.22),0 0 16px rgba(var(--team-rgb),.06);font-size:10px;font-weight:900;letter-spacing:.08em}.signing-card-stars{height:12px;color:#d7b667;font-size:8px;letter-spacing:-.06em}.signing-card strong{display:block;width:100%;margin-top:2px;overflow:hidden;color:#f1f5fa;font-size:11px;line-height:1.2;text-overflow:ellipsis;white-space:nowrap}.signing-card>span:not(.signing-card-avatar):not(.signing-card-rank):not(.signing-card-stars){margin-top:3px;color:#7f92a8;font-size:8px;line-height:1.3}.signing-card em{margin-top:auto;padding-top:8px;color:var(--team-secondary);font-size:7px;font-style:normal;font-weight:900;letter-spacing:.12em}.signing-card.is-wavering em{color:#efc56d}.signing-empty{display:flex;min-height:76px;flex-direction:column;justify-content:center;padding:12px;border:1px dashed #31445b;border-radius:10px;background:#101821}.signing-empty strong{color:#dce5ef;font-size:12px}.signing-empty span{margin-top:3px;color:#71849a;font-size:9px}
+.commitment-spotlight{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto auto;gap:13px;align-items:center;min-height:104px;padding:14px 15px;border-color:color-mix(in srgb,var(--team-secondary) 42%,#354b63);background:radial-gradient(circle at 15% 0,rgba(var(--team-rgb),.18),transparent 17rem),linear-gradient(105deg,color-mix(in srgb,var(--team-primary) 36%,#121d29),#0e161f 58%,#0b1219)}.commitment-spotlight:after{content:"COMMITTED";position:absolute;right:-8px;bottom:-8px;color:rgba(255,255,255,.025);font-size:47px;font-weight:950;letter-spacing:-.07em;pointer-events:none}.commitment-stamp{align-self:start;padding:4px 6px;border:1px solid color-mix(in srgb,var(--team-secondary) 48%,#344a62);border-radius:6px;color:var(--team-secondary);background:rgba(var(--team-rgb),.06);font-size:7px;font-weight:900;letter-spacing:.13em}.commitment-avatar{display:grid;width:60px;height:60px;place-items:center;border:1px solid color-mix(in srgb,var(--team-secondary) 58%,#344a62);border-radius:14px;color:#fff;background:linear-gradient(145deg,var(--team-primary),#101923);box-shadow:0 10px 24px rgba(0,0,0,.28),0 0 22px rgba(var(--team-rgb),.09);font-size:14px;font-weight:950;letter-spacing:.08em}.commitment-copy{min-width:0}.commitment-copy>span{display:block;color:#71859d;font-size:7px;font-weight:850;letter-spacing:.14em;text-transform:uppercase}.commitment-copy strong{display:block;margin-top:2px;overflow:hidden;color:#f6f8fb;font-size:20px;line-height:1.08;letter-spacing:-.035em;text-overflow:ellipsis;white-space:nowrap}.commitment-copy small{display:block;margin-top:4px;color:#8799ad;font-size:9px}.commitment-school{display:flex;align-items:center;gap:8px;max-width:210px}.commitment-school b{display:grid;width:35px;height:35px;place-items:center;border:1px solid color-mix(in srgb,var(--team-secondary) 48%,#344a62);border-radius:9px;color:#fff;background:linear-gradient(145deg,var(--team-primary),#101923);font-size:9px;letter-spacing:.07em}.commitment-school span{overflow:hidden;color:#a7b5c6;font-size:9px;font-weight:700;text-overflow:ellipsis;white-space:nowrap}.commitment-spotlight button{position:relative;z-index:1;padding:7px 9px;font-size:9px}
+/* Recruit profile hero */
+.sports-recruit-dialog .dialog-head{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;min-height:132px;padding-top:21px;padding-bottom:21px}.recruit-hero-identity{display:grid!important;grid-template-columns:auto minmax(0,1fr);gap:13px;align-items:center;min-width:0}.recruit-hero-avatar{display:flex;width:78px;height:78px;flex-direction:column;align-items:center;justify-content:center;border:1px solid color-mix(in srgb,var(--team-secondary) 48%,#405773);border-radius:14px;background:radial-gradient(circle at 30% 20%,rgba(var(--team-rgb),.16),transparent 7rem),linear-gradient(145deg,var(--team-primary),#101923);box-shadow:0 12px 28px rgba(0,0,0,.28),0 0 22px rgba(var(--team-rgb),.08)}.recruit-hero-avatar span{color:#fff;font-size:20px;font-weight:950;letter-spacing:.08em}.recruit-hero-avatar small{margin-top:3px;color:#d8bb72;font-size:7px;letter-spacing:-.04em}.sports-recruit-dialog .dialog-head h2{font-size:29px;line-height:1;letter-spacing:-.04em}.sports-recruit-dialog #recruitDialogMeta{max-width:450px;margin-top:6px;color:#9dacc0;font-size:10px;line-height:1.4}.recruit-hero-rail{display:grid;grid-template-columns:auto repeat(3,minmax(66px,auto));gap:7px;margin-right:4px}.recruit-position-chip,.recruit-hero-rail>div{display:flex;min-height:55px;flex-direction:column;justify-content:center;padding:7px 9px;border:1px solid #33485f;border-radius:10px;background:rgba(7,12,18,.48)}.recruit-position-chip{min-width:48px;align-items:center;color:var(--team-secondary);font-size:14px;font-weight:950}.recruit-hero-rail span{color:#7e91a8;font-size:6px;font-weight:850;letter-spacing:.11em}.recruit-hero-rail strong{margin-top:3px;color:#eef3fa;font-size:14px;line-height:1;letter-spacing:-.025em}.recruit-status{border-color:color-mix(in srgb,var(--team-secondary) 40%,#344a62)!important;background:rgba(var(--team-rgb),.07)!important}.recruit-status.warn{border-color:#725a36!important;background:rgba(242,198,109,.055)!important}.recruit-status.warn strong{color:#efc76e}.sports-recruit-profile-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.sports-recruit-profile-grid .profile-stat{border:1px solid #2c3e52;background:linear-gradient(180deg,#17222f,#121b25)}
+@media(max-width:1100px){.signing-card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.commitment-spotlight{grid-template-columns:auto auto minmax(0,1fr) auto}.commitment-school{display:none}}
+@media(max-width:760px){.signing-class-head{align-items:flex-start}.signing-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.commitment-spotlight{grid-template-columns:auto minmax(0,1fr);gap:10px}.commitment-stamp{grid-column:1/-1;justify-self:start}.commitment-copy strong{white-space:normal;font-size:17px}.commitment-spotlight button{grid-column:1/-1;justify-self:start}.sports-recruit-dialog{max-width:calc(100vw - 12px);overflow-x:hidden}.sports-recruit-dialog .dialog-shell{min-width:0;max-width:100%;overflow-x:hidden}.sports-recruit-dialog .dialog-head{grid-template-columns:1fr}.recruit-hero-rail{grid-template-columns:repeat(4,minmax(0,1fr));margin-right:0}.sports-recruit-dialog .dialog-close{position:absolute;right:15px;top:15px}.sports-recruit-dialog .dialog-head h2{padding-right:62px}.sports-recruit-profile-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:460px){.signing-card-grid{grid-template-columns:1fr 1fr}.signing-card{min-height:132px}.recruit-hero-identity{grid-template-columns:62px minmax(0,1fr)}.recruit-hero-avatar{width:62px;height:62px}.recruit-hero-rail{grid-template-columns:repeat(2,minmax(0,1fr))}.commitment-avatar{width:52px;height:52px}.signing-class-count strong{font-size:24px}}
+@media(prefers-reduced-motion:reduce){.signing-class-feature *{transition:none!important}}
 </style></head><body>
 <div id="app">
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.9.6</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.9.7</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -937,7 +1495,7 @@ main{max-width:1280px;margin:auto;padding:20px}.tab{display:none}.tab.active{dis
 'use strict';
 const EMBEDDED_SCHOOLS=[{"id":1,"name":"Chicago Metropolitan","conference":"Great Lakes","prestige":92,"resources":93,"development":81,"nil":86,"academics":81,"fan_support":92,"facilities":94,"admin_patience":25,"program_ceiling":100,"city":"Chicago","state":"IL","lat":41.8781,"lon":-87.6298},{"id":2,"name":"Great Lakes University","conference":"Great Lakes","prestige":60,"resources":62,"development":58,"nil":59,"academics":63,"fan_support":68,"facilities":60,"admin_patience":78,"program_ceiling":67,"city":"Evanston","state":"IL","lat":42.0451,"lon":-87.6877},{"id":3,"name":"Wisconsin Commonwealth","conference":"Great Lakes","prestige":89,"resources":88,"development":84,"nil":98,"academics":61,"fan_support":83,"facilities":85,"admin_patience":61,"program_ceiling":100,"city":"Madison","state":"WI","lat":43.0731,"lon":-89.4012},{"id":4,"name":"Milwaukee State","conference":"Great Lakes","prestige":59,"resources":70,"development":55,"nil":70,"academics":60,"fan_support":67,"facilities":62,"admin_patience":66,"program_ceiling":74,"city":"Milwaukee","state":"WI","lat":43.0389,"lon":-87.9065},{"id":5,"name":"Michigan Commonwealth","conference":"Great Lakes","prestige":94,"resources":97,"development":82,"nil":94,"academics":66,"fan_support":75,"facilities":99,"admin_patience":50,"program_ceiling":100,"city":"Lansing","state":"MI","lat":42.7325,"lon":-84.5555},{"id":6,"name":"Detroit Metropolitan","conference":"Great Lakes","prestige":75,"resources":93,"development":47,"nil":90,"academics":37,"fan_support":76,"facilities":85,"admin_patience":42,"program_ceiling":90,"city":"Detroit","state":"MI","lat":42.3314,"lon":-83.0458},{"id":7,"name":"Lake Erie University","conference":"Great Lakes","prestige":62,"resources":63,"development":67,"nil":66,"academics":70,"fan_support":63,"facilities":62,"admin_patience":87,"program_ceiling":71,"city":"Cleveland","state":"OH","lat":41.4993,"lon":-81.6944},{"id":8,"name":"Ohio Western","conference":"Great Lakes","prestige":49,"resources":62,"development":40,"nil":62,"academics":58,"fan_support":82,"facilities":54,"admin_patience":63,"program_ceiling":54,"city":"Toledo","state":"OH","lat":41.6528,"lon":-83.5379},{"id":9,"name":"Indiana Commonwealth","conference":"Great Lakes","prestige":65,"resources":57,"development":53,"nil":50,"academics":78,"fan_support":67,"facilities":57,"admin_patience":58,"program_ceiling":70,"city":"Indianapolis","state":"IN","lat":39.7684,"lon":-86.1581},{"id":10,"name":"Fort Wayne State","conference":"Great Lakes","prestige":59,"resources":40,"development":62,"nil":47,"academics":66,"fan_support":47,"facilities":47,"admin_patience":65,"program_ceiling":66,"city":"Fort Wayne","state":"IN","lat":41.0793,"lon":-85.1394},{"id":11,"name":"Twin Cities University","conference":"Great Lakes","prestige":84,"resources":84,"development":65,"nil":79,"academics":76,"fan_support":73,"facilities":79,"admin_patience":63,"program_ceiling":97,"city":"Minneapolis","state":"MN","lat":44.9778,"lon":-93.265},{"id":12,"name":"Iowa Lakes University","conference":"Great Lakes","prestige":41,"resources":38,"development":58,"nil":29,"academics":72,"fan_support":39,"facilities":35,"admin_patience":81,"program_ceiling":51,"city":"Cedar Rapids","state":"IA","lat":41.9779,"lon":-91.6656},{"id":13,"name":"New England Commonwealth","conference":"Northeast","prestige":82,"resources":85,"development":57,"nil":99,"academics":42,"fan_support":72,"facilities":77,"admin_patience":46,"program_ceiling":91,"city":"Boston","state":"MA","lat":42.3601,"lon":-71.0589},{"id":14,"name":"Massachusetts Bay University","conference":"Northeast","prestige":58,"resources":58,"development":49,"nil":63,"academics":79,"fan_support":48,"facilities":46,"admin_patience":68,"program_ceiling":66,"city":"Worcester","state":"MA","lat":42.2626,"lon":-71.8023},{"id":15,"name":"Hudson University","conference":"Northeast","prestige":47,"resources":45,"development":43,"nil":38,"academics":60,"fan_support":38,"facilities":44,"admin_patience":65,"program_ceiling":59,"city":"Albany","state":"NY","lat":42.6526,"lon":-73.7562},{"id":16,"name":"New York Metropolitan","conference":"Northeast","prestige":80,"resources":75,"development":72,"nil":76,"academics":81,"fan_support":78,"facilities":76,"admin_patience":66,"program_ceiling":90,"city":"New York","state":"NY","lat":40.7128,"lon":-74.006},{"id":17,"name":"Long Island State","conference":"Northeast","prestige":58,"resources":53,"development":59,"nil":40,"academics":64,"fan_support":72,"facilities":61,"admin_patience":48,"program_ceiling":74,"city":"Hempstead","state":"NY","lat":40.7062,"lon":-73.6187},{"id":18,"name":"Connecticut Commonwealth","conference":"Northeast","prestige":47,"resources":48,"development":37,"nil":48,"academics":77,"fan_support":44,"facilities":49,"admin_patience":43,"program_ceiling":56,"city":"Hartford","state":"CT","lat":41.7658,"lon":-72.6734},{"id":19,"name":"Rhode Island Maritime","conference":"Northeast","prestige":57,"resources":55,"development":62,"nil":51,"academics":97,"fan_support":61,"facilities":58,"admin_patience":44,"program_ceiling":74,"city":"Providence","state":"RI","lat":41.824,"lon":-71.4128},{"id":20,"name":"Vermont State","conference":"Northeast","prestige":28,"resources":27,"development":57,"nil":29,"academics":77,"fan_support":36,"facilities":35,"admin_patience":70,"program_ceiling":38,"city":"Burlington","state":"VT","lat":44.4759,"lon":-73.2121},{"id":21,"name":"New Hampshire Tech","conference":"Northeast","prestige":60,"resources":58,"development":48,"nil":30,"academics":73,"fan_support":64,"facilities":63,"admin_patience":43,"program_ceiling":69,"city":"Manchester","state":"NH","lat":42.9956,"lon":-71.4548},{"id":22,"name":"Maine Commonwealth","conference":"Northeast","prestige":47,"resources":40,"development":52,"nil":29,"academics":72,"fan_support":50,"facilities":39,"admin_patience":74,"program_ceiling":55,"city":"Portland","state":"ME","lat":43.6591,"lon":-70.2568},{"id":23,"name":"Delaware Valley University","conference":"Northeast","prestige":41,"resources":33,"development":44,"nil":35,"academics":56,"fan_support":53,"facilities":28,"admin_patience":75,"program_ceiling":54,"city":"Wilmington","state":"DE","lat":39.7391,"lon":-75.5398},{"id":24,"name":"Jersey Coastal University","conference":"Northeast","prestige":32,"resources":36,"development":65,"nil":29,"academics":57,"fan_support":28,"facilities":34,"admin_patience":68,"program_ceiling":79,"city":"Newark","state":"NJ","lat":40.7357,"lon":-74.1724},{"id":25,"name":"Chesapeake University","conference":"Atlantic","prestige":82,"resources":96,"development":53,"nil":89,"academics":69,"fan_support":99,"facilities":84,"admin_patience":50,"program_ceiling":90,"city":"Baltimore","state":"MD","lat":39.2904,"lon":-76.6122},{"id":26,"name":"Potomac Commonwealth","conference":"Atlantic","prestige":53,"resources":46,"development":46,"nil":67,"academics":78,"fan_support":50,"facilities":47,"admin_patience":67,"program_ceiling":63,"city":"Washington","state":"DC","lat":38.9072,"lon":-77.0369},{"id":27,"name":"Virginia Commonwealth Tech","conference":"Atlantic","prestige":84,"resources":93,"development":72,"nil":99,"academics":59,"fan_support":75,"facilities":85,"admin_patience":53,"program_ceiling":100,"city":"Richmond","state":"VA","lat":37.5407,"lon":-77.436},{"id":28,"name":"Tidewater State","conference":"Atlantic","prestige":62,"resources":72,"development":57,"nil":62,"academics":85,"fan_support":58,"facilities":71,"admin_patience":61,"program_ceiling":75,"city":"Norfolk","state":"VA","lat":36.8508,"lon":-76.2859},{"id":29,"name":"Blue Ridge University","conference":"Atlantic","prestige":49,"resources":55,"development":83,"nil":50,"academics":62,"fan_support":62,"facilities":56,"admin_patience":56,"program_ceiling":63,"city":"Roanoke","state":"VA","lat":37.2709,"lon":-79.9414},{"id":30,"name":"Carolina Commonwealth","conference":"Atlantic","prestige":88,"resources":88,"development":64,"nil":99,"academics":69,"fan_support":98,"facilities":93,"admin_patience":57,"program_ceiling":100,"city":"Charlotte","state":"NC","lat":35.2271,"lon":-80.8431},{"id":31,"name":"Piedmont University","conference":"Atlantic","prestige":69,"resources":67,"development":55,"nil":64,"academics":95,"fan_support":73,"facilities":72,"admin_patience":56,"program_ceiling":81,"city":"Raleigh","state":"NC","lat":35.7796,"lon":-78.6382},{"id":32,"name":"Cape Fear State","conference":"Atlantic","prestige":67,"resources":53,"development":68,"nil":47,"academics":66,"fan_support":69,"facilities":56,"admin_patience":78,"program_ceiling":76,"city":"Wilmington","state":"NC","lat":34.2257,"lon":-77.9447},{"id":33,"name":"Palmetto University","conference":"Atlantic","prestige":70,"resources":67,"development":68,"nil":65,"academics":81,"fan_support":62,"facilities":65,"admin_patience":52,"program_ceiling":86,"city":"Columbia","state":"SC","lat":34.0007,"lon":-81.0348},{"id":34,"name":"Charleston Maritime","conference":"Atlantic","prestige":60,"resources":68,"development":73,"nil":56,"academics":70,"fan_support":49,"facilities":60,"admin_patience":52,"program_ceiling":77,"city":"Charleston","state":"SC","lat":32.7765,"lon":-79.9311},{"id":35,"name":"Appalachian Commonwealth","conference":"Atlantic","prestige":48,"resources":49,"development":63,"nil":45,"academics":58,"fan_support":44,"facilities":47,"admin_patience":78,"program_ceiling":54,"city":"Asheville","state":"NC","lat":35.5951,"lon":-82.5515},{"id":36,"name":"Shenandoah University","conference":"Atlantic","prestige":71,"resources":72,"development":53,"nil":75,"academics":67,"fan_support":81,"facilities":62,"admin_patience":85,"program_ceiling":78,"city":"Charlottesville","state":"VA","lat":38.0293,"lon":-78.4767},{"id":37,"name":"Georgia Commonwealth","conference":"Southeastern","prestige":96,"resources":99,"development":73,"nil":99,"academics":83,"fan_support":99,"facilities":98,"admin_patience":51,"program_ceiling":100,"city":"Atlanta","state":"GA","lat":33.749,"lon":-84.388},{"id":38,"name":"Georgia Coastal","conference":"Southeastern","prestige":84,"resources":85,"development":63,"nil":84,"academics":74,"fan_support":95,"facilities":86,"admin_patience":38,"program_ceiling":95,"city":"Savannah","state":"GA","lat":32.0809,"lon":-81.0912},{"id":39,"name":"Florida Commonwealth","conference":"Southeastern","prestige":92,"resources":94,"development":90,"nil":84,"academics":72,"fan_support":91,"facilities":92,"admin_patience":54,"program_ceiling":97,"city":"Orlando","state":"FL","lat":28.5383,"lon":-81.3792},{"id":40,"name":"South Florida Metropolitan","conference":"Southeastern","prestige":52,"resources":51,"development":48,"nil":48,"academics":59,"fan_support":40,"facilities":55,"admin_patience":71,"program_ceiling":90,"city":"Miami","state":"FL","lat":25.7617,"lon":-80.1918},{"id":41,"name":"Florida Gulf University","conference":"Southeastern","prestige":69,"resources":73,"development":59,"nil":91,"academics":44,"fan_support":71,"facilities":75,"admin_patience":53,"program_ceiling":78,"city":"Tampa","state":"FL","lat":27.9506,"lon":-82.4572},{"id":42,"name":"Alabama Commonwealth","conference":"Southeastern","prestige":97,"resources":91,"development":86,"nil":88,"academics":61,"fan_support":85,"facilities":99,"admin_patience":16,"program_ceiling":100,"city":"Birmingham","state":"AL","lat":33.5186,"lon":-86.8104},{"id":43,"name":"Mobile State","conference":"Southeastern","prestige":40,"resources":35,"development":42,"nil":33,"academics":62,"fan_support":34,"facilities":29,"admin_patience":68,"program_ceiling":56,"city":"Mobile","state":"AL","lat":30.6954,"lon":-88.0399},{"id":44,"name":"Tennessee Commonwealth","conference":"Southeastern","prestige":85,"resources":78,"development":74,"nil":84,"academics":75,"fan_support":66,"facilities":88,"admin_patience":30,"program_ceiling":100,"city":"Nashville","state":"TN","lat":36.1627,"lon":-86.7816},{"id":45,"name":"Knoxville Tech","conference":"Southeastern","prestige":48,"resources":45,"development":54,"nil":50,"academics":72,"fan_support":53,"facilities":44,"admin_patience":65,"program_ceiling":65,"city":"Knoxville","state":"TN","lat":35.9606,"lon":-83.9207},{"id":46,"name":"Mississippi Commonwealth","conference":"Southeastern","prestige":54,"resources":53,"development":64,"nil":63,"academics":77,"fan_support":59,"facilities":65,"admin_patience":41,"program_ceiling":66,"city":"Jackson","state":"MS","lat":32.2988,"lon":-90.1848},{"id":47,"name":"Magnolia State","conference":"Southeastern","prestige":52,"resources":54,"development":71,"nil":34,"academics":82,"fan_support":63,"facilities":53,"admin_patience":67,"program_ceiling":60,"city":"Hattiesburg","state":"MS","lat":31.3271,"lon":-89.2903},{"id":48,"name":"Kentucky Commonwealth","conference":"Southeastern","prestige":65,"resources":76,"development":65,"nil":75,"academics":79,"fan_support":43,"facilities":73,"admin_patience":50,"program_ceiling":80,"city":"Lexington","state":"KY","lat":38.0406,"lon":-84.5037},{"id":49,"name":"Louisiana Commonwealth","conference":"Gulf","prestige":91,"resources":99,"development":66,"nil":96,"academics":79,"fan_support":96,"facilities":92,"admin_patience":61,"program_ceiling":100,"city":"Baton Rouge","state":"LA","lat":30.4515,"lon":-91.1871},{"id":50,"name":"New Orleans University","conference":"Gulf","prestige":83,"resources":64,"development":57,"nil":66,"academics":67,"fan_support":80,"facilities":73,"admin_patience":40,"program_ceiling":93,"city":"New Orleans","state":"LA","lat":29.9511,"lon":-90.0715},{"id":51,"name":"Acadiana State","conference":"Gulf","prestige":66,"resources":57,"development":44,"nil":50,"academics":72,"fan_support":81,"facilities":68,"admin_patience":78,"program_ceiling":72,"city":"Lafayette","state":"LA","lat":30.2241,"lon":-92.0198},{"id":52,"name":"Gulf Coast Tech","conference":"Gulf","prestige":67,"resources":78,"development":83,"nil":77,"academics":57,"fan_support":77,"facilities":67,"admin_patience":31,"program_ceiling":79,"city":"Biloxi","state":"MS","lat":30.396,"lon":-88.8853},{"id":53,"name":"Houston Metropolitan","conference":"Gulf","prestige":84,"resources":94,"development":59,"nil":84,"academics":77,"fan_support":86,"facilities":99,"admin_patience":53,"program_ceiling":99,"city":"Houston","state":"TX","lat":29.7604,"lon":-95.3698},{"id":54,"name":"East Texas University","conference":"Gulf","prestige":67,"resources":54,"development":57,"nil":53,"academics":64,"fan_support":56,"facilities":68,"admin_patience":51,"program_ceiling":84,"city":"Beaumont","state":"TX","lat":30.0802,"lon":-94.1266},{"id":55,"name":"Arkansas Delta","conference":"Gulf","prestige":68,"resources":62,"development":50,"nil":63,"academics":57,"fan_support":56,"facilities":72,"admin_patience":66,"program_ceiling":85,"city":"Little Rock","state":"AR","lat":34.7465,"lon":-92.2896},{"id":56,"name":"Ozark Commonwealth","conference":"Gulf","prestige":67,"resources":79,"development":71,"nil":88,"academics":57,"fan_support":53,"facilities":70,"admin_patience":57,"program_ceiling":75,"city":"Fayetteville","state":"AR","lat":36.0822,"lon":-94.1719},{"id":57,"name":"Memphis Metropolitan","conference":"Gulf","prestige":64,"resources":65,"development":67,"nil":75,"academics":68,"fan_support":60,"facilities":55,"admin_patience":58,"program_ceiling":77,"city":"Memphis","state":"TN","lat":35.1495,"lon":-90.049},{"id":58,"name":"Red River University","conference":"Gulf","prestige":77,"resources":75,"development":60,"nil":76,"academics":78,"fan_support":81,"facilities":88,"admin_patience":52,"program_ceiling":90,"city":"Shreveport","state":"LA","lat":32.5252,"lon":-93.7502},{"id":59,"name":"Coastal Bend State","conference":"Gulf","prestige":63,"resources":70,"development":57,"nil":74,"academics":47,"fan_support":59,"facilities":69,"admin_patience":42,"program_ceiling":72,"city":"Corpus Christi","state":"TX","lat":27.8006,"lon":-97.3964},{"id":60,"name":"Gulf Plains University","conference":"Gulf","prestige":31,"resources":28,"development":60,"nil":22,"academics":73,"fan_support":29,"facilities":25,"admin_patience":60,"program_ceiling":44,"city":"Lake Charles","state":"LA","lat":30.2266,"lon":-93.2174},{"id":61,"name":"Missouri Commonwealth","conference":"Heartland","prestige":82,"resources":83,"development":85,"nil":65,"academics":69,"fan_support":99,"facilities":85,"admin_patience":59,"program_ceiling":98,"city":"Columbia","state":"MO","lat":38.9517,"lon":-92.3341},{"id":62,"name":"St. Louis Metropolitan","conference":"Heartland","prestige":65,"resources":74,"development":50,"nil":67,"academics":69,"fan_support":54,"facilities":72,"admin_patience":67,"program_ceiling":76,"city":"St. Louis","state":"MO","lat":38.627,"lon":-90.1994},{"id":63,"name":"Kansas Commonwealth","conference":"Heartland","prestige":81,"resources":91,"development":74,"nil":91,"academics":75,"fan_support":84,"facilities":82,"admin_patience":81,"program_ceiling":86,"city":"Wichita","state":"KS","lat":37.6872,"lon":-97.3301},{"id":64,"name":"Prairie Tech","conference":"Heartland","prestige":65,"resources":65,"development":64,"nil":77,"academics":72,"fan_support":73,"facilities":64,"admin_patience":48,"program_ceiling":82,"city":"Manhattan","state":"KS","lat":39.1836,"lon":-96.5717},{"id":65,"name":"Nebraska Commonwealth","conference":"Heartland","prestige":87,"resources":94,"development":65,"nil":83,"academics":95,"fan_support":61,"facilities":87,"admin_patience":54,"program_ceiling":97,"city":"Lincoln","state":"NE","lat":40.8136,"lon":-96.7026},{"id":66,"name":"Omaha State","conference":"Heartland","prestige":73,"resources":75,"development":64,"nil":76,"academics":74,"fan_support":63,"facilities":70,"admin_patience":58,"program_ceiling":84,"city":"Omaha","state":"NE","lat":41.2565,"lon":-95.9345},{"id":67,"name":"Iowa Commonwealth","conference":"Heartland","prestige":69,"resources":75,"development":51,"nil":73,"academics":64,"fan_support":70,"facilities":73,"admin_patience":57,"program_ceiling":77,"city":"Des Moines","state":"IA","lat":41.5868,"lon":-93.625},{"id":68,"name":"Dakota University","conference":"Heartland","prestige":79,"resources":89,"development":68,"nil":82,"academics":70,"fan_support":82,"facilities":80,"admin_patience":58,"program_ceiling":94,"city":"Sioux Falls","state":"SD","lat":43.5446,"lon":-96.7311},{"id":69,"name":"North Dakota Commonwealth","conference":"Heartland","prestige":66,"resources":73,"development":63,"nil":73,"academics":82,"fan_support":73,"facilities":68,"admin_patience":62,"program_ceiling":77,"city":"Fargo","state":"ND","lat":46.8772,"lon":-96.7898},{"id":70,"name":"Oklahoma Northern","conference":"Heartland","prestige":60,"resources":47,"development":74,"nil":59,"academics":75,"fan_support":59,"facilities":47,"admin_patience":55,"program_ceiling":77,"city":"Tulsa","state":"OK","lat":36.154,"lon":-95.9928},{"id":71,"name":"Springfield State","conference":"Heartland","prestige":51,"resources":64,"development":51,"nil":64,"academics":58,"fan_support":35,"facilities":57,"admin_patience":78,"program_ceiling":68,"city":"Springfield","state":"MO","lat":37.209,"lon":-93.2923},{"id":72,"name":"Central Plains University","conference":"Heartland","prestige":71,"resources":70,"development":73,"nil":65,"academics":85,"fan_support":61,"facilities":67,"admin_patience":65,"program_ceiling":78,"city":"Topeka","state":"KS","lat":39.0473,"lon":-95.6752},{"id":73,"name":"Texas Republic University","conference":"Southwest","prestige":98,"resources":99,"development":73,"nil":99,"academics":71,"fan_support":78,"facilities":83,"admin_patience":46,"program_ceiling":100,"city":"Austin","state":"TX","lat":30.2672,"lon":-97.7431},{"id":74,"name":"Lone Star Tech","conference":"Southwest","prestige":90,"resources":79,"development":65,"nil":73,"academics":73,"fan_support":83,"facilities":83,"admin_patience":58,"program_ceiling":100,"city":"Dallas","state":"TX","lat":32.7767,"lon":-96.797},{"id":75,"name":"Fort Worth State","conference":"Southwest","prestige":70,"resources":62,"development":75,"nil":60,"academics":84,"fan_support":71,"facilities":64,"admin_patience":79,"program_ceiling":83,"city":"Fort Worth","state":"TX","lat":32.7555,"lon":-97.3308},{"id":76,"name":"San Antonio Commonwealth","conference":"Southwest","prestige":69,"resources":91,"development":74,"nil":92,"academics":66,"fan_support":52,"facilities":82,"admin_patience":62,"program_ceiling":81,"city":"San Antonio","state":"TX","lat":29.4241,"lon":-98.4936},{"id":77,"name":"West Texas University","conference":"Southwest","prestige":56,"resources":40,"development":60,"nil":50,"academics":75,"fan_support":68,"facilities":41,"admin_patience":50,"program_ceiling":61,"city":"Lubbock","state":"TX","lat":33.5779,"lon":-101.8552},{"id":78,"name":"Rio Grande State","conference":"Southwest","prestige":68,"resources":67,"development":74,"nil":70,"academics":88,"fan_support":74,"facilities":61,"admin_patience":45,"program_ceiling":74,"city":"El Paso","state":"TX","lat":31.7619,"lon":-106.485},{"id":79,"name":"Oklahoma Commonwealth","conference":"Southwest","prestige":87,"resources":87,"development":69,"nil":85,"academics":60,"fan_support":88,"facilities":84,"admin_patience":52,"program_ceiling":94,"city":"Oklahoma City","state":"OK","lat":35.4676,"lon":-97.5164},{"id":80,"name":"Red Dirt University","conference":"Southwest","prestige":65,"resources":60,"development":76,"nil":71,"academics":73,"fan_support":73,"facilities":59,"admin_patience":44,"program_ceiling":73,"city":"Norman","state":"OK","lat":35.2226,"lon":-97.4395},{"id":81,"name":"New Mexico Commonwealth","conference":"Southwest","prestige":60,"resources":51,"development":50,"nil":63,"academics":76,"fan_support":64,"facilities":64,"admin_patience":65,"program_ceiling":72,"city":"Albuquerque","state":"NM","lat":35.0844,"lon":-106.6504},{"id":82,"name":"Santa Fe Tech","conference":"Southwest","prestige":53,"resources":51,"development":73,"nil":54,"academics":57,"fan_support":61,"facilities":53,"admin_patience":70,"program_ceiling":60,"city":"Santa Fe","state":"NM","lat":35.687,"lon":-105.9378},{"id":83,"name":"Arizona Commonwealth","conference":"Southwest","prestige":82,"resources":91,"development":65,"nil":81,"academics":72,"fan_support":99,"facilities":85,"admin_patience":64,"program_ceiling":90,"city":"Phoenix","state":"AZ","lat":33.4484,"lon":-112.074},{"id":84,"name":"Desert State University","conference":"Southwest","prestige":56,"resources":68,"development":36,"nil":54,"academics":46,"fan_support":46,"facilities":62,"admin_patience":68,"program_ceiling":67,"city":"Tucson","state":"AZ","lat":32.2226,"lon":-110.9747},{"id":85,"name":"Colorado Commonwealth","conference":"Mountain","prestige":82,"resources":86,"development":67,"nil":81,"academics":57,"fan_support":73,"facilities":85,"admin_patience":40,"program_ceiling":100,"city":"Denver","state":"CO","lat":39.7392,"lon":-104.9903},{"id":86,"name":"Front Range University","conference":"Mountain","prestige":56,"resources":59,"development":56,"nil":69,"academics":65,"fan_support":71,"facilities":55,"admin_patience":66,"program_ceiling":60,"city":"Colorado Springs","state":"CO","lat":38.8339,"lon":-104.8214},{"id":87,"name":"Utah Commonwealth","conference":"Mountain","prestige":84,"resources":88,"development":71,"nil":89,"academics":65,"fan_support":89,"facilities":89,"admin_patience":48,"program_ceiling":92,"city":"Salt Lake City","state":"UT","lat":40.7608,"lon":-111.891},{"id":88,"name":"Wasatch Tech","conference":"Mountain","prestige":82,"resources":74,"development":60,"nil":79,"academics":74,"fan_support":82,"facilities":88,"admin_patience":57,"program_ceiling":91,"city":"Provo","state":"UT","lat":40.2338,"lon":-111.6585},{"id":89,"name":"Boise Commonwealth","conference":"Mountain","prestige":81,"resources":87,"development":80,"nil":93,"academics":65,"fan_support":79,"facilities":84,"admin_patience":63,"program_ceiling":95,"city":"Boise","state":"ID","lat":43.615,"lon":-116.2023},{"id":90,"name":"Montana Commonwealth","conference":"Mountain","prestige":55,"resources":62,"development":45,"nil":54,"academics":55,"fan_support":59,"facilities":68,"admin_patience":68,"program_ceiling":68,"city":"Missoula","state":"MT","lat":46.8721,"lon":-113.994},{"id":91,"name":"Big Sky State","conference":"Mountain","prestige":76,"resources":67,"development":67,"nil":44,"academics":79,"fan_support":98,"facilities":74,"admin_patience":53,"program_ceiling":88,"city":"Bozeman","state":"MT","lat":45.677,"lon":-111.0429},{"id":92,"name":"Wyoming State","conference":"Mountain","prestige":35,"resources":45,"development":39,"nil":36,"academics":51,"fan_support":43,"facilities":36,"admin_patience":76,"program_ceiling":46,"city":"Cheyenne","state":"WY","lat":41.14,"lon":-104.8202},{"id":93,"name":"Nevada Commonwealth","conference":"Mountain","prestige":38,"resources":44,"development":58,"nil":48,"academics":53,"fan_support":26,"facilities":50,"admin_patience":57,"program_ceiling":42,"city":"Reno","state":"NV","lat":39.5296,"lon":-119.8138},{"id":94,"name":"Las Vegas Metropolitan","conference":"Mountain","prestige":78,"resources":69,"development":78,"nil":74,"academics":76,"fan_support":76,"facilities":74,"admin_patience":79,"program_ceiling":90,"city":"Las Vegas","state":"NV","lat":36.1699,"lon":-115.1398},{"id":95,"name":"Idaho Northern","conference":"Mountain","prestige":61,"resources":56,"development":63,"nil":53,"academics":66,"fan_support":60,"facilities":59,"admin_patience":59,"program_ceiling":69,"city":"Coeur d'Alene","state":"ID","lat":47.6777,"lon":-116.7805},{"id":96,"name":"Rocky Mountain University","conference":"Mountain","prestige":49,"resources":49,"development":47,"nil":39,"academics":84,"fan_support":52,"facilities":51,"admin_patience":48,"program_ceiling":65,"city":"Grand Junction","state":"CO","lat":39.0639,"lon":-108.5506},{"id":97,"name":"Southern California Commonwealth","conference":"Pacific","prestige":95,"resources":99,"development":70,"nil":92,"academics":64,"fan_support":95,"facilities":99,"admin_patience":38,"program_ceiling":100,"city":"Los Angeles","state":"CA","lat":34.0522,"lon":-118.2437},{"id":98,"name":"Los Angeles Metropolitan","conference":"Pacific","prestige":54,"resources":67,"development":56,"nil":55,"academics":45,"fan_support":54,"facilities":68,"admin_patience":52,"program_ceiling":69,"city":"Los Angeles","state":"CA","lat":34.0522,"lon":-118.2437},{"id":99,"name":"California Pacific","conference":"Pacific","prestige":75,"resources":79,"development":72,"nil":70,"academics":79,"fan_support":57,"facilities":81,"admin_patience":74,"program_ceiling":83,"city":"San Diego","state":"CA","lat":32.7157,"lon":-117.1611},{"id":100,"name":"Bay Area University","conference":"Pacific","prestige":84,"resources":79,"development":68,"nil":71,"academics":72,"fan_support":78,"facilities":76,"admin_patience":35,"program_ceiling":91,"city":"San Francisco","state":"CA","lat":37.7749,"lon":-122.4194},{"id":101,"name":"Sacramento State College","conference":"Pacific","prestige":74,"resources":82,"development":73,"nil":88,"academics":83,"fan_support":74,"facilities":85,"admin_patience":73,"program_ceiling":80,"city":"Sacramento","state":"CA","lat":38.5816,"lon":-121.4944},{"id":102,"name":"Central California Tech","conference":"Pacific","prestige":48,"resources":46,"development":65,"nil":34,"academics":62,"fan_support":35,"facilities":45,"admin_patience":63,"program_ceiling":64,"city":"Fresno","state":"CA","lat":36.7378,"lon":-119.7871},{"id":103,"name":"Oregon Commonwealth","conference":"Pacific","prestige":87,"resources":92,"development":81,"nil":98,"academics":82,"fan_support":89,"facilities":85,"admin_patience":68,"program_ceiling":96,"city":"Portland","state":"OR","lat":45.5152,"lon":-122.6784},{"id":104,"name":"Cascade University","conference":"Pacific","prestige":48,"resources":58,"development":54,"nil":58,"academics":55,"fan_support":37,"facilities":46,"admin_patience":52,"program_ceiling":58,"city":"Eugene","state":"OR","lat":44.0521,"lon":-123.0868},{"id":105,"name":"Washington Commonwealth","conference":"Pacific","prestige":90,"resources":88,"development":82,"nil":93,"academics":81,"fan_support":68,"facilities":81,"admin_patience":46,"program_ceiling":100,"city":"Seattle","state":"WA","lat":47.6062,"lon":-122.3321},{"id":106,"name":"Puget Sound State","conference":"Pacific","prestige":62,"resources":60,"development":56,"nil":57,"academics":59,"fan_support":63,"facilities":64,"admin_patience":72,"program_ceiling":75,"city":"Tacoma","state":"WA","lat":47.2529,"lon":-122.4443},{"id":107,"name":"Hawaii Commonwealth","conference":"Pacific","prestige":53,"resources":56,"development":55,"nil":63,"academics":61,"fan_support":47,"facilities":54,"admin_patience":60,"program_ceiling":65,"city":"Honolulu","state":"HI","lat":21.3069,"lon":-157.8583},{"id":108,"name":"Alaska Pacific","conference":"Pacific","prestige":22,"resources":21,"development":49,"nil":39,"academics":90,"fan_support":25,"facilities":25,"admin_patience":50,"program_ceiling":36,"city":"Anchorage","state":"AK","lat":61.2181,"lon":-149.9003},{"id":109,"name":"Philadelphia Metropolitan","conference":"Metro","prestige":80,"resources":93,"development":68,"nil":99,"academics":63,"fan_support":92,"facilities":92,"admin_patience":48,"program_ceiling":94,"city":"Philadelphia","state":"PA","lat":39.9526,"lon":-75.1652},{"id":110,"name":"Pittsburgh Commonwealth","conference":"Metro","prestige":82,"resources":71,"development":81,"nil":52,"academics":60,"fan_support":73,"facilities":85,"admin_patience":49,"program_ceiling":89,"city":"Pittsburgh","state":"PA","lat":40.4406,"lon":-79.9959},{"id":111,"name":"Baltimore Metropolitan","conference":"Metro","prestige":43,"resources":39,"development":62,"nil":41,"academics":75,"fan_support":39,"facilities":36,"admin_patience":67,"program_ceiling":60,"city":"Baltimore","state":"MD","lat":39.2904,"lon":-76.6122},{"id":112,"name":"Cincinnati Commonwealth","conference":"Metro","prestige":79,"resources":60,"development":66,"nil":61,"academics":54,"fan_support":72,"facilities":63,"admin_patience":77,"program_ceiling":87,"city":"Cincinnati","state":"OH","lat":39.1031,"lon":-84.512},{"id":113,"name":"Louisville Metropolitan","conference":"Metro","prestige":77,"resources":68,"development":73,"nil":87,"academics":76,"fan_support":84,"facilities":82,"admin_patience":66,"program_ceiling":82,"city":"Louisville","state":"KY","lat":38.2527,"lon":-85.7585},{"id":114,"name":"Nashville Tech","conference":"Metro","prestige":51,"resources":41,"development":52,"nil":24,"academics":63,"fan_support":48,"facilities":41,"admin_patience":62,"program_ceiling":69,"city":"Nashville","state":"TN","lat":36.1627,"lon":-86.7816},{"id":115,"name":"Indianapolis Metropolitan","conference":"Metro","prestige":60,"resources":63,"development":49,"nil":58,"academics":54,"fan_support":56,"facilities":74,"admin_patience":64,"program_ceiling":75,"city":"Indianapolis","state":"IN","lat":39.7684,"lon":-86.1581},{"id":116,"name":"Columbus Metropolitan","conference":"Metro","prestige":78,"resources":67,"development":62,"nil":68,"academics":77,"fan_support":60,"facilities":76,"admin_patience":44,"program_ceiling":91,"city":"Columbus","state":"OH","lat":39.9612,"lon":-82.9988},{"id":117,"name":"Buffalo State University","conference":"Metro","prestige":46,"resources":47,"development":71,"nil":41,"academics":77,"fan_support":30,"facilities":47,"admin_patience":65,"program_ceiling":55,"city":"Buffalo","state":"NY","lat":42.8864,"lon":-78.8784},{"id":118,"name":"Pittsburgh Tech","conference":"Metro","prestige":42,"resources":28,"development":54,"nil":27,"academics":49,"fan_support":33,"facilities":29,"admin_patience":56,"program_ceiling":59,"city":"Pittsburgh","state":"PA","lat":40.4406,"lon":-79.9959},{"id":119,"name":"Richmond Metropolitan","conference":"Metro","prestige":69,"resources":62,"development":61,"nil":51,"academics":62,"fan_support":70,"facilities":68,"admin_patience":65,"program_ceiling":85,"city":"Richmond","state":"VA","lat":37.5407,"lon":-77.436},{"id":120,"name":"Toronto International University","conference":"Metro","prestige":62,"resources":49,"development":49,"nil":56,"academics":53,"fan_support":67,"facilities":39,"admin_patience":67,"program_ceiling":72,"city":"Toronto","state":"ON","lat":43.6532,"lon":-79.3832}];
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.9.6';
+const APP_VERSION='0.9.7';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -1738,5 +2296,172 @@ function bind(){
 }
 if(typeof window!=='undefined')window.__DL_TEST__={selected,createOpening,renderStaff};
 loadSchools().then(()=>{initUniverse();refreshTeamOptions('Chicago Metropolitan');POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});allConfs().forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();render();setStatus(`v${APP_VERSION} ready. Export or Save to preserve a dynasty.`);}).catch(e=>{$('#app').innerHTML='<div style="padding:30px">Could not initialize Dynasty Lab. '+e.message+'</div>'});
+})();
+
+(() => {
+'use strict';
+
+// Presentation-only school branding. This deliberately does not mutate universe/team
+// objects or save data. A future create-a-school pass can replace this with explicit
+// colors/logos without requiring migration from this visual layer.
+const palettes=[
+  {primary:'#173b67',secondary:'#79b4ff',rgb:'121,180,255'},
+  {primary:'#6a1f2b',secondary:'#f0c56f',rgb:'240,197,111'},
+  {primary:'#1f513f',secondary:'#79d7ad',rgb:'121,215,173'},
+  {primary:'#47306e',secondary:'#b39cff',rgb:'179,156,255'},
+  {primary:'#8a3e16',secondary:'#ffad72',rgb:'255,173,114'},
+  {primary:'#155360',secondary:'#78d4df',rgb:'120,212,223'},
+  {primary:'#622e46',secondary:'#ef9fbd',rgb:'239,159,189'},
+  {primary:'#3d3a20',secondary:'#e8ce72',rgb:'232,206,114'},
+  {primary:'#274b8b',secondary:'#8bb7ff',rgb:'139,183,255'},
+  {primary:'#712829',secondary:'#ff9292',rgb:'255,146,146'},
+  {primary:'#315022',secondary:'#a5d77b',rgb:'165,215,123'},
+  {primary:'#55324e',secondary:'#cfa2c4',rgb:'207,162,196'},
+  {primary:'#244f58',secondary:'#84c8d4',rgb:'132,200,212'},
+  {primary:'#4d3c23',secondary:'#d6b67b',rgb:'214,182,123'}
+];
+
+function hashText(value){
+  let h=2166136261;
+  const text=String(value||'Dynasty Lab');
+  for(let i=0;i<text.length;i++){
+    h^=text.charCodeAt(i);
+    h=Math.imul(h,16777619);
+  }
+  return h>>>0;
+}
+
+function initials(name){
+  const ignore=new Set(['university','state','commonwealth','metropolitan','tech','college','maritime']);
+  const parts=String(name||'DL').trim().split(/\s+/).filter(Boolean);
+  const meaningful=parts.filter(p=>!ignore.has(p.toLowerCase()));
+  const source=meaningful.length?meaningful:parts;
+  if(!source.length)return 'DL';
+  if(source.length===1)return source[0].slice(0,2).toUpperCase();
+  return (source[0][0]+source[source.length-1][0]).toUpperCase();
+}
+
+function applyBrand(){
+  const root=document.documentElement;
+  const teamNameEl=document.getElementById('teamName');
+  const picker=document.getElementById('userTeam');
+  const name=(teamNameEl&&teamNameEl.textContent||picker&&picker.options[picker.selectedIndex]?.text||'Dynasty Lab').trim();
+  if(!name||name==='—')return;
+  const palette=palettes[hashText(name)%palettes.length];
+  root.style.setProperty('--team-primary',palette.primary);
+  root.style.setProperty('--team-secondary',palette.secondary);
+  root.style.setProperty('--team-rgb',palette.rgb);
+  root.dataset.teamBrand=String(hashText(name)%palettes.length);
+  root.dataset.teamMark=initials(name);
+  const brandMark=document.querySelector('.topbar>div:first-child');
+  if(brandMark)brandMark.setAttribute('data-team-mark',initials(name));
+}
+
+function queueBrand(){
+  if(typeof requestAnimationFrame==='function')requestAnimationFrame(applyBrand);
+  else setTimeout(applyBrand,0);
+}
+
+const picker=document.getElementById('userTeam');
+if(picker)picker.addEventListener('change',queueBrand);
+const teamNameEl=document.getElementById('teamName');
+if(teamNameEl&&typeof MutationObserver!=='undefined'){
+  new MutationObserver(queueBrand).observe(teamNameEl,{childList:true,subtree:true,characterData:true});
+}
+
+document.addEventListener('click',event=>{
+  if(event.target&&event.target.closest&&event.target.closest('#applyProgramEdit'))setTimeout(applyBrand,0);
+});
+
+applyBrand();
+})();
+
+(() => {
+'use strict';
+
+// Presentation-only enhancement. Reads rendered DOM; never mutates universe/save data.
+const palettes=[
+ ['#173b67','#79b4ff','121,180,255'],['#6a1f2b','#f0c56f','240,197,111'],
+ ['#1f513f','#79d7ad','121,215,173'],['#47306e','#b39cff','179,156,255'],
+ ['#8a3e16','#ffad72','255,173,114'],['#155360','#78d4df','120,212,223'],
+ ['#622e46','#ef9fbd','239,159,189'],['#3d3a20','#e8ce72','232,206,114'],
+ ['#274b8b','#8bb7ff','139,183,255'],['#712829','#ff9292','255,146,146'],
+ ['#315022','#a5d77b','165,215,123'],['#55324e','#cfa2c4','207,162,196']
+];
+function hash(s){let h=2166136261;for(const c of String(s||'DL')){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function palette(name){const p=palettes[hash(name)%palettes.length];return {primary:p[0],secondary:p[1],rgb:p[2]}}
+function initials(name){const skip=new Set(['university','state','commonwealth','metropolitan','tech','college','maritime']);let a=String(name||'DL').trim().split(/\s+/).filter(Boolean),b=a.filter(x=>!skip.has(x.toLowerCase()));a=b.length?b:a;return !a.length?'DL':a.length===1?a[0].slice(0,2).toUpperCase():(a[0][0]+a.at(-1)[0]).toUpperCase()}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function team(){const p=document.querySelector('#userTeam'),n=document.querySelector('#teamName')?.textContent;return (n||p?.options[p.selectedIndex]?.text||'Program').trim()}
+function txt(el,sel){return (el?.querySelector(sel)?.textContent||'').trim()}
+function mark(name,size=''){const p=palette(name);return `<div class="sports-mark ${size}" style="--mark-primary:${p.primary};--mark-secondary:${p.secondary};--mark-rgb:${p.rgb}" aria-hidden="true">${esc(initials(name))}</div>`}
+function go(tab){document.querySelector(`.tabs button[data-tab="${tab}"]`)?.click()}
+
+function dashboard(){
+ const d=document.querySelector('#dashboard'),hero=d?.querySelector('.hero-grid'),hub=document.querySelector('#weeklyHub');if(!d||!hero||!hub)return;
+ let f=document.querySelector('#broadcastFeature');if(!f){f=document.createElement('section');f.id='broadcastFeature';f.className='broadcast-feature';hero.after(f)}
+ const items=[...hub.querySelectorAll('.hub-item')],next=items.find(x=>txt(x,'.hub-kicker').toUpperCase()==='NEXT UP'),last=items.find(x=>txt(x,'.hub-kicker').toUpperCase()==='FINAL');
+ const u=team(),record=document.querySelector('#recordBig')?.textContent||'0–0',rank=document.querySelector('#rankLine')?.textContent||'Preseason',week=document.querySelector('#weekLine')?.textContent||'';
+ if(next){const main=txt(next,'.hub-main'),sub=txt(next,'.hub-sub'),m=main.match(/^Week\s+(\d+):\s+(vs|@)\s+(.+)$/i),wk=m?.[1]||'—',loc=m?.[2]||'vs',opp=(m?.[3]||main).trim();f.innerHTML=`<div class="broadcast-feature-main"><div class="broadcast-kicker">WEEK ${esc(wk)} · NEXT MATCHUP</div><div class="broadcast-matchup"><div class="broadcast-team">${mark(u,'large')}<div><span class="broadcast-team-role">YOUR PROGRAM</span><strong>${esc(u)}</strong><span>${esc(record)} · ${esc(rank)}</span></div></div><div class="broadcast-versus"><b>${loc==='@'?'AT':'VS'}</b><span>SCOUTING DESK</span></div><div class="broadcast-team opponent">${mark(opp,'large')}<div><span class="broadcast-team-role">OPPONENT</span><strong>${esc(opp)}</strong><span>${esc(sub)}</span></div></div></div><div class="broadcast-actions"><button type="button" data-sports-tab="gamelab">Open Game Lab</button><span>${esc(week)}</span></div></div><aside class="broadcast-result"><div class="broadcast-kicker">${last?'LAST RESULT':'PROGRAM STATUS'}</div>${last?`<strong>${esc(txt(last,'.hub-main'))}</strong><span>${esc(txt(last,'.hub-sub'))}</span><button type="button" data-sports-tab="season">View Season</button>`:`<strong>${esc(record)}</strong><span>${esc(rank)} · ${esc(week)}</span>`}</aside>`}
+ else if(last){f.innerHTML=`<div class="broadcast-feature-main"><div class="broadcast-kicker">DYNASTY LAB · FINAL</div><div class="broadcast-final">${mark(u,'large')}<div><strong>${esc(txt(last,'.hub-main'))}</strong><span>${esc(txt(last,'.hub-sub'))}</span></div></div><div class="broadcast-actions"><button type="button" data-sports-tab="season">Open Season Center</button><span>${esc(week)}</span></div></div>`}
+ else f.innerHTML=`<div class="broadcast-feature-main"><div class="broadcast-kicker">DYNASTY LAB · PROGRAM DESK</div><div class="broadcast-final">${mark(u,'large')}<div><strong>${esc(u)}</strong><span>${esc(record)} · ${esc(rank)} · ${esc(week)}</span></div></div><div class="broadcast-actions"><span>Matchup and result graphics will surface here as the season advances.</span></div></div>`;
+}
+
+function playerHero(){
+ const dlg=document.querySelector('#playerDialog');if(!dlg?.hasAttribute('open'))return;const head=dlg.querySelector('.dialog-head'),id=head?.querySelector('.dialog-identity'),body=document.querySelector('#playerDialogBody');if(!head||!id||!body)return;
+ const name=document.querySelector('#playerDialogName')?.textContent||'Player',meta=document.querySelector('#playerDialogMeta')?.textContent||'',stats=[...body.querySelectorAll('.profile-grid .profile-stat')];if(stats.length<3)return;
+ const key=name+'|'+meta+'|'+stats.slice(0,3).map(x=>x.textContent).join('|');if(dlg.dataset.sportsHeroKey===key)return;dlg.dataset.sportsHeroKey=key;dlg.classList.add('sports-player-dialog');head.querySelector('.player-hero-rail')?.remove();id.querySelector('.player-hero-team-mark')?.remove();
+ const parts=meta.split('·').map(x=>x.trim()).filter(Boolean),school=parts.length>=5?parts.at(-1):team(),pos=parts[0]||'PLAYER',p=palette(school);let tm=document.createElement('div');tm.className='player-hero-team-mark';tm.style.cssText=`--mark-primary:${p.primary};--mark-secondary:${p.secondary};--mark-rgb:${p.rgb}`;tm.innerHTML=`<span>${esc(initials(school))}</span><small>${esc(school)}</small>`;id.append(tm);
+ let rail=document.createElement('div');rail.className='player-hero-rail';rail.innerHTML=`<div class="player-position-chip">${esc(pos)}</div>`+stats.slice(0,3).map((x,i)=>`<div class="player-hero-rating ${i===0?'primary':''}"><span>${esc(x.querySelector('.small')?.textContent||'')}</span><strong>${esc(x.querySelector('.v')?.textContent||'—')}</strong></div>`).join('');head.insertBefore(rail,head.querySelector('.dialog-close'));body.querySelector('.profile-grid')?.classList.add('sports-profile-grid')
+}
+
+function matchup(){
+ const c=document.querySelector('#nextGameCard');if(!c||c.querySelector('.matchup-shell'))return;const title=c.querySelector('strong')?.textContent?.trim(),detail=c.querySelector('.muted')?.textContent?.trim();if(!title||!detail)return;const m=title.match(/^Week\s+(\d+):\s+(vs|@)\s+(.+)$/i);if(!m)return;const [,wk,loc,opp]=m,u=team(),halves=detail.split(/\s+·\s+/);c.innerHTML=`<div class="matchup-shell"><div class="matchup-label">WEEK ${esc(wk)} · GAME LAB PREVIEW</div><div class="matchup-board"><div class="matchup-team is-user">${mark(u,'xl')}<strong>${esc(u)}</strong><span>${esc((halves[0]||'').replace(u+':','').trim())}</span></div><div class="matchup-center"><b>${loc==='@'?'AT':'VS'}</b><span>TALE OF THE TAPE</span></div><div class="matchup-team">${mark(opp,'xl')}<strong>${esc(opp)}</strong><span>${esc((halves.slice(1).join(' · ')||'').replace(opp+':','').trim())}</span></div></div><div class="matchup-footer"><span>Current staff/game-model reads</span><strong>${loc==='@'?'ROAD GAME':'HOME GAME'}</strong></div></div>`
+}
+function score(){document.querySelector('#detailedBox .big')?.classList.add('sports-scoreline')}
+let queued=false;function run(){queued=false;dashboard();playerHero();matchup();score()}function queue(){if(queued)return;queued=true;if(window.requestAnimationFrame)window.requestAnimationFrame(run);else setTimeout(run,0)}
+document.addEventListener('click',e=>{const tab=e.target?.closest?.('[data-sports-tab]')?.dataset?.sportsTab;if(tab){e.preventDefault();go(tab)}setTimeout(queue,0)});document.querySelector('#userTeam')?.addEventListener('change',()=>setTimeout(queue,0));
+if(window.MutationObserver){for(const sel of ['#weeklyHub','#playerDialog','#nextGameCard','#detailedBox']){const el=document.querySelector(sel);if(el)new MutationObserver(queue).observe(el,{childList:true,subtree:true,characterData:true,attributes:sel==='#playerDialog'})}}
+queue();
+})();
+
+(() => {
+'use strict';
+
+// Recruiting presentation only. This reads the already-rendered recruiting DOM and
+// never mutates recruit/team/universe state.
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function initials(name){const parts=String(name||'R').trim().split(/\s+/).filter(Boolean);return parts.length<2?(parts[0]||'R').slice(0,2).toUpperCase():(parts[0][0]+parts.at(-1)[0]).toUpperCase()}
+function team(){const n=document.querySelector('#teamName')?.textContent?.trim();const p=document.querySelector('#userTeam');return n&&n!=='—'?n:(p?.options[p.selectedIndex]?.text||'Program').trim()}
+function cell(row,label){return row?.querySelector(`[data-label="${label}"]`)}
+function rankOf(row){const n=(cell(row,'Rank')?.textContent||'').match(/#(\d+)/);return n?+n[1]:9999}
+function recruitRows(){return [...document.querySelectorAll('#recruitBody tr')].map(row=>{const b=row.querySelector('[data-recruit]');if(!b)return null;const home=cell(row,'Hometown / HS'),interest=cell(row,'Interest');return {row,id:b.dataset.recruit,name:b.textContent.trim(),pos:(cell(row,'Pos')?.textContent||'').trim(),rank:rankOf(row),stars:(cell(row,'Stars')?.textContent||'').trim(),home:[...home?.childNodes||[]].find(n=>n.nodeType===3)?.textContent?.trim()||'',hs:home?.querySelector('.small')?.textContent?.trim()||'',status:(interest?.textContent||'').trim()}}).filter(Boolean)}
+function recentCommitment(){return [...document.querySelectorAll('#weeklyHub .hub-item')].find(x=>['COMMITMENT','FLIP'].includes((x.querySelector('.hub-kicker')?.textContent||'').trim().toUpperCase()))}
+function findRecruitIdByHeadline(text,rows){return rows.find(r=>String(text||'').includes(r.name))?.id||''}
+
+function renderSigningClass(){
+ const tab=document.querySelector('#recruiting'),summary=document.querySelector('#classSummary'),body=document.querySelector('#recruitBody');if(!tab||!summary||!body)return;
+ const rows=recruitRows(),commits=rows.filter(r=>/COMMITTED|WAVERING/.test(r.status.toUpperCase())).sort((a,b)=>a.rank-b.rank),count=+(summary.textContent.match(/(\d+)\s+commitments?/i)?.[1]||commits.length),classRank=summary.textContent.match(/#\d+\s+recruiting class/i)?.[0]||'Recruiting class',blue=+(summary.textContent.match(/(\d+)\s+blue chips?/i)?.[1]||0),recent=recentCommitment();
+ let feature=document.querySelector('#signingClassFeature');if(!feature){feature=document.createElement('section');feature.id='signingClassFeature';feature.className='signing-class-feature';const head=tab.querySelector('.section-head');(head||summary).after(feature)}
+ const sig=[count,classRank,blue,commits.slice(0,6).map(r=>r.id+':'+r.status).join(','),recent?.textContent||''].join('|');if(feature.dataset.signature===sig)return;feature.dataset.signature=sig;
+ let spotlight='';if(recent){const kicker=(recent.querySelector('.hub-kicker')?.textContent||'COMMITMENT').trim(),main=(recent.querySelector('.hub-main')?.textContent||'').trim(),sub=(recent.querySelector('.hub-sub')?.textContent||'').trim(),rid=findRecruitIdByHeadline(main,rows);spotlight=`<article class="commitment-spotlight"><div class="commitment-stamp">${esc(kicker)}</div><div class="commitment-avatar">${esc(initials(main.replace(/[★]/g,'').replace(/^\s*[A-Z]{1,4}\s+/,'').trim()))}</div><div class="commitment-copy"><span>DYNASTY LAB RECRUITING</span><strong>${esc(main)}</strong><small>${esc(sub)}</small></div><div class="commitment-school"><b>${esc(initials(team()))}</b><span>${esc(team())}</span></div>${rid?`<button type="button" data-signing-recruit="${esc(rid)}">View recruit</button>`:''}</article>`}
+ const cards=commits.slice(0,6).map(r=>`<button type="button" class="signing-card${/WAVERING/.test(r.status.toUpperCase())?' is-wavering':''}" data-signing-recruit="${esc(r.id)}"><span class="signing-card-rank">#${r.rank}</span><span class="signing-card-avatar">${esc(initials(r.name))}</span><span class="signing-card-stars">${esc(r.stars)}</span><strong>${esc(r.name)}</strong><span>${esc(r.pos)} · ${esc(r.home||r.hs)}</span><em>${/WAVERING/.test(r.status.toUpperCase())?'WAVERING':'COMMITTED'}</em></button>`).join('');
+ const empty=count?`<div class="signing-empty"><strong>${count} commitment${count===1?' is':'s are'} in the class.</strong><span>Recent and board-visible commitments appear as individual cards here.</span></div>`:`<div class="signing-empty"><strong>No commitments yet.</strong><span>Your first commitment will become a collectible-style signing card here.</span></div>`;
+ feature.innerHTML=`${spotlight}<div class="signing-class-board"><div class="signing-class-head"><div><span class="signing-kicker">SIGNING CLASS</span><h3>${esc(classRank)}</h3><p>${count} commitment${count===1?'':'s'} · ${blue} blue chip${blue===1?'':'s'}</p></div><div class="signing-class-count"><strong>${count}</strong><span>of 30 slots</span></div></div><div class="signing-meter" aria-label="${count} of 30 signing slots"><i style="width:${Math.min(100,Math.round(count/30*100))}%"></i></div>${cards?`<div class="signing-card-grid">${cards}</div>`:empty}</div>`;
+ feature.querySelectorAll('[data-signing-recruit]').forEach(b=>b.onclick=()=>document.querySelector(`#recruitBody [data-recruit="${CSS.escape(b.dataset.signingRecruit)}"]`)?.click());
+}
+
+function renderRecruitHero(){
+ const dlg=document.querySelector('#recruitDialog');if(!dlg?.hasAttribute('open'))return;const head=dlg.querySelector('.dialog-head'),body=document.querySelector('#recruitDialogBody'),name=document.querySelector('#recruitDialogName')?.textContent?.trim(),meta=document.querySelector('#recruitDialogMeta')?.textContent?.trim();if(!head||!body||!name||!meta)return;
+ const row=recruitRows().find(r=>r.name===name),stats=[...body.querySelectorAll('.profile-grid .profile-stat')],interest=stats.find(x=>/Interest/i.test(x.querySelector('.small')?.textContent||''))?.querySelector('.v')?.textContent||'—',stars=meta.match(/★+/)?.[0]||'',national=meta.match(/#\d+\s+national/i)?.[0]||'',pos=meta.split('·')[0]?.trim()||'RECRUIT',status=row&&/COMMITTED|WAVERING/.test(row.status.toUpperCase())?row.status.toUpperCase():'PROSPECT',key=[name,meta,status,interest].join('|');if(dlg.dataset.recruitHeroKey===key)return;dlg.dataset.recruitHeroKey=key;dlg.classList.add('sports-recruit-dialog');
+ const identity=head.firstElementChild;identity?.classList.add('recruit-hero-identity');identity?.querySelector('.recruit-hero-avatar')?.remove();head.querySelector('.recruit-hero-rail')?.remove();
+ if(identity){const avatar=document.createElement('div');avatar.className='recruit-hero-avatar';avatar.innerHTML=`<span>${esc(initials(name))}</span><small>${esc(stars||'PROSPECT')}</small>`;identity.prepend(avatar)}
+ const rail=document.createElement('div');rail.className='recruit-hero-rail';rail.innerHTML=`<div class="recruit-position-chip">${esc(pos)}</div><div><span>NATIONAL</span><strong>${esc(national.replace(/\s+national/i,'')||'—')}</strong></div><div><span>INTEREST</span><strong>${esc(interest)}</strong></div><div class="recruit-status ${status==='WAVERING'?'warn':''}"><span>STATUS</span><strong>${esc(status)}</strong></div>`;head.insertBefore(rail,head.querySelector('.dialog-close'));body.querySelector('.profile-grid')?.classList.add('sports-recruit-profile-grid')
+}
+
+let queued=false;function run(){queued=false;renderSigningClass();renderRecruitHero()}function queue(){if(queued)return;queued=true;if(window.requestAnimationFrame)window.requestAnimationFrame(run);else setTimeout(run,0)}
+document.addEventListener('click',()=>setTimeout(queue,0));document.querySelector('#userTeam')?.addEventListener('change',()=>setTimeout(queue,0));
+if(window.MutationObserver){for(const [sel,attrs] of [['#recruitBody',false],['#classSummary',false],['#weeklyHub',false],['#recruitDialog',true]]){const el=document.querySelector(sel);if(el)new MutationObserver(queue).observe(el,{childList:true,subtree:true,characterData:true,attributes:attrs})}}
+queue();
 })();
 </script></body></html>
