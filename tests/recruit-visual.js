@@ -18,7 +18,10 @@ const path = require('path');
   await page.click('#signingClassFeature .signing-card');await page.waitForSelector('#recruitDialog[open] .recruit-hero-rail');
   check(`[${label}] recruit profile gets hero rail`,await page.locator('#recruitDialog .recruit-hero-rail > *').count()===4);
   check(`[${label}] recruit hero has identity graphic`,await page.locator('#recruitDialog .recruit-hero-avatar').count()===1);
-  if(label==='iphone'){const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);check(`[${label}] recruiting visuals have no horizontal overflow`,overflow<=1,`${overflow}px`)}
+  if(label==='iphone'){
+   const info=await page.evaluate(()=>{const root=document.documentElement,overflow=root.scrollWidth-root.clientWidth,vw=root.clientWidth;const offenders=[...document.querySelectorAll('body *')].map(el=>{const r=el.getBoundingClientRect();return {tag:el.tagName.toLowerCase(),id:el.id||'',cls:String(el.className||'').slice(0,90),left:Math.round(r.left),right:Math.round(r.right),width:Math.round(r.width),sw:el.scrollWidth,cw:el.clientWidth}}).filter(x=>x.right>vw+1||x.left<-1||x.sw>x.cw+1).sort((a,b)=>Math.max(b.right-vw,b.sw-b.cw)-Math.max(a.right-vw,a.sw-a.cw)).slice(0,8);return {overflow,offenders}});
+   check(`[${label}] recruiting visuals have no horizontal overflow`,info.overflow<=1,`${info.overflow}px ${JSON.stringify(info.offenders)}`)
+  }
   check(`[${label}] recruiting visuals throw no console errors`,errors.length===0,errors.slice(0,2).join(' | '));await page.close();
  }
  await browser.close();console.log(out.join('\n'));console.log(`\n${pass} passed, ${fail} failed`);process.exit(fail?1:0);
