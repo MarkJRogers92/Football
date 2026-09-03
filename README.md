@@ -43,6 +43,9 @@ Completed v0.9 slices:
 - v0.9.2 — permanent Game Center / historical box scores
 - v0.9.3 — deterministic Portrait V1 integration
 
+Current development preview:
+- v0.9.4 — persistent coaching careers (stable stints, retirement/archive and coach profiles)
+
 See `CHANGELOG.md` and `CONTINUATION.md` for the current checkpoint and next
 bounded milestone.
 

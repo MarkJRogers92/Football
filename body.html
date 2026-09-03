@@ -94,6 +94,7 @@
         <div class="card"><h3>Scheme Identity</h3><div id="schemeCard"></div></div>
       </div>
       <div class="card"><h3>Scheme-Fit Leaders</h3><div id="schemeFitLeaders"></div></div>
+      <div class="card"><h3>Former Coaches & Career History</h3><div class="muted" style="margin-bottom:8px">Coaches remain part of the dynasty after they leave. Open a name to see the same career across jobs.</div><div id="coachHistoryList"></div></div>
     </section>
 
     <section id="gamelab" class="panel tab">
@@ -257,6 +258,13 @@
   </form>
 </dialog>
 
+
+<dialog id="coachDialog" class="player-dialog" aria-labelledby="coachDialogName">
+  <form method="dialog" class="dialog-shell">
+    <div class="dialog-head"><div><div class="eyebrow">COACH PROFILE</div><h2 id="coachDialogName">Coach</h2><div id="coachDialogMeta" class="muted"></div></div><button class="dialog-close" value="close" aria-label="Close coach profile">Close</button></div>
+    <div id="coachDialogBody"></div>
+  </form>
+</dialog>
 
 <dialog id="gameDialog" class="player-dialog game-dialog" aria-labelledby="gameDialogName">
  <form method="dialog" class="dialog-shell">

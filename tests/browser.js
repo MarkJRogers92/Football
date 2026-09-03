@@ -73,6 +73,15 @@ const path = require('path');
     check(`[${label}] school history reopens same score`,await page.locator('#gameDialogName').innerText()===gameTitle);
     await page.getByRole('button',{name:'Close Game Center',exact:true}).click();
 
+    // Persistent coach profile dialog.
+    await page.click('.tabs button[data-tab="staff"]');
+    await page.click('#staffList [data-coach]');
+    await page.waitForTimeout(80);
+    check(`[${label}] coach profile opens`, await page.locator('#coachDialog').isVisible());
+    check(`[${label}] coach profile shows career history`, /Career timeline/i.test(await page.locator('#coachDialogBody').innerText()));
+    check(`[${label}] coach profile fits viewport`, await page.locator('#coachDialog').evaluate(el=>el.getBoundingClientRect().right<=innerWidth&&el.scrollWidth<=el.clientWidth+1));
+    await page.getByRole('button',{name:'Close coach profile',exact:true}).click();
+
     // Player profile dialog.
     await page.click('.tabs button[data-tab="roster"]');
     await page.waitForTimeout(80);

@@ -1,5 +1,18 @@
 # WORKLOG
 
+## v0.9.4 — persistent coaching careers
+
+Plan: turn the coach IDs introduced with promises into durable people before adding a hiring market. Preserve existing turnover behavior where possible, add retirement/internal-promotion paths only to exercise career continuity, and keep relationship portability for v0.9.5.
+
+Decisions:
+- Career history stores evidence we actually have. Legacy saves get a current/last stint but zero reconstructed wins or titles.
+- Every completed season is recorded before the offseason carousel changes a staff.
+- Cross-school `moveCoach()` is implemented as a stable-ID foundation and deterministic test seam; the general candidate/poaching market remains out of scope.
+- Coach profiles expose specialties and plain-language career traits, not the raw hidden ambition/loyalty values.
+- Departed and retired coaches live in `coachArchive`; active staff are not duplicated there after normalization.
+
+Validation is performed by the v0.9.4 branch CI pass before preview publication.
+
 Running log for the v0.8.1 follow-up work list. One entry per item: plan,
 decisions a successor would otherwise re-derive, outcome, test result.
 `npm test` is the gate; `npm run build` regenerates `index.html` before every

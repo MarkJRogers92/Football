@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.9.4 — Persistent coaching careers (preview batch)
+
+- Coaches now keep one durable identity across jobs, role changes and retirement, with persistent career stints and season-by-season team records.
+- The existing offseason carousel records each staff season before turnover, preserves fired/departed/retired coaches, and can make a bounded internal coordinator-to-HC promotion without introducing the full hiring market.
+- Staff names open a Coach Profile with descriptive specialties/traits, tracked record, titles, recent seasons and a career timeline. Former coaches remain visible from the selected program. Hidden personality numbers are not exposed.
+- Coach movement/retirement events use stable coach IDs; existing player/recruit coach references continue to resolve. Old saves receive additive legacy career stints without fabricated historical wins or titles.
+- Full interviews, competing offers, salary negotiation, staff budgets and relationship portability remain intentionally deferred to later v0.9 slices.
+
+## v0.9.3 — Portrait V1 and release hardening
+
+- Frozen deterministic Portrait V1 is integrated into roster and player profiles; identity survives recruiting-to-signing, saves, transfers and player archive.
+- School jersey colors are deterministic and portrait rendering is cached.
+- `VERSION.txt` is the single release-version source checked against the app/package at build/test time.
+- GitHub Pages publishing now lives entirely in the Football repo, with production at `markjrogers92.github.io/Football/`.
+
 ## v0.9.2 — Permanent Game Center (preview batch)
 
 - Stable game IDs and historical school/rank/record snapshots for every new game.

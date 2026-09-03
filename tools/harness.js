@@ -85,7 +85,7 @@ globalThis.__ENGINE__ = {
   T, findPlayer, rebuildIndexes, packUniverse, packPlayer,
   setRecruitPromise, commitRecruit, signPlayerPromise, auditPlayerPromises, auditPromises, normalizePromiseState,
   recordPromiseTraining, recordPromisePositionChange, promisePenalty, archiveRecord, rememberCoach, promiseHubItems,
-  generateCoach, promiseHTML, applyDevelopmentPhase,
+  generateCoach, coachById, ensureCoachCareer, normalizeCoachState, recordCoachSeason, closeCoachStint, openCoachStint, archiveCoach, addCoachEvent, replaceStaffCoach, promoteCoachWithinTeam, moveCoach, retireCoach, coachCareerTotals, coachProfileHTML, carousel, promiseHTML, applyDevelopmentPhase,
   captureRecruitment, transferFit, chooseTransferDestination, placeTransfer, familiarFaceItems, releasePlayerPromises, transferHistoryHTML, archivePlayerSeason,
   saveBrowser, loadBrowser, exportSave, importSave, installSave, ensureArchiveLoaded, archiveIsDeferred,
   POS, POS_COUNTS, ROLE_DEFS, OFF_SCHEMES, DEF_SCHEMES, GROWTH_CURVES,
