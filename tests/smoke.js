@@ -91,6 +91,12 @@ const mean = a => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0);
   check('no eligibility-dead players remain',
     u.teams.every(t => t.roster.every(p => e.eligibilityBase(p) < 4)));
   check('archive populated', u.playerArchive.length > 0);
+  const arch = u.playerArchive[u.playerArchive.length - 1], live = u.teams[7].roster[3];
+  check('findPlayer resolves an archived player through the index',
+    e.findPlayer(arch.id)?.active === false && e.findPlayer(arch.id).p === arch);
+  check('findPlayer resolves a live player after roster turnover',
+    e.findPlayer(live.id)?.active === true && e.findPlayer(live.id).team === u.teams[7]);
+  check('T() resolves every team by name', u.teams.every(t => e.T(t.name) === t));
   const archiveBytes = JSON.stringify(u.playerArchive[0]).length;
   const liveBytes = JSON.stringify(u.teams[0].roster[0]).length;
   check('archive rows are slimmer than live players', archiveBytes < liveBytes * 0.75,

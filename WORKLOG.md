@@ -87,3 +87,33 @@ Outcome: done. `npm test` 48/48 (two new checks), browser 45/45, audit
 rosters still 85–105. Note: the audit's existing "signees/team" line is
 meaningless — it counts every roster player whose origin says "star recruit",
 which is everyone generated — mean 90 per team. Not fixed; out of scope.
+
+## Item 4 — ID indexes for T() and findPlayer()
+
+Plan: `Map` indexes (team name → team, player id → {p, team}, archive id →
+row) held in module-level `IDX`. `rebuildIndexes()` is called from
+`normalizeUniverse()` and lazily whenever a lookup detects the index is
+stale. `T()` and `findPlayer()` keep their signatures and return shapes.
+
+Decisions:
+- No instrumentation of roster-mutation sites (six push/filter sites, easy
+  to miss one). Instead the index self-validates: a team hit must still be at
+  its recorded position in `universe.teams`; a player hit must still be on
+  the recorded team's roster; the total roster population is compared with
+  the indexed population on every findPlayer miss/stale hit and the index is
+  rebuilt when they differ. A rebuild costs one full scan, i.e. what a single
+  findPlayer cost before.
+- The archive only grows by push, so its index is extended incrementally
+  from the last indexed position rather than rebuilt.
+- A miss that survives a rebuild is remembered (`IDX.miss`) so a render path
+  asking for a dead id does not rebuild every call; the memo clears on the
+  next rebuild.
+
+Measured (harness, one season + camps + offseason, so the archive is
+populated): `findPlayer` on a live player 2,000 lookups scan 218ms → index
+5ms; on an archived player, 500 lookups scan 121ms → index 2ms; `T()`
+20,000 lookups scan 19ms → index 1ms. `initUniverse()` also resets the
+index so a New Universe doesn't reuse a prior game's stale Maps.
+
+Outcome: done. `npm test` 51/51 (three new checks: archived lookup, live
+lookup after roster turnover, T() over all 120 teams), browser 45/45.

@@ -78,6 +78,7 @@ globalThis.__ENGINE__ = {
   generateRecruitPool, generatePlayer, generateRoster, conditionRating,
   roleFit, unit, starter, roleStarter, participants, eligibilityBase,
   transferRisk, draftProjection, seasonScore, normalizeUniverse, recruitPitch,
+  T, findPlayer, rebuildIndexes,
   POS, POS_COUNTS, ROLE_DEFS, OFF_SCHEMES, DEF_SCHEMES, GROWTH_CURVES,
   render: () => {},
 };
