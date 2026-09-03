@@ -67,6 +67,7 @@ main{max-width:1280px;margin:auto;padding:20px}.tab{display:none}.tab.active{dis
   .stacked-table td[data-label="Player"]::before{display:none}
   .stacked-table td[data-label="Style"]{grid-column:1/-1;display:block}
   .stacked-table td[data-label="Style"]::before{display:block;margin-bottom:3px}
+  .stacked-table td[data-label="Staff Note"],.stacked-table td[data-label="Hometown / HS"]{grid-column:1/-1}
   .stacked-table .table-wrap,.stacked-table{overflow:visible}
   .stacked-table td>span,.stacked-table td>.pill{text-align:right;min-width:0}
 }
