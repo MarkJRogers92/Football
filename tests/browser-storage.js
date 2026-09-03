@@ -22,11 +22,12 @@ const assert=require('node:assert/strict');
     const db=r.result,tx=db.transaction(['saves','archives'],'readonly');let main,first;
     const a=tx.objectStore('saves').get('main');a.onsuccess=()=>{main=a.result};
     const b=tx.objectStore('archives').get(0);b.onsuccess=()=>{first=b.result[0]};
-    tx.oncomplete=()=>{db.close();resolve({coreHasArchive:'playerArchive' in main.universe,ref:main.archiveRef,first})};tx.onabort=()=>{db.close();reject(tx.error)};
+    tx.oncomplete=()=>{db.close();resolve({coreHasArchive:'playerArchive' in main.universe,ref:main.archiveRef,first,games:main.universe.gameArchive})};tx.onabort=()=>{db.close();reject(tx.error)};
    };
   }));
   assert.equal(record.coreHasArchive,false);assert.ok(record.ref.count>128);
   console.log('PASS real browser save stores archived careers separately');
+  assert.equal(record.games.length,745);const historical=record.games.find(g=>g.home.name==='Chicago Metropolitan'||g.away.name==='Chicago Metropolitan');
   // Loading and saving before any archive access must preserve stored careers.
   await page.click('#loadBrowser');await status('^Loaded');await page.click('#saveBrowser');await status('^Saved');
   await tab('history');await page.fill('#archiveSearch',record.first.name);
@@ -42,7 +43,7 @@ const assert=require('node:assert/strict');
   const exported=JSON.parse(await readFile(await download.path(),'utf8'));
   assert.equal(exported.universe.playerArchive.length,record.ref.count);
   assert.deepEqual(exported.universe.playerArchive[0],record.first);
-  assert.equal(exported.universe.year,2028);assert.equal(exported.storageVersion,undefined);
+  assert.deepEqual(exported.universe.gameArchive,record.games);assert.equal(exported.universe.year,2028);assert.equal(exported.storageVersion,undefined);
   console.log('PASS complete portable JSON export hydrates deferred history');
   // Import the actual downloaded JSON through the app's file input.
   await page.locator('#importFile').setInputFiles(await download.path());await status('^Imported');
@@ -68,6 +69,13 @@ const assert=require('node:assert/strict');
   assert.match(await page.textContent('#playerDialogBody'),/Broken promise/);
   assert.deepEqual(errors,[]);
   console.log('PASS historical promise and transfer survive browser Save/Load and render in profile');
-  console.log('5 browser persistence scenarios passed; no console errors');
+  await page.locator('#playerDialog button').filter({hasText:'Close'}).click();
+  await page.locator(`#gameHistoryList [data-game="${historical.id}"]`).click();
+  assert.equal(await page.textContent('#gameDialogName'),`${historical.away.name} ${historical.score.away} — ${historical.score.home} ${historical.home.name}`);
+  assert.match(await page.textContent('#gamePregame'),/0-0/);
+  await page.locator('#gameTabs button[data-game-tab="Box Score"]').click();assert.match(await page.textContent('#gameDialogBody'),/Passing/);
+  assert.deepEqual(errors,[]);
+  console.log('PASS permanent game reopens after rollover, real IndexedDB save/load and JSON export/import');
+  console.log('6 browser persistence scenarios passed; no console errors');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

@@ -110,3 +110,20 @@ school IDs plus name snapshots. A capacity-blocked transfer stays in the core
 `transferPortal` array as the same player's full record; it is never silently cut.
 The portal queue and transfer events travel in portable JSON and browser saves.
 No database version change or archive rewrite is introduced.
+
+## v0.9.2 additions
+
+`universe.gameArchiveVersion: 1`, `gameCounter` and `gameArchive` are part of the
+core browser/portable save. Records are write-once snapshots keyed by permanent
+IDs; schedule/latest/event references carry those IDs. IDs do not depend on team
+names. Normalize retains counters and rejects unsupported future archive formats.
+Player game deltas use sparse fields, with copied ID/name/position. Team metadata
+is captured before updating standings. Drive outcomes (not full play logs) are
+retained for detailed simulations. No historical markup or mutable roster refs.
+
+Current storage cost is approximately 6.6 MB per 745-game season, plus ordinary
+roster/player archives. Game boxes still load/save with the core; this batch does
+not establish 30–50-season performance. Future work should separate immutable
+boxes into indexed, deferred chunks with atomic revision/archive checks, preserving
+full portable JSON and all old game IDs. Never prune silently. Full play logs are
+optional/temporary; boxes and drive summaries remain permanent.

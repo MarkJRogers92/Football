@@ -78,3 +78,5 @@ main{max-width:1280px;margin:auto;padding:20px}.tab{display:none}.tab.active{dis
 .tabs::-webkit-scrollbar{display:none}
 .tabs-shell{position:relative}
 .tabs-shell::after{content:"";position:absolute;top:0;right:0;bottom:0;width:34px;pointer-events:none;background:linear-gradient(90deg,rgba(17,22,30,0),#11161e)}
+
+.game-dialog{width:min(1050px,96vw);max-width:96vw;box-sizing:border-box}.game-dialog .dialog-shell{min-width:0}.game-dialog h2{font-size:24px;overflow-wrap:anywhere}.game-dialog h3{margin:20px 0 10px}.game-dialog h4{margin:16px 0 8px}.game-table{max-width:100%;margin:10px 0}.game-table table{min-width:520px}.game-link{text-align:left;font-size:12px}.game-dialog .active{border-color:var(--good);color:var(--good)}#gameHistoryYear{margin:12px 0}@media(max-width:600px){.game-dialog .dialog-shell{padding:12px}.game-dialog h2{font-size:19px}.game-dialog .dialog-head{gap:8px}#gameTabs{gap:4px}#gameTabs button{padding:8px;font-size:12px}}

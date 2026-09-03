@@ -2,7 +2,7 @@
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span>v0.9.1</span></h1>
+      <h1>Dynasty Lab <span>v0.9.2</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -234,7 +234,7 @@
         <input id="archiveSearch" class="wide-input" type="search" placeholder="Search player name">
         <div id="archiveResults" class="archive-results muted">Type a name to search.</div>
       </div>
-      <div id="historyLog"></div>
+      <div class="card"><h3>Game archive · selected school</h3><label>Season <select id="gameHistoryYear" aria-label="Game archive season"></select></label><div id="gameHistoryList"></div></div><div id="historyLog"></div>
     </section>
   </main>
 </div>
@@ -257,3 +257,13 @@
   </form>
 </dialog>
 
+
+<dialog id="gameDialog" class="player-dialog game-dialog" aria-labelledby="gameDialogName">
+ <form method="dialog" class="dialog-shell">
+  <div class="dialog-head"><div><div class="eyebrow">GAME CENTER</div><h2 id="gameDialogName"></h2></div><button class="dialog-close" aria-label="Close Game Center">Close</button></div>
+  <p id="gameDialogMeta" class="muted"></p><p id="gamePregame" class="muted"></p>
+  <div id="gameTabs" class="button-row" aria-label="Game Center sections">
+   <button type="button" data-game-tab="Summary">Summary</button><button type="button" data-game-tab="Box Score">Box Score</button><button type="button" data-game-tab="Drives">Drives</button><button type="button" data-game-tab="Play-by-Play">Play-by-Play</button>
+  </div><div id="gameDialogBody"></div>
+ </form>
+</dialog>

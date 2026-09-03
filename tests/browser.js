@@ -58,6 +58,21 @@ const path = require('path');
       && await page.$eval(`#${hubTab}`, el => el.classList.contains('active')));
     await page.evaluate(() => document.querySelectorAll('dialog[open]').forEach(d => d.close()));
 
+    // Reopen a completed result and navigate every Game Center section.
+    await page.click('.tabs button[data-tab="season"]');
+    await page.click('#teamSchedule [data-game]');
+    const gameTitle=await page.locator('#gameDialogName').innerText();
+    check(`[${label}] completed schedule opens permanent Game Center`,await page.locator('#gameDialog').isVisible()&&gameTitle.includes('—'));
+    for(const section of ['Summary','Box Score','Drives','Play-by-Play']){
+      await page.locator('#gameTabs button').filter({hasText:new RegExp('^'+section.replace(/-/g,'\\-')+'$')}).click();
+      check(`[${label}] Game Center ${section}`, (await page.locator('#gameDialogBody').innerText()).length>30);
+    }
+    check(`[${label}] Game Center fits viewport`,await page.locator('#gameDialog').evaluate(el=>el.getBoundingClientRect().right<=innerWidth&&el.scrollWidth<=el.clientWidth+1));
+    await page.getByRole('button',{name:'Close Game Center',exact:true}).click();
+    await page.click('.tabs button[data-tab="history"]');await page.locator('#gameHistoryList [data-game]').first().click();
+    check(`[${label}] school history reopens same score`,await page.locator('#gameDialogName').innerText()===gameTitle);
+    await page.getByRole('button',{name:'Close Game Center',exact:true}).click();
+
     // Player profile dialog.
     await page.click('.tabs button[data-tab="roster"]');
     await page.waitForTimeout(80);

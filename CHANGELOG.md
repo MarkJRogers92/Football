@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.9.2 — Permanent Game Center (preview batch)
+
+- Stable game IDs and historical school/rank/record snapshots for every new game.
+- Permanent team/player box scores, injuries, game leaders and detailed drive
+  outcomes. Summary / Box Score / Drives / Play-by-Play sections; no invented
+  quarters or clocks. Existing unlogged score adjustments are disclosed.
+- Schedule, results, Weekly Hub, Game Lab and season-filtered school History
+  reopen saved results. Game/championship events and former-player links use IDs.
+- Core archive format 1 survives rollover, IndexedDB and JSON import/export;
+  unknown future formats are rejected. About 6.6 MB per full 745-game season.
+  Full play logs remain temporary; permanent boxes/drives are never pruned.
+- Validation: 52 engine checks, 16 Node groups, 59 desktop/mobile-layout browser
+  checks and six browser persistence scenarios. Actual iPhone Safari untested.
+
 ## v0.9.1 — Transfer destinations and memory (preview batch)
 
 - Transfer destinations now weigh recruiting finalists/known offers, playing

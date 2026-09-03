@@ -39,7 +39,7 @@ const {create} = require('../storage.js');
   for(const version of ['0.7','0.8','0.8.1']){
     const legacy=JSON.parse(JSON.stringify(exported));legacy.version=version;legacy.universe.version=version;
     await e.importSave(JSON.stringify(legacy));assert.match(e.$el('#saveStatus').textContent,/Imported/);
-    assert.equal(e.universe.version,'0.9.1');assert.deepEqual(e.packUniverse(e.universe).playerArchive,expectedArchive);
+    assert.equal(e.universe.version,'0.9.2');assert.deepEqual(e.packUniverse(e.universe).playerArchive,expectedArchive);
   }
   const before=e.universe;
   await e.importSave('{bad json');assert.equal(e.universe,before);
