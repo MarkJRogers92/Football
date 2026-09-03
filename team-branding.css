@@ -1,0 +1,78 @@
+/* Team branding skin. Values are supplied by visual-identity.js and are intentionally
+   presentation-only so old/new saves and the simulation model remain untouched. */
+:root{
+  --team-primary:#234875;
+  --team-secondary:#73a8ff;
+  --team-rgb:115,168,255;
+  --team-ink:#f7fbff;
+}
+
+#dashboard>.hero-grid>.card:first-child{
+  border-color:color-mix(in srgb,var(--team-secondary) 42%,#26384b);
+  background:
+    radial-gradient(circle at 92% 15%,rgba(var(--team-rgb),.18),transparent 20rem),
+    linear-gradient(135deg,color-mix(in srgb,var(--team-primary) 55%,#142131) 0%,#111b27 58%,#101720 100%);
+}
+#dashboard>.hero-grid>.card:first-child::after{
+  border-color:rgba(var(--team-rgb),.20);
+  box-shadow:0 0 0 35px rgba(var(--team-rgb),.035),0 0 0 70px rgba(var(--team-rgb),.02);
+}
+#teamName{
+  color:var(--team-ink);
+  text-shadow:0 0 28px rgba(var(--team-rgb),.12);
+}
+#teamMeta::before{
+  content:"";
+  display:inline-block;
+  width:7px;height:7px;
+  margin:0 7px 1px 0;
+  border-radius:50%;
+  background:var(--team-secondary);
+  box-shadow:0 0 12px rgba(var(--team-rgb),.55);
+}
+
+.tabs button.active::after{background:var(--team-secondary);box-shadow:0 0 14px rgba(var(--team-rgb),.55)}
+.player-button:hover,.player-button:focus{color:#fff;text-decoration-color:var(--team-secondary)}
+.hub-item.action{border-left-color:var(--team-secondary)}
+.hub-item.hub-link .hub-kicker::after{color:var(--team-secondary)}
+.hub-item.hub-link:hover,.hub-item.hub-link:focus-visible{outline-color:color-mix(in srgb,var(--team-secondary) 58%,#39516e)}
+.pipeline-dot{background:var(--team-secondary)}
+.bar>span,.confidence-meter>i{background:linear-gradient(90deg,var(--team-primary),var(--team-secondary))}
+
+#simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason{
+  border-color:color-mix(in srgb,var(--team-secondary) 58%,#29405b);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--team-primary) 78%,#203f66),color-mix(in srgb,var(--team-primary) 88%,#142b45));
+}
+#simWeek:hover:not(:disabled),#simSeason:hover:not(:disabled),#hubAdvance:hover:not(:disabled),#seasonWeek:hover:not(:disabled),#simDetailedGame:hover:not(:disabled),#autoTarget:hover:not(:disabled),#applyProgramEdit:hover:not(:disabled),#runOffseason:hover:not(:disabled){
+  border-color:var(--team-secondary);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--team-primary) 70%,var(--team-secondary)),var(--team-primary));
+}
+
+.topbar>div:first-child::before{
+  border-color:color-mix(in srgb,var(--team-secondary) 55%,#39516e);
+  background:linear-gradient(145deg,color-mix(in srgb,var(--team-primary) 78%,#203b5d),#101b29);
+  box-shadow:inset 0 1px rgba(255,255,255,.10),0 8px 22px rgba(0,0,0,.28),0 0 20px rgba(var(--team-rgb),.08);
+}
+.topbar::after{background:linear-gradient(90deg,transparent,rgba(var(--team-rgb),.45),transparent)}
+
+.command-center{
+  border-color:color-mix(in srgb,var(--team-secondary) 32%,#344a64);
+  background:
+    linear-gradient(90deg,rgba(var(--team-rgb),.065),transparent 25%),
+    linear-gradient(180deg,#151f2b,#101821);
+}
+
+.player-dialog{
+  border-color:color-mix(in srgb,var(--team-secondary) 30%,#3a506c);
+}
+.dialog-head{
+  background:
+    radial-gradient(circle at 12% -50%,rgba(var(--team-rgb),.18),transparent 18rem),
+    linear-gradient(180deg,#172333,#111923);
+}
+.dialog-portrait{border-color:color-mix(in srgb,var(--team-secondary) 46%,#344a64)}
+
+@supports not (color:color-mix(in srgb,red,blue)){
+  #dashboard>.hero-grid>.card:first-child{border-color:#39516e}
+  #simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason{border-color:#4a75ad}
+}
