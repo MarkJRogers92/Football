@@ -82,6 +82,38 @@ const path = require('path');
     check(`[${label}] coach profile fits viewport`, await page.locator('#coachDialog').evaluate(el=>el.getBoundingClientRect().right<=innerWidth&&el.scrollWidth<=el.clientWidth+1));
     await page.getByRole('button',{name:'Close coach profile',exact:true}).click();
 
+    // Coaching market: force a DC opening on the controlled team, interview a
+    // fresh candidate, and hire through the same Interview/Offer buttons a
+    // player uses. Math.random is nudged low (never exactly 0 -- that stalls
+    // this build's gauss()) so the offer is accepted deterministically.
+    const marketBefore = await page.evaluate(() => {
+      const { selected, createOpening, renderStaff } = window.__DL_TEST__;
+      const t = selected(); createOpening(t, 'DC', 'Left for another opportunity', 'DEPARTED'); renderStaff();
+      return { interim: !!t.staff.DC.interim, oldDcId: t.staff.DC.id };
+    });
+    check(`[${label}] an opening installs an interim and a candidate market`, marketBefore.interim);
+    await page.waitForTimeout(60);
+    check(`[${label}] Staff tab shows the coaching search panel`,
+      await page.$eval('#coachMarket', el => el.textContent.includes('Coaching Search')));
+    await page.click('#coachMarket [data-interview]');
+    await page.waitForTimeout(60);
+    check(`[${label}] interviewing a candidate enables Make Offer`,
+      await page.$eval('#coachMarket [data-start-offer]', el => !el.disabled));
+    await page.click('#coachMarket [data-start-offer]');
+    await page.waitForTimeout(60);
+    check(`[${label}] Make Offer reveals the offer form`, await page.$('#coachMarket .offer-form') !== null);
+    await page.evaluate(() => { window.__realRandom = Math.random; Math.random = () => 0.0001; });
+    await page.click('#coachMarket [data-send-offer]');
+    await page.waitForTimeout(60);
+    await page.evaluate(() => { Math.random = window.__realRandom; });
+    const hireResult = await page.evaluate((oldDcId) => {
+      const t = window.__DL_TEST__.selected();
+      return { interim: !!t.staff.DC.interim, hired: t.staff.DC.id !== oldDcId,
+        status: document.querySelector('#saveStatus').textContent };
+    }, marketBefore.oldDcId);
+    check(`[${label}] sending the offer hires the coach and clears the interim tag`,
+      !hireResult.interim && hireResult.hired, JSON.stringify(hireResult));
+
     // Player profile dialog.
     await page.click('.tabs button[data-tab="roster"]');
     await page.waitForTimeout(80);

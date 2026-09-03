@@ -1,5 +1,48 @@
 # WORKLOG
 
+## v0.9.6 — coaching market
+
+Plan: turn the v0.9.5 carousel's instant AI-only auto-fill into a real, bounded
+hiring market for the controlled team, per `ROADMAP_V09.md`'s v0.9.6 slice —
+openings, a candidate pool, interview-then-offer, salary/years/authority,
+internal promotion, and AI hiring by fit (already true of the existing
+carousel scoring; not duplicated).
+
+Decisions:
+- AI teams keep their existing instant-fill behavior unchanged — only the
+  controlled team's vacancies route through `createOpening()`. This kept the
+  blast radius small: `carousel()`/`replaceStaffCoach()`/`moveCoach()` for
+  every AI team are untouched, so the v0.9.4/v0.9.5 test suites needed no
+  changes.
+- A vacancy on the controlled team is never silently unfilled: an interim
+  coach (reduced ratings, half salary) holds the slot, so ignoring a search
+  has a real cost and the rest of the engine (which assumes `t.staff[slot]`
+  is always a real coach) never sees a hole.
+- Hiring routes through the same `openCoachStint`/`closeCoachStint`/
+  `archiveCoach` primitives every other coach transition uses — no parallel
+  identity system, no risk of a coach existing in two places at once.
+- Found and fixed during testing: promoting an internal candidate initially
+  ran the same "close old stint, auto-regenerate the vacated slot" path used
+  for cross-team hires, but since the origin and destination team are the
+  *same* team object, that aliased `t.staff[OC]` and `t.staff[HC]` to the
+  same coach and the follow-on `createOpening()` call closed the coach's
+  brand-new HC stint by mistake. Fixed by only doing the auto-regenerate
+  step for genuine cross-team moves; an internal promotion just closes the
+  old stint and lets the deliberate follow-on `createOpening()` call install
+  the real replacement.
+- Interview-then-offer is a hard gate (no offer without an interview) and a
+  per-team budget (same salary formula the engine already uses, summed
+  across all five roles plus a cushion) hard-caps what can be offered —
+  both enforced in the engine function, not just the UI, so there is no way
+  to route around them from a modified request.
+
+Validation: `npm test` (39/39, including the new `tests/coachmarket.js`),
+`npm run test:browser` (79/79, including a real interview→offer→hire click
+path added to `tests/browser.js`), and `npm run longrun` (12 seasons, stable).
+An 8-season run with no user interaction confirmed openings persist correctly
+(never duplicated, never auto-resolved) and the interim penalty compounds as
+expected when a search is ignored.
+
 ## v0.9.4 — persistent coaching careers
 
 Plan: turn the coach IDs introduced with promises into durable people before adding a hiring market. Preserve existing turnover behavior where possible, add retirement/internal-promotion paths only to exercise career continuity, and keep relationship portability for v0.9.5.

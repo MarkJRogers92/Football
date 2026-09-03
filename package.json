@@ -1,11 +1,11 @@
 {
   "name": "dynasty-lab",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "private": true,
   "description": "Fictional college-football dynasty simulator.",
   "scripts": {
     "build": "node tools/build.js",
-    "test": "node tests/smoke.js && node --test tests/storage.js tests/persistence.js tests/promises.js tests/transfers.js tests/games.js tests/portraits.js tests/coaches.js tests/relationships.js",
+    "test": "node tests/smoke.js && node --test tests/storage.js tests/persistence.js tests/promises.js tests/transfers.js tests/games.js tests/portraits.js tests/coaches.js tests/relationships.js tests/coachmarket.js",
     "test:browser": "node tests/browser.js",
     "audit": "node tools/audit.js",
     "longrun": "SEASONS=12 node tools/longrun.js",

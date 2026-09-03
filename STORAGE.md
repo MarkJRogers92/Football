@@ -136,3 +136,17 @@ same fields through `ARCHIVE_FIELDS`. Relationship fallout is stored as ordinary
 core dynasty events; no IndexedDB schema change, archive rewrite or new network
 dependency is introduced. Old saves use their already-recorded
 `recruitingMemory.recruiterCoachId`/relationship as the additive migration source.
+
+## v0.9.6 additions
+
+`universe.openings` (array) and `universe.candidateMarket` (opening ID → candidate
+array) are new top-level core fields, both defaulted by `normalizeCoachState()` so
+old saves migrate additively with no IndexedDB version bump. A coach object gains
+an optional `interim` flag and `playCallAuthority`; both are already covered by the
+existing coach fields that travel through `packUniverse`/browser saves — no new
+ARCHIVE_FIELDS entries were needed since openings/candidates are program-level
+state, not player-level. Interim/candidate coaches use the same `careerHistory`
+stint machinery as every other coach (`openCoachStint`/`closeCoachStint`), so no
+parallel identity system was introduced; a hired candidate keeps the coach ID they
+already had if they came from another program (`coachId` on the candidate record),
+or is minted once via `generateCoach` if they were a fresh/off-market hire.

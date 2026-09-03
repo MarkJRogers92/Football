@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.9.6 — Coaching Market
+
+- Firing, retiring or losing a coach on the controlled team no longer auto-fills the slot: it opens a search. A weaker interim coach holds the role (staff ratings docked ~18%, half salary) until the user acts, so leaving a search unfilled has a real, visible cost. AI-controlled teams are unaffected and keep resolving vacancies instantly, exactly as before.
+- Each opening gets a candidate market: two freshly generated candidates, up to two poachable coordinators/HCs from other programs (ambition-gated, fit-scored), and — for Head Coach openings only — the team's own OC/DC as internal-promotion candidates.
+- A candidate must be interviewed before an offer can be made. Offers set salary, contract years and play-calling authority (full vs. shared); acceptance chance depends on fit, how the offer compares to their ask, and whether they were interviewed. A new per-team athletic department budget (derived from resources/prestige, matching the existing salary formula) caps what can be offered.
+- Hiring an external coach closes their old stint at their old program (which then auto-fills its own vacancy, same as any AI departure) and opens a new one at the new program under the same coach identity — no duplicate coach objects. Promoting internally opens a follow-on search for the slot they vacated rather than leaving it silently unfilled.
+- Declined offers mark the candidate and leave the opening searchable; accepted offers are final and clear the interim tag. Openings and the candidate market are core, portable universe state — old saves migrate additively, no IndexedDB schema change.
+
 ## v0.9.5 — Coaches take relationships with them (preview batch)
 
 - Recruits now keep a stable primary-recruiter coach ID plus coach-specific relationship values separate from school interest.
