@@ -62,6 +62,24 @@ saves continue to load through `normalizeUniverse()`.
   twelve different champions before, and eight after, with the strongest
   programs repeating.
 
+- **Recruit star ratings mean something.** The generic `stars()` thresholds
+  were applied to a recruit pool centred at 58, so the median recruit sat
+  exactly on the one-star/two-star boundary: 49% of every class was one star and
+  the entire country produced seven five-stars. There was nothing to fight over.
+  Recruit bands are now calibrated against the generator's own distribution.
+
+  | Recruit pool (n=2,800) | v0.8 | v0.8.1 |
+  | --- | --- | --- |
+  | 5-star | 7 | 27 |
+  | 4-star | 58 | 320 |
+  | 3-star | 390 | 1,342 |
+  | 2-star | 975 | 895 |
+  | 1-star | 1,370 | 216 |
+
+  Blue-chip signings now stratify the way the design intends: the top twenty
+  programs by prestige sign 4.3 four- and five-stars per class against 0.1 for
+  the bottom twenty, where before it was 0.6 against 0.0.
+
 - **Prestige no longer deflates.** Expected wins were anchored at prestige 50
   while the league averages 66, so a typical program lost prestige every year
   and the universe drifted down ~0.4 prestige per season indefinitely. The
