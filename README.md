@@ -42,9 +42,8 @@ browser save upgrade, compatibility, limitations and required validation.
 
 ## Publishing
 
-The game is served by GitHub Pages from the `gh-pages` branch of
-`MarkJRogers92/Property-Lookup`. Production and previews share one Pages site,
-so there is a single host to reason about.
+The game is served by GitHub Pages from this repository's `gh-pages` branch.
+Production and previews share one Pages site, so there is a single host.
 
 ```
 npm run publish                        # -> /            (production)
@@ -55,14 +54,18 @@ node tools/publish.js --remove v094    # delete a preview
 
 | | URL |
 | --- | --- |
-| Production | https://markjrogers92.github.io/Property-Lookup/ |
-| Previews | https://markjrogers92.github.io/Property-Lookup/preview/ |
+| Production | https://markjrogers92.github.io/Football/ |
+| Previews | https://markjrogers92.github.io/Football/preview/ |
 
-`tools/publish.js` builds first, copies the result into a checkout of the Pages
-branch (`../property-lookup`, or `PAGES_REPO`), regenerates the preview index
-from whatever folders exist, then commits and pushes. Pages serves the new
+`tools/publish.js` builds first, then copies the result into a `gh-pages`
+worktree at `.pages/` (override with `PAGES_WORKTREE`), regenerates the preview
+index from whatever folders exist, commits and pushes. Pages serves the new
 build within about a minute.
 
-Each preview runs from the same origin as production, so **they share browser
+`gh-pages` holds only what the site serves — `index.html`, `.nojekyll`, and
+`preview/`. The source lives on the working branch; the site branch is not a
+mirror of it.
+
+Each preview runs on the same origin as production, so **they share browser
 save storage**. Export a save before switching between builds if a dynasty
 matters.

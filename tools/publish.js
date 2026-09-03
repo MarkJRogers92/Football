@@ -10,16 +10,17 @@
 // serves both. The preview index is regenerated from whatever folders exist,
 // so it can never drift from reality.
 //
-// The Pages checkout defaults to ../property-lookup; override with PAGES_REPO.
+// The site is served from this repository's gh-pages branch, so publishing
+// uses a worktree of that branch rather than a checkout of another repo.
 
 const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
-const PAGES = process.env.PAGES_REPO || path.join(ROOT, '..', 'property-lookup');
 const BRANCH = 'gh-pages';
-const SITE = 'https://markjrogers92.github.io/Property-Lookup';
+const PAGES = process.env.PAGES_WORKTREE || path.join(ROOT, '.pages');
+const SITE = 'https://markjrogers92.github.io/Football';
 
 const git = (...args) =>
   execFileSync('git', ['-C', PAGES, ...args], { encoding: 'utf8' }).trim();
@@ -47,13 +48,16 @@ function validName(name) {
 }
 
 function ensureCheckout() {
-  if (!fs.existsSync(path.join(PAGES, '.git')))
-    usage(`No git checkout at ${PAGES}. Clone the Pages repo there, or set PAGES_REPO.`);
+  // An explicit refspec: a shallow clone updates FETCH_HEAD but would not
+  // create the remote-tracking ref the worktree needs.
+  execFileSync('git', ['-C', ROOT, 'fetch', 'origin',
+    `+refs/heads/${BRANCH}:refs/remotes/origin/${BRANCH}`], { encoding: 'utf8' });
+  if (!fs.existsSync(path.join(PAGES, '.git'))) {
+    execFileSync('git', ['-C', ROOT, 'worktree', 'add', '--force', PAGES, BRANCH],
+      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+  }
   const dirty = git('status', '--porcelain');
   if (dirty) usage(`${PAGES} has uncommitted changes:\n${dirty}\nCommit or stash them first.`);
-  // An explicit refspec: a shallow clone updates FETCH_HEAD but would not
-  // create the remote-tracking ref that reset needs.
-  git('fetch', 'origin', `+refs/heads/${BRANCH}:refs/remotes/origin/${BRANCH}`);
   git('checkout', '-B', BRANCH, `refs/remotes/origin/${BRANCH}`);
 }
 
