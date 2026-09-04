@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.9.26 — Five groups instead of fourteen tabs (roadmap milestone C)
+
+Fourteen flat tabs was the last thing roadmap milestone C flagged, and the tab strip had grown to 1387px of content in a 390px viewport — a sideways-scrolling row nobody could see the end of. Tabs are now organised into five groups:
+
+- **Program** — Dashboard, Program Lab, History
+- **Team** — Roster, Roles & Depth, Development & Camp
+- **Recruiting**
+- **Games** — Game Lab, Season, Stats, Newsletter
+- **Staff & Offseason** — Staff & Schemes, Offseason, Awards & Records
+
+Selecting a group reveals its tabs and opens the first one. **The tab buttons themselves are untouched** — same markup, same `data-tab` values — so every `go()` call, hub tile, weekly-plan step and existing selector still resolves.
+
+The one thing that had to be right: any programmatic jump into a tab (a wire tile, the weekly plan, `go()`) must bring its group with it, or the tab would open with the wrong group highlighted and its siblings hidden. `setActiveTab()` now syncs the group on every activation regardless of what triggered it, and there is a browser check that clicks a tab directly and asserts the group follows.
+
+- Horizontal scrolling in the tab strip is gone: 0px overflow at both 1280px and 390px, down from 997px of hidden content on mobile.
+- 5 new browser checks per viewport (10 total). Navigation in the browser suites now goes through a `goTab()` helper that selects the group first — the IA changed, so the way a test reaches a tab changed with it.
+- No engine or storage change.
+
 ## v0.9.25 — Academic eligibility
 
 `t.academics` was a recruiting weight and nothing else, so a 3-star at a 90-academics school was mechanically identical to one at a 55. Every player now carries an academic standing that drifts each week toward what his program and his own head can sustain, and falling through the floor costs you the player.

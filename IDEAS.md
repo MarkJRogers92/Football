@@ -87,7 +87,7 @@ existing `playCall` and familiarity systems.
 All-time record, coaching lineage, records by era — all stored already. The
 Career Chronology (v0.9.20) proved the pattern.
 
-### Tab coherence (roadmap milestone C)
+### ~~Tab coherence (roadmap milestone C)~~ — shipped in v0.9.26
 Fourteen tabs is too many. Five groups: **Program** (dashboard/program/history),
 **Team** (roster/depth/development), **Recruiting**, **Games**
 (season/gamelab/stats/newsletter), **Offseason** (staff/offseason/records).

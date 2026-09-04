@@ -1,5 +1,39 @@
 # WORKLOG
 
+## v0.9.26 — tab groups (roadmap milestone C)
+
+Plan: the last open roadmap milestone. Fourteen flat tabs, and the strip had
+1387px of buttons in a 390px viewport.
+
+**The constraint that shaped the implementation.** Four browser test files
+navigate with `page.click('.tabs button[data-tab="X"]')`, and Playwright's
+`click` requires the element to be visible. Any grouping that hides tabs breaks
+all of them. Three options: keep all fourteen visible and merely decorate them
+(no real win), hide them and update the tests, or something clever. It is the
+second — the information architecture genuinely changed, so how a test reaches a
+tab genuinely changed, and pretending otherwise would have meant not doing the
+milestone. The tests now share a `goTab()` helper that selects the group first.
+
+**What deliberately did not change.** The tab buttons: same markup, same
+`data-tab` values, same `.tabs` container. `go()` in sports-presentation.js,
+every hub tile's `data-tab`, and every weekly-plan step still resolve without
+knowing groups exist. Grouping is a visibility layer on top, not a rewrite of
+navigation.
+
+**The subtle part.** `el.click()` works on a hidden element, so a hub tile
+jumping to a tab in another group succeeded — but left that tab open with the
+wrong group highlighted and its siblings hidden, which is worse than not
+grouping at all. Fixed by syncing the group inside `setActiveTab()`, which every
+activation path already funnels through, rather than at each call site. The
+browser check clicks a tab element directly, bypassing the group bar entirely,
+and asserts the group follows.
+
+Verified before running the suite: five groups, group switching opens the first
+tab, a direct jump switches groups, and tab-strip overflow is 0 at both 1280px
+and 390px. That last number was 997px of hidden content on mobile.
+
+Validation: 10 new browser checks, full Node and browser suites.
+
 ## v0.9.25 — academic eligibility
 
 Plan: the last of the "data the game stores but barely reads" items.

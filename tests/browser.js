@@ -2,6 +2,10 @@
 // the UI end to end and fails on any console error or page exception.
 const { chromium } = require('playwright-core');
 const path = require('path');
+// Tabs live inside groups since v0.9.26; selecting the group is part of navigating to a tab.
+const TAB_GROUP={"dashboard": "program", "program": "program", "history": "program", "roster": "team", "depth": "team", "development": "team", "recruiting": "recruiting", "gamelab": "games", "season": "games", "stats": "games", "newsletter": "games", "staff": "staff", "offseason": "staff", "records": "staff"};
+const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${TAB_GROUP[id]}"]`);await page.click(`.tabs button[data-tab="${id}"]`)};
+
 
 (async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--no-sandbox'] });
@@ -33,7 +37,7 @@ const path = require('path');
     // Every tab must render without throwing.
     const tabs = await page.$$eval('.tabs button', els => els.map(e => e.dataset.tab));
     for (const t of tabs) {
-      await page.click(`.tabs button[data-tab="${t}"]`);
+      await goTab(page, t);
       await page.waitForTimeout(60);
       const visible = await page.$eval(`#${t}`, el => el.classList.contains('active'));
       const hasContent = await page.$eval(`#${t}`, el => el.textContent.trim().length > 20);
@@ -41,7 +45,7 @@ const path = require('path');
     }
 
     // Simulate a week and confirm the UI advances.
-    await page.click('.tabs button[data-tab="dashboard"]');
+    await goTab(page, 'dashboard');
     const t0 = Date.now();
     await page.click('#simWeek');
     await page.waitForFunction(() => /Week 1/.test(document.querySelector('#weekLine').textContent), { timeout: 60000 });
@@ -59,7 +63,7 @@ const path = require('path');
     await page.evaluate(() => document.querySelectorAll('dialog[open]').forEach(d => d.close()));
 
     // Reopen a completed result and navigate every Game Center section.
-    await page.click('.tabs button[data-tab="season"]');
+    await goTab(page, 'season');
     await page.click('#teamSchedule [data-game]');
     const gameTitle=await page.locator('#gameDialogName').innerText();
     check(`[${label}] completed schedule opens permanent Game Center`,await page.locator('#gameDialog').isVisible()&&gameTitle.includes('—'));
@@ -69,12 +73,12 @@ const path = require('path');
     }
     check(`[${label}] Game Center fits viewport`,await page.locator('#gameDialog').evaluate(el=>el.getBoundingClientRect().right<=innerWidth&&el.scrollWidth<=el.clientWidth+1));
     await page.getByRole('button',{name:'Close Game Center',exact:true}).click();
-    await page.click('.tabs button[data-tab="history"]');await page.locator('#gameHistoryList [data-game]').first().click();
+    await goTab(page, 'history');await page.locator('#gameHistoryList [data-game]').first().click();
     check(`[${label}] school history reopens same score`,await page.locator('#gameDialogName').innerText()===gameTitle);
     await page.getByRole('button',{name:'Close Game Center',exact:true}).click();
 
     // Persistent coach profile dialog.
-    await page.click('.tabs button[data-tab="staff"]');
+    await goTab(page, 'staff');
     await page.click('#staffList [data-coach]');
     await page.waitForTimeout(80);
     check(`[${label}] coach profile opens`, await page.locator('#coachDialog').isVisible());
@@ -115,7 +119,7 @@ const path = require('path');
       !hireResult.interim && hireResult.hired, JSON.stringify(hireResult));
 
     // Recruiting board headers sort the whole pool, not just the visible slice.
-    await page.click('.tabs button[data-tab="recruiting"]');
+    await goTab(page, 'recruiting');
     await page.waitForTimeout(150);
     const readRow = () => page.$eval('#recruitBody tr:first-child', el => el.innerText.replace(/\s+/g, ' '));
     // The header is a real click target for a user (verified by hit-testing:
@@ -153,7 +157,7 @@ const path = require('path');
     check(`[${label}] sorting back by rank restores the default order`, await readRow() === beforeSort);
 
     // Scheme installation surfaces on the Staff tab while it is in progress.
-    await page.click('.tabs button[data-tab="staff"]');
+    await goTab(page, 'staff');
     const schemeInstall = await page.evaluate(() => {
       const { selected, setTeamScheme, renderStaff } = window.__DL_TEST__;
       const t = selected(), from = t.offScheme;
@@ -169,7 +173,7 @@ const path = require('path');
       schemeInstall.card.slice(0, 120));
 
     // Weekly newsletter: recaps derived from the archived box scores.
-    await page.click('.tabs button[data-tab="newsletter"]');
+    await goTab(page, 'newsletter');
     await page.waitForTimeout(120);
     const news = await page.evaluate(() => ({
       weeks: document.querySelector('#newsWeek').options.length,
@@ -185,7 +189,7 @@ const path = require('path');
     check(`[${label}] program coverage leads with the controlled team`, teamLead.includes(teamName.trim()), teamLead.slice(0, 80));
 
     // Game Center summary opens with the same generated recap.
-    await page.click('.tabs button[data-tab="season"]');
+    await goTab(page, 'season');
     await page.click('#teamSchedule [data-game]');
     await page.waitForTimeout(120);
     const summaryRecap = await page.$eval('#gameDialogBody .recap', el => el.textContent);
@@ -193,7 +197,7 @@ const path = require('path');
     await page.getByRole('button',{name:'Close Game Center',exact:true}).click();
 
     // Player profile dialog.
-    await page.click('.tabs button[data-tab="roster"]');
+    await goTab(page, 'roster');
     await page.waitForTimeout(80);
     await page.click('#rosterBody .player-button');
     await page.waitForTimeout(120);
@@ -220,6 +224,25 @@ const path = require('path');
         document.documentElement.scrollWidth - document.documentElement.clientWidth);
       check(`[${label}] no horizontal page overflow`, overflow <= 1, `${overflow}px`);
     }
+
+    // Tab groups (v0.9.26): five groups, and only the active group's tabs are reachable.
+    const visibleTabs=()=>page.$$eval('.tabs button',els=>els.filter(e=>!e.hidden).map(e=>e.dataset.tab));
+    check(`[${label}] five tab groups`, (await page.$$('.tab-groups button')).length===5);
+    await page.click('.tab-groups button[data-group="games"]');
+    const gamesTabs=await visibleTabs();
+    check(`[${label}] a group shows only its own tabs`,
+      JSON.stringify(gamesTabs)===JSON.stringify(['gamelab','season','stats','newsletter']),
+      JSON.stringify(gamesTabs));
+    check(`[${label}] selecting a group opens its first tab`,
+      await page.$eval('.tab.active',el=>el.id)==='gamelab');
+    // A programmatic jump (hub tile, weekly plan, go()) must bring its group with it.
+    await page.evaluate(()=>document.querySelector('.tabs button[data-tab="records"]').click());
+    check(`[${label}] a jump into another group switches the group`,
+      await page.$eval('.tab-groups button.active',el=>el.dataset.group)==='staff'
+      && await page.$eval('.tab.active',el=>el.id)==='records');
+    check(`[${label}] the tab strip no longer scrolls sideways`,
+      await page.evaluate(()=>{const n=document.querySelector('.tabs');return n.scrollWidth-n.clientWidth;})===0);
+    await goTab(page,'dashboard');
 
     check(`[${label}] no console errors`, errors.length === 0, errors.slice(0, 3).join(' | '));
     await page.close();

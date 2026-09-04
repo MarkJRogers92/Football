@@ -1,12 +1,24 @@
-# Dynasty Lab — v0.9.25 checkpoint
+# Dynasty Lab — v0.9.26 checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `claude/v0925-academics` (merged into the
+Current source branch: `claude/v0926-tab-groups` (merged into the
 main working branch `claude/review-improvement-dwjemy`)
 Production branch: `gh-pages`
-Production: v0.9.25 at https://markjrogers92.github.io/Football/
+Production: v0.9.26 at https://markjrogers92.github.io/Football/
 
 ## Current release
+
+v0.9.26 closes roadmap milestone C: fourteen flat tabs become five groups
+(Program, Team, Recruiting, Games, Staff & Offseason). The tab buttons are
+untouched — same markup, same `data-tab` values — so `go()`, hub tiles and
+weekly-plan steps all still resolve; grouping is a visibility layer on top.
+
+If you add a tab, add it to `TAB_GROUPS` or it will never be visible. And note
+`setActiveTab()` syncs the group on every activation: a programmatic jump with
+`el.click()` works on a hidden button, so without that sync a hub tile would
+open a tab with the wrong group highlighted.
+
+## Previous release
 
 v0.9.25 adds academic eligibility. Standing drifts weekly toward
 `academicTarget()` (program support + player iq - wear); below 30 the player is
@@ -151,7 +163,8 @@ simulation gaps.
 
 ## Storage guardrail
 
-Read `STORAGE.md` before altering saves. v0.9.25 adds `p.academicStanding`,
+Read `STORAGE.md` before altering saves. v0.9.26 changes no stored state at all.
+v0.9.25 added `p.academicStanding`,
 `p.academicPlan` and `p.academicHold`, additive. v0.9.24 added `universe.signingDay`,
 additive. v0.9.23 added `universe.bowls`,
 `t.bowlResult` and `t.fanBaseline`, all additive. v0.9.22 added `universe.careerHistory`,
@@ -178,7 +191,7 @@ The game archive is solved (v0.9.12). Remaining growth (~4 MB/season) is
 scouting snapshots and weekly decisions added on top. Measure before
 touching anything.
 
-### C) 14-tab coherence
+### C) ~~14-tab coherence~~ — done (v0.9.26)
 The weekly plan (v0.9.13), the Coach's Desk decision cards (v0.9.14/15) and
 the polish pass (v0.9.17) covered the worst of it. What remains is the tab
 surface itself — grouping, or a first-run path.
@@ -186,7 +199,7 @@ surface itself — grouping, or a first-run path.
 ## Resume prompt
 
 Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.25 is production and all
+`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.26 is production and all
 known feature branches are reconciled into the main line — check
 `git branch -r` for anything new before assuming that's still true. Work in
 a new bounded branch, validate fully (`npm test` + `npm run test:browser`),

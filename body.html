@@ -17,20 +17,27 @@
   <div id="saveStatus" class="save-status muted">No save loaded.</div>
 
   <div class="tabs-shell">
+  <nav class="tab-groups" aria-label="Sections">
+    <button data-group="program" class="active">Program</button>
+    <button data-group="team">Team</button>
+    <button data-group="recruiting">Recruiting</button>
+    <button data-group="games">Games</button>
+    <button data-group="staff">Staff &amp; Offseason</button>
+  </nav>
   <nav class="tabs">
     <button data-tab="dashboard" class="active">Dashboard</button>
-    <button data-tab="roster">Roster</button>
-    <button data-tab="depth">Roles & Depth</button>
-    <button data-tab="staff">Staff & Schemes</button>
-    <button data-tab="gamelab">Game Lab</button>
-    <button data-tab="season">Season</button>
-    <button data-tab="newsletter">Newsletter</button>
-    <button data-tab="stats">Stats</button>
-    <button data-tab="recruiting">Recruiting</button>
+    <button data-tab="roster" hidden>Roster</button>
+    <button data-tab="depth" hidden>Roles & Depth</button>
+    <button data-tab="staff" hidden>Staff & Schemes</button>
+    <button data-tab="gamelab" hidden>Game Lab</button>
+    <button data-tab="season" hidden>Season</button>
+    <button data-tab="newsletter" hidden>Newsletter</button>
+    <button data-tab="stats" hidden>Stats</button>
+    <button data-tab="recruiting" hidden>Recruiting</button>
     <button data-tab="program">Program Lab</button>
-    <button data-tab="development">Development & Camp</button>
-    <button data-tab="offseason">Offseason</button>
-    <button data-tab="records">Awards & Records</button>
+    <button data-tab="development" hidden>Development & Camp</button>
+    <button data-tab="offseason" hidden>Offseason</button>
+    <button data-tab="records" hidden>Awards & Records</button>
     <button data-tab="history">History</button>
   </nav>
   </div>
