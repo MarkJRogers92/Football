@@ -81,3 +81,72 @@ Ranked by measured payoff, once the IndexedDB numbers confirm the shape:
    meaningful snaps would be safe.
 3. **Everything else** — not worth touching. `events` in particular is a
    rounding error, and it is load-bearing for the wire.
+
+## Update — resident IndexedDB measured directly (v0.9.38)
+
+The original measurement above used `packUniverse()` — the **portable export**
+shape — with a caveat that the browser already chunks and defers
+`playerArchive`, so the real IndexedDB footprint might be meaningfully
+smaller. That caveat is now checked and **disproved**.
+
+### Method
+
+Same six-season run, but driven through the real `storage.js` against
+`fake-indexeddb`, calling `store.save()` exactly the way `saveBrowser()` does
+in `app.js` (append-only `additions`/`gameAdditions`, real chunking). Then
+every object store was read back with `getAll()` and weighed for real —
+this is what actually sits in a browser's IndexedDB, not an estimate.
+
+### Result
+
+| Season | `archives` | `games` | `saves` (core) | **IDB total** | portable export |
+|---|---|---|---|---|---|
+| 1 | 1.75 MB | 6.11 MB | 19.40 MB | **27.25 MB** | 27.25 MB |
+| 6 | 19.25 MB | 35.56 MB | 29.95 MB | **84.76 MB** | 84.76 MB |
+
+**Resident IndexedDB size is the same as the portable export, byte for
+byte.** Chunking splits `playerArchive`/`gameArchive` into multiple records
+so the app can *load* them lazily — it does not reduce how many bytes are
+written to disk. The growth rate is unchanged: **+11.5 MB/season**, and the
+linear projection is **~188 MB by season 15**.
+
+One further thing this run surfaced that the export-only measurement
+couldn't: the `saves` store (the core snapshot — everything except the
+deferred archives, so 120 full team rosters, the live recruit pool, etc.) is
+not small either — 19.4 MB at season 1, growing to 29.95 MB by season 6
+(+2.1 MB/season). It's the single largest store early on and stays roughly
+a third of the total throughout. `gameArchive` overtakes it as the dominant
+driver by season 3, matching the original measurement's finding.
+
+### What this changes
+
+The original write-up's conclusion — "measure before optimizing, because the
+roadmap's own hypothesis was already wrong once" — holds, but the specific
+reason to *not* worry ("the browser already shrinks it") does not. There is
+no hidden discount. A twelve-season dynasty is a genuinely large IndexedDB
+footprint (roughly 130–150 MB by extrapolation), and on a storage-constrained
+context — mobile Safari in particular, which this project already targets
+(390px viewport tests throughout the suite) — that is the range where quota
+prompts or eviction become a real risk, not a theoretical one.
+
+### Recommendation
+
+This is now a real, not hypothetical, item for a storage-reduction pass —
+not urgent (nothing breaks below quota, and quota itself varies enormously
+by browser/device/free disk space), but worth scheduling before this project
+targets long dynasties as a headline feature. Ranked by the same measured
+payoff as before:
+
+1. **`gameArchive` first** (41–42% of the total, fastest-growing). It is
+   already chunked; the next lever is rolling old seasons' play-level detail
+   (drives, play-by-play — see v0.9.2's design notes) down to box-score
+   granularity after N seasons, keeping the record permanent but smaller.
+2. **The core `saves` row second.** It is large from season one because it
+   holds all 120 rosters and the full recruit pool, not just the controlled
+   team's. Worth checking whether AI-team roster detail needs to be as rich
+   as the controlled team's for save purposes, or whether it can be
+   compacted for teams the player doesn't control.
+3. **`playerArchive` third** (unchanged from the original measurement).
+
+Still no code changed here — this is measurement only, same discipline as
+before.
