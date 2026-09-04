@@ -2,7 +2,11 @@
 
 ## v0.9.18 — Reconciling the Coach's Desk, Player Agency and Scouting Intelligence
 
-- Merges three GPT/codex feature branches (v0.9.14–v0.9.16 in their own previews) onto the commercial polish pass. See the entries below for what each brings; this release is the reconciliation, not new work of its own.
+- Rebases three GPT/codex feature branches (v0.9.14–v0.9.16, previously only in their own previews, never merged) onto the commercial polish pass (v0.9.17). See the three entries below for what each brings; this release is the reconciliation.
+- Four real merge conflicts in `app.js` (the recruit profile, the player profile, and the recruiting board row/handler) were resolved by hand: the polish pass's `profile-sections` layout and styling classes were kept, with the scouting-intelligence panels, history and behavioral additions (`ensureScoutingIntel`, `scoutingPanelHTML`, `scoutingHistoryHTML`, `firstRecruitEvaluation`) woven in at the same points the original branch put them.
+- One deliberate design call in that merge: the player profile's raw Speed/Power/Technique/IQ grades (present since v0.8, absent from the v0.9.16 branch) were **not** restored. Scouting Intelligence's whole premise is that those numbers are uncertain and staff-estimated; showing the exact figure next to a fuzzy confidence range next to it would have undermined the feature it was reconciled with.
+- Version bumped from 0.9.17 straight to 0.9.18 (the codex branches' own 0.9.14–0.9.16 numbers were retired on rebase, since none of them had reached production).
+- No new simulation logic beyond what each of the three branches already validated; the added surface here is entirely the merge itself, verified with the full suite plus a direct visual pass of the merged recruit profile, player profile and dashboard decision cards.
 
 ## v0.9.17 — Commercial polish pass (presentation only)
 

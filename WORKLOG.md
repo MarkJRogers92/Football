@@ -1,5 +1,47 @@
 # WORKLOG
 
+## v0.9.18 — reconciling three feature branches with the polish pass
+
+Plan: the previous session flagged three GPT/codex branches (v0.9.14 Coach's
+Desk, v0.9.15 Player Agency, v0.9.16 Scouting Intelligence) as diverged and
+unreconciled — built on the same v0.9.13 checkpoint as the commercial polish
+pass, but not including it. All three were sequential (each built on the
+last), so this was one rebase of the v0.9.16 tip onto v0.9.17, not three
+separate merges.
+
+What actually happened:
+- 10 of 13 conflicts across the three commits were mechanical: VERSION.txt,
+  package.json and the `APP_VERSION` line, plus `index.html` (generated,
+  always dropped and rebuilt) and `CONTINUATION.md` (rewritten wholesale
+  regardless). Renumbered straight to 0.9.18 rather than reusing any of
+  14/15/16, since none had reached production and the polish pass already
+  claimed 17.
+- 3 real conflicts, all in `app.js`, all in the same shape: the polish pass
+  had restructured the recruit profile and player profile into a
+  `profile-sections` layout with real section classes; scouting-intelligence
+  had independently added its own panels (`scoutingPanelHTML`,
+  `scoutingHistoryHTML`) and a behavioral hook
+  (`firstRecruitEvaluation` on first target) into the *old*, pre-polish
+  markup. Resolved by keeping the polish pass's structure and weaving the
+  scouting calls in at the same relative position the original branch put
+  them, rather than picking one side wholesale.
+- One judgment call inside that merge: the player profile used to show raw
+  Speed/Power/Technique/IQ grades (present since v0.8). The scouting-intel
+  branch's own diff removed them, replacing them with fuzzy ranges + a
+  confidence label. That removal was deliberate on their part, not
+  incidental — showing an exact number next to a feature whose entire point
+  is that the number is *uncertain* would have contradicted it. Went with
+  their removal rather than restoring the old rows.
+
+Validation: did not trust the branches' own claims. Full suite from scratch
+after the rebase (53 smoke + 86 Node, 10 new tests from the three branches;
+134 browser checks across all three suites), plus a direct Playwright pass
+of the merged UI specifically at the conflict sites: opened a player profile
+(scouting panel + section layout together), a recruit profile (same), and
+drove a live game state until a Coach's Desk decision card actually
+appeared on the Dashboard to confirm it renders inside the polish pass's
+`.plan-card` correctly. Zero console errors at any step.
+
 ## v0.9.17 — commercial polish pass
 
 Plan: bring the previous session's (Fable) commercial polish work — dashboard
