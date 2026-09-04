@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.9.36 — The Game Lab stops showing a game from three weeks ago
+
+Reported directly: sim from the Dashboard, see the new score there, then open the Game Lab and it still shows the last game run through *its* buttons. The cause was that `universe.lastDetailedGame` is written in exactly one place — `simulateUserDetailed()`, the Game Lab's own "Watch My Next Game" / "Sim Instantly" — and `simWeek()` never touched it. So the top of the tab (next-game card, key matchups) was always current while the bottom (Detailed Box, Drive/Play Log) was frozen at whenever you last used a Game Lab button, with **no week or season label anywhere** to signal it was historical. Half-live, half-stale, unlabelled.
+
+- **A dashboard sim of your own game now clears the stale detail.** The Game Lab then reads "no detailed game" for the current week rather than showing an unrelated one. Nothing is lost: that game is permanently in the archive and the box already links to it in Game Center.
+- **A game played *through* the Game Lab keeps its detail.** `simWeek` skips already-played games, so the clear only fires when the fast engine actually plays your game — the distinction the fix turns on, and the case most likely to be broken by a careless version of it.
+- **The detailed box is stamped with its season and week**, so it can never read as ambiguous again. Saves made before this version have no stamp and simply omit the line rather than guessing.
+
+Worth keeping in mind for anyone touching this area: the two engines produce genuinely different records. A dashboard-simmed game has a box score but `drives: []` and no play-by-play; only the detailed engine produces drives and a play log. The Game Lab is not redundant with Game Center — it is the only way to generate that detail — the presentation was just lying about *when*.
+
+- 4 new tests in `tests/gamelab.js`. No new stored fields (`season`/`week` ride along on the existing `lastDetailedGame` object). Still schema 3.
+
 ## v0.9.35 — Reconciling v0.9.34 (title screen), and a real cost for full scout
 
 **Reconciliation.** GPT shipped v0.9.34 (a title screen — New/Continue/Load Dynasty, Options, How to Play) directly to `gh-pages` while this branch was at v0.9.33; same situation as the v0.9.29-32 reconciliation, resolved the same way: extracted the changed source files (`app.js`, `body.html`, `sports-presentation.js`, `polish.css`) out of the live build byte-for-byte and verified the rebuild against production before touching anything.

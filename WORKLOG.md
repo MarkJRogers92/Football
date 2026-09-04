@@ -1,5 +1,38 @@
 # WORKLOG
 
+## v0.9.36 — Game Lab freshness
+
+A player-reported inconsistency, and a good example of a bug that no test would
+have caught because nothing was technically wrong: every function did what it
+said, and the tab still lied.
+
+`universe.lastDetailedGame` has exactly one writer (`simulateUserDetailed`) and
+`simWeek` has never touched it — correct in isolation, incoherent on screen,
+because `renderGameLab` renders the current next-game card and that frozen
+object in the same view with no temporal marker on either.
+
+Two changes, and the second is the one worth being careful about:
+
+1. Stamp the detail at capture time with `season` and `g.week`. The result
+   object from `detailedGame` carries neither, and resolving them later from
+   the archive is unreliable once the archive is deferred — so record them at
+   the one moment both are known for certain.
+2. Clear it when the *fast* engine plays the user's own game. The subtlety is
+   that a game already played through the Game Lab is skipped by `simWeek`'s
+   loop (`if(g.played)continue`), so its detail correctly survives the same
+   week's remaining games being simulated. A naive "clear on any simWeek" would
+   have thrown away the detail for the very game you just watched. There are
+   tests for both directions, plus one that other programs' games never clear
+   it, and one that a full `simSeason` fast-forward leaves nothing stale.
+
+Deliberately not done: making the Game Lab display dashboard-simmed games. It
+looks tempting for consistency, but the fast engine records `drives: []` and no
+play-by-play, so the Drive/Play Log panel would render empty — trading a stale
+panel for a hollow one. Verified that difference directly before ruling it out
+rather than assuming the archive was uniform.
+
+Validation: 4 new tests, 148/148 Node, 144/144 browser.
+
 ## v0.9.35 — reconcile v0.9.34, close the free-scout hole, fix what reconciling exposed
 
 Second GPT reconciliation this session, same playbook as v0.9.29-32: extract

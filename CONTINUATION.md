@@ -1,12 +1,26 @@
-# Dynasty Lab — v0.9.35 checkpoint
+# Dynasty Lab — v0.9.36 checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
 Current source branch: `claude/review-improvement-dwjemy` (reconciled directly —
 see below)
 Production branch: `gh-pages`
-Production: v0.9.35 at https://markjrogers92.github.io/Football/
+Production: v0.9.36 at https://markjrogers92.github.io/Football/
 
 ## Current release
+
+v0.9.36 fixes a player-reported inconsistency: the Game Lab's lower panels
+showed the last game run through *its* buttons while the card above them
+showed the current next game, with no week label on either. A dashboard sim of
+your own game now clears the stale detail, a game played through the Game Lab
+keeps it (`simWeek` skips already-played games — that asymmetry is the whole
+fix), and the box is stamped with season/week.
+
+Note for anyone working here: the two engines are not interchangeable. A
+dashboard-simmed game has a box score but `drives: []` and no play-by-play;
+only `detailedGame` produces those. The Game Lab is the only way to generate
+that detail, so it is not redundant with Game Center.
+
+## Previous release
 
 v0.9.35 reconciles v0.9.34 (GPT's title screen — New/Continue/Load Dynasty)
 the same way v0.9.29-32 was reconciled: extract changed source files out of
@@ -288,7 +302,7 @@ surface itself — grouping, or a first-run path.
 ## Resume prompt
 
 Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.35 is production and all
+`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.36 is production and all
 known feature branches are reconciled into the main line — check
 `git branch -r` for anything new before assuming that's still true. Work in
 a new bounded branch, validate fully (`npm test` + `npm run test:browser`),
