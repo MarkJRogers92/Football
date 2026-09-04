@@ -321,3 +321,10 @@ Still schema 3.
 
 See `docs/SAVE_SIZE_MEASUREMENT.md` for measured per-component save growth.
 Still schema 3.
+
+## v0.9.29 presentation only
+
+No stored state. Matchup entrances, score counting and the possession replay
+derive from the current DOM and existing immutable game snapshots. Replay
+position and playback progress are transient UI state and are never exported or
+saved. IndexedDB remains schema 3.

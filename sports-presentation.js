@@ -18,6 +18,11 @@ function team(){const p=document.querySelector('#userTeam'),n=document.querySele
 function txt(el,sel){return (el?.querySelector(sel)?.textContent||'').trim()}
 function mark(name,size=''){const p=palette(name);return `<div class="sports-mark ${size}" style="--mark-primary:${p.primary};--mark-secondary:${p.secondary};--mark-rgb:${p.rgb}" aria-hidden="true">${esc(initials(name))}</div>`}
 function go(tab){document.querySelector(`.tabs button[data-tab="${tab}"]`)?.click()}
+const reducedMotion=()=>window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+function animateNumber(el,target){
+ if(!el)return;if(reducedMotion()){el.textContent=target;return}const started=performance.now(),duration=620;el.textContent='0';el.classList.add('score-counting');
+ const tick=now=>{const p=Math.min(1,(now-started)/duration),eased=1-Math.pow(1-p,3);el.textContent=String(Math.round(target*eased));if(p<1)requestAnimationFrame(tick);else{el.textContent=target;el.classList.remove('score-counting')}};requestAnimationFrame(tick)
+}
 
 function dashboard(){
  const d=document.querySelector('#dashboard'),hero=d?.querySelector('.program-masthead,.hero-grid'),hub=document.querySelector('#weeklyHub');if(!d||!hero||!hub)return;
@@ -49,9 +54,21 @@ function gamecenter(){
  let sb=head.querySelector('.scoreboard');if(!sb){sb=document.createElement('div');sb.className='scoreboard';h.after(sb)}
  const side=(name,score,win,role)=>`<div class="sb-team${win?' winner':''}">${mark(name,'large')}<div class="sb-copy"><span class="sb-role">${role}</span><strong>${esc(name)}</strong><small>${esc(rec(name))}</small></div><b class="sb-score">${esc(score)}</b></div>`;
  sb.innerHTML=side(away,as,aw,'AWAY')+`<div class="sb-mid"><span class="sb-status">${esc(meta[0]||'FINAL')}</span><span>${esc(meta.slice(1,3).join(' · '))}</span><span>${esc(meta.slice(3).join(' · '))}</span></div>`+side(home,hs,hw,'HOME');
+ sb.classList.remove('scoreboard-enter');void sb.offsetWidth;sb.classList.add('scoreboard-enter');const scores=sb.querySelectorAll('.sb-score');animateNumber(scores[0],+as);animateNumber(scores[1],+hs);
+ if(!dlg.dataset.motionCloseBound){dlg.dataset.motionCloseBound='1';dlg.addEventListener('close',()=>{delete dlg.dataset.sportsScoreKey;head.querySelector('.scoreboard')?.remove()})}
+}
+function driveReplay(){
+ const panel=document.querySelector('[data-drive-replay]');if(!panel||panel.dataset.motionBound)return;panel.dataset.motionBound='1';
+ const field=panel.querySelector('.drive-field'),ball=panel.querySelector('.drive-ball'),caption=panel.querySelector('[data-drive-caption]'),awayScore=panel.querySelector('[data-drive-away-score]'),homeScore=panel.querySelector('[data-drive-home-score]'),play=panel.querySelector('[data-drive-play]'),strip=panel.querySelector('.drive-sequence'),steps=[...panel.querySelectorAll('[data-drive-step]')];let timer=0,next=0;
+ const position=(side,result)=>{const away=side==='away',start=away?13:87,map={TD:96,FG:80,MISS:76,PUNT:61,INT:48,END:58},raw=map[result]??58,end=away?raw:100-raw;return{start,end}};
+ const stop=()=>{if(timer)clearInterval(timer);timer=0;play.textContent='Play sequence';play.setAttribute('aria-pressed','false')};
+ const show=(index,move=true)=>{const step=steps[index];if(!step)return;steps.forEach(x=>x.classList.toggle('active',x===step));const side=step.dataset.side,result=step.dataset.result,{start,end}=position(side,result);field.style.setProperty('--ball-start',start+'%');field.style.setProperty('--ball-end',end+'%');field.dataset.result=result;field.dataset.side=side;field.classList.remove('is-moving','is-score');ball.style.left='';void field.offsetWidth;if(move&&!reducedMotion())field.classList.add('is-moving');else ball.style.left=end+'%';if(+step.dataset.points)field.classList.add('is-score');awayScore.textContent=step.dataset.awayScore;homeScore.textContent=step.dataset.homeScore;const team=step.querySelector('strong')?.textContent||'',detail=step.querySelector('small')?.textContent||'';caption.textContent=`${step.firstElementChild?.textContent||'Drive'} · ${team} · ${detail}`;if(strip&&!reducedMotion())strip.scrollTo({left:Math.max(0,step.offsetLeft-strip.clientWidth/2+step.clientWidth/2),behavior:'smooth'})};
+ steps.forEach((step,index)=>step.addEventListener('click',()=>{stop();next=index+1;show(index)}));
+ play?.addEventListener('click',()=>{if(timer){stop();return}next=0;play.textContent='Pause replay';play.setAttribute('aria-pressed','true');show(next++);timer=setInterval(()=>{if(!panel.isConnected||next>=steps.length){stop();return}show(next++)},reducedMotion()?90:560)});panel.closest('dialog')?.addEventListener('close',stop,{once:true});
+ if(steps.length)show(0,false)
 }
 function score(){document.querySelector('#detailedBox .big')?.classList.add('sports-scoreline')}
-let queued=false;function run(){queued=false;dashboard();top15();playerHero();matchup();gamecenter();score()}function queue(){if(queued)return;queued=true;if(window.requestAnimationFrame)window.requestAnimationFrame(run);else setTimeout(run,0)}
+let queued=false;function run(){queued=false;dashboard();top15();playerHero();matchup();gamecenter();driveReplay();score()}function queue(){if(queued)return;queued=true;if(window.requestAnimationFrame)window.requestAnimationFrame(run);else setTimeout(run,0)}
 document.addEventListener('click',e=>{if(e.target?.closest?.('[data-sports-final]')){e.preventDefault();[...document.querySelectorAll('#weeklyHub .hub-item')].find(x=>txt(x,'.hub-kicker').toUpperCase()==='FINAL')?.click();return}const tab=e.target?.closest?.('[data-sports-tab]')?.dataset?.sportsTab;if(tab){e.preventDefault();go(tab)}setTimeout(queue,0)});document.querySelector('#userTeam')?.addEventListener('change',()=>setTimeout(queue,0));
 if(window.MutationObserver){for(const sel of ['#weeklyHub','#top15','#playerDialog','#gameDialog','#nextGameCard','#detailedBox']){const el=document.querySelector(sel);if(el)new MutationObserver(queue).observe(el,{childList:true,subtree:true,characterData:true,attributes:sel==='#playerDialog'||sel==='#gameDialog'})}}
 queue();

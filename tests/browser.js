@@ -44,6 +44,32 @@ const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${
       check(`[${label}] tab ${t} renders`, visible && hasContent);
     }
 
+    // A detailed game has the permanent drive outcomes needed by the motion
+    // replay. The visual remains schematic because yardage and clock are not archived.
+    await goTab(page, 'gamelab');
+    await page.click('#simDetailedGame');
+    await page.click('#detailedBox [data-game]');
+    await page.locator('#gameTabs button').filter({hasText:/^Drives$/}).click();
+    const motion = await page.evaluate(() => ({
+      replay: !!document.querySelector('[data-drive-replay]'),
+      steps: document.querySelectorAll('[data-drive-step]').length,
+      note: document.querySelector('#gameDialogBody')?.textContent || '',
+    }));
+    check(`[${label}] drive replay renders all recorded possessions`,
+      motion.replay && motion.steps === 24 && motion.note.includes('exact field position'), JSON.stringify(motion));
+    await page.waitForFunction(() => document.querySelector('[data-drive-replay]')?.dataset.motionBound === '1');
+    await page.click('[data-drive-play]');
+    await page.waitForTimeout(650);
+    const moving = await page.evaluate(() => ({
+      active: document.querySelectorAll('[data-drive-step].active').length,
+      caption: document.querySelector('[data-drive-caption]')?.textContent || '',
+      playing: document.querySelector('[data-drive-play]')?.getAttribute('aria-pressed'),
+    }));
+    check(`[${label}] drive sequence advances its motion graphic`,
+      moving.active === 1 && moving.caption.includes('plays') && moving.playing === 'true', JSON.stringify(moving));
+    await page.click('[data-drive-play]');
+    await page.getByRole('button',{name:'Close Game Center',exact:true}).click();
+
     // Simulate a week and confirm the UI advances.
     await goTab(page, 'dashboard');
     const t0 = Date.now();

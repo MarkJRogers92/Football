@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.9.29 — Game Center in motion
+
+The broadcast layer now moves without changing a single simulation result.
+
+- Game Lab matchup cards stage both teams with a brief broadcast-style entrance.
+- Game Center scores count into the final and the scoreboard enters as one unit.
+- Detailed games gain a playable possession replay: the football moves across a
+  schematic field, the running score updates, scoring drives flash, and every
+  recorded possession remains directly selectable.
+- The replay states plainly that exact field position, clock and possession time
+  were not archived. TD, field-goal, punt, interception, miss and end-of-drive
+  destinations communicate the recorded outcome, not invented yardage.
+- `prefers-reduced-motion` removes entrances, score counting, field motion and
+  flashes while leaving every result and control available.
+- Presentation is derived from immutable game snapshots at render time. No save
+  fields, archive format, simulation formulas or IndexedDB schema changed.
+
 ## v0.9.28 — Fix: an ignored job offer froze career progression forever
 
 Found by a headless multi-season soak test, not by hand-play. If a closed tenure's job offers were never resolved — a player who ignored the CAREER wire tile, or a script that never called `acceptPost` — the season kept simulating normally (games, recruiting, rosters, the wire) while the program's own `careerHistory`, `adminConfidence` and tenure record silently froze at whatever they were the moment the tenure closed, forever. Not a crash: a stuck state that looked like nothing was wrong.

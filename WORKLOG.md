@@ -1,5 +1,30 @@
 # WORKLOG
 
+## v0.9.29 — Game Center motion
+
+Plan: add the smallest coherent moving-graphics slice — matchup entrance,
+score reveal and drive replay — on the current v0.9.28 source, without touching
+the game model or storing presentation state.
+
+The archive constraint shaped the design. Detailed games preserve drive side,
+plays, result and points, but not field position, clock or possession time. A
+literal field replay would therefore fabricate most of what it showed. The new
+field is explicitly schematic: possession begins from an own-side marker and
+moves to an outcome zone based only on TD / FG / MISS / PUNT / INT / END. The
+caption and help text name the missing data, while a separate running score is
+the exact sum of recorded drive points. Existing score adjustments remain
+identified as adjustments rather than invented scoring plays.
+
+All motion lives in the presentation layer. Game snapshots, simulation RNG and
+save state are untouched; opening or replaying history cannot change a future
+result. Replay timers stop when their dialog closes or their panel is replaced.
+Reduced-motion users receive immediate state changes with no transforms,
+counting or flashes.
+
+Credit-conscious validation: one tiny deterministic markup test during
+development, followed by one full Node/browser gate at the end. No season audit
+or calibration was run because this release changes no simulation behavior.
+
 ## v0.9.28 — blocking the calendar on an unresolved job offer
 
 Plan: fix the freeze found during a 7-season headless soak test of v0.9.21-27.

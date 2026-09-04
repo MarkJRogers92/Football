@@ -1,12 +1,25 @@
-# Dynasty Lab — v0.9.28 checkpoint
+# Dynasty Lab — v0.9.29 preview checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `claude/v0928-career-blocks-calendar` (merged into the
-main working branch `claude/review-improvement-dwjemy`)
+Current source branch: `codex/v0929-game-center-motion` (based on validated
+v0.9.28 source `claude/review-improvement-dwjemy` at `d61ff2c`)
 Production branch: `gh-pages`
 Production: v0.9.28 at https://markjrogers92.github.io/Football/
 
 ## Current release
+
+v0.9.29 is a presentation-only motion pass. Game Lab matchups receive a brief
+broadcast entrance, Game Center scores count into the final, and detailed games
+have a playable possession replay with a moving football, running score and
+scoring flash. The replay uses only archived drive side, plays, result and
+points; it explicitly labels the exact field position and clock as unavailable.
+
+All animation respects `prefers-reduced-motion`. No engine formula, RNG call,
+save field or archive changed. No multi-season calibration was run because
+there is no simulation change. Preview target:
+https://markjrogers92.github.io/Football/preview/v0929/
+
+## Previous release
 
 v0.9.28 fixes a real bug found by a 7-season headless soak test (not by hand
 play): an ignored job offer froze career progression forever while the rest of
@@ -16,9 +29,8 @@ used for weekly decisions. The one non-obvious part: `simSeason`'s fast-forward
 loop needed its own guard, or a blocked `simWeek` would leave it spinning
 forever rather than hanging cleanly. See WORKLOG.
 
-If you soak-test again: this confirms multi-season headless runs find things
-single-season tests structurally cannot. Worth doing again after the next
-batch of features that touches offseason/tenure/career state.
+If you soak-test again: reserve it for a batch that changes
+offseason/tenure/career state. The v0.9.29 motion pass does not justify one.
 
 ## Previous release
 
@@ -166,15 +178,12 @@ part of the main line — nothing is orphaned.
 ## Validation checkpoint
 
 - 53/53 engine smoke checks;
-- 86/86 Node tests across all suites (10 new: `weeklydecisions.js`,
-  `playeragency.js`, `scouting.js`);
-- 134 desktop + iPhone-layout browser checks (99 + 14 + 21 across the three
-  Chromium suites);
-- direct Playwright pass of the merged UI at every real conflict site:
-  player profile (scouting panel + polish section layout together), recruit
-  profile (same), and a live-driven Dashboard state showing an actual
-  Coach's Desk decision card rendering inside the polish pass's `.plan-card`.
-  Zero console errors throughout.
+- 134/134 Node tests, including the immutable drive-replay markup check;
+- 148/148 desktop + iPhone-layout browser checks (113 + 14 + 21 across the
+  three Chromium suites), including all 24 recorded possessions, playback,
+  Game Center fit and mobile page overflow;
+- zero console errors throughout. No storage audit, multi-season calibration
+  or real iPhone Safari run; v0.9.29 changes presentation only.
 
 ## How the merge was done
 
@@ -198,7 +207,8 @@ simulation gaps.
 
 ## Storage guardrail
 
-Read `STORAGE.md` before altering saves. v0.9.28 changes no stored state.
+Read `STORAGE.md` before altering saves. v0.9.29 changes no stored state.
+v0.9.28 changes no stored state.
 v0.9.27 added `t.coachTreeCredited`,
 additive. v0.9.26 changed no stored state at all.
 v0.9.25 added `p.academicStanding`,
@@ -237,9 +247,9 @@ surface itself — grouping, or a first-run path.
 ## Resume prompt
 
 Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.28 is production and all
-known feature branches are reconciled into the main line — check
-`git branch -r` for anything new before assuming that's still true. Work in
-a new bounded branch, validate fully (`npm test` + `npm run test:browser`),
-update CHANGELOG/WORKLOG/STORAGE/CONTINUATION, publish a preview first, then
+`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.28 remains production;
+v0.9.29 is the presentation-only motion candidate on
+`codex/v0929-game-center-motion`. Review its preview before promotion. For
+later work, check `git branch -r` for anything newer, work in a bounded branch,
+run one proportionate final validation pass, publish a preview first, and
 promote only after review.
