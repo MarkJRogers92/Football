@@ -148,9 +148,9 @@ an impatient one (25) does not.
 **In-season visibility.** Wire tiles as the mandate slips out of reach, and a
 confidence meter on the Program tab. The number must never be a surprise.
 
-*Deliberately out of scope for v0.9.21:* being rehired at a lower-prestige
-program and carrying a career record across tenures. That is the natural
-follow-up once the ending exists.
+*Shipped in v0.9.22:* being rehired at a lower-prestige program and carrying a
+career record across tenures. The hot seat now has an ending **and** a next
+chapter.
 
 ## C. NIL as a spendable budget
 

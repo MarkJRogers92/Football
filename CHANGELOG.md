@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.9.22 — The career arc
+
+v0.9.21 gave the hot seat an ending and nowhere to go. A dynasty that can only end is worse than one that never ends, so a closed tenure is now a line on a résumé and the résumé is what the next job market reads.
+
+- **Closing a tenure** archives it to `universe.careerHistory` with the school, its prestige, the years, the record and why it ended. Closing twice is a no-op.
+- **The job market reads the résumé.** `hiringCeiling()` blends the best prestige you have held (72%), your career win percentage (up to 46 points) and your longevity (up to 10), clamped to 18–96. Up to three programs at or below that ceiling are offered, best first; the school that let you go is never among them. A good record at a weak program still counts for something, and a bad one genuinely costs you.
+- **Taking a post** starts a fresh tenure at zero while the career record carries forward, seeds the new employer's confidence from *its own* `admin_patience` rather than your old school's, and writes a `TENURE_STARTED` event.
+- **Two guards that matter.** A closed tenure stops accruing seasons until a post is taken, so a run cannot silently continue at a school that already let you go. And switching the controlled program by hand is treated as a new post ("stepped away") rather than a continuation of the old record.
+- The wire carries a CAREER tile at importance 95 — above everything else, including a national record — while offers are open, and the Program tab gains a Coaching Career card, a career line in Institutional DNA, and the offer card itself.
+- 5 new tests in `tests/career.js`. Storage additive only: `universe.careerHistory`, `universe.jobOffers`, and `closed` on `universe.tenure`. IndexedDB stays at schema 3.
+
 ## v0.9.21 — Stakes: rivalries, the administration, and NIL you have to spend
 
 Three features from the new `IDEAS.md` backlog, all built on data the game already stored.

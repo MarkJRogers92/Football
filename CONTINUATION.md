@@ -1,12 +1,23 @@
-# Dynasty Lab — v0.9.21 checkpoint
+# Dynasty Lab — v0.9.22 checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `claude/v0921-stakes` (merged into the
+Current source branch: `claude/v0922-career-arc` (merged into the
 main working branch `claude/review-improvement-dwjemy`)
 Production branch: `gh-pages`
-Production: v0.9.21 at https://markjrogers92.github.io/Football/
+Production: v0.9.22 at https://markjrogers92.github.io/Football/
 
 ## Current release
+
+v0.9.22 closes the hole v0.9.21 opened: the administration could end a tenure
+and the run had nowhere to go. A closed tenure now archives to
+`universe.careerHistory`, and up to three programs at or below a ceiling
+derived from your resume will hire you. The career record carries across
+posts. Two guards are load-bearing and easy to break: a closed tenure stops
+accruing seasons until a post is taken, and switching the controlled program
+by hand closes the old tenure as "stepped away" rather than misattributing
+its seasons. See WORKLOG for both.
+
+## Previous release
 
 v0.9.21 adds the three stakes features from `IDEAS.md`: rivalries (derived
 from the schedule, with persistent series and trophies), the administration
@@ -101,7 +112,9 @@ simulation gaps.
 
 ## Storage guardrail
 
-Read `STORAGE.md` before altering saves. v0.9.21 adds only additive fields
+Read `STORAGE.md` before altering saves. v0.9.22 adds `universe.careerHistory`,
+`universe.jobOffers` and `closed` on `universe.tenure`, all additive.
+v0.9.21 added only additive fields
 (`t.rivalry`, `t.adminConfidence`, `t.mandate`, `t.nilSpent`, `universe.tenure`,
 `nilDeal` on players and recruits), all backfilled in `normalizeUniverse`;
 IndexedDB stays at schema 3. v0.9.20 added no save-format change of
@@ -131,7 +144,7 @@ surface itself — grouping, or a first-run path.
 ## Resume prompt
 
 Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.21 is production and all
+`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.22 is production and all
 known feature branches are reconciled into the main line — check
 `git branch -r` for anything new before assuming that's still true. Work in
 a new bounded branch, validate fully (`npm test` + `npm run test:browser`),

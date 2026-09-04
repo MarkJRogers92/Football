@@ -1,5 +1,43 @@
 # WORKLOG
 
+## v0.9.22 — career arc (closing the hole v0.9.21 opened)
+
+Plan: v0.9.21's administration could end a tenure and then the run had nowhere
+to go. That was a hole I introduced, so it was the right thing to close before
+starting anything new from IDEAS.md.
+
+The design question was what a program is willing to gamble on. A pure
+win-percentage ceiling makes a 4-8 season at a blue-blood worth more than 9-3 at
+a bad one, which is wrong; a pure prestige ceiling means results never matter.
+The blend settled on is best-prestige-held at 72% plus win percentage worth up
+to 46 points plus longevity worth up to 10 — so a strong record moves you up a
+tier or two but does not vault a losing coach into a better job than the one he
+just lost. Tested by holding the school constant and swapping only the record.
+
+Two state guards took more thought than the feature:
+
+1. A closed tenure must stop accruing. `reviewControlledProgram` runs every
+   offseason; without a guard it would keep pushing reviews into a tenure the
+   player had already been fired from, and `careerTotals` would double-count.
+   It now returns null while offers are open.
+2. The controlled program can be switched by hand from the picker at any time —
+   this is a sandbox as much as a career. If that happens the tenure's school no
+   longer matches the selected team, so the old tenure is closed as "stepped
+   away" and a new one opened. Without it the career record would silently
+   attribute one school's seasons to another.
+
+One test failure, and it was the test: I asserted the wire tile appears three
+weeks into season one, but `universe.tenure` does not exist until the first
+offseason review creates it, so `closeTenure` correctly no-opped. Rewritten to
+finish a season first, and it now also asserts the no-tenure no-op explicitly,
+since that guard is worth pinning down.
+
+Also worth recording: every string patch in this release used a replacer
+function rather than a replacement string, after v0.9.21 shipped a bug where
+`$$` in a replacement collapsed to `$` and broke two selectors.
+
+Validation: 5 new tests, full Node and browser suites.
+
 ## v0.9.21 — three stakes features
 
 Plan: the user picked the top three from the brainstorm — hot seat, rivalries,

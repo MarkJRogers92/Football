@@ -264,3 +264,14 @@ On players and recruits:
 
 Events gain three types (`RIVALRY_RESULT`, `ADMIN_REVIEW`, `NIL_DEAL`), all
 carrying `importance` on the same 0-100 scale the wire ranks by.
+
+## v0.9.22 additive state
+
+- `universe.careerHistory: [{school, prestige, startYear, endYear, seasons, w, l, reason}]`
+  — one entry per closed tenure, appended by `closeTenure()`.
+- `universe.jobOffers: [{schoolId, name, conference, prestige, why}]` — non-empty
+  only while the player owes a decision; cleared by `acceptPost()`.
+- `universe.tenure.closed: boolean` — guards against a closed tenure accruing
+  further seasons.
+
+Both universe fields are backfilled in `normalizeUniverse()`. Still schema 3.
