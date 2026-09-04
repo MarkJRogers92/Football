@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.9.34 — Title screen (handoff candidate)
+## v0.9.34 — Title screen
 
 Dynasty Lab now opens on a game-native stadium title screen instead of silently
 generating a universe and dropping the player into a program. Continue reads the
@@ -15,11 +15,11 @@ background, not a screenshot. No dynasty or IndexedDB schema changed. The
 deployment helper now carries the single title background into production and
 versioned preview folders.
 
-Handoff status: the focused desktop/iPhone browser suite passed 114 checks after
-the startup flow was added. A subsequent visual inspection found that author CSS
-overrode the native `hidden` display on subpanels; that one-line presentation fix
-is applied and visually checked. Run the final full Node/browser/storage gate
-before preview publication.
+Validation passed: 53 engine smoke checks, 143 Node tests, 150 desktop/iPhone
+browser presentation checks (115 + 14 + 21), and 7 real IndexedDB persistence
+scenarios, with no browser console errors. The final pass caught one stale test
+that assumed every season archived exactly 745 games; it now correctly includes
+the season's variable bowl field. No product or save-format change was required.
 
 ## v0.9.33 — Program history, and a real weekly gameplan
 

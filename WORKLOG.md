@@ -1,6 +1,6 @@
 # WORKLOG
 
-## v0.9.34 — Title screen handoff
+## v0.9.34 — Title screen
 
 Built from Claude's validated v0.9.33 source (`165a181`) on
 `codex/v0934-title-screen`. Startup no longer calls `initUniverse()`; it loads
@@ -15,12 +15,12 @@ not enter the dynasty save. The original background was generated as a clean
 asset with no baked-in UI, converted to a 218 KB JPEG, and is copied by the
 existing GitHub Pages publisher beside the standalone HTML.
 
-Credit-conscious handoff: build and syntax checks passed. The focused
-desktop/iPhone browser suite passed 114 checks. After that run, visual inspection
-found and fixed one CSS `hidden` override in the program-selection panel; the
-corrected panel was visually checked. Full Node, complete browser presentation,
-and real IndexedDB persistence suites remain for the next agent before preview.
-No long simulation/calibration was run.
+Credit-conscious final validation passed: 53 engine smoke checks, 143 Node
+tests, 150 desktop/iPhone browser presentation checks (115 + 14 + 21), and 7
+real IndexedDB persistence scenarios, with no browser console errors. The pass
+caught and corrected a stale exact game-archive expectation so it includes the
+variable number of bowls. No product change or long simulation/calibration was
+required.
 
 ## v0.9.33 — program history + weekly gameplan
 
