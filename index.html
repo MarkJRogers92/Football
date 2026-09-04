@@ -925,6 +925,49 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
 #recruiting td[data-label="Priority"]{white-space:nowrap;font-size:12px}
 #recruiting td select{max-width:104px}
 @media(max-width:700px){#recruiting .player-cell-text{max-width:none}#recruiting td select{max-width:100%}}
+
+/* ==== Game Center (Phase 6) ========================================================== */
+.sports-game-dialog .dialog-head{align-items:flex-start;padding-bottom:16px}
+.sports-game-dialog .dialog-head>div:first-child{flex:1 1 auto;min-width:0}
+.sports-game-dialog #gameDialogName{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.sports-game-dialog #gameDialogMeta,.sports-game-dialog #gamePregame{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);margin:0}
+.scoreboard{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:14px;align-items:center;margin-top:10px}
+.sb-team{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;min-width:0;padding:10px 12px;border:1px solid var(--line-2);border-radius:var(--radius);background:rgba(7,12,18,.45)}
+.sb-team.winner{border-color:var(--line-3);background:var(--surf-3)}
+.sb-copy{min-width:0}
+.sb-role{display:block;font-size:9px;font-weight:800;letter-spacing:.12em;color:var(--ink-4)}
+.sb-team strong{display:block;font-size:16px;line-height:1.15;letter-spacing:-.02em;color:var(--ink-2);overflow-wrap:anywhere}
+.sb-team.winner strong{color:var(--ink-1)}
+.sb-team small{display:block;margin-top:2px;font-size:11px;color:var(--ink-3)}
+.sb-score{font-size:40px;font-weight:850;line-height:1;letter-spacing:-.05em;font-variant-numeric:tabular-nums;color:var(--ink-3)}
+.sb-team.winner .sb-score{color:var(--ink-1)}
+.sb-team.winner .sb-score::after{content:"";display:inline-block;width:0;height:0;margin-left:6px;vertical-align:middle;border:5px solid transparent;border-right:0;border-left:7px solid var(--team-secondary);opacity:.9}
+.sb-mid{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:120px;text-align:center;font-size:10px;color:var(--ink-3)}
+.sb-status{padding:3px 9px;border:1px solid #2f6b4e;border-radius:999px;color:#7fe0b0;background:rgba(101,211,154,.10);font-size:10px;font-weight:800;letter-spacing:.12em}
+.sports-game-dialog #gameTabs{display:inline-flex;gap:2px;margin:6px 0 14px;padding:3px;border:1px solid var(--line-2);border-radius:9px;background:var(--surf-0)}
+.sports-game-dialog #gameTabs button{border:1px solid transparent;background:transparent;border-radius:6px;padding:6px 12px;font-size:12px;color:var(--ink-3)}
+.sports-game-dialog #gameTabs button:hover:not(:disabled){background:var(--surf-2);color:var(--ink-1)}
+.sports-game-dialog #gameTabs button.active{background:var(--surf-3);border-color:var(--line-3);color:var(--ink-1)}
+.game-dialog .recap{font-size:15px;line-height:1.6;color:var(--ink-2)}
+.game-dialog .recap:first-of-type{font-size:16px;color:var(--ink-1)}
+.game-dialog h3{margin:18px 0 8px;font-size:var(--t-eyebrow);font-weight:750;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);padding-bottom:6px;border-bottom:1px solid var(--line-2)}
+.game-dialog h4{margin:12px 0 4px;font-size:13px;font-weight:700;color:var(--ink-1)}
+.game-dialog .lineitem{padding:7px 4px;font-size:var(--t-table)}
+.game-dialog .lineitem strong{font-variant-numeric:tabular-nums}
+.game-table table{min-width:0}
+@media(max-width:720px){
+  .scoreboard{grid-template-columns:1fr;gap:8px}
+  .sb-mid{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:6px 10px;min-width:0;order:3;padding-top:4px}
+  .sb-team{padding:9px 10px}
+  .sb-score{font-size:32px}
+  .sports-game-dialog #gameTabs{display:flex;overflow:auto}
+  .sports-game-dialog #gameTabs button{flex:1 0 auto;padding:6px 9px}
+}
+/* Team names wrap on word boundaries; the score column stays fixed */
+.sb-team{grid-template-columns:auto minmax(0,1fr) minmax(64px,auto)}
+.sb-team strong{overflow-wrap:normal;word-break:normal;hyphens:manual}
+.sb-score{text-align:right}
+.scoreboard{grid-template-columns:minmax(0,1.15fr) minmax(150px,.7fr) minmax(0,1.15fr)}
 </style></head><body>
 <div id="app">
   <header class="topbar">
@@ -3303,10 +3346,18 @@ function matchup(){
  const c=document.querySelector('#nextGameCard');if(!c||c.querySelector('.matchup-shell'))return;const title=c.querySelector('strong')?.textContent?.trim(),detail=c.querySelector('.muted')?.textContent?.trim();if(!title||!detail)return;const m=title.match(/^Week\s+(\d+):\s+(vs|@)\s+(.+)$/i);if(!m)return;const [,wk,loc,opp]=m,u=team(),halves=detail.split(/\s+·\s+/);c.innerHTML=`<div class="matchup-shell"><div class="matchup-label">WEEK ${esc(wk)} · GAME LAB PREVIEW</div><div class="matchup-board"><div class="matchup-team is-user">${mark(u,'xl')}<strong>${esc(u)}</strong><span>${esc((halves[0]||'').replace(u+':','').trim())}</span></div><div class="matchup-center"><b>${loc==='@'?'AT':'VS'}</b><span>TALE OF THE TAPE</span></div><div class="matchup-team">${mark(opp,'xl')}<strong>${esc(opp)}</strong><span>${esc((halves.slice(1).join(' · ')||'').replace(opp+':','').trim())}</span></div></div><div class="matchup-footer"><span>Current staff/game-model reads</span><strong>${loc==='@'?'ROAD GAME':'HOME GAME'}</strong></div></div>`
 }
 function top15(){for(const row of document.querySelectorAll('#top15 .rankrow')){const cell=row.firstElementChild;if(!cell||cell.querySelector('.sports-mark'))continue;const name=[...cell.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();if(!name)continue;cell.querySelector('.rank')?.insertAdjacentHTML('afterend',mark(name,'small'))}}
+function gamecenter(){
+ const dlg=document.querySelector('#gameDialog');if(!dlg?.hasAttribute('open'))return;const h=document.querySelector('#gameDialogName'),head=dlg.querySelector('.dialog-head');if(!h||!head)return;const title=(h.textContent||'').trim(),m=title.match(/^(.+?)\s+(\d+)\s+—\s+(\d+)\s+(.+)$/);if(!m)return;
+ const meta=(document.querySelector('#gameDialogMeta')?.textContent||'').split('·').map(x=>x.trim()).filter(Boolean),pre=document.querySelector('#gamePregame')?.textContent||'',key=title+'|'+meta.join('|')+'|'+pre;if(dlg.dataset.sportsScoreKey===key)return;dlg.dataset.sportsScoreKey=key;dlg.classList.add('sports-game-dialog');
+ const [,away,as,hs,home]=m,rec=name=>{const r=pre.match(new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s+(\\S+)\\s+\\(#([^)]+)\\)'));return r?`${r[1]}${r[2]!=='—'?' · #'+r[2]:''}`:''},aw=+as>+hs,hw=+hs>+as;
+ let sb=head.querySelector('.scoreboard');if(!sb){sb=document.createElement('div');sb.className='scoreboard';h.after(sb)}
+ const side=(name,score,win,role)=>`<div class="sb-team${win?' winner':''}">${mark(name,'large')}<div class="sb-copy"><span class="sb-role">${role}</span><strong>${esc(name)}</strong><small>${esc(rec(name))}</small></div><b class="sb-score">${esc(score)}</b></div>`;
+ sb.innerHTML=side(away,as,aw,'AWAY')+`<div class="sb-mid"><span class="sb-status">${esc(meta[0]||'FINAL')}</span><span>${esc(meta.slice(1,3).join(' · '))}</span><span>${esc(meta.slice(3).join(' · '))}</span></div>`+side(home,hs,hw,'HOME');
+}
 function score(){document.querySelector('#detailedBox .big')?.classList.add('sports-scoreline')}
-let queued=false;function run(){queued=false;dashboard();top15();playerHero();matchup();score()}function queue(){if(queued)return;queued=true;if(window.requestAnimationFrame)window.requestAnimationFrame(run);else setTimeout(run,0)}
+let queued=false;function run(){queued=false;dashboard();top15();playerHero();matchup();gamecenter();score()}function queue(){if(queued)return;queued=true;if(window.requestAnimationFrame)window.requestAnimationFrame(run);else setTimeout(run,0)}
 document.addEventListener('click',e=>{if(e.target?.closest?.('[data-sports-final]')){e.preventDefault();[...document.querySelectorAll('#weeklyHub .hub-item')].find(x=>txt(x,'.hub-kicker').toUpperCase()==='FINAL')?.click();return}const tab=e.target?.closest?.('[data-sports-tab]')?.dataset?.sportsTab;if(tab){e.preventDefault();go(tab)}setTimeout(queue,0)});document.querySelector('#userTeam')?.addEventListener('change',()=>setTimeout(queue,0));
-if(window.MutationObserver){for(const sel of ['#weeklyHub','#top15','#playerDialog','#nextGameCard','#detailedBox']){const el=document.querySelector(sel);if(el)new MutationObserver(queue).observe(el,{childList:true,subtree:true,characterData:true,attributes:sel==='#playerDialog'})}}
+if(window.MutationObserver){for(const sel of ['#weeklyHub','#top15','#playerDialog','#gameDialog','#nextGameCard','#detailedBox']){const el=document.querySelector(sel);if(el)new MutationObserver(queue).observe(el,{childList:true,subtree:true,characterData:true,attributes:sel==='#playerDialog'||sel==='#gameDialog'})}}
 queue();
 })();
 
