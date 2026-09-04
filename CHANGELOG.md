@@ -1,5 +1,47 @@
 # Changelog
 
+## v0.9.22 — Consolidation and tuning
+
+This release closes the two remaining commercial-polish findings and validates
+the v0.9.21 stakes systems before adding another major feature.
+
+**Stakes tuning.** A new repeatable `npm run audit:stakes` harness advances
+three seeded dynasties for five seasons each. Across those 15 completed
+seasons, league NIL budgets ranged from 3–12 points (median 8), a recruit deal
+added 6–9 pitch points (mean 7.3), roster deals removed 6–26 transfer-risk
+points (mean 12.8), administration confidence exercised 13–100 and every
+paired rivalry met exactly once per season. The results support keeping the
+existing numeric tuning: deals matter without guaranteeing an outcome, board
+states reach both hot-seat and secure territory, and rivalry wins move fan
+support. The audit is measurement, not a production simulation mode.
+
+**NIL control and accounting.** The Recruiting board now exposes the recruit
+side of the same finite NIL pool already used for roster retention, including
+offer/release controls and remaining budget. A current-season recruit deal can
+no longer be overwritten by a second school, which previously left the first
+school's spend stranded. The NIL Priority promise is labeled separately from
+the seasonal cash offer.
+
+**Recruiting hierarchy.** The national board is now the default working
+surface, with My Battles and Signing Class in an in-screen switcher instead of
+three large blocks stacked above the table. Every board row includes a
+position-aware scouted grade range, a numeric range and a visual confidence
+meter derived from the existing scouting model; presentation does not create
+new scouting state for unevaluated recruits.
+
+**Two-level shell.** Five primary areas — Home, Team, Competition, Recruiting
+and Program — select a contextual second row containing the existing 14
+destinations. Deep links and test hooks still resolve directly to every
+existing panel, while desktop and mobile no longer begin with a flat 14-tab
+strip.
+
+**Measured storage, no migration.** The same audit measured average growth per
+completed season at 2.59 MB for the browser core, 3.13 MB for retired-player
+archive data and 5.69 MB for immutable game boxes; full portable JSON grew
+11.41 MB per season. The new stakes state rounded to 0.00 MB per season.
+IndexedDB remains schema 3 and no history is pruned or rewritten. See
+`STORAGE.md` for method and boundaries.
+
 ## v0.9.21 — Stakes: rivalries, the administration, and NIL you have to spend
 
 Three features from the new `IDEAS.md` backlog, all built on data the game already stored.

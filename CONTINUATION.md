@@ -1,139 +1,79 @@
-# Dynasty Lab — v0.9.21 checkpoint
+# Dynasty Lab — v0.9.22 preview checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `claude/v0921-stakes` (merged into the
-main working branch `claude/review-improvement-dwjemy`)
+
+Source branch: `codex/v0922-consolidation-tuning`
+
 Production branch: `gh-pages`
-Production: v0.9.21 at https://markjrogers92.github.io/Football/
 
-## Current release
+Production remains v0.9.21 at https://markjrogers92.github.io/Football/
 
-v0.9.21 adds the three stakes features from `IDEAS.md`: rivalries (derived
-from the schedule, with persistent series and trophies), the administration
-(a preseason expectation and a confidence score that judges the player on the
-same formula `carousel()` uses on AI coaches), and NIL as a finite per-season
-budget spent on retention or recruiting. Read `IDEAS.md` for the remaining
-nine ideas and WORKLOG for the two assumptions that turned out wrong during
-implementation.
+Preview target: https://markjrogers92.github.io/Football/preview/v0922/
 
-Known trade-off worth carrying forward: rivals are the nearest conference
-school **that is actually on the schedule**, because the round-robin plays
-eight of eleven opponents. That means a program's true geographic neighbour is
-sometimes not its rival. 114 of 120 programs are paired.
+## Release boundary
 
-## Previous release
+v0.9.22 is a consolidation/tuning release. It validates the v0.9.21 NIL,
+administration and rivalry systems across 15 simulated dynasty-seasons; makes
+recruit NIL allocation playable and closes a cross-school accounting bug;
+finishes recruiting-screen hierarchy and scouting-confidence presentation;
+and replaces the flat 14-tab shell with five primary areas plus a contextual
+second level.
 
-v0.9.20 completes roadmap milestone A with the story surface: record-chase
-alerts on the wire, and a career chronology in the player profile. Both read
-data the game already stored. The record chase works because season records
-are rewritten only at year end (`finalizeSeasonHonors`), so a running stat
-line compared against them is a real chase against a prior year's mark; see
-WORKLOG for why that single fact shaped the design. Milestone A is done.
+Program Pipeline was not started. Production must not be promoted until the
+v0.9.22 preview is reviewed.
 
-## Previous release
+## Tuning result
 
-v0.9.19 ranks the weekly hub ("the wire") by importance instead of insertion
-order. Every tile now carries a numeric importance on the same 0–100 scale
-`universe.events` uses — previously only the coach-fallout and familiar-face
-tiles did, so the sort the roadmap asked for would have compared `undefined`
-on most of a normal week. See CHANGELOG/WORKLOG for the per-tile values. The
-CSS `order` grouping by tile type in `polish.css` is unchanged.
+Run `npm run audit:stakes` to reproduce the fixed three-seed, five-season audit.
+The completed run measured:
 
-## Previous release
+- league NIL budgets: 3–12, median 8;
+- recruit-deal pitch lift: 6–9, mean 7.3;
+- roster-deal transfer-risk relief: 6–26, mean 12.8;
+- administration confidence: 13–100, with Hot seat, Final warning and Secure
+  outcomes all exercised;
+- rivalry meetings: exactly one per paired program per season.
 
-v0.9.18 reconciles three previously-diverged GPT/codex feature branches
-(v0.9.14–v0.9.16, only in their own previews before this) onto the
-commercial polish pass (v0.9.17). All three feature branches are now fully
-part of the main line — nothing is orphaned.
+No numeric formula was retuned. The distributions show that NIL changes close
+races without buying a guaranteed signing, confidence reaches both punitive
+and rewarding states, and rivalry results consistently move fan support. The
+implementation fixes were usability/accounting gaps found by the audit, not a
+new economy.
 
-- **The Coach's Desk** (v0.9.14): the Weekly Command Center can open up to
-  three state-backed coaching decisions in a controlled-team week (workload,
-  redshirt threshold, playing-time concern, recruiting priority choice).
-  Reuses existing rotation/morale/trust/promise/visit systems.
-- **Player Agency / Locker Room** (v0.9.15): players can now initiate five
-  Coach's Desk conversations (playing time, transfer concerns, role
-  requests, redshirt, position change). Shares `universe.weeklyDecisions`
-  and the event ledger with the Coach's Desk; capped cadence so it never
-  becomes a constant interruption.
-- **Scouting Intelligence** (v0.9.16): recruit and player profiles show five
-  position-specific scouting domains as ranges with confidence labels,
-  derived from existing attributes. Confidence responds to evaluation
-  exposure; belief snapshots are preserved at meaningful checkpoints
-  (first evaluation, signing day, first fall camp, end of freshman season).
-  Hidden true ratings remain hidden.
-- The player profile no longer shows raw Speed/Power/Technique/IQ grades
-  (removed by the scouting-intel branch itself, kept removed here) — showing
-  an exact number next to a deliberately-uncertain scouted range would have
-  undermined the feature.
+## Storage checkpoint
+
+Read `STORAGE.md` before changing saves. No storage code or schema changed;
+IndexedDB remains schema 3. Average measured growth per completed season was
+2.59 MB browser core, 3.13 MB retired-player archive, 5.69 MB immutable game
+archive and 11.41 MB complete portable JSON. Stakes state was below 0.005 MB
+per season. These are serialized payload measurements, not browser-quota or
+iPhone Safari results, and all historical records remain intact.
+
+## Commercial-polish checkpoint
+
+Both remaining partials in `docs/COMMERCIAL_POLISH_AUDIT.md` are complete:
+
+- Recruiting opens on the national board; My Battles and Signing Class are
+  local views. Every prospect row has a projected grade/range and a confidence
+  meter derived without eagerly creating scouting state.
+- The shell has Home, Team, Competition, Recruiting and Program as primary
+  areas. The existing 14 destinations remain direct, testable second-level
+  panels with their original IDs.
 
 ## Validation checkpoint
 
-- 53/53 engine smoke checks;
-- 86/86 Node tests across all suites (10 new: `weeklydecisions.js`,
-  `playeragency.js`, `scouting.js`);
-- 134 desktop + iPhone-layout browser checks (99 + 14 + 21 across the three
-  Chromium suites);
-- direct Playwright pass of the merged UI at every real conflict site:
-  player profile (scouting panel + polish section layout together), recruit
-  profile (same), and a live-driven Dashboard state showing an actual
-  Coach's Desk decision card rendering inside the polish pass's `.plan-card`.
-  Zero console errors throughout.
-
-## How the merge was done
-
-Three commits, sequential (v0.9.14 → v0.9.15 → v0.9.16, each built on the
-last), rebased as one chain onto v0.9.17. 10 of 13 conflicts across the
-three commits were mechanical (version files, generated `index.html`,
-`CONTINUATION.md` — always taken as "ours" and rewritten wholesale
-regardless). 3 were real, all in `app.js`, all the same shape: the polish
-pass's `profile-sections` layout on one side, scouting-intelligence's new
-panels/behavior on the other, woven together by hand rather than picking
-one side. See `WORKLOG.md`'s v0.9.18 entry for the specific reasoning,
-including the Speed/Power/Technique/IQ removal call.
-
-## Not addressed in this release
-
-Hub tile order still follows CSS `order` per type rather than the engine's
-`importance` values (recommended milestone A below). Roster/Season/Stats
-tabs still have only the shared design system, no screen-specific hierarchy
-work. The 390px header is still three rows. These are cosmetic gaps, not
-simulation gaps.
-
-## Storage guardrail
-
-Read `STORAGE.md` before altering saves. v0.9.21 adds only additive fields
-(`t.rivalry`, `t.adminConfidence`, `t.mandate`, `t.nilSpent`, `universe.tenure`,
-`nilDeal` on players and recruits), all backfilled in `normalizeUniverse`;
-IndexedDB stays at schema 3. v0.9.20 added no save-format change of
-its own (`importance` is an additive field on hub tiles, which are rebuilt
-every week). v0.9.18 was a merge of already-shipped
-additive changes — no new save-format changes of its own. IndexedDB remains
-schema 3. Scouting/decision/agency state uses additive fields on existing
-player/recruit/universe records with no IndexedDB version bump.
-
-## Next roadmap sequence
-
-### A) ~~Hub priority + story surface~~ — done (v0.9.19 + v0.9.20)
-Both halves shipped. Any new wire tile type needs an `importance` on the
-0–100 scale to rank correctly among the others.
-
-### B) Live-league save size
-The game archive is solved (v0.9.12). Remaining growth (~4 MB/season) is
-`universe.events` and per-player `seasonHistory` across 120 teams, now with
-scouting snapshots and weekly decisions added on top. Measure before
-touching anything.
-
-### C) 14-tab coherence
-The weekly plan (v0.9.13), the Coach's Desk decision cards (v0.9.14/15) and
-the polish pass (v0.9.17) covered the worst of it. What remains is the tab
-surface itself — grouping, or a first-run path.
+- Implementation-targeted checks passed during development: 14/14 NIL,
+  administration and rivalry tests; 119/119 main browser checks; and 21/21
+  recruiting visual/layout checks at desktop and iPhone widths.
+- Final release gate passed: 53/53 engine smoke checks, 103/103 Node tests,
+  and 154/154 desktop + iPhone-layout browser checks (119 + 14 + 21), with
+  zero console errors and no mobile page overflow. The generated standalone is
+  current and `npm run audit:stakes` completed once with the figures above.
 
 ## Resume prompt
 
-Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.21 is production and all
-known feature branches are reconciled into the main line — check
-`git branch -r` for anything new before assuming that's still true. Work in
-a new bounded branch, validate fully (`npm test` + `npm run test:browser`),
-update CHANGELOG/WORKLOG/STORAGE/CONTINUATION, publish a preview first, then
-promote only after review.
+Review the v0.9.22 preview from `codex/v0922-consolidation-tuning`. Verify the
+new two-level shell, all three Recruiting views, scouting-confidence reads and
+both recruit/roster NIL allocations. Production is still v0.9.21; promote only
+with explicit approval. If approved and stable, define Program Pipeline as a
+separate bounded milestone rather than adding it to this release.

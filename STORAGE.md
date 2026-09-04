@@ -264,3 +264,39 @@ On players and recruits:
 
 Events gain three types (`RIVALRY_RESULT`, `ADMIN_REVIEW`, `NIL_DEAL`), all
 carrying `importance` on the same 0-100 scale the wire ranks by.
+
+## v0.9.22 live-league measurement
+
+No storage implementation changed in this release. IndexedDB remains schema 3;
+browser saves still separate core state, retired-player archive chunks and
+immutable game-box chunks, while portable JSON intentionally materializes all
+three. No historical record is pruned, summarized or rewritten.
+
+`npm run audit:stakes` advances three fixed-seed dynasties for five seasons
+each and measures compact JSON bytes after each completed season. Average
+growth per season across the 15 dynasty-seasons was:
+
+| Component | Growth / season |
+|---|---:|
+| Browser core (excludes player/game archives) | 2.59 MB |
+| └ Events | 0.28 MB |
+| └ Active-player season history | 0.51 MB |
+| └ Active scouting state | 0.04 MB |
+| └ Weekly decisions | 0.01 MB |
+| └ Rivalry, administration and NIL state | <0.005 MB |
+| Retired-player archive | 3.13 MB |
+| Immutable game archive | 5.69 MB |
+| Complete portable JSON | 11.41 MB |
+
+After five seasons, the average measured footprint was 28.17 MB core,
+15.64 MB retired-player archive, 28.44 MB game archive and 72.26 MB portable
+JSON. These figures measure serialized payload size, not IndexedDB overhead,
+browser quota, transaction latency or iPhone Safari behavior. They are a
+repeatable baseline for a future storage milestone, not proof of long-run
+mobile viability.
+
+The main actionable result is that the v0.9.21 stakes systems are not a storage
+driver. Game boxes remain the largest single persistent stream and must stay
+immutable; active-player history and events are the meaningful core streams.
+Any future reduction should preserve full historical fidelity and be validated
+against this baseline before changing schema or chunking.

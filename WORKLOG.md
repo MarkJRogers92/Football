@@ -1,5 +1,54 @@
 # WORKLOG
 
+## v0.9.22 — consolidation and tuning
+
+Plan: validate the three v0.9.21 stakes systems over multiple seasons, close
+the two partial commercial-polish findings, measure live-league save growth,
+and stop before Program Pipeline.
+
+**What the audit changed.** `tools/stakes-audit.js` is a repeatable, seeded
+engine harness rather than a browser macro. It runs three five-season
+dynasties, applies a conservative policy to plausible close recruit races and
+high-risk roster players, and reports distributions rather than one showcase
+result. Fifteen completed seasons produced league NIL budgets of 3–12
+(median 8), 6–9 recruit-pitch lift (mean 7.3), and 6–26 retention-risk relief
+(mean 12.8). Administration confidence reached 13–100, with Hot seat, Final
+warning and Secure outcomes all observed; rivalry schedules produced exactly
+one meeting per paired program per season. Those ranges made a numeric retune
+harder to justify than leaving the formulas alone: NIL is a marginal advantage,
+not a guaranteed signing, and board confidence is capable of both pressure and
+reward.
+
+The audit exposed two product gaps instead. Recruit NIL existed in the engine
+but had no control on the Recruiting screen, so the advertised shared
+recruiting/retention budget was not actually playable from the UI. It now has
+offer/release controls beside each recruit and a remaining-budget readout.
+Also, `signNilDeal` allowed a second school to overwrite another school's
+current recruit deal while the original school's `nilSpent` remained charged.
+The guard now treats any current-season deal as active, and a focused test
+covers the cross-school case.
+
+**Recruiting and shell.** The Recruiting screen now opens on the national board
+and moves My Battles and Signing Class behind a small local switcher. The board
+shows a non-mutating scouting read — position-aware grade, projected range and
+confidence meter — using the existing v0.9.16 calculation without materializing
+scouting state for all 220 visible recruits. The outer shell now has five stable
+areas and a contextual second row for the original 14 destinations. Existing
+panel IDs and direct navigation are unchanged.
+
+**Storage measurement.** Average completed-season growth was 2.59 MB in the
+browser core, including 0.28 MB events, 0.51 MB active-player season history,
+0.04 MB active scouting, 0.01 MB weekly decisions and less than 0.005 MB stakes
+state. Retired-player chunks grew 3.13 MB and immutable game-box chunks 5.69 MB;
+complete portable JSON grew 11.41 MB. After five seasons the three-run average
+was 28.17 MB core, 15.64 MB player archive, 28.44 MB game archive and 72.26 MB
+portable. These are serialized JSON byte counts, not browser quota measurements,
+and the browser stores archive/game chunks separately, so the components are
+reported independently. No storage code, schema or history retention changed.
+
+Program Pipeline was not started. The release stays bounded to consolidation,
+measured tuning and presentation.
+
 ## v0.9.21 — three stakes features
 
 Plan: the user picked the top three from the brainstorm — hot seat, rivalries,
