@@ -28,7 +28,7 @@ const html = `<!doctype html><html lang="en"><head><meta charset="utf-8">` +
   `<title>Dynasty Lab v${version}</title><style>` +
   read('styles.css') + '\n' + read('visual-identity.css') + '\n' + read('team-branding.css') + '\n' + read('sports-presentation.css') + '\n' + read('sports-layout.css') + '\n' + read('recruit-presentation.css') + '\n' + read('polish.css') +
   `</style></head><body>\n` +
-  read('body.html').replace(/(<span data-app-version>)[^<]*(<\/span>)/, `$1v${version}$2`) +
+  read('body.html').replace(/(<span data-app-version>)[^<]*(<\/span>)/, `$1v${version}$2`).replace(/(<b data-title-version>)[^<]*(<\/b>)/, `$1v${version}$2`) +
   `<script>` + read('portraits/renderer-v1.js') + '\n' + read('storage.js') + '\n' + read('app.js') + '\n' + read('visual-identity.js') + '\n' + read('sports-presentation.js') + '\n' + read('recruit-presentation.js') + `</script></body></html>`;
 
 const out = process.argv[2] || 'index.html';

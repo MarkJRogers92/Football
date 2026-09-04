@@ -11,7 +11,11 @@ test('the gameplan card is offered once per opponent and names the matchup',asyn
  assert.ok(d,'a decision is offered ahead of a scheduled game');
  assert.equal(d.type,'WEEKLY_GAMEPLAN');
  assert.ok(d.title.includes(opp.name));
- assert.equal(d.options.length,3);
+ assert.equal(d.options.length,5);
+ assert.ok(d.options.some(o=>o.id==='stop_run'));
+ assert.ok(d.options.some(o=>o.id==='protect_pass'));
+ assert.ok(d.options.some(o=>o.id==='pressure'));
+ assert.equal(d.options.filter(o=>o.recommended).length,1);
  // Resolving it (via the same path resolveWeeklyDecision uses) should stop it re-offering this week.
  e.applyGameplanDecision(me,{id:'balance'});
  // decisionRecent needs a matching resolved record, which only resolveWeeklyDecision writes; confirm
@@ -51,6 +55,7 @@ test('scouting costs extra scheme familiarity only while a program is mid-instal
  e.applyGameplanDecision(me,{id:'scout'});
  assert.equal(me.schemeTransition.off.familiarity,before-8,'full scout costs the most install progress');
  me.schemeTransition.off.familiarity=40;
+ me.gameplan=null;
  e.applyGameplanDecision(me,{id:'balance'});
  assert.equal(me.schemeTransition.off.familiarity,40-3,'balanced prep costs less');
  me.schemeTransition=null;
@@ -61,25 +66,25 @@ test('scouting costs extra scheme familiarity only while a program is mid-instal
  assert.doesNotThrow(()=>e.applyGameplanDecision(me,{id:'scout'}));
 });
 
-test('scouting always costs real starter wear, whether or not a scheme is mid-install',async()=>{
+test('preparation survives recovery and portable save/load, and kickoff charges it only once',async()=>{
  const e=await setup(3107),u=e.universe,me=e.T('Chicago Metropolitan');
- me.schemeTransition=null;                       // fully installed: no familiarity to spend
- const starters=e.importantStarters(me).slice(0,5);
- const before=starters.map(p=>p.wear||0);
- e.applyGameplanDecision(me,{id:'scout'});
- for(let i=0;i<starters.length;i++)
-  assert.equal(starters[i].wear,before[i]+3,`${starters[i].name} pays the full-scout wear cost regardless of scheme state`);
- for(const p of starters)p.wear=0;
- e.applyGameplanDecision(me,{id:'balance'});
- for(const p of starters)assert.equal(p.wear,1,'balanced prep costs less wear');
- for(const p of starters)p.wear=0;
- e.applyGameplanDecision(me,{id:'standard'});
- for(const p of starters)assert.equal(p.wear,0,'standard prep costs nothing at all — the only truly free option');
- // Wear is not cosmetic: it directly lowers conditionRating, which is what makes "always full
- // scout" a real choice with a real downside instead of a free action.
- const p=starters[0];
- const fresh=e.conditionRating({...p,wear:0}),tired=e.conditionRating({...p,wear:30});
- assert.ok(tired<fresh,'accumulated wear measurably hurts the player it was spent on');
+ me.schemeTransition=null;
+ me.roster.forEach(p=>{p.wear=0;p.health=100;p.injuryWeeks=0});
+ const starters=e.importantStarters(me).slice(0,5),ids=starters.map(p=>p.id);
+ const match=u.schedule[0].find(g=>g.home===me.name||g.away===me.name);
+ const opp=e.T(match.home===me.name?match.away:match.home);
+ assert.equal(e.applyGameplanDecision(me,{id:'stop_run'}),true);
+ assert.equal(e.applyGameplanDecision(me,{id:'pressure'}),false,'choice cannot be charged twice');
+ assert.ok(starters.every(p=>p.wear===0),'cost is pending until kickoff');
+ const portable=JSON.parse(JSON.stringify(e.packUniverse(u)));
+ e.installSave({version:'0.9.36',userTeam:me.name,universe:portable});
+ const loaded=e.T(me.name),other=e.T(opp.name);
+ e.recoverWeek();e.beginGame(loaded,other,true);
+ const actual=ids.map(id=>loaded.roster.find(p=>p.id===id));
+ assert.ok(actual.every(p=>p.wear===3),'fresh starters still pay after recovery');
+ e.recoverWeek();e.beginGame(loaded,other,true);
+ assert.ok(actual.every(p=>p.wear===3),'repeat kickoff cannot double-charge');
+ assert.ok(e.conditionRating(actual[0])<e.conditionRating({...actual[0],wear:0}));
 });
 
 test('an unresolved gameplan card never blocks the calendar, unlike every other Coach\'s Desk decision',async()=>{
@@ -96,17 +101,42 @@ test('an unresolved gameplan card never blocks the calendar, unlike every other 
  assert.equal(me.gameplan,undefined,'ignoring it is the same as choosing standard: no edge applied');
 });
 
-test('the edge actually reaches gameSim: a fully-scouted defense concedes fewer points on average',async()=>{
- const e=await setup(3105),u=e.universe;
- const a=u.teams[0],b=u.teams[1];
- a.w=0;a.l=0;b.w=0;b.l=0;
- let withPrep=0,without=0,n=30;
- for(let i=0;i<n;i++){
-  a.gameplan={year:u.year,week:u.week,opponent:b.name,prep:'scout'};
-  const r1=e.gameSim(a,b,true);withPrep+=r1.ap;              // a is away in this call, scores ap
-  a.gameplan=null;
-  const r2=e.gameSim(a,b,true);without+=r2.ap;
+test('matchup choices trade real run, coverage and pressure components',async()=>{
+ const e=await setup(3110),base={offense:70,defense:70,qb:70,skill:70,ol:70,front:70,coverage:70};
+ const run=e.applyGameplanEdge({...base},'stop_run'),pass=e.applyGameplanEdge({...base},'protect_pass'),pressure=e.applyGameplanEdge({...base},'pressure');
+ assert.ok(run.front>base.front&&run.coverage<base.coverage);
+ assert.ok(pass.coverage>base.coverage&&pass.front<base.front);
+ assert.ok(pressure.prepPressure>0&&pressure.coverage<base.coverage);
+ assert.deepEqual(e.applyGameplanEdge({...base},'unknown'),base);
+});
+
+test('quick and Watch simulations consume the plan and preserve an immutable report',async()=>{
+ for(const mode of ['gameSim','detailedGame']){
+  const boxes=[];
+  for(const prep of ['stop_run','protect_pass']){
+   const e=await setup(3111),u=e.universe,a=u.teams[0],g=u.schedule[0].find(g=>g.home===a.name||g.away===a.name),b=e.T(g.home===a.name?g.away:g.home);
+   e.applyGameplanDecision(a,{id:prep});e.recoverWeek();
+   const ids=a.gameplan.wearPending;
+   const result=e[mode](a,b,true),record=u.gameArchive.find(g=>g.id===result.gameId);
+   assert.ok(a.gameplan.wearApplied,mode+' charges pending preparation');
+   assert.equal(record.home.gameplan.prep,prep);
+   assert.equal(record.away.gameplan.prep,'standard');
+   assert.ok(ids.every(id=>a.roster.find(p=>p.id===id).wear>=3));
+   const report=e.coachingReportHTML(record),snapshot=JSON.stringify(record);
+   assert.match(report,/Postgame coaching report/);assert.match(report,/Turnovers:/);
+   a.gameplan=null;assert.equal(e.coachingReportHTML(record),report);
+   assert.equal(JSON.stringify(record),snapshot,'report is read-only');
+   boxes.push(JSON.stringify(result.box));
+  }
+  assert.notEqual(boxes[0],boxes[1],mode+' uses tactical components with the same seed');
  }
- // A noisy sim over 30 draws; assert the direction, not an exact number.
- assert.ok(withPrep/n>=without/n-1,'scouting should not make the prepared team worse on average');
+});
+
+test('old reports label missing plans and escape names without inventing untracked stats',async()=>{
+ const e=await setup(3112);
+ const g={home:{name:'<script>'},away:{name:'Away'},teamStats:{home:{sacksTaken:4},away:{rushAtt:20,rushYds:120}},injuries:[]};
+ const html=e.coachingReportHTML(g);
+ assert.match(html,/&lt;script&gt;/);assert.doesNotMatch(html,/<script>/);
+ assert.match(html,/Not recorded for this older game/);assert.match(html,/unavailable/);
+ assert.match(html,/Review protection/);assert.match(html,/6.0 per carry/);
 });

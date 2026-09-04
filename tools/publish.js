@@ -136,6 +136,10 @@ function publish({ preview, remove }) {
     target = preview ? path.join(PAGES, 'preview', preview) : PAGES;
     fs.mkdirSync(target, { recursive: true });
     fs.copyFileSync(built, path.join(target, 'index.html'));
+    // The title background must travel with every new preview as well as production.
+    fs.mkdirSync(path.join(target, 'assets'), { recursive: true });
+    fs.copyFileSync(path.join(ROOT, 'assets', 'title-stadium-v1.jpg'),
+      path.join(target, 'assets', 'title-stadium-v1.jpg'));
     label = preview ? `preview ${preview}` : 'production';
   }
 
