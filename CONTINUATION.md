@@ -1,12 +1,21 @@
-# Dynasty Lab — v0.9.18 checkpoint
+# Dynasty Lab — v0.9.19 checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `claude/v0918-reconcile-desk-agency-scouting` (merged
-into the main working branch `claude/review-improvement-dwjemy`)
+Current source branch: `claude/v0919-hub-priority-sort` (merged into the
+main working branch `claude/review-improvement-dwjemy`)
 Production branch: `gh-pages`
-Production: v0.9.18 at https://markjrogers92.github.io/Football/
+Production: v0.9.19 at https://markjrogers92.github.io/Football/
 
 ## Current release
+
+v0.9.19 ranks the weekly hub ("the wire") by importance instead of insertion
+order. Every tile now carries a numeric importance on the same 0–100 scale
+`universe.events` uses — previously only the coach-fallout and familiar-face
+tiles did, so the sort the roadmap asked for would have compared `undefined`
+on most of a normal week. See CHANGELOG/WORKLOG for the per-tile values. The
+CSS `order` grouping by tile type in `polish.css` is unchanged.
+
+## Previous release
 
 v0.9.18 reconciles three previously-diverged GPT/codex feature branches
 (v0.9.14–v0.9.16, only in their own previews before this) onto the
@@ -68,26 +77,22 @@ simulation gaps.
 
 ## Storage guardrail
 
-Read `STORAGE.md` before altering saves. v0.9.18 is a merge of already-shipped
+Read `STORAGE.md` before altering saves. v0.9.19 adds no save-format change of
+its own (`importance` is an additive field on hub tiles, which are rebuilt
+every week). v0.9.18 was a merge of already-shipped
 additive changes — no new save-format changes of its own. IndexedDB remains
 schema 3. Scouting/decision/agency state uses additive fields on existing
 player/recruit/universe records with no IndexedDB version bump.
 
-## Pending review (not yet in production)
-
-v0.9.19 on branch `claude/v0919-hub-priority-sort` implements milestone A
-part 1 (hub priority sort — see CHANGELOG/WORKLOG). It is published as a
-preview only; production is still v0.9.18 until it is reviewed and
-promoted with `node tools/publish.js`. Do not re-implement it.
-
 ## Next roadmap sequence
 
-### A) Hub priority + story surface (recommended)
-`buildWeeklyHub` takes `items.slice(0, 9)` in insertion order despite every
-event already carrying an `importance` value. Sort by it. Then add record-chase
-alerts and a player career chronology from data already stored
-(`seasonHistory`/`transferHistory`/`promises`/`awards`) — the unbuilt "story
-surface" slice from `ROADMAP_V09.md`.
+### A) Story surface (recommended) — part 1 shipped in v0.9.19
+The hub priority sort is done. What remains of this milestone is the story
+surface: record-chase alerts and a player career chronology built from data
+already stored (`seasonHistory`/`transferHistory`/`promises`/`awards`) — the
+unbuilt slice from `ROADMAP_V09.md`. Both would feed the wire, which now
+ranks properly, so a record-chase alert needs an importance on the same
+0–100 scale to sit correctly among the other tiles.
 
 ### B) Live-league save size
 The game archive is solved (v0.9.12). Remaining growth (~4 MB/season) is
@@ -103,7 +108,7 @@ surface itself — grouping, or a first-run path.
 ## Resume prompt
 
 Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.18 is production and all
+`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.19 is production and all
 known feature branches are reconciled into the main line — check
 `git branch -r` for anything new before assuming that's still true. Work in
 a new bounded branch, validate fully (`npm test` + `npm run test:browser`),
