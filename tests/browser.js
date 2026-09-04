@@ -7,6 +7,17 @@ const TAB_GROUP={"dashboard": "program", "program": "program", "history": "progr
 const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${TAB_GROUP[id]}"]`);await page.click(`.tabs button[data-tab="${id}"]`)};
 
 
+// v0.9.34 added a title screen in front of the app; every browser test now has to click
+// through it (New Dynasty -> Start Dynasty, which defaults to Chicago Metropolitan) before
+// #userTeam and the rest of the dashboard exist at all.
+const startNewDynasty=async page=>{
+ await page.waitForSelector('#titleNew',{timeout:30000});
+ await page.click('#titleNew');
+ await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});
+ await page.click('#titleStart');
+ await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000});
+};
+
 (async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--no-sandbox'] });
   const results = [];
@@ -23,7 +34,7 @@ const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${
     page.on('pageerror', e => errors.push(String(e)));
 
     await page.goto('file://' + path.join(__dirname, '..', 'index.html'));
-    await page.waitForFunction(() => document.querySelector('#userTeam')?.options.length > 0, { timeout: 60000 });
+    await startNewDynasty(page);
 
     check(`[${label}] 120 programs in the picker`,
       await page.$eval('#userTeam', el => el.options.length) === 120);

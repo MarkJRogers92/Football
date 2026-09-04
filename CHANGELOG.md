@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.9.35 — Reconciling v0.9.34 (title screen), and a real cost for full scout
+
+**Reconciliation.** GPT shipped v0.9.34 (a title screen — New/Continue/Load Dynasty, Options, How to Play) directly to `gh-pages` while this branch was at v0.9.33; same situation as the v0.9.29-32 reconciliation, resolved the same way: extracted the changed source files (`app.js`, `body.html`, `sports-presentation.js`, `polish.css`) out of the live build byte-for-byte and verified the rebuild against production before touching anything.
+
+**Two real problems found and fixed as part of reconciling it, not GPT's fault to fix, but blocking:**
+- The title screen references `assets/title-stadium-v1.jpg` — an external image, uploaded to `gh-pages` by the publish process but never committed to the repository. Every local build and test was silently missing it (a 404 that only a browser test catches, which is exactly what happened). Pulled the actual file from `gh-pages` into `assets/` and committed it, so a fresh clone builds correctly again. Worth noting for future work: this is the project's first departure from "always a single self-contained HTML file" — a real trade-off, not a regression, but one that should be a deliberate decision going forward rather than an accident of who published last.
+- All four browser test files loaded the page and waited on `#userTeam`, which no longer exists until a dynasty is actually started from the new title screen. Added a shared `startNewDynasty()` helper (New Dynasty → Start Dynasty, which defaults to Chicago Metropolitan) to each file.
+
+**Full scout now has a real, unconditional cost.** Reported directly by a player: full-scouting the upcoming opponent had a real cost only while a program was mid-scheme-installation, and no cost at all otherwise — which is nearly always, so there was no reason not to always pick it. `GAMEPLAN_TIERS` now also costs starter wear (`wearCost`: 3 for full scout, 1 for balanced, 0 for standard), applied to the team's top 5 `importantStarters` regardless of scheme state. Wear was already load-bearing — it feeds `conditionRating`, which decides roster ordering, and the `INJURED_STARTER` decision's own threshold — so this is a real cost, not a cosmetic one. The scheme-familiarity cost during an active installation is unchanged and stacks with it.
+
+- 1 new test (`tests/gameplan.js`) asserting the wear cost applies with or without an active scheme transition, and that it measurably affects `conditionRating`.
+- 144/144 browser checks, actually verified end to end through the new title screen — not assumed from a background process that silently died.
+
 ## v0.9.33 — Program history, and a real weekly gameplan
 
 **Program history.** No program had an all-time record — `t.w`/`t.l` reset every season and nothing archived it. Tracking begins now, additively, for all 120 programs: `t.allTimeRecord` accrues wins, losses, conference titles and national titles once per season, captured at the same point `runOffseason` already knows the final record. Coaching lineage — every stint any known coach has held at a given school — was already derivable from the coaching-tree data (v0.9.27) and needed no new state; it now renders on the Program tab for whichever program is selected, not just the controlled one. Pre-v0.9.33 seasons are not retroactively known, and the card says so.

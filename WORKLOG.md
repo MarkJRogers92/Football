@@ -1,5 +1,64 @@
 # WORKLOG
 
+## v0.9.35 — reconcile v0.9.34, close the free-scout hole, fix what reconciling exposed
+
+Second GPT reconciliation this session, same playbook as v0.9.29-32: extract
+the changed source files out of the live bundle by finding byte-identical
+unchanged neighbors as anchors, verify the rebuild matches production exactly
+before doing anything else. This time `app.js`, `body.html`,
+`sports-presentation.js` and `polish.css` changed (a title screen); every
+other source file matched byte-for-byte.
+
+One wrinkle repeated from the first reconciliation: `polish.css` is the last
+CSS file concatenated before `</style>`, so a prefix-match check on it gives a
+false "unchanged" when content was appended to its end. Caught it the same way
+as before — a byte diff pointed at `</style></head><body>`, not inside any
+individual file's expected content — and fixed the extraction to use that
+boundary directly rather than trusting the prefix match. Worth writing down
+plainly: **any file that is last in a concatenation order cannot be verified
+by `indexOf`-prefix-matching alone; only files with a known file after them
+can.** The next reconciliation should extract polish.css using the
+`</style>` boundary from the start, not rediscover this.
+
+Then the actual work: the player who asked for the wear-cost fix pointed out
+what was really a design bug from v0.9.33, invisible until someone actually
+played with a settled program (which is nearly always true — new scheme
+installs are rare). Confirmed with `schemeFitFor` months ago during the
+original build that familiarity only matters mid-transition, so the fix needed
+an unconditional lever. Wear was the obvious, already-real one: it directly
+feeds `conditionRating`, so a scouted-heavy program's key starters measurably
+degrade, which is the property the new test asserts directly rather than
+trusting the number alone.
+
+Reconciling also surfaced two things that were not part of either task but
+were blocking validation, so they got fixed as part of this release rather
+than punted:
+
+1. **A missing binary asset.** The title screen's background image lives on
+   `gh-pages` but was never committed — GPT's publish flow apparently uploads
+   `assets/` separately from the single-file build. Nobody would have noticed
+   locally; the browser suite caught it as a 404 console error, which is
+   exactly the class of bug that check exists to catch. Pulled the real file
+   from `gh-pages` and committed it. This is the project's first dependency
+   on an external file rather than one self-contained HTML page — flagged in
+   the changelog as a trade-off worth a deliberate look, not something to
+   quietly normalize.
+2. **Every browser test's bootstrap.** All four files waited on `#userTeam`
+   existing immediately after `page.goto`; it now only exists after a
+   dynasty is started from the title screen. One shared `startNewDynasty`
+   helper, copied into each file the same way `goTab` was for the tab-groups
+   migration.
+
+Real lesson from this session, worth keeping: a background test run started
+with a bare `&` inside a single Bash call can silently die with zero output
+when the tool call returns, twice now. The fix each time was to run it as a
+plain foreground call (which the harness promotes to a tracked background job
+on its own if it runs long) rather than backgrounding it by hand.
+
+Validation: 1 new test, 144 Node tests total (all passing), 144/144 browser
+checks — the browser suite specifically re-run and read in full this time,
+not treated as passed because Node was.
+
 ## v0.9.33 — program history + weekly gameplan
 
 Two remaining IDEAS.md items, built together since the history page reads data

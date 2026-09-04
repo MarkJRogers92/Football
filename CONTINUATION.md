@@ -1,12 +1,36 @@
-# Dynasty Lab — v0.9.33 checkpoint
+# Dynasty Lab — v0.9.35 checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
 Current source branch: `claude/review-improvement-dwjemy` (reconciled directly —
 see below)
 Production branch: `gh-pages`
-Production: v0.9.33 at https://markjrogers92.github.io/Football/
+Production: v0.9.35 at https://markjrogers92.github.io/Football/
 
 ## Current release
+
+v0.9.35 reconciles v0.9.34 (GPT's title screen — New/Continue/Load Dynasty)
+the same way v0.9.29-32 was reconciled: extract changed source files out of
+the live build using byte-identical unchanged neighbors as anchors, verify
+the rebuild matches production exactly. If you do this again: **polish.css
+is the last CSS file before `</style>` and cannot be verified by prefix
+matching** — extract it using the `</style></head><body>` boundary directly,
+first time, not after a failed byte-diff points you at it.
+
+Two things reconciling this exposed, fixed here: the title screen's
+background image (`assets/title-stadium-v1.jpg`) lives on `gh-pages` but was
+never committed to the repo — pulled and committed. This is the project's
+first dependency on an external file rather than a single self-contained
+HTML page; worth a deliberate look, not something to quietly keep growing.
+And all four browser test files needed a `startNewDynasty()` helper since
+`#userTeam` no longer exists until a dynasty is started from the title screen.
+
+Also fixed: full scout in the weekly gameplan (v0.9.33) had no real cost
+outside an active scheme installation, which is nearly always — reported
+directly by the player as "why wouldn't you always do it." Added an
+unconditional starter-wear cost alongside the existing conditional
+familiarity cost.
+
+## Previous release
 
 v0.9.33 adds program history (all-time record + coaching lineage on the
 Program tab, for whichever program is selected) and the weekly gameplan (a
@@ -264,7 +288,7 @@ surface itself — grouping, or a first-run path.
 ## Resume prompt
 
 Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.33 is production and all
+`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.35 is production and all
 known feature branches are reconciled into the main line — check
 `git branch -r` for anything new before assuming that's still true. Work in
 a new bounded branch, validate fully (`npm test` + `npm run test:browser`),

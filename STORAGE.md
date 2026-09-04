@@ -333,3 +333,13 @@ Still schema 3.
   to be cleared.
 
 Still schema 3.
+
+## v0.9.35 note
+
+No new stored fields. The gameplan wear-cost fix writes to the existing
+`p.wear`, already part of the schema since early versions. Still schema 3.
+
+`assets/title-stadium-v1.jpg` is now committed to the repo (previously only
+on `gh-pages`) — a binary asset outside the single-file build, referenced by
+CSS `url()` in the title screen. This is the first source-tree dependency
+that is not concatenated into `index.html` by `tools/build.js`.

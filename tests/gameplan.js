@@ -44,7 +44,7 @@ test('applyGameplanEdge scales with prep tier and stays within profile bounds',a
  assert.equal(e.applyGameplanEdge(null,'scout'),null,'tolerates no profile');
 });
 
-test('scouting costs real scheme familiarity only while a program is mid-installation',async()=>{
+test('scouting costs extra scheme familiarity only while a program is mid-installation',async()=>{
  const e=await setup(3104),u=e.universe,me=e.T('Chicago Metropolitan');
  me.schemeTransition={off:{to:me.offScheme,from:'Pro Style',familiarity:40},def:null};
  const before=me.schemeTransition.off.familiarity;
@@ -56,8 +56,30 @@ test('scouting costs real scheme familiarity only while a program is mid-install
  me.schemeTransition=null;
  const p=e.T(u.teams.find(t=>t!==me).name);
  p.schemeTransition=null;
- // Nothing to cost when the scheme is already fully installed — no error, no negative familiarity.
+ // No scheme cost to speak of once installed — no error, no negative familiarity — but that must
+ // not mean no cost at all (see the wear test below).
  assert.doesNotThrow(()=>e.applyGameplanDecision(me,{id:'scout'}));
+});
+
+test('scouting always costs real starter wear, whether or not a scheme is mid-install',async()=>{
+ const e=await setup(3107),u=e.universe,me=e.T('Chicago Metropolitan');
+ me.schemeTransition=null;                       // fully installed: no familiarity to spend
+ const starters=e.importantStarters(me).slice(0,5);
+ const before=starters.map(p=>p.wear||0);
+ e.applyGameplanDecision(me,{id:'scout'});
+ for(let i=0;i<starters.length;i++)
+  assert.equal(starters[i].wear,before[i]+3,`${starters[i].name} pays the full-scout wear cost regardless of scheme state`);
+ for(const p of starters)p.wear=0;
+ e.applyGameplanDecision(me,{id:'balance'});
+ for(const p of starters)assert.equal(p.wear,1,'balanced prep costs less wear');
+ for(const p of starters)p.wear=0;
+ e.applyGameplanDecision(me,{id:'standard'});
+ for(const p of starters)assert.equal(p.wear,0,'standard prep costs nothing at all — the only truly free option');
+ // Wear is not cosmetic: it directly lowers conditionRating, which is what makes "always full
+ // scout" a real choice with a real downside instead of a free action.
+ const p=starters[0];
+ const fresh=e.conditionRating({...p,wear:0}),tired=e.conditionRating({...p,wear:30});
+ assert.ok(tired<fresh,'accumulated wear measurably hurts the player it was spent on');
 });
 
 test('an unresolved gameplan card never blocks the calendar, unlike every other Coach\'s Desk decision',async()=>{
