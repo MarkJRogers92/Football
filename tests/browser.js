@@ -58,13 +58,18 @@ const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${
     }));
     check(`[${label}] Watch Mode opens without spoiling the final`,
       watchStart.title.includes(' at ')&&!watchStart.title.includes('—')&&watchStart.away==='0'&&watchStart.home==='0'&&watchStart.visible===0&&watchStart.drives>=18&&watchStart.drives<=30,JSON.stringify(watchStart));
+    const firstDriveCalls=await page.locator('[data-watch-drive="0"] [data-watch-play-event]').count();
     await page.click('[data-watch-next]');
-    const firstDrive=await page.evaluate(()=>({
+    const firstPlay=await page.evaluate(()=>({
       visible:[...document.querySelectorAll('[data-watch-drive]')].filter(x=>!x.hidden).length,
       caption:document.querySelector('[data-watch-caption]')?.textContent||'',
       progress:document.querySelector('[data-watch-progress]')?.textContent||'',
+      calls:document.querySelectorAll('[data-watch-play-log] li:not(.watch-play-empty)').length,
     }));
-    check(`[${label}] next drive advances the broadcast`,firstDrive.visible===1&&firstDrive.caption.includes('plays')&&firstDrive.progress.startsWith('1 of'),JSON.stringify(firstDrive));
+    check(`[${label}] next play advances the broadcast before revealing the drive result`,firstDriveCalls>0&&firstPlay.visible===0&&firstPlay.calls===1&&firstPlay.progress.includes('Play 1 of'),JSON.stringify(firstPlay));
+    for(let i=0;i<firstDriveCalls;i++)await page.click('[data-watch-next]');
+    const firstDrive=await page.evaluate(()=>({visible:[...document.querySelectorAll('[data-watch-drive]')].filter(x=>!x.hidden).length,caption:document.querySelector('[data-watch-caption]')?.textContent||'',recap:document.querySelector('[data-watch-drive="0"] p')?.textContent||''}));
+    check(`[${label}] completed drive adds its recap below the play-by-play`,firstDrive.visible===1&&firstDrive.caption.startsWith('Drive recap')&&firstDrive.recap.includes('Score:'),JSON.stringify(firstDrive));
     await page.selectOption('[data-watch-speed]','400');
     await page.click('[data-watch-skip]');
     const watchFinal=await page.evaluate(()=>({
@@ -96,6 +101,8 @@ const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${
     check(`[${label}] drive sequence advances its motion graphic`,
       moving.active === 1 && moving.caption.includes('plays') && moving.playing === 'true', JSON.stringify(moving));
     await page.click('[data-drive-play]');
+    await page.locator('#gameTabs button').filter({hasText:/^Play-by-Play$/}).click();
+    check(`[${label}] generated play-by-play survives in Game Center`,(await page.locator('#gameDialogBody').innerText()).includes('Archived generated play log'));
     await page.getByRole('button',{name:'Close Game Center',exact:true}).click();
 
     // Simulate a week and confirm the UI advances.

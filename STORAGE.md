@@ -343,3 +343,17 @@ No new stored field. Newly simulated detailed games archive a variable-length
 `drives` array using the existing format; old arrays are neither migrated nor
 regenerated. Watch and replay progress remain transient presentation state.
 IndexedDB remains schema 3.
+
+## v0.9.32 archived detailed-game calls
+
+New detailed-game drive snapshots may include `playByPlay: string[]`, copied
+from the already-generated temporary simulation log for that exact drive. It is
+optional and additive: old games remain valid and display a drive-only fallback.
+Because drives are already immutable rows in the chunked game archive, browser
+save/load and portable export/import retain the array without a new storage path.
+
+The seeded detailed-game fixture measured 5,148 extra JSON bytes. At twelve
+watched regular-season games that is roughly 62 KB per season, around 0.5% of
+the measured 11.4 MB annual portable-save growth. No pruning, compression,
+IndexedDB schema bump or `gameArchiveVersion` bump was warranted. IndexedDB
+remains schema 3 and game archive version remains 1.

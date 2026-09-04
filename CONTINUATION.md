@@ -1,31 +1,37 @@
-# Dynasty Lab — v0.9.31 production checkpoint
+# Dynasty Lab — v0.9.32 play-by-play Watch Mode preview
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `codex/v0931-variable-drives` (based on validated
-v0.9.30 source `codex/v0930-broadcast-watch` at `e046609`)
+Current source branch: `codex/v0932-play-by-play-watch` (based on validated
+v0.9.31 source `codex/v0931-variable-drives` at `d0c2759`)
 Production branch: `gh-pages`
 Production: v0.9.31 at https://markjrogers92.github.io/Football/
 
 ## Current release
 
-v0.9.31 removes the detailed engine's fixed 24-drive structure. A game now has
-18–30 total possessions based on both offenses' tempo plus game-flow variance.
-Slow matchups center near 20, balanced matchups near 22 and two Tempo Spread
-teams near 25. Possessions alternate from a randomized opening side, so teams
-finish even or one drive apart.
+v0.9.32 makes Watch Mode a play-by-play broadcast. Each generated call appears
+before its possession outcome is revealed; the running score changes only when
+the drive completes, and the lower feed becomes a set of completed-drive recaps.
+Play/pause, next play, speed, skip and replay all remain available.
 
-Watch Mode and the drive replay already derive their length from the archived
-drive list, so both follow the new game-specific total and old games retain their
-original sequence. No save field, archive format or IndexedDB schema changed.
-The bounded check sampled drive-count rolls rather than running a multi-season
-calibration. Preview target:
-https://markjrogers92.github.io/Football/preview/v0931/
+New detailed games attach the play strings the engine already generated to each
+immutable drive. They survive browser save/load and portable export/import and
+reopen in Game Center. Older games have no invented history and use the existing
+drive-only fallback. The measured cost was 5,148 bytes in the seeded game, about
+62 KB for twelve watched regular-season games. IndexedDB remains schema 3 and
+game archive version remains 1. Preview target:
+https://markjrogers92.github.io/Football/preview/v0932/
 
-The validated v0.9.31 preview was promoted unchanged to production after user
-approval. Preview remains available at the URL above for comparison.
-Validation is green: 53 smoke scenarios, 136 Node tests and 121 desktop/iPhone
-end-to-end checks. Presentation-only and real-browser storage suites were not
-rerun because this batch changes no CSS, markup, storage API or schema.
+Production deliberately remains v0.9.31 until this preview is reviewed.
+
+Validation is complete: 53 smoke scenarios plus 136 Node tests; 125
+desktop/iPhone end-to-end checks; 14 presentation checks; 21 recruiting-visual
+checks; and six real-browser persistence scenarios all passed with no console
+errors. No new long multi-season calibration was run.
+
+## Previous release
+
+v0.9.31 varies detailed games from 18–30 possessions based on tempo and game
+flow. Its validated preview was promoted unchanged to production.
 
 ## Previous release
 

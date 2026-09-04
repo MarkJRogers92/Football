@@ -1,5 +1,37 @@
 # WORKLOG
 
+## v0.9.32 — Play-by-play Watch Mode
+
+The v0.9.31 broadcast advanced a whole drive per step, even though the detailed
+engine already wrote named play calls to its temporary log. The smallest honest
+extension was to associate those existing calls with the drive that produced
+them, not create a second play generator.
+
+The caller records the log boundary around each `drive()` invocation and copies
+that slice into `drive.playByPlay`, removing the redundant H1/A1 prefix. No RNG
+call or simulation branch moved. Watch Mode now maintains two cursors: play
+within drive, then completed drive. The score and bottom recap stay hidden until
+the play cursor exhausts that possession; only then does the existing outcome
+animation run. The live board keeps five recent calls so it stays legible on a
+phone. Skip to final and replay retain their previous behavior.
+
+Older games have no `playByPlay`; they deliberately fall back to one drive per
+step instead of inventing missing events. New arrays travel inside the existing
+immutable drive snapshot, so deferred browser chunks and portable JSON require
+no separate wiring or migration. The Game Center Play-by-Play tab prefers the
+archived arrays and uses the old temporary last-game log only as a fallback.
+
+Measured on the seeded permanent-game fixture: 5,148 additional JSON bytes for
+one detailed game. Twelve watched regular-season games would add about 62 KB,
+roughly 0.5% of the previously measured 11.4 MB annual portable-save growth.
+This did not justify a storage redesign or multi-season calibration.
+
+Credit-conscious validation used focused game-motion/game-archive checks while
+building, then one final gate: 53 smoke scenarios plus 136 Node tests; 125
+desktop/iPhone end-to-end checks, 14 presentation checks and 21 recruiting
+visual checks; and six real-browser persistence scenarios. All passed with no
+console errors. No new long multi-season calibration was run.
+
 ## v0.9.31 — Variable detailed-game possessions
 
 The detailed engine's fixed loop generated H1/A1 through H12/A12 in every

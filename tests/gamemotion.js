@@ -7,10 +7,10 @@ test('drive replay presents immutable outcomes without inventing field position'
  const game={
   away:{name:'Lake City'},home:{name:'Prairie Tech'},
   drives:[
-   {side:'away',label:'A1',plays:6,result:'TD',points:7},
-   {side:'home',label:'H1',plays:4,result:'PUNT',points:0},
-   {side:'away',label:'A2',plays:8,result:'FG',points:3},
-   {side:'home',label:'H2',plays:9,result:'TD',points:7},
+   {side:'away',label:'A1',plays:6,result:'TD',points:7,playByPlay:['Marcus Hall runs for 8.','TOUCHDOWN Lake City.']},
+   {side:'home',label:'H1',plays:4,result:'PUNT',points:0,playByPlay:['Eli Wood incomplete for Jamal Hill.','Prairie Tech punts.']},
+   {side:'away',label:'A2',plays:8,result:'FG',points:3,playByPlay:['Lake City field goal good from 38.']},
+   {side:'home',label:'H2',plays:9,result:'TD',points:7,playByPlay:['Eli Wood to Jamal Hill for 14.','TOUCHDOWN Prairie Tech.']},
   ],
  };
  const frozen=JSON.stringify(game),html=e.gameDrivesHTML(game);
@@ -27,10 +27,10 @@ test('watch mode hides the final and exposes broadcast controls without changing
  const game={
   away:{name:'Lake City'},home:{name:'Prairie Tech'},score:{away:10,home:10},scoreAdjustment:{home:3,away:0},
   drives:[
-   {side:'away',label:'A1',plays:6,result:'TD',points:7},
-   {side:'home',label:'H1',plays:4,result:'PUNT',points:0},
-   {side:'away',label:'A2',plays:8,result:'FG',points:3},
-   {side:'home',label:'H2',plays:9,result:'TD',points:7},
+   {side:'away',label:'A1',plays:6,result:'TD',points:7,playByPlay:['Marcus Hall runs for 8.','TOUCHDOWN Lake City.']},
+   {side:'home',label:'H1',plays:4,result:'PUNT',points:0,playByPlay:['Eli Wood incomplete for Jamal Hill.','Prairie Tech punts.']},
+   {side:'away',label:'A2',plays:8,result:'FG',points:3,playByPlay:['Lake City field goal good from 38.']},
+   {side:'home',label:'H2',plays:9,result:'TD',points:7,playByPlay:['Eli Wood to Jamal Hill for 14.','TOUCHDOWN Prairie Tech.']},
   ],
  };
  const frozen=JSON.stringify(game),html=e.gameWatchHTML(game);
@@ -40,6 +40,10 @@ test('watch mode hides the final and exposes broadcast controls without changing
  assert.match(html,/data-watch-next/);
  assert.match(html,/data-watch-speed/);
  assert.match(html,/data-watch-skip/);
+ assert.equal((html.match(/data-watch-play-event=/g)||[]).length,7);
+ assert.match(html,/Next play/);
+ assert.match(html,/reaches the end zone after 6 plays/);
+ assert.match(html,/Completed drive recaps/);
  assert.match(html,/calculated once before this broadcast begins/);
  assert.equal(JSON.stringify(game),frozen,'watch presentation must not alter the archived game');
  assert.match(e.gameWatchHTML({...game,drives:[]}),/Watch Mode unavailable/);

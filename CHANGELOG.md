@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.9.32 — Play-by-play Watch Mode
+
+Watch Mode now unfolds each possession one generated play at a time before
+revealing the completed-drive recap.
+
+- **Next play** and automatic playback advance through the simulator's actual
+  named pass, run, sack, penalty, turnover and kick calls. The drive result and
+  running score remain hidden until every call in that possession is shown.
+- A live play-by-play board keeps the five most recent calls readable while the
+  schematic football pulses on each snap. Completed drive recaps collect in the
+  lower feed with outcome, play count and running score.
+- New detailed games preserve each drive's generated calls in an optional
+  `playByPlay` array. Game Center's Play-by-Play tab can therefore reopen them
+  after save/load; older archived games retain the v0.9.31 drive-only fallback.
+- The measured addition was 5,148 bytes for the seeded detailed game, or roughly
+  62 KB if all twelve regular-season games are watched—about 0.5% of the
+  previously measured 11.4 MB annual portable-save growth.
+- The simulation result, RNG sequence and box allocation are unchanged: the
+  feature stores text the detailed engine already generated. No database or
+  archive-version migration is required.
+
 ## v0.9.31 — Variable game flow
 
 Detailed games no longer force exactly twelve possessions per team.
