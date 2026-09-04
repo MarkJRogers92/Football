@@ -72,7 +72,7 @@ practices feeding the existing camp system, and recruiting momentum. Fits as a
 them one at a time as an event sequence instead of silently. The best story
 moment in the recruiting calendar, from data that already exists.
 
-### Coaching tree
+### ~~Coaching tree~~ — shipped in v0.9.27
 Coach career stints, relationships and a carousel all exist. Show where former
 assistants ended up and give prestige credit for producing head coaches.
 
@@ -92,7 +92,7 @@ Fourteen tabs is too many. Five groups: **Program** (dashboard/program/history),
 **Team** (roster/depth/development), **Recruiting**, **Games**
 (season/gamelab/stats/newsletter), **Offseason** (staff/offseason/records).
 
-### Save size (roadmap milestone B)
+### Save size (roadmap milestone B) — measured in v0.9.27, see docs/SAVE_SIZE_MEASUREMENT.md
 Measure before touching. Likely `universe.events` dominates and wants a
 per-season rollup — but that is a guess until measured.
 

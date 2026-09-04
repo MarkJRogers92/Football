@@ -311,3 +311,13 @@ On every player:
   `gameAvailable()` false.
 
 Still schema 3.
+
+## v0.9.27 additive state
+
+- `t.coachTreeCredited: [coachId]` — coaches this program has already been
+  given prestige credit for producing. The tree itself is derived on read from
+  `careerHistory` and `coachArchive`, so without this ledger the same branch
+  would pay out every offseason.
+
+See `docs/SAVE_SIZE_MEASUREMENT.md` for measured per-component save growth.
+Still schema 3.

@@ -1,5 +1,46 @@
 # WORKLOG
 
+## v0.9.27 — coaching tree, cache fix, roadmap B measurement
+
+**The tree** was cheap because `c.careerHistory` already held dated stints per
+school and `universe.coachArchive` kept departed coaches. The only real design
+question was what counts as a branch. "Anyone who worked here and is now
+elsewhere" wrongly claims credit for a veteran head coach who took a
+coordinator job with you late in his career; the rule is that the later job has
+to start at or after the stint here ended. A test constructs precisely that
+inverted career and asserts he is excluded.
+
+Prestige credit is per-coach, tracked in `t.coachTreeCredited`, because the tree
+is derived fresh every time it is read — without the ledger the same branch
+would pay out every offseason forever. Capped at two a season and at
+`program_ceiling`, both tested.
+
+**The cache fix** came out of a real report: the published site showed the
+previous version after a promote. Diagnosis: the deploy and the file were both
+correct, and GitHub Pages sends `Cache-Control: max-age=600` on HTML, so a
+browser can hold the old single-file app for ten minutes. One meta tag in
+`tools/build.js`. Worth noting the proxy in this environment returns 403 for
+github.io, so the live URL could not be fetched to confirm — the diagnosis
+rested on the branch content being provably correct and there being no service
+worker in the build.
+
+**Roadmap B is the interesting one.** The instruction in CONTINUATION.md was
+"measure before touching anything", and measuring immediately invalidated the
+roadmap's own hypothesis. It named `universe.events` and `seasonHistory` as the
+growth drivers at ~4 MB/season. They are 2.0% and +0.33 MB/season respectively;
+real growth is 11.4 MB/season and 80% of it is `gameArchive` plus
+`playerArchive`. Had anyone implemented the roadmap as written — an events
+rollup — they would have spent the work for under 3% and broken the wire, the
+story surface and everything built on the ledger since v0.9.19.
+
+Deliberately stopped at measurement. The numbers are of `packUniverse`, and
+`STORAGE.md` records that the browser already chunks and defers
+`playerArchive`, so the resident cost differs from the export cost. Optimising
+now would be optimising a shape that is not what gets stored. The write-up says
+the next step is instrumenting `saveBrowser` and reading back real record sizes.
+
+Validation: 5 new tests, full Node and browser suites.
+
 ## v0.9.26 — tab groups (roadmap milestone C)
 
 Plan: the last open roadmap milestone. Fourteen flat tabs, and the strip had

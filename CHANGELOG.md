@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.9.27 — The coaching tree, a cache fix, and roadmap B measured
+
+**Coaching tree.** Coach career stints and the coach archive already recorded everything needed; nothing showed where the people who worked for you ended up. The Staff tab now has a Coaching Tree card listing every former staffer who moved on, head coaches first, with their career record. Producing a head coach is worth up to two prestige points a season, credited **once per coach** so a long-tenured branch does not pay out forever, and capped by `program_ceiling`.
+
+The definition is the careful part: a branch is someone who worked here and *then* took a job elsewhere. A coach who was a head coach somewhere else before joining your staff is not something your program produced, and there is a test for exactly that case.
+
+**Cache fix.** The built page now carries `<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">`. GitHub Pages serves HTML with `max-age=600`, so a freshly published build could show the previous version for up to ten minutes. Browsers now revalidate instead.
+
+**Roadmap B measured, not built.** Six seasons of one league, measured per component — written up in `docs/SAVE_SIZE_MEASUREMENT.md`. The roadmap's stated assumption was wrong in every particular:
+
+- Growth is **11.4 MB/season**, not the ~4 MB recorded.
+- `universe.events`, named as one of the two drivers, is **2.0% of the save**.
+- `seasonHistory`, the other named driver, grows +0.33 MB/season.
+- The real drivers are `gameArchive` (+5.83 MB/season, 41.8%) and `playerArchive` (+3.50 MB/season, 22.9%) — **80% of all growth between them**, and neither was named.
+
+No optimisation shipped, deliberately: those are portable-export numbers, and browser storage already defers `playerArchive` into chunks, so the next step is measuring what IndexedDB actually holds rather than optimising a shape that is not what gets stored.
+
+- 5 new tests in `tests/coachtree.js`. Storage additive: `t.coachTreeCredited`.
+
 ## v0.9.26 — Five groups instead of fourteen tabs (roadmap milestone C)
 
 Fourteen flat tabs was the last thing roadmap milestone C flagged, and the tab strip had grown to 1387px of content in a 390px viewport — a sideways-scrolling row nobody could see the end of. Tabs are now organised into five groups:

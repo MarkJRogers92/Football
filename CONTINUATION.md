@@ -1,12 +1,33 @@
-# Dynasty Lab — v0.9.26 checkpoint
+# Dynasty Lab — v0.9.27 checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `claude/v0926-tab-groups` (merged into the
+Current source branch: `claude/v0927-coaching-tree` (merged into the
 main working branch `claude/review-improvement-dwjemy`)
 Production branch: `gh-pages`
-Production: v0.9.26 at https://markjrogers92.github.io/Football/
+Production: v0.9.27 at https://markjrogers92.github.io/Football/
 
 ## Current release
+
+v0.9.27 adds the coaching tree (Staff tab; producing a head coach is worth up
+to two prestige a season, credited once per coach via `t.coachTreeCredited`),
+a `no-cache` meta on the built page because GitHub Pages holds HTML for ten
+minutes, and **roadmap B's measurement**.
+
+## Roadmap B: measured, and the roadmap was wrong
+
+Read `docs/SAVE_SIZE_MEASUREMENT.md` before doing anything here. The roadmap
+said growth was ~4 MB/season driven by `universe.events` and `seasonHistory`.
+Measured over six seasons: growth is **11.4 MB/season**, `events` is **2.0%**
+of the save, `seasonHistory` grows 0.33 MB/season, and the real drivers are
+`gameArchive` (41.8%) and `playerArchive` (22.9%) — 80% of growth between them.
+Implementing the roadmap as written would have cost the wire and the story
+surface to reclaim under 3%.
+
+Next step is **another measurement, not an optimisation**: those are
+`packUniverse` numbers and the browser already chunks/defers `playerArchive`,
+so instrument `saveBrowser` and read back real IndexedDB record sizes first.
+
+## Previous release
 
 v0.9.26 closes roadmap milestone C: fourteen flat tabs become five groups
 (Program, Team, Recruiting, Games, Staff & Offseason). The tab buttons are
@@ -163,7 +184,8 @@ simulation gaps.
 
 ## Storage guardrail
 
-Read `STORAGE.md` before altering saves. v0.9.26 changes no stored state at all.
+Read `STORAGE.md` before altering saves. v0.9.27 adds `t.coachTreeCredited`,
+additive. v0.9.26 changed no stored state at all.
 v0.9.25 added `p.academicStanding`,
 `p.academicPlan` and `p.academicHold`, additive. v0.9.24 added `universe.signingDay`,
 additive. v0.9.23 added `universe.bowls`,
@@ -185,11 +207,12 @@ player/recruit/universe records with no IndexedDB version bump.
 Both halves shipped. Any new wire tile type needs an `importance` on the
 0–100 scale to rank correctly among the others.
 
-### B) Live-league save size
-The game archive is solved (v0.9.12). Remaining growth (~4 MB/season) is
-`universe.events` and per-player `seasonHistory` across 120 teams, now with
-scouting snapshots and weekly decisions added on top. Measure before
-touching anything.
+### B) Live-league save size — measured in v0.9.27, not yet built
+See `docs/SAVE_SIZE_MEASUREMENT.md`. The hypothesis recorded here previously
+(events + seasonHistory, ~4 MB/season) was measured and disproved. Real growth
+is 11.4 MB/season, 80% of it `gameArchive` + `playerArchive`. Measure IndexedDB
+before optimising anything.
+
 
 ### C) ~~14-tab coherence~~ — done (v0.9.26)
 The weekly plan (v0.9.13), the Coach's Desk decision cards (v0.9.14/15) and
@@ -199,7 +222,7 @@ surface itself — grouping, or a first-run path.
 ## Resume prompt
 
 Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.26 is production and all
+`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.27 is production and all
 known feature branches are reconciled into the main line — check
 `git branch -r` for anything new before assuming that's still true. Work in
 a new bounded branch, validate fully (`npm test` + `npm run test:browser`),

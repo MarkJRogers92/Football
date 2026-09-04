@@ -22,7 +22,8 @@ if (appVersion !== version)
   throw new Error(`version drift: VERSION.txt says ${version}, app.js APP_VERSION says ${appVersion}`);
 
 const html = `<!doctype html><html lang="en"><head><meta charset="utf-8">` +
-  `<meta name="viewport" content="width=device-width,initial-scale=1">` +
+  `<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta name="viewport" content="width=device-width,initial-scale=1">` +
   `<meta name="theme-color" content="#090d12">` +
   `<title>Dynasty Lab v${version}</title><style>` +
   read('styles.css') + '\n' + read('visual-identity.css') + '\n' + read('team-branding.css') + '\n' + read('sports-presentation.css') + '\n' + read('sports-layout.css') + '\n' + read('recruit-presentation.css') + '\n' + read('polish.css') +
