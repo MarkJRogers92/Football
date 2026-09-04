@@ -303,11 +303,15 @@ player/recruit/universe records with no IndexedDB version bump.
 Both halves shipped. Any new wire tile type needs an `importance` on the
 0–100 scale to rank correctly among the others.
 
-### B) Live-league save size — measured in v0.9.27, not yet built
-See `docs/SAVE_SIZE_MEASUREMENT.md`. The hypothesis recorded here previously
-(events + seasonHistory, ~4 MB/season) was measured and disproved. Real growth
-is 11.4 MB/season, 80% of it `gameArchive` + `playerArchive`. Measure IndexedDB
-before optimising anything.
+### B) Live-league save size — fully measured (v0.9.27 + v0.9.38), not yet built
+See `docs/SAVE_SIZE_MEASUREMENT.md`. Growth is +11.5 MB/season (~188 MB by
+season 15). v0.9.38 checked the one open caveat from the original
+measurement — that resident IndexedDB might be smaller than the portable
+export because of chunking/deferral — directly, against real `storage.js` +
+`fake-indexeddb`. It is not smaller; chunking only affects load timing, not
+bytes on disk. `gameArchive` is the largest, fastest-growing store (41-42%)
+and the recommended first target if this is ever built: roll old seasons'
+play-level detail down to box-score granularity after N seasons.
 
 
 ### C) ~~14-tab coherence~~ — done (v0.9.26)
