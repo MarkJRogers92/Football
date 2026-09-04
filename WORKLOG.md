@@ -25,6 +25,9 @@ and real-browser storage suites were not rerun because this batch changes no CSS
 markup, storage API or schema; the end-to-end suite covers Watch and replay
 length on both viewports.
 
+After preview review, the user explicitly approved production publication. The
+validated v0.9.31 build was promoted without additional product changes.
+
 ## v0.9.30 — Broadcast Watch Mode
 
 Plan: extend the v0.9.29 presentation layer into one bounded way to “watch” a

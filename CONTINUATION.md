@@ -1,10 +1,10 @@
-# Dynasty Lab — v0.9.31 variable game-flow preview
+# Dynasty Lab — v0.9.31 production checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
 Current source branch: `codex/v0931-variable-drives` (based on validated
 v0.9.30 source `codex/v0930-broadcast-watch` at `e046609`)
 Production branch: `gh-pages`
-Production: v0.9.29 at https://markjrogers92.github.io/Football/
+Production: v0.9.31 at https://markjrogers92.github.io/Football/
 
 ## Current release
 
@@ -21,7 +21,8 @@ The bounded check sampled drive-count rolls rather than running a multi-season
 calibration. Preview target:
 https://markjrogers92.github.io/Football/preview/v0931/
 
-Production deliberately remains v0.9.29 until this preview is reviewed.
+The validated v0.9.31 preview was promoted unchanged to production after user
+approval. Preview remains available at the URL above for comparison.
 Validation is green: 53 smoke scenarios, 136 Node tests and 121 desktop/iPhone
 end-to-end checks. Presentation-only and real-browser storage suites were not
 rerun because this batch changes no CSS, markup, storage API or schema.
