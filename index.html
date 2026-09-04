@@ -98,6 +98,7 @@ main{max-width:1280px;margin:auto;padding:20px}.tab{display:none}.tab.active{dis
 .recap{line-height:1.55;margin:0 0 10px}.news-lead h3{margin:4px 0 8px}.news-item{padding:10px 0;border-bottom:1px solid var(--line)}.news-item:last-of-type{border-bottom:0}.news-item .compact{margin:3px 0 5px;line-height:1.5}
 .pull-offer{border-color:var(--bad);color:var(--bad)}
 th.sortable{cursor:pointer;user-select:none;white-space:nowrap}th.sortable:hover{color:var(--text)}th.sortable.sorted{color:var(--accent2)}th.sortable[data-dir=asc]::after{content:' \2191'}th.sortable[data-dir=desc]::after{content:' \2193'}
+.plan-card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:14px}.plan-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}.plan-item{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--line);cursor:pointer}.plan-item:last-child{border-bottom:0}.plan-item:hover .plan-label{color:var(--accent2)}.plan-mark{color:var(--accent2);width:14px;flex:0 0 auto}.plan-done{opacity:.5}.plan-done .plan-mark{color:var(--good)}.plan-text{display:flex;flex-direction:column;min-width:0}.plan-label{font-weight:600}.plan-detail{font-size:12px;color:var(--muted)}
 
 /* Dynasty Lab visual identity layer
    Presentation-only overrides. Keep simulation, save state, and game logic out of this file. */
@@ -721,6 +722,10 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
       </div>
       <div class="card command-center">
         <div class="section-head"><div><div class="small muted">WEEKLY COMMAND CENTER</div><h2 id="hubTitle">Preseason Briefing</h2></div><button id="hubAdvance">Advance Week</button></div>
+        <div class="plan-card">
+          <div class="plan-head"><strong id="planHeading">This week</strong><span class="pill" id="planCount"></span></div>
+          <div id="weeklyPlan"></div>
+        </div>
         <div id="weeklyHub" class="hub-grid"></div>
       </div>
       <div class="two-col">
@@ -2608,9 +2613,69 @@ let activeTab='dashboard';
 function renderActiveTab(){(TAB_RENDERERS[activeTab]||(()=>{}))()}
 function setActiveTab(id){activeTab=id;renderActiveTab()}
 function goToTab(id){if(!$('#'+id))return;$$('.tabs button').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));$$('.tab').forEach(x=>x.classList.toggle('active',x.id===id));setActiveTab(id);$('#'+id).scrollIntoView?.({block:'start'})}
-function render(){const order=ranked();const u=selected();if(!u)return;const p=profiles(u);$('#teamName').textContent=u.name;$('#teamMeta').textContent=`${u.conference} · ${u.offScheme} / ${u.defScheme} · Prestige ${u.prestige} · Ceiling ${u.program_ceiling}`;$('#teamMetrics').innerHTML=[['Offense',grade(p.offense)],['Defense',grade(p.defense)],['Scheme Fit',grade((p.offFit+p.defFit)/2)],['Development',grade(u.development)]].map(x=>`<div class="metric"><div class="small muted">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');$('#recordBig').textContent=`${u.w}–${u.l}`;$('#rankLine').textContent=u.rank<=25?`#${u.rank} nationally`:`#${u.rank} nationally · outside the top 25`;$('#weekLine').textContent=`${universe.year} · Week ${universe.week}`;$('#top15').innerHTML=order.slice(0,15).map((t,i)=>`<div class="rankrow"><div><span class="rank">${i+1}.</span> ${t.name}</div><div>${t.w}-${t.l}</div></div>`).join('');const leaders=u.roster.slice().sort((a,b)=>b.perceived-a.perceived).slice(0,5);$('#snapshot').innerHTML=`<div class="lineitem"><span>Roster</span><strong>${u.roster.length}</strong></div><div class="lineitem"><span>Protected redshirts</span><strong>${u.roster.filter(p=>p.redshirtActive).length}</strong></div><div class="lineitem"><span>Commits</span><strong>${u.commits.length}</strong></div><div class="lineitem"><span>Head Coach</span><strong>${u.staff.HC.name}</strong></div><div class="lineitem"><span>PF / PA</span><strong>${u.pf} / ${u.pa}</strong></div>`+leaders.map(x=>`<div class="lineitem compact"><span>${x.pos} ${x.name}</span><span>${playerGrade(x)} · ${x.style}</span></div>`).join('');renderWeeklyHub();renderActiveTab();$('#simConf').disabled=universe.phase!=='confReady';$('#simPlayoff').disabled=universe.phase!=='playoffReady';let devState=ensureDevelopmentState();$('#runOffseason').disabled=universe.phase!=='complete'||!devState.springRun||!devState.fallRun;$('#simDetailedGame').disabled=!findUserGame()}
+function render(){const order=ranked();const u=selected();if(!u)return;const p=profiles(u);$('#teamName').textContent=u.name;$('#teamMeta').textContent=`${u.conference} · ${u.offScheme} / ${u.defScheme} · Prestige ${u.prestige} · Ceiling ${u.program_ceiling}`;$('#teamMetrics').innerHTML=[['Offense',grade(p.offense)],['Defense',grade(p.defense)],['Scheme Fit',grade((p.offFit+p.defFit)/2)],['Development',grade(u.development)]].map(x=>`<div class="metric"><div class="small muted">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');$('#recordBig').textContent=`${u.w}–${u.l}`;$('#rankLine').textContent=u.rank<=25?`#${u.rank} nationally`:`#${u.rank} nationally · outside the top 25`;$('#weekLine').textContent=`${universe.year} · Week ${universe.week}`;$('#top15').innerHTML=order.slice(0,15).map((t,i)=>`<div class="rankrow"><div><span class="rank">${i+1}.</span> ${t.name}</div><div>${t.w}-${t.l}</div></div>`).join('');const leaders=u.roster.slice().sort((a,b)=>b.perceived-a.perceived).slice(0,5);$('#snapshot').innerHTML=`<div class="lineitem"><span>Roster</span><strong>${u.roster.length}</strong></div><div class="lineitem"><span>Protected redshirts</span><strong>${u.roster.filter(p=>p.redshirtActive).length}</strong></div><div class="lineitem"><span>Commits</span><strong>${u.commits.length}</strong></div><div class="lineitem"><span>Head Coach</span><strong>${u.staff.HC.name}</strong></div><div class="lineitem"><span>PF / PA</span><strong>${u.pf} / ${u.pa}</strong></div>`+leaders.map(x=>`<div class="lineitem compact"><span>${x.pos} ${x.name}</span><span>${playerGrade(x)} · ${x.style}</span></div>`).join('');renderWeeklyPlan();renderWeeklyHub();renderActiveTab();$('#simConf').disabled=universe.phase!=='confReady';$('#simPlayoff').disabled=universe.phase!=='playoffReady';let devState=ensureDevelopmentState();$('#runOffseason').disabled=universe.phase!=='complete'||!devState.springRun||!devState.fallRun;$('#simDetailedGame').disabled=!findUserGame()}
 function attachPlayerLinks(){$$('[data-player]').forEach(b=>b.onclick=()=>showPlayerProfile(b.dataset.player));paintPortraits()}
 
+// --- v0.9.13: the weekly plan ----------------------------------------------
+// Fourteen tabs and no signposting: the sequence that actually advances a
+// dynasty (season → spring → fall camp → offseason) was invisible until you
+// got stuck. This derives a short, ordered list of what is worth doing now,
+// with the steps you have already cleared shown as done so the run of play
+// reads like a checklist rather than a guess.
+function planStep(key,label,detail,tab,done=false,priority=50){return {key,label,detail,tab,done,priority}}
+function weeklyPlan(u){
+ if(!u)return {items:[],remaining:0,heading:''};
+ const out=[],ds=ensureDevelopmentState(),phase=universe.phase;
+ // 1. The gate that moves the calendar. There is always exactly one.
+ if(phase==='regular'&&universe.week<12)
+  out.push(planStep('sim',`Play week ${universe.week+1}`,'Simulate the week, or take the game yourself in Game Lab.','dashboard',false,100));
+ else if(phase==='confReady')
+  out.push(planStep('conf','Play the conference championships','The regular season is over.','season',false,100));
+ else if(phase==='playoffReady')
+  out.push(planStep('playoff','Play the playoff','Conference titles are settled.','season',false,100));
+ else if(phase==='complete'){
+  // The offseason is a strict sequence, so show all of it with progress.
+  out.push(planStep('spring','Run spring development','Develop the roster and open position battles.','development',!!ds.springRun,100));
+  out.push(planStep('fall','Run fall camp','Second development window; sets the depth chart.','development',!!ds.fallRun,99));
+  out.push(planStep('offseason','Finalize the offseason',ds.springRun&&ds.fallRun?'Graduations, the draft, the portal, the carousel and signing day.':'Available once both camps are done.','offseason',false,98));
+ }
+ // 2. Anything blocking the program.
+ for(const o of (universe.openings||[]).filter(o=>o.schoolId===u.id&&o.status==='OPEN'))
+  out.push(planStep(`hire_${o.slot}`,`Hire a ${o.role}`,'An interim is holding the job and your staff is weaker for it.','staff',false,95));
+ const sch=scholarshipSummary(u);
+ if(sch.over)
+  out.push(planStep('over','Get under the scholarship limit',`${sch.over} over. Signing day will pull your weakest commitments for you.`,'recruiting',false,92));
+ // 3. Recruiting work that is actually available this week.
+ const targets=universe.recruits.filter(r=>r.targeted&&!r.committed).length;
+ if(sch.room>0&&phase==='regular')
+  out.push(planStep('target',targets?`Work your ${targets} recruiting target${targets===1?'':'s'}`:'Build a recruiting board',
+   `${sch.room} scholarship${sch.room===1?'':'s'} open. Auto-target fills the board in one click.`,'recruiting',targets>=Math.min(8,sch.room),70));
+ const waver=universe.recruits.find(r=>r.committed===u.name&&r.challenger&&r.pressure>0);
+ if(waver)out.push(planStep('waver',`Hold ${waver.name}`,`${waver.challenger} is making a push. Target him, schedule a visit or make a promise.`,'recruiting',false,85));
+ // 4. The locker room.
+ const risk=u.roster.map(p=>({p,r:transferRisk(p)})).sort((a,b)=>b.r-a.r)[0];
+ if(risk&&risk.r>=50)
+  out.push(planStep('risk',`Check in on ${risk.p.name}`,`Transfer risk ${Math.round(risk.r)}. Playing time, a broken promise or a scheme change is behind it.`,'roster',false,60));
+ out.sort((a,b)=>(a.done-b.done)||(b.priority-a.priority));
+ const items=out.slice(0,6);
+ return {items,remaining:items.filter(x=>!x.done).length,
+  heading:phase==='complete'?'Offseason checklist':universe.week===0?'Before the season':`Week ${universe.week+1}`};
+}
+function renderWeeklyPlan(){
+ const u=selected();if(!u||!$('#weeklyPlan'))return;
+ const plan=weeklyPlan(u);
+ $('#planCount').textContent=plan.remaining?`${plan.remaining} thing${plan.remaining===1?'':'s'} worth doing`:'Nothing pending';
+ $('#planHeading').textContent=plan.heading;
+ $('#weeklyPlan').innerHTML=plan.items.map((x,i)=>
+  `<div class="plan-item${x.done?' plan-done':''}" data-plan="${i}" data-tab="${gameEscape(x.tab)}" role="button" tabindex="0">
+   <span class="plan-mark">${x.done?'✓':'○'}</span>
+   <span class="plan-text"><span class="plan-label">${gameEscape(x.label)}</span><span class="plan-detail">${gameEscape(x.detail)}</span></span>
+  </div>`).join('')||'<div class="muted small">Nothing pending.</div>';
+ $$('#weeklyPlan [data-plan]').forEach(el=>{
+  const go=()=>{const b=$(`.tabs button[data-tab="${el.dataset.tab}"]`);if(b)b.click()};
+  el.onclick=go;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}};
+ });
+}
 function renderWeeklyHub(){universe.weeklyHub=[...familiarFaceItems(selected()),...(universe.weeklyHub||[]).filter(x=>x.kicker!=='FAMILIAR FACE')].slice(0,9);let hub=universe.weeklyHub||[];$('#hubTitle').textContent=universe.week===0?'Preseason Briefing':`Week ${universe.week} Briefing`;if(!hub.length)buildPreseasonHub();$('#weeklyHub').innerHTML=(universe.weeklyHub||[]).map((x,i)=>`<div class="hub-item ${x.type||''}${x.tab?' hub-link':''}"${x.tab?` data-hub="${i}" data-tab="${x.tab}" role="button" tabindex="0"`:''}><div class="hub-kicker">${x.kicker}</div><div class="hub-main">${x.main}</div><div class="hub-sub">${x.sub||''}</div></div>`).join('');$$('[data-hub]').forEach(el=>{const go=()=>openHubItem((universe.weeklyHub||[])[+el.dataset.hub]);el.onclick=go;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}}})}
 function openHubItem(x){if(!x?.tab)return;goToTab(x.tab);if(x.gameId){showGameCenter(x.gameId);return}if(x.player&&findPlayer(x.player))showPlayerProfile(x.player);else if(x.recruit&&universe.recruits.find(r=>r.id===x.recruit))showRecruitProfile(x.recruit)}
 function statLeaderRows(list,key,fmt=v=>v,n=8){return list.filter(x=>(x.p.stats?.[key]||0)>0).sort((a,b)=>(b.p.stats?.[key]||0)-(a.p.stats?.[key]||0)).slice(0,n).map((x,i)=>`<div class="leader-row"><span>${i+1}</span><span><button class="player-button" data-player="${x.p.id}">${x.p.name}</button><div class="small muted">${x.p.pos} · ${x.t.name}</div></span><span class="leader-val">${fmt(x.p.stats?.[key]||0,x.p.stats)}</span></div>`).join('')||'<span class="muted">No qualifying statistics yet.</span>'}
