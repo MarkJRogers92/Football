@@ -16,6 +16,7 @@ const path = require('path');
   await page.click('.tabs button[data-tab="roster"]');await page.click('#rosterBody .player-button');await page.waitForSelector('#playerDialog[open] .player-hero-rail');
   check(`[${label}] player profile becomes hero card`,await page.locator('#playerDialog .player-hero-rating').count()===3);
   check(`[${label}] player hero keeps portrait`,await page.locator('#playerDialogPortrait canvas').count()===1);
+  if(label==='iphone'){const overflow=await page.$eval('#playerDialog',el=>el.scrollWidth-el.clientWidth);check(`[${label}] scouting profile has no horizontal overflow`,overflow<=1,`${overflow}px`)}
   await page.evaluate(()=>document.querySelector('#playerDialog').close());
   await page.click('.tabs button[data-tab="dashboard"]');await page.click('#simWeek');await page.waitForFunction(()=>/Week 1/.test(document.querySelector('#weekLine')?.textContent),{timeout:60000});await page.waitForSelector('#broadcastFeature .broadcast-matchup');
   check(`[${label}] dashboard promotes next matchup after sim`,/NEXT MATCHUP/.test(await page.locator('#broadcastFeature').innerText()));
