@@ -106,9 +106,15 @@ const mean = a => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0);
   const classSizes = u.teams.map(t => u.recruitCycle.signeesByTeam[t.name] || 0);
   check('recorded signing counts match the completed recruiting pool',
     u.teams.every(t => u.recruitCycle.signeesByTeam[t.name] === (perTeam[t.name] || 0)));
+  // v0.9.11: class size is bounded by scholarship room, not a flat cap, so the
+  // floor moves with attrition. What must hold is the signing-class band and
+  // that no program finished over its own limit.
   check('recruiting classes are in range',
-    Math.min(...classSizes) >= 15 && Math.max(...classSizes) <= 30,
+    Math.min(...classSizes) >= 10 && Math.max(...classSizes) <= 25,
     `min ${Math.min(...classSizes)} max ${Math.max(...classSizes)}`);
+  const overLimit = u.teams.filter(t => (u.recruitCycle.signeesByTeam[t.name] || 0) > e.scholarshipCapacity(t));
+  check('no program signed past its scholarship limit',
+    overLimit.length === 0, overLimit.map(t => t.name).slice(0, 3).join(', '));
 
   // --- save round-trip ----------------------------------------------------
   const packed = JSON.parse(JSON.stringify({ userTeam: 'Chicago Metropolitan', universe: e.packUniverse ? e.packUniverse(u) : u }));

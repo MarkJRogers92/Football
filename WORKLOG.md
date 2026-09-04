@@ -1,5 +1,41 @@
 # WORKLOG
 
+## v0.9.11 — scholarship scarcity and pulled offers
+
+Plan: give recruiting a real constraint. `canTakeCommit` was
+`classCommitCount < 30`, a flat number unrelated to the roster, so chasing a
+recruit cost nothing and volume never mattered.
+
+Decisions:
+- Tuning this had to be measured, not guessed. The first model (85 minus
+  projected returning) produced capacities of 4-9 because generated rosters
+  start at 93 with only 7-9 seniors, and it then swung between 4 and 30 as
+  the senior class oscillated. Instrumenting four seasons showed the real
+  shape of roster churn; the band was set from that, not from intuition.
+- Capacity is clamped to a signing-class band rather than tracking churn
+  exactly. Programs sign toward a steady roster, initial counters are capped
+  anyway, and the floor stops a thin-attrition year from making recruiting
+  pointless.
+- Over-signing is a program trait, not a universal habit. A flat allowance
+  made all 120 teams over-sign by exactly two and pull exactly two every
+  year — 240 identical events, pure noise. Tying appetite to admin patience
+  and prestige gives roughly a third of the league a pulled offer in a
+  season, which reads as news.
+- A pulled offer had to cost something or it would be a free release valve:
+  the recruit is permanently blocked from that program (enforced in both
+  `commitRecruit` and `recruitPitch`) and the pipeline he came from drops.
+- Discovered along the way: the offseason auto-fill to 85 had been quietly
+  stocking rosters all along, which is why recruiting volume never mattered
+  before. It is now a safety net rather than the main supply.
+
+Two existing tests encoded the old flat cap and were corrected rather than
+widened: the smoke audit now asserts the signing-class band plus a new check
+that no program finished over its own limit, and the promises fixture clears
+its class counter because it exercises promises, not recruiting.
+
+Validation: `npm test` (63/63, including the new `tests/scholarships.js`) and
+`npm run test:browser` (125/125 across all three suites).
+
 ## v0.9.10 — scheme installation and position-change agency
 
 Plan: close the last simulation gap on the roadmap. The v0.9.6 coaching

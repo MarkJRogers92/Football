@@ -175,3 +175,13 @@ stored per player, so nothing is written into the roster or the archive and
 no IndexedDB version bump is needed. Position-change willingness is likewise
 derived at call time from existing fields (role, staffTrust, versatility,
 promises) and never persisted.
+
+## v0.9.11 additions
+
+`recruit.pulledBy` (an array of program names) and `recruit.pulledSeason` are
+the only new persisted fields; they travel with the existing recruit records
+in the core universe. Scholarship capacity, room and over-sign appetite are
+all derived at call time from roster state and stable program traits rather
+than stored, so nothing needs migrating and an older save simply starts
+obeying the limit. Pulled offers are recorded as ordinary `OFFER_PULLED`
+dynasty events. No IndexedDB version change.

@@ -8,7 +8,11 @@ test('promise outcomes, exceptions, ownership, identities and idempotent history
  const u=e.universe,t=u.teams[0];let caseId=0;
  const setup=(label)=>{
   const p=structuredClone(t.roster[0]);Object.assign(p,{id:`case${++caseId}`,morale:70,staffTrust:70,stats:{games:0},injuryHistory:[],redshirtUsed:false,redshirtActive:false,eligibilityUsed:0});
-  const r={id:`recruit${caseId}`,pos:p.pos,promise:'None'};e.setRecruitPromise(r,label,t);assert.ok(e.commitRecruit(r,t.name));e.signPlayerPromise(p,r,t);p.promises[0].firstSeason=u.year;return p;
+  const r={id:`recruit${caseId}`,pos:p.pos,promise:'None'};e.setRecruitPromise(r,label,t);
+  // These fixtures exercise promises, not recruiting: clear the class counter so
+  // v0.9.11 scholarship room never blocks a case from being set up.
+  u.recruitClassCounts[t.name]=0;
+  assert.ok(e.commitRecruit(r,t.name));e.signPlayerPromise(p,r,t);p.promises[0].firstSeason=u.year;return p;
  };
  let p=setup('Early Role');p.stats.games=8;e.auditPlayerPromises(p,t);assert.equal(p.promises[0].status,'FULFILLED');
  p=setup('Early Role');p.stats.games=4;e.auditPlayerPromises(p,t);assert.equal(p.promises[0].status,'PARTIAL');

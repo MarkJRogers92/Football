@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.9.11 — Scholarship scarcity and pulled offers
+
+- Recruiting classes are bounded by the room the roster actually leaves instead of a flat cap of 30. Capacity derives from the 85-man limit against projected returning players, held inside a realistic signing-class band, so a heavy graduating year gives you room and a thin one squeezes you.
+- Attrition is now a recruiting resource: transfers out, early declarations and graduations are what buy your next class.
+- Some programs over-sign on purpose, betting on attrition they cannot name yet. Appetite is a stable trait — impatient, high-profile programs push the limit — and signing day settles the bet by pulling the weakest commitments. Roughly a third of the league has to pull an offer in a given year.
+- You can pull an offer yourself. It is never free: the recruit reopens his recruitment, will not consider your program again, and the pipeline he came from takes a hit. The Weekly Hub reports it.
+- The Recruiting tab shows scholarships committed against capacity, spots remaining, and a warning when you are over the limit.
+
 ## v0.9.10 — Scheme installation and position-change agency
 
 - Coordinators now run a system of their own. Hiring an OC or DC who prefers a different scheme replaces yours and starts an installation, so the coaching market is a strategic choice rather than a pick-the-highest-rating exercise. Candidate cards say up front what a coach runs and warn when hiring him will change your system.
