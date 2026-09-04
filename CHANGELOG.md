@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.9.30 — Broadcast Watch Mode
+
+Detailed games can now be watched as a spoiler-free possession broadcast
+instead of appearing immediately as a final score.
+
+- Game Lab offers **Watch My Next Game** alongside the existing instant sim.
+- Watch Mode begins at 0–0, keeps unrevealed drives hidden, moves the football
+  across the schematic field and builds a running drive feed and score.
+- Play/pause, next-drive, three playback speeds and skip-to-final controls let
+  the player set the pace. A completed broadcast links directly to the full
+  final summary; detailed archived games can also be rewatched from Game Center.
+- The game is still calculated exactly once by the existing detailed engine.
+  Broadcast playback never rerolls or changes the result, player production,
+  injuries, schedule, standings or archive.
+- Watch Mode identifies the same archive boundary as the possession replay:
+  drive outcome, side, plays and points are exact; field position, clock and
+  possession time are not retained and are not fabricated.
+- No simulation formula, RNG call order, stored field, archive format or
+  IndexedDB schema changed. No multi-season calibration was run.
+- Final validation also corrected a pre-existing UI gate: after conference
+  championships the playoff button is now enabled during `bowlReady`, allowing
+  its existing handler to run the bowls before the playoff as designed.
+
 ## v0.9.29 — Game Center in motion
 
 The broadcast layer now moves without changing a single simulation result.

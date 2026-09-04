@@ -1,23 +1,36 @@
-# Dynasty Lab — v0.9.29 production checkpoint
+# Dynasty Lab — v0.9.30 Broadcast Watch Mode preview
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `codex/v0929-game-center-motion` (based on validated
-v0.9.28 source `claude/review-improvement-dwjemy` at `d61ff2c`)
+Current source branch: `codex/v0930-broadcast-watch` (based on validated
+v0.9.29 source `codex/v0929-game-center-motion` at `b70de03`)
 Production branch: `gh-pages`
 Production: v0.9.29 at https://markjrogers92.github.io/Football/
 
 ## Current release
 
-v0.9.29 is a presentation-only motion pass. Game Lab matchups receive a brief
-broadcast entrance, Game Center scores count into the final, and detailed games
-have a playable possession replay with a moving football, running score and
-scoring flash. The replay uses only archived drive side, plays, result and
-points; it explicitly labels the exact field position and clock as unavailable.
+v0.9.30 is a presentation-only Broadcast Watch Mode. Game Lab now offers Watch
+My Next Game, which calculates the existing detailed game once and then hides
+its final while the archived possession sequence is revealed. Controls cover
+play/pause, next drive, slow/normal/fast playback and skip to final. Any detailed
+archived game can be rewatched through the new Game Center Watch tab.
 
-All animation respects `prefers-reduced-motion`. No engine formula, RNG call,
-save field or archive changed. No multi-season calibration was run because
-there is no simulation change. Preview target:
-https://markjrogers92.github.io/Football/preview/v0929/
+The broadcast uses only archived drive side, plays, result and points and labels
+field position, clock and possession time as unavailable. Playback is transient
+DOM state. No engine formula, RNG call order, save field, archive format or
+IndexedDB schema changed. No multi-season calibration was run because there is
+no simulation change. Preview target:
+https://markjrogers92.github.io/Football/preview/v0930/
+
+Production deliberately remains v0.9.29 until this preview is reviewed.
+Validation is green: 188 smoke/Node checks, 156 desktop/mobile browser and
+presentation checks, and six real-browser persistence scenarios.
+
+## Previous release
+
+v0.9.29 is the production presentation-motion pass. Game Lab matchups receive a
+brief broadcast entrance, Game Center scores count into the final, and detailed
+games have a playable possession replay with a moving football, running score
+and scoring flash. All animation respects `prefers-reduced-motion`.
 
 ## Previous release
 

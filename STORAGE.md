@@ -328,3 +328,11 @@ No stored state. Matchup entrances, score counting and the possession replay
 derive from the current DOM and existing immutable game snapshots. Replay
 position and playback progress are transient UI state and are never exported or
 saved. IndexedDB remains schema 3.
+
+## v0.9.30 presentation only
+
+No stored state. Broadcast Watch Mode reads the same immutable detailed-game
+snapshot as Game Center, and its current drive, speed, timer, running-score
+display and completion state live only in the open DOM. Starting Watch Mode
+records one normal detailed game; replaying it never writes or rerolls anything.
+IndexedDB remains schema 3.

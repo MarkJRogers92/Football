@@ -1,5 +1,44 @@
 # WORKLOG
 
+## v0.9.30 — Broadcast Watch Mode
+
+Plan: extend the v0.9.29 presentation layer into one bounded way to “watch” a
+game, while preserving the important distinction between watching a recorded
+simulation and calling plays in a live decision engine.
+
+The existing detailed simulator remains the sole authority. Clicking Watch My
+Next Game invokes that path once, stores the same immutable game snapshot and
+then opens Game Center with the final score removed from the title. The Watch
+tab reveals the archived 24-drive sequence in order. Playback state — current
+drive, timer, speed, running score and completion — exists only in the DOM and
+is discarded when the panel closes or changes. Rewatching therefore changes no
+game state and cannot produce a different result.
+
+The archive boundary still shapes the field treatment. A drive contains side,
+plays, outcome and points, but not its actual yard line, clock or time of
+possession. The football motion remains a schematic journey to an outcome zone;
+the disclosure says exactly what is unavailable. Any home-field or tiebreak
+points that lack a scoring play are applied only at FINAL and labeled as a
+recorded simulation adjustment.
+
+Credit-conscious validation: one focused deterministic markup check during
+development, followed by one full Node/browser/storage gate. Final counts: 53
+smoke scenarios plus 135 Node tests; 121 end-to-end desktop/mobile checks, 14
+presentation checks and 21 recruiting-visual checks; six real-browser
+persistence scenarios. All passed with no console errors. No season audit or
+calibration was run because no simulation or persistence behavior changed.
+
+The real-browser storage gate exposed one unrelated but blocking UI mismatch:
+`simPlayoff()` has handled `bowlReady` since v0.9.23 by running bowls first, but
+`render()` only enabled its button at `playoffReady`. The interface therefore
+could not call the supported path. The button now enables for either phase; no
+postseason formula or phase transition changed.
+
+That correction made the storage suite archive bowls for the first time and
+exposed its stale hard-coded 745-game expectation. The engine test had already
+used `745 + bowl count`; the browser persistence test now uses the same
+state-derived expectation instead of treating valid bowl records as excess.
+
 ## v0.9.29 — Game Center motion
 
 Plan: add the smallest coherent moving-graphics slice — matchup entrance,

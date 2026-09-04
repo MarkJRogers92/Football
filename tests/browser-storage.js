@@ -27,13 +27,13 @@ const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${
     const a=tx.objectStore('saves').get('main');a.onsuccess=()=>{main=a.result};
     const b=tx.objectStore('archives').get(0);b.onsuccess=()=>{first=b.result[0]};
     const c=tx.objectStore('games').getAll();c.onsuccess=()=>{gameChunks=c.result};
-    tx.oncomplete=()=>{db.close();resolve({coreHasArchive:'playerArchive' in main.universe,coreHasGames:'gameArchive' in main.universe,ref:main.archiveRef,gameRef:main.gameRef,first,games:gameChunks.flat()})};tx.onabort=()=>{db.close();reject(tx.error)};
+    tx.oncomplete=()=>{db.close();resolve({coreHasArchive:'playerArchive' in main.universe,coreHasGames:'gameArchive' in main.universe,ref:main.archiveRef,gameRef:main.gameRef,first,games:gameChunks.flat(),bowls:main.universe.bowls?.length||0})};tx.onabort=()=>{db.close();reject(tx.error)};
    };
   }));
   assert.equal(record.coreHasArchive,false);assert.ok(record.ref.count>128);
   console.log('PASS real browser save stores archived careers separately');
   assert.equal(record.coreHasGames,false);assert.equal(record.games.length,record.gameRef.count);
-  assert.equal(record.games.length,745);const historical=record.games.find(g=>g.home.name==='Chicago Metropolitan'||g.away.name==='Chicago Metropolitan');
+  assert.equal(record.games.length,745+record.bowls);const historical=record.games.find(g=>g.home.name==='Chicago Metropolitan'||g.away.name==='Chicago Metropolitan');
   // Loading and saving before any archive access must preserve stored careers.
   await page.click('#loadBrowser');await status('^Loaded');await page.click('#saveBrowser');await status('^Saved');
   await tab('history');await page.fill('#archiveSearch',record.first.name);

@@ -44,11 +44,39 @@ const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${
       check(`[${label}] tab ${t} renders`, visible && hasContent);
     }
 
-    // A detailed game has the permanent drive outcomes needed by the motion
-    // replay. The visual remains schematic because yardage and clock are not archived.
+    // Watch Mode calculates the detailed game once, hides the final and reveals
+    // the permanent drive record as a broadcast. It never changes the outcome.
     await goTab(page, 'gamelab');
-    await page.click('#simDetailedGame');
-    await page.click('#detailedBox [data-game]');
+    await page.click('#watchDetailedGame');
+    await page.waitForFunction(() => document.querySelector('[data-watch-game]')?.dataset.watchBound === '1');
+    const watchStart=await page.evaluate(()=>({
+      title:document.querySelector('#gameDialogName')?.textContent||'',
+      away:document.querySelector('[data-watch-away-score]')?.textContent,
+      home:document.querySelector('[data-watch-home-score]')?.textContent,
+      visible:[...document.querySelectorAll('[data-watch-drive]')].filter(x=>!x.hidden).length,
+      drives:document.querySelectorAll('[data-watch-drive]').length,
+    }));
+    check(`[${label}] Watch Mode opens without spoiling the final`,
+      watchStart.title.includes(' at ')&&!watchStart.title.includes('—')&&watchStart.away==='0'&&watchStart.home==='0'&&watchStart.visible===0&&watchStart.drives===24,JSON.stringify(watchStart));
+    await page.click('[data-watch-next]');
+    const firstDrive=await page.evaluate(()=>({
+      visible:[...document.querySelectorAll('[data-watch-drive]')].filter(x=>!x.hidden).length,
+      caption:document.querySelector('[data-watch-caption]')?.textContent||'',
+      progress:document.querySelector('[data-watch-progress]')?.textContent||'',
+    }));
+    check(`[${label}] next drive advances the broadcast`,firstDrive.visible===1&&firstDrive.caption.includes('plays')&&firstDrive.progress.startsWith('1 of'),JSON.stringify(firstDrive));
+    await page.selectOption('[data-watch-speed]','400');
+    await page.click('[data-watch-skip]');
+    const watchFinal=await page.evaluate(()=>({
+      final:!document.querySelector('[data-watch-final-card]')?.hidden,
+      line:document.querySelector('[data-watch-final-line]')?.textContent||'',
+      visible:[...document.querySelectorAll('[data-watch-drive]')].filter(x=>!x.hidden).length,
+    }));
+    check(`[${label}] skip reveals the recorded final`,watchFinal.final&&watchFinal.line.includes('—')&&watchFinal.visible===24,JSON.stringify(watchFinal));
+    await page.click('[data-watch-summary]');
+    check(`[${label}] final summary reveals the permanent score`,(await page.locator('#gameDialogName').innerText()).includes('—'));
+
+    // The original all-drives replay remains available after the broadcast.
     await page.locator('#gameTabs button').filter({hasText:/^Drives$/}).click();
     const motion = await page.evaluate(() => ({
       replay: !!document.querySelector('[data-drive-replay]'),
