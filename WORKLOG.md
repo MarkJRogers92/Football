@@ -1,5 +1,39 @@
 # WORKLOG
 
+## v0.9.36 — Matchup plans and a complete title-screen check
+
+Based directly on Claude's v0.9.35 source at 8bfe544, on
+`codex/v0936-matchup-gameplans`. Kept the work to preparation, evidence-based
+postgame feedback, and the user's requested title-screen fixes.
+
+The wear fix belongs at beginGame, after recoverWeek and before profile capture.
+Charging on selection was erased by 3–7 weekly recovery on fresh starters. The
+chosen five player IDs and a paid flag persist on t.gameplan; legacy plans lacking
+pending IDs are not charged again. Normal UI decisions lock after one selection.
+gameProfiles is shared by both simulation modes. Tactics modify front/coverage
+and pressure, so they reach detailed drives as well as quick-game statistics.
+
+Reports derive from the saved box score and a tiny immutable plan snapshot in
+each game side. No full report is stored, no current roster is consulted, and
+there is no assertion that the plan caused any observed result. The report is on
+Summary, avoiding spoilers during Watch playback.
+
+Title checks found Load and Continue shared the same handler, so an active
+universe prevented Load from reading storage. Dedicated Load now confirms
+replacement and reads the actual slot. Fresh saves update small title metadata;
+failed preference writes are visible. Restored original source changes that
+v0.9.35's HTML reconstruction missed, including title tests and asset publishing.
+
+Source-history correction: v0.9.34 source, tests, publisher and the JPEG were
+already committed/pushed on codex/v0934-title-screen (69eb41e through 0cad81a).
+The v0.9.35 notes claiming otherwise describe its branch's missing context, not
+the repository. Future agents should fetch and compare source branches before
+reconstructing files from published HTML.
+
+Final gate: 53 smoke checks, 146 Node tests, 164 browser checks and 8 browser
+persistence scenarios passed. The standard smoke suite includes eight seasons;
+no separate calibration, image generation or new dependencies were used.
+
 ## v0.9.35 — reconcile v0.9.34, close the free-scout hole, fix what reconciling exposed
 
 Second GPT reconciliation this session, same playbook as v0.9.29-32: extract

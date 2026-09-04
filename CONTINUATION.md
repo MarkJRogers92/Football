@@ -1,12 +1,40 @@
-# Dynasty Lab — v0.9.35 checkpoint
+# Dynasty Lab — v0.9.36 preview checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `claude/review-improvement-dwjemy` (reconciled directly —
-see below)
+Current source branch: `codex/v0936-matchup-gameplans` (based on Claude's v0.9.35
+source at `8bfe544`)
 Production branch: `gh-pages`
 Production: v0.9.35 at https://markjrogers92.github.io/Football/
 
-## Current release
+## Current preview milestone
+
+v0.9.36 adds opponent-specific preparation and a postgame coaching report, and
+repairs title-screen loading/publishing. Preview target:
+https://markjrogers92.github.io/Football/preview/v0936/
+
+New tactical choices: Stop the run, Protect against the pass, Pressure the QB,
+Balanced prep and Standard week. The first three trade defensive components;
+all adjustments apply in both quick and Watch simulations. Extra starter wear
+is charged once at kickoff after recovery. Plan choice and pending payment
+survive save/load; historical game records retain a compact plan label. Reports
+are derived from archived stats on Summary, never live rosters or guessed causes.
+
+Title Load now reads the saved slot even with a live session; Continue preserves
+that session. The save menu updates after Save. Version labels and stadium
+deployment are restored, and options report browser-write failures honestly.
+
+Final gate passed: 53 smoke checks, 146 Node tests, 164 Chromium desktop/mobile
+checks (129 + 14 + 21), and 8 real IndexedDB/JSON persistence scenarios. No console
+errors. The existing smoke suite includes eight seasons; no separate calibration
+was run. Mobile coverage is Chromium at an iPhone viewport, not physical Safari.
+
+Stop after preview verification. Production remains v0.9.35 pending review.
+Captains/mentorship, staff progression and Watch halftime controls are future
+milestones. Fetch source branches before continuing; do not reconstruct from
+the production HTML when source is available. See WORKLOG's v0.9.36 correction
+to the historical reconciliation notes below.
+
+## Previous release
 
 v0.9.35 reconciles v0.9.34 (GPT's title screen — New/Continue/Load Dynasty)
 the same way v0.9.29-32 was reconciled: extract changed source files out of

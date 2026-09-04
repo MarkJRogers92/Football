@@ -1,5 +1,16 @@
 # Browser archive persistence (v0.8.1 continuation)
 
+## v0.9.36 additive preparation metadata
+
+`t.gameplan` now carries `wearPending` (up to five roster player IDs) and
+`wearApplied`. Payment occurs once at kickoff after weekly recovery. Old plans
+without pending IDs are treated as previously charged. These fields travel
+through existing team serialization and JSON export/import without migration.
+New archived game sides carry `gameplan: {prep, label}` captured before play.
+Postgame report prose is computed on demand and is not saved. Old games without
+that snapshot display an explicit unavailable label. IndexedDB remains schema 3;
+existing append-only game history is unchanged.
+
 ## Scope
 
 Previously every browser save packed and structured-cloned the entire alumni

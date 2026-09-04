@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.9.36 — Matchup preparation, coaching reports, and title-screen repair
+
+- Weekly preparation now offers Stop the run, Protect against the pass, Pressure
+  the QB, Balanced prep, and Standard week. Each specialist plan explicitly trades
+  coverage, run defense, or pressure; the staff pick follows the opponent's scheme
+  tendency. One choice per opponent/week, with the existing optional pacing.
+- Preparation wear is paid once at kickoff, after recovery, by five identified
+  starters. Pending costs survive saves. Both quick games and Watch games now
+  consume the same prepared profiles; previously detailed games ignored prep.
+- Game Center Summary adds a postgame coaching report for each team from recorded
+  turnovers, sacks, rushing/passing yards and injuries. Each new game preserves its
+  plan label. Older games say the plan was not recorded; reports do not claim
+  causal effects or invent missing data.
+- Title Load restores the saved slot even when a different live session exists;
+  Continue resumes that session. Save immediately updates title metadata. Returning
+  to the title preserves the session without an unnecessary confirmation.
+- Restored v0.9.34 title/Continue tests, variable-bowl storage assertion and stadium
+  deployment copying. Title version now follows VERSION.txt; failed options writes
+  report failure honestly. No new artwork or IndexedDB schema change.
+
+Preview milestone only; captains, staff progression and halftime control remain
+future work.
+
 ## v0.9.35 — Reconciling v0.9.34 (title screen), and a real cost for full scout
 
 **Reconciliation.** GPT shipped v0.9.34 (a title screen — New/Continue/Load Dynasty, Options, How to Play) directly to `gh-pages` while this branch was at v0.9.33; same situation as the v0.9.29-32 reconciliation, resolved the same way: extracted the changed source files (`app.js`, `body.html`, `sports-presentation.js`, `polish.css`) out of the live build byte-for-byte and verified the rebuild against production before touching anything.
