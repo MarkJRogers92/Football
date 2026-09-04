@@ -2659,7 +2659,9 @@ function weeklyPlan(u){
  out.sort((a,b)=>(a.done-b.done)||(b.priority-a.priority));
  const items=out.slice(0,6);
  return {items,remaining:items.filter(x=>!x.done).length,
-  heading:phase==='complete'?'Offseason checklist':universe.week===0?'Before the season':`Week ${universe.week+1}`};
+  heading:phase==='complete'?'Offseason checklist'
+   :phase==='confReady'||phase==='playoffReady'?'Postseason'
+   :universe.week===0?'Before the season':`Week ${universe.week+1}`};
 }
 function renderWeeklyPlan(){
  const u=selected();if(!u||!$('#weeklyPlan'))return;
