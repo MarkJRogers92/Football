@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.9.13 — The weekly plan
+
+- The Dashboard now suggests what is worth doing right now. It leads with the single step that moves the calendar, then real blockers (an open coaching search, being over the scholarship limit), then available recruiting and locker-room work.
+- The offseason sequence — spring development, fall camp, finalize — is shown as an explicit checklist. Steps you have cleared are marked done and sink to the bottom, so the progression is visible instead of something you discover by getting stuck.
+- Every suggestion routes to the tab where the work happens, and the list is capped so it stays short enough to act on.
+
 ## v0.9.12 — Box scores stop rewriting themselves
 
 - Permanent box scores now live in their own append-only chunks instead of the core save row. An ordinary save appends only the games just played; a twelve-season dynasty no longer rewrites ~75 MB of history it never touched. Measured at three seasons: a save writes 29 MB instead of 53 MB, and the gap widens every year.

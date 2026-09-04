@@ -1,5 +1,25 @@
 # WORKLOG
 
+## v0.9.13 — the weekly plan
+
+Plan: close the coherence gap. Fourteen tabs, and nothing told a player which
+of them advances the dynasty. The phase sequence in particular
+(regular -> confReady -> playoffReady -> complete -> spring -> fall ->
+offseason) was invisible until you got stuck wondering why Finalize Offseason
+was disabled.
+
+Decisions:
+- Exactly one calendar gate is ever shown, because there is only ever one.
+- The offseason is rendered as all three steps with done marks rather than
+  one step at a time, since the sequence itself is the thing nobody could
+  see.
+- Everything is derived from live state, so a suggestion never appears
+  without a real reason behind it and disappears once handled.
+- Capped at six. A list long enough to feel like homework is not guidance.
+
+Validation: `npm test` (53 smoke + 76 Node, including the new
+`tests/weeklyplan.js`) and `npm run test:browser` (133 checks).
+
 ## v0.9.12 — chunked, deferred game archive
 
 Plan: stop the core save row growing without bound. Measurement first: at
