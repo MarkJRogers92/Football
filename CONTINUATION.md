@@ -1,12 +1,23 @@
-# Dynasty Lab — v0.9.23 checkpoint
+# Dynasty Lab — v0.9.24 checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `claude/v0923-bowls-and-fans` (merged into the
+Current source branch: `claude/v0924-signing-day` (merged into the
 main working branch `claude/review-improvement-dwjemy`)
 Production branch: `gh-pages`
-Production: v0.9.23 at https://markjrogers92.github.io/Football/
+Production: v0.9.24 at https://markjrogers92.github.io/Football/
 
 ## Current release
+
+v0.9.24 makes signing day a live event. Contested commitments are resolved
+inside `buildSigningDay()` during `finalizeRecruiting` and revealed one name at
+a time; revealing is pure presentation and changes no outcome, which is the
+invariant to protect if this is ever extended. It also fixed a pre-existing
+bug: `r.challenger` was never cleared on commitment, so a recruit who flipped
+to his challenger kept naming that school as his challenger, and the WAVERING
+pill and the weekly plan's "Hold X" step both fired on recruits nobody was
+chasing.
+
+## Previous release
 
 v0.9.23 adds bowl season and a fanbase that answers to results. A `bowlReady`
 phase sits between the conference round and the playoff; every six-win team
@@ -127,7 +138,8 @@ simulation gaps.
 
 ## Storage guardrail
 
-Read `STORAGE.md` before altering saves. v0.9.23 adds `universe.bowls`,
+Read `STORAGE.md` before altering saves. v0.9.24 adds `universe.signingDay`,
+additive. v0.9.23 added `universe.bowls`,
 `t.bowlResult` and `t.fanBaseline`, all additive. v0.9.22 added `universe.careerHistory`,
 `universe.jobOffers` and `closed` on `universe.tenure`, all additive.
 v0.9.21 added only additive fields
@@ -160,7 +172,7 @@ surface itself — grouping, or a first-run path.
 ## Resume prompt
 
 Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.23 is production and all
+`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.24 is production and all
 known feature branches are reconciled into the main line — check
 `git branch -r` for anything new before assuming that's still true. Work in
 a new bounded branch, validate fully (`npm test` + `npm run test:browser`),

@@ -286,3 +286,15 @@ Both universe fields are backfilled in `normalizeUniverse()`. Still schema 3.
   `fan_support` so seasonal movement has something to decay back toward.
 
 Still schema 3.
+
+## v0.9.24 additive state
+
+- `universe.signingDay: {year, board:[{recruitId,name,pos,stars,from,challenger,pressure,odds,flipped}], revealed}`
+  — rebuilt each cycle by `buildSigningDay()`; `revealed` is a presentation
+  counter only and never affects an outcome.
+
+Also note a behaviour change in `commitRecruit()`: it now clears `r.challenger`
+and `r.pressure`. Both are recomputed every cycle by `advanceRecruiting()`, so
+nothing persisted depends on their surviving a commitment.
+
+Still schema 3.

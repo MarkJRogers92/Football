@@ -1,5 +1,44 @@
 # WORKLOG
 
+## v0.9.24 — live signing day
+
+Plan: the highest-value remaining item from IDEAS.md, and the cheapest, because
+`pressure` and `challenger` were already modelled all season and then thrown
+away at the end of it.
+
+**The one real design decision** was where the randomness lives. The obvious
+implementation rolls each flip as the player reveals it, which is dramatic and
+wrong: the outcome would then depend on whether somebody clicks "next" or
+"announce the rest", and a save/reload mid-reveal would re-roll the board.
+Everything is decided inside `buildSigningDay()` during `finalizeRecruiting`,
+and revealing moves a counter and nothing else. The test asserts the serialised
+board is unchanged across a full reveal, which is the property that actually
+matters.
+
+Placement also mattered: `buildSigningDay()` runs at the *top* of
+`finalizeRecruiting`, before the bulk auto-commit fills every remaining
+scholarship. Run it after and the challenger would routinely have no room left
+to take the recruit, so nearly every contested commitment would hold for the
+wrong reason.
+
+**A pre-existing bug the tests found.** The first assertion I wrote was that a
+recruit is never contested by his own school, which read as tautological — the
+challenger search explicitly skips `t.name===r.committed`. It failed anyway.
+The cause was staleness, not the search: when a recruit flips to his challenger
+through the normal in-season path, `r.challenger` still names that school, and
+nothing ever cleared it. So the recruiting board could show a recruit WAVERING
+against the program he had just committed to, and the weekly plan could tell you
+to go hold a recruit nobody was chasing. Fixed in `commitRecruit` by clearing
+`challenger` and `pressure` on commitment — a fresh commitment is not under
+challenge, and `advanceRecruiting` recomputes both every cycle. `buildSigningDay`
+also guards against it independently, since a board built on stale state would
+be nonsense regardless of where the staleness came from.
+
+That is the second time in three releases that writing an assertion I expected
+to be trivially true found a real bug. Worth continuing to write them.
+
+Validation: 5 new tests, full Node and browser suites.
+
 ## v0.9.23 — bowl season and dynamic fan support
 
 Plan: the two highest-ranked remaining items from IDEAS.md, built together

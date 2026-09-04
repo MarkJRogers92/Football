@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.9.24 — Signing day, one name at a time
+
+Wavering commitments carried a `challenger` and a `pressure` score all season, and then survived to signing day untouched — the drama the engine had already modelled simply evaporated. Contested commitments now get one last resolution, and the player watches it land one name at a time.
+
+- `buildSigningDay()` takes the twelve most contested commitments, sorted by pressure, and resolves each one. Odds come from the pressure already on the board, softened by the recruit's relationship with his recruiter and by a signed promise, bounded 2–62%.
+- **Everything is decided up front and stored; revealing is pure presentation.** Re-rolling on reveal would make the outcome depend on how fast somebody clicks. `revealNextSigning()` and `revealAllSigning()` only move a counter, and there is a test asserting the board is byte-identical before and after a full reveal.
+- A flip genuinely moves the recruit and is written to the decommit log with both `from` and `to`, so it reads as a flip rather than an unexplained decommit. If the challenger cannot actually take him, the original school keeps him.
+- The Recruiting tab gains the signing-day board, colour-coded from the controlled program's point of view, with "Announce the next name" and "Announce the rest". The wire carries it at importance 84 until every name is in.
+
+**Bug fixed at the source, found by the new tests.** `r.challenger` was never cleared when a recruit committed, so a recruit who flipped *to* his challenger kept naming that school as the one challenging him — the board showed him WAVERING against his own program. `commitRecruit` now clears `challenger` and `pressure`, which `advanceRecruiting` recomputes each cycle anyway. This also fixes the pre-existing WAVERING pill and the weekly plan's "Hold X" step, both of which could fire on a recruit nobody was chasing.
+
+- 5 new tests in `tests/signingday.js`. Storage additive: `universe.signingDay`. IndexedDB stays at schema 3.
+
 ## v0.9.23 — Bowl season, and a fanbase that answers to results
 
 **Bowl season.** The phase machine ran `regular → confReady → playoffReady → complete`, so roughly 112 of 120 programs simply stopped playing once the regular season ended. There is now a `bowlReady` phase between the conference round and the playoff: every team with six wins that is not in the playoff field gets one more game, paired best-against-best down the rankings. That gives a mediocre team something to chase in weeks nine through twelve, which is the real point — the wire carries a BOWL WATCH tile naming exactly how many more wins are needed while they can still be got.

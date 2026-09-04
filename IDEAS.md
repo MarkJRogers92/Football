@@ -67,7 +67,7 @@ practices feeding the existing camp system, and recruiting momentum. Fits as a
 
 ## 4. Depth on systems already built
 
-### Signing day, live
+### ~~Signing day, live~~ — shipped in v0.9.24
 `pressure` and `challenger` are already modelled on wavering commits. Resolve
 them one at a time as an event sequence instead of silently. The best story
 moment in the recruiting calendar, from data that already exists.
