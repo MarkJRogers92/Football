@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.9.20 — The story surface
+
+- **Record chase on the wire.** `recordChaseHubItems` compares every rostered player's live season stats against the standing school and national single-season records and puts the ones in reach on the wire. Passing a mark reads as NATIONAL RECORD (importance 88) or SCHOOL RECORD (72); sitting inside 80% of one reads as RECORD WATCH (60 national / 50 school), naming the number and who holds it. One tile per player so a quarterback cannot take the whole wire on passing yards and passing touchdowns at once, two tiles total.
+- Season records are only rewritten at year end by `finalizeSeasonHonors`, so through a season these are genuinely last year's marks being chased rather than the current leader compared against himself. Season one has no standing records and so produces no tiles, and the player who already holds a mark is never told he is chasing himself.
+- **Career chronology.** The player profile's Season Timeline is now a Career Chronology: signing (stars and region), every archived season, honors, transfers with their reason, injuries with weeks missed, and the draft result, merged into one list ordered newest year first. All of it was already stored — `recruitingMemory`, `seasonHistory`, `awards`, `transferHistory`, `injuryHistory`, `draftResult` — and none of it was previously readable in one place.
+- Two new tests in `tests/weeklyplan.js`: one plants standing marks and checks reach, ranking, self-chase and the no-records case; one asserts the chronology's ordering and its empty state.
+- Completes roadmap milestone A (part 1, the hub priority sort, shipped in v0.9.19). No save-format change — every field read here already existed.
+
 ## v0.9.19 — The wire ranks by importance
 
 - `buildWeeklyHub` used to keep the first nine tiles in insertion order, so on a busy week the items pushed last (a wavering commit, the top target, a flip) were the ones that fell off regardless of how much they mattered. It now stable-sorts by `importance` before taking nine; ties keep their original order, and the CSS `order` grouping by tile type in `polish.css` is unchanged.

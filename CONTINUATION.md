@@ -1,12 +1,21 @@
-# Dynasty Lab — v0.9.19 checkpoint
+# Dynasty Lab — v0.9.20 checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `claude/v0919-hub-priority-sort` (merged into the
+Current source branch: `claude/v0920-story-surface` (merged into the
 main working branch `claude/review-improvement-dwjemy`)
 Production branch: `gh-pages`
-Production: v0.9.19 at https://markjrogers92.github.io/Football/
+Production: v0.9.20 at https://markjrogers92.github.io/Football/
 
 ## Current release
+
+v0.9.20 completes roadmap milestone A with the story surface: record-chase
+alerts on the wire, and a career chronology in the player profile. Both read
+data the game already stored. The record chase works because season records
+are rewritten only at year end (`finalizeSeasonHonors`), so a running stat
+line compared against them is a real chase against a prior year's mark; see
+WORKLOG for why that single fact shaped the design. Milestone A is done.
+
+## Previous release
 
 v0.9.19 ranks the weekly hub ("the wire") by importance instead of insertion
 order. Every tile now carries a numeric importance on the same 0–100 scale
@@ -77,7 +86,7 @@ simulation gaps.
 
 ## Storage guardrail
 
-Read `STORAGE.md` before altering saves. v0.9.19 adds no save-format change of
+Read `STORAGE.md` before altering saves. v0.9.20 adds no save-format change of
 its own (`importance` is an additive field on hub tiles, which are rebuilt
 every week). v0.9.18 was a merge of already-shipped
 additive changes — no new save-format changes of its own. IndexedDB remains
@@ -86,13 +95,9 @@ player/recruit/universe records with no IndexedDB version bump.
 
 ## Next roadmap sequence
 
-### A) Story surface (recommended) — part 1 shipped in v0.9.19
-The hub priority sort is done. What remains of this milestone is the story
-surface: record-chase alerts and a player career chronology built from data
-already stored (`seasonHistory`/`transferHistory`/`promises`/`awards`) — the
-unbuilt slice from `ROADMAP_V09.md`. Both would feed the wire, which now
-ranks properly, so a record-chase alert needs an importance on the same
-0–100 scale to sit correctly among the other tiles.
+### A) ~~Hub priority + story surface~~ — done (v0.9.19 + v0.9.20)
+Both halves shipped. Any new wire tile type needs an `importance` on the
+0–100 scale to rank correctly among the others.
 
 ### B) Live-league save size
 The game archive is solved (v0.9.12). Remaining growth (~4 MB/season) is
@@ -108,7 +113,7 @@ surface itself — grouping, or a first-run path.
 ## Resume prompt
 
 Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.19 is production and all
+`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.20 is production and all
 known feature branches are reconciled into the main line — check
 `git branch -r` for anything new before assuming that's still true. Work in
 a new bounded branch, validate fully (`npm test` + `npm run test:browser`),

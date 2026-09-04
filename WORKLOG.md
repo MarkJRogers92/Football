@@ -1,5 +1,41 @@
 # WORKLOG
 
+## v0.9.20 — story surface (roadmap milestone A, part 2)
+
+Plan: the unbuilt slice from ROADMAP_V09.md — record-chase alerts and a player
+career chronology, both from data already stored.
+
+The thing worth knowing before writing the record chase: `updateSeasonRecords()`
+is called from exactly one place, `finalizeSeasonHonors()`, at season end. That
+single fact decides the whole design. Records are *not* live-updated weekly, so
+through a season `t.records` and `universe.records.nationalSeason` hold prior
+years' marks, and comparing a player's running stats against them is a real
+chase rather than a comparison against the current leader (which would have
+been himself, every week, forever). Had records been rewritten weekly this
+feature would have needed its own snapshot state; it needs none.
+
+Consequences handled explicitly: season one has no records at all, so the
+guard is `!rec?.value` and the wire simply stays quiet. After honors finalize,
+the new holder would otherwise be told he is 100% of the way to his own record,
+so a holder check (`rec.playerId===p.id&&rec.year===universe.year`) skips him.
+One tile per player, best-importance wins, two tiles total — a good quarterback
+qualifies on passing yards and passing touchdowns simultaneously and would
+otherwise eat a quarter of the nine-tile wire.
+
+Importances sit on the same 0-100 scale v0.9.19 established: broken national 88
+(above everything except a championship), broken school 72, watch 60/50 — above
+a routine win, below a loss or a medical. Tested by asserting a broken-record
+tile lands in the top four of the ranked wire, which is the property that
+actually matters, not the number itself.
+
+The chronology is the cheaper half: six already-stored sources merged, sorted
+newest-year-first with a within-year rank so a season precedes the honor it
+earned and signing sits at the bottom. It replaces the Season Timeline section
+rather than adding a seventh place to look, which is the point of a story
+surface. The Honors list in the Career section stays as a summary.
+
+Validation: two new tests, full Node and browser suites re-run.
+
 ## v0.9.19 — hub priority sort (roadmap milestone A, part 1)
 
 Plan: the one-function fix flagged in CONTINUATION.md — `buildWeeklyHub`

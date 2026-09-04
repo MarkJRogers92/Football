@@ -78,3 +78,52 @@ test('the wire ranks tiles by importance instead of insertion order',async()=>{
  assert.ok(trivial>0,'a low-importance tile inserted first no longer leads the wire');
  assert.ok(hub.slice(0,trivial).every(x=>imp(x)>=5),'everything above it matters more');
 });
+
+test('the wire chases records that are actually in reach',async()=>{
+ const e=await setup(1401),u=e.universe,me=e.T('Chicago Metropolitan');
+ for(let i=0;i<4;i++)e.simWeek();
+ const find=k=>(u.weeklyHub||[]).filter(x=>['RECORD WATCH','SCHOOL RECORD','NATIONAL RECORD'].includes(x.kicker));
+ assert.equal(find().length,0,'season one has no standing records, so nothing is chased');
+
+ // Plant a standing school mark from a prior year that the leading passer is comfortably past,
+ // and a national one he is inside 80% of but has not caught.
+ const passer=me.roster.filter(p=>p.pos==='QB').sort((a,b)=>(b.stats?.passYds||0)-(a.stats?.passYds||0))[0];
+ const yds=passer.stats.passYds=1200;
+ me.records={passYds:{label:'Passing Yards',value:900,playerId:'OLD_1',playerName:'Prior Guy',year:u.year-3}};
+ u.records.nationalSeason={passYds:{label:'Passing Yards',value:1400,playerId:'OLD_2',playerName:'National Guy',year:u.year-5}};
+ e.buildWeeklyHub(me.rank);
+ const tiles=find();
+ assert.equal(tiles.length,1,'one tile per player, so a QB cannot take the whole wire');
+ assert.equal(tiles[0].kicker,'SCHOOL RECORD','passing a mark outranks merely closing on one');
+ assert.equal(tiles[0].importance,72);
+ assert.ok(tiles[0].sub.includes('900')&&tiles[0].sub.includes('Prior Guy'),'the tile names the mark and who held it');
+ assert.ok(u.weeklyHub.indexOf(tiles[0])<4,'a broken record ranks near the top of the wire');
+
+ // A mark he is nowhere near is not a storyline.
+ me.records.passYds.value=yds*5;u.records.nationalSeason={};
+ e.buildWeeklyHub(me.rank);
+ assert.equal(find().length,0,'a distant record produces no tile');
+
+ // The holder is not told he is chasing himself.
+ me.records.passYds={label:'Passing Yards',value:yds,playerId:passer.id,playerName:passer.name,year:u.year};
+ e.buildWeeklyHub(me.rank);
+ assert.equal(find().length,0,'the current holder is not chasing his own record');
+});
+
+test('the career chronology puts everything already stored in order',async()=>{
+ const e=await setup(1402),u=e.universe,me=e.T('Chicago Metropolitan');
+ const p=me.roster[0];
+ p.recruitingMemory={season:2024,schoolId:me.id,stars:4,homeRegion:'Midwest'};
+ p.seasonHistory=[{year:2025,team:me.name,pos:p.pos,eligibility:'FR'},{year:2026,team:me.name,pos:p.pos,eligibility:'SO'}];
+ p.awards=[{year:2026,name:'All-Conference'}];
+ p.injuryHistory=[{year:2025,week:6,type:'Ankle sprain',weeks:2}];
+ p.transferHistory=[{season:2026,fromSchool:'Somewhere State',toSchool:me.name,reason:'PLAYING_TIME'}];
+ const html=e.careerChronologyHTML(p);
+ for(const bit of ['SIGNED','SEASON','HONOR','TRANSFER','INJURY','Ankle sprain','All-Conference','Midwest'])
+  assert.ok(html.includes(bit),`the chronology surfaces ${bit}`);
+ const at=x=>html.indexOf(x);
+ assert.ok(at('2026 · SEASON')<at('2025 · SEASON'),'most recent year leads');
+ assert.ok(at('2026 · SEASON')<at('2026 · HONOR'),'within a year, what he played precedes what he won');
+ assert.ok(at('2025 · SEASON')<at('2024 · SIGNED'),'signing sits at the bottom as the earliest entry');
+ assert.ok(e.careerChronologyHTML({}).includes('No career history'),'an empty career says so rather than rendering blank');
+});
