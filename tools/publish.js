@@ -136,6 +136,13 @@ function publish({ preview, remove }) {
     target = preview ? path.join(PAGES, 'preview', preview) : PAGES;
     fs.mkdirSync(target, { recursive: true });
     fs.copyFileSync(built, path.join(target, 'index.html'));
+    // index.html is self-contained except for CSS url() references outside the concatenated
+    // bundle (e.g. the title screen background), which resolve relative to wherever the page
+    // itself is served from — so any such asset has to be copied alongside every target, not
+    // just committed once at the repo root.
+    const assetsDir = path.join(ROOT, 'assets');
+    if (fs.existsSync(assetsDir))
+      fs.cpSync(assetsDir, path.join(target, 'assets'), { recursive: true });
     label = preview ? `preview ${preview}` : 'production';
   }
 
