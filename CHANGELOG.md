@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.9.16 — Scouting Intelligence
+
+- Recruit and active-player profiles now show five position-specific scouting domains as ranges with confidence labels. The domains derive from attributes already in the simulation; hidden true ratings remain hidden.
+- Confidence responds to staff evaluation, recruiting exposure and visits, camps, appearances, starts, snaps, class, coach familiarity and transfer experience. Public player styles and existing development profiles shape uncertainty without revealing private development labels.
+- Staff belief is preserved at meaningful checkpoints: first recruiting evaluation, signing day, first fall camp, the end of a freshman season and later major revisions. Snapshots retain the ranges the staff saw at the time instead of rewriting history.
+- Scouting state uses additive player/recruit fields and the existing save/export paths. Old saves initialize lazily and idempotently with no IndexedDB schema change.
+
 ## v0.9.15 — Player Agency / Locker Room
 
 - Players can now initiate five focused Coach's Desk conversations: playing-time complaints, transfer concerns, role requests, redshirt discussions and position-change requests. Every trigger comes from existing morale, promises, relationships, usage, depth, transfer risk, redshirt eligibility or role/scheme fit.

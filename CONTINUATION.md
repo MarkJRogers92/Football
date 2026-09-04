@@ -1,23 +1,22 @@
-# Dynasty Lab — v0.9.15 Player Agency / Locker Room preview
+# Dynasty Lab — v0.9.16 Scouting Intelligence preview
 
 Repository: https://github.com/MarkJRogers92/Football
-Source branch: `codex/v0915-player-agency`
+Source branch: `codex/v0916-scouting-intelligence`
 Production remains unchanged until Mark explicitly approves promotion.
 
 ## Preview scope
 
-- Players occasionally initiate playing-time, transfer, role, redshirt or position-change conversations through the existing Coach's Desk cards.
-- Triggers use existing state only, and outcomes flow through morale, staff trust, transfer risk, promises, redshirts, rotations and position familiarity.
-- Alternate-week cadence, a per-player cooldown and a maximum of three interactions in any four-week window keep frequency low.
-- Sim Regular Season delegates unresolved conversations; single-week advancement still waits for the coach.
+- Recruit and player profiles show position-specific domain ranges rather than hidden true attribute grades.
+- Confidence tightens through existing recruiting, coach, camp, class, transfer and participation state.
+- Sparse scouting snapshots preserve first evaluation, signing day, first fall camp, freshman-year end and meaningful later revisions.
+- All v0.9.15 Coach's Desk and player-agency behavior remains intact.
 
 ## Persistence
 
-Player requests remain additive records in `universe.weeklyDecisions`; old
-records normalize to staff-originated decisions. No IndexedDB schema change.
+`scoutingDomains` and `scoutingHistory` are additive nested recruit/player data
+in existing saves and exports. No IndexedDB schema change.
 
 ## Review focus
 
-Review interaction frequency and consequence strength over a real season, plus
-button wrapping on actual iPhone Safari. Production still requires Mark's
-explicit approval.
+Review range readability, history usefulness and the 390px profile layout on
+actual iPhone Safari. Production still requires Mark's explicit approval.

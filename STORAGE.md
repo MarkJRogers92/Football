@@ -224,3 +224,12 @@ and may carry a requested position; older v0.9.14 records receive
 `source: "STAFF"` idempotently on load. A player's latest deferred, declined or
 approved position request is ordinary player state and is retained in an archive
 record if the player departs. No IndexedDB schema change or archive rewrite.
+
+## v0.9.16 additions
+
+Evaluated recruits and players may carry `scoutingDomains` plus sparse
+`scoutingHistory` checkpoints. These fields are ordinary nested core data and
+travel through browser saves, portable exports/imports and player archives.
+Existing saves add an empty history idempotently and create deterministic
+domain estimates only when needed. No IndexedDB schema change or archive
+rewrite is required.

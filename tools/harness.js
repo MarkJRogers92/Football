@@ -83,6 +83,7 @@ globalThis.__ENGINE__ = {
   generateRecruitPool, generatePlayer, generateRoster, conditionRating,
   roleFit, unit, starter, roleStarter, participants, eligibilityBase,
   transferRisk, draftProjection, seasonScore, normalizeUniverse, recruitPitch, recruitCoachRelationshipBoost, ensureRecruitRelationships, assignPrimaryRecruiter, growRecruiterRelationship, coachTransferPressure,
+  scoutingDefs, ensureScoutingIntel, scoutingDomainView, scoutingConfidenceLabel, refreshScoutingIntel, snapshotScouting, firstRecruitEvaluation, scoutingPanelHTML, scoutingHistoryHTML,
   ensurePortrait, portraitSeedFor, jerseyFor, schoolColors, ensureSchoolColors, PORTRAIT_VERSION,
   APP_VERSION,
   T, findPlayer, rebuildIndexes, packUniverse, packPlayer,
