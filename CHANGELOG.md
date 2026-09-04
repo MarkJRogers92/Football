@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.9.37 — Merging two parallel v0.9.36 releases
+
+GPT and this branch both built on v0.9.35 and both published as 0.9.36. Mine landed second and overwrote theirs in production. Nothing was lost — theirs remained in `gh-pages` history at `5e293d2` — and this release is the actual merge of the two, with GPT's work taken as the base because it is the better of the two designs.
+
+**What GPT's v0.9.36 added, kept in full:**
+- **Directional gameplan prep replaces the intensity slider.** The card no longer offers scout/balance/standard; it offers *what to prepare against* — Stop the Run (front +6, coverage −4), Protect Against the Pass (front −4, coverage +6), Pressure the QB (coverage −3, pressure +.035) — plus balanced and standard. Each trades one strength for another, so none is strictly best. This is a better answer to "why wouldn't you always full scout" than v0.9.35's cost fix was, and it supersedes it as the primary mechanic.
+- **Prep wear is deferred to game time.** `applyGameplanDecision` now records `wearPending`/`wearApplied` and `applyGameplanWear()` charges it when the game is actually played — so answering the card for a game you never play costs nothing, and the same game can never be charged twice. Strictly better than v0.9.35 charging it at decision time.
+- `gameProfiles`, `gameplanSnapshot`, `coachingReportHTML`, `loadTitleDynasty`.
+- The per-opponent idempotency guard on `applyGameplanDecision`.
+
+**What this branch's v0.9.36 added, rebased on top:** the Game Lab freshness fix (stamping `lastDetailedGame` with season/week, and clearing it when the dashboard's fast engine plays your own game). All three of its edit sites existed verbatim in GPT's `app.js`, so it rebased with no conflicts.
+
+**Three of this branch's gameplan tests were rewritten**, not because anything regressed but because they asserted v0.9.35's contract: the card offers 5 directional options rather than 3 intensity levels, a second decision for the same opponent is now refused by design, and wear lands at game time rather than decision time. The rewritten wear test asserts the new contract directly — nothing charged on answering, charged once when the game runs, never twice.
+
+- 148/148 Node, 144/144 browser on the merged tree, with GPT's build verified byte-identical before the rebase.
+
 ## v0.9.36 — The Game Lab stops showing a game from three weeks ago
 
 Reported directly: sim from the Dashboard, see the new score there, then open the Game Lab and it still shows the last game run through *its* buttons. The cause was that `universe.lastDetailedGame` is written in exactly one place — `simulateUserDetailed()`, the Game Lab's own "Watch My Next Game" / "Sim Instantly" — and `simWeek()` never touched it. So the top of the tab (next-game card, key matchups) was always current while the bottom (Detailed Box, Drive/Play Log) was frozen at whenever you last used a Game Lab button, with **no week or season label anywhere** to signal it was historical. Half-live, half-stale, unlabelled.

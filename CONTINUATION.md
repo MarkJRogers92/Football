@@ -1,12 +1,28 @@
-# Dynasty Lab — v0.9.36 checkpoint
+# Dynasty Lab — v0.9.37 checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
 Current source branch: `claude/review-improvement-dwjemy` (reconciled directly —
 see below)
 Production branch: `gh-pages`
-Production: v0.9.36 at https://markjrogers92.github.io/Football/
+Production: v0.9.37 at https://markjrogers92.github.io/Football/
 
 ## Current release
+
+v0.9.37 merges two parallel v0.9.36 releases — GPT's and this branch's — after
+both cut from v0.9.35 and this branch's publish overwrote GPT's in production.
+
+**Read this before publishing again:** the actual defect was publishing to a
+shared target without first checking whether that version number was already
+taken on `gh-pages`. Check `git log origin/gh-pages` for the version you are
+about to publish, every time.
+
+GPT's gameplan design won on merit and supersedes v0.9.35's: directional prep
+(stop the run / protect the pass / pressure the QB, each giving one thing and
+costing another) instead of an intensity slider, and wear deferred to game
+time via `wearPending`/`wearApplied` instead of charged when the card is
+answered. This branch's Game Lab freshness fix rebased cleanly on top.
+
+## Previous release
 
 v0.9.36 fixes a player-reported inconsistency: the Game Lab's lower panels
 showed the last game run through *its* buttons while the card above them
@@ -302,7 +318,7 @@ surface itself — grouping, or a first-run path.
 ## Resume prompt
 
 Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.36 is production and all
+`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.37 is production and all
 known feature branches are reconciled into the main line — check
 `git branch -r` for anything new before assuming that's still true. Work in
 a new bounded branch, validate fully (`npm test` + `npm run test:browser`),

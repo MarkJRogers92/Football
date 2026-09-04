@@ -11,7 +11,9 @@ test('the gameplan card is offered once per opponent and names the matchup',asyn
  assert.ok(d,'a decision is offered ahead of a scheduled game');
  assert.equal(d.type,'WEEKLY_GAMEPLAN');
  assert.ok(d.title.includes(opp.name));
- assert.equal(d.options.length,3);
+ const offered=d.options.map(o=>o.id);
+ assert.deepEqual(offered,['stop_run','protect_pass','pressure','balance','standard'],
+  'directional prep replaced the old intensity slider — each option trades something, none is strictly best');
  // Resolving it (via the same path resolveWeeklyDecision uses) should stop it re-offering this week.
  e.applyGameplanDecision(me,{id:'balance'});
  // decisionRecent needs a matching resolved record, which only resolveWeeklyDecision writes; confirm
@@ -50,7 +52,7 @@ test('scouting costs extra scheme familiarity only while a program is mid-instal
  const before=me.schemeTransition.off.familiarity;
  e.applyGameplanDecision(me,{id:'scout'});
  assert.equal(me.schemeTransition.off.familiarity,before-8,'full scout costs the most install progress');
- me.schemeTransition.off.familiarity=40;
+ me.schemeTransition.off.familiarity=40;me.gameplan=null;   // one gameplan per opponent; clear to re-decide
  e.applyGameplanDecision(me,{id:'balance'});
  assert.equal(me.schemeTransition.off.familiarity,40-3,'balanced prep costs less');
  me.schemeTransition=null;
@@ -61,20 +63,26 @@ test('scouting costs extra scheme familiarity only while a program is mid-instal
  assert.doesNotThrow(()=>e.applyGameplanDecision(me,{id:'scout'}));
 });
 
-test('scouting always costs real starter wear, whether or not a scheme is mid-install',async()=>{
+test('prep wear is charged when the game is played, not when the card is answered',async()=>{
  const e=await setup(3107),u=e.universe,me=e.T('Chicago Metropolitan');
  me.schemeTransition=null;                       // fully installed: no familiarity to spend
+ const g=u.schedule[u.week].find(x=>x.home===me.name||x.away===me.name);
+ const opp=g.home===me.name?g.away:g.home;
  const starters=e.importantStarters(me).slice(0,5);
- const before=starters.map(p=>p.wear||0);
- e.applyGameplanDecision(me,{id:'scout'});
- for(let i=0;i<starters.length;i++)
-  assert.equal(starters[i].wear,before[i]+3,`${starters[i].name} pays the full-scout wear cost regardless of scheme state`);
  for(const p of starters)p.wear=0;
- e.applyGameplanDecision(me,{id:'balance'});
- for(const p of starters)assert.equal(p.wear,1,'balanced prep costs less wear');
+ e.applyGameplanDecision(me,{id:'stop_run'});
+ for(const p of starters)assert.equal(p.wear,0,'answering the card alone costs nothing — a game you never play should not tire anyone');
+ assert.equal(me.gameplan.wearApplied,false);
+ e.applyGameplanWear(me,opp);
+ for(const p of starters)assert.equal(p.wear,3,'the cost lands when the game does');
+ e.applyGameplanWear(me,opp);
+ for(const p of starters)assert.equal(p.wear,3,'and is never charged twice for the same game');
+ // Standard prep remains the genuinely free option.
  for(const p of starters)p.wear=0;
+ me.gameplan=null;
  e.applyGameplanDecision(me,{id:'standard'});
- for(const p of starters)assert.equal(p.wear,0,'standard prep costs nothing at all — the only truly free option');
+ e.applyGameplanWear(me,opp);
+ for(const p of starters)assert.equal(p.wear,0,'standard prep costs nothing at all');
  // Wear is not cosmetic: it directly lowers conditionRating, which is what makes "always full
  // scout" a real choice with a real downside instead of a free action.
  const p=starters[0];

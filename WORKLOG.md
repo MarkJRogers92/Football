@@ -1,5 +1,49 @@
 # WORKLOG
 
+## v0.9.37 — merging two parallel v0.9.36 releases
+
+The collision this session had been risking finally happened: GPT and this
+branch both cut v0.9.36 from v0.9.35, and my publish landed second and
+overwrote theirs in production. The user caught it, not me — worth stating
+plainly. `gh-pages` history made it fully recoverable (`5e293d2`), but the
+right lesson is that publishing to a shared target without checking whether
+the version number is already taken is the actual defect, not the merge.
+
+Merge approach, once the two builds were identified: extract GPT's source out
+of their published bundle with the usual anchor technique, restore it as the
+working tree, verify `cmp` byte-identical against their build **before**
+touching anything, then reapply this branch's much smaller diff on top. All
+three of my edit sites survived verbatim in their `app.js`, so the rebase was
+clean; had they not, the honest move would have been to merge by hand rather
+than force either side.
+
+The substantive call was whose gameplan design wins. GPT's is better and it
+supersedes mine on both axes:
+
+1. They replaced the intensity slider (scout/balance/standard) with
+   directional prep — stop the run, protect the pass, pressure the QB — each
+   giving one thing and costing another (front +6 / coverage −4). My v0.9.35
+   fix made "always full scout" *expensive*; theirs makes it *not a question*,
+   because there is no strictly-best option left to always pick. That is the
+   better fix to the problem the user originally raised.
+2. They deferred the wear charge from decision time to game time via
+   `wearPending`/`wearApplied`. Mine charged on answering the card, which
+   meant a gameplan for a game you never played still tired your starters.
+   Theirs is simply correct.
+
+So my wear values survive (3/1/0) but inside their better structure. Kept all
+of it; changed none of it.
+
+Three of my gameplan tests then failed — all three asserting my own superseded
+contract, none a real regression: option count (3 → 5 directional), a second
+decision for the same opponent now refused by an idempotency guard, and wear
+no longer landing at decision time. Rewrote them against the new contract,
+including explicit coverage that answering the card charges nothing and that
+the same game can never be double-charged, since that deferred behavior is now
+the real invariant worth protecting.
+
+Validation: 148/148 Node, 144/144 browser on the merged tree.
+
 ## v0.9.36 — Game Lab freshness
 
 A player-reported inconsistency, and a good example of a bug that no test would
