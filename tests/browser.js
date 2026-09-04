@@ -30,9 +30,24 @@ const path = require('path');
     check(`[${label}] command center populated`,
       await page.$$eval('#weeklyHub .hub-item', els => els.length) > 0);
 
+    const openTab = async tab => {
+      await page.evaluate(id => window.__DL_TEST__.goToTab(id), tab);
+      await page.waitForTimeout(60);
+    };
+    check(`[${label}] shell has five primary areas`,
+      await page.$$eval('.nav-groups [data-nav-group]', els => els.length) === 5);
+    check(`[${label}] home starts with one contextual view`,
+      await page.$$eval('.tabs button.nav-visible', els => els.map(e => e.dataset.tab).join(',')) === 'dashboard');
+    await page.click('.nav-groups [data-nav-group="team"]');
+    check(`[${label}] primary area opens its default view`,
+      await page.$eval('.tabs button.active', el => el.dataset.tab) === 'roster');
+    check(`[${label}] team area shows only team views`,
+      await page.$$eval('.tabs button.nav-visible', els => els.every(e => e.dataset.navParent === 'team') && els.length === 4));
+
     // Every tab must render without throwing.
-    const tabs = await page.$$eval('.tabs button', els => els.map(e => e.dataset.tab));
-    for (const t of tabs) {
+    const tabs = await page.$$eval('.tabs button[data-tab]', els => els.map(e => ({ tab: e.dataset.tab, group: e.dataset.navParent })));
+    for (const { tab: t, group } of tabs) {
+      await page.click(`.nav-groups [data-nav-group="${group}"]`);
       await page.click(`.tabs button[data-tab="${t}"]`);
       await page.waitForTimeout(60);
       const visible = await page.$eval(`#${t}`, el => el.classList.contains('active'));
@@ -41,7 +56,7 @@ const path = require('path');
     }
 
     // Simulate a week and confirm the UI advances.
-    await page.click('.tabs button[data-tab="dashboard"]');
+    await openTab('dashboard');
     const t0 = Date.now();
     await page.click('#simWeek');
     await page.waitForFunction(() => /Week 1/.test(document.querySelector('#weekLine').textContent), { timeout: 60000 });
@@ -55,11 +70,13 @@ const path = require('path');
     await page.waitForTimeout(120);
     check(`[${label}] hub item opens its tab (${hubTab})`,
       await page.$eval('.tabs button.active', el => el.dataset.tab) === hubTab
-      && await page.$eval(`#${hubTab}`, el => el.classList.contains('active')));
+      && await page.$eval(`#${hubTab}`, el => el.classList.contains('active'))
+      && await page.$eval('.nav-groups button.active', el => el.dataset.navGroup) ===
+        await page.$eval(`.tabs button[data-tab="${hubTab}"]`, el => el.dataset.navParent));
     await page.evaluate(() => document.querySelectorAll('dialog[open]').forEach(d => d.close()));
 
     // Reopen a completed result and navigate every Game Center section.
-    await page.click('.tabs button[data-tab="season"]');
+    await openTab('season');
     await page.click('#teamSchedule [data-game]');
     const gameTitle=await page.locator('#gameDialogName').innerText();
     check(`[${label}] completed schedule opens permanent Game Center`,await page.locator('#gameDialog').isVisible()&&gameTitle.includes('—'));
@@ -69,12 +86,12 @@ const path = require('path');
     }
     check(`[${label}] Game Center fits viewport`,await page.locator('#gameDialog').evaluate(el=>el.getBoundingClientRect().right<=innerWidth&&el.scrollWidth<=el.clientWidth+1));
     await page.getByRole('button',{name:'Close Game Center',exact:true}).click();
-    await page.click('.tabs button[data-tab="history"]');await page.locator('#gameHistoryList [data-game]').first().click();
+    await openTab('history');await page.locator('#gameHistoryList [data-game]').first().click();
     check(`[${label}] school history reopens same score`,await page.locator('#gameDialogName').innerText()===gameTitle);
     await page.getByRole('button',{name:'Close Game Center',exact:true}).click();
 
     // Persistent coach profile dialog.
-    await page.click('.tabs button[data-tab="staff"]');
+    await openTab('staff');
     await page.click('#staffList [data-coach]');
     await page.waitForTimeout(80);
     check(`[${label}] coach profile opens`, await page.locator('#coachDialog').isVisible());
@@ -115,8 +132,29 @@ const path = require('path');
       !hireResult.interim && hireResult.hired, JSON.stringify(hireResult));
 
     // Recruiting board headers sort the whole pool, not just the visible slice.
-    await page.click('.tabs button[data-tab="recruiting"]');
+    await openTab('recruiting');
     await page.waitForTimeout(150);
+    check(`[${label}] recruiting opens on the national board`,
+      await page.$eval('[data-recruit-pane="board"]', el => !el.hidden));
+    check(`[${label}] recruit rows show scouting confidence`,
+      await page.$$eval('#recruitBody .recruit-confidence', els => els.length > 20 && els.every(el => /confidence/i.test(el.getAttribute('aria-label') || ''))));
+    const nilRecruit = await page.$eval('#recruitBody [data-nil-recruit]', el => el.dataset.nilRecruit);
+    const nilBefore = await page.$eval('#classSummary', el => (el.textContent.match(/NIL\s+(\d+)\/(\d+)/) || []).slice(1).map(Number));
+    await page.click(`#recruitBody [data-nil-recruit="${nilRecruit}"]`);
+    await page.waitForTimeout(100);
+    const nilAfter = await page.$eval('#classSummary', el => (el.textContent.match(/NIL\s+(\d+)\/(\d+)/) || []).slice(1).map(Number));
+    check(`[${label}] recruit NIL offer spends the shared budget`,
+      nilAfter.length === 2 && nilAfter[0] < nilBefore[0] && nilAfter[1] === nilBefore[1], `${nilBefore} -> ${nilAfter}`);
+    check(`[${label}] recruit NIL offer becomes releasable`,
+      await page.$eval(`#recruitBody [data-nil-recruit="${nilRecruit}"]`, el => el.classList.contains('rs-active')));
+    await page.click(`#recruitBody [data-nil-recruit="${nilRecruit}"]`);
+    await page.click('[data-recruit-view="battles"]');
+    check(`[${label}] My Battles switches the recruiting workspace`,
+      await page.$eval('[data-recruit-pane="battles"]', el => !el.hidden));
+    await page.click('[data-recruit-view="class"]');
+    check(`[${label}] Signing Class switches the recruiting workspace`,
+      await page.$eval('[data-recruit-pane="class"]', el => !el.hidden));
+    await page.click('[data-recruit-view="board"]');
     const readRow = () => page.$eval('#recruitBody tr:first-child', el => el.innerText.replace(/\s+/g, ' '));
     // The header is a real click target for a user (verified by hit-testing:
     // elementFromPoint at its centre returns the TH). Playwright parks the
@@ -153,7 +191,7 @@ const path = require('path');
     check(`[${label}] sorting back by rank restores the default order`, await readRow() === beforeSort);
 
     // Scheme installation surfaces on the Staff tab while it is in progress.
-    await page.click('.tabs button[data-tab="staff"]');
+    await openTab('staff');
     const schemeInstall = await page.evaluate(() => {
       const { selected, setTeamScheme, renderStaff } = window.__DL_TEST__;
       const t = selected(), from = t.offScheme;
@@ -169,7 +207,7 @@ const path = require('path');
       schemeInstall.card.slice(0, 120));
 
     // Weekly newsletter: recaps derived from the archived box scores.
-    await page.click('.tabs button[data-tab="newsletter"]');
+    await openTab('newsletter');
     await page.waitForTimeout(120);
     const news = await page.evaluate(() => ({
       weeks: document.querySelector('#newsWeek').options.length,
@@ -185,7 +223,7 @@ const path = require('path');
     check(`[${label}] program coverage leads with the controlled team`, teamLead.includes(teamName.trim()), teamLead.slice(0, 80));
 
     // Game Center summary opens with the same generated recap.
-    await page.click('.tabs button[data-tab="season"]');
+    await openTab('season');
     await page.click('#teamSchedule [data-game]');
     await page.waitForTimeout(120);
     const summaryRecap = await page.$eval('#gameDialogBody .recap', el => el.textContent);
@@ -193,7 +231,7 @@ const path = require('path');
     await page.getByRole('button',{name:'Close Game Center',exact:true}).click();
 
     // Player profile dialog.
-    await page.click('.tabs button[data-tab="roster"]');
+    await openTab('roster');
     await page.waitForTimeout(80);
     await page.click('#rosterBody .player-button');
     await page.waitForTimeout(120);

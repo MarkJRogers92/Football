@@ -16,22 +16,29 @@
   </header>
   <div id="saveStatus" class="save-status muted">No save loaded.</div>
 
-  <div class="tabs-shell">
-  <nav class="tabs">
-    <button data-tab="dashboard" class="active">Dashboard</button>
-    <button data-tab="roster">Roster</button>
-    <button data-tab="depth">Roles & Depth</button>
-    <button data-tab="staff">Staff & Schemes</button>
-    <button data-tab="gamelab">Game Lab</button>
-    <button data-tab="season">Season</button>
-    <button data-tab="newsletter">Newsletter</button>
-    <button data-tab="stats">Stats</button>
-    <button data-tab="recruiting">Recruiting</button>
-    <button data-tab="program">Program Lab</button>
-    <button data-tab="development">Development & Camp</button>
-    <button data-tab="offseason">Offseason</button>
-    <button data-tab="records">Awards & Records</button>
-    <button data-tab="history">History</button>
+  <div class="tabs-shell" data-active-group="home">
+  <nav class="nav-groups" aria-label="Primary areas">
+    <button data-nav-group="home" data-nav-target="dashboard" class="active">Home</button>
+    <button data-nav-group="team" data-nav-target="roster">Team</button>
+    <button data-nav-group="competition" data-nav-target="gamelab">Competition</button>
+    <button data-nav-group="recruiting" data-nav-target="recruiting">Recruiting</button>
+    <button data-nav-group="program" data-nav-target="program">Program</button>
+  </nav>
+  <nav class="tabs" aria-label="Home views">
+    <button data-tab="dashboard" data-nav-parent="home" class="active nav-visible">Dashboard</button>
+    <button data-tab="roster" data-nav-parent="team">Roster</button>
+    <button data-tab="depth" data-nav-parent="team">Roles & Depth</button>
+    <button data-tab="staff" data-nav-parent="team">Staff & Schemes</button>
+    <button data-tab="development" data-nav-parent="team">Development & Camp</button>
+    <button data-tab="gamelab" data-nav-parent="competition">Game Lab</button>
+    <button data-tab="season" data-nav-parent="competition">Season</button>
+    <button data-tab="newsletter" data-nav-parent="competition">Newsletter</button>
+    <button data-tab="stats" data-nav-parent="competition">Stats</button>
+    <button data-tab="recruiting" data-nav-parent="recruiting">Recruiting Board</button>
+    <button data-tab="program" data-nav-parent="program">Program Lab</button>
+    <button data-tab="offseason" data-nav-parent="program">Offseason</button>
+    <button data-tab="records" data-nav-parent="program">Awards & Records</button>
+    <button data-tab="history" data-nav-parent="program">History</button>
   </nav>
   </div>
 
@@ -173,11 +180,24 @@
         <div><h2>Recruiting Board</h2><div class="muted">Each recruit now has a region and a major priority. Visits, coaching, scheme, NIL, development and program trajectory influence the race.</div></div>
         <button id="autoTarget">Auto-Target 20</button>
       </div>
-      <div class="card card--compact" id="classSummary"></div>
-      <div class="card"><h3>Active Recruiting Battles</h3><div id="recruitBattleBoard"></div></div>
-      <div class="table-wrap"><table><thead><tr>
-        <th class="sortable" data-sort="name">Recruit</th><th class="sortable" data-sort="pos">Pos</th><th class="sortable" data-sort="rank">Rank</th><th class="sortable" data-sort="stars">Stars</th><th class="sortable" data-sort="home">Hometown / HS</th><th class="sortable" data-sort="miles">Miles</th><th class="sortable" data-sort="priority">Priority</th><th class="sortable" data-sort="scout">Scout</th><th class="sortable" data-sort="interest">Interest</th><th class="sortable" data-sort="trend">Trend</th><th class="sortable" data-sort="leader">Leader</th><th>Visit</th><th>Promise</th><th></th>
-      </tr></thead><tbody id="recruitBody"></tbody></table></div>
+      <div class="recruiting-command-bar">
+        <div class="card card--compact" id="classSummary"></div>
+        <div class="recruiting-view-tabs" role="tablist" aria-label="Recruiting workspace">
+          <button type="button" role="tab" aria-selected="true" data-recruit-view="board" class="active">National Board</button>
+          <button type="button" role="tab" aria-selected="false" data-recruit-view="battles">My Battles</button>
+          <button type="button" role="tab" aria-selected="false" data-recruit-view="class">Signing Class</button>
+        </div>
+      </div>
+      <div data-recruit-pane="board" role="tabpanel" class="recruiting-pane active">
+        <div class="recruiting-board-head"><div><strong>National prospect board</strong><span>Sort any heading. Scout ranges get tighter as your staff evaluates a prospect.</span></div><div class="confidence-legend"><span class="confidence-dot confidence-low"></span>Low confidence <span class="confidence-dot confidence-high"></span>High confidence</div></div>
+        <div class="table-wrap"><table><thead><tr>
+          <th class="sortable" data-sort="name">Recruit</th><th class="sortable" data-sort="pos">Pos</th><th class="sortable" data-sort="rank">Rank</th><th class="sortable" data-sort="stars">Stars</th><th class="sortable" data-sort="home">Hometown / HS</th><th class="sortable" data-sort="miles">Miles</th><th class="sortable" data-sort="priority">Priority</th><th class="sortable" data-sort="scout">Scout Read</th><th class="sortable" data-sort="interest">Interest</th><th class="sortable" data-sort="trend">Trend</th><th class="sortable" data-sort="leader">Leader</th><th>Visit</th><th>Promise</th><th>Actions</th>
+        </tr></thead><tbody id="recruitBody"></tbody></table></div>
+      </div>
+      <div data-recruit-pane="battles" role="tabpanel" class="recruiting-pane" hidden>
+        <div class="card"><h3>Active Recruiting Battles</h3><div id="recruitBattleBoard"></div></div>
+      </div>
+      <div id="signingClassHost" data-recruit-pane="class" role="tabpanel" class="recruiting-pane" hidden></div>
     </section>
 
     <section id="program" class="panel tab">

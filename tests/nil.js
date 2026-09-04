@@ -60,6 +60,19 @@ test('a recruit deal only helps the school that paid for it',async()=>{
  assert.equal(e.recruitPitch(me,r)-mineBefore,res.cost*3);
 });
 
+test('a second school cannot overwrite an active recruit deal',async()=>{
+ const e=await setup(2306),u=e.universe,me=e.T('Chicago Metropolitan');
+ const r=u.recruits.find(x=>x.stars>=4&&!x.committed);
+ const rival=u.teams.find(t=>t!==me&&e.nilDealCost(r,true)<=e.nilRemaining(t));
+ const mine=e.signNilDeal(me,r,true),spent=me.nilSpent;
+ assert.ok(mine.ok);
+ const theirs=e.signNilDeal(rival,r,true);
+ assert.equal(theirs.ok,false,'one current-season deal cannot be silently replaced');
+ assert.equal(r.nilDeal.schoolId,me.id);
+ assert.equal(me.nilSpent,spent,'the original budget remains accountable');
+ assert.equal(rival.nilSpent,0,'the second school is not charged');
+});
+
 test('a new season restores the budget and clears last year deals',async()=>{
  const e=await setup(2305),u=e.universe,me=e.T('Chicago Metropolitan');
  const p=me.roster[0];
