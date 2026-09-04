@@ -1,32 +1,24 @@
-# Dynasty Lab — v0.9.8 recruit portrait preview
+# Dynasty Lab — v0.9.14 Coach's Desk preview
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `codex/v098-recruit-portraits`
-Production branch: `gh-pages`
-Production remains v0.9.7 at https://markjrogers92.github.io/Football/ until this preview is reviewed.
+Source branch: `codex/v0914-coachs-desk`
+Production remains v0.9.13 until Mark explicitly approves promotion.
 
 ## Preview scope
 
-v0.9.8 is a bounded presentation/identity milestone on top of v0.9.7.
+- Up to three meaningful, state-backed decision cards appear above the existing Weekly Plan for the controlled team.
+- The implemented decisions cover a compromised starter, the four-game redshirt threshold, a playing-time concern and a recruiting priority.
+- Choices reuse weekly availability/rotation, redshirt and promise state, morale/staff trust, recruiting visits and the existing event ledger.
+- The same subject has a short cooldown so decisions do not become constant interruptions.
 
-- Recruiting board rows now show deterministic Portrait V1 thumbnails.
-- Signing Class cards use the recruit's actual generated portrait rather than initials.
-- Commitment/flip spotlights use the recruit portrait when the recruit can be resolved from the current board.
-- Recruit Profile uses a large portrait hero.
-- Uncommitted prospects render in a neutral scouting uniform; committed recruits render in their committed program colors without changing face identity.
-- Recruiting-board portraits paint lazily near the viewport for mobile performance.
-- The existing recruit `portraitSeed` continues into the signed player object, preserving the same face after signing.
+## Persistence
 
-## Validation
+`universe.weeklyDecisions` is additive core save data and old saves normalize to
+an empty array. No IndexedDB schema change. See `STORAGE.md`.
 
-The implementation branch passed the full pre-version pipeline before this preview: build, engine/persistence tests, desktop+iPhone browser/visual tests including new recruit portrait checks, real-browser IndexedDB regression checks and simulation audit. This preview workflow reruns the full suite after the 0.9.8 version metadata is applied.
+## Review focus
 
-## Storage guardrail
-
-No IndexedDB schema change. Existing recruit portrait seed/version fields are reused. For older in-memory recruits missing a seed, the renderer assigns a stable recruit-id fallback before signing so continuity is retained.
-
-Production and preview paths share the same GitHub Pages origin, so export a portable JSON backup before saving from a preview when a dynasty matters.
-
-## Next step
-
-Review Recruiting on desktop and actual iPhone Safari, especially scrolling performance, Signing Class cards, commitment spotlights and Recruit Profile. Promote only after visual review.
+Review the Coach's Desk on desktop and actual iPhone Safari, including button
+wrapping, single-week blocking while a card is unresolved, season-sim staff
+delegation, and the practical feel of limited-role and rotation choices. Publish
+production only with Mark's explicit approval.

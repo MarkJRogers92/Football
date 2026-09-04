@@ -18,15 +18,17 @@ const assert=require('node:assert/strict');
   await page.waitForFunction(()=>document.querySelector('#weekLine').textContent.includes('2028'));
   await page.click('#saveBrowser');await status('^Saved');
   const record=await page.evaluate(()=>new Promise((resolve,reject)=>{
-   const r=indexedDB.open('DynastyLabDB',2);r.onerror=()=>reject(r.error);r.onsuccess=()=>{
-    const db=r.result,tx=db.transaction(['saves','archives'],'readonly');let main,first;
+   const r=indexedDB.open('DynastyLabDB',3);r.onerror=()=>reject(r.error);r.onsuccess=()=>{
+    const db=r.result,tx=db.transaction(['saves','archives','games'],'readonly');let main,first,gameChunks=[];
     const a=tx.objectStore('saves').get('main');a.onsuccess=()=>{main=a.result};
     const b=tx.objectStore('archives').get(0);b.onsuccess=()=>{first=b.result[0]};
-    tx.oncomplete=()=>{db.close();resolve({coreHasArchive:'playerArchive' in main.universe,ref:main.archiveRef,first,games:main.universe.gameArchive})};tx.onabort=()=>{db.close();reject(tx.error)};
+    const c=tx.objectStore('games').getAll();c.onsuccess=()=>{gameChunks=c.result};
+    tx.oncomplete=()=>{db.close();resolve({coreHasArchive:'playerArchive' in main.universe,coreHasGames:'gameArchive' in main.universe,ref:main.archiveRef,gameRef:main.gameRef,first,games:gameChunks.flat()})};tx.onabort=()=>{db.close();reject(tx.error)};
    };
   }));
   assert.equal(record.coreHasArchive,false);assert.ok(record.ref.count>128);
   console.log('PASS real browser save stores archived careers separately');
+  assert.equal(record.coreHasGames,false);assert.equal(record.games.length,record.gameRef.count);
   assert.equal(record.games.length,745);const historical=record.games.find(g=>g.home.name==='Chicago Metropolitan'||g.away.name==='Chicago Metropolitan');
   // Loading and saving before any archive access must preserve stored careers.
   await page.click('#loadBrowser');await status('^Loaded');await page.click('#saveBrowser');await status('^Saved');

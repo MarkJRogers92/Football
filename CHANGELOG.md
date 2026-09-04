@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.9.14 — The Coach's Desk
+
+- The Weekly Command Center can now open up to three state-backed coaching decisions in a controlled-team week: a compromised starter's workload, a player nearing the four-game redshirt threshold, a meaningful playing-time concern, or a choice between two recruiting priorities.
+- Decisions reuse the systems already underneath the game. Injury choices change weekly availability and workload risk, redshirt choices use the existing protection flag and promises, playing-time answers adjust the real rotation/morale/trust/promise state, and recruiting priorities schedule an existing visit.
+- Resolutions persist in `universe.weeklyDecisions` and write a `WEEKLY_DECISION_RESOLVED` entry to the existing event ledger. A short cooldown prevents the same player or recruiting pair from becoming a constant interruption.
+- The existing Weekly Plan remains intact below the decision cards. Single-week controls wait for an answer; Sim Regular Season explicitly delegates choices to the staff.
+
 ## v0.9.13 — The weekly plan
 
 - The Dashboard now suggests what is worth doing right now. It leads with the single step that moves the calendar, then real blockers (an open coaching search, being over the scholarship limit), then available recruiting and locker-room work.

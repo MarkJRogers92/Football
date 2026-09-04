@@ -206,3 +206,12 @@ Deferral is now per-archive: careers are chunked from storage 2 onward, box
 scores only from 3, so the `loaded` and `gamesLoaded` flags are derived
 separately from the record's storage version rather than from one shared
 test.
+
+## v0.9.14 additions
+
+`universe.weeklyDecisions` is a new additive core array. Each record identifies
+the season, week, controlled team, decision type, linked player/recruit IDs,
+options and resolution. It travels through the existing core browser save and
+portable JSON paths; old saves normalize it to an empty array. Resolutions also
+append an ordinary `WEEKLY_DECISION_RESOLVED` dynasty event. No IndexedDB schema
+change, archive rewrite or new storage reference is introduced.
