@@ -1,10 +1,10 @@
-# Dynasty Lab — v0.9.36 preview checkpoint
+# Dynasty Lab — v0.9.36 production checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
 Current source branch: `codex/v0936-matchup-gameplans` (based on Claude's v0.9.35
 source at `8bfe544`)
 Production branch: `gh-pages`
-Production: v0.9.35 at https://markjrogers92.github.io/Football/
+Production: v0.9.36 at https://markjrogers92.github.io/Football/
 
 ## Current preview milestone
 
@@ -28,7 +28,8 @@ checks (129 + 14 + 21), and 8 real IndexedDB/JSON persistence scenarios. No cons
 errors. The existing smoke suite includes eight seasons; no separate calibration
 was run. Mobile coverage is Chromium at an iPhone viewport, not physical Safari.
 
-Stop after preview verification. Production remains v0.9.35 pending review.
+User approved production promotion on September 4, 2026. The validated v0.9.36
+build is published to production; the versioned preview remains available.
 Captains/mentorship, staff progression and Watch halftime controls are future
 milestones. Fetch source branches before continuing; do not reconstruct from
 the production HTML when source is available. See WORKLOG's v0.9.36 correction
