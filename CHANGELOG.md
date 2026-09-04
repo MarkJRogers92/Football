@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.9.33 — Program history, and a real weekly gameplan
+
+**Program history.** No program had an all-time record — `t.w`/`t.l` reset every season and nothing archived it. Tracking begins now, additively, for all 120 programs: `t.allTimeRecord` accrues wins, losses, conference titles and national titles once per season, captured at the same point `runOffseason` already knows the final record. Coaching lineage — every stint any known coach has held at a given school — was already derivable from the coaching-tree data (v0.9.27) and needed no new state; it now renders on the Program tab for whichever program is selected, not just the controlled one. Pre-v0.9.33 seasons are not retroactively known, and the card says so.
+
+**Weekly gameplan.** The last mechanic on `IDEAS.md`: a Coach's Desk card offering to scout the upcoming opponent. Full scout gives the bigger in-game edge (offense +1.2, defense +1.8 that week only) but costs real scheme-installation progress if the program is mid-transition (`schemeTransition`); a fully-installed program pays nothing, which is the honest state of that system rather than an invented penalty. Balanced and standard prep scale down accordingly. The edge is applied inside `gameSim` itself, keyed to the exact opponent and week, so it can never leak into a different matchup or linger past the game it was for.
+
+Caught by the browser suite before this shipped: a scheduled game exists almost every week, unlike every other Coach's Desk decision, which is situational — so wiring this one to block the calendar the same way every other decision does would have turned an occasional ritual into a mandatory one every single week. It stays real and fully choosable, and still applies its effect when resolved, but an unresolved gameplan card alone never blocks `simWeek`/`simSeason`/the detailed-game path. Every other decision type is unaffected.
+
+- 9 new tests across `tests/programhistory.js` and `tests/gameplan.js`.
+- Storage additive: `t.allTimeRecord`, `t.gameplan`. IndexedDB stays at schema 3.
+
 ## v0.9.29-32 — Reconciled: GPT's Game Center drive replay / watch mode
 
 Between this branch's v0.9.28 and this commit, a parallel GPT/codex session shipped four

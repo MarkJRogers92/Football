@@ -321,3 +321,15 @@ Still schema 3.
 
 See `docs/SAVE_SIZE_MEASUREMENT.md` for measured per-component save growth.
 Still schema 3.
+
+## v0.9.33 additive state
+
+- `t.allTimeRecord: {w,l,confTitles,natTitles,seasons}` — accrued once per
+  season by `recordSeasonInHistory()`. Not retroactive; seasons before this
+  version aren't counted.
+- `t.gameplan: {year,week,opponent,prep}` — set by `applyGameplanDecision()`,
+  read only by `teamGameplanFor()` matching all three fields exactly, so a
+  stale value from a prior week or wrong opponent is inert rather than needing
+  to be cleared.
+
+Still schema 3.

@@ -1,12 +1,20 @@
-# Dynasty Lab — v0.9.32 checkpoint
+# Dynasty Lab — v0.9.33 checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
 Current source branch: `claude/review-improvement-dwjemy` (reconciled directly —
 see below)
 Production branch: `gh-pages`
-Production: v0.9.32 at https://markjrogers92.github.io/Football/
+Production: v0.9.33 at https://markjrogers92.github.io/Football/
 
-## Current release: reconciliation, not a feature
+## Current release
+
+v0.9.33 adds program history (all-time record + coaching lineage on the
+Program tab, for whichever program is selected) and the weekly gameplan (a
+Coach's Desk card that scouts the upcoming opponent for a small in-game edge,
+costing real scheme-install progress only while a program is mid-transition).
+Both closed out items on IDEAS.md.
+
+## Previous: reconciliation, not a feature
 
 v0.9.29-32 shipped from a parallel GPT/codex session directly to `gh-pages`
 with no source ever pushed to any branch or PR — the only record was the
@@ -213,7 +221,8 @@ simulation gaps.
 
 ## Storage guardrail
 
-Read `STORAGE.md` before altering saves. v0.9.29-32 (GPT) added Game Center
+Read `STORAGE.md` before altering saves. v0.9.33 adds `t.allTimeRecord` and
+`t.gameplan`, additive. v0.9.29-32 (GPT) added Game Center
 watch-mode presentation only, no new persisted fields as far as reconciliation
 could tell — verify against STORAGE.md if anything looks off.
 v0.9.28 changed no stored state.
@@ -255,7 +264,7 @@ surface itself — grouping, or a first-run path.
 ## Resume prompt
 
 Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.32 is production and all
+`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.33 is production and all
 known feature branches are reconciled into the main line — check
 `git branch -r` for anything new before assuming that's still true. Work in
 a new bounded branch, validate fully (`npm test` + `npm run test:browser`),

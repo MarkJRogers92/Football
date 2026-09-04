@@ -1,5 +1,51 @@
 # WORKLOG
 
+## v0.9.33 — program history + weekly gameplan
+
+Two remaining IDEAS.md items, built together since the history page reads data
+the coaching tree already produces and the gameplan closes out the last real
+mechanic on the list.
+
+Program history's coaching-lineage half needed zero new state — `careerHistory`
+already records every stint, dated, per school, from the coaching tree work.
+The all-time-record half is genuinely new and additive-only; my first test
+asserted it started empty and it did not, because world generation already
+opens a day-one stint for every program's starting staff. Not a bug — the
+test's assumption was wrong, and fixing it (asserting 5 stints, not 0) is a
+more accurate test than the one I wrote first.
+
+Gameplan's cost mechanism was the one real design decision. IDEAS.md specified
+"trading practice time against scheme familiarity" — checked whether
+`playerSchemeFit` reads position familiarity in steady state before assuming
+that was a real lever, and it does not; familiarity only matters during an
+active `schemeTransition`. So the honest cost is against schemeTransition's own
+familiarity meter, which means a fully-installed program pays nothing for
+scouting — a real, load-bearing distinction rather than a cosmetic one, and the
+tests cover both states explicitly.
+
+The edge itself is applied directly on the `H`/`A` profile objects gameSim
+already computes, keyed by `teamGameplanFor(t, opponentName)` matching
+year/week/opponent exactly — cannot apply to the wrong game or carry over,
+tested directly rather than relying on gameSim's own randomness to prove it.
+
+One real bug the browser suite caught before it shipped, not a flaky test: the
+browser check `page.click('#simWeek')` timed out because the button stayed
+disabled forever. Traced it to the gameplan card — `hasPendingWeeklyDecisions`
+and `renderWeeklyDecisions`'s own `blocked` calculation both treat any
+unresolved Coach's Desk decision as calendar-blocking, which is correct for
+every existing decision type because all of them are situational (an injury,
+a redshirt threshold, a transfer complaint). A scheduled game exists almost
+every week, so the gameplan card is not situational — it would have forced a
+choice every single week, turning a light weekly touch into a mandatory gate.
+Fixed by excluding `WEEKLY_GAMEPLAN` specifically from both blocking checks;
+the card still renders and still applies its real effect if chosen, it simply
+cannot be the sole reason the calendar refuses to advance. Every other
+decision type's blocking behavior is untouched — confirmed by re-running
+`tests/weeklydecisions.js` and `tests/playeragency.js` unchanged.
+
+Validation: 10 new tests (the pacing fix added one), full Node (143/143) and
+browser (144/144) suites, both actually green — not just the Node half.
+
 ## v0.9.29-32 — reconciling GPT's untracked production releases
 
 Checked `git fetch` vs the live site and found production four versions ahead of this branch's

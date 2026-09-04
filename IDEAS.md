@@ -76,14 +76,14 @@ moment in the recruiting calendar, from data that already exists.
 Coach career stints, relationships and a carousel all exist. Show where former
 assistants ended up and give prestige credit for producing head coaches.
 
-### Opponent scouting / weekly gameplan
+### ~~Opponent scouting / weekly gameplan~~ — shipped in v0.9.33
 Scouting Intelligence is per-player. The extension is per-opponent: a Coach's
 Desk decision trading practice time against scheme familiarity, using the
 existing `playCall` and familiarity systems.
 
 ## 5. Presentation
 
-### Program history page
+### ~~Program history page~~ — shipped in v0.9.33
 All-time record, coaching lineage, records by era — all stored already. The
 Career Chronology (v0.9.20) proved the pattern.
 
