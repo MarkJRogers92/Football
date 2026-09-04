@@ -73,6 +73,13 @@ additive changes — no new save-format changes of its own. IndexedDB remains
 schema 3. Scouting/decision/agency state uses additive fields on existing
 player/recruit/universe records with no IndexedDB version bump.
 
+## Pending review (not yet in production)
+
+v0.9.19 on branch `claude/v0919-hub-priority-sort` implements milestone A
+part 1 (hub priority sort — see CHANGELOG/WORKLOG). It is published as a
+preview only; production is still v0.9.18 until it is reviewed and
+promoted with `node tools/publish.js`. Do not re-implement it.
+
 ## Next roadmap sequence
 
 ### A) Hub priority + story surface (recommended)

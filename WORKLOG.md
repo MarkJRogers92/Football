@@ -1,5 +1,43 @@
 # WORKLOG
 
+## v0.9.19 — hub priority sort (roadmap milestone A, part 1)
+
+Plan: the one-function fix flagged in CONTINUATION.md — `buildWeeklyHub`
+takes `items.slice(0,9)` in insertion order despite events carrying an
+`importance` value. Sort by it, nothing more.
+
+What the code actually said: the premise was only half true. Events in
+`universe.events` all carry `importance`, but the *hub tiles* built from
+them are a different shape, and only two of the tile sources (coach fallout,
+familiar faces) copied the value across. The ten inline tiles that make up
+most of a normal week had none. A bare `sort((a,b)=>b.importance-a.importance)`
+would have compared `undefined` and produced a NaN-shuffled order that
+happened to look fine in the common case — the exact bug class the polish
+pass hit with the signing-class signature.
+
+So the change is still one function's worth of logic but touches each push:
+every inline tile gets an explicit importance on the event scale (loss 60 /
+win 50, medical 55, wavering 52, next-up 48, rankings 45, commitment
+40+3×stars, decommit 50+3×stars, flip 45+3×stars, top target 35, transfer
+risk uses its own ≥42 score capped at 80). The three event-derived helpers
+pass `e.importance` through (coaching search gets 62). The comparator
+defaults to 40 so nothing can ever produce NaN again. Stable sort, so ties
+keep insertion order and the week's narrative sequence survives within a
+tier.
+
+Deliberately untouched: the CSS `order` per tile type in `polish.css`
+still groups alerts first — engine ranking now decides which nine survive
+and the order within a group, which is what the milestone asked for.
+`renderWeeklyHub`'s prepend-familiar-faces-then-reslice is also outside
+the brief; those tiles are 55–70 importance so they would rank near the top
+anyway.
+
+Validation: the new test walks a full 12-week season asserting every tile
+is numerically ranked and the wire is sorted, then plants a trivial
+importance-5 promise event (inserted first by construction) and checks it
+sinks. Full Node + browser suites re-run; preview published, production
+untouched pending review.
+
 ## v0.9.18 — reconciling three feature branches with the polish pass
 
 Plan: the previous session flagged three GPT/codex branches (v0.9.14 Coach's

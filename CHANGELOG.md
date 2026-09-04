@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.9.19 — The wire ranks by importance
+
+- `buildWeeklyHub` used to keep the first nine tiles in insertion order, so on a busy week the items pushed last (a wavering commit, the top target, a flip) were the ones that fell off regardless of how much they mattered. It now stable-sorts by `importance` before taking nine; ties keep their original order, and the CSS `order` grouping by tile type in `polish.css` is unchanged.
+- Only some tiles actually carried an `importance` (the coach-fallout and familiar-face items). The inline FINAL / RANKINGS / MEDICAL / COMMITMENT / NEXT UP / LOCKER ROOM / DECOMMIT / FLIP / WAVERING / TOP TARGET tiles now carry one on the same 0–100 scale `universe.events` uses (a loss outranks a win, a 5★ commitment outranks a 3★, transfer risk uses its own score), and OFFER PULLED / PROMISE BROKEN pass the underlying event's importance through; COACHING SEARCH gets a fixed 62. A missing value falls back to 40 rather than producing a `NaN` comparison.
+- One new test in `tests/weeklyplan.js` walks a full regular season checking every tile is numerically ranked and the wire stays sorted, then plants a deliberately trivial promise event (which `buildWeeklyHub` inserts first) and confirms it no longer leads the wire.
+- No save-format change; `importance` is an additive field on hub tiles, which are rebuilt every week anyway.
+
 ## v0.9.18 — Reconciling the Coach's Desk, Player Agency and Scouting Intelligence
 
 - Rebases three GPT/codex feature branches (v0.9.14–v0.9.16, previously only in their own previews, never merged) onto the commercial polish pass (v0.9.17). See the three entries below for what each brings; this release is the reconciliation.

@@ -59,3 +59,22 @@ test('the plan stays short enough to act on',async()=>{
   e.runSpringCamp();e.runFallCamp();e.runOffseason();
  }
 });
+
+test('the wire ranks tiles by importance instead of insertion order',async()=>{
+ const e=await setup(1305),u=e.universe,me=e.T('Chicago Metropolitan');
+ const imp=x=>x.importance??40;
+ for(let i=0;i<12;i++){
+  e.simWeek();
+  const hub=u.weeklyHub;
+  assert.ok(hub.length<=9,'the wire never shows more than nine tiles');
+  assert.ok(hub.every(x=>Number.isFinite(x.importance)),`every tile carries a numeric importance (week ${u.week}): ${hub.filter(x=>!Number.isFinite(x.importance)).map(x=>x.kicker)}`);
+  assert.ok(hub.every((x,i)=>i===0||imp(hub[i-1])>=imp(x)),`tiles are ordered by importance (week ${u.week}): ${hub.map(x=>x.kicker+'='+imp(x))}`);
+ }
+ // Promise items are the first thing buildWeeklyHub inserts, so under insertion order a trivial one would
+ // lead the wire; ranked by importance it has to sink beneath the week's result and next matchup.
+ u.events.push({id:'EVT_TEST',type:'PROMISE_BROKEN',season:u.year,week:u.week,timestampOrder:1e9,importance:5,schoolIds:[me.id],playerIds:[me.roster[0].id],coachIds:[],recruitIds:[],gameIds:[],summary:'Trivial promise',metadata:{result:'minor'}});
+ e.buildWeeklyHub(me.rank);
+ const hub=u.weeklyHub,trivial=hub.findIndex(x=>x.main==='Trivial promise');
+ assert.ok(trivial>0,'a low-importance tile inserted first no longer leads the wire');
+ assert.ok(hub.slice(0,trivial).every(x=>imp(x)>=5),'everything above it matters more');
+});
