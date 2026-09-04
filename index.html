@@ -708,6 +708,126 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
   .command-center .hub-grid{grid-template-columns:1fr}
   .hub-item.hub-promoted{flex-wrap:wrap;gap:4px 10px}
 }
+
+/* ==== Shared design system (Phase 3) ================================================
+   Tokens and normalized primitives. Additive: existing class names keep working, these
+   rules pull them onto one scale. New variant classes are available for later screens. */
+:root{
+  /* type scale */
+  --t-page:22px;--t-section:15px;--t-eyebrow:10px;--t-body:14px;--t-meta:12px;--t-table:13px;--t-stat:22px;--t-stat-lg:30px;
+  /* spacing scale */
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;
+  /* surfaces */
+  --surf-0:#0c121a;--surf-1:#111a24;--surf-2:#152029;--surf-3:#1a2634;
+  --line-1:#233245;--line-2:#2d3e53;--line-3:#3a4e66;
+  --ink-1:#f3f6fb;--ink-2:#c9d4e2;--ink-3:#93a2b6;--ink-4:#6f8298;
+  --radius-lg:14px;--radius:10px;--radius-sm:7px;
+}
+
+/* ---- Shell: no atmospheric gradients, a quieter texture, grouped tabs -------------- */
+body{background:var(--bg)}
+body::before{opacity:.12}
+.topbar{box-shadow:none;backdrop-filter:none;background:rgba(10,15,21,.97)}
+.topbar>div:first-child::before{box-shadow:inset 0 1px rgba(255,255,255,.08)}
+.tabs-shell{box-shadow:none}
+.tabs button.active::after{box-shadow:none}
+.tabs button:nth-child(2),.tabs button:nth-child(5),.tabs button:nth-child(9),.tabs button:nth-child(13){margin-left:10px;position:relative}
+.tabs button:nth-child(2)::before,.tabs button:nth-child(5)::before,.tabs button:nth-child(9)::before,.tabs button:nth-child(13)::before{content:"";position:absolute;left:-7px;top:9px;bottom:9px;width:1px;background:var(--line-2)}
+.save-status{font-size:11px}
+
+/* ---- Typography ------------------------------------------------------------------- */
+.section-head h2{font-size:var(--t-page)}
+.card h3,.card>h3,.section-head h3{font-size:var(--t-section);font-weight:700;color:var(--ink-1)}
+.eyebrow,.small.muted,.hub-kicker,.broadcast-kicker,.matchup-label,.signing-kicker,.record-group h4,.role-card .role-side{font-size:var(--t-eyebrow);letter-spacing:.11em;font-weight:750}
+.metric .small,.profile-stat .small{font-size:var(--t-eyebrow);letter-spacing:.09em}
+.player-hero-rating span,.recruit-hero-rail span,.broadcast-versus span,.matchup-center span,.commitment-copy>span,.signing-class-count span,.commitment-stamp,.signing-card em{font-size:9px}
+.broadcast-team-role{font-size:9px!important}
+.compact{font-size:var(--t-table)}
+.muted{color:var(--ink-3)}
+.metric .v,.profile-stat .v{font-size:var(--t-stat);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+
+/* ---- Cards: flat surfaces, hierarchy from borders and spacing ---------------------- */
+.card,.depth-card{background:var(--surf-1);box-shadow:none;border-color:var(--line-2)}
+.card::before{display:none}
+.card{padding:var(--s4) 18px;margin-bottom:var(--s4)}
+.card--elevated{background:var(--surf-2);border-color:var(--line-3)}
+.card--alert{border-color:#6b5a33;background:linear-gradient(90deg,rgba(231,188,98,.07),transparent 40%),var(--surf-1)}
+.card--hero{border-top:3px solid var(--team-secondary);background:linear-gradient(180deg,#131c27,#0f1620)}
+.card--compact{padding:var(--s3) var(--s4)}
+.card--compact h3{margin-bottom:6px}
+.candidate-card,.camp-phase,.plan-card{background:var(--surf-2);box-shadow:none}
+.metric,.profile-stat{background:var(--surf-2);box-shadow:none}
+
+/* ---- Buttons ---------------------------------------------------------------------- */
+button,select{background:var(--surf-3);box-shadow:none;border-color:var(--line-3);font-size:13px;font-weight:650;padding:8px 12px;border-radius:8px}
+button:hover:not(:disabled){box-shadow:none;background:#213042}
+button:disabled{opacity:.38}
+.btn-primary,#simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason{font-weight:700}
+.btn-quiet,.game-link,.dialog-close{background:transparent;border-color:transparent;color:var(--ink-2)}
+.btn-quiet:hover:not(:disabled),.game-link:hover:not(:disabled),.dialog-close:hover:not(:disabled){background:var(--surf-3);border-color:var(--line-3);color:var(--ink-1)}
+.btn-danger,.pull-offer{border-color:#7a3a41;color:#f3a3a9;background:rgba(239,125,133,.08)}
+.btn-danger:hover:not(:disabled),.pull-offer:hover:not(:disabled){background:rgba(239,125,133,.16);border-color:#a04c55}
+.rs-button{padding:5px 9px;font-size:12px;font-weight:650}
+.game-link{padding:4px 8px;font-size:12px}
+
+/* ---- Status chips ----------------------------------------------------------------- */
+.pill,.scheme-badge,.battle-school{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:2px 8px;border-radius:999px;
+  border:1px solid var(--line-3);background:var(--surf-3);box-shadow:none;
+  font-size:11px;font-weight:650;line-height:1.5;color:var(--ink-2);white-space:nowrap;
+}
+.pill.good,.pill--success{border-color:#2f6b4e;color:#7fe0b0;background:rgba(101,211,154,.10)}
+.pill.warn,.pill--warning{border-color:#75602f;color:#f2ca76;background:rgba(231,188,98,.10)}
+.pill.bad,.pill--danger{border-color:#7a3a41;color:#f3a3a9;background:rgba(239,125,133,.10)}
+.pill--neutral{color:var(--ink-3)}
+.pill--interest{border-color:color-mix(in srgb,var(--team-secondary) 45%,var(--line-3));color:var(--team-secondary);background:rgba(var(--team-rgb),.08)}
+.pill--commit{border-color:#2f6b4e;color:#7fe0b0;background:rgba(101,211,154,.12);font-weight:750;letter-spacing:.04em}
+.pill--wavering{border-color:#75602f;color:#f2ca76;background:rgba(231,188,98,.12);font-weight:750;letter-spacing:.04em}
+.pill--injury{border-color:#7a3a41;color:#f3a3a9;background:rgba(239,125,133,.12)}
+.pill.rs-used{opacity:.7}
+.health-out{font-weight:650}
+
+/* ---- Tables ----------------------------------------------------------------------- */
+.table-wrap{background:var(--surf-1);box-shadow:none;border-color:var(--line-2);border-radius:var(--radius)}
+table{font-size:var(--t-table)}
+th{font-size:var(--t-eyebrow);letter-spacing:.08em;padding:9px 10px;background:var(--surf-2);border-bottom:1px solid var(--line-3);color:var(--ink-3)}
+th.num,td.num{text-align:right}
+td{padding:8px 10px;border-bottom-color:var(--line-1);vertical-align:middle}
+tbody tr:hover{background:rgba(255,255,255,.025)}
+tbody tr.target,tbody tr.is-selected{background:rgba(var(--team-rgb),.09)}
+th.sortable.sorted{color:var(--team-secondary)}
+.player-cell{gap:9px}
+.player-cell .player-button{font-size:13px}
+.player-cell .small.muted{font-size:11px;letter-spacing:0;text-transform:none;font-weight:500}
+.lineitem,.rankrow,.resultrow,.historyrow{font-size:var(--t-body)}
+
+/* ---- Portrait frames -------------------------------------------------------------- */
+.portrait{border:1px solid var(--line-2);border-radius:var(--radius-sm)}
+.portrait-list{width:40px;height:40px}
+.portrait-profile{width:112px;height:112px;border-radius:12px}
+.sports-mark,.signing-card-avatar,.commitment-avatar,.recruit-hero-avatar,.player-hero-team-mark span{box-shadow:none}
+.signing-card,.signing-class-board,.commitment-spotlight,.broadcast-feature-main,.broadcast-result{box-shadow:none}
+.signing-class-board:after,.commitment-spotlight:after{display:none}
+
+/* ---- Dialog shell ----------------------------------------------------------------- */
+.player-dialog{box-shadow:0 30px 80px rgba(0,0,0,.6);border-color:var(--line-3)}
+.dialog-head{background:linear-gradient(90deg,rgba(var(--team-rgb),.10),transparent 45%),var(--surf-2)}
+
+/* ---- Mobile chrome ---------------------------------------------------------------- */
+@media(max-width:700px){
+  .card{padding:14px}
+  .tabs button:nth-child(2),.tabs button:nth-child(5),.tabs button:nth-child(9),.tabs button:nth-child(13){margin-left:8px}
+}
+@media(max-width:480px){
+  .topbar{gap:10px;padding-block:10px}
+  .topbar h1{font-size:19px}
+  .topbar .eyebrow{display:none}
+  .header-actions{gap:5px}
+  .header-actions select{min-width:0;flex:1 1 100%;font-size:13px;padding:7px 9px}
+  .header-actions button{flex:1 1 auto;padding:6px 8px;font-size:12px}
+  .save-status{padding-block:4px;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
 </style></head><body>
 <div id="app">
   <header class="topbar">
