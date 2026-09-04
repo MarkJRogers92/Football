@@ -46,7 +46,7 @@ recruiting pitch. Let wins, rivalry results and trajectory move it, then feed it
 into home-field advantage in `gameSim` (currently a flat `ha=2.2`) and into
 administration confidence. Turns a constant into a feedback loop.
 
-### Academic eligibility
+### ~~Academic eligibility~~ — shipped in v0.9.25
 `t.academics` is a recruiting weight and nothing else. Give players an academic
 standing; weak-academics programs risk losing contributors. Gives the Coach's
 Desk a genuinely hard decision (study table vs. practice reps) and makes a

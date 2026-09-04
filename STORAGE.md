@@ -298,3 +298,16 @@ and `r.pressure`. Both are recomputed every cycle by `advanceRecruiting()`, so
 nothing persisted depends on their surviving a commitment.
 
 Still schema 3.
+
+## v0.9.25 additive state
+
+On every player:
+
+- `academicStanding` (5–99) — seeded by `ensureAcademics()` from
+  `academicTarget()` plus noise, on both new universes and loaded saves.
+- `academicPlan: {id, season, week}` — the last Coach's Desk academic choice;
+  read by `advanceAcademics()` for the following week's lift only.
+- `academicHold` — weeks of ineligibility remaining. Non-zero makes
+  `gameAvailable()` false.
+
+Still schema 3.

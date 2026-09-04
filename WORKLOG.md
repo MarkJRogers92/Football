@@ -1,5 +1,40 @@
 # WORKLOG
 
+## v0.9.25 — academic eligibility
+
+Plan: the last of the "data the game stores but barely reads" items.
+`t.academics` fed one recruiting pitch term and nothing else.
+
+**Where it hooks.** `gameAvailable(p)` is the single availability gate —
+`participants`, the depth chart and the sim all run through it — so
+ineligibility is one clause there rather than a new concept threaded through
+every selection path. The test asserts through `participants()` rather than
+through `gameAvailable` alone, because the gate being right matters less than
+no selection path being able to route around it.
+
+**The tuning bug, which is the real story of this release.** The first
+formula was `academics*.55 + (iq-50)*.45 + 34 - wear*.06`. Two tests failed and
+both looked like my test setup being unrealistic. Working out why showed the
+opposite: under the weekly -1 drag, standing equilibrates about 8 below target,
+and that formula bottomed out near 38 for the worst possible player at the worst
+possible program. The floor is 30. So no player could ever have gone
+ineligible, in any universe, ever — the feature would have shipped completely
+inert and every test I had written would still have passed except the two that
+happened to poke at the extreme.
+
+Retuned to `(academics-50)*.5 + (iq-50)*.6 + 55 - wear*.08`, which puts a weak
+student carrying a heavy season at a thin-support program in the twenties and a
+good student at a strong program around 91. The test now builds that at-risk
+case explicitly and asserts it takes more than one week to fall through, since
+"you see it coming" is the property that makes this fair rather than random.
+
+**The desk card.** Most Coach's Desk options have one that is plainly correct.
+This one does not: study table is the biggest academic gain and the biggest
+scheme-familiarity cost, practice is the reverse, and the split is neither. That
+was the point of picking this feature.
+
+Validation: 6 new tests, full Node and browser suites.
+
 ## v0.9.24 — live signing day
 
 Plan: the highest-value remaining item from IDEAS.md, and the cheapest, because

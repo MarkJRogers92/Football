@@ -1,12 +1,25 @@
-# Dynasty Lab — v0.9.24 checkpoint
+# Dynasty Lab — v0.9.25 checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `claude/v0924-signing-day` (merged into the
+Current source branch: `claude/v0925-academics` (merged into the
 main working branch `claude/review-improvement-dwjemy`)
 Production branch: `gh-pages`
-Production: v0.9.24 at https://markjrogers92.github.io/Football/
+Production: v0.9.25 at https://markjrogers92.github.io/Football/
 
 ## Current release
+
+v0.9.25 adds academic eligibility. Standing drifts weekly toward
+`academicTarget()` (program support + player iq - wear); below 30 the player is
+ineligible for two weeks, enforced in `gameAvailable()` so no selection path can
+route around it. A new Coach's Desk card trades academic standing against scheme
+familiarity, with no option that is simply correct.
+
+Carry this forward if you touch the curve: standing equilibrates about **8
+below** target under the weekly drag, so the target range decides whether the
+floor is reachable at all. The first tuning bottomed out near 38 against a floor
+of 30 and the feature would have shipped inert. See WORKLOG.
+
+## Previous release
 
 v0.9.24 makes signing day a live event. Contested commitments are resolved
 inside `buildSigningDay()` during `finalizeRecruiting` and revealed one name at
@@ -138,7 +151,8 @@ simulation gaps.
 
 ## Storage guardrail
 
-Read `STORAGE.md` before altering saves. v0.9.24 adds `universe.signingDay`,
+Read `STORAGE.md` before altering saves. v0.9.25 adds `p.academicStanding`,
+`p.academicPlan` and `p.academicHold`, additive. v0.9.24 added `universe.signingDay`,
 additive. v0.9.23 added `universe.bowls`,
 `t.bowlResult` and `t.fanBaseline`, all additive. v0.9.22 added `universe.careerHistory`,
 `universe.jobOffers` and `closed` on `universe.tenure`, all additive.
@@ -172,7 +186,7 @@ surface itself — grouping, or a first-run path.
 ## Resume prompt
 
 Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.24 is production and all
+`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.25 is production and all
 known feature branches are reconciled into the main line — check
 `git branch -r` for anything new before assuming that's still true. Work in
 a new bounded branch, validate fully (`npm test` + `npm run test:browser`),

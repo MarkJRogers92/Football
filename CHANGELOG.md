@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.9.25 — Academic eligibility
+
+`t.academics` was a recruiting weight and nothing else, so a 3-star at a 90-academics school was mechanically identical to one at a 55. Every player now carries an academic standing that drifts each week toward what his program and his own head can sustain, and falling through the floor costs you the player.
+
+- `academicTarget()` blends program support, the player's `iq` and the wear of a heavy season. Standing moves 12% of the way toward it each week with a point of steady drag, so equilibrium sits about eight below target. A good student at a strong program settles around 91; a weak one carrying a heavy load at a thin-support program settles in the twenties — under the floor of 30.
+- Below the floor he is **ineligible for two weeks**, enforced through `gameAvailable()` — the single gate every selection path already runs through, so no depth chart, rotation or game sim can field him. The hold expires and returns him just above the floor rather than into an instant relapse.
+- **A new Coach's Desk card where every branch costs something.** Study table is six points of standing a week and six points of scheme familiarity; splitting the week is two and two; keeping him at practice buys nothing academically and lets the drift continue. This is the trade-off the desk was missing — most of its other cards have an option that is simply correct.
+- The wire escalates: ACADEMIC WATCH at importance 56 while he is close, ACADEMICS at 74 once he is actually lost. The Roster board gains an Academics column colour-coded like health.
+
+**Tuning note worth recording.** The first pass put targets in a range where the floor was mathematically almost unreachable — the feature would have shipped inert. The tests caught it as two failures that looked like test bugs and were not. The published curve is the retuned one.
+
+- 6 new tests in `tests/academics.js`. Storage additive: `p.academicStanding`, `p.academicPlan`, `p.academicHold`. IndexedDB stays at schema 3.
+
 ## v0.9.24 — Signing day, one name at a time
 
 Wavering commitments carried a `challenger` and a `pressure` score all season, and then survived to signing day untouched — the drama the engine had already modelled simply evaporated. Contested commitments now get one last resolution, and the player watches it land one name at a time.
