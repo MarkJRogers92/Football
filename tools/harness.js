@@ -91,7 +91,7 @@ globalThis.__ENGINE__ = {
   generateCoach, coachById, ensureCoachCareer, normalizeCoachState, recordCoachSeason, closeCoachStint, openCoachStint, archiveCoach, addCoachEvent, applyCoachRelationshipChange, coachFalloutHubItems, replaceStaffCoach, promoteCoachWithinTeam, moveCoach, retireCoach, coachCareerTotals, coachProfileHTML, chooseCoachMoveDestination, carousel, promiseHTML, applyDevelopmentPhase,
   teamStaffBudget, teamStaffSpend, candidateFitScore, generateCandidatePool, createOpening, interviewCandidate, candidateAcceptChance, extendOffer, hireCandidate, coachOpeningHubItems, COACH_SLOT_ROLES,
   captureRecruitment, transferFit, chooseTransferDestination, placeTransfer, familiarFaceItems, releasePlayerPromises, transferHistoryHTML, archivePlayerSeason,
-  saveBrowser, loadBrowser, exportSave, importSave, installSave, ensureArchiveLoaded, archiveIsDeferred,
+  saveBrowser, loadBrowser, exportSave, importSave, installSave, ensureArchiveLoaded, archiveIsDeferred, ensureGamesLoaded, gamesAreDeferred,
   POS, POS_COUNTS, ROLE_DEFS, OFF_SCHEMES, DEF_SCHEMES, GROWTH_CURVES, OFF_POS,
   render: () => {},
 };

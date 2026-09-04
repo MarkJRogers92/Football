@@ -13,11 +13,17 @@ async function transact(db,names,mode,work){return new Promise((res,rej)=>{const
   const {indexedDB,store}=fixture();const old=snapshot();old.universe.playerArchive=Array.from({length:257},(_,i)=>player(i));
   const db=await open(indexedDB,1);await transact(db,['saves'],'readwrite',tx=>tx.objectStore('saves').put(old,'main'));db.close();
   assert.deepEqual(await store.load(),old);
-  const saved=await store.save(old,{expectedRevision:revisionOf(old),additions:old.universe.playerArchive});
-  const current=await store.load();assert.equal(current.storageVersion,2);assert.equal('playerArchive' in current.universe,false);
+  const games=Array.from({length:130},(_,i)=>({id:`G2027_${i}`,season:2027,week:1,score:{home:i,away:0}}));
+  old.universe.gameArchive=games;
+  const saved=await store.save(old,{expectedRevision:revisionOf(old),additions:old.universe.playerArchive,gameAdditions:games});
+  const current=await store.load();assert.equal(current.storageVersion,3);assert.equal('playerArchive' in current.universe,false);
+  // v0.9.12: box scores leave the core row on the same upgrade.
+  assert.equal('gameArchive' in current.universe,false);
   assert.deepEqual(current.universe.records,old.universe.records);
   assert.equal(saved.archiveRef.count,257);assert.equal(saved.archiveRef.chunks,3);
+  assert.equal(saved.gameRef.count,130);assert.equal(saved.gameRef.chunks,2);
   assert.deepEqual(await store.readArchive(saved.archiveRef),old.universe.playerArchive);
+  assert.deepEqual(await store.readGames(saved.gameRef),games);
  });
  test('weekly saves do not rewrite old careers; append writes only new chunks',async()=>{
   const {store}=fixture();const original=Array.from({length:260},(_,i)=>player(i));
@@ -59,12 +65,12 @@ async function transact(db,names,mode,work){return new Promise((res,rej)=>{const
  });
  test('missing archive chunks cause an error rather than silently dropping alumni',async()=>{
   const {indexedDB,store}=fixture();const state=await store.save(snapshot(),{additions:[player(1)]});
-  const db=await open(indexedDB,2);await transact(db,['archives'],'readwrite',tx=>tx.objectStore('archives').delete(0));db.close();
+  const db=await open(indexedDB,3);await transact(db,['archives'],'readwrite',tx=>tx.objectStore('archives').delete(0));db.close();
   await assert.rejects(store.readArchive(state.archiveRef),/missing or damaged/);
  });
  test('empty archives round-trip and unsupported storage versions are rejected',async()=>{
   const {indexedDB,store}=fixture();const state=await store.save(snapshot());assert.deepEqual(await store.readArchive(state.archiveRef),[]);
-  const d=await store.load();d.storageVersion=3;const db=await open(indexedDB,2);await transact(db,['saves'],'readwrite',tx=>tx.objectStore('saves').put(d,'main'));db.close();
+  const d=await store.load();d.storageVersion=4;const db=await open(indexedDB,3);await transact(db,['saves'],'readwrite',tx=>tx.objectStore('saves').put(d,'main'));db.close();
   await assert.rejects(store.load(),/newer game version/);
  });
  test('blocked upgrade rejects promptly and does not run later in the background',async()=>{

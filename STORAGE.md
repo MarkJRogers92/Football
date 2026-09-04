@@ -185,3 +185,24 @@ all derived at call time from roster state and stable program traits rather
 than stored, so nothing needs migrating and an older save simply starts
 obeying the limit. Pulled offers are recorded as ordinary `OFFER_PULLED`
 dynasty events. No IndexedDB version change.
+
+## v0.9.12 additions
+
+IndexedDB moves to **schema 3**, adding a `games` object store alongside
+`saves` and `archives`. Permanent box scores leave the core save row and
+become append-only chunks addressed by a `gameRef` ({id, count, chunks}) that
+mirrors `archiveRef` exactly: same 128-row chunking, same optimistic revision
+check, same fail-closed reads on a missing or damaged chunk, same refusal to
+read a reference from a replaced dynasty.
+
+Games are immutable once written, so an ordinary save appends only the ones
+played since the last save. A storage-2 save keeps its games inline, loads
+normally, and splits them out atomically on its next save — the same upgrade
+path careers took in v0.9.0. Portable JSON is unchanged and still carries the
+complete dynasty; `exportSave` hydrates both archives before packing so an
+export can never silently omit history.
+
+Deferral is now per-archive: careers are chunked from storage 2 onward, box
+scores only from 3, so the `loaded` and `gamesLoaded` flags are derived
+separately from the record's storage version rather than from one shared
+test.

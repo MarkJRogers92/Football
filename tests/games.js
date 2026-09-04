@@ -22,7 +22,11 @@ test('permanent boxes match actual player deltas, snapshot identity and retain d
  assert.ok(u.events.some(x=>x.gameIds?.includes(g.id)));
  assert.match(e.gameBoxHTML(g),/Passing/);assert.match(e.gameSummaryHTML(g),/Game leaders/);
  const t=u.teams.find(t=>t.id===g.home.id);t.rank=120;t.w=99;t.roster[0].name='CHANGED NAME';assert.equal(JSON.stringify(g),frozen);
- await e.saveBrowser();await e.loadBrowser();assert.equal(JSON.stringify(e.universe.gameArchive[0]),frozen);
+ // v0.9.12: box scores are chunked and deferred like archived careers, so a
+ // freshly loaded dynasty hydrates them before the record is readable.
+ await e.saveBrowser();await e.loadBrowser();
+ assert.equal(e.gamesAreDeferred(),true);assert.equal(e.universe.gameArchive.length,0);
+ await e.ensureGamesLoaded();assert.equal(JSON.stringify(e.universe.gameArchive[0]),frozen);
  await e.ensureArchiveLoaded();const portable=JSON.parse(JSON.stringify(e.packUniverse(e.universe)));e.installSave({version:'0.9.2',userTeam:'Chicago Metropolitan',universe:portable});
  assert.equal(JSON.stringify(e.universe.gameArchive[0]),frozen);e.normalizeUniverse();assert.equal(e.universe.gameArchive.length,60);
  const current=e.universe;assert.throws(()=>e.installSave({universe:{...current,gameArchiveVersion:2}}),/newer version/);assert.equal(e.universe,current);

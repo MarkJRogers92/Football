@@ -9,7 +9,7 @@
   function create({indexedDB = root.indexedDB, name = 'DynastyLabDB'} = {}) {
     function open() {
       return new Promise((resolve, reject) => {
-        const request = indexedDB.open(name, 2);
+        const request = indexedDB.open(name, 3);
         let cancelled = false;
         request.onblocked = () => {
           cancelled = true;
@@ -20,6 +20,10 @@
           const db = request.result;
           if (!db.objectStoreNames.contains('saves')) db.createObjectStore('saves');
           if (!db.objectStoreNames.contains('archives')) db.createObjectStore('archives');
+          // v0.9.12: permanent box scores move out of the core row into their
+          // own append-only chunks, so an ordinary save stops rewriting years
+          // of history it never touched.
+          if (!db.objectStoreNames.contains('games')) db.createObjectStore('games');
         };
         request.onerror = () => reject(request.error);
         request.onsuccess = () => {
@@ -60,9 +64,12 @@
         const req = tx.objectStore('saves').get('main');
         req.onsuccess = () => {
           const d = req.result;
-          if (d?.storageVersion && d.storageVersion !== 2) return fail(new Error('This browser save needs a newer game version.'));
-          if (d?.storageVersion === 2 && (!validRef(d.archiveRef) || !d.revision))
+          if (d?.storageVersion && d.storageVersion !== 2 && d.storageVersion !== 3)
+            return fail(new Error('This browser save needs a newer game version.'));
+          if (d?.storageVersion >= 2 && (!validRef(d.archiveRef) || !d.revision))
             return fail(new Error('The saved archive reference is invalid. Use a complete JSON backup.'));
+          if (d?.storageVersion === 3 && !validRef(d.gameRef))
+            return fail(new Error('The saved game archive reference is invalid. Use a complete JSON backup.'));
           done(d);
         };
       });
@@ -96,13 +103,43 @@
       });
     }
 
+    function readGames(ref) {
+      if (!validRef(ref)) return Promise.reject(new Error('Invalid game archive reference.'));
+      return transact(['saves', 'games'], 'readonly', (tx, done, fail) => {
+        const req = tx.objectStore('saves').get('main');
+        req.onsuccess = () => {
+          const current = req.result?.gameRef;
+          if (!current || current.id !== ref.id || current.count < ref.count || current.chunks < ref.chunks)
+            return fail(new Error('The browser save was replaced in another tab. Load it again before opening history.'));
+          const chunks = new Array(ref.chunks);
+          let remaining = ref.chunks;
+          if (!remaining) { done([]); return; }
+          for (let i = 0; i < ref.chunks; i++) {
+            const r = tx.objectStore('games').get(i);
+            r.onsuccess = () => {
+              if (!Array.isArray(r.result) || !r.result.length || r.result.some(g => !g || typeof g !== 'object' || !g.id))
+                return fail(new Error('Archived games are missing or damaged. Use a complete JSON backup.'));
+              chunks[i] = r.result;
+              if (--remaining === 0) {
+                const rows = chunks.flat();
+                if (rows.length !== ref.count) return fail(new Error('Game archive count does not match the saved dynasty.'));
+                done(rows);
+              }
+            };
+          }
+        };
+      });
+    }
+
     // Archived careers are append-only. Ordinary saves write zero archive chunks.
     // A new/imported universe replaces both stores atomically; a loaded universe
     // must still match its last saved revision to avoid overwriting another tab.
-    function save(snapshot, {expectedRevision = null, archiveRef = null, additions = []} = {}) {
+    function save(snapshot, {expectedRevision = null, archiveRef = null, additions = [],
+                             gameRef = null, gameAdditions = []} = {}) {
       if (archiveRef && !validRef(archiveRef)) return Promise.reject(new Error('Invalid archive reference.'));
-      return transact(['saves', 'archives'], 'readwrite', (tx, done, fail) => {
-        const saves = tx.objectStore('saves'), archives = tx.objectStore('archives');
+      if (gameRef && !validRef(gameRef)) return Promise.reject(new Error('Invalid game archive reference.'));
+      return transact(['saves', 'archives', 'games'], 'readwrite', (tx, done, fail) => {
+        const saves = tx.objectStore('saves'), archives = tx.objectStore('archives'), games = tx.objectStore('games');
         const req = saves.get('main');
         req.onsuccess = () => {
           try {
@@ -111,20 +148,28 @@
             if (archiveRef && (req.result?.archiveRef?.id !== archiveRef.id
               || req.result.archiveRef.count !== archiveRef.count || req.result.archiveRef.chunks !== archiveRef.chunks))
               return fail(new Error('The saved archive changed. Reload before saving.'));
+            if (gameRef && (req.result?.gameRef?.id !== gameRef.id
+              || req.result.gameRef.count !== gameRef.count || req.result.gameRef.chunks !== gameRef.chunks))
+              return fail(new Error('The saved game archive changed. Reload before saving.'));
             let chunks = archiveRef?.chunks || 0;
             if (!archiveRef) archives.clear();
             for (let i = 0; i < additions.length; i += CHUNK_SIZE)
               archives.put(additions.slice(i, i + CHUNK_SIZE), chunks++);
             const ref = {id: archiveRef?.id || token(), count: (archiveRef?.count || 0) + additions.length, chunks};
-            const {playerArchive, ...core} = snapshot.universe;
-            const data = {...snapshot, universe: core, storageVersion: 2, archiveRef: ref, revision: token()};
+            let gameChunks = gameRef?.chunks || 0;
+            if (!gameRef) games.clear();
+            for (let i = 0; i < gameAdditions.length; i += CHUNK_SIZE)
+              games.put(gameAdditions.slice(i, i + CHUNK_SIZE), gameChunks++);
+            const gRef = {id: gameRef?.id || token(), count: (gameRef?.count || 0) + gameAdditions.length, chunks: gameChunks};
+            const {playerArchive, gameArchive, ...core} = snapshot.universe;
+            const data = {...snapshot, universe: core, storageVersion: 3, archiveRef: ref, gameRef: gRef, revision: token()};
             saves.put(data, 'main');
-            done({revision: data.revision, archiveRef: ref});
+            done({revision: data.revision, archiveRef: ref, gameRef: gRef});
           } catch (e) { fail(e); }
         };
       });
     }
-    return {load, readArchive, save};
+    return {load, readArchive, readGames, save};
   }
   const api = {create, revisionOf};
   if (typeof module === 'object' && module.exports) module.exports = api;

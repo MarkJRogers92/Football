@@ -114,6 +114,44 @@ const path = require('path');
     check(`[${label}] sending the offer hires the coach and clears the interim tag`,
       !hireResult.interim && hireResult.hired, JSON.stringify(hireResult));
 
+    // Recruiting board headers sort the whole pool, not just the visible slice.
+    await page.click('.tabs button[data-tab="recruiting"]');
+    await page.waitForTimeout(150);
+    const readRow = () => page.$eval('#recruitBody tr:first-child', el => el.innerText.replace(/\s+/g, ' '));
+    // The header is a real click target for a user (verified by hit-testing:
+    // elementFromPoint at its centre returns the TH). Playwright parks the
+    // sticky header under the topbar when it auto-scrolls, so dispatch the
+    // click on the element instead of fighting its scroll heuristics.
+    const sortBy = async key => {
+      await page.$eval(`#recruiting th[data-sort="${key}"]`, el => el.click());
+      await page.waitForTimeout(150);
+    };
+    const beforeSort = await readRow();
+    await sortBy('miles');
+    const milesAsc = await page.evaluate(() => ({
+      dir: document.querySelector('#recruiting th[data-sort="miles"]').dataset.dir,
+      rows: [...document.querySelectorAll('#recruitBody tr')].slice(0, 8)
+        .map(tr => Number(tr.querySelector('td:nth-child(6)')?.textContent.trim())),
+    }));
+    check(`[${label}] a header click sorts the recruiting board`,
+      milesAsc.dir === 'asc' && milesAsc.rows.every((n, i, a) => i === 0 || a[i - 1] <= n),
+      JSON.stringify(milesAsc));
+    await sortBy('miles');
+    const milesDesc = await page.evaluate(() => ({
+      dir: document.querySelector('#recruiting th[data-sort="miles"]').dataset.dir,
+      rows: [...document.querySelectorAll('#recruitBody tr')].slice(0, 8)
+        .map(tr => Number(tr.querySelector('td:nth-child(6)')?.textContent.trim())),
+    }));
+    check(`[${label}] clicking the same header reverses it`,
+      milesDesc.dir === 'desc' && milesDesc.rows.every((n, i, a) => i === 0 || a[i - 1] >= n),
+      JSON.stringify(milesDesc));
+    // Interest is a column where the interesting end is the top.
+    await sortBy('interest');
+    check(`[${label}] a best-first column opens descending`,
+      await page.$eval('#recruiting th[data-sort="interest"]', el => el.dataset.dir) === 'desc');
+    await sortBy('rank');
+    check(`[${label}] sorting back by rank restores the default order`, await readRow() === beforeSort);
+
     // Scheme installation surfaces on the Staff tab while it is in progress.
     await page.click('.tabs button[data-tab="staff"]');
     const schemeInstall = await page.evaluate(() => {

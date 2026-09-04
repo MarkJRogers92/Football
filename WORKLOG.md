@@ -1,5 +1,42 @@
 # WORKLOG
 
+## v0.9.12 — chunked, deferred game archive
+
+Plan: stop the core save row growing without bound. Measurement first: at
+four seasons a dynasty was 63 MB, of which the game archive was 24 MB (38%)
+and rising ~6 MB per season — and because it sat in the core blob, every
+single save rewrote all of it.
+
+Decisions:
+- Mirror the career-archive design rather than invent a second scheme. Same
+  chunk size, same ref shape, same optimistic revision check, same
+  fail-closed reads. The pattern was already proven and already tested.
+- Deferred hydration on demand, guarded at each entry point that reads
+  across history (Game Center, school history, the newsletter) using the
+  existing `storageOperation` re-entry pattern.
+- `exportSave` hydrates both archives before packing. Portable JSON has to
+  stay a complete dynasty or the format silently becomes lossy.
+- Caught by the existing persistence test: the `loaded` flag was derived
+  from `storageVersion !== 2`, meaning "legacy inline save". Introducing
+  storage 3 made that predicate report chunked career archives as already
+  loaded when they were in fact empty — an export would have produced a
+  dynasty with no archived careers at all. Deferral is now derived per
+  archive from the version that introduced its chunking.
+- Two existing tests encoded the old contract and were corrected rather than
+  widened: the legacy-upgrade test now asserts games split out on the same
+  upgrade, and the Game Center identity test hydrates before reading, which
+  is exactly what the feature requires of any consumer.
+
+Also, on request: the recruiting board's headers now sort it. The whole pool
+is ordered before the visible slice is taken, and columns whose interesting
+end is the top open descending so the first click shows the best and the
+arrow still tells the truth.
+
+Validation: `npm test` (72 Node tests including the new `tests/gamestore.js`,
+plus 53 smoke checks) and `npm run test:browser` (99 + 13 + 21 checks).
+Measured after: a save at season three writes 29 MB instead of 53 MB, and the
+18 MB of box scores is never rewritten again.
+
 ## v0.9.11 — scholarship scarcity and pulled offers
 
 Plan: give recruiting a real constraint. `canTakeCommit` was

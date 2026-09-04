@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.9.12 — Box scores stop rewriting themselves
+
+- Permanent box scores now live in their own append-only chunks instead of the core save row. An ordinary save appends only the games just played; a twelve-season dynasty no longer rewrites ~75 MB of history it never touched. Measured at three seasons: a save writes 29 MB instead of 53 MB, and the gap widens every year.
+- Game history is hydrated on demand, the same way archived careers already were. Opening the Game Center, the newsletter or school history loads it; exporting a dynasty hydrates it first, so portable JSON remains a complete save with every game ID intact. Nothing is ever pruned.
+- Browser storage moves to schema 3. An existing save keeps working and splits its history out on the next save, exactly as the v0.9.0 career-archive upgrade did.
+- The recruiting board sorts by any column header. Click to sort, click again to reverse; columns where the interesting end is the top (stars, scout grade, interest, trend) open descending. Sorting orders the entire pool before the visible slice is taken, so it surfaces the real leaders rather than reordering the first 220 rows.
+
 ## v0.9.11 — Scholarship scarcity and pulled offers
 
 - Recruiting classes are bounded by the room the roster actually leaves instead of a flat cap of 30. Capacity derives from the 85-man limit against projected returning players, held inside a realistic signing-class band, so a heavy graduating year gives you room and a thin one squeezes you.
