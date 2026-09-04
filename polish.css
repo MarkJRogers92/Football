@@ -1,0 +1,128 @@
+/* Dynasty Lab commercial polish layer (v0.9.14 pass).
+   Loaded last. Presentation only: no simulation, storage or save-format code depends on it.
+   Section 1 — flagship Dashboard. Later sections add shared primitives. */
+
+/* ---- 1. Program masthead: identity + record + week in one read --------------------- */
+.program-masthead{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:"identity status" "metrics actions";
+  gap:18px 28px;
+  align-items:start;
+  padding:22px 24px 20px;
+  margin-bottom:18px;
+  border-top:3px solid var(--team-secondary);
+  border-color:#33465d;
+  border-top-color:var(--team-secondary);
+  background:linear-gradient(180deg,#131c27,#0f1620);
+  overflow:hidden;
+}
+.program-masthead::before{display:none}
+.masthead-identity{grid-area:identity;display:flex;align-items:center;gap:16px;min-width:0}
+.masthead-mark{
+  display:grid;place-items:center;flex:0 0 auto;
+  width:64px;height:64px;
+  border:1px solid color-mix(in srgb,var(--team-secondary) 55%,#39516e);
+  border-radius:14px;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--team-primary) 82%,#1b2d43),color-mix(in srgb,var(--team-primary) 94%,#0d151f));
+  color:#fff;font-size:17px;font-weight:900;letter-spacing:.08em;
+  box-shadow:inset 0 1px rgba(255,255,255,.08),0 8px 20px rgba(0,0,0,.28);
+}
+.masthead-mark::before{content:attr(data-team-mark)}
+.masthead-mark:not([data-team-mark])::before{content:"DL"}
+.masthead-copy{min-width:0}
+#teamName{margin:2px 0 4px;font-size:32px;line-height:1.02;letter-spacing:-.035em;color:var(--team-ink);overflow-wrap:anywhere}
+#teamMeta{font-size:13px;color:#93a2b6}
+#teamMeta::before{content:"";display:inline-block;width:7px;height:7px;margin:0 7px 1px 0;border-radius:50%;background:var(--team-secondary)}
+.masthead-status{grid-area:status;text-align:right;min-width:190px}
+.masthead-status .big,#recordBig{
+  margin:0 0 2px;
+  font-size:52px;font-weight:850;line-height:1;letter-spacing:-.06em;
+  font-variant-numeric:tabular-nums;color:#f8fafc;text-shadow:none;
+}
+#rankLine{color:#d5dfec;font-weight:650;font-size:14px}
+#weekLine{margin:2px 0 0;font-size:12px;color:#8ea0b6}
+.program-masthead .metric-grid{grid-area:metrics;margin:0;gap:8px}
+.program-masthead .metric{
+  min-height:60px;padding:9px 11px;
+  border:1px solid #27394d;border-radius:9px;
+  background:rgba(8,14,21,.5);box-shadow:none;
+}
+.program-masthead .metric .v{font-size:22px;line-height:1.05;margin-top:2px}
+.masthead-actions{grid-area:actions;justify-content:flex-end;align-self:end}
+
+/* ---- 2. Broadcast strip: calmer, no decorative rings ------------------------------- */
+.broadcast-feature-main:after{display:none}
+.broadcast-feature-main,.broadcast-result{box-shadow:none;background:#0f1721}
+.broadcast-feature-main{background:linear-gradient(90deg,rgba(var(--team-rgb),.10),transparent 42%),#0f1721}
+.broadcast-result button{padding:6px 10px;font-size:11px}
+
+/* ---- 3. Command center: plan (left) + wire (right) --------------------------------- */
+.command-center{box-shadow:none;background:#111a24;border-color:#33465d}
+.command-center::before{display:none}
+.command-center .section-head{margin-bottom:16px}
+.command-grid{display:grid;grid-template-columns:minmax(280px,.85fr) minmax(0,1.5fr);gap:22px;align-items:start}
+.command-center .plan-card{
+  margin:0;padding:0;border:0;background:transparent;border-radius:0;
+}
+.plan-head{margin-bottom:6px;padding-bottom:8px;border-bottom:1px solid #27384b}
+.plan-head strong{font-size:15px;letter-spacing:-.01em}
+.plan-item{padding:9px 0;gap:11px}
+.plan-mark{
+  display:grid;place-items:center;width:18px;height:18px;margin-top:1px;
+  border:1.5px solid #4a6079;border-radius:50%;
+  font-size:11px;line-height:1;color:transparent;
+}
+.plan-done .plan-mark{border-color:var(--dl-green);background:rgba(101,211,154,.16);color:var(--dl-green)}
+.plan-item:not(.plan-done) .plan-mark{color:transparent}
+.plan-item:hover .plan-mark{border-color:var(--team-secondary)}
+.plan-label{font-size:14px}
+.plan-detail{margin-top:1px}
+.hub-wire-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid #27384b}
+.command-center .hub-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.hub-item{min-height:0;padding:11px 12px 10px;border-radius:9px;box-shadow:none;background:#141e2a;border-left-width:3px}
+.hub-kicker{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:9.5px}
+.hub-kicker::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.9}
+.hub-item.alert{order:0;background:rgba(231,188,98,.06)}.hub-item.alert .hub-kicker{color:var(--dl-gold)}
+.hub-item.bad-news{order:1;background:rgba(239,125,133,.05)}.hub-item.bad-news .hub-kicker{color:var(--dl-red)}
+.hub-item.action{order:2}.hub-item.action .hub-kicker{color:var(--team-secondary)}
+.hub-item.good-news{order:3}.hub-item.good-news .hub-kicker{color:var(--dl-green)}
+.hub-item.hub-link .hub-kicker::after{margin-left:auto;color:#6f8298}
+.hub-item.hub-link:hover,.hub-item.hub-link:focus-visible{transform:none;background:#182535}
+/* Tiles already promoted into the broadcast strip collapse to one-line links. */
+.hub-item.hub-promoted{order:9;grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:6px 10px;background:transparent;border-color:#27384b;border-left-width:2px}
+.hub-item.hub-promoted .hub-kicker{margin:0;flex:0 0 auto;color:#7f91a7}
+.hub-item.hub-promoted .hub-kicker::after{display:none}
+.hub-item.hub-promoted .hub-main{font-size:12px;font-weight:600;color:#c9d4e2}
+.hub-item.hub-promoted .hub-sub{display:none}
+.hub-grid.hub-quiet::after{content:"Nothing else on the wire this week.";grid-column:1/-1;order:5;padding:8px 0;font-size:12px;color:#7f91a7}
+
+/* ---- 4. Top 15 / snapshot: broadcast-style rank list ------------------------------- */
+#top15 .rankrow{align-items:center;padding:7px 8px}
+#top15 .rankrow>div:first-child{display:flex;align-items:center;gap:9px;min-width:0}
+#top15 .rank{width:22px;text-align:right;font-variant-numeric:tabular-nums}
+#top15 .rankrow>div:last-child{font-variant-numeric:tabular-nums;font-weight:650;color:#c9d4e2}
+#top15 .rankrow.target{border-radius:7px;background:rgba(var(--team-rgb),.10);font-weight:700}
+.sports-mark.small{width:24px;height:24px;border-radius:6px;font-size:8px;box-shadow:none}
+#snapshot .lineitem strong{font-variant-numeric:tabular-nums}
+
+@media(max-width:900px){
+  .command-grid{grid-template-columns:1fr;gap:18px}
+  .program-masthead{grid-template-columns:minmax(0,1fr) auto;gap:16px 18px}
+  #teamName{font-size:28px}
+  .masthead-status .big,#recordBig{font-size:44px}
+}
+@media(max-width:700px){
+  .program-masthead{grid-template-columns:1fr;grid-template-areas:"identity" "status" "metrics" "actions";padding:16px;gap:14px}
+  .masthead-mark{width:48px;height:48px;font-size:13px;border-radius:11px}
+  .masthead-status{text-align:left;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"eyebrow eyebrow" "record rank" "record week";column-gap:14px;align-items:center;padding-top:12px;border-top:1px solid #23334a}
+  .masthead-status .eyebrow{grid-area:eyebrow}
+  .masthead-status .big{grid-area:record;font-size:40px}
+  #rankLine{grid-area:rank;align-self:end}
+  #weekLine{grid-area:week;align-self:start;margin:0}
+  .masthead-actions{justify-content:stretch}
+  .masthead-actions button{flex:1 1 auto}
+  #teamName{font-size:25px}
+  .command-center .hub-grid{grid-template-columns:1fr}
+  .hub-item.hub-promoted{flex-wrap:wrap;gap:4px 10px}
+}

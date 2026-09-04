@@ -7,30 +7,6 @@
   --team-ink:#f7fbff;
 }
 
-#dashboard>.hero-grid>.card:first-child{
-  border-color:color-mix(in srgb,var(--team-secondary) 42%,#26384b);
-  background:
-    radial-gradient(circle at 92% 15%,rgba(var(--team-rgb),.18),transparent 20rem),
-    linear-gradient(135deg,color-mix(in srgb,var(--team-primary) 55%,#142131) 0%,#111b27 58%,#101720 100%);
-}
-#dashboard>.hero-grid>.card:first-child::after{
-  border-color:rgba(var(--team-rgb),.20);
-  box-shadow:0 0 0 35px rgba(var(--team-rgb),.035),0 0 0 70px rgba(var(--team-rgb),.02);
-}
-#teamName{
-  color:var(--team-ink);
-  text-shadow:0 0 28px rgba(var(--team-rgb),.12);
-}
-#teamMeta::before{
-  content:"";
-  display:inline-block;
-  width:7px;height:7px;
-  margin:0 7px 1px 0;
-  border-radius:50%;
-  background:var(--team-secondary);
-  box-shadow:0 0 12px rgba(var(--team-rgb),.55);
-}
-
 .tabs button.active::after{background:var(--team-secondary);box-shadow:0 0 14px rgba(var(--team-rgb),.55)}
 .player-button:hover,.player-button:focus{color:#fff;text-decoration-color:var(--team-secondary)}
 .hub-item.action{border-left-color:var(--team-secondary)}
@@ -74,6 +50,5 @@
 .dialog-portrait{border-color:color-mix(in srgb,var(--team-secondary) 46%,#344a64)}
 
 @supports not (color:color-mix(in srgb,red,blue)){
-  #dashboard>.hero-grid>.card:first-child{border-color:#39516e}
   #simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason{border-color:#4a75ad}
 }

@@ -37,31 +37,39 @@
 
   <main>
     <section id="dashboard" class="panel tab active">
-      <div class="hero-grid">
-        <div class="card">
-          <div class="small muted">CURRENT PROGRAM</div>
-          <h2 id="teamName">—</h2>
-          <div id="teamMeta" class="muted">—</div>
-          <div class="metric-grid" id="teamMetrics"></div>
+      <div class="card program-masthead hero-grid">
+        <div class="masthead-identity">
+          <div class="masthead-mark" aria-hidden="true"></div>
+          <div class="masthead-copy">
+            <div class="eyebrow">CURRENT PROGRAM</div>
+            <h2 id="teamName">—</h2>
+            <div id="teamMeta" class="muted">—</div>
+          </div>
         </div>
-        <div class="card">
-          <div class="small muted">DYNASTY STATUS</div>
+        <div class="masthead-status">
+          <div class="eyebrow">DYNASTY STATUS</div>
           <div class="big" id="recordBig">0–0</div>
           <div id="rankLine" class="muted">Preseason</div>
           <div id="weekLine" class="muted">2027 · Week 0</div>
-          <div class="button-row">
-            <button id="simWeek">Sim Week</button>
-            <button id="simSeason">Sim Regular Season</button>
-          </div>
+        </div>
+        <div class="metric-grid" id="teamMetrics"></div>
+        <div class="masthead-actions button-row">
+          <button id="simWeek">Sim Week</button>
+          <button id="simSeason">Sim Regular Season</button>
         </div>
       </div>
       <div class="card command-center">
-        <div class="section-head"><div><div class="small muted">WEEKLY COMMAND CENTER</div><h2 id="hubTitle">Preseason Briefing</h2></div><button id="hubAdvance">Advance Week</button></div>
-        <div class="plan-card">
-          <div class="plan-head"><strong id="planHeading">This week</strong><span class="pill" id="planCount"></span></div>
-          <div id="weeklyPlan"></div>
+        <div class="section-head"><div><div class="eyebrow">WEEKLY COMMAND CENTER</div><h2 id="hubTitle">Preseason Briefing</h2></div><button id="hubAdvance">Advance Week</button></div>
+        <div class="command-grid">
+          <div class="plan-card">
+            <div class="plan-head"><strong id="planHeading">This week</strong><span class="pill" id="planCount"></span></div>
+            <div id="weeklyPlan"></div>
+          </div>
+          <div class="hub-wire">
+            <div class="hub-wire-head"><span class="eyebrow">THE WIRE</span></div>
+            <div id="weeklyHub" class="hub-grid"></div>
+          </div>
         </div>
-        <div id="weeklyHub" class="hub-grid"></div>
       </div>
       <div class="two-col">
         <div class="card"><h3>Top 15</h3><div id="top15"></div></div>

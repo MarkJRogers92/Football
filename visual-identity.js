@@ -55,6 +55,7 @@ function applyBrand(){
   root.dataset.teamMark=initials(name);
   const brandMark=document.querySelector('.topbar>div:first-child');
   if(brandMark)brandMark.setAttribute('data-team-mark',initials(name));
+  document.querySelectorAll('.masthead-mark').forEach(el=>el.setAttribute('data-team-mark',initials(name)));
 }
 
 function queueBrand(){

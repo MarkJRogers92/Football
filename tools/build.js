@@ -25,11 +25,11 @@ const html = `<!doctype html><html lang="en"><head><meta charset="utf-8">` +
   `<meta name="viewport" content="width=device-width,initial-scale=1">` +
   `<meta name="theme-color" content="#090d12">` +
   `<title>Dynasty Lab v${version}</title><style>` +
-  read('styles.css') + '\n' + read('visual-identity.css') + '\n' + read('team-branding.css') + '\n' + read('sports-presentation.css') + '\n' + read('sports-layout.css') + '\n' + read('recruit-presentation.css') +
+  read('styles.css') + '\n' + read('visual-identity.css') + '\n' + read('team-branding.css') + '\n' + read('sports-presentation.css') + '\n' + read('sports-layout.css') + '\n' + read('recruit-presentation.css') + '\n' + read('polish.css') +
   `</style></head><body>\n` +
   read('body.html').replace(/(<span data-app-version>)[^<]*(<\/span>)/, `$1v${version}$2`) +
   `<script>` + read('portraits/renderer-v1.js') + '\n' + read('storage.js') + '\n' + read('app.js') + '\n' + read('visual-identity.js') + '\n' + read('sports-presentation.js') + '\n' + read('recruit-presentation.js') + `</script></body></html>`;
 
 const out = process.argv[2] || 'index.html';
 fs.writeFileSync(path.join(root, out), html);
-console.log(`built ${out} (${(html.length / 1024).toFixed(0)} KB) from renderer-v1.js + app.js + storage.js + styles.css + visual-identity.css + team-branding.css + sports-presentation.css + sports-layout.css + recruit-presentation.css + body.html + visual-identity.js + sports-presentation.js + recruit-presentation.js`);
+console.log(`built ${out} (${(html.length / 1024).toFixed(0)} KB) from renderer-v1.js + app.js + storage.js + styles.css + visual-identity.css + team-branding.css + sports-presentation.css + sports-layout.css + recruit-presentation.css + polish.css + body.html + visual-identity.js + sports-presentation.js + recruit-presentation.js`);

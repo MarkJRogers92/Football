@@ -303,56 +303,6 @@ main{max-width:1440px;padding:26px 22px 48px}
 }
 .card h3{font-size:15px;margin-bottom:10px;color:#e9eef6}
 
-.hero-grid{grid-template-columns:minmax(0,1.42fr) minmax(320px,.78fr);gap:18px}
-#dashboard>.hero-grid>.card:first-child{
-  overflow:hidden;
-  min-height:184px;
-  padding:24px;
-  border-color:#39516e;
-  background:
-    radial-gradient(circle at 92% 16%,rgba(115,168,255,.12),transparent 18rem),
-    linear-gradient(135deg,#172536 0%,#111b27 58%,#101720 100%);
-}
-#dashboard>.hero-grid>.card:first-child::after{
-  content:"";
-  position:absolute;
-  width:310px;height:310px;
-  right:-165px;bottom:-238px;
-  border:1px solid rgba(115,168,255,.14);
-  border-radius:50%;
-  box-shadow:0 0 0 35px rgba(115,168,255,.025),0 0 0 70px rgba(115,168,255,.018);
-}
-#teamName{margin:4px 0 3px;font-size:31px;line-height:1.05;letter-spacing:-.035em}
-#teamMeta{font-size:13px}
-#dashboard>.hero-grid>.card:nth-child(2){
-  min-height:184px;
-  padding:24px;
-  border-color:#34465e;
-  background:linear-gradient(155deg,#121d29,#0f161f);
-}
-#recordBig{
-  margin:8px 0 2px;
-  font-size:56px;
-  font-weight:850;
-  letter-spacing:-.065em;
-  font-variant-numeric:tabular-nums;
-  color:#f8fafc;
-  text-shadow:0 10px 28px rgba(0,0,0,.3);
-}
-#rankLine{color:#c7d4e5;font-weight:680}
-#weekLine{margin-bottom:14px}
-.metric-grid{gap:9px;margin-top:20px}
-.metric{
-  min-height:69px;
-  padding:10px 11px;
-  border:1px solid #26384b;
-  border-radius:10px;
-  background:rgba(8,14,21,.44);
-  box-shadow:inset 0 1px rgba(255,255,255,.02);
-}
-.metric .v{font-size:22px;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
-.metric .small{color:#8293a9;text-transform:uppercase;letter-spacing:.08em;font-size:9px;font-weight:760}
-
 .command-center{
   padding:20px;
   border-color:#3a5272;
@@ -470,9 +420,6 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
   main{padding:20px 16px 40px}
   .topbar{padding-inline:16px}
   .save-status{padding-inline:16px}
-  .hero-grid{grid-template-columns:1fr}
-  #dashboard>.hero-grid>.card:nth-child(2){min-height:auto}
-  #recordBig{font-size:48px}
 }
 
 @media(max-width:700px){
@@ -486,9 +433,6 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
   .tabs button.active::after{bottom:-9px}
   main{padding:16px 12px 34px}
   .card{padding:15px}
-  #dashboard>.hero-grid>.card:first-child,#dashboard>.hero-grid>.card:nth-child(2){padding:18px;min-height:auto}
-  #teamName{font-size:27px}
-  #recordBig{font-size:44px}
   .metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .hub-grid{grid-template-columns:1fr}
   .dialog-shell{padding:16px}
@@ -501,8 +445,6 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
   .topbar>div:first-child::before{display:none}
   .header-actions{gap:6px}
   .header-actions button,.header-actions select{padding:8px 9px}
-  #teamName{font-size:25px}
-  #recordBig{font-size:40px}
   .player-dialog{width:calc(100% - 12px)}
   .dialog-head h2{font-size:21px}
 }
@@ -518,30 +460,6 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
   --team-secondary:#73a8ff;
   --team-rgb:115,168,255;
   --team-ink:#f7fbff;
-}
-
-#dashboard>.hero-grid>.card:first-child{
-  border-color:color-mix(in srgb,var(--team-secondary) 42%,#26384b);
-  background:
-    radial-gradient(circle at 92% 15%,rgba(var(--team-rgb),.18),transparent 20rem),
-    linear-gradient(135deg,color-mix(in srgb,var(--team-primary) 55%,#142131) 0%,#111b27 58%,#101720 100%);
-}
-#dashboard>.hero-grid>.card:first-child::after{
-  border-color:rgba(var(--team-rgb),.20);
-  box-shadow:0 0 0 35px rgba(var(--team-rgb),.035),0 0 0 70px rgba(var(--team-rgb),.02);
-}
-#teamName{
-  color:var(--team-ink);
-  text-shadow:0 0 28px rgba(var(--team-rgb),.12);
-}
-#teamMeta::before{
-  content:"";
-  display:inline-block;
-  width:7px;height:7px;
-  margin:0 7px 1px 0;
-  border-radius:50%;
-  background:var(--team-secondary);
-  box-shadow:0 0 12px rgba(var(--team-rgb),.55);
 }
 
 .tabs button.active::after{background:var(--team-secondary);box-shadow:0 0 14px rgba(var(--team-rgb),.55)}
@@ -587,7 +505,6 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 .dialog-portrait{border-color:color-mix(in srgb,var(--team-secondary) 46%,#344a64)}
 
 @supports not (color:color-mix(in srgb,red,blue)){
-  #dashboard>.hero-grid>.card:first-child{border-color:#39516e}
   #simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason{border-color:#4a75ad}
 }
 
@@ -662,6 +579,135 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 .signing-card-avatar,.commitment-avatar,.recruit-hero-avatar{overflow:hidden}
 .signing-card-avatar canvas,.commitment-avatar canvas,.recruit-hero-avatar canvas{display:block;width:100%;height:100%;border-radius:inherit}
 .signing-card-avatar:has(canvas),.commitment-avatar:has(canvas),.recruit-hero-avatar:has(canvas){padding:0}
+
+/* Dynasty Lab commercial polish layer (v0.9.14 pass).
+   Loaded last. Presentation only: no simulation, storage or save-format code depends on it.
+   Section 1 — flagship Dashboard. Later sections add shared primitives. */
+
+/* ---- 1. Program masthead: identity + record + week in one read --------------------- */
+.program-masthead{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:"identity status" "metrics actions";
+  gap:18px 28px;
+  align-items:start;
+  padding:22px 24px 20px;
+  margin-bottom:18px;
+  border-top:3px solid var(--team-secondary);
+  border-color:#33465d;
+  border-top-color:var(--team-secondary);
+  background:linear-gradient(180deg,#131c27,#0f1620);
+  overflow:hidden;
+}
+.program-masthead::before{display:none}
+.masthead-identity{grid-area:identity;display:flex;align-items:center;gap:16px;min-width:0}
+.masthead-mark{
+  display:grid;place-items:center;flex:0 0 auto;
+  width:64px;height:64px;
+  border:1px solid color-mix(in srgb,var(--team-secondary) 55%,#39516e);
+  border-radius:14px;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--team-primary) 82%,#1b2d43),color-mix(in srgb,var(--team-primary) 94%,#0d151f));
+  color:#fff;font-size:17px;font-weight:900;letter-spacing:.08em;
+  box-shadow:inset 0 1px rgba(255,255,255,.08),0 8px 20px rgba(0,0,0,.28);
+}
+.masthead-mark::before{content:attr(data-team-mark)}
+.masthead-mark:not([data-team-mark])::before{content:"DL"}
+.masthead-copy{min-width:0}
+#teamName{margin:2px 0 4px;font-size:32px;line-height:1.02;letter-spacing:-.035em;color:var(--team-ink);overflow-wrap:anywhere}
+#teamMeta{font-size:13px;color:#93a2b6}
+#teamMeta::before{content:"";display:inline-block;width:7px;height:7px;margin:0 7px 1px 0;border-radius:50%;background:var(--team-secondary)}
+.masthead-status{grid-area:status;text-align:right;min-width:190px}
+.masthead-status .big,#recordBig{
+  margin:0 0 2px;
+  font-size:52px;font-weight:850;line-height:1;letter-spacing:-.06em;
+  font-variant-numeric:tabular-nums;color:#f8fafc;text-shadow:none;
+}
+#rankLine{color:#d5dfec;font-weight:650;font-size:14px}
+#weekLine{margin:2px 0 0;font-size:12px;color:#8ea0b6}
+.program-masthead .metric-grid{grid-area:metrics;margin:0;gap:8px}
+.program-masthead .metric{
+  min-height:60px;padding:9px 11px;
+  border:1px solid #27394d;border-radius:9px;
+  background:rgba(8,14,21,.5);box-shadow:none;
+}
+.program-masthead .metric .v{font-size:22px;line-height:1.05;margin-top:2px}
+.masthead-actions{grid-area:actions;justify-content:flex-end;align-self:end}
+
+/* ---- 2. Broadcast strip: calmer, no decorative rings ------------------------------- */
+.broadcast-feature-main:after{display:none}
+.broadcast-feature-main,.broadcast-result{box-shadow:none;background:#0f1721}
+.broadcast-feature-main{background:linear-gradient(90deg,rgba(var(--team-rgb),.10),transparent 42%),#0f1721}
+.broadcast-result button{padding:6px 10px;font-size:11px}
+
+/* ---- 3. Command center: plan (left) + wire (right) --------------------------------- */
+.command-center{box-shadow:none;background:#111a24;border-color:#33465d}
+.command-center::before{display:none}
+.command-center .section-head{margin-bottom:16px}
+.command-grid{display:grid;grid-template-columns:minmax(280px,.85fr) minmax(0,1.5fr);gap:22px;align-items:start}
+.command-center .plan-card{
+  margin:0;padding:0;border:0;background:transparent;border-radius:0;
+}
+.plan-head{margin-bottom:6px;padding-bottom:8px;border-bottom:1px solid #27384b}
+.plan-head strong{font-size:15px;letter-spacing:-.01em}
+.plan-item{padding:9px 0;gap:11px}
+.plan-mark{
+  display:grid;place-items:center;width:18px;height:18px;margin-top:1px;
+  border:1.5px solid #4a6079;border-radius:50%;
+  font-size:11px;line-height:1;color:transparent;
+}
+.plan-done .plan-mark{border-color:var(--dl-green);background:rgba(101,211,154,.16);color:var(--dl-green)}
+.plan-item:not(.plan-done) .plan-mark{color:transparent}
+.plan-item:hover .plan-mark{border-color:var(--team-secondary)}
+.plan-label{font-size:14px}
+.plan-detail{margin-top:1px}
+.hub-wire-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid #27384b}
+.command-center .hub-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.hub-item{min-height:0;padding:11px 12px 10px;border-radius:9px;box-shadow:none;background:#141e2a;border-left-width:3px}
+.hub-kicker{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:9.5px}
+.hub-kicker::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.9}
+.hub-item.alert{order:0;background:rgba(231,188,98,.06)}.hub-item.alert .hub-kicker{color:var(--dl-gold)}
+.hub-item.bad-news{order:1;background:rgba(239,125,133,.05)}.hub-item.bad-news .hub-kicker{color:var(--dl-red)}
+.hub-item.action{order:2}.hub-item.action .hub-kicker{color:var(--team-secondary)}
+.hub-item.good-news{order:3}.hub-item.good-news .hub-kicker{color:var(--dl-green)}
+.hub-item.hub-link .hub-kicker::after{margin-left:auto;color:#6f8298}
+.hub-item.hub-link:hover,.hub-item.hub-link:focus-visible{transform:none;background:#182535}
+/* Tiles already promoted into the broadcast strip collapse to one-line links. */
+.hub-item.hub-promoted{order:9;grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:6px 10px;background:transparent;border-color:#27384b;border-left-width:2px}
+.hub-item.hub-promoted .hub-kicker{margin:0;flex:0 0 auto;color:#7f91a7}
+.hub-item.hub-promoted .hub-kicker::after{display:none}
+.hub-item.hub-promoted .hub-main{font-size:12px;font-weight:600;color:#c9d4e2}
+.hub-item.hub-promoted .hub-sub{display:none}
+.hub-grid.hub-quiet::after{content:"Nothing else on the wire this week.";grid-column:1/-1;order:5;padding:8px 0;font-size:12px;color:#7f91a7}
+
+/* ---- 4. Top 15 / snapshot: broadcast-style rank list ------------------------------- */
+#top15 .rankrow{align-items:center;padding:7px 8px}
+#top15 .rankrow>div:first-child{display:flex;align-items:center;gap:9px;min-width:0}
+#top15 .rank{width:22px;text-align:right;font-variant-numeric:tabular-nums}
+#top15 .rankrow>div:last-child{font-variant-numeric:tabular-nums;font-weight:650;color:#c9d4e2}
+#top15 .rankrow.target{border-radius:7px;background:rgba(var(--team-rgb),.10);font-weight:700}
+.sports-mark.small{width:24px;height:24px;border-radius:6px;font-size:8px;box-shadow:none}
+#snapshot .lineitem strong{font-variant-numeric:tabular-nums}
+
+@media(max-width:900px){
+  .command-grid{grid-template-columns:1fr;gap:18px}
+  .program-masthead{grid-template-columns:minmax(0,1fr) auto;gap:16px 18px}
+  #teamName{font-size:28px}
+  .masthead-status .big,#recordBig{font-size:44px}
+}
+@media(max-width:700px){
+  .program-masthead{grid-template-columns:1fr;grid-template-areas:"identity" "status" "metrics" "actions";padding:16px;gap:14px}
+  .masthead-mark{width:48px;height:48px;font-size:13px;border-radius:11px}
+  .masthead-status{text-align:left;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"eyebrow eyebrow" "record rank" "record week";column-gap:14px;align-items:center;padding-top:12px;border-top:1px solid #23334a}
+  .masthead-status .eyebrow{grid-area:eyebrow}
+  .masthead-status .big{grid-area:record;font-size:40px}
+  #rankLine{grid-area:rank;align-self:end}
+  #weekLine{grid-area:week;align-self:start;margin:0}
+  .masthead-actions{justify-content:stretch}
+  .masthead-actions button{flex:1 1 auto}
+  #teamName{font-size:25px}
+  .command-center .hub-grid{grid-template-columns:1fr}
+  .hub-item.hub-promoted{flex-wrap:wrap;gap:4px 10px}
+}
 </style></head><body>
 <div id="app">
   <header class="topbar">
@@ -702,31 +748,39 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 
   <main>
     <section id="dashboard" class="panel tab active">
-      <div class="hero-grid">
-        <div class="card">
-          <div class="small muted">CURRENT PROGRAM</div>
-          <h2 id="teamName">—</h2>
-          <div id="teamMeta" class="muted">—</div>
-          <div class="metric-grid" id="teamMetrics"></div>
+      <div class="card program-masthead hero-grid">
+        <div class="masthead-identity">
+          <div class="masthead-mark" aria-hidden="true"></div>
+          <div class="masthead-copy">
+            <div class="eyebrow">CURRENT PROGRAM</div>
+            <h2 id="teamName">—</h2>
+            <div id="teamMeta" class="muted">—</div>
+          </div>
         </div>
-        <div class="card">
-          <div class="small muted">DYNASTY STATUS</div>
+        <div class="masthead-status">
+          <div class="eyebrow">DYNASTY STATUS</div>
           <div class="big" id="recordBig">0–0</div>
           <div id="rankLine" class="muted">Preseason</div>
           <div id="weekLine" class="muted">2027 · Week 0</div>
-          <div class="button-row">
-            <button id="simWeek">Sim Week</button>
-            <button id="simSeason">Sim Regular Season</button>
-          </div>
+        </div>
+        <div class="metric-grid" id="teamMetrics"></div>
+        <div class="masthead-actions button-row">
+          <button id="simWeek">Sim Week</button>
+          <button id="simSeason">Sim Regular Season</button>
         </div>
       </div>
       <div class="card command-center">
-        <div class="section-head"><div><div class="small muted">WEEKLY COMMAND CENTER</div><h2 id="hubTitle">Preseason Briefing</h2></div><button id="hubAdvance">Advance Week</button></div>
-        <div class="plan-card">
-          <div class="plan-head"><strong id="planHeading">This week</strong><span class="pill" id="planCount"></span></div>
-          <div id="weeklyPlan"></div>
+        <div class="section-head"><div><div class="eyebrow">WEEKLY COMMAND CENTER</div><h2 id="hubTitle">Preseason Briefing</h2></div><button id="hubAdvance">Advance Week</button></div>
+        <div class="command-grid">
+          <div class="plan-card">
+            <div class="plan-head"><strong id="planHeading">This week</strong><span class="pill" id="planCount"></span></div>
+            <div id="weeklyPlan"></div>
+          </div>
+          <div class="hub-wire">
+            <div class="hub-wire-head"><span class="eyebrow">THE WIRE</span></div>
+            <div id="weeklyHub" class="hub-grid"></div>
+          </div>
         </div>
-        <div id="weeklyHub" class="hub-grid"></div>
       </div>
       <div class="two-col">
         <div class="card"><h3>Top 15</h3><div id="top15"></div></div>
@@ -2613,7 +2667,7 @@ let activeTab='dashboard';
 function renderActiveTab(){(TAB_RENDERERS[activeTab]||(()=>{}))()}
 function setActiveTab(id){activeTab=id;renderActiveTab()}
 function goToTab(id){if(!$('#'+id))return;$$('.tabs button').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));$$('.tab').forEach(x=>x.classList.toggle('active',x.id===id));setActiveTab(id);$('#'+id).scrollIntoView?.({block:'start'})}
-function render(){const order=ranked();const u=selected();if(!u)return;const p=profiles(u);$('#teamName').textContent=u.name;$('#teamMeta').textContent=`${u.conference} · ${u.offScheme} / ${u.defScheme} · Prestige ${u.prestige} · Ceiling ${u.program_ceiling}`;$('#teamMetrics').innerHTML=[['Offense',grade(p.offense)],['Defense',grade(p.defense)],['Scheme Fit',grade((p.offFit+p.defFit)/2)],['Development',grade(u.development)]].map(x=>`<div class="metric"><div class="small muted">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');$('#recordBig').textContent=`${u.w}–${u.l}`;$('#rankLine').textContent=u.rank<=25?`#${u.rank} nationally`:`#${u.rank} nationally · outside the top 25`;$('#weekLine').textContent=`${universe.year} · Week ${universe.week}`;$('#top15').innerHTML=order.slice(0,15).map((t,i)=>`<div class="rankrow"><div><span class="rank">${i+1}.</span> ${t.name}</div><div>${t.w}-${t.l}</div></div>`).join('');const leaders=u.roster.slice().sort((a,b)=>b.perceived-a.perceived).slice(0,5);$('#snapshot').innerHTML=`<div class="lineitem"><span>Roster</span><strong>${u.roster.length}</strong></div><div class="lineitem"><span>Protected redshirts</span><strong>${u.roster.filter(p=>p.redshirtActive).length}</strong></div><div class="lineitem"><span>Commits</span><strong>${u.commits.length}</strong></div><div class="lineitem"><span>Head Coach</span><strong>${u.staff.HC.name}</strong></div><div class="lineitem"><span>PF / PA</span><strong>${u.pf} / ${u.pa}</strong></div>`+leaders.map(x=>`<div class="lineitem compact"><span>${x.pos} ${x.name}</span><span>${playerGrade(x)} · ${x.style}</span></div>`).join('');renderWeeklyPlan();renderWeeklyHub();renderActiveTab();$('#simConf').disabled=universe.phase!=='confReady';$('#simPlayoff').disabled=universe.phase!=='playoffReady';let devState=ensureDevelopmentState();$('#runOffseason').disabled=universe.phase!=='complete'||!devState.springRun||!devState.fallRun;$('#simDetailedGame').disabled=!findUserGame()}
+function render(){const order=ranked();const u=selected();if(!u)return;const p=profiles(u);$('#teamName').textContent=u.name;$('#teamMeta').textContent=`${u.conference} · ${u.offScheme} / ${u.defScheme} · Prestige ${u.prestige} · Ceiling ${u.program_ceiling}`;$('#teamMetrics').innerHTML=[['Offense',grade(p.offense)],['Defense',grade(p.defense)],['Scheme Fit',grade((p.offFit+p.defFit)/2)],['Development',grade(u.development)]].map(x=>`<div class="metric"><div class="small muted">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');$('#recordBig').textContent=`${u.w}–${u.l}`;$('#rankLine').textContent=u.rank<=25?`#${u.rank} nationally`:`#${u.rank} nationally · outside the top 25`;$('#weekLine').textContent=`${universe.year} · Week ${universe.week}`;$('#top15').innerHTML=order.slice(0,15).map((t,i)=>`<div class="rankrow${t.name===u.name?' target':''}"><div><span class="rank">${i+1}.</span> ${t.name}</div><div>${t.w}-${t.l}</div></div>`).join('');const leaders=u.roster.slice().sort((a,b)=>b.perceived-a.perceived).slice(0,5);$('#snapshot').innerHTML=`<div class="lineitem"><span>Roster</span><strong>${u.roster.length}</strong></div><div class="lineitem"><span>Protected redshirts</span><strong>${u.roster.filter(p=>p.redshirtActive).length}</strong></div><div class="lineitem"><span>Commits</span><strong>${u.commits.length}</strong></div><div class="lineitem"><span>Head Coach</span><strong>${u.staff.HC.name}</strong></div><div class="lineitem"><span>PF / PA</span><strong>${u.pf} / ${u.pa}</strong></div>`+leaders.map(x=>`<div class="lineitem compact"><span>${x.pos} ${x.name}</span><span>${playerGrade(x)} · ${x.style}</span></div>`).join('');renderWeeklyPlan();renderWeeklyHub();renderActiveTab();$('#simConf').disabled=universe.phase!=='confReady';$('#simPlayoff').disabled=universe.phase!=='playoffReady';let devState=ensureDevelopmentState();$('#runOffseason').disabled=universe.phase!=='complete'||!devState.springRun||!devState.fallRun;$('#simDetailedGame').disabled=!findUserGame()}
 function attachPlayerLinks(){$$('[data-player]').forEach(b=>b.onclick=()=>showPlayerProfile(b.dataset.player));paintPortraits()}
 
 // --- v0.9.13: the weekly plan ----------------------------------------------
@@ -2966,6 +3020,7 @@ function applyBrand(){
   root.dataset.teamMark=initials(name);
   const brandMark=document.querySelector('.topbar>div:first-child');
   if(brandMark)brandMark.setAttribute('data-team-mark',initials(name));
+  document.querySelectorAll('.masthead-mark').forEach(el=>el.setAttribute('data-team-mark',initials(name)));
 }
 
 function queueBrand(){
@@ -3009,12 +3064,13 @@ function mark(name,size=''){const p=palette(name);return `<div class="sports-mar
 function go(tab){document.querySelector(`.tabs button[data-tab="${tab}"]`)?.click()}
 
 function dashboard(){
- const d=document.querySelector('#dashboard'),hero=d?.querySelector('.hero-grid'),hub=document.querySelector('#weeklyHub');if(!d||!hero||!hub)return;
+ const d=document.querySelector('#dashboard'),hero=d?.querySelector('.program-masthead,.hero-grid'),hub=document.querySelector('#weeklyHub');if(!d||!hero||!hub)return;
  let f=document.querySelector('#broadcastFeature');if(!f){f=document.createElement('section');f.id='broadcastFeature';f.className='broadcast-feature';hero.after(f)}
  const items=[...hub.querySelectorAll('.hub-item')],next=items.find(x=>txt(x,'.hub-kicker').toUpperCase()==='NEXT UP'),last=items.find(x=>txt(x,'.hub-kicker').toUpperCase()==='FINAL');
+ for(const x of items)x.classList.toggle('hub-promoted',x===next||x===last);hub.classList.toggle('hub-quiet',items.length>0&&items.every(x=>x===next||x===last));
  const u=team(),record=document.querySelector('#recordBig')?.textContent||'0–0',rank=document.querySelector('#rankLine')?.textContent||'Preseason',week=document.querySelector('#weekLine')?.textContent||'';
- if(next){const main=txt(next,'.hub-main'),sub=txt(next,'.hub-sub'),m=main.match(/^Week\s+(\d+):\s+(vs|@)\s+(.+)$/i),wk=m?.[1]||'—',loc=m?.[2]||'vs',opp=(m?.[3]||main).trim();f.innerHTML=`<div class="broadcast-feature-main"><div class="broadcast-kicker">WEEK ${esc(wk)} · NEXT MATCHUP</div><div class="broadcast-matchup"><div class="broadcast-team">${mark(u,'large')}<div><span class="broadcast-team-role">YOUR PROGRAM</span><strong>${esc(u)}</strong><span>${esc(record)} · ${esc(rank)}</span></div></div><div class="broadcast-versus"><b>${loc==='@'?'AT':'VS'}</b><span>SCOUTING DESK</span></div><div class="broadcast-team opponent">${mark(opp,'large')}<div><span class="broadcast-team-role">OPPONENT</span><strong>${esc(opp)}</strong><span>${esc(sub)}</span></div></div></div><div class="broadcast-actions"><button type="button" data-sports-tab="gamelab">Open Game Lab</button><span>${esc(week)}</span></div></div><aside class="broadcast-result"><div class="broadcast-kicker">${last?'LAST RESULT':'PROGRAM STATUS'}</div>${last?`<strong>${esc(txt(last,'.hub-main'))}</strong><span>${esc(txt(last,'.hub-sub'))}</span><button type="button" data-sports-tab="season">View Season</button>`:`<strong>${esc(record)}</strong><span>${esc(rank)} · ${esc(week)}</span>`}</aside>`}
- else if(last){f.innerHTML=`<div class="broadcast-feature-main"><div class="broadcast-kicker">DYNASTY LAB · FINAL</div><div class="broadcast-final">${mark(u,'large')}<div><strong>${esc(txt(last,'.hub-main'))}</strong><span>${esc(txt(last,'.hub-sub'))}</span></div></div><div class="broadcast-actions"><button type="button" data-sports-tab="season">Open Season Center</button><span>${esc(week)}</span></div></div>`}
+ if(next){const main=txt(next,'.hub-main'),sub=txt(next,'.hub-sub'),m=main.match(/^Week\s+(\d+):\s+(vs|@)\s+(.+)$/i),wk=m?.[1]||'—',loc=m?.[2]||'vs',opp=(m?.[3]||main).trim();f.innerHTML=`<div class="broadcast-feature-main"><div class="broadcast-kicker">WEEK ${esc(wk)} · NEXT MATCHUP</div><div class="broadcast-matchup"><div class="broadcast-team">${mark(u,'large')}<div><span class="broadcast-team-role">YOUR PROGRAM</span><strong>${esc(u)}</strong><span>${esc(record)} · ${esc(rank)}</span></div></div><div class="broadcast-versus"><b>${loc==='@'?'AT':'VS'}</b><span>SCOUTING DESK</span></div><div class="broadcast-team opponent">${mark(opp,'large')}<div><span class="broadcast-team-role">OPPONENT</span><strong>${esc(opp)}</strong><span>${esc(sub)}</span></div></div></div><div class="broadcast-actions"><button type="button" data-sports-tab="gamelab">Open Game Lab</button><span>${esc(week)}</span></div></div><aside class="broadcast-result"><div class="broadcast-kicker">${last?'LAST RESULT':'PROGRAM STATUS'}</div>${last?`<strong>${esc(txt(last,'.hub-main'))}</strong><span>${esc(txt(last,'.hub-sub'))}</span><button type="button" data-sports-final="1">Game Center</button>`:`<strong>${esc(record)}</strong><span>${esc(rank)} · ${esc(week)}</span>`}</aside>`}
+ else if(last){f.innerHTML=`<div class="broadcast-feature-main"><div class="broadcast-kicker">DYNASTY LAB · FINAL</div><div class="broadcast-final">${mark(u,'large')}<div><strong>${esc(txt(last,'.hub-main'))}</strong><span>${esc(txt(last,'.hub-sub'))}</span></div></div><div class="broadcast-actions"><button type="button" data-sports-final="1">Game Center</button><button type="button" data-sports-tab="season">Season</button><span>${esc(week)}</span></div></div>`}
  else f.innerHTML=`<div class="broadcast-feature-main"><div class="broadcast-kicker">DYNASTY LAB · PROGRAM DESK</div><div class="broadcast-final">${mark(u,'large')}<div><strong>${esc(u)}</strong><span>${esc(record)} · ${esc(rank)} · ${esc(week)}</span></div></div><div class="broadcast-actions"><span>Matchup and result graphics will surface here as the season advances.</span></div></div>`;
 }
 
@@ -3029,10 +3085,11 @@ function playerHero(){
 function matchup(){
  const c=document.querySelector('#nextGameCard');if(!c||c.querySelector('.matchup-shell'))return;const title=c.querySelector('strong')?.textContent?.trim(),detail=c.querySelector('.muted')?.textContent?.trim();if(!title||!detail)return;const m=title.match(/^Week\s+(\d+):\s+(vs|@)\s+(.+)$/i);if(!m)return;const [,wk,loc,opp]=m,u=team(),halves=detail.split(/\s+·\s+/);c.innerHTML=`<div class="matchup-shell"><div class="matchup-label">WEEK ${esc(wk)} · GAME LAB PREVIEW</div><div class="matchup-board"><div class="matchup-team is-user">${mark(u,'xl')}<strong>${esc(u)}</strong><span>${esc((halves[0]||'').replace(u+':','').trim())}</span></div><div class="matchup-center"><b>${loc==='@'?'AT':'VS'}</b><span>TALE OF THE TAPE</span></div><div class="matchup-team">${mark(opp,'xl')}<strong>${esc(opp)}</strong><span>${esc((halves.slice(1).join(' · ')||'').replace(opp+':','').trim())}</span></div></div><div class="matchup-footer"><span>Current staff/game-model reads</span><strong>${loc==='@'?'ROAD GAME':'HOME GAME'}</strong></div></div>`
 }
+function top15(){for(const row of document.querySelectorAll('#top15 .rankrow')){const cell=row.firstElementChild;if(!cell||cell.querySelector('.sports-mark'))continue;const name=[...cell.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();if(!name)continue;cell.querySelector('.rank')?.insertAdjacentHTML('afterend',mark(name,'small'))}}
 function score(){document.querySelector('#detailedBox .big')?.classList.add('sports-scoreline')}
-let queued=false;function run(){queued=false;dashboard();playerHero();matchup();score()}function queue(){if(queued)return;queued=true;if(window.requestAnimationFrame)window.requestAnimationFrame(run);else setTimeout(run,0)}
-document.addEventListener('click',e=>{const tab=e.target?.closest?.('[data-sports-tab]')?.dataset?.sportsTab;if(tab){e.preventDefault();go(tab)}setTimeout(queue,0)});document.querySelector('#userTeam')?.addEventListener('change',()=>setTimeout(queue,0));
-if(window.MutationObserver){for(const sel of ['#weeklyHub','#playerDialog','#nextGameCard','#detailedBox']){const el=document.querySelector(sel);if(el)new MutationObserver(queue).observe(el,{childList:true,subtree:true,characterData:true,attributes:sel==='#playerDialog'})}}
+let queued=false;function run(){queued=false;dashboard();top15();playerHero();matchup();score()}function queue(){if(queued)return;queued=true;if(window.requestAnimationFrame)window.requestAnimationFrame(run);else setTimeout(run,0)}
+document.addEventListener('click',e=>{if(e.target?.closest?.('[data-sports-final]')){e.preventDefault();[...document.querySelectorAll('#weeklyHub .hub-item')].find(x=>txt(x,'.hub-kicker').toUpperCase()==='FINAL')?.click();return}const tab=e.target?.closest?.('[data-sports-tab]')?.dataset?.sportsTab;if(tab){e.preventDefault();go(tab)}setTimeout(queue,0)});document.querySelector('#userTeam')?.addEventListener('change',()=>setTimeout(queue,0));
+if(window.MutationObserver){for(const sel of ['#weeklyHub','#top15','#playerDialog','#nextGameCard','#detailedBox']){const el=document.querySelector(sel);if(el)new MutationObserver(queue).observe(el,{childList:true,subtree:true,characterData:true,attributes:sel==='#playerDialog'})}}
 queue();
 })();
 
