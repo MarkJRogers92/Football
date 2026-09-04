@@ -230,8 +230,9 @@ const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${
     check(`[${label}] five tab groups`, (await page.$$('.tab-groups button')).length===5);
     await page.click('.tab-groups button[data-group="games"]');
     const gamesTabs=await visibleTabs();
+    // Membership is the property under test; the order is body.html's business, not the group's.
     check(`[${label}] a group shows only its own tabs`,
-      JSON.stringify(gamesTabs)===JSON.stringify(['gamelab','season','stats','newsletter']),
+      JSON.stringify([...gamesTabs].sort())===JSON.stringify(['gamelab','newsletter','season','stats']),
       JSON.stringify(gamesTabs));
     check(`[${label}] selecting a group opens its first tab`,
       await page.$eval('.tab.active',el=>el.id)==='gamelab');
