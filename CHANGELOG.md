@@ -1,5 +1,30 @@
 # Changelog
 
+## v0.9.29-32 — Reconciled: GPT's Game Center drive replay / watch mode
+
+Between this branch's v0.9.28 and this commit, a parallel GPT/codex session shipped four
+versions (v0.9.29-32) straight to `gh-pages` production without ever pushing source — the
+work existed only inside the built `index.html` on the `gh-pages` branch, in no branch or PR.
+
+Reconciled by exact extraction rather than reverse-engineering: `tools/build.js` concatenates
+named source files with known separators, so each unchanged file (`renderer-v1.js`, `storage.js`,
+`visual-identity.js`, `recruit-presentation.js`, most CSS) was locatable verbatim inside the
+live bundle, and the changed ones (`app.js`, `sports-presentation.js`, `body.html`,
+`sports-presentation.css`, `polish.css`) were sliced out using those as anchors. Rebuilding from
+the extracted files reproduces the live `index.html` **byte-for-byte** — confirmed, not assumed.
+
+What it added: a Game Center drive-by-drive replay / watch mode (`driveReplay`, `gameWatchHTML`,
+`watchGame`, `watchUserDetailed`, `animateNumber`, `detailedDriveCount`), plus drive counts that
+now vary per game rather than following a fixed pattern.
+
+One stale test fixed: `tests/games.js` asserted an exact drive count (24) for a fixed seed; that
+number is no longer stable now that drive count varies by design, so the assertion was updated
+to the current value with the real invariant (drive-points-sum-to-score) left in place and
+re-verified. 133/133 Node tests, 144/144 browser checks pass on the reconciled tree.
+
+No feature changes of this branch's own in this entry — this is the merge point. New work
+continues from here as v0.9.33+.
+
 ## v0.9.28 — Fix: an ignored job offer froze career progression forever
 
 Found by a headless multi-season soak test, not by hand-play. If a closed tenure's job offers were never resolved — a player who ignored the CAREER wire tile, or a script that never called `acceptPost` — the season kept simulating normally (games, recruiting, rosters, the wire) while the program's own `careerHistory`, `adminConfidence` and tenure record silently froze at whatever they were the moment the tenure closed, forever. Not a crash: a stuck state that looked like nothing was wrong.

@@ -1,6 +1,6 @@
 {
   "name": "dynasty-lab",
-  "version": "0.9.28",
+  "version": "0.9.32",
   "private": true,
   "description": "Fictional college-football dynasty simulator.",
   "scripts": {

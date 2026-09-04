@@ -1,5 +1,37 @@
 # WORKLOG
 
+## v0.9.29-32 — reconciling GPT's untracked production releases
+
+Checked `git fetch` vs the live site and found production four versions ahead of this branch's
+source, with the extra work existing nowhere in git except baked into `gh-pages`'s built
+`index.html` history (no branch, no PR — `list_pull_requests` came back empty). Confirmed via
+the user this was a parallel GPT/codex session, the same shared-repo pattern as the three codex
+branches reconciled earlier in this project's history — except this time nothing was pushed to
+reconcile *from*.
+
+The approach that made this tractable: `tools/build.js` concatenates named files with '\n' and no
+markers, but each file's exact text is still a locatable substring of the bundle if it didn't
+change. Checked every source file with `String.indexOf` against the live bundle; six were
+byte-identical (found instantly), five had changed (`app.js`, `sports-presentation.js`,
+`body.html`, `sports-presentation.css`, `polish.css`). For the changed ones, sliced the bundle
+between the offsets of its known-unchanged neighbors. Two gotchas: `sports-presentation.js`'s
+extraction was right the first time, but the *first* CSS check falsely reported `polish.css`
+unchanged because `indexOf` only proves the known text is a substring somewhere — `polish.css` is
+the last file before `</style>`, and the new keyframes were appended to its end, so the old
+content was a true prefix of the new. Fixed by re-slicing to the `</style>` tag as the hard
+boundary instead of trusting the substring match. Verified by rebuilding from the swapped-in
+files and diffing against the live bundle with `cmp` — got byte-identical only after both CSS
+fixes landed, which is the actual proof this is correct, not a good guess.
+
+One test broke against the reconciled `app.js`: `tests/games.js` hardcoded a drive count (24) for
+seed 922. The user confirmed drive count is now intentionally variable per game rather than
+fixed, so this was never a real invariant — updated to the current value (23) and left the
+invariant that does matter (drive points reconcile to the final score) in place, independently
+re-verified before touching anything.
+
+Validation: full Node suite (133/133) and browser suite (144/144) both green on the reconciled
+tree before committing.
+
 ## v0.9.28 — blocking the calendar on an unresolved job offer
 
 Plan: fix the freeze found during a 7-season headless soak test of v0.9.21-27.

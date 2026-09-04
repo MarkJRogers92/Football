@@ -1,12 +1,27 @@
-# Dynasty Lab — v0.9.28 checkpoint
+# Dynasty Lab — v0.9.32 checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `claude/v0928-career-blocks-calendar` (merged into the
-main working branch `claude/review-improvement-dwjemy`)
+Current source branch: `claude/review-improvement-dwjemy` (reconciled directly —
+see below)
 Production branch: `gh-pages`
-Production: v0.9.28 at https://markjrogers92.github.io/Football/
+Production: v0.9.32 at https://markjrogers92.github.io/Football/
 
-## Current release
+## Current release: reconciliation, not a feature
+
+v0.9.29-32 shipped from a parallel GPT/codex session directly to `gh-pages`
+with no source ever pushed to any branch or PR — the only record was the
+built `index.html` in gh-pages history. Reconciled by exact extraction (see
+CHANGELOG/WORKLOG for method); the rebuild is byte-identical to what was live.
+Added: Game Center drive-by-drive replay / watch mode. This branch's own
+v0.9.21-28 work is untouched and still fully present.
+
+**If this happens again:** check `git fetch origin gh-pages` vs your branch's
+VERSION.txt before assuming production matches source. `tools/build.js`'s
+file-concatenation is exploitable for exactly this kind of reconciliation —
+diff each source file against the live bundle with `String.indexOf` before
+assuming any of them changed.
+
+## Previous release
 
 v0.9.28 fixes a real bug found by a 7-season headless soak test (not by hand
 play): an ignored job offer froze career progression forever while the rest of
@@ -198,7 +213,10 @@ simulation gaps.
 
 ## Storage guardrail
 
-Read `STORAGE.md` before altering saves. v0.9.28 changes no stored state.
+Read `STORAGE.md` before altering saves. v0.9.29-32 (GPT) added Game Center
+watch-mode presentation only, no new persisted fields as far as reconciliation
+could tell — verify against STORAGE.md if anything looks off.
+v0.9.28 changed no stored state.
 v0.9.27 added `t.coachTreeCredited`,
 additive. v0.9.26 changed no stored state at all.
 v0.9.25 added `p.academicStanding`,
@@ -237,7 +255,7 @@ surface itself — grouping, or a first-run path.
 ## Resume prompt
 
 Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.28 is production and all
+`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.32 is production and all
 known feature branches are reconciled into the main line — check
 `git branch -r` for anything new before assuming that's still true. Work in
 a new bounded branch, validate fully (`npm test` + `npm run test:browser`),
