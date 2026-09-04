@@ -891,6 +891,40 @@ th.sortable.sorted{color:var(--team-secondary)}
   .sports-recruit-profile-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
   .sports-recruit-profile-grid .profile-stat .v{font-size:13px}
 }
+
+/* ==== Recruiting board (Phase 5) ===================================================== */
+/* Secondary text inside data rows is metadata, not an eyebrow */
+td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .small.muted,.leader-row .small.muted,.coach-card .small.muted,.candidate-card .small.muted,.timeline .small.muted{text-transform:none;letter-spacing:0;font-weight:500;font-size:11px;color:var(--ink-3)}
+#classSummary{font-size:var(--t-body)}
+#classSummary .small.muted{margin-top:4px}
+#recruiting th,#recruiting td{padding:8px 7px}
+#recruiting .player-cell-text .player-button{white-space:nowrap}
+#recruiting td[data-label="Rank"]{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.stars,td[data-label="Stars"]{color:var(--dl-gold);letter-spacing:-.08em;white-space:nowrap;font-size:12px}
+#recruiting td[data-label="Hometown / HS"]{white-space:nowrap;max-width:180px}
+#recruiting td[data-label="Hometown / HS"] .small{white-space:normal;overflow:hidden;text-overflow:ellipsis}
+#recruiting td[data-label="Scout"],#recruiting td[data-label="Trend"],#recruiting td[data-label="Miles"],#recruiting td[data-label="Pos"]{white-space:nowrap}
+#recruiting td[data-label="Miles"],#recruiting td[data-label="Interest"]{font-variant-numeric:tabular-nums}
+.interest-val{font-weight:700;font-size:14px}
+#recruiting td[data-label="Leader"]{font-size:12px;color:var(--ink-2)}
+#recruiting td button,#recruiting td select{padding:5px 8px;font-size:12px}
+#recruiting tbody tr.target td:first-child{box-shadow:inset 3px 0 0 var(--team-secondary)}
+.battle-card{padding:10px 0}
+.battle-schools .battle-school:first-child{border-color:color-mix(in srgb,var(--team-secondary) 50%,var(--line-3));color:var(--ink-1)}
+.signing-class-board{background:var(--surf-1);border-color:var(--line-2)}
+.signing-card{box-shadow:none}
+@media(max-width:700px){
+  #recruiting td[data-label="Hometown / HS"]{white-space:normal;max-width:none}
+  .stacked-table td[data-label="Stars"]>span{text-align:left}
+}
+/* Keep the whole board, including the Target column, inside a 1280px viewport */
+#recruiting .player-cell-text{max-width:130px}
+#recruiting .player-cell-text .player-button{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+#recruiting td[data-label="Hometown / HS"]{max-width:160px}
+#recruiting td[data-label="Leader"]{max-width:125px;line-height:1.3}
+#recruiting td[data-label="Priority"]{white-space:nowrap;font-size:12px}
+#recruiting td select{max-width:104px}
+@media(max-width:700px){#recruiting .player-cell-text{max-width:none}#recruiting td select{max-width:100%}}
 </style></head><body>
 <div id="app">
   <header class="topbar">
@@ -1066,7 +1100,7 @@ th.sortable.sorted{color:var(--team-secondary)}
         <div><h2>Recruiting Board</h2><div class="muted">Each recruit now has a region and a major priority. Visits, coaching, scheme, NIL, development and program trajectory influence the race.</div></div>
         <button id="autoTarget">Auto-Target 20</button>
       </div>
-      <div class="card" id="classSummary"></div>
+      <div class="card card--compact" id="classSummary"></div>
       <div class="card"><h3>Active Recruiting Battles</h3><div id="recruitBattleBoard"></div></div>
       <div class="table-wrap"><table><thead><tr>
         <th class="sortable" data-sort="name">Recruit</th><th class="sortable" data-sort="pos">Pos</th><th class="sortable" data-sort="rank">Rank</th><th class="sortable" data-sort="stars">Stars</th><th class="sortable" data-sort="home">Hometown / HS</th><th class="sortable" data-sort="miles">Miles</th><th class="sortable" data-sort="priority">Priority</th><th class="sortable" data-sort="scout">Scout</th><th class="sortable" data-sort="interest">Interest</th><th class="sortable" data-sort="trend">Trend</th><th class="sortable" data-sort="leader">Leader</th><th>Visit</th><th>Promise</th><th></th>
@@ -2996,7 +3030,7 @@ function attachRecruitSort(){
  });
 }
 function renderRecruiting(){const u=selected(),rank=recruitingClassRank(u);const sch=scholarshipSummary(u);
- $('#classSummary').innerHTML=`<strong>${rank?'#'+rank:'Unranked'} recruiting class</strong> · <strong class="${sch.over?'bad':sch.room?'':'warn'}">${sch.committed}/${sch.capacity} scholarships</strong> ${sch.over?`· <span class="bad">${sch.over} over the limit — offers will be pulled on signing day</span>`:`· ${sch.room} spot${sch.room===1?'':'s'} left`} · ${u.commits.length} commitments · ${universe.recruits.filter(r=>r.targeted&&!r.committed).length} active targets · ${universe.recruits.filter(r=>r.committed===u.name&&r.stars>=4).length} blue chips · Best pipeline: ${Object.entries(u.pipelines||{}).sort((a,b)=>b[1]-a[1])[0]?.[0]||u.conference}`;$('#classSummary').innerHTML+='<div class="small muted">Promises are assessed when the player’s first offseason is finalized. Early Role: 8 appearances, adjusted for injury. Development Plan: Technique in both camps. NIL Priority is recorded only.</div>';renderRecruitBattles();$('#recruitBody').innerHTML=sortRecruits(universe.recruits).slice(0,220).map(r=>{let tr=r.trend||0,trend=tr>0?`<span class="trend-up">↑ ${tr}</span>`:tr<0?`<span class="trend-down">↓ ${Math.abs(tr)}</span>`:'<span class="trend-flat">—</span>';return `<tr class="${r.targeted?'target':''}"><td data-label="Player"><div class="player-cell">${portraitTag(r,64,'list','recruit')}<div class="player-cell-text"><button class="player-button" data-recruit="${r.id}">${r.name}</button><div class="small muted">${r.style}</div></div></div></td><td data-label="Pos">${r.pos}</td><td data-label="Rank">#${r.nationalRank}<div class="small muted">#${r.positionRank} ${r.pos}</div></td><td data-label="Stars">${'★'.repeat(r.stars)}</td><td data-label="Hometown / HS">${r.homeCity}, ${r.homeState}<div class="small muted">${r.highSchool}</div></td><td data-label="Miles">${recruitDistance(u,r)}</td><td data-label="Priority">${r.priority}</td><td data-label="Scout">${grade(r.scout)} / ${grade(r.scoutUp)}</td><td data-label="Interest">${r.committed?(r.committed===u.name?(r.challenger?`<span class="warn">WAVERING</span>`:'COMMITTED'):`<span class="muted">Committed</span><div class="small muted">${r.committed}</div>`):r.interest+'%'}</td><td data-label="Trend">${trend}</td><td data-label="Leader">${r.leader||'—'}</td><td data-label="Visit">${r.committed===u.name?'—':`<button data-visit="${r.id}">${r.visitWeek?'Wk '+r.visitWeek:'Schedule'}</button>`}</td><td data-label="Promise">${r.committed?(r.committed===u.name?(r.signedPromise?promiseLabel(r.signedPromise.type):'None'):'—'):`<select data-promise="${r.id}">${PROMISES.map(x=>`<option ${x===(r.promiseOffer?.schoolId===u.id?r.promise:'None')?'selected':''}>${x}</option>`).join('')}</select>`}</td><td data-label="Target">${r.committed===u.name?`<button class="pull-offer" data-pull="${r.id}">Pull offer</button>`:`<button data-target="${r.id}">${r.targeted?'Remove':'Target'}</button>`}</td></tr>`}).join('');$$('[data-target]').forEach(b=>b.onclick=()=>{let r=universe.recruits.find(x=>x.id===b.dataset.target);r.targeted=!r.targeted;renderRecruiting()});$$('[data-visit]').forEach(b=>b.onclick=()=>{let r=universe.recruits.find(x=>x.id===b.dataset.visit);scheduleVisit(r);renderRecruiting()});
+ $('#classSummary').innerHTML=`<strong>${rank?'#'+rank:'Unranked'} recruiting class</strong> · <strong class="${sch.over?'bad':sch.room?'':'warn'}">${sch.committed}/${sch.capacity} scholarships</strong> ${sch.over?`· <span class="bad">${sch.over} over the limit — offers will be pulled on signing day</span>`:`· ${sch.room} spot${sch.room===1?'':'s'} left`} · ${u.commits.length} commitments · ${universe.recruits.filter(r=>r.targeted&&!r.committed).length} active targets · ${universe.recruits.filter(r=>r.committed===u.name&&r.stars>=4).length} blue chips · Best pipeline: ${Object.entries(u.pipelines||{}).sort((a,b)=>b[1]-a[1])[0]?.[0]||u.conference}`;$('#classSummary').innerHTML+='<div class="small muted">Promises are assessed when the player’s first offseason is finalized. Early Role: 8 appearances, adjusted for injury. Development Plan: Technique in both camps. NIL Priority is recorded only.</div>';renderRecruitBattles();$('#recruitBody').innerHTML=sortRecruits(universe.recruits).slice(0,220).map(r=>{let tr=r.trend||0,trend=tr>0?`<span class="trend-up">↑ ${tr}</span>`:tr<0?`<span class="trend-down">↓ ${Math.abs(tr)}</span>`:'<span class="trend-flat">—</span>';return `<tr class="${r.targeted?'target':''}"><td data-label="Player"><div class="player-cell">${portraitTag(r,64,'list','recruit')}<div class="player-cell-text"><button class="player-button" data-recruit="${r.id}">${r.name}</button><div class="small muted">${r.style}</div></div></div></td><td data-label="Pos">${r.pos}</td><td data-label="Rank">#${r.nationalRank}<div class="small muted">#${r.positionRank} ${r.pos}</div></td><td data-label="Stars"><span class="stars">${'★'.repeat(r.stars)}</span></td><td data-label="Hometown / HS">${r.homeCity}, ${r.homeState}<div class="small muted">${r.highSchool}</div></td><td data-label="Miles">${recruitDistance(u,r)}</td><td data-label="Priority">${r.priority}</td><td data-label="Scout">${grade(r.scout)} / ${grade(r.scoutUp)}</td><td data-label="Interest">${r.committed?(r.committed===u.name?(r.challenger?`<span class="pill pill--wavering">WAVERING</span>`:'<span class="pill pill--commit">COMMITTED</span>'):`<span class="muted">Committed</span><div class="small muted">${r.committed}</div>`):`<strong class="interest-val">${r.interest}%</strong>`}</td><td data-label="Trend">${trend}</td><td data-label="Leader">${r.leader||'—'}</td><td data-label="Visit">${r.committed===u.name?'—':`<button data-visit="${r.id}">${r.visitWeek?'Wk '+r.visitWeek:'Schedule'}</button>`}</td><td data-label="Promise">${r.committed?(r.committed===u.name?(r.signedPromise?promiseLabel(r.signedPromise.type):'None'):'—'):`<select data-promise="${r.id}">${PROMISES.map(x=>`<option ${x===(r.promiseOffer?.schoolId===u.id?r.promise:'None')?'selected':''}>${x}</option>`).join('')}</select>`}</td><td data-label="Target">${r.committed===u.name?`<button class="pull-offer" data-pull="${r.id}">Pull offer</button>`:`<button data-target="${r.id}">${r.targeted?'Remove':'Target'}</button>`}</td></tr>`}).join('');$$('[data-target]').forEach(b=>b.onclick=()=>{let r=universe.recruits.find(x=>x.id===b.dataset.target);r.targeted=!r.targeted;renderRecruiting()});$$('[data-visit]').forEach(b=>b.onclick=()=>{let r=universe.recruits.find(x=>x.id===b.dataset.visit);scheduleVisit(r);renderRecruiting()});
  $$('[data-pull]').forEach(b=>b.onclick=()=>{const r=universe.recruits.find(x=>x.id===b.dataset.pull);if(!r)return;
   if(!confirm(`Pull the offer to ${r.name}?\n\nHe reopens his recruitment, will not consider ${u.name} again, and the ${r.homeRegion||'local'} pipeline takes a hit.`))return;
   if(pullOffer(r,u.name,'Pulled by the staff')){setStatus(`Offer pulled: ${r.name} is no longer committed.`);render()}});$$('[data-promise]').forEach(s=>s.onchange=()=>{let r=universe.recruits.find(x=>x.id===s.dataset.promise);setRecruitPromise(r,s.value,u)});attachRecruitLinks()}

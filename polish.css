@@ -309,3 +309,37 @@ th.sortable.sorted{color:var(--team-secondary)}
   .sports-recruit-profile-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
   .sports-recruit-profile-grid .profile-stat .v{font-size:13px}
 }
+
+/* ==== Recruiting board (Phase 5) ===================================================== */
+/* Secondary text inside data rows is metadata, not an eyebrow */
+td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .small.muted,.leader-row .small.muted,.coach-card .small.muted,.candidate-card .small.muted,.timeline .small.muted{text-transform:none;letter-spacing:0;font-weight:500;font-size:11px;color:var(--ink-3)}
+#classSummary{font-size:var(--t-body)}
+#classSummary .small.muted{margin-top:4px}
+#recruiting th,#recruiting td{padding:8px 7px}
+#recruiting .player-cell-text .player-button{white-space:nowrap}
+#recruiting td[data-label="Rank"]{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.stars,td[data-label="Stars"]{color:var(--dl-gold);letter-spacing:-.08em;white-space:nowrap;font-size:12px}
+#recruiting td[data-label="Hometown / HS"]{white-space:nowrap;max-width:180px}
+#recruiting td[data-label="Hometown / HS"] .small{white-space:normal;overflow:hidden;text-overflow:ellipsis}
+#recruiting td[data-label="Scout"],#recruiting td[data-label="Trend"],#recruiting td[data-label="Miles"],#recruiting td[data-label="Pos"]{white-space:nowrap}
+#recruiting td[data-label="Miles"],#recruiting td[data-label="Interest"]{font-variant-numeric:tabular-nums}
+.interest-val{font-weight:700;font-size:14px}
+#recruiting td[data-label="Leader"]{font-size:12px;color:var(--ink-2)}
+#recruiting td button,#recruiting td select{padding:5px 8px;font-size:12px}
+#recruiting tbody tr.target td:first-child{box-shadow:inset 3px 0 0 var(--team-secondary)}
+.battle-card{padding:10px 0}
+.battle-schools .battle-school:first-child{border-color:color-mix(in srgb,var(--team-secondary) 50%,var(--line-3));color:var(--ink-1)}
+.signing-class-board{background:var(--surf-1);border-color:var(--line-2)}
+.signing-card{box-shadow:none}
+@media(max-width:700px){
+  #recruiting td[data-label="Hometown / HS"]{white-space:normal;max-width:none}
+  .stacked-table td[data-label="Stars"]>span{text-align:left}
+}
+/* Keep the whole board, including the Target column, inside a 1280px viewport */
+#recruiting .player-cell-text{max-width:130px}
+#recruiting .player-cell-text .player-button{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+#recruiting td[data-label="Hometown / HS"]{max-width:160px}
+#recruiting td[data-label="Leader"]{max-width:125px;line-height:1.3}
+#recruiting td[data-label="Priority"]{white-space:nowrap;font-size:12px}
+#recruiting td select{max-width:104px}
+@media(max-width:700px){#recruiting .player-cell-text{max-width:none}#recruiting td select{max-width:100%}}
