@@ -1,4 +1,4 @@
-# Dynasty Lab — v0.9.22 preview checkpoint
+# Dynasty Lab — v0.9.22 production checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
 
@@ -6,7 +6,7 @@ Source branch: `codex/v0922-consolidation-tuning`
 
 Production branch: `gh-pages`
 
-Production remains v0.9.21 at https://markjrogers92.github.io/Football/
+Production: v0.9.22 at https://markjrogers92.github.io/Football/
 
 Preview target: https://markjrogers92.github.io/Football/preview/v0922/
 
@@ -19,8 +19,8 @@ finishes recruiting-screen hierarchy and scouting-confidence presentation;
 and replaces the flat 14-tab shell with five primary areas plus a contextual
 second level.
 
-Program Pipeline was not started. Production must not be promoted until the
-v0.9.22 preview is reviewed.
+Program Pipeline was not started. v0.9.22 was promoted only after its preview
+and complete validation checkpoint were reviewed.
 
 ## Tuning result
 
@@ -72,8 +72,9 @@ Both remaining partials in `docs/COMMERCIAL_POLISH_AUDIT.md` are complete:
 
 ## Resume prompt
 
-Review the v0.9.22 preview from `codex/v0922-consolidation-tuning`. Verify the
-new two-level shell, all three Recruiting views, scouting-confidence reads and
-both recruit/roster NIL allocations. Production is still v0.9.21; promote only
-with explicit approval. If approved and stable, define Program Pipeline as a
-separate bounded milestone rather than adding it to this release.
+Continue from the validated v0.9.22 source on
+`codex/v0922-consolidation-tuning`. Production is v0.9.22. If the release is
+stable, define Program Pipeline as a separate bounded milestone rather than
+adding it retroactively to this release. Keep the existing measurement-first
+storage guardrail and use the smallest deterministic calibration that can
+answer the next release question.
