@@ -233,3 +233,34 @@ travel through browser saves, portable exports/imports and player archives.
 Existing saves add an empty history idempotently and create deterministic
 domain estimates only when needed. No IndexedDB schema change or archive
 rewrite is required.
+
+## v0.9.21 additive state
+
+Three features added persisted state. All of it is additive on records that
+already existed, so there is no IndexedDB version bump — the schema stays at 3
+and older saves migrate through `normalizeUniverse()` without special handling.
+
+On each team:
+
+- `rivalry: {rivalId, trophy, series:{w,l,streak,lastYear,lastResult,miles}}` —
+  derived by `deriveRivalries()` from the built schedule. Backfilled when no
+  team on the universe has one. Re-derivation preserves an existing series when
+  the same pair comes back, so history is never silently reset.
+- `adminConfidence` (0-100), `mandate` (`null`, or `{year,wins,text}`) — seeded
+  from `admin_patience` by `ensureAdminState()`.
+- `nilSpent` — reset every offseason by `resetNilSeason()`.
+
+On the universe:
+
+- `tenure: {startYear, school, seasons:[review], ended}` — one review appended
+  per season by `reviewControlledProgram()`.
+
+On players and recruits:
+
+- `nilDeal: {amount, year, schoolId}` — cleared for prior seasons by
+  `resetNilSeason()`. `schoolId` is required on recruits, which are shared
+  objects visible to every program; without it a deal one school paid for would
+  improve every school's pitch.
+
+Events gain three types (`RIVALRY_RESULT`, `ADMIN_REVIEW`, `NIL_DEAL`), all
+carrying `importance` on the same 0-100 scale the wire ranks by.

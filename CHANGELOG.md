@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.9.21 — Stakes: rivalries, the administration, and NIL you have to spend
+
+Three features from the new `IDEAS.md` backlog, all built on data the game already stored.
+
+**Rivalries.** Every program's rival is derived, never authored: the nearest school in its own conference *that is actually on the schedule*. That last clause matters — the conference round-robin plays eight of eleven opponents, so the geographically nearest school is not necessarily one you ever meet, and a rivalry you play only two years in three is not a rivalry. Pairing takes the globally closest eligible pair first; taking each team in turn strands the last two in a conference. 114 of 120 programs get a rival; the remainder genuinely have no unpaired conference opponent they play. Each pair shares a trophy, an all-time series and a streak that persists across seasons, and the result moves both fanbases. The wire flags rivalry week before the game and the outcome after.
+
+**The administration.** `carousel()` has always fired AI head coaches on `admin_patience` while explicitly skipping the controlled team, so every program in the world lived with consequences except the player's. The board now sets a preseason expectation on the same formula the AI is judged by — `clamp(Math.round((prestige-30)/8),4,10)` — and reviews the season against it. Confidence moves on wins against that number, the rivalry result, and conference and national titles, at a speed set by `admin_patience`: an impatient board (25) swings roughly twice as hard as a patient one (90). Sustained confidence buys resources and facilities; sustained failure costs them, states a mandate for next season, and ultimately ends the tenure. The wire warns while the season is still winnable rather than delivering the verdict in the offseason.
+
+**NIL as a budget.** `t.nil` was a static number that only tilted `recruitPitch`. It is now a finite per-season budget (derived from `nil` and `resources`) that you allocate: a deal on a rostered player is real retention pressure against everything `transferRisk` sums, and a deal on a recruit improves your pitch — and only yours, since deals record the school that paid. Deals are reversible within the season they were signed and clear at the new year. Holding a disgruntled starter and signing a blue-chip come out of the same pool, which is the decision.
+
+- New Roster column for NIL offers, new Program tab rows for rivalry, series, expectation, confidence, mandate and NIL.
+- 13 new tests across `tests/rivalries.js`, `tests/adminconfidence.js` and `tests/nil.js`.
+- Storage: additive only (`t.rivalry`, `t.adminConfidence`, `t.mandate`, `t.nilSpent`, `universe.tenure`, `nilDeal` on players and recruits), backfilled in `normalizeUniverse`. IndexedDB stays at schema 3.
+- Also adds `IDEAS.md`, a twelve-item backlog grounded in what the code actually does, with these three specced.
+
 ## v0.9.20 — The story surface
 
 - **Record chase on the wire.** `recordChaseHubItems` compares every rostered player's live season stats against the standing school and national single-season records and puts the ones in reach on the wire. Passing a mark reads as NATIONAL RECORD (importance 88) or SCHOOL RECORD (72); sitting inside 80% of one reads as RECORD WATCH (60 national / 50 school), naming the number and who holds it. One tile per player so a quarterback cannot take the whole wire on passing yards and passing touchdowns at once, two tiles total.

@@ -1,5 +1,58 @@
 # WORKLOG
 
+## v0.9.21 — three stakes features
+
+Plan: the user picked the top three from the brainstorm — hot seat, rivalries,
+NIL as a budget. Wrote `IDEAS.md` first so the other nine ideas survive the
+session, then built in dependency order (rivalries feed administration
+confidence).
+
+**Rivalries — the assumption that was wrong.** The spec said an in-conference
+rival is guaranteed to be played because weeks 4-11 are a conference
+round-robin. It is not: `buildSchedule` runs `for(let r=0;r<8;r++)` over a
+twelve-team conference, so each team plays eight of eleven conference
+opponents, the same eight every season. The first implementation derived rivals
+by pure geography and the test caught it immediately — Chicago Metropolitan's
+nearest conference school is twelve miles away and is not on its schedule.
+Fixed by deriving from the schedule instead: only opponents actually played
+qualify. The cost is honest and worth naming — Chicago's rival is Fort Wayne
+State at 140 miles, not the school across town, because the school across town
+is never played. Guaranteeing the annual meeting was judged worth more than
+geographic purity, since a rivalry you skip two years in three does not work.
+
+Second correction in the same feature: per-team greedy pairing left six teams
+unpaired, in three conferences, two apiece — the last two in a conference
+having no unpaired opponent they meet. Switched to sorting all eligible pairs
+by distance and taking the closest first. Still six unpaired, and the test now
+asserts *why*: for each unpaired team, no eligible partner remained. That is a
+real property of the schedule, not a bug, and the test says so rather than
+hiding it behind a loose threshold.
+
+**The administration.** The framing had to be checked before writing anything.
+I pitched this as "you get fired and take a lower job", but the player hires
+their own HC — `carousel()` creates an opening on the controlled team rather
+than replacing the coach — so the player is the program's steward, not the head
+coach. Firing the player would have contradicted the model. It became
+administration confidence in the program instead, which fits and uses the same
+`admin_patience` field that already drives AI firings, on the same expectation
+formula, so the player is held to exactly the AI's standard. Being rehired
+elsewhere and carrying a career record across tenures is deliberately out of
+scope and noted in IDEAS.md as the follow-up.
+
+Two test failures here were the test being wrong, not the code: a season record
+is longer than twelve games once the postseason is included, and my "hopeless"
+setup (0-4 with eight to play) still left eight wins arithmetically reachable.
+Both fixed in the test with a comment saying why.
+
+**NIL.** Cheapest of the three because both ends already existed: `transferRisk`
+sums morale, promises, coach pressure and scheme fit, so retention relief is one
+subtraction; `recruitPitch` already weighted `t.nil`, so a deal is one addition.
+The only real design point is that recruit deals carry `schoolId` — recruits are
+shared objects visible to all 120 programs, so without it every school would
+benefit from a deal one school paid for. There is a test for exactly that.
+
+Validation: 13 new tests, full Node and browser suites.
+
 ## v0.9.20 — story surface (roadmap milestone A, part 2)
 
 Plan: the unbuilt slice from ROADMAP_V09.md — record-chase alerts and a player

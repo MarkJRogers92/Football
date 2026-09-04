@@ -1,12 +1,27 @@
-# Dynasty Lab — v0.9.20 checkpoint
+# Dynasty Lab — v0.9.21 checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `claude/v0920-story-surface` (merged into the
+Current source branch: `claude/v0921-stakes` (merged into the
 main working branch `claude/review-improvement-dwjemy`)
 Production branch: `gh-pages`
-Production: v0.9.20 at https://markjrogers92.github.io/Football/
+Production: v0.9.21 at https://markjrogers92.github.io/Football/
 
 ## Current release
+
+v0.9.21 adds the three stakes features from `IDEAS.md`: rivalries (derived
+from the schedule, with persistent series and trophies), the administration
+(a preseason expectation and a confidence score that judges the player on the
+same formula `carousel()` uses on AI coaches), and NIL as a finite per-season
+budget spent on retention or recruiting. Read `IDEAS.md` for the remaining
+nine ideas and WORKLOG for the two assumptions that turned out wrong during
+implementation.
+
+Known trade-off worth carrying forward: rivals are the nearest conference
+school **that is actually on the schedule**, because the round-robin plays
+eight of eleven opponents. That means a program's true geographic neighbour is
+sometimes not its rival. 114 of 120 programs are paired.
+
+## Previous release
 
 v0.9.20 completes roadmap milestone A with the story surface: record-chase
 alerts on the wire, and a career chronology in the player profile. Both read
@@ -86,7 +101,10 @@ simulation gaps.
 
 ## Storage guardrail
 
-Read `STORAGE.md` before altering saves. v0.9.20 adds no save-format change of
+Read `STORAGE.md` before altering saves. v0.9.21 adds only additive fields
+(`t.rivalry`, `t.adminConfidence`, `t.mandate`, `t.nilSpent`, `universe.tenure`,
+`nilDeal` on players and recruits), all backfilled in `normalizeUniverse`;
+IndexedDB stays at schema 3. v0.9.20 added no save-format change of
 its own (`importance` is an additive field on hub tiles, which are rebuilt
 every week). v0.9.18 was a merge of already-shipped
 additive changes — no new save-format changes of its own. IndexedDB remains
@@ -113,7 +131,7 @@ surface itself — grouping, or a first-run path.
 ## Resume prompt
 
 Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.20 is production and all
+`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.21 is production and all
 known feature branches are reconciled into the main line — check
 `git branch -r` for anything new before assuming that's still true. Work in
 a new bounded branch, validate fully (`npm test` + `npm run test:browser`),
