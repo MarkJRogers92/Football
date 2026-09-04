@@ -38,6 +38,19 @@ in `normalizeUniverse` but never initialised in `initUniverse`, so a fresh
 universe had it undefined. Both fixed in the engine, which is where they
 belonged.
 
+Two existing tests then failed, and both were the tests owing an update rather
+than the code owing a fix:
+
+- `tests/weeklyplan.js` asserted the plan names 'playoff' straight after the
+  conference round. It now correctly names 'bowls'. Updated to walk the real
+  sequence — conf, bowls, playoff — which is a stronger assertion than before.
+- `tests/games.js` pinned the season's archive at exactly 745 games (720
+  regular + 10 conference + 15 playoff). Bowls are real games and belong in the
+  permanent archive, so the count is higher. Rather than swap in a new magic
+  number, the expectation is now derived — `745 + u.bowls.length` — with a
+  comment naming where each component comes from, so it survives a change to
+  the bowl field size.
+
 Validation: 6 new tests, full Node and browser suites.
 
 ## v0.9.22 — career arc (closing the hole v0.9.21 opened)

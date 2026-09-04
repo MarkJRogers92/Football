@@ -37,10 +37,14 @@ test('permanent boxes match actual player deltas, snapshot identity and retain d
 test('regular season, championships, rollover and portable history preserve game records',async()=>{
  const e=loadEngine({seed:923});await e.loadSchools();e.setUserTeam('Chicago Metropolitan');e.initUniverse();
  e.simWeek();const original=JSON.stringify(e.universe.gameArchive[0]);e.simSeason();e.simConferenceChampionships();e.simPlayoff();
- const u=e.universe;assert.equal(u.gameArchive.length,745);const final=u.gameArchive.find(g=>g.label==='National Championship');assert.ok(final);assert.equal(final.week,17);assert.equal(final.venue,'Neutral site');
+ const u=e.universe;
+ // 720 regular season + 10 conference titles + 15 playoff + however many bowls the field produced.
+ const bowlGames=u.bowls.length,expected=745+bowlGames;
+ assert.ok(bowlGames>0,'bowl season actually happened');
+ assert.equal(u.gameArchive.length,expected);const final=u.gameArchive.find(g=>g.label==='National Championship');assert.ok(final);assert.equal(final.week,17);assert.equal(final.venue,'Neutral site');
  assert.ok(u.events.some(x=>x.type==='CHAMPIONSHIP_WON'&&x.gameIds[0]===final.id));
- e.runSpringCamp();e.runFallCamp();e.runOffseason();assert.equal(JSON.stringify(u.gameArchive[0]),original);assert.equal(u.gameArchive.length,745);
+ e.runSpringCamp();e.runFallCamp();e.runOffseason();assert.equal(JSON.stringify(u.gameArchive[0]),original);assert.equal(u.gameArchive.length,expected);
  const save=JSON.parse(JSON.stringify(e.packUniverse(u)));e.installSave({version:'0.9.2',userTeam:'Chicago Metropolitan',universe:save});assert.equal(JSON.stringify(e.universe.gameArchive[0]),original);
- e.simWeek();assert.equal(e.universe.gameArchive.length,805);assert.equal(new Set(e.universe.gameArchive.map(g=>g.id)).size,805);
+ e.simWeek();assert.equal(e.universe.gameArchive.length,expected+60);assert.equal(new Set(e.universe.gameArchive.map(g=>g.id)).size,expected+60);
  console.log('Game archive bytes/season:',Buffer.byteLength(JSON.stringify(save.gameArchive)));
 });

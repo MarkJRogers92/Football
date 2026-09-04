@@ -15,6 +15,8 @@ test('the plan always names the one step that moves the calendar',async()=>{
  for(let i=0;i<12;i++)e.simWeek();
  assert.ok(keys(e.weeklyPlan(me)).includes('conf'),'the conference round is surfaced when it is due');
  e.simConferenceChampionships();
+ assert.ok(keys(e.weeklyPlan(me)).includes('bowls'),'bowl season is the gate before the playoff');
+ e.simBowls();
  assert.ok(keys(e.weeklyPlan(me)).includes('playoff'));
  e.simPlayoff();
  const plan=e.weeklyPlan(me);
