@@ -1,12 +1,27 @@
-# Dynasty Lab — v0.9.22 checkpoint
+# Dynasty Lab — v0.9.23 checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `claude/v0922-career-arc` (merged into the
+Current source branch: `claude/v0923-bowls-and-fans` (merged into the
 main working branch `claude/review-improvement-dwjemy`)
 Production branch: `gh-pages`
-Production: v0.9.22 at https://markjrogers92.github.io/Football/
+Production: v0.9.23 at https://markjrogers92.github.io/Football/
 
 ## Current release
+
+v0.9.23 adds bowl season and a fanbase that answers to results. A `bowlReady`
+phase sits between the conference round and the playoff; every six-win team
+outside the playoff field plays one more game. `simPlayoff()` deliberately
+plays the bowls itself if called from `bowlReady`, so bowls cannot be skipped
+and the thirteen existing test files that call it directly still work.
+
+`fan_support` now moves once a season and decays toward a per-program
+`fanBaseline`, and it drives home-field advantage — previously a flat 2.2 for
+all 120 programs, now `2.2 + (fan_support-60)*0.03`, deliberately centred so a
+median program is unchanged. `gameSim` is the most load-bearing function in the
+engine; that centring is why this is a spread around current behaviour rather
+than a league-wide rebalance, and a test pins the median to 2.2.
+
+## Previous release
 
 v0.9.22 closes the hole v0.9.21 opened: the administration could end a tenure
 and the run had nowhere to go. A closed tenure now archives to
@@ -112,7 +127,8 @@ simulation gaps.
 
 ## Storage guardrail
 
-Read `STORAGE.md` before altering saves. v0.9.22 adds `universe.careerHistory`,
+Read `STORAGE.md` before altering saves. v0.9.23 adds `universe.bowls`,
+`t.bowlResult` and `t.fanBaseline`, all additive. v0.9.22 added `universe.careerHistory`,
 `universe.jobOffers` and `closed` on `universe.tenure`, all additive.
 v0.9.21 added only additive fields
 (`t.rivalry`, `t.adminConfidence`, `t.mandate`, `t.nilSpent`, `universe.tenure`,
@@ -144,7 +160,7 @@ surface itself — grouping, or a first-run path.
 ## Resume prompt
 
 Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.22 is production and all
+`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.23 is production and all
 known feature branches are reconciled into the main line — check
 `git branch -r` for anything new before assuming that's still true. Work in
 a new bounded branch, validate fully (`npm test` + `npm run test:browser`),

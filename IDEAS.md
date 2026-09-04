@@ -40,7 +40,7 @@ a resource you allocate — hold a player whose `transferRisk` is climbing, or c
 a wavering commit (`pressure`/`challenger` already modelled). Plugs into two
 systems that already exist.
 
-### Fan support as a living number
+### ~~Fan support as a living number~~ — shipped in v0.9.23
 `t.fan_support` is static and feeds exactly one thing: the "Campus Life"
 recruiting pitch. Let wins, rivalry results and trajectory move it, then feed it
 into home-field advantage in `gameSim` (currently a flat `ha=2.2`) and into
@@ -58,7 +58,7 @@ Desk a genuinely hard decision (study table vs. practice reps) and makes a
 Zero occurrences in the codebase. Every school has `lat`/`lon`, `state` and
 `conference`, so rivals can be derived rather than authored.
 
-### Bowl season
+### ~~Bowl season~~ — shipped in v0.9.23
 Also zero. The phase machine runs `regular → confReady → playoffReady → complete`,
 so roughly 112 of 120 teams simply stop. A bowl tier gives every mediocre program
 a reason to care about weeks 9–12 (six wins = eligible), an extra game, bowl

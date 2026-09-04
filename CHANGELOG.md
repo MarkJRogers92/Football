@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.9.23 — Bowl season, and a fanbase that answers to results
+
+**Bowl season.** The phase machine ran `regular → confReady → playoffReady → complete`, so roughly 112 of 120 programs simply stopped playing once the regular season ended. There is now a `bowlReady` phase between the conference round and the playoff: every team with six wins that is not in the playoff field gets one more game, paired best-against-best down the rankings. That gives a mediocre team something to chase in weeks nine through twelve, which is the real point — the wire carries a BOWL WATCH tile naming exactly how many more wins are needed while they can still be got.
+
+- `simPlayoff()` deliberately tolerates being called straight from `bowlReady` and plays the bowls first. Bowls therefore cannot be skipped, and every existing caller — thirteen test files among them — keeps working without change.
+- Each eligible team plays exactly one bowl; a win is worth fan support and is recorded on the team and the event ledger.
+
+**Fan support answers to results.** `t.fan_support` was a static number feeding exactly one recruiting pitch. It now moves once a season toward a target set by wins against expectation, a conference title, a national title and a bowl win — and decays back toward the program's own `fanBaseline`, so one good year is not permanent and one bad year is not fatal.
+
+- It feeds home-field advantage, which was a flat `ha=2.2` for all 120 programs regardless of who was in the stadium. It is now `2.2 + (fan_support-60)*0.03`, bounded to 0.8–3.4 — an average fanbase keeps exactly the old value, so the change is a spread around today's behaviour rather than a shift in it.
+- Together with the rivalry result from v0.9.21, fan support is now a genuine feedback loop: results move the fanbase, the fanbase moves home field and recruiting, and those move results.
+
+- 6 new tests in `tests/bowls.js`. Storage additive: `universe.bowls`, `t.bowlResult`, `t.fanBaseline`. IndexedDB stays at schema 3.
+
 ## v0.9.22 — The career arc
 
 v0.9.21 gave the hot seat an ending and nowhere to go. A dynasty that can only end is worse than one that never ends, so a closed tenure is now a line on a résumé and the résumé is what the next job market reads.

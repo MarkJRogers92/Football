@@ -1,5 +1,45 @@
 # WORKLOG
 
+## v0.9.23 — bowl season and dynamic fan support
+
+Plan: the two highest-ranked remaining items from IDEAS.md, built together
+because they feed each other — a bowl win is one of the things that should move
+a fanbase.
+
+**The blast-radius decision.** Bowls want their own phase: it is a distinct
+thing the player does, and burying it inside the conference round would hide
+it. But thirteen test files call `simConferenceChampionships()` and then
+`simPlayoff()` back to back, and inserting a mandatory phase between them would
+have broken all thirteen — `simPlayoff` would no-op, the phase would never
+reach 'complete', and `runOffseason` would return early. Rather than edit
+thirteen files, `simPlayoff` now plays the bowls itself if it is called while
+still in `bowlReady`. Old callers keep working, the new step is still real and
+visible in the weekly plan, and bowls become impossible to skip. There is a
+test for exactly that path.
+
+**Fan support, centred rather than shifted.** The home-field formula is
+`2.2 + (fan_support-60)*0.03`. 2.2 was the old flat constant and 60 is the
+middle of the fan_support range, so a median program gets exactly what it got
+before and the change is a spread around current behaviour, not a rebalance of
+it. That matters because `gameSim` is the single most load-bearing function in
+the engine and this touches every game played. The test pins the median case to
+2.2 so a future edit cannot quietly shift the whole league.
+
+The decay term matters as much as the movement one. Without decaying toward a
+per-program `fanBaseline`, a decade of good results would ratchet every
+controlled program to 100 and the number would stop meaning anything. A team
+that merely meets expectations settles back to its baseline within a few
+seasons; the test runs twelve to prove it.
+
+Two test failures, both real gaps in the engine rather than the test:
+`seedField` was not exported from the harness, so the test could not check that
+bowl teams are outside the playoff field; and `universe.bowls` was backfilled
+in `normalizeUniverse` but never initialised in `initUniverse`, so a fresh
+universe had it undefined. Both fixed in the engine, which is where they
+belonged.
+
+Validation: 6 new tests, full Node and browser suites.
+
 ## v0.9.22 — career arc (closing the hole v0.9.21 opened)
 
 Plan: v0.9.21's administration could end a tenure and then the run had nowhere

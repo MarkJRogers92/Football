@@ -275,3 +275,14 @@ carrying `importance` on the same 0-100 scale the wire ranks by.
   further seasons.
 
 Both universe fields are backfilled in `normalizeUniverse()`. Still schema 3.
+
+## v0.9.23 additive state
+
+- `universe.bowls: [{label, winner, loser, score, gameId}]` — rebuilt each
+  season by `simBowls()`; initialised in `initUniverse` and backfilled in
+  `normalizeUniverse`.
+- `t.bowlResult: {label, won, year}` — the team's most recent bowl.
+- `t.fanBaseline` — the program's resting fan support, seeded from its starting
+  `fan_support` so seasonal movement has something to decay back toward.
+
+Still schema 3.
