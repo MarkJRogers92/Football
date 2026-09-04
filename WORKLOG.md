@@ -1,5 +1,30 @@
 # WORKLOG
 
+## v0.9.31 — Variable detailed-game possessions
+
+The detailed engine's fixed loop generated H1/A1 through H12/A12 in every
+game, so Watch Mode accurately revealed 24 drives but also exposed that every
+broadcast had the same length. This follow-up changes only that loop.
+
+`detailedDriveCount()` starts at 22 total possessions, moves the target by 0.13
+for each point that the two offenses' average pace differs from 68, adds a
+two-drive standard-deviation game-flow roll, rounds and clamps to 18–30. With
+neutral variance that makes Heavy Play Action vs Heavy Play Action about 20,
+Multiple vs Multiple 22, and Tempo Spread vs Tempo Spread 25. A randomized
+opening side then alternates possessions; an odd total gives that side one more.
+
+The drive function, play outcomes, score accounting, box allocation and archive
+shape are unchanged. Old detailed games are untouched because Watch Mode reads
+their already-stored arrays. Focused coverage checks pace response, variance,
+hard limits, alternating side counts, immutable score reconciliation and replay
+length. No multi-season run was justified for this local controlled-game change.
+
+Final validation: 53 smoke scenarios, 136 Node tests and 121 desktop/iPhone
+end-to-end checks passed with no console errors. The separate presentation-only
+and real-browser storage suites were not rerun because this batch changes no CSS,
+markup, storage API or schema; the end-to-end suite covers Watch and replay
+length on both viewports.
+
 ## v0.9.30 — Broadcast Watch Mode
 
 Plan: extend the v0.9.29 presentation layer into one bounded way to “watch” a

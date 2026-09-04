@@ -1,29 +1,35 @@
-# Dynasty Lab — v0.9.30 Broadcast Watch Mode preview
+# Dynasty Lab — v0.9.31 variable game-flow preview
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `codex/v0930-broadcast-watch` (based on validated
-v0.9.29 source `codex/v0929-game-center-motion` at `b70de03`)
+Current source branch: `codex/v0931-variable-drives` (based on validated
+v0.9.30 source `codex/v0930-broadcast-watch` at `e046609`)
 Production branch: `gh-pages`
 Production: v0.9.29 at https://markjrogers92.github.io/Football/
 
 ## Current release
 
-v0.9.30 is a presentation-only Broadcast Watch Mode. Game Lab now offers Watch
-My Next Game, which calculates the existing detailed game once and then hides
-its final while the archived possession sequence is revealed. Controls cover
-play/pause, next drive, slow/normal/fast playback and skip to final. Any detailed
-archived game can be rewatched through the new Game Center Watch tab.
+v0.9.31 removes the detailed engine's fixed 24-drive structure. A game now has
+18–30 total possessions based on both offenses' tempo plus game-flow variance.
+Slow matchups center near 20, balanced matchups near 22 and two Tempo Spread
+teams near 25. Possessions alternate from a randomized opening side, so teams
+finish even or one drive apart.
 
-The broadcast uses only archived drive side, plays, result and points and labels
-field position, clock and possession time as unavailable. Playback is transient
-DOM state. No engine formula, RNG call order, save field, archive format or
-IndexedDB schema changed. No multi-season calibration was run because there is
-no simulation change. Preview target:
-https://markjrogers92.github.io/Football/preview/v0930/
+Watch Mode and the drive replay already derive their length from the archived
+drive list, so both follow the new game-specific total and old games retain their
+original sequence. No save field, archive format or IndexedDB schema changed.
+The bounded check sampled drive-count rolls rather than running a multi-season
+calibration. Preview target:
+https://markjrogers92.github.io/Football/preview/v0931/
 
 Production deliberately remains v0.9.29 until this preview is reviewed.
-Validation is green: 188 smoke/Node checks, 156 desktop/mobile browser and
-presentation checks, and six real-browser persistence scenarios.
+Validation is green: 53 smoke scenarios, 136 Node tests and 121 desktop/iPhone
+end-to-end checks. Presentation-only and real-browser storage suites were not
+rerun because this batch changes no CSS, markup, storage API or schema.
+
+## Previous release
+
+v0.9.30 adds Broadcast Watch Mode: play/pause, next drive, speed controls, skip
+to final and rewatching detailed archived games without rerolling their result.
 
 ## Previous release
 

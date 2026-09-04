@@ -336,3 +336,10 @@ snapshot as Game Center, and its current drive, speed, timer, running-score
 display and completion state live only in the open DOM. Starting Watch Mode
 records one normal detailed game; replaying it never writes or rerolls anything.
 IndexedDB remains schema 3.
+
+## v0.9.31 variable drive count
+
+No new stored field. Newly simulated detailed games archive a variable-length
+`drives` array using the existing format; old arrays are neither migrated nor
+regenerated. Watch and replay progress remain transient presentation state.
+IndexedDB remains schema 3.

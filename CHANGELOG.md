@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.9.31 — Variable game flow
+
+Detailed games no longer force exactly twelve possessions per team.
+
+- Each detailed game now produces 18–30 total drives. The target combines both
+  offenses' tempo with game-level variance: slow matchups center near 20,
+  balanced matchups near 22 and two Tempo Spread teams near 25.
+- Possession alternates after a randomized opening side, so teams finish with
+  equal drive counts or a one-possession difference.
+- Watch Mode and the possession replay already read the archived drive list, so
+  their progress counters and reveal sequences automatically match each game's
+  actual length.
+- The focused distribution check samples 80 game-flow rolls and verifies both
+  variability and the 18–30 limits. No long multi-season calibration was run.
+- No new stored fields or IndexedDB migration. Existing archived detailed games
+  retain and replay their original drive counts exactly.
+
 ## v0.9.30 — Broadcast Watch Mode
 
 Detailed games can now be watched as a spoiler-free possession broadcast

@@ -57,7 +57,7 @@ const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${
       drives:document.querySelectorAll('[data-watch-drive]').length,
     }));
     check(`[${label}] Watch Mode opens without spoiling the final`,
-      watchStart.title.includes(' at ')&&!watchStart.title.includes('—')&&watchStart.away==='0'&&watchStart.home==='0'&&watchStart.visible===0&&watchStart.drives===24,JSON.stringify(watchStart));
+      watchStart.title.includes(' at ')&&!watchStart.title.includes('—')&&watchStart.away==='0'&&watchStart.home==='0'&&watchStart.visible===0&&watchStart.drives>=18&&watchStart.drives<=30,JSON.stringify(watchStart));
     await page.click('[data-watch-next]');
     const firstDrive=await page.evaluate(()=>({
       visible:[...document.querySelectorAll('[data-watch-drive]')].filter(x=>!x.hidden).length,
@@ -72,7 +72,7 @@ const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${
       line:document.querySelector('[data-watch-final-line]')?.textContent||'',
       visible:[...document.querySelectorAll('[data-watch-drive]')].filter(x=>!x.hidden).length,
     }));
-    check(`[${label}] skip reveals the recorded final`,watchFinal.final&&watchFinal.line.includes('—')&&watchFinal.visible===24,JSON.stringify(watchFinal));
+    check(`[${label}] skip reveals the recorded final`,watchFinal.final&&watchFinal.line.includes('—')&&watchFinal.visible===watchStart.drives,JSON.stringify(watchFinal));
     await page.click('[data-watch-summary]');
     check(`[${label}] final summary reveals the permanent score`,(await page.locator('#gameDialogName').innerText()).includes('—'));
 
@@ -84,7 +84,7 @@ const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${
       note: document.querySelector('#gameDialogBody')?.textContent || '',
     }));
     check(`[${label}] drive replay renders all recorded possessions`,
-      motion.replay && motion.steps === 24 && motion.note.includes('exact field position'), JSON.stringify(motion));
+      motion.replay && motion.steps===watchStart.drives && motion.note.includes('exact field position'), JSON.stringify(motion));
     await page.waitForFunction(() => document.querySelector('[data-drive-replay]')?.dataset.motionBound === '1');
     await page.click('[data-drive-play]');
     await page.waitForTimeout(650);

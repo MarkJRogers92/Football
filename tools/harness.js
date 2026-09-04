@@ -78,7 +78,7 @@ globalThis.__ENGINE__ = {
   weeklyPlan, ensureWeeklyDecisions, currentWeeklyDecisions, hasPendingWeeklyDecisions, hasPendingCareerChoice, resolveWeeklyDecision, delegateWeeklyDecisions, playerAgencyDecision, playerInteractionWindow, promisePlayerOpportunity, applyRequestedPositionChange, importantStarters, weeklyPlayerPlan, pipelineStrength, oversignAppetite, scholarshipRoom, scholarshipCapacity, scholarshipSummary, projectedReturning, projectedDepartures, pullOffer, recruitBlocked, enforceScholarshipLimits, canTakeCommit, classCommitCount, pulledOfferHubItems, SCHOLARSHIP_LIMIT,
   setTeamScheme, schemeTransition, schemeFamiliarity, advanceSchemeInstall, schemeFitFor, schemeDefFor, schemeFitPressure, applyCoachScheme, ensureCoachScheme, positionOptions, positionChangeWillingness, positionTransitionFit, applyPositionChangeCost, playerSchemeFit, SCHEME_SIDE,
   gameRecap, recapFacts, recapPicker, weeklyNewsletter, newsWeight, newsGames, newsWeeks,
-  gameSim, detailedGame, simulateUserDetailed, watchUserDetailed, gameBoxHTML, gameSummaryHTML, gameDrivesHTML, gameWatchHTML, renderGameArchive, showGameCenter, simWeek, simSeason, simConferenceChampionships, simPlayoff, runOffseason,
+  gameSim, detailedDriveCount, detailedGame, simulateUserDetailed, watchUserDetailed, gameBoxHTML, gameSummaryHTML, gameDrivesHTML, gameWatchHTML, renderGameArchive, showGameCenter, simWeek, simSeason, simConferenceChampionships, simPlayoff, runOffseason,
   runSpringCamp, runFallCamp, advanceRecruiting, finalizeRecruiting,
   generateRecruitPool, generatePlayer, generateRoster, conditionRating,
   roleFit, unit, starter, roleStarter, participants, eligibilityBase,
