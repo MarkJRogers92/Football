@@ -215,3 +215,12 @@ options and resolution. It travels through the existing core browser save and
 portable JSON paths; old saves normalize it to an empty array. Resolutions also
 append an ordinary `WEEKLY_DECISION_RESOLVED` dynasty event. No IndexedDB schema
 change, archive rewrite or new storage reference is introduced.
+
+## v0.9.15 additions
+
+Player-initiated locker-room conversations continue to use the existing
+`universe.weeklyDecisions` core array. New records identify `source: "PLAYER"`
+and may carry a requested position; older v0.9.14 records receive
+`source: "STAFF"` idempotently on load. A player's latest deferred, declined or
+approved position request is ordinary player state and is retained in an archive
+record if the player departs. No IndexedDB schema change or archive rewrite.

@@ -14,6 +14,13 @@
 - Fixed in review: the Signing Class card's "of 30 slots" was a leftover from before v0.9.11 introduced dynamic scholarship capacity; it now reads the real per-program number, and the memoized re-render that was silently dropping the correct value now keys on capacity too.
 - No simulation, storage, schema or save-format changes beyond the fix above. Audit and continuation notes in `docs/`.
 
+## v0.9.15 — Player Agency / Locker Room
+
+- Players can now initiate five focused Coach's Desk conversations: playing-time complaints, transfer concerns, role requests, redshirt discussions and position-change requests. Every trigger comes from existing morale, promises, relationships, usage, depth, transfer risk, redshirt eligibility or role/scheme fit.
+- Responses feed bounded changes back into the existing morale, staff-trust, promise, redshirt, rotation and position systems. Position requests use the established familiarity path and player-requested promise handling; no ratings or hidden personality values are exposed.
+- Player requests share `universe.weeklyDecisions`, the existing cards and the event ledger. A per-player cooldown, alternate-week cadence and rolling cap of three interactions per four weeks keep the locker room from becoming a constant interruption.
+- Old decisions normalize additively as staff-originated. Browser/portable persistence remains on the existing schema, and Sim Regular Season can continue by delegating conversations to staff.
+
 ## v0.9.14 — The Coach's Desk
 
 - The Weekly Command Center can now open up to three state-backed coaching decisions in a controlled-team week: a compromised starter's workload, a player nearing the four-game redshirt threshold, a meaningful playing-time concern, or a choice between two recruiting priorities.
