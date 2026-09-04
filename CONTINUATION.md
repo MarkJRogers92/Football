@@ -23,7 +23,9 @@ desktop/iPhone browser presentation checks (115 + 14 + 21), and 7 real
 IndexedDB persistence scenarios, with no browser console errors. The final pass
 corrected one stale test expectation to count the variable bowl field; no
 product or storage change was needed. No long calibration was run. Publish only
-to `/preview/v0934/`, then stop for review. Production stays v0.9.33.
+to `/preview/v0934/`, then stop for review. The preview is live at
+https://markjrogers92.github.io/Football/preview/v0934/. Production stays
+v0.9.33.
 
 ## Current release
 
