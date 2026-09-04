@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.9.28 — Fix: an ignored job offer froze career progression forever
+
+Found by a headless multi-season soak test, not by hand-play. If a closed tenure's job offers were never resolved — a player who ignored the CAREER wire tile, or a script that never called `acceptPost` — the season kept simulating normally (games, recruiting, rosters, the wire) while the program's own `careerHistory`, `adminConfidence` and tenure record silently froze at whatever they were the moment the tenure closed, forever. Not a crash: a stuck state that looked like nothing was wrong.
+
+Fixed the same way the Coach's Desk already blocks the calendar on unresolved decisions: `simWeek`, `simSeason` and `simulateUserDetailed` now refuse to advance while `universe.jobOffers` is non-empty, via a new `hasPendingCareerChoice()` check, with a status message telling the player why. Unlike a Coach's Desk decision there is no "delegate" option — picking your next job **is** the decision — so the check is unconditional rather than skippable the way weekly decisions are during a fast-forwarded season.
+
+**The check that mattered most:** `simSeason`'s fast-forward loop (`while(universe.phase==='regular')...`) would otherwise spin forever re-checking a week that can never advance, since a blocked `simWeek` returns without changing anything. The guard sits at the top of `simSeason` itself, before the loop starts, not just inside `simWeek` — and there's a test asserting `simSeason` returns in under two seconds rather than hanging.
+
+- 4 new tests in `tests/careerblock.js`, including the infinite-loop check.
+- No storage or engine-state change — this only changes when three existing functions are willing to run.
+
 ## v0.9.27 — The coaching tree, a cache fix, and roadmap B measured
 
 **Coaching tree.** Coach career stints and the coach archive already recorded everything needed; nothing showed where the people who worked for you ended up. The Staff tab now has a Coaching Tree card listing every former staffer who moved on, head coaches first, with their career record. Producing a head coach is worth up to two prestige points a season, credited **once per coach** so a long-tenured branch does not pay out forever, and capped by `program_ceiling`.

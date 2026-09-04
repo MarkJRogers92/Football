@@ -1,12 +1,26 @@
-# Dynasty Lab — v0.9.27 checkpoint
+# Dynasty Lab — v0.9.28 checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `claude/v0927-coaching-tree` (merged into the
+Current source branch: `claude/v0928-career-blocks-calendar` (merged into the
 main working branch `claude/review-improvement-dwjemy`)
 Production branch: `gh-pages`
-Production: v0.9.27 at https://markjrogers92.github.io/Football/
+Production: v0.9.28 at https://markjrogers92.github.io/Football/
 
 ## Current release
+
+v0.9.28 fixes a real bug found by a 7-season headless soak test (not by hand
+play): an ignored job offer froze career progression forever while the rest of
+the game kept running. `simWeek`, `simSeason` and `simulateUserDetailed` now
+block on `hasPendingCareerChoice()`, the same pattern the Coach's Desk already
+used for weekly decisions. The one non-obvious part: `simSeason`'s fast-forward
+loop needed its own guard, or a blocked `simWeek` would leave it spinning
+forever rather than hanging cleanly. See WORKLOG.
+
+If you soak-test again: this confirms multi-season headless runs find things
+single-season tests structurally cannot. Worth doing again after the next
+batch of features that touches offseason/tenure/career state.
+
+## Previous release
 
 v0.9.27 adds the coaching tree (Staff tab; producing a head coach is worth up
 to two prestige a season, credited once per coach via `t.coachTreeCredited`),
@@ -184,7 +198,8 @@ simulation gaps.
 
 ## Storage guardrail
 
-Read `STORAGE.md` before altering saves. v0.9.27 adds `t.coachTreeCredited`,
+Read `STORAGE.md` before altering saves. v0.9.28 changes no stored state.
+v0.9.27 added `t.coachTreeCredited`,
 additive. v0.9.26 changed no stored state at all.
 v0.9.25 added `p.academicStanding`,
 `p.academicPlan` and `p.academicHold`, additive. v0.9.24 added `universe.signingDay`,
@@ -222,7 +237,7 @@ surface itself — grouping, or a first-run path.
 ## Resume prompt
 
 Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.27 is production and all
+`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.28 is production and all
 known feature branches are reconciled into the main line — check
 `git branch -r` for anything new before assuming that's still true. Work in
 a new bounded branch, validate fully (`npm test` + `npm run test:browser`),

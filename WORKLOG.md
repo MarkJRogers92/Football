@@ -1,5 +1,42 @@
 # WORKLOG
 
+## v0.9.28 — blocking the calendar on an unresolved job offer
+
+Plan: fix the freeze found during a 7-season headless soak test of v0.9.21-27.
+A closed tenure's job offers, if never resolved, left careerHistory,
+adminConfidence and the tenure record frozen forever while the rest of the
+game — that team's games, recruiting, rosters — kept running normally. Not a
+crash, just silently stuck, and the wire's CAREER tile kept saying so every
+week without anything actually being blocked.
+
+Chose to block the calendar over auto-accepting an offer after N weeks,
+because it is the smaller, lower-risk change: `simWeek` already has this exact
+pattern for the Coach's Desk (`hasPendingWeeklyDecisions`), so
+`hasPendingCareerChoice` is the same shape, not a new one. Auto-accept would
+have needed a week-counter, a rule for which offer gets picked, and an answer
+to what happens on the weeks in between anyway — this fix is one boolean and
+three call sites.
+
+The one place a naive version of this would have broken something new:
+`simSeason`'s `while(universe.phase==='regular'){delegateWeeklyDecisions(...);
+simWeek(true)}`. If only `simWeek` were guarded, a blocked `simWeek` returns
+without changing `universe.week` or `universe.phase`, so the while condition
+stays true forever — an actual hang, not a gameplay bug. `simSeason` needed its
+own guard before the loop starts. The test for this asserts `simSeason`
+returns in under two seconds, since "does not hang" is the property that
+actually matters and a normal assertion wouldn't have caught a spin loop
+directly.
+
+Also guarded `simulateUserDetailed`, the single-game path, the same way.
+`simConferenceChampionships`/`simPlayoff` need no guard: they only run once a
+regular season has already completed, and a pending career choice can only
+exist starting at week 0 of the *next* season (offers are created inside
+`runOffseason`, which itself resets the season to `regular`/week 0 right
+before returning) — so the block at `simWeek`'s first week already prevents
+the postseason functions from ever being reached with an unresolved choice.
+
+Validation: 4 new tests, full Node and browser suites.
+
 ## v0.9.27 — coaching tree, cache fix, roadmap B measurement
 
 **The tree** was cheap because `c.careerHistory` already held dated stints per
