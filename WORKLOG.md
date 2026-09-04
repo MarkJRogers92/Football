@@ -458,3 +458,14 @@ Decisions:
   evidence used.
 
 Validation is performed by the one-shot v0.9.5 workflow before preview publish.
+
+## Commercial polish pass (unreleased, presentation only)
+
+Why these calls were made:
+
+- **One masthead instead of two hero cards.** Record and rank belonged next to the program name; splitting them meant two competing headlines. The broadcast strip stays as the "scoreboard" so the masthead never duplicates the next matchup.
+- **Duplicate hub tiles collapse rather than hide.** The strip already promotes NEXT UP and FINAL. Hiding them would break `tests/browser.js` (it clicks the first `.hub-link`) and lose the FINAL tile's direct Game Center link, so they render as one-line links at the bottom of the wire.
+- **Urgency by CSS `order`, not engine sort.** Keeps the pass out of `buildWeeklyHub`. The real importance-based sort remains handoff item A.
+- **A last-loaded `polish.css` instead of editing five CSS files.** Every rule in the pass is in one place another model can read top to bottom; the old two-card hero rules were the only deletions.
+- **Game Center scoreboard is DOM-derived.** `sports-presentation.js` parses the existing title/meta/pregame text, and those elements stay in the DOM (visually hidden) for `aria-labelledby` and the storage regression test that reads `#gamePregame`.
+- **Profile sections are markup edits in `app.js`.** The renderer is the only place the body markup exists; the edit wraps existing values in `<section>`s and moves nothing out of the save model.
