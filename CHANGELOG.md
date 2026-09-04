@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.9.18 — Reconciling the Coach's Desk, Player Agency and Scouting Intelligence
+
+- Merges three GPT/codex feature branches (v0.9.14–v0.9.16 in their own previews) onto the commercial polish pass. See the entries below for what each brings; this release is the reconciliation, not new work of its own.
+
 ## v0.9.17 — Commercial polish pass (presentation only)
 
 - Dashboard: one program masthead (identity, record, rank, week, grades, sim actions); command center splits into weekly plan and "the wire"; hub tiles ordered by urgency; tiles already promoted into the broadcast strip collapse to one-line links; Game Center button on the last result; Top 15 shows team marks and highlights the controlled program.
@@ -9,6 +13,13 @@
 - Game Center: scoreboard with marks, records, ranks and winner emphasis; segmented section control.
 - Fixed in review: the Signing Class card's "of 30 slots" was a leftover from before v0.9.11 introduced dynamic scholarship capacity; it now reads the real per-program number, and the memoized re-render that was silently dropping the correct value now keys on capacity too.
 - No simulation, storage, schema or save-format changes beyond the fix above. Audit and continuation notes in `docs/`.
+
+## v0.9.14 — The Coach's Desk
+
+- The Weekly Command Center can now open up to three state-backed coaching decisions in a controlled-team week: a compromised starter's workload, a player nearing the four-game redshirt threshold, a meaningful playing-time concern, or a choice between two recruiting priorities.
+- Decisions reuse the systems already underneath the game. Injury choices change weekly availability and workload risk, redshirt choices use the existing protection flag and promises, playing-time answers adjust the real rotation/morale/trust/promise state, and recruiting priorities schedule an existing visit.
+- Resolutions persist in `universe.weeklyDecisions` and write a `WEEKLY_DECISION_RESOLVED` entry to the existing event ledger. A short cooldown prevents the same player or recruiting pair from becoming a constant interruption.
+- The existing Weekly Plan remains intact below the decision cards. Single-week controls wait for an answer; Sim Regular Season explicitly delegates choices to the staff.
 
 ## v0.9.13 — The weekly plan
 
