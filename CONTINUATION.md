@@ -1,10 +1,10 @@
-# Dynasty Lab — v0.9.29 preview checkpoint
+# Dynasty Lab — v0.9.29 production checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
 Current source branch: `codex/v0929-game-center-motion` (based on validated
 v0.9.28 source `claude/review-improvement-dwjemy` at `d61ff2c`)
 Production branch: `gh-pages`
-Production: v0.9.28 at https://markjrogers92.github.io/Football/
+Production: v0.9.29 at https://markjrogers92.github.io/Football/
 
 ## Current release
 
@@ -247,9 +247,7 @@ surface itself — grouping, or a first-run path.
 ## Resume prompt
 
 Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.28 remains production;
-v0.9.29 is the presentation-only motion candidate on
-`codex/v0929-game-center-motion`. Review its preview before promotion. For
-later work, check `git branch -r` for anything newer, work in a bounded branch,
-run one proportionate final validation pass, publish a preview first, and
-promote only after review.
+`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.29 is production from
+`codex/v0929-game-center-motion`. For later work, check `git branch -r` for
+anything newer, work in a bounded branch, run one proportionate final
+validation pass, publish a preview first, and promote only after review.
