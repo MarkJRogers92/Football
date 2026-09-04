@@ -1,3 +1,11 @@
+> **Superseded.** This note was written before the pass was reviewed and
+> shipped. It is kept for historical record only — see `CONTINUATION.md` at
+> the repo root for the current, accurate state. In particular: the version
+> was bumped to **0.9.17** (not left at 0.9.13, to avoid colliding with three
+> other preview branches at 0.9.14-16), the "of 30 slots" Signing Class bug
+> below was found and fixed, and this pass **is now production**, not just a
+> preview.
+
 # Dynasty Lab — commercial polish pass: continuation note
 
 **Branches:** `claude/commercial-polish-pass` (as requested) and

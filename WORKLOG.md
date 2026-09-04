@@ -1,5 +1,48 @@
 # WORKLOG
 
+## v0.9.17 — commercial polish pass
+
+Plan: bring the previous session's (Fable) commercial polish work — dashboard
+masthead, design-system tokens, profile/recruiting/Game Center presentation —
+to production. The work itself was presentation-only, layered the same way
+the earlier visual-identity/sports-presentation passes were: read the
+already-rendered DOM, never touch engine state, load last in the build.
+
+What I did:
+- Bumped the version. The branch was left unbumped at 0.9.13 while three
+  other preview branches (codex v0.9.14-16, gameplay features, not yet
+  merged) had already claimed 14-16 in their own previews. Took 0.9.17 to
+  avoid any collision, even though none of those three are in production.
+- Ran the full suite fresh rather than trusting the handoff note's claim:
+  53 smoke + 76 Node + 133 browser checks, all green.
+- Found a real bug on visual inspection, not from a test: the new Signing
+  Class card read "of 30 slots" while the summary line one row below it
+  correctly said "12 spots left" — a flat 30 hardcoded back in v0.9.7,
+  before v0.9.11 made scholarship capacity dynamic. `recruit-presentation.js`
+  is a DOM-scraper by design (per its own header comment, it never touches
+  app.js state), so the fix reads the real number from `#classSummary`'s
+  already-rendered text the same way the file reads everything else.
+- That fix didn't render on the first try. The component memoizes its
+  markup behind a signature string to avoid re-rendering on every mutation;
+  the signature didn't include capacity, so the very first render (before
+  `#classSummary` had real data, capacity falling back to 30) got cached,
+  and a later render with the correct capacity never re-fired because
+  nothing else in the signature had changed. Added capacity to the
+  signature. Confirmed by instrumenting the actual call sequence rather
+  than guessing — the first call really did fire with an empty
+  `summary.textContent`.
+
+Validation: full suite re-run after the fix (53 smoke + 76 Node + 133
+browser, unchanged pass count), plus a direct Playwright pass reading real
+rendered pixels at 1280px and 390px (dashboard, staff, recruiting, Game
+Center) rather than trusting the audit doc's screenshot claims.
+
+Known gaps carried forward from the polish pass itself (not addressed here):
+hub tile order still follows CSS `order` per type rather than the engine's
+`importance` values; Roster/Season/Stats/Development got only the shared
+design system, no screen-specific hierarchy pass; the 390px header is still
+three rows.
+
 ## v0.9.13 — the weekly plan
 
 Plan: close the coherence gap. Fourteen tabs, and nothing told a player which

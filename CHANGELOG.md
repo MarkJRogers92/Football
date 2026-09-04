@@ -1,13 +1,14 @@
 # Changelog
 
-## Unreleased — commercial polish pass (presentation only)
+## v0.9.17 — Commercial polish pass (presentation only)
 
 - Dashboard: one program masthead (identity, record, rank, week, grades, sim actions); command center splits into weekly plan and "the wire"; hub tiles ordered by urgency; tiles already promoted into the broadcast strip collapse to one-line links; Game Center button on the last result; Top 15 shows team marks and highlights the controlled program.
 - Design system: `polish.css` adds type/spacing/surface tokens, flat card variants, button and status-chip families, table density/hover/selected rules, portrait frames, grouped tab separators and a compact 390px header.
 - Profiles: player body grouped into Season / Development / Health / Career; recruit profile framed as a dossier with Close pinned to the corner.
 - Recruiting board: commit/wavering chips, gold stars, weighted rank and interest, targeted-row edge, columns fit a 1280px viewport.
 - Game Center: scoreboard with marks, records, ranks and winner emphasis; segmented section control.
-- No simulation, storage, schema or save-format changes. Version unchanged (0.9.13). Audit and continuation notes in `docs/`.
+- Fixed in review: the Signing Class card's "of 30 slots" was a leftover from before v0.9.11 introduced dynamic scholarship capacity; it now reads the real per-program number, and the memoized re-render that was silently dropping the correct value now keys on capacity too.
+- No simulation, storage, schema or save-format changes beyond the fix above. Audit and continuation notes in `docs/`.
 
 ## v0.9.13 — The weekly plan
 
