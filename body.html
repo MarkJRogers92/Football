@@ -1,8 +1,62 @@
-<div id="app">
+<section id="titleScreen" class="title-screen" aria-labelledby="titleGameName">
+  <div class="title-screen-art" aria-hidden="true"></div>
+  <div class="title-screen-shade" aria-hidden="true"></div>
+  <div class="title-screen-content">
+    <header class="title-brand">
+      <div class="title-crest" aria-hidden="true"><span>DL</span></div>
+      <div>
+        <div class="title-rule"></div>
+        <h1 id="titleGameName">Dynasty <em>Lab</em></h1>
+        <p>Build the program. Own the era.</p>
+      </div>
+    </header>
+
+    <div class="title-menu-shell">
+      <nav id="titleMainMenu" class="title-menu" aria-label="Main menu">
+        <button id="titleContinue" class="title-action title-action--primary" type="button" disabled>
+          <span><strong>Continue Dynasty</strong><small id="titleContinueMeta">Checking for a browser save…</small></span><i aria-hidden="true">›</i>
+        </button>
+        <button id="titleNew" class="title-action" type="button"><span><strong>New Dynasty</strong><small>Choose a program and begin in 2027</small></span><i aria-hidden="true">›</i></button>
+        <button id="titleLoad" class="title-action" type="button"><span><strong>Load Dynasty</strong><small>Browser save or exported JSON</small></span><i aria-hidden="true">›</i></button>
+        <button id="titleOptions" class="title-action" type="button"><span><strong>Options</strong><small>Motion and broadcast playback</small></span><i aria-hidden="true">›</i></button>
+        <button id="titleHowTo" class="title-action title-action--quiet" type="button"><span><strong>How to Play</strong><small>Your first season in three steps</small></span><i aria-hidden="true">›</i></button>
+      </nav>
+
+      <section id="titleNewPanel" class="title-subpanel" aria-labelledby="titleNewHeading" hidden>
+        <div class="title-panel-head"><div><span>NEW DYNASTY</span><h2 id="titleNewHeading">Choose your program</h2></div><button type="button" data-title-back aria-label="Back to main menu">Back</button></div>
+        <label class="title-field">Program<select id="titleTeam" aria-label="Starting program"></select></label>
+        <p>Every dynasty begins in the 2027 preseason. The rest of the country is generated only after you confirm.</p>
+        <button id="titleStart" class="title-panel-primary" type="button">Start Dynasty</button>
+      </section>
+
+      <section id="titleLoadPanel" class="title-subpanel" aria-labelledby="titleLoadHeading" hidden>
+        <div class="title-panel-head"><div><span>LOAD DYNASTY</span><h2 id="titleLoadHeading">Return to the sideline</h2></div><button type="button" data-title-back aria-label="Back to main menu">Back</button></div>
+        <button id="titleLoadBrowser" class="title-panel-choice" type="button" disabled><strong>Load browser save</strong><small id="titleLoadMeta">Checking this device…</small></button>
+        <button id="titleImport" class="title-panel-choice" type="button"><strong>Import exported save</strong><small>Choose a complete Dynasty Lab JSON backup</small></button>
+      </section>
+
+      <section id="titleOptionsPanel" class="title-subpanel" aria-labelledby="titleOptionsHeading" hidden>
+        <div class="title-panel-head"><div><span>OPTIONS</span><h2 id="titleOptionsHeading">Presentation</h2></div><button type="button" data-title-back aria-label="Back to main menu">Back</button></div>
+        <label class="title-toggle"><span><strong>Title &amp; Watch motion</strong><small>Atmosphere and broadcast animation</small></span><input id="titleMotion" type="checkbox" checked></label>
+        <label class="title-field">Default Watch Mode speed<select id="titleWatchSpeed"><option value="1400">Slow</option><option value="850">Normal</option><option value="400">Fast</option></select></label>
+        <button id="titleSaveOptions" class="title-panel-primary" type="button">Save Options</button>
+      </section>
+
+      <section id="titleHowPanel" class="title-subpanel" aria-labelledby="titleHowHeading" hidden>
+        <div class="title-panel-head"><div><span>HOW TO PLAY</span><h2 id="titleHowHeading">Build your era</h2></div><button type="button" data-title-back aria-label="Back to main menu">Back</button></div>
+        <ol class="title-how-list"><li><b>1</b><span><strong>Set the program</strong><small>Shape the roster, roles, staff and weekly plan.</small></span></li><li><b>2</b><span><strong>Own Saturdays</strong><small>Sim instantly or watch your game unfold play by play.</small></span></li><li><b>3</b><span><strong>Build the legacy</strong><small>Recruit, develop, survive expectations and chase titles.</small></span></li></ol>
+      </section>
+    </div>
+
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.9.34</b></span></footer>
+  </div>
+</section>
+
+<div id="app" hidden>
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.9.32</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.9.34</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -11,7 +65,7 @@
       <button id="exportSave">Export</button>
       <button id="importSave">Import</button>
       <input id="importFile" type="file" accept="application/json,.json" hidden>
-      <button id="newUniverse">New Universe</button>
+      <button id="newUniverse">Title Screen</button>
     </div>
   </header>
   <div id="saveStatus" class="save-status muted">No save loaded.</div>

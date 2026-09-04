@@ -136,6 +136,12 @@ function publish({ preview, remove }) {
     target = preview ? path.join(PAGES, 'preview', preview) : PAGES;
     fs.mkdirSync(target, { recursive: true });
     fs.copyFileSync(built, path.join(target, 'index.html'));
+    const titleAsset = path.join(ROOT, 'assets', 'title-stadium-v1.jpg');
+    if (fs.existsSync(titleAsset)) {
+      const assetTarget = path.join(target, 'assets');
+      fs.mkdirSync(assetTarget, { recursive: true });
+      fs.copyFileSync(titleAsset, path.join(assetTarget, 'title-stadium-v1.jpg'));
+    }
     label = preview ? `preview ${preview}` : 'production';
   }
 
