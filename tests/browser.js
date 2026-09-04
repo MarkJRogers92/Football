@@ -23,12 +23,20 @@ const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${
     page.on('pageerror', e => errors.push(String(e)));
 
     await page.goto('file://' + path.join(__dirname, '..', 'index.html'));
+    await page.waitForFunction(() => document.querySelector('#titleTeam')?.options.length === 120, { timeout: 60000 });
+    const titleState=await page.evaluate(()=>({title:!document.querySelector('#titleScreen').hidden,app:!document.querySelector('#app').hidden,programs:document.querySelector('#titleTeam').options.length,background:getComputedStyle(document.querySelector('.title-screen-art')).backgroundImage}));
+    check(`[${label}] title screen opens before a dynasty exists`,titleState.title&&!titleState.app&&titleState.programs===120&&titleState.background.includes('title-stadium-v1.jpg'),JSON.stringify(titleState));
+    if(label==='iphone')check(`[${label}] title screen has no horizontal overflow`,await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth<=1));
+    await page.click('#titleNew');
+    check(`[${label}] New Dynasty opens program selection`,await page.locator('#titleNewPanel').isVisible());
+    if(label==='iphone')check(`[${label}] program selection has no horizontal overflow`,await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth<=1));
+    await page.selectOption('#titleTeam','Chicago Metropolitan');await page.click('#titleStart');
     await page.waitForFunction(() => document.querySelector('#userTeam')?.options.length > 0, { timeout: 60000 });
 
     check(`[${label}] 120 programs in the picker`,
       await page.$eval('#userTeam', el => el.options.length) === 120);
     check(`[${label}] team name rendered`,
-      (await page.$eval('#teamName', el => el.textContent)).length > 2);
+      (await page.$eval('#teamName', el => el.textContent)) === 'Chicago Metropolitan');
     check(`[${label}] Top 15 populated`,
       await page.$$eval('#top15 .rankrow', els => els.length) === 15);
     check(`[${label}] command center populated`,

@@ -13,6 +13,7 @@ const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${
   const page=await browser.newPage({viewport:{width:390,height:844},acceptDownloads:true});
   const errors=[];page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
   await page.goto('file://'+path.join(__dirname,'..','index.html'));
+  await page.waitForFunction(()=>document.querySelector('#titleTeam').options.length===120);await page.click('#titleNew');await page.click('#titleStart');
   await page.waitForFunction(()=>document.querySelector('#userTeam').options.length===120);
   const tab=id=>goTab(page, id);
   const status=pattern=>page.waitForFunction(source=>new RegExp(source).test(document.querySelector('#saveStatus').textContent),pattern,{timeout:30000});
@@ -21,6 +22,9 @@ const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${
   await tab('offseason');await page.click('#runOffseason');
   await page.waitForFunction(()=>document.querySelector('#weekLine').textContent.includes('2028'));
   await page.click('#saveBrowser');await status('^Saved');
+  await page.reload();await page.waitForFunction(()=>!document.querySelector('#titleContinue').disabled,{timeout:30000});
+  assert.equal(await page.locator('#app').getAttribute('hidden'),'');await page.click('#titleContinue');await page.waitForFunction(()=>!document.querySelector('#app').hidden&&document.querySelector('#weekLine').textContent.includes('2028'),{timeout:30000});
+  console.log('PASS startup Continue loads the real browser dynasty before showing the game');
   const record=await page.evaluate(()=>new Promise((resolve,reject)=>{
    const r=indexedDB.open('DynastyLabDB',3);r.onerror=()=>reject(r.error);r.onsuccess=()=>{
     const db=r.result,tx=db.transaction(['saves','archives','games'],'readonly');let main,first,gameChunks=[];
@@ -82,6 +86,6 @@ const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${
   await page.locator('#gameTabs button[data-game-tab="Box Score"]').click();assert.match(await page.textContent('#gameDialogBody'),/Passing/);
   assert.deepEqual(errors,[]);
   console.log('PASS permanent game reopens after rollover, real IndexedDB save/load and JSON export/import');
-  console.log('6 browser persistence scenarios passed; no console errors');
+  console.log('7 browser persistence scenarios passed; no console errors');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

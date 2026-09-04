@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.9.34 — Title screen (handoff candidate)
+
+Dynasty Lab now opens on a game-native stadium title screen instead of silently
+generating a universe and dropping the player into a program. Continue reads the
+existing browser save, New Dynasty requires a program choice before generation,
+and Load supports both the browser slot and the existing complete JSON import.
+Options persist title/Watch motion and default Watch speed as device-local
+preferences. How to Play gives a compact first-season orientation, and the game
+header can return to the title screen without discarding the live session.
+
+The interface is real responsive HTML over an original generated stadium-tunnel
+background, not a screenshot. No dynasty or IndexedDB schema changed. The
+deployment helper now carries the single title background into production and
+versioned preview folders.
+
+Handoff status: the focused desktop/iPhone browser suite passed 114 checks after
+the startup flow was added. A subsequent visual inspection found that author CSS
+overrode the native `hidden` display on subpanels; that one-line presentation fix
+is applied and visually checked. Run the final full Node/browser/storage gate
+before preview publication.
+
 ## v0.9.33 — Program history, and a real weekly gameplan
 
 **Program history.** No program had an all-time record — `t.w`/`t.l` reset every season and nothing archived it. Tracking begins now, additively, for all 120 programs: `t.allTimeRecord` accrues wins, losses, conference titles and national titles once per season, captured at the same point `runOffseason` already knows the final record. Coaching lineage — every stint any known coach has held at a given school — was already derivable from the coaching-tree data (v0.9.27) and needed no new state; it now renders on the Program tab for whichever program is selected, not just the controlled one. Pre-v0.9.33 seasons are not retroactively known, and the card says so.

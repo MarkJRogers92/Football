@@ -11,7 +11,7 @@ const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${
  let fail=0,pass=0;const out=[];const check=(name,ok,detail='')=>{ok?pass++:fail++;out.push(`  ${ok?'PASS':'FAIL'}  ${name}${detail?' — '+detail:''}`)};
  for(const [label,viewport] of [['desktop',{width:1280,height:900}],['iphone',{width:390,height:844}]]){
   const page=await browser.newPage({viewport}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
-  await page.goto('file://'+path.join(__dirname,'..','index.html'));await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000});
+  await page.goto('file://'+path.join(__dirname,'..','index.html'));await page.waitForFunction(()=>document.querySelector('#titleTeam')?.options.length===120,{timeout:60000});await page.click('#titleNew');await page.click('#titleStart');await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000});
   await goTab(page, 'recruiting');await page.waitForSelector('#recruitBody tr');await page.waitForSelector('#signingClassFeature .signing-class-board');
   check(`[${label}] signing-class board renders`,/SIGNING CLASS/.test(await page.locator('#signingClassFeature').innerText()));
   check(`[${label}] signing-class meter renders`,await page.locator('#signingClassFeature .signing-meter').count()===1);

@@ -1,5 +1,27 @@
 # WORKLOG
 
+## v0.9.34 — Title screen handoff
+
+Built from Claude's validated v0.9.33 source (`165a181`) on
+`codex/v0934-title-screen`. Startup no longer calls `initUniverse()`; it loads
+only the school list and menu bindings. A universe is created only after the
+player chooses New Dynasty and confirms a program, or installed through the
+existing browser/JSON validation path.
+
+The title screen includes Continue, New, Load, Options and How to Play. The live
+session remains in memory when returning to the title, so Continue resumes it
+without a reroll. Device-only presentation preferences use localStorage and do
+not enter the dynasty save. The original background was generated as a clean
+asset with no baked-in UI, converted to a 218 KB JPEG, and is copied by the
+existing GitHub Pages publisher beside the standalone HTML.
+
+Credit-conscious handoff: build and syntax checks passed. The focused
+desktop/iPhone browser suite passed 114 checks. After that run, visual inspection
+found and fixed one CSS `hidden` override in the program-selection panel; the
+corrected panel was visually checked. Full Node, complete browser presentation,
+and real IndexedDB persistence suites remain for the next agent before preview.
+No long simulation/calibration was run.
+
 ## v0.9.33 — program history + weekly gameplan
 
 Two remaining IDEAS.md items, built together since the history page reads data

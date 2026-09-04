@@ -1,10 +1,29 @@
-# Dynasty Lab — v0.9.33 checkpoint
+# Dynasty Lab — v0.9.34 title-screen handoff
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `claude/review-improvement-dwjemy` (reconciled directly —
-see below)
+Current source branch: `codex/v0934-title-screen` (from Claude's validated
+v0.9.33 source at `165a181`)
 Production branch: `gh-pages`
 Production: v0.9.33 at https://markjrogers92.github.io/Football/
+
+## Current handoff
+
+v0.9.34 is implemented locally as a title-screen candidate. The site opens at a
+cinematic stadium menu without generating a random dynasty. Continue loads the
+browser save, New Dynasty opens the 120-program picker and generates only after
+confirmation, Load supports the browser slot and JSON import, Options persists
+presentation motion/default Watch speed locally, and How to Play is included.
+The in-game header now returns to the title; the live session can be resumed.
+
+New files: `title-screen.css` and `assets/title-stadium-v1.jpg`. Build/publish
+tooling includes both the stylesheet and deployed image. No save schema changed.
+
+Validation so far: build/syntax clean and 114 focused desktop/iPhone browser
+checks passed. A visual check then found and fixed the title subpanel `hidden`
+rule and confirmed the corrected program picker. Before preview, run `npm test`,
+`npm run test:browser`, and `npm run test:browser-storage`; update counts here.
+Do not run a long calibration. Publish preview `/preview/v0934/` only, then stop
+for review. Production stays v0.9.33.
 
 ## Current release
 
