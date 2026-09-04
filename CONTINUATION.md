@@ -1,24 +1,23 @@
-# Dynasty Lab — v0.9.14 Coach's Desk preview
+# Dynasty Lab — v0.9.15 Player Agency / Locker Room preview
 
 Repository: https://github.com/MarkJRogers92/Football
-Source branch: `codex/v0914-coachs-desk`
-Production remains v0.9.13 until Mark explicitly approves promotion.
+Source branch: `codex/v0915-player-agency`
+Production remains unchanged until Mark explicitly approves promotion.
 
 ## Preview scope
 
-- Up to three meaningful, state-backed decision cards appear above the existing Weekly Plan for the controlled team.
-- The implemented decisions cover a compromised starter, the four-game redshirt threshold, a playing-time concern and a recruiting priority.
-- Choices reuse weekly availability/rotation, redshirt and promise state, morale/staff trust, recruiting visits and the existing event ledger.
-- The same subject has a short cooldown so decisions do not become constant interruptions.
+- Players occasionally initiate playing-time, transfer, role, redshirt or position-change conversations through the existing Coach's Desk cards.
+- Triggers use existing state only, and outcomes flow through morale, staff trust, transfer risk, promises, redshirts, rotations and position familiarity.
+- Alternate-week cadence, a per-player cooldown and a maximum of three interactions in any four-week window keep frequency low.
+- Sim Regular Season delegates unresolved conversations; single-week advancement still waits for the coach.
 
 ## Persistence
 
-`universe.weeklyDecisions` is additive core save data and old saves normalize to
-an empty array. No IndexedDB schema change. See `STORAGE.md`.
+Player requests remain additive records in `universe.weeklyDecisions`; old
+records normalize to staff-originated decisions. No IndexedDB schema change.
 
 ## Review focus
 
-Review the Coach's Desk on desktop and actual iPhone Safari, including button
-wrapping, single-week blocking while a card is unresolved, season-sim staff
-delegation, and the practical feel of limited-role and rotation choices. Publish
-production only with Mark's explicit approval.
+Review interaction frequency and consequence strength over a real season, plus
+button wrapping on actual iPhone Safari. Production still requires Mark's
+explicit approval.
