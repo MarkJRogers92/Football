@@ -126,3 +126,78 @@ test('a slot name that could collide with the key scheme is refused outright',as
  assert.doesNotThrow(()=>Storage.create({indexedDB,name:'X'}));
  assert.doesNotThrow(()=>Storage.create({indexedDB,name:'X',slot:'dynasty-2'}));
 });
+
+// --- commit 3: safe autosave orchestration ----------------------------------
+
+const {loadEngine}=require('../tools/harness');
+async function engine(seed){
+ const e=loadEngine({seed,indexedDB:new IDBFactory()});
+ e.setUserTeam('Chicago Metropolitan');await e.loadSchools();e.initUniverse();
+ return e;
+}
+
+test('a checkpoint is refused while the player is mid-decision',async()=>{
+ const e=await engine(4901);
+ assert.equal(e.autosaveBlocked(),null,'a settled dynasty can be checkpointed');
+ // A pending job offer means the player owes an answer; capturing now would checkpoint a
+ // state they are still resolving.
+ e.universe.jobOffers=[{schoolId:e.universe.teams[1].id,name:'Somewhere'}];
+ assert.match(String(e.autosaveBlocked()),/career decision/);
+ assert.equal(await e.runAutosave(),false,'and the write does not happen');
+ e.universe.jobOffers=[];
+ assert.equal(e.autosaveBlocked(),null);
+});
+
+test('only known checkpoint kinds are accepted',async()=>{
+ const e=await engine(4902);
+ for(const kind of e.AUTOSAVE_KINDS)assert.doesNotThrow(()=>e.autosaveAfter(kind),kind);
+ // A typo must fail loudly rather than silently never checkpointing.
+ assert.throws(()=>e.autosaveAfter('halfway'),/Unknown autosave checkpoint/);
+});
+
+test('an autosave writes a loadable dynasty and records what it checkpointed',async()=>{
+ const e=await engine(4903);
+ await e.saveBrowser();                       // establish the slot
+ e.simWeek();
+ e.autosaveAfter('week');
+ assert.equal(await e.runAutosave(),true,'the checkpoint was written');
+ assert.equal(e.universe.lastCheckpoint.kind,'week');
+ assert.equal(e.universe.lastCheckpoint.week,e.universe.week);
+ const week=e.universe.week;
+ await e.loadBrowser();
+ assert.equal(e.universe.week,week,'the checkpoint reloads at the week it captured');
+});
+
+test('a checkpoint never captures a half-advanced week',async()=>{
+ const e=await engine(4904);
+ await e.saveBrowser();
+ // Drive several weeks, checkpointing after each, then confirm what landed is a whole week.
+ for(let i=0;i<3;i++){e.simWeek();e.autosaveAfter('week');await e.runAutosave()}
+ const expected=e.universe.week;
+ await e.loadBrowser();
+ assert.equal(e.universe.week,expected);
+ assert.equal(Number.isInteger(e.universe.week),true);
+ // Every game in a completed week has a result; a torn write would leave some unplayed.
+ for(let w=0;w<e.universe.week;w++)
+  for(const g of e.universe.schedule[w]||[])
+   assert.equal(g.played,true,`week ${w+1} game ${g.away} at ${g.home} was captured unplayed`);
+});
+
+test('a failed autosave reports itself and leaves the dynasty playable',async()=>{
+ const e=await engine(4905);
+ await e.saveBrowser();
+ const year=e.universe.year;
+ // Simulate a storage failure at write time.
+ const real=e.universe.playerArchive;
+ Object.defineProperty(e.universe,'playerArchive',{get(){throw new Error('disk on fire')},configurable:true});
+ e.autosaveAfter('week');
+ assert.equal(await e.runAutosave(),false,'the failure is reported, not thrown');
+ Object.defineProperty(e.universe,'playerArchive',{value:real,writable:true,configurable:true});
+ // Play continues: the in-memory dynasty is untouched and a later save still works.
+ assert.equal(e.universe.year,year);
+ e.simWeek();
+ assert.equal(await e.saveBrowser(),undefined);
+ const week=e.universe.week;
+ await e.loadBrowser();
+ assert.equal(e.universe.week,week,'a later manual save still lands');
+});
