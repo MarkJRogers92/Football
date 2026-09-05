@@ -1,5 +1,16 @@
 # WORKLOG
 
+## v0.9.41 — team branding
+
+Followed `TEAM_BRANDING_V1_ASSET_HANDOFF.md` (from GPT's `codex/team-branding-v1-assets`) directly rather than redesigning it: numeric `teamId` as the only valid key, one central helper, graceful fallback, no simulation-logic changes. The handoff was well-specified enough that the implementation itself was mechanical — the real work was in the validation pass it required.
+
+Two things the automated checks alone would have missed, caught only by actually opening Game Center in a browser at both widths as the handoff insists on:
+
+- The real logo was in the DOM at every surface (my unit tests and a first pass of DOM-presence browser checks both said so) but invisible in Game Center specifically, because a separate pre-existing script (`sports-presentation.js`) parses the score out of the dialog's title text, then visually clips that whole element to 1px and replaces it with its own from-scratch initials badge. Presence in the DOM is not the same as visible on screen — worth remembering next time a check only asserts `innerHTML.includes(...)`.
+- A genuinely pre-existing, unrelated CSS ordering bug (`polish.css`'s mobile scoreboard layout being permanently overridden by a later unconditional rule at equal specificity) only surfaced because the mobile screenshot looked wrong. It predates this change by a long way — nothing in this session's earlier reconciliations touched that file's tail — but it was blocking a correct look at the very surface being validated, so it got fixed here rather than just noted and walked past.
+
+Deliberately did not touch the pre-existing `.sports-mark` initials badges in Top 15 or the Game Lab preview card, even though they now sit slightly redundantly next to the real logo in Top 15. That system belongs to `sports-presentation.js`, is not one of the six surfaces the handoff named, and removing it is a design call (which badge wins) rather than a bug — left for a follow-up pass rather than folded into a branding commit.
+
 ## v0.9.37 — merging two parallel v0.9.36 releases
 
 The collision this session had been risking finally happened: GPT and this

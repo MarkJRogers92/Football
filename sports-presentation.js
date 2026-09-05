@@ -52,9 +52,13 @@ function gamecenter(){
  const dlg=document.querySelector('#gameDialog');if(!dlg?.hasAttribute('open'))return;const h=document.querySelector('#gameDialogName'),head=dlg.querySelector('.dialog-head');if(!h||!head)return;const title=(h.textContent||'').trim(),m=title.match(/^(.+?)\s+(\d+)\s+—\s+(\d+)\s+(.+)$/);if(!m){delete dlg.dataset.sportsScoreKey;head.querySelector('.scoreboard')?.remove();return}
  const meta=(document.querySelector('#gameDialogMeta')?.textContent||'').split('·').map(x=>x.trim()).filter(Boolean),pre=document.querySelector('#gamePregame')?.textContent||'',key=title+'|'+meta.join('|')+'|'+pre;if(dlg.dataset.sportsScoreKey===key)return;dlg.dataset.sportsScoreKey=key;dlg.classList.add('sports-game-dialog');
  const [,away,as,hs,home]=m,rec=name=>{const r=pre.match(new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s+(\\S+)\\s+\\(#([^)]+)\\)'));return r?`${r[1]}${r[2]!=='—'?' · #'+r[2]:''}`:''},aw=+as>+hs,hw=+hs>+as;
+ // #gameDialogName carries real team-logo art (app.js's teamLogoHTML) that this dialog's own
+ // CSS then visually clips to 1px once .sports-game-dialog is applied below — reuse that art in
+ // the scoreboard slot instead of the generic initials mark, so the real logo is what's shown.
+ const logos=[...h.querySelectorAll('.team-logo')];
  let sb=head.querySelector('.scoreboard');if(!sb){sb=document.createElement('div');sb.className='scoreboard';h.after(sb)}
- const side=(name,score,win,role)=>`<div class="sb-team${win?' winner':''}">${mark(name,'large')}<div class="sb-copy"><span class="sb-role">${role}</span><strong>${esc(name)}</strong><small>${esc(rec(name))}</small></div><b class="sb-score">${esc(score)}</b></div>`;
- sb.innerHTML=side(away,as,aw,'AWAY')+`<div class="sb-mid"><span class="sb-status">${esc(meta[0]||'FINAL')}</span><span>${esc(meta.slice(1,3).join(' · '))}</span><span>${esc(meta.slice(3).join(' · '))}</span></div>`+side(home,hs,hw,'HOME');
+ const side=(name,score,win,role,logo)=>`<div class="sb-team${win?' winner':''}">${logo?`<div class="sports-mark large has-logo" style="${esc(logo.getAttribute('style')||'')}" aria-hidden="true"></div>`:mark(name,'large')}<div class="sb-copy"><span class="sb-role">${role}</span><strong>${esc(name)}</strong><small>${esc(rec(name))}</small></div><b class="sb-score">${esc(score)}</b></div>`;
+ sb.innerHTML=side(away,as,aw,'AWAY',logos[0])+`<div class="sb-mid"><span class="sb-status">${esc(meta[0]||'FINAL')}</span><span>${esc(meta.slice(1,3).join(' · '))}</span><span>${esc(meta.slice(3).join(' · '))}</span></div>`+side(home,hs,hw,'HOME',logos[1]);
  sb.classList.remove('scoreboard-enter');void sb.offsetWidth;sb.classList.add('scoreboard-enter');const scores=sb.querySelectorAll('.sb-score');animateNumber(scores[0],+as);animateNumber(scores[1],+hs);
  if(!dlg.dataset.motionCloseBound){dlg.dataset.motionCloseBound='1';dlg.addEventListener('close',()=>{delete dlg.dataset.sportsScoreKey;head.querySelector('.scoreboard')?.remove()})}
 }

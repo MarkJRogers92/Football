@@ -385,7 +385,10 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
 .sb-team{grid-template-columns:auto minmax(0,1fr) minmax(64px,auto)}
 .sb-team strong{overflow-wrap:normal;word-break:normal;hyphens:manual}
 .sb-score{text-align:right}
-.scoreboard{grid-template-columns:minmax(0,1.15fr) minmax(150px,.7fr) minmax(0,1.15fr)}
+/* Desktop-only: this used to be unconditional and, coming after the max-width:720px block
+   above at equal specificity, always won and silently defeated the mobile single-column
+   layout regardless of viewport width. */
+@media(min-width:721px){.scoreboard{grid-template-columns:minmax(0,1.15fr) minmax(150px,.7fr) minmax(0,1.15fr)}}
 
 /* Game Center motion — presentation only; archived outcomes remain canonical. */
 @keyframes scoreboard-enter{from{opacity:0;transform:translateY(-8px) scale(.985)}to{opacity:1;transform:none}}
@@ -474,3 +477,10 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
  .title-footer{align-items:flex-end}.title-footer #titleStatus{max-width:68%;white-space:normal}
 }
 @media(prefers-reduced-motion:reduce){.title-screen-art,.title-screen-shade::after{animation:none!important}.title-action{transition:none}}
+
+/* Team Branding v1 — staging 32px atlas. */
+.team-logo{display:inline-block;vertical-align:middle;background-repeat:no-repeat;flex:0 0 auto;border-radius:3px}
+.team-logo--inline{margin-right:4px;transform:translateY(-1px)}
+.team-logo--fallback{background:var(--surf-3,#1a2330);border:1px solid var(--line-2,#2a3444)}
+.masthead-mark.has-logo::before{content:none}
+.masthead-mark.has-logo{background:transparent}

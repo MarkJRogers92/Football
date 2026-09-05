@@ -322,9 +322,25 @@ surface itself — grouping, or a first-run path.
 ## Resume prompt
 
 Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md`. v0.9.37 is production and all
-known feature branches are reconciled into the main line — check
-`git branch -r` for anything new before assuming that's still true. Work in
-a new bounded branch, validate fully (`npm test` + `npm run test:browser`),
-update CHANGELOG/WORKLOG/STORAGE/CONTINUATION, publish a preview first, then
-promote only after review.
+`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md` — but note the header of this
+file still says "v0.9.37 checkpoint" and that is stale: `CHANGELOG.md` now
+has entries through v0.9.41 (team branding, on `claude/v0941-team-branding`,
+branched from `claude/review-improvement-dwjemy` at the publish-guard
+commit). Check `git branch -r`, `git log --oneline -10` on both the source
+branch and `gh-pages`, and the top of `CHANGELOG.md` before trusting any
+version number stated as current anywhere in this file — this checkpoint
+was not kept in sync through v0.9.38-41 and needs a real rewrite, not a
+patch, next time someone has the credit budget for it.
+
+Team branding (v0.9.41): the atlas and `teamLogoHTML()` helper are in;
+deferred surfaces are recruiting-board interest/commitment display and any
+future postseason/history views — see the v0.9.41 `CHANGELOG.md` entry for
+the full list and for a CSS bug found and fixed along the way that was
+already there before this pass. Higher-resolution per-team art (64/128px+)
+was not requested by the handoff and the 32px atlas reads fine even at the
+48px Game Center size — only worth revisiting if it looks soft on a real
+high-DPI display.
+
+Work in a new bounded branch, validate fully (`npm test` +
+`npm run test:browser`), update CHANGELOG/WORKLOG/STORAGE/CONTINUATION,
+publish a preview first, then promote only after review.

@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.9.41 — Team branding: the 384×320 logo atlas, wired into six surfaces
+
+Implements `TEAM_BRANDING_V1_ASSET_HANDOFF.md` from `codex/team-branding-v1-assets`: a locked, real-logo atlas for all 120 programs, addressed only by numeric `teamId` (never by school name), with a graceful fallback for anything invalid.
+
+- **`assets/team-logos-atlas-32.png`** — 384×320, 12×10 grid of 32px cells, row-major by `teamId` (id 1 → row 0/col 0, id 120 → row 9/col 11). Reconstructed from the handoff's staged base64 chunks via `team-branding-v1/unpack_assets.py`; SHA-256 and dimensions verified against the spec exactly. `tools/publish.js` already copies the whole `assets/` directory to every publish target, so no publish-tooling change was needed.
+- **`teamLogoHTML(teamId, size, extraClass)`** (`app.js`) is the one place the sprite math lives: `background-position`/`background-size` computed from `id-1` mod/div 12. An invalid id (out of 1–120, non-integer, `NaN`, `null`) renders a distinct styled fallback box instead of ever pointing at a broken cell.
+- **Wired into six surfaces**: the dashboard masthead (48px, replacing the old initials mark), Top 15 rankings and conference standings (20px inline), latest results and team schedule (18px inline), and the Game Center matchup header (48px, both the live "watching" state and the completed-game scoreboard).
+- **Game Center needed one more fix to actually show it.** `sports-presentation.js`'s pre-existing scoreboard enhancement visually clips the raw `#gameDialogName` markup to 1px once a completed game's score is parsed out of it, and replaces it with its own initials-only badge — so the real logo was in the DOM but never seen. It now lifts the actual `.team-logo` element straight out of the (clipped) name and reuses it in the visible scoreboard slot instead of generating a separate initials mark.
+- **Found and fixed in passing, while checking Game Center at mobile widths as the handoff requires:** an unrelated pre-existing CSS bug. `polish.css` had an unconditional `.scoreboard{grid-template-columns:...}` rule *after* the `max-width:720px` block that set the mobile single-column layout — at equal specificity, source order meant the desktop 3-column layout always won, so the mobile scoreboard layout had never actually applied at any width. Fixed by scoping the desktop rule to `min-width:721px`.
+- Deliberately deferred (not part of the six required surfaces): recruiting board school-interest/commitment text, dedicated conference-page views (standings above already cover the conference surface the handoff names), postseason bracket/history. The pre-existing `.sports-mark` initials badge in Top 15 and the Game Lab "next matchup" preview card still show alongside/instead of the new logo in a couple of spots — cosmetic redundancy, not broken, left alone as out of scope for this pass.
+- `tests/teambranding.js` (4 new tests): every id 1–120 resolves to a distinct real cell; the handoff's exact spot-check ids (1, 12, 13, 24, 45, 48, 49, 73, 85, 97, 109, 120) land on the cell the spec formula predicts; every invalid id shape produces the fallback and never references the atlas; size scaling keeps the same cell visible.
+- 152/152 Node, 144/144 browser. Visually verified at desktop (1280px) and iPhone (390px) widths on all six wired surfaces plus the Game Center fix, via a throwaway Playwright script (not committed).
+- No save-format change. Atlas art is presentation-only; nothing about simulation or gameplay changed.
+
 ## v0.9.37 — Merging two parallel v0.9.36 releases
 
 GPT and this branch both built on v0.9.35 and both published as 0.9.36. Mine landed second and overwrote theirs in production. Nothing was lost — theirs remained in `gh-pages` history at `5e293d2` — and this release is the actual merge of the two, with GPT's work taken as the base because it is the better of the two designs.
