@@ -1,4 +1,4 @@
-name: Dynamic home-field quick-sim patch
+name: Dynamic home-field baseline diagnostic
 
 on:
   push:
@@ -6,89 +6,18 @@ on:
       - codex/dynamic-home-field-quick-sim
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  patch-and-validate:
-    if: github.event.head_commit.message == 'Bootstrap dynamic home-field patch'
+  baseline-recap:
+    if: github.event.head_commit.message == 'Check baseline recap seed'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Apply bounded home-field patch
-        shell: bash
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          app_path = Path('app.js')
-          app = app_path.read_text()
-          old_score = "let hp=hs.pts+(neutral?0:(Math.random()<.45?3:0)),ap=as.pts;"
-          new_score = "let hp=hs.pts+homeFieldScoreBonus(home,neutral),ap=as.pts;"
-          assert app.count(old_score) == 1, f'quick-sim score anchor count={app.count(old_score)}'
-          app = app.replace(old_score, new_score, 1)
-
-          old_home = "function homeFieldFor(t){return clamp(2.2+(((t?.fan_support??60)-60)*.03),.8,3.4)}"
-          helper = """function homeFieldFor(t){return clamp(2.2+(((t?.fan_support??60)-60)*.03),.8,3.4)}
-          // Keep quick-sim score changes in football-sized increments while matching homeFieldFor() in expectation.
-          function homeFieldScoreBonus(t,neutral=false){
-           if(neutral)return 0;
-           const edge=homeFieldFor(t),base=Math.floor(edge/3)*3,remainder=edge-base;
-           return base+(remainder>0&&Math.random()<remainder/3?3:0);
-          }"""
-          assert app.count(old_home) == 1, f'homeFieldFor anchor count={app.count(old_home)}'
-          app = app.replace(old_home, helper, 1)
-          app_path.write_text(app)
-
-          harness_path = Path('tools/harness.js')
-          harness = harness_path.read_text()
-          old_export = 'fanSupportTarget, updateFanSupport, homeFieldFor, cancelNilDeal'
-          new_export = 'fanSupportTarget, updateFanSupport, homeFieldFor, homeFieldScoreBonus, cancelNilDeal'
-          assert harness.count(old_export) == 1, f'harness export anchor count={harness.count(old_export)}'
-          harness_path.write_text(harness.replace(old_export, new_export, 1))
-
-          tests_path = Path('tests/games.js')
-          tests = tests_path.read_text()
-          marker = "test('quick sim home-field bonus scales with fan support and vanishes on neutral sites'"
-          assert marker not in tests, 'home-field regression test already present'
-          regression = r'''
-
-          test('quick sim home-field bonus scales with fan support and vanishes on neutral sites',()=>{
-           const e=loadEngine({seed:924}),low={fan_support:30},high={fan_support:95},samples=12000;
-           const lowExpected=e.homeFieldFor(low),highExpected=e.homeFieldFor(high);
-           assert.ok(Math.abs(lowExpected-1.3)<1e-9);assert.ok(Math.abs(highExpected-3.25)<1e-9);
-           let lowTotal=0,highTotal=0;
-           for(let i=0;i<samples;i++)lowTotal+=e.homeFieldScoreBonus(low,false);
-           for(let i=0;i<samples;i++)highTotal+=e.homeFieldScoreBonus(high,false);
-           const lowMean=lowTotal/samples,highMean=highTotal/samples;
-           assert.ok(Math.abs(lowMean-lowExpected)<.08,`low-support mean ${lowMean} vs expected ${lowExpected}`);
-           assert.ok(Math.abs(highMean-highExpected)<.08,`high-support mean ${highMean} vs expected ${highExpected}`);
-           assert.ok(highMean>lowMean+1.7,`high-support edge ${highMean} should materially exceed low-support edge ${lowMean}`);
-           for(let i=0;i<100;i++)assert.equal(e.homeFieldScoreBonus(high,true),0,'neutral sites receive no home-field bonus');
-           const source=require('node:fs').readFileSync(require('node:path').join(__dirname,'..','app.js'),'utf8');
-           assert.ok(source.includes('let hp=hs.pts+homeFieldScoreBonus(home,neutral),ap=as.pts;'),'quick sim must consume the dynamic home-field helper');
-          });
-          '''
-          tests_path.write_text(tests + regression)
-          PY
       - name: Install dependencies
         run: npm install --no-package-lock
-      - name: Engine and persistence tests
-        run: npm test
-      - name: Build standalone
-        run: npm run build
-      - name: Simulation audit
-        run: npm run audit
-      - name: Commit validated patch
-        shell: bash
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app.js tools/harness.js tests/games.js
-          git diff --cached --check
-          git commit -m "Use dynamic home-field advantage in quick sim"
-          git push origin HEAD:codex/dynamic-home-field-quick-sim
+      - name: Run untouched recap tests
+        run: node --test tests/recaps.js
