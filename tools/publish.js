@@ -153,6 +153,24 @@ function publish({ preview, remove }) {
     return;
   }
   const version = fs.readFileSync(path.join(ROOT, 'VERSION.txt'), 'utf8').trim();
+
+  // Two agents (or two sessions) can build this same version from different source and both
+  // reach for `node tools/publish.js` — that is exactly how v0.9.36 got silently overwritten in
+  // production once already this project. If this version number already has a production
+  // publish commit AND the content about to be pushed actually differs, refuse rather than
+  // clobber it: someone has to look at what is different before one side's work disappears.
+  if (!remove && !preview) {
+    const prior = git('log', '--oneline', '--grep', `^Publish production: ${version}$`);
+    if (prior) {
+      usage(
+        `Refusing to publish production: ${version} — that version was already published ` +
+        `(${prior.split('\n')[0]}), and the build about to go out differs from what is live.\n` +
+        `Someone else likely shipped this version number from different source. Reconcile ` +
+        `first (see CONTINUATION.md), or bump VERSION.txt to a version never published before.`
+      );
+    }
+  }
+
   git('-c', 'user.email=MarkJRogers92@gmail.com', '-c', 'user.name=Mark J Rogers',
       'commit', '-q', '-m', `Publish ${label}: ${version}`);
   git('push', 'origin', BRANCH);
