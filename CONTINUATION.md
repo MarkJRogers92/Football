@@ -1,9 +1,9 @@
-# Dynasty Lab — v0.9.39 consistency preview
+# Dynasty Lab — v0.9.39 production checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
 Current source branch: `codex/v0939-game-consistency`
 Production branch: `gh-pages`
-Production: v0.9.37 at https://markjrogers92.github.io/Football/
+Production: v0.9.39 at https://markjrogers92.github.io/Football/
 
 ## Current work
 
@@ -12,7 +12,7 @@ That patch is now production (still v0.9.37), from source branch
 `codex/v0937-homefield-release`, commit `9f33ae3`; production was verified
 byte-identical to that build. It adds the fan-support-based homeFieldScoreBonus.
 
-v0.9.39 is the subsequent preview milestone. v0.9.38 was already used for
+v0.9.39 is the subsequent production release. v0.9.38 was already used for
 Claude's storage measurement work, so its number is not reused here.
 
 - Shared completeScheduledGame writes schedule results and settles rivalry
@@ -30,9 +30,10 @@ Validation: version-label check and 53 smoke checks passed. Of 152 Node tests,
 151 passed in the full run; the remaining name-collision assertion was corrected
 and passed its targeted rerun. All 164 desktop/mobile browser checks and 8 real
 browser persistence scenarios passed. See WORKLOG for the two test-fixture fixes.
-Preview target: https://markjrogers92.github.io/Football/preview/v0939/
-Stop after preview verification; production promotion of this milestone needs
-review. Next feature candidate remains bounded captains/mentorship.
+The preserved preview is https://markjrogers92.github.io/Football/preview/v0939/.
+The user approved production promotion on September 4, 2026, and the live files
+were verified after publication. Next feature candidate remains bounded
+captains/mentorship.
 
 ## Previous release
 
