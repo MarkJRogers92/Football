@@ -41,6 +41,12 @@ Strategy integrity batch 5 moves position traits upstream into team profiles and
 therefore both game engines: QB, skill, OL, front and coverage units each use a
 position-specific blend alongside current overall/health/wear. A controlled test
 verifies relevant matchup movement and irrelevant-edge isolation.
+
+Strategy integrity batch 6 makes Watch defense exact. Detailed plays select and
+name the defender responsible for pressures, sacks, tackles/TFLs, interceptions
+and breakups, then credit that same player directly. The detailed box no longer
+redistributes defense afterward. Existing drive strings carry the names, so save
+shape is unchanged; focused game persistence and attribution checks pass.
 User requested small committed/pushed batches for easy Claude/chat takeover,
 covering every position, ratings, descriptions and actual statistical behavior.
 Production remains v0.9.39. These are source checkpoints, not a new release.

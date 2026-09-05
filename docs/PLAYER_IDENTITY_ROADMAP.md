@@ -35,14 +35,16 @@ Scouted descriptions must respect uncertainty instead of exposing hidden ability
    tendencies where modeled. Separate QB accuracy/decisions/mobility from generic
    overall; map OL movement, power and protection to relevant outcomes. Test
    healthy backups, overlapping roles, injuries, redshirts and limited players.
-4. Actual play attribution — structured plays with passer, runner, target,
-   defender where actually modeled, yards, result and scoring type. Add designed
+4. Actual play attribution — implemented for every currently modeled actor in
+   detailed games: passer, runner, target and relevant defender, with yards,
+   result and scoring type. Add designed
    QB runs and pressure-driven scrambles using shared identity logic. Generate
    Watch text and box scores from those plays; remove post-game redistribution
    for detailed games. Fix random TD-type reassignment at the goal line. Verify
    named players, plays, drives, TDs and box totals agree, including sacks/turnovers.
-5. Defense — upstream front/coverage profiles and initial quick-sim allocation
-   implemented. EDGE/DT: rush vs run responsibilities, pressure and sack efficiency;
+5. Defense — upstream front/coverage profiles, quick-sim allocation and exact
+   detailed-play attribution implemented. EDGE/DT: rush vs run responsibilities,
+   pressure and sack efficiency;
    LB: box, pursuit, coverage and blitz; CB/S: coverage roles, targets allowed,
    breakups and interceptions only if those events are tracked. Use opportunity
    denominators; do not invent individual tackles/coverage facts from narration.

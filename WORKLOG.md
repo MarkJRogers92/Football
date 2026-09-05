@@ -1,5 +1,17 @@
 # WORKLOG
 
+## Strategy integrity batch 6 — actual Watch defenders
+
+Detailed plays now choose defenders from the same role, archetype and rating
+weights used by defensive allocation. The recorded actor receives each pressure,
+sack, tackle, tackle for loss, interception or pass breakup immediately, and the
+Watch log names that player. Detailed box scores consume those exact defensive
+lines instead of redistributing defense after the final whistle.
+
+The existing drive play-by-play strings hold the extra names, so no archive or
+save field was added. Focused game tests verify every named defender owns the
+corresponding stat and all existing game/box persistence invariants still pass.
+
 ## Strategy integrity batch 5 — position traits reach the matchup
 
 Team profiles now blend current overall/health/wear with role-specific traits:

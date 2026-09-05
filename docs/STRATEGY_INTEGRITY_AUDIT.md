@@ -36,9 +36,9 @@ replace the matchup. The desired chain is:
 | Injuries, availability and wear | Functional | Remove or weaken players used by role and unit calculations. | The matchup UI does not explain the resulting personnel edge well. |
 | Morale | Context-specific | Drives transfer risk and some player-management systems. | It does not affect game performance; any performance implication would be decorative. |
 | Staff | Functional/partial | Play-calling affects team profiles and detailed plays; development/evaluation/recruiting ratings affect their named systems. | Generated specialty text mostly describes rating shape rather than adding a distinct tactical effect. |
-| Individual statistics | Functional downstream | Drive awards, records, career history and draft production components. | They do not inform opponent tendencies, gameplan recommendations or adaptive defensive choices. Detailed stats are still redistributed after narration. |
+| Individual statistics | Functional downstream | Drive awards, records, career history and draft production components; detailed-game offense and defense now come from the named play actors. | They do not yet inform opponent tendencies, gameplan recommendations or adaptive defensive choices. |
 | Home field | Functional | Fan support creates a bounded score bonus and neutral games suppress it. | It is omitted from the pregame matchup explanation. |
-| Watch Mode attribution | Functional/partial | Each offensive play selects and directly credits its runner or target from shared role/archetype usage; touchdown type follows the scoring play. | Relevant defenders are not yet recorded per play, so defensive production is still allocated from team totals. |
+| Watch Mode attribution | Functional for modeled events | Each play directly credits its passer, runner, target and relevant defender from shared role/archetype weights; scoring type follows the scoring play. | Exact clock, field coordinates, return plays and assists remain untracked and are not invented. |
 
 ## Critical code evidence
 
@@ -54,8 +54,9 @@ replace the matchup. The desired chain is:
 4. Quick sim creates team totals first; `applyGameStats` allocates those totals.
    The branch's archetype work makes allocation more honest but cannot make a
    player's skills change team success without an upstream matchup change.
-5. Detailed sim chooses one QB/RB/WR at drive start. Every narrated run uses that
-   RB and every target uses that WR, before `applyGameStats` redistributes totals.
+5. Detailed sim now chooses offensive and defensive actors per play and passes
+   exact stat lines into `applyGameStats`; quick sim intentionally remains an
+   aggregate-first path for performance.
 6. `renderGameLab` uses raw `profiles`, so it cannot show the chosen gameplan's
    adjusted matchup even though `gameProfiles` applies it during simulation.
 7. The gameplan recommendation compares only the opponent scheme's base pass
