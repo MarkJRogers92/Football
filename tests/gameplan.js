@@ -104,17 +104,18 @@ test('an unresolved gameplan card never blocks the calendar, unlike every other 
  assert.equal(me.gameplan,undefined,'ignoring it is the same as choosing standard: no edge applied');
 });
 
-test('the edge actually reaches gameSim: a fully-scouted defense concedes fewer points on average',async()=>{
- const e=await setup(3105),u=e.universe;
- const a=u.teams[0],b=u.teams[1];
- a.w=0;a.l=0;b.w=0;b.l=0;
- let withPrep=0,without=0,n=30;
- for(let i=0;i<n;i++){
-  a.gameplan={year:u.year,week:u.week,opponent:b.name,prep:'scout'};
-  const r1=e.gameSim(a,b,true);withPrep+=r1.ap;              // a is away in this call, scores ap
-  a.gameplan=null;
-  const r2=e.gameSim(a,b,true);without+=r2.ap;
- }
- // A noisy sim over 30 draws; assert the direction, not an exact number.
- assert.ok(withPrep/n>=without/n-1,'scouting should not make the prepared team worse on average');
+test('the edge actually reaches gameSim, through gameProfiles',async()=>{
+ // Full-game score is noisy and, since the reconciliation with GPT's richer sim internals,
+ // applyGameplanEdge spreads its bonus across qb/skill/ol/front/coverage rather than the old
+ // coarse offense/defense fields — so the real, deterministic thing to check is the actual
+ // integration point (gameProfiles), not a statistical guess at the final score.
+ const e=await setup(3105),u=e.universe,a=u.teams[0],b=u.teams[1];
+ const plain=e.profiles(a);
+ a.gameplan={year:u.year,week:u.week,opponent:b.name,prep:'scout'};
+ const scouted=e.gameProfiles(a,b.name);
+ assert.notDeepEqual(scouted,plain,'gameProfiles actually differs once a gameplan is set');
+ assert.ok(scouted.qb>=plain.qb&&scouted.skill>=plain.skill&&scouted.ol>=plain.ol,
+  'full scout raises every offensive sub-rating gameSim reads');
+ a.gameplan=null;
+ assert.deepEqual(e.gameProfiles(a,b.name),plain,'and nothing lingers once the gameplan is cleared');
 });
