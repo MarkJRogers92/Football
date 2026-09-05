@@ -52,10 +52,10 @@ const {create} = require('../storage.js');
   assert.equal(e.findPlayer(before.teams[0].roster[0].id).active,true);
   await e.saveBrowser();await e.loadBrowser();
   const oldCount=(await store.load()).archiveRef.count;
-  // A new season can be simulated with the archive deferred; offseason loads
-  // history before updating career records and appending the new departures.
-  e.simSeason();e.simConferenceChampionships();e.simPlayoff();e.runSpringCamp();e.runFallCamp();
-  assert.equal(e.archiveIsDeferred(),true);await e.runOffseason();
+  // A new season can be simulated with the archive deferred; the first
+  // offseason advance loads history before review archives the new season.
+  e.simSeason();e.simConferenceChampionships();e.simPlayoff();await e.runSpringCamp();e.runFallCamp();
+  assert.equal(e.archiveIsDeferred(),false);await e.runOffseason();
   assert.equal(e.universe.year,2029);assert.equal(e.archiveIsDeferred(),false);
   assert.ok(e.universe.playerArchive.length>oldCount);
   assert.deepEqual(e.packUniverse(e.universe).playerArchive.slice(0,oldCount),expectedArchive);

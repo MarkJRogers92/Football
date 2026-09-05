@@ -1,0 +1,56 @@
+name: Validate Dynasty Lab
+
+on:
+  pull_request:
+  push:
+    branches-ignore:
+      - gh-pages
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dynasty-validate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Build standalone artifact
+        run: npm run build
+      - name: Verify committed build is current
+        run: git diff --exit-code -- index.html
+      - name: Verify releasable source tree
+        run: npm run verify:release
+      - name: Engine and presentation tests
+        run: npm test
+      - name: Locate Chromium
+        id: chromium
+        shell: bash
+        run: |
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$browser" ]; then
+            npx playwright-core install chromium
+            browser="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$browser"
+          echo "path=$browser" >> "$GITHUB_OUTPUT"
+      - name: Browser UI and visual regression tests
+        run: npm run test:browser
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+      - name: Browser IndexedDB regression check
+        run: npm run test:browser-storage
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+      - name: Simulation audit
+        run: npm run audit

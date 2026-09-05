@@ -21,11 +21,14 @@ try {
   const version = read('VERSION.txt').trim().replace(/^Dynasty Lab\s*/, '').replace(/^v/, '');
   const packageVersion = JSON.parse(read('package.json')).version;
   const appVersion = (read('app.js').match(/APP_VERSION='([^']+)'/) || [])[1];
+  const body = read('body.html');
   const html = fs.readFileSync(outPath, 'utf8');
   const v = escapeRe(version);
 
   assert.equal(packageVersion, version, 'package.json version must match VERSION.txt');
   assert.equal(appVersion, version, 'APP_VERSION must match VERSION.txt');
+  assert.doesNotMatch(body, /data-(?:title-)?version>v\d+\.\d+\.\d+</,
+    'body.html must use neutral version placeholders rather than a stale release');
   assert.match(html, new RegExp(`<title>Dynasty Lab v${v}<\\/title>`), 'document title must use VERSION.txt');
   assert.match(html, new RegExp(`data-title-version>v${v}<\\/b>`), 'title-screen label must use VERSION.txt');
   assert.match(html, new RegExp(`data-app-version>v${v}<\\/span>`), 'in-game header label must use VERSION.txt');

@@ -26,6 +26,7 @@ npm run test:browser
 npm run test:browser-storage
 npm run audit
 npm run longrun
+npm run verify:release
 ```
 
 `tools/harness.js` loads the engine in Node behind a small DOM shim so the
@@ -33,20 +34,15 @@ simulation can be exercised and measured without a browser.
 
 ## Version
 
-The live release is **v0.9.43**. `VERSION.txt` is the single release-version
+The live release is **v0.9.44**. `VERSION.txt` is the single release-version
 source and the build/test pipeline checks it against the application/package
 version so mismatched labels fail before publishing.
 
-Completed v0.9 slices:
-- v0.9.0 — Promises Become Debts + stable coach identity/event foundation
-- v0.9.1 — transfer destinations and persistent transfer memory
-- v0.9.2 — permanent Game Center / historical box scores
-- v0.9.3 — deterministic Portrait V1 integration
-- v0.9.4 — persistent coaching careers
-- v0.9.5 — coach relationship portability and recruiting/player fallout
-- v0.9.6 — Coaching Market
-- v0.9.7 — Visual Identity V1 presentation layer
-- v0.9.8 (preview) — recruit portraits across recruiting surfaces
+The v0.9 line now includes durable promises/transfers/game archives, coaching
+careers and hiring, player agency and scouting, scholarships, scheme changes,
+rivalries, administration/NIL stakes, bowls, academics, program history,
+gameplans, Watch Mode, team branding, program colors and conference/game-day
+presentation. See `CHANGELOG.md` for the version-by-version record.
 
 See `CHANGELOG.md` and `CONTINUATION.md` for the current checkpoint and next
 bounded milestone.
@@ -58,14 +54,19 @@ The canonical development source is this repository; `gh-pages` is deployment
 output only. Do not resume from the old Property-Lookup deployment or treat the
 historical `codex/v081-save-continuation` branch as the current release head.
 
-v0.9.7 is a presentation-only release on top of the validated v0.9.6 Coaching Market.
-The next gameplay milestone should remain bounded and be chosen from the remaining
-v0.9 roadmap rather than mixed into this visual release.
+The post-v0.9.44 implementation order and bounded work packets live in
+`docs/roadmap/README.md` and `docs/roadmap/STATUS.md`.
 
 ## Publishing
 
 The game is served by GitHub Pages from this repository's `gh-pages` branch.
-Production and previews share one Pages site.
+Production and previews share one Pages site. The preferred release path is the
+manual **Publish Dynasty Lab** GitHub Actions workflow: choose `preview` and a
+preview name, or choose `production` and enter `PUBLISH` as confirmation. It
+runs the complete validation suite before publishing and never edits the source
+branch.
+
+The local commands remain available for maintainers:
 
 ```bash
 npm run publish                        # -> /            (production)
@@ -81,7 +82,9 @@ node tools/publish.js --remove v094    # delete a preview
 
 `tools/publish.js` builds first, then copies the generated result into a
 `gh-pages` worktree at `.pages/` (override with `PAGES_WORKTREE`), regenerates
-the preview index from the folders that actually exist, commits and pushes.
+the preview index from the folders that actually exist, commits and pushes. It
+refuses a dirty source tree, a stale generated build, or a conflicting repeat
+of an already-published production version.
 
 `gh-pages` holds only what the site serves. The source lives on the development
 branch; the site branch is not a source mirror and should not be hand-edited as

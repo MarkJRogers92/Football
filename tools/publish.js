@@ -3,6 +3,7 @@
 //
 //   node tools/publish.js                  -> production, served at /
 //   node tools/publish.js --preview v094   -> preview, served at /preview/v094/
+//   node tools/publish.js --verify         -> verify a clean, reproducible release artifact
 //   node tools/publish.js --list           -> show what is currently published
 //   node tools/publish.js --remove v094    -> delete a preview
 //
@@ -24,6 +25,8 @@ const SITE = 'https://markjrogers92.github.io/Football';
 
 const git = (...args) =>
   execFileSync('git', ['-C', PAGES, ...args], { encoding: 'utf8' }).trim();
+const sourceGit = (...args) =>
+  execFileSync('git', ['-C', ROOT, ...args], { encoding: 'utf8' }).trim();
 const run = (cmd, args, cwd) =>
   execFileSync(cmd, args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 
@@ -33,6 +36,7 @@ function usage(msg) {
 Usage:
   node tools/publish.js                 publish to production (/)
   node tools/publish.js --preview NAME  publish to /preview/NAME/
+  node tools/publish.js --verify        verify release source and artifact
   node tools/publish.js --list          list what is published
   node tools/publish.js --remove NAME   delete a preview
 `);
@@ -53,7 +57,11 @@ function ensureCheckout() {
   execFileSync('git', ['-C', ROOT, 'fetch', 'origin',
     `+refs/heads/${BRANCH}:refs/remotes/origin/${BRANCH}`], { encoding: 'utf8' });
   if (!fs.existsSync(path.join(PAGES, '.git'))) {
-    execFileSync('git', ['-C', ROOT, 'worktree', 'add', '--force', PAGES, BRANCH],
+    // Actions checks out a detached source ref and does not create a local
+    // gh-pages branch. Create or reset it from the fetched deployment ref so
+    // the same publisher works both locally and in the manual workflow.
+    execFileSync('git', ['-C', ROOT, 'worktree', 'add', '--force', '-B', BRANCH,
+      PAGES, `refs/remotes/origin/${BRANCH}`],
       { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
   }
   const dirty = git('status', '--porcelain');
@@ -75,6 +83,29 @@ function titleOf(file) {
     const head = fs.readFileSync(file, 'utf8').slice(0, 4096);
     return (head.match(/<title>([^<]*)<\/title>/) || [, 'Dynasty Lab'])[1];
   } catch { return 'Dynasty Lab'; }
+}
+
+function validateSourceArtifact() {
+  const dirty = sourceGit('status', '--porcelain', '--untracked-files=all');
+  if (dirty) {
+    usage(
+      `Refusing to publish from a dirty source tree:\n${dirty}\n` +
+      'Commit or stash every source change before publishing.'
+    );
+  }
+
+  const built = path.join(ROOT, 'index.html');
+  if (!fs.existsSync(built)) usage('No validated index.html exists. Run npm run build and commit it first.');
+  const validated = fs.readFileSync(built);
+  console.log('verifying build...');
+  console.log(run('node', [path.join(ROOT, 'tools', 'build.js')], ROOT).trim());
+  const rebuilt = fs.readFileSync(built);
+  if (!validated.equals(rebuilt)) {
+    usage(
+      'Refusing to publish because a fresh build differs from the committed index.html.\n' +
+      'Review the generated diff, run validation, and commit the artifact first.'
+    );
+  }
 }
 
 // Regenerated on every publish so the list always matches the folders on disk.
@@ -120,6 +151,7 @@ ${rows}
 }
 
 function publish({ preview, remove }) {
+  if (!remove) validateSourceArtifact();
   ensureCheckout();
 
   let target, label;
@@ -129,10 +161,7 @@ function publish({ preview, remove }) {
     fs.rmSync(dir, { recursive: true, force: true });
     label = `remove preview ${remove}`;
   } else {
-    console.log('building...');
-    console.log(run('node', [path.join(ROOT, 'tools', 'build.js')], ROOT).trim());
     const built = path.join(ROOT, 'index.html');
-    if (!fs.existsSync(built)) usage('Build produced no index.html.');
     target = preview ? path.join(PAGES, 'preview', preview) : PAGES;
     fs.mkdirSync(target, { recursive: true });
     fs.copyFileSync(built, path.join(target, 'index.html'));
@@ -184,7 +213,11 @@ function publish({ preview, remove }) {
 const argv = process.argv.slice(2);
 if (argv.includes('--help') || argv.includes('-h')) usage();
 
-if (argv.includes('--list')) {
+if (argv.includes('--verify')) {
+  if (argv.length !== 1) usage('--verify cannot be combined with another argument.');
+  validateSourceArtifact();
+  console.log('release source and artifact verified');
+} else if (argv.includes('--list')) {
   ensureCheckout();
   const names = listPreviews();
   const prod = path.join(PAGES, 'index.html');

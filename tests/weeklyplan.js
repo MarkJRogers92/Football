@@ -20,8 +20,8 @@ test('the plan always names the one step that moves the calendar',async()=>{
  assert.ok(keys(e.weeklyPlan(me)).includes('playoff'));
  e.simPlayoff();
  const plan=e.weeklyPlan(me);
- assert.deepEqual(keys(plan).slice(0,3),['spring','fall','offseason'],
-  'the offseason sequence is shown in order, which is the part nothing else signposts');
+ assert.deepEqual(keys(plan).slice(0,6),['review','departures','signing','portal','spring','fall'],
+  'the real offseason sequence is shown in order, which is the part nothing else signposts');
  assert.equal(plan.heading,'Offseason checklist');
 });
 
@@ -30,13 +30,13 @@ test('completed steps are marked done, sink to the bottom and stop counting',asy
  for(let i=0;i<12;i++)e.simWeek();
  e.simConferenceChampionships();e.simPlayoff();
  const before=e.weeklyPlan(me);
- assert.equal(before.items.find(x=>x.key==='spring').done,false);
+ assert.equal(before.items[0].key,'review');
  e.runSpringCamp();
  const after=e.weeklyPlan(me);
- const spring=after.items.find(x=>x.key==='spring');
- assert.equal(spring.done,true,'a finished step is marked done rather than disappearing');
- assert.equal(after.remaining,before.remaining-1,'and stops counting toward what is left');
- assert.ok(after.items.indexOf(spring)>after.items.findIndex(x=>!x.done),'done steps sink below pending ones');
+ assert.equal(after.items[0].key,'fall','the next unfinished phase rises to the top');
+ assert.equal(after.remaining,2,'only fall camp and preseason remain');
+ assert.ok(['review','departures','signing','portal','spring'].every(x=>e.universe.offseason.completed.includes(x)));
+ assert.ok(after.items.filter(x=>x.done).every(x=>after.items.indexOf(x)>after.items.findIndex(y=>!y.done)),'done steps sink below pending ones');
 });
 
 test('the plan surfaces real blockers and never invents one',async()=>{

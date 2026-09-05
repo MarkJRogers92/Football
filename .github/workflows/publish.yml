@@ -1,0 +1,98 @@
+name: Publish Dynasty Lab
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Publish destination
+        required: true
+        default: preview
+        type: choice
+        options:
+          - preview
+          - production
+      preview_name:
+        description: Preview URL name (required for preview)
+        required: false
+        type: string
+      confirmation:
+        description: Type PUBLISH to confirm production
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dynasty-publish
+  cancel-in-progress: false
+
+jobs:
+  validate-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Validate publish request
+        shell: bash
+        env:
+          TARGET: ${{ inputs.target }}
+          PREVIEW_NAME: ${{ inputs.preview_name }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          if [ "$TARGET" = "preview" ]; then
+            [[ "$PREVIEW_NAME" =~ ^[A-Za-z0-9][A-Za-z0-9._-]{0,39}$ ]] || {
+              echo "A valid preview_name is required for preview publication." >&2
+              exit 1
+            }
+          elif [ "$CONFIRMATION" != "PUBLISH" ]; then
+            echo "Production publication requires confirmation=PUBLISH." >&2
+            exit 1
+          fi
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Build standalone artifact
+        run: npm run build
+      - name: Verify committed build is current
+        run: git diff --exit-code -- index.html
+      - name: Verify releasable source tree
+        run: npm run verify:release
+      - name: Engine and presentation tests
+        run: npm test
+      - name: Locate Chromium
+        id: chromium
+        shell: bash
+        run: |
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$browser" ]; then
+            npx playwright-core install chromium
+            browser="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$browser"
+          echo "path=$browser" >> "$GITHUB_OUTPUT"
+      - name: Browser UI and visual regression tests
+        run: npm run test:browser
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+      - name: Browser IndexedDB regression check
+        run: npm run test:browser-storage
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+      - name: Simulation audit
+        run: npm run audit
+      - name: Publish selected target
+        shell: bash
+        env:
+          TARGET: ${{ inputs.target }}
+          PREVIEW_NAME: ${{ inputs.preview_name }}
+        run: |
+          if [ "$TARGET" = "preview" ]; then
+            node tools/publish.js --preview "$PREVIEW_NAME"
+          else
+            node tools/publish.js
+          fi

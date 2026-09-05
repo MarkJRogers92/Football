@@ -36,6 +36,15 @@ const startNewDynasty=async page=>{
     await page.goto('file://' + path.join(__dirname, '..', 'index.html'));
     await startNewDynasty(page);
 
+    check(`[${label}] new dynasty defaults to locked Dynasty Mode`,
+      await page.$eval('#userTeam', el => el.disabled)
+      && await page.$eval('#controlModeBanner', el => el.hidden));
+    await goTab(page, 'program');
+    check(`[${label}] Dynasty Mode locks direct institutional editing`,
+      await page.$eval('#applyProgramEdit', el => el.disabled)
+      && await page.$eval('#programEditNotice', el => /Dynasty Mode locks/.test(el.textContent)));
+    await goTab(page, 'dashboard');
+
     check(`[${label}] 120 programs in the picker`,
       await page.$eval('#userTeam', el => el.options.length) === 120);
     check(`[${label}] team name rendered`,

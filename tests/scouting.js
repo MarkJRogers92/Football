@@ -29,6 +29,6 @@ test('experience, camps and transfers improve knowledge without revealing exact 
 
 test('signing-day beliefs follow a recruit into his player history',async()=>{
  const {e,u,t}=await setup(1603),r=u.recruits.find(x=>!x.committed&&e.canTakeCommit(t.name));r.targeted=true;e.firstRecruitEvaluation(r,t);assert.equal(e.commitRecruit(r,t.name),true);
- u.phase='complete';u.developmentState={year:u.year,springRun:true,fallRun:true,springReport:[],fallReport:[],battles:[]};e.runOffseason();
+ u.phase='complete';u.offseason=e.makeOffseasonState(u.year,'signing');e.offseasonEnrollment();
  const p=t.roster.find(x=>x.name===r.name);assert.ok(p);assert.deepEqual(p.scoutingHistory.map(x=>x.phase),['FIRST_EVALUATION','SIGNING_DAY']);assert.equal(Object.keys(p.scoutingDomains).length,5);
 });

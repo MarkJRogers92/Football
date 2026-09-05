@@ -25,10 +25,10 @@ const packageVersion = JSON.parse(read('package.json')).version;
 if (packageVersion !== version)
   throw new Error(`version drift: VERSION.txt says ${version}, package.json says ${packageVersion}`);
 
-// Visible version labels are stamped at build time from VERSION.txt. body.html is
-// allowed to contain an old literal because it is a template, but a built release
-// is not. Require both markers to exist so a future markup refactor cannot quietly
-// drop one of the stamps.
+// Visible version labels are stamped at build time from VERSION.txt. body.html
+// uses neutral placeholders so the authored template never claims to be an old
+// release. Require both markers to exist so a future markup refactor cannot
+// quietly drop one of the stamps.
 function stampVersionLabel(markup, pattern, label) {
   if (!pattern.test(markup)) throw new Error(`${label} version marker not found in body.html`);
   return markup.replace(pattern, `$1v${version}$2`);

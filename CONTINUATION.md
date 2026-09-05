@@ -1,10 +1,13 @@
-# Dynasty Lab — v0.9.44 working checkpoint
+# Dynasty Lab — v0.9.44 production checkpoint
 
-Branch: `codex/v0944-conference-gameday`
+Source commit: `dc3c76c`
+Production commit: `99d8a88` on `gh-pages`
 
 v0.9.44 is a presentation-only conference identity and game-day pass. It adds ten CSS-rendered conference crests/identities and upgrades Game Lab using only existing engine facts. No simulation rules, save schema, migration or IndexedDB behavior changed.
 
-Production remains v0.9.43 until this branch is approved and published.
+v0.9.44 is live. The next bounded work is specified in
+`docs/roadmap/STATUS.md`; do not infer the current task from the older historical
+sections below.
 
 ## Prior checkpoint
 

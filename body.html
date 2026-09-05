@@ -25,6 +25,7 @@
       <section id="titleNewPanel" class="title-subpanel" aria-labelledby="titleNewHeading" hidden>
         <div class="title-panel-head"><div><span>NEW DYNASTY</span><h2 id="titleNewHeading">Choose your program</h2></div><button type="button" data-title-back aria-label="Back to main menu">Back</button></div>
         <label class="title-field">Program<select id="titleTeam" aria-label="Starting program"></select></label>
+        <label class="title-field">Mode<select id="titleMode" aria-label="Dynasty control mode"><option value="dynasty">Dynasty — one program, career moves only</option><option value="commissioner">Commissioner — switch and edit programs</option></select></label>
         <p>Every dynasty begins in the 2027 preseason. The rest of the country is generated only after you confirm.</p>
         <button id="titleStart" class="title-panel-primary" type="button">Start Dynasty</button>
       </section>
@@ -48,7 +49,7 @@
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.9.40</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v—</b></span></footer>
   </div>
 </section>
 
@@ -56,7 +57,7 @@
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.9.40</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v—</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -68,6 +69,7 @@
       <button id="newUniverse">Title Screen</button>
     </div>
   </header>
+  <div id="controlModeBanner" class="control-mode-banner" hidden></div>
   <div id="saveStatus" class="save-status muted">No save loaded.</div>
 
   <div class="tabs-shell">
@@ -245,6 +247,7 @@
 
     <section id="program" class="panel tab">
       <div class="section-head"><div><h2>Program Lab</h2><div class="muted">Edit the controlled fictional school in place. This is the first version of Create-a-School / universe editing.</div></div></div>
+      <div id="programEditNotice" class="card muted"></div>
       <div class="card editor-grid">
         <label>School name<input id="editName" type="text"></label>
         <label>Conference (fixed in v0.4)<select id="editConference" disabled></select></label>
@@ -301,7 +304,7 @@
     <section id="offseason" class="panel tab">
       <div class="section-head">
         <div><h2>Offseason Lab</h2><div class="muted">After spring development and fall camp, finalize graduation, transfers, draft decisions, coaching movement and the incoming class.</div></div>
-        <button id="runOffseason" disabled>Finalize Offseason & Advance Year</button>
+        <button id="runOffseason" disabled>Advance Offseason Phase</button>
       </div>
       <div class="two-col">
         <div class="card"><h3>Transfer Watch</h3><div id="transferWatch"></div></div>
