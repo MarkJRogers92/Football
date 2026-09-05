@@ -51,8 +51,8 @@ test('an ordinary save appends only the games just played and never rewrites his
 test('missing or damaged game chunks fail loudly instead of dropping history',async()=>{
  const {indexedDB,store}=fixture();
  const state=await store.save(snapshot(),{gameAdditions:[game(1)]});
- const db=await new Promise(res=>{const r=indexedDB.open('DynastyLabDB',3);r.onsuccess=()=>res(r.result)});
- await new Promise(res=>{const tx=db.transaction(['games'],'readwrite');tx.oncomplete=res;tx.objectStore('games').delete(0)});
+ const db=await new Promise(res=>{const r=indexedDB.open('DynastyLabDB',4);r.onsuccess=()=>res(r.result)});
+ await new Promise(res=>{const tx=db.transaction(['games'],'readwrite');tx.oncomplete=res;tx.objectStore('games').delete('main:0')});
  db.close();
  await assert.rejects(store.readGames(state.gameRef),/missing or damaged/);
 });

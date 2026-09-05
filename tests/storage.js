@@ -65,12 +65,12 @@ async function transact(db,names,mode,work){return new Promise((res,rej)=>{const
  });
  test('missing archive chunks cause an error rather than silently dropping alumni',async()=>{
   const {indexedDB,store}=fixture();const state=await store.save(snapshot(),{additions:[player(1)]});
-  const db=await open(indexedDB,3);await transact(db,['archives'],'readwrite',tx=>tx.objectStore('archives').delete(0));db.close();
+  const db=await open(indexedDB,4);await transact(db,['archives'],'readwrite',tx=>tx.objectStore('archives').delete('main:0'));db.close();
   await assert.rejects(store.readArchive(state.archiveRef),/missing or damaged/);
  });
  test('empty archives round-trip and unsupported storage versions are rejected',async()=>{
   const {indexedDB,store}=fixture();const state=await store.save(snapshot());assert.deepEqual(await store.readArchive(state.archiveRef),[]);
-  const d=await store.load();d.storageVersion=4;const db=await open(indexedDB,3);await transact(db,['saves'],'readwrite',tx=>tx.objectStore('saves').put(d,'main'));db.close();
+  const d=await store.load();d.storageVersion=4;const db=await open(indexedDB,4);await transact(db,['saves'],'readwrite',tx=>tx.objectStore('saves').put(d,'main'));db.close();
   await assert.rejects(store.load(),/newer game version/);
  });
  test('blocked upgrade rejects promptly and does not run later in the background',async()=>{

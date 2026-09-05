@@ -6,10 +6,18 @@
   const revisionOf = d => d ? (d.revision || `legacy:${d.savedAt || ''}`) : null;
   const token = () => Array.from(crypto.getRandomValues(new Uint32Array(4)), n => n.toString(16)).join('-');
 
-  function create({indexedDB = root.indexedDB, name = 'DynastyLabDB'} = {}) {
+  // v0.9.49: every slot owns its own rows. Chunk keys are namespaced by slot, so one
+  // dynasty can never read or clear another's archives — the old bare-index keys and the
+  // store-wide clear() below made that a real hazard the moment a second slot existed.
+  const DEFAULT_SLOT = 'main';
+  const slotKey = (slot, i) => `${slot}:${i}`;
+
+  function create({indexedDB = root.indexedDB, name = 'DynastyLabDB', slot = DEFAULT_SLOT} = {}) {
+    if (typeof slot !== 'string' || !slot || /[:;]/.test(slot))
+      throw new Error(`Invalid save slot "${slot}".`);
     function open() {
       return new Promise((resolve, reject) => {
-        const request = indexedDB.open(name, 3);
+        const request = indexedDB.open(name, 4);
         let cancelled = false;
         request.onblocked = () => {
           cancelled = true;
@@ -24,6 +32,11 @@
           // own append-only chunks, so an ordinary save stops rewriting years
           // of history it never touched.
           if (!db.objectStoreNames.contains('games')) db.createObjectStore('games');
+          // v0.9.49: slot summaries live apart from the dynasty itself, so a slot picker
+          // can list programs, years and sizes without loading a whole save.
+          if (!db.objectStoreNames.contains('meta')) db.createObjectStore('meta');
+          // Chunks written before slots were bare indexes and all belonged to the default slot.
+          if (request.transaction) migrateBareChunks(request.transaction, ['archives', 'games']);
         };
         request.onerror = () => reject(request.error);
         request.onsuccess = () => {
@@ -33,6 +46,34 @@
           resolve(db);
         };
       });
+    }
+
+    // Replacing a dynasty clears only this slot's chunks. The old code called clear() on the
+    // whole store, which would have destroyed every other slot's history. Deletes are issued
+    // for the known prior keys rather than driven by a cursor: a cursor is still walking the
+    // store while the replacement puts are queued behind it, so it deletes the very rows just
+    // written. clear() never had that problem because it is a single atomic request.
+    function clearSlotChunks(store, slot, priorChunks) {
+      for (let i = 0; i < (priorChunks || 0); i++) store.delete(slotKey(slot, i));
+    }
+
+    // Rewrites legacy numeric chunk keys as `main:<i>` in place. Runs inside the upgrade
+    // transaction, so a failure aborts the version change and leaves the old layout intact.
+    function migrateBareChunks(tx, stores) {
+      for (const storeName of stores) {
+        if (!tx.objectStoreNames.contains(storeName)) continue;
+        const store = tx.objectStore(storeName);
+        const cursorReq = store.openCursor();
+        cursorReq.onsuccess = () => {
+          const cursor = cursorReq.result;
+          if (!cursor) return;
+          if (typeof cursor.key === 'number') {
+            store.put(cursor.value, slotKey(DEFAULT_SLOT, cursor.key));
+            cursor.delete();
+          }
+          cursor.continue();
+        };
+      }
     }
 
     async function transact(stores, mode, work) {
@@ -61,7 +102,7 @@
 
     function load() {
       return transact(['saves'], 'readonly', (tx, done, fail) => {
-        const req = tx.objectStore('saves').get('main');
+        const req = tx.objectStore('saves').get(slot);
         req.onsuccess = () => {
           const d = req.result;
           if (d?.storageVersion && d.storageVersion !== 2 && d.storageVersion !== 3)
@@ -78,7 +119,7 @@
     function readArchive(ref) {
       if (!validRef(ref)) return Promise.reject(new Error('Invalid archive reference.'));
       return transact(['saves', 'archives'], 'readonly', (tx, done, fail) => {
-        const req = tx.objectStore('saves').get('main');
+        const req = tx.objectStore('saves').get(slot);
         req.onsuccess = () => {
           const current = req.result?.archiveRef;
           if (!current || current.id !== ref.id || current.count < ref.count || current.chunks < ref.chunks)
@@ -87,7 +128,7 @@
           let remaining = ref.chunks;
           if (!remaining) { done([]); return; }
           for (let i = 0; i < ref.chunks; i++) {
-            const r = tx.objectStore('archives').get(i);
+            const r = tx.objectStore('archives').get(slotKey(slot, i));
             r.onsuccess = () => {
               if (!Array.isArray(r.result) || !r.result.length || r.result.some(p => !p || typeof p !== 'object'))
                 return fail(new Error('Archived careers are missing or damaged. Use a complete JSON backup.'));
@@ -106,7 +147,7 @@
     function readGames(ref) {
       if (!validRef(ref)) return Promise.reject(new Error('Invalid game archive reference.'));
       return transact(['saves', 'games'], 'readonly', (tx, done, fail) => {
-        const req = tx.objectStore('saves').get('main');
+        const req = tx.objectStore('saves').get(slot);
         req.onsuccess = () => {
           const current = req.result?.gameRef;
           if (!current || current.id !== ref.id || current.count < ref.count || current.chunks < ref.chunks)
@@ -115,7 +156,7 @@
           let remaining = ref.chunks;
           if (!remaining) { done([]); return; }
           for (let i = 0; i < ref.chunks; i++) {
-            const r = tx.objectStore('games').get(i);
+            const r = tx.objectStore('games').get(slotKey(slot, i));
             r.onsuccess = () => {
               if (!Array.isArray(r.result) || !r.result.length || r.result.some(g => !g || typeof g !== 'object' || !g.id))
                 return fail(new Error('Archived games are missing or damaged. Use a complete JSON backup.'));
@@ -140,7 +181,7 @@
       if (gameRef && !validRef(gameRef)) return Promise.reject(new Error('Invalid game archive reference.'));
       return transact(['saves', 'archives', 'games'], 'readwrite', (tx, done, fail) => {
         const saves = tx.objectStore('saves'), archives = tx.objectStore('archives'), games = tx.objectStore('games');
-        const req = saves.get('main');
+        const req = saves.get(slot);
         req.onsuccess = () => {
           try {
             if (expectedRevision !== null && revisionOf(req.result) !== expectedRevision)
@@ -152,18 +193,18 @@
               || req.result.gameRef.count !== gameRef.count || req.result.gameRef.chunks !== gameRef.chunks))
               return fail(new Error('The saved game archive changed. Reload before saving.'));
             let chunks = archiveRef?.chunks || 0;
-            if (!archiveRef) archives.clear();
+            if (!archiveRef) clearSlotChunks(archives, slot, req.result?.archiveRef?.chunks);
             for (let i = 0; i < additions.length; i += CHUNK_SIZE)
-              archives.put(additions.slice(i, i + CHUNK_SIZE), chunks++);
+              archives.put(additions.slice(i, i + CHUNK_SIZE), slotKey(slot, chunks++));
             const ref = {id: archiveRef?.id || token(), count: (archiveRef?.count || 0) + additions.length, chunks};
             let gameChunks = gameRef?.chunks || 0;
-            if (!gameRef) games.clear();
+            if (!gameRef) clearSlotChunks(games, slot, req.result?.gameRef?.chunks);
             for (let i = 0; i < gameAdditions.length; i += CHUNK_SIZE)
-              games.put(gameAdditions.slice(i, i + CHUNK_SIZE), gameChunks++);
+              games.put(gameAdditions.slice(i, i + CHUNK_SIZE), slotKey(slot, gameChunks++));
             const gRef = {id: gameRef?.id || token(), count: (gameRef?.count || 0) + gameAdditions.length, chunks: gameChunks};
             const {playerArchive, gameArchive, ...core} = snapshot.universe;
             const data = {...snapshot, universe: core, storageVersion: 3, archiveRef: ref, gameRef: gRef, revision: token()};
-            saves.put(data, 'main');
+            saves.put(data, slot);
             done({revision: data.revision, archiveRef: ref, gameRef: gRef});
           } catch (e) { fail(e); }
         };
