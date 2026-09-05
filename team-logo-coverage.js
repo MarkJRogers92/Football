@@ -164,7 +164,10 @@ let queued=false;
 function run(){
  queued=false;ensureStyles();patchTopbar();patchMasthead();patchSportsMarks();patchPlayerHero();patchCommitmentSchool();patchInlineIdentity();
 }
-function queue(){if(queued)return;queued=true;(window.requestAnimationFrame||setTimeout)(run)}
+function queue(){
+ if(queued)return;queued=true;
+ if(window.requestAnimationFrame)window.requestAnimationFrame(run);else setTimeout(run,0);
+}
 
 const picker=document.querySelector('#userTeam');
 picker?.addEventListener('change',()=>setTimeout(queue,0));
