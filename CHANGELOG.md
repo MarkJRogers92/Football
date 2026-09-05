@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.9.42 — Complete team-logo coverage
+
+- Completes the locked 120-program real-logo presentation pass across Game Lab, app header, dashboard matchups, recruiting, stats, records, history and coaching surfaces.
+- Replaces remaining legacy initials marks while preserving numeric `teamId` atlas mapping.
+- Presentation-only; no simulation or save-format changes.
+- Release validation: 155/155 Node, 109/109 core browser UI, 26/26 logo/visual and 21/21 recruiting visual checks passed.
+
 ## v0.9.41 — Team branding: the 384×320 logo atlas, wired into six surfaces
 
 Implements `TEAM_BRANDING_V1_ASSET_HANDOFF.md` from `codex/team-branding-v1-assets`: a locked, real-logo atlas for all 120 programs, addressed only by numeric `teamId` (never by school name), with a graceful fallback for anything invalid.

@@ -1,3 +1,11 @@
+# Dynasty Lab — v0.9.42 checkpoint
+
+Production: v0.9.42 at https://markjrogers92.github.io/Football/
+
+v0.9.42 completes team-logo coverage across the remaining presentation surfaces. This release is presentation-only: no simulation rules, save schema, migration or IndexedDB behavior changed.
+
+## Prior continuation notes
+
 # Dynasty Lab — v0.9.37 checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
