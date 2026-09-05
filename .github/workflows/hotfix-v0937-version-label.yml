@@ -1,0 +1,63 @@
+name: Validate and publish v0.9.37 version-label hotfix
+
+on:
+  push:
+    branches:
+      - codex/v0937-version-label-hotfix
+
+permissions:
+  contents: write
+
+jobs:
+  hotfix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Verify release metadata
+        shell: bash
+        run: |
+          test "$(tr -d '\r\n' < VERSION.txt)" = "0.9.37"
+          grep -q "const APP_VERSION='0.9.37';" app.js
+          grep -q '"version": "0.9.37"' package.json
+
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Build standalone
+        run: npm run build
+      - name: Verify all visible version labels
+        shell: bash
+        run: |
+          grep -q '<title>Dynasty Lab v0.9.37</title>' index.html
+          grep -q 'data-title-version>v0.9.37</b>' index.html
+          grep -q 'data-app-version>v0.9.37</span>' index.html
+          ! grep -q 'data-title-version>v0.9.36</b>' index.html
+          ! grep -q 'data-app-version>v0.9.36</span>' index.html
+      - name: Engine and persistence tests
+        run: npm test
+      - name: Browser UI tests
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then
+            npx playwright-core install chromium
+            CHROME="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$CHROME"
+          CHROMIUM_PATH="$CHROME" npm run test:browser
+      - name: Browser IndexedDB regression check
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then CHROME="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"; fi
+          test -n "$CHROME"
+          CHROMIUM_PATH="$CHROME" npm run test:browser-storage
+      - name: Simulation audit
+        run: npm run audit
+      - name: Publish production hotfix
+        run: node tools/publish.js
