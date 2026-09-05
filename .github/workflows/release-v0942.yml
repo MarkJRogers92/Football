@@ -1,0 +1,134 @@
+name: Publish Dynasty Lab v0.9.42
+
+on:
+  push:
+    branches:
+      - codex/v0942-release
+    paths:
+      - .release-v0942
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Prepare v0.9.42 release metadata
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json, re
+
+          old='0.9.41'
+          version='0.9.42'
+
+          app=Path('app.js')
+          text=app.read_text()
+          old_marker=f"const APP_VERSION='{old}';"
+          new_marker=f"const APP_VERSION='{version}';"
+          if new_marker not in text:
+              if old_marker not in text:
+                  raise SystemExit(f'Expected APP_VERSION {old} marker not found')
+              text=text.replace(old_marker,new_marker,1)
+              app.write_text(text)
+
+          pkg_path=Path('package.json')
+          pkg=json.loads(pkg_path.read_text())
+          if pkg.get('version') not in (old,version):
+              raise SystemExit(f"Unexpected package version {pkg.get('version')}")
+          pkg['version']=version
+          pkg_path.write_text(json.dumps(pkg,indent=2)+'\n')
+          Path('VERSION.txt').write_text(version+'\n')
+
+          readme=Path('README.md')
+          r=readme.read_text()
+          r=re.sub(r'The live release is \*\*v\d+\.\d+\.\d+\*\*\.',f'The live release is **v{version}**.',r,count=1)
+          if '- v0.9.41 — 120-program real-logo atlas on core presentation surfaces' not in r:
+              anchor='- v0.9.8 (preview) — recruit portraits across recruiting surfaces\n'
+              extra='- v0.9.41 — 120-program real-logo atlas on core presentation surfaces\n- v0.9.42 — complete team-logo coverage across remaining presentation surfaces\n'
+              if anchor in r:r=r.replace(anchor,anchor+extra,1)
+          readme.write_text(r)
+
+          changelog=Path('CHANGELOG.md')
+          c=changelog.read_text()
+          heading='## v0.9.42 — Complete team-logo coverage\n'
+          if heading not in c:
+              entry='''## v0.9.42 — Complete team-logo coverage\n\n- Replaced the remaining legacy initials-based school marks with the locked 120-program real-logo atlas, including the app header, Game Lab next-matchup card, dashboard broadcast matchups, player school identity and recruiting commitment identity.\n- Extended logo context to recruiting battles, statistical leaders, awards, draft results, national records, program/player history, coach career history and other school-reference presentation surfaces.\n- Added paired program marks to two-team Game Lab result, newsletter scoreline and historical game-list surfaces.\n- Preserved the numeric `teamId` atlas mapping and added a presentation-only compatibility adapter for older name-only DOM surfaces; no simulation or save-format behavior changed.\n- Focused regression validation before release: 11/11 branding/Game Lab Node tests and 26/26 desktop+iPhone visual checks, including explicit rejection of CH/PH-style Game Lab initials and zero mobile horizontal overflow.\n\n'''
+              c=c.replace('# Changelog\n\n','# Changelog\n\n'+entry,1)
+              changelog.write_text(c)
+
+          cont=Path('CONTINUATION.md')
+          x=cont.read_text()
+          marker='# Dynasty Lab — v0.9.42 checkpoint\n'
+          if not x.startswith(marker):
+              current='''# Dynasty Lab — v0.9.42 checkpoint\n\nRepository: https://github.com/MarkJRogers92/Football\nCanonical source after promotion: `claude/review-improvement-dwjemy`\nProduction branch: `gh-pages`\nProduction: v0.9.42 at https://markjrogers92.github.io/Football/\n\n## Current release\n\nv0.9.42 completes the real-logo presentation pass started in v0.9.41. The locked 120-program atlas now replaces the remaining legacy school-initial marks and supplies logo context across Game Lab, dashboard broadcast cards, player/recruit identity, recruiting battles, stats, awards/draft/records, history/archive and coaching-history surfaces. Two-team score/history rows receive both program marks where practical.\n\nThis is presentation-only. No simulation rules, save schema, migration, IndexedDB behavior or player portrait identity changed. v0.9.41 had already passed 152/152 Node and 144/144 browser tests; the v0.9.42 coverage delta additionally passed focused branding/Game Lab and desktop+iPhone visual regression checks before release.\n\n## Prior continuation notes\n\n'''
+              cont.write_text(current+x)
+          PY
+
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Build standalone
+        run: npm run build
+      - name: Full Node test suite
+        run: npm test
+      - name: Browser UI and visual regression tests
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then
+            npx playwright-core install chromium
+            CHROME="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$CHROME"
+          CHROMIUM_PATH="$CHROME" npm run test:browser
+      - name: Browser IndexedDB regression check
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then CHROME="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"; fi
+          test -n "$CHROME"
+          CHROMIUM_PATH="$CHROME" npm run test:browser-storage
+      - name: Simulation audit
+        run: npm run audit
+
+      - name: Commit v0.9.42 source checkpoint
+        shell: bash
+        run: |
+          git config user.name "Dynasty Lab Release"
+          git config user.email "136272503+MarkJRogers92@users.noreply.github.com"
+          git add app.js package.json VERSION.txt README.md CHANGELOG.md CONTINUATION.md index.html
+          git diff --cached --quiet || git commit -m "Release Dynasty Lab v0.9.42 team-logo coverage"
+          git push origin HEAD:codex/v0942-release
+
+      - name: Publish production to gh-pages
+        shell: bash
+        run: |
+          SOURCE_INDEX="$PWD/index.html"
+          SOURCE_ASSETS="$PWD/assets"
+          git fetch origin gh-pages
+          if git log origin/gh-pages --oneline --grep='^Publish production: 0.9.42$' | grep -q .; then
+            echo 'v0.9.42 has already been published; refusing to overwrite it.' >&2
+            exit 1
+          fi
+          rm -rf /tmp/dynasty-pages
+          git worktree add /tmp/dynasty-pages origin/gh-pages
+          cd /tmp/dynasty-pages
+          git checkout -B gh-pages origin/gh-pages
+          cp "$SOURCE_INDEX" index.html
+          mkdir -p assets
+          cp -R "$SOURCE_ASSETS"/. assets/
+          git add index.html assets
+          git diff --cached --quiet && { echo 'Published build already matches production.'; exit 0; }
+          git config user.name "Dynasty Lab Release"
+          git config user.email "136272503+MarkJRogers92@users.noreply.github.com"
+          git commit -m "Publish production: 0.9.42"
+          git push origin gh-pages
