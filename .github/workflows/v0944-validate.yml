@@ -1,0 +1,43 @@
+name: v0944 conference and game-day validation
+
+on:
+  push:
+    branches:
+      - codex/v0944-conference-gameday
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Build standalone
+        run: npm run build
+      - name: Engine and presentation tests
+        run: npm test
+      - name: Browser UI and visual regression tests
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then
+            npx playwright-core install chromium
+            CHROME="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$CHROME"
+          CHROMIUM_PATH="$CHROME" npm run test:browser
+      - name: Browser IndexedDB regression check
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then CHROME="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"; fi
+          test -n "$CHROME"
+          CHROMIUM_PATH="$CHROME" npm run test:browser-storage
+      - name: Simulation audit
+        run: npm run audit
