@@ -113,7 +113,10 @@ causal checks pass and only when a season-level question requires it.
 
 ## Immediate small batches
 
-1. Fix recruit truth continuity and tests.
+1. Fix recruit truth continuity and tests. **Implemented on this branch.** New
+   recruits carry seven persistent traits; active-cycle legacy recruits retain
+   the old fallback and are labeled. A fresh 2,800-recruit save increased from
+   16,606,083 to 16,865,918 bytes: +259,835 bytes (+1.56%).
 2. Add shared matchup edges for pass protection/rush, run game/front and targets/coverage.
 3. Render those edges plus gameplan adjustments and replace the shallow recommendation.
 4. Correct the gameplan outcome test and add paired directional tests.

@@ -7,6 +7,11 @@ const width=x=>x.high-x.low;
 
 test('position-specific domains show uncertain ranges and recruiting exposure tightens them',async()=>{
  const {e,u,t}=await setup(),r=u.recruits.find(x=>x.pos==='QB');
+ assert.equal(e.hasPlayerTraits(r),true,'new recruits carry persistent position traits');
+ const arm=e.scoutingDefs(r).find(x=>x[0]==='arm');
+ assert.equal(e.scoutingTruth(r,arm,true),Math.round(r.power*.7+r.technique*.3),'scouting evaluates the recruit traits that will survive signing');
+ const packed=e.packUniverse(u).recruits.find(x=>x.id===r.id);
+ assert.deepEqual(e.playerTraitFields(packed),e.playerTraitFields(r),'portable saves retain recruit identity');
  const initial=e.scoutingDomainView(r,t,true);assert.deepEqual(initial.map(x=>x.label),['Arm Strength','Accuracy','Processing','Mobility','Upside']);
  assert.ok(initial.every(x=>x.low<x.high&&x.confidence<100));
  const before=initial.reduce((n,x)=>n+width(x),0);r.targeted=true;e.firstRecruitEvaluation(r,t);e.refreshScoutingIntel(r,t,8,'VISIT',true);
@@ -29,6 +34,15 @@ test('experience, camps and transfers improve knowledge without revealing exact 
 
 test('signing-day beliefs follow a recruit into his player history',async()=>{
  const {e,u,t}=await setup(1603),r=u.recruits.find(x=>!x.committed&&e.canTakeCommit(t.name));r.targeted=true;e.firstRecruitEvaluation(r,t);assert.equal(e.commitRecruit(r,t.name),true);
+ const identity=e.playerTraitFields(r);
  u.phase='complete';u.developmentState={year:u.year,springRun:true,fallRun:true,springReport:[],fallReport:[],battles:[]};e.runOffseason();
- const p=t.roster.find(x=>x.name===r.name);assert.ok(p);assert.deepEqual(p.scoutingHistory.map(x=>x.phase),['FIRST_EVALUATION','SIGNING_DAY']);assert.equal(Object.keys(p.scoutingDomains).length,5);
+ const p=t.roster.find(x=>x.name===r.name);assert.ok(p);assert.deepEqual(e.playerTraitFields(p),identity,'the signed player keeps the exact traits that were scouted');assert.deepEqual(p.scoutingHistory.map(x=>x.phase),['FIRST_EVALUATION','SIGNING_DAY']);assert.equal(Object.keys(p.scoutingDomains).length,5);
+});
+
+test('legacy recruits remain loadable and are labeled honestly',async()=>{
+ const {e,u,t}=await setup(1604),r=u.recruits.find(x=>x.pos==='RB');
+ for(const key of Object.keys(e.playerTraitFields(r)))delete r[key];
+ assert.equal(e.hasPlayerTraits(r),false);
+ assert.doesNotThrow(()=>e.scoutingDomainView(r,t,true));
+ assert.match(e.scoutingPanelHTML(r,t,true),/Legacy evaluation/);
 });

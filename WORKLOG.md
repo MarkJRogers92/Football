@@ -1,5 +1,18 @@
 # WORKLOG
 
+## Strategy integrity batch 1 — persistent recruit truth
+
+Recruit position-domain scouting previously evaluated deterministic variations
+around overall rating. Signing then generated unrelated player attributes while
+retaining those evaluations. New recruits now receive the same seven hidden
+traits as roster players; scouting reads those traits and enrollment preserves
+them exactly. Current-cycle recruits loaded from older saves keep the compatible
+fallback and display a legacy-evaluation note rather than pretending continuity.
+
+A seeded fresh save with 2,800 recruits grew from 16,606,083 to 16,865,918 bytes,
+an increase of 259,835 bytes (1.56%). Focused scouting checks cover real-domain
+truth, portable persistence, signing continuity and legacy compatibility.
+
 ## Player identity batch 1 — QB quick-sim rushing allocation
 
 The old allocation inspected whether the scheme's list contained the words
