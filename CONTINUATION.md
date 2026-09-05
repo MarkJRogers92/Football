@@ -1,4 +1,14 @@
-# Dynasty Lab — v0.9.39 production checkpoint
+# Dynasty Lab — player identity batches in progress
+
+Active source branch: `codex/player-identity-batches`, based on `ba26de1`.
+Read [the all-position roadmap](docs/PLAYER_IDENTITY_ROADMAP.md) first.
+User requested small committed/pushed batches for easy Claude/chat takeover,
+covering every position, ratings, descriptions and actual statistical behavior.
+Production remains v0.9.39. These are source checkpoints, not a new release.
+Batch 0: roadmap saved. Batch 1: QB allocation fix is next. Remaining batches
+and acceptance criteria are in the roadmap; do not claim the full overhaul done.
+
+## Previous production checkpoint
 
 Repository: https://github.com/MarkJRogers92/Football
 Current source branch: `codex/v0939-game-consistency`
