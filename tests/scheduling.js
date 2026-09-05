@@ -48,34 +48,59 @@ test('the validator actually catches a broken schedule instead of rubber-stampin
  t.schedule.pop();
 });
 
-test('KNOWN GAP: home and away are badly unbalanced across the league',async()=>{
+test('home and away are balanced across the whole league',async()=>{
  const e=await setup(9103);
- const homes=e.universe.teams.map(t=>t.schedule.filter(g=>g.home===t.name).length);
- const outside=homes.filter(h=>h<e.SCHEDULE_HOME_MIN||h>e.SCHEDULE_HOME_MAX).length;
- // Today most of the league is outside the bound: teams run from 2 home games to 11.
- // When commit 3 lands, this becomes assert.equal(outside,0) and the range narrows.
- assert.ok(outside>50,`expected the current imbalance, only ${outside} teams were outside the bound`);
- assert.ok(Math.min(...homes)<=3,`expected someone stuck near-all-away, min was ${Math.min(...homes)}`);
- assert.ok(Math.max(...homes)>=9,`expected someone hoarding home games, max was ${Math.max(...homes)}`);
-});
-
-test('KNOWN GAP: the same schedule repeats forever and three conference opponents are never played',async()=>{
- const e=await setup(9104),name='Chicago Metropolitan';
- const confSets=[],nonConfSets=[];
  for(let season=0;season<3;season++){
-  confSets.push([...e.conferenceOpponentsFor(e.universe,name)].sort().join('|'));
-  nonConfSets.push(e.nonConferenceOpponentsFor(e.universe,name).slice().sort().join('|'));
+  const homes=e.universe.teams.map(t=>t.schedule.filter(g=>g.home===t.name).length);
+  const outside=homes.filter(h=>h<e.SCHEDULE_HOME_MIN||h>e.SCHEDULE_HOME_MAX);
+  // Before v0.9.48 this ranged 2-11 with 83 of 120 teams outside the bound, and half the
+  // league played every conference game on the road.
+  assert.equal(outside.length,0,`${outside.length} teams outside ${e.SCHEDULE_HOME_MIN}-${e.SCHEDULE_HOME_MAX} in ${e.universe.year}`);
+  for(const t of e.universe.teams){
+   const conf=t.schedule.filter(g=>g.conf),home=conf.filter(g=>g.home===t.name).length;
+   assert.ok(home>0&&home<conf.length,`${t.name} plays ${home}/${conf.length} conference games at home`);
+  }
   rollSeason(e);
  }
- // Every season is identical, so a dynasty never sees a new opponent. Commit 3 rotates the
- // conference slate and commit 4 varies nonconference; both of these become >1 then.
- assert.equal(new Set(confSets).size,1,'expected the conference slate to repeat exactly');
- assert.equal(new Set(nonConfSets).size,1,'expected the nonconference slate to repeat exactly');
- const met=new Set(confSets[0].split('|'));
- assert.equal(met.size,8,`expected 8 of 11 conference opponents, saw ${met.size}`);
- // The union over three seasons is no larger than one season: those three are unreachable.
+});
+
+test('the schedule rotates: new opponents every season, and the whole conference within a cycle',async()=>{
+ const e=await setup(9104),name='Chicago Metropolitan';
+ const rivalName=e.universe.teams.find(t=>t.id===e.T(name).protectedRivalId)?.name;
+ assert.ok(rivalName,'a protected rival is designated');
+ const confSets=[],nonConf=[];
+ for(let season=0;season<6;season++){
+  const met=[...e.conferenceOpponentsFor(e.universe,name)];
+  assert.ok(met.includes(rivalName),`the protected rival was skipped in ${e.universe.year}`);
+  confSets.push(met.sort().join('|'));
+  nonConf.push(...e.nonConferenceOpponentsFor(e.universe,name));
+  rollSeason(e);
+ }
+ // Every season must differ; previously all six were identical.
+ assert.equal(new Set(confSets).size,6,'a conference slate repeated');
+ // And the three permanently unreachable opponents must now come round.
  const union=new Set(confSets.flatMap(x=>x.split('|')));
- assert.equal(union.size,8,'three conference opponents are unreachable in any season');
+ assert.equal(union.size,11,`only ${union.size} of 11 conference opponents were ever played`);
+ // Nonconference must not rerun the same opponents either.
+ assert.equal(new Set(nonConf).size,nonConf.length,'a nonconference opponent repeated within six seasons');
+});
+
+test('a protected rivalry does not depend on the schedule that happens to be generated',async()=>{
+ const e=await setup(9106);
+ // Designation is mutual, same-conference and total — the old derivation only considered
+ // opponents already on the schedule, which left six teams with no rival at all.
+ const byId=new Map(e.universe.teams.map(t=>[t.id,t]));
+ for(const t of e.universe.teams){
+  const o=byId.get(t.protectedRivalId);
+  assert.ok(o,`${t.name} has no protected rival`);
+  assert.equal(o.protectedRivalId,t.id,`${t.name} and ${o.name} do not agree`);
+  assert.equal(o.conference,t.conference,`${t.name}'s rival is in another conference`);
+  assert.notEqual(o.id,t.id);
+ }
+ // And it survives rebuilds rather than being re-picked each year.
+ const before=new Map(e.universe.teams.map(t=>[t.id,t.protectedRivalId]));
+ rollSeason(e);
+ for(const t of e.universe.teams)assert.equal(t.protectedRivalId,before.get(t.id),`${t.name}'s rival changed between seasons`);
 });
 
 test('a played season keeps its schedule when the next one is generated',async()=>{

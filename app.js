@@ -749,6 +749,22 @@ function conferenceOpponentsFor(u,teamName){
   if(g.home===teamName)out.add(g.away);
   else if(g.away===teamName)out.add(g.home);
  }
+ // A greedy pass can still strand a few teams outside the bound. Flipping any game whose
+ // host already has two more home dates than its guest strictly reduces the spread, so
+ // repeating it converges instead of trading one violation for another.
+ const count=new Map();
+ for(const g of out)count.set(g.home,(count.get(g.home)||0)+1);
+ const homeOf=n=>count.get(n)||0;
+ for(let pass=0;pass<24;pass++){
+  let moved=false;
+  for(const g of out){
+   if(homeOf(g.home)-homeOf(g.away)<2)continue;
+   count.set(g.home,homeOf(g.home)-1);count.set(g.away,homeOf(g.away)+1);
+   [g.home,g.away]=[g.away,g.home];
+   moved=true;
+  }
+  if(!moved)break;
+ }
  return out;
 }
 function nonConferenceOpponentsFor(u,teamName){
@@ -761,7 +777,119 @@ function nonConferenceOpponentsFor(u,teamName){
  return out;
 }
 
-function buildSchedule(){universe.teams.forEach(t=>t.schedule=[]);universe.schedule=Array.from({length:12},()=>[]);const cn=allConfs();for(let w=0;w<4;w++)circlePair(cn,w).forEach(([ca,cb])=>{const A=universe.teams.filter(t=>t.conference===ca),B=universe.teams.filter(t=>t.conference===cb);for(let i=0;i<Math.min(A.length,B.length);i++){let j=(i+w)%B.length,home=(i+w)%2===0?A[i]:B[j],away=home===A[i]?B[j]:A[i];universe.schedule[w].push({week:w+1,home:home.name,away:away.name,conf:false,played:false})}});allConfs().forEach(c=>{let arr=universe.teams.filter(t=>t.conference===c);if(arr.length%2)return;for(let r=0;r<8;r++)circlePair(arr,r).forEach(([a,b],k)=>{let home=(r+k)%2===0?a:b,away=home===a?b:a;universe.schedule[4+r].push({week:r+5,home:home.name,away:away.name,conf:true,played:false})})});universe.schedule.flat().forEach(g=>{T(g.home)?.schedule.push(g);T(g.away)?.schedule.push(g)})}
+// Designation has to happen before the schedule is built, or round 0 is not the rivalry
+// round. Geographic only, so it needs nothing from the schedule it is about to shape.
+function ensureProtectedRivals(){
+ const byId=new Map(universe.teams.map(t=>[t.id,t]));
+ const dist=(a,b)=>haversineMiles(a.lat||0,a.lon||0,b.lat||0,b.lon||0);
+ for(const c of allConfs()){
+  const arr=universe.teams.filter(t=>t.conference===c);
+  const taken=new Set();
+  for(const t of arr){
+   const o=byId.get(t.protectedRivalId);
+   if(o&&o.protectedRivalId===t.id&&o.conference===t.conference&&!taken.has(t.id)&&!taken.has(o.id)){taken.add(t.id);taken.add(o.id)}
+   else if(t.protectedRivalId&&!(o&&o.protectedRivalId===t.id))t.protectedRivalId=null;
+  }
+  const free=arr.filter(t=>!taken.has(t.id));
+  const pairs=[];
+  for(let i=0;i<free.length;i++)for(let j=i+1;j<free.length;j++)pairs.push({t:free[i],o:free[j],d:dist(free[i],free[j])});
+  pairs.sort((a,b)=>a.d-b.d||a.t.id-b.t.id);
+  for(const {t,o} of pairs){
+   if(taken.has(t.id)||taken.has(o.id))continue;
+   t.protectedRivalId=o.id;o.protectedRivalId=t.id;taken.add(t.id);taken.add(o.id);
+  }
+ }
+}
+// Existing saves already carry a derived rival; keep it where both sides agree rather than
+// re-picking and orphaning a series' history. Anything left over is paired geographically.
+function migrateProtectedRivals(){
+ const byId=new Map(universe.teams.map(t=>[t.id,t]));
+ for(const t of universe.teams){
+  if(t.protectedRivalId||!t.rivalry?.rivalId)continue;
+  const o=byId.get(t.rivalry.rivalId);
+  if(o&&o.rivalry?.rivalId===t.id&&o.conference===t.conference){t.protectedRivalId=o.id;o.protectedRivalId=t.id}
+ }
+ ensureProtectedRivals();
+}
+function ensureScheduleRotation(){const r=universe.scheduleRotation??={season:0,lastHost:{}};r.season=Math.max(0,Math.round(Number(r.season)||0));r.lastHost??={};return r}
+// The circle method pairs index i with len-1-i, so putting protected rivals in mirrored
+// slots makes round 0 the rivalry round — the one round every season is guaranteed to use.
+function conferenceRotationOrder(arr){
+ const byId=new Map(arr.map(t=>[t.id,t])),used=new Set(),left=[],right=[];
+ for(const t of arr){
+  if(used.has(t.id))continue;
+  const o=byId.get(t.protectedRivalId);
+  if(o&&o.id!==t.id&&!used.has(o.id)){left.push(t);right.unshift(o);used.add(t.id);used.add(o.id)}
+ }
+ const rest=arr.filter(t=>!used.has(t.id));
+ while(rest.length){left.push(rest.shift());if(rest.length)right.unshift(rest.shift())}
+ return [...left,...right];
+}
+// Home/away is decided after the pairings exist, never inside them: whoever has fewer home
+// games so far hosts, and an even split reverses the previous meeting's venue rather than
+// repeating it. That is what keeps anyone from a third straight home game in a series.
+function assignHomeAway(pairings,rotation){
+ const homeCount=new Map(),seriesKey=(a,b)=>a.id<b.id?`${a.id}:${b.id}`:`${b.id}:${a.id}`;
+ const out=[];
+ for(const p of pairings){
+  const ha=homeCount.get(p.a.id)||0,hb=homeCount.get(p.b.id)||0,key=seriesKey(p.a,p.b);
+  let host;
+  if(ha!==hb)host=ha<hb?p.a:p.b;
+  else{const last=rotation.lastHost[key];host=last===p.a.id?p.b:last===p.b.id?p.a:((p.a.id+p.b.id+rotation.season)%2===0?p.a:p.b)}
+  const guest=host===p.a?p.b:p.a;
+  homeCount.set(host.id,(homeCount.get(host.id)||0)+1);
+  rotation.lastHost[key]=host.id;
+  out.push({week:p.week,home:host.name,away:guest.name,conf:!!p.conf,played:false});
+ }
+ // The greedy pass above still strands a few teams, because it can only see the games it has
+ // placed so far. Flipping any game whose host already holds two more home dates than its
+ // guest strictly narrows the spread, so repeating it converges rather than trading one
+ // violation for another.
+ const tally=new Map();
+ for(const g of out)tally.set(g.home,(tally.get(g.home)||0)+1);
+ const homeOf=n=>tally.get(n)||0;
+ for(let pass=0;pass<24;pass++){
+  let moved=false;
+  for(const g of out){
+   if(homeOf(g.home)-homeOf(g.away)<2)continue;
+   tally.set(g.home,homeOf(g.home)-1);tally.set(g.away,homeOf(g.away)+1);
+   const host=g.away,guest=g.home;g.home=host;g.away=guest;
+   moved=true;
+  }
+  if(!moved)break;
+ }
+ return out;
+}
+function buildSchedule(){
+ universe.teams.forEach(t=>t.schedule=[]);
+ universe.schedule=Array.from({length:12},()=>[]);
+ ensureProtectedRivals();
+ const rotation=ensureScheduleRotation(),season=rotation.season,cn=allConfs(),pairings=[];
+ // Weeks 1-4, nonconference. The conference pairing and the offset within it both advance
+ // with the season, so a dynasty stops replaying the same four opponents forever.
+ for(let w=0;w<4;w++)circlePair(cn,(w+season)%cn.length).forEach(([ca,cb])=>{
+  const A=universe.teams.filter(t=>t.conference===ca),B=universe.teams.filter(t=>t.conference===cb);
+  if(!A.length||!B.length)return;
+  for(let i=0;i<Math.min(A.length,B.length);i++){
+   const j=(i+w+season*3)%B.length;
+   pairings.push({week:w+1,a:A[i],b:B[j],conf:false});
+  }
+ });
+ // Weeks 5-12, conference. Round 0 is the rivalry round and always plays, in the final week;
+ // the other seven rotate through rounds 1-10 so every opponent comes round within a cycle.
+ for(const c of allConfs()){
+  const arr=universe.teams.filter(t=>t.conference===c);
+  if(arr.length<2||arr.length%2)continue;
+  const order=conferenceRotationOrder(arr),rounds=arr.length-1,spare=rounds-1;
+  const chosen=[];
+  for(let k=0;k<Math.min(7,spare);k++)chosen.push(1+((season*7+k)%spare));
+  chosen.forEach((r,idx)=>circlePair(order,r).forEach(([a,b])=>pairings.push({week:5+idx,a,b,conf:true})));
+  circlePair(order,0).forEach(([a,b])=>pairings.push({week:5+chosen.length,a,b,conf:true}));
+ }
+ for(const g of assignHomeAway(pairings,rotation))universe.schedule[g.week-1].push(g);
+ universe.schedule.flat().forEach(g=>{T(g.home)?.schedule.push(g);T(g.away)?.schedule.push(g)});
+ rotation.season=season+1;
+}
 // Immutable game snapshots. Sparse player deltas retain only actual game production.
 function beginGame(home,away,neutral,context={}){
  // All simulation paths enter here after weekly recovery. Charge preparation once,
@@ -1105,21 +1233,35 @@ function deriveRivalries(){
  // eleven, so the nearest school geographically is not necessarily one you ever meet. Pair the
  // globally closest eligible pair first — taking each team in turn strands the last two in a
  // conference when they happen not to play each other.
- const pairs=[];
- for(let i=0;i<teams.length;i++)for(let j=i+1;j<teams.length;j++){
-  const t=teams[i],o=teams[j];
-  if(t.conference!==o.conference)continue;
-  if(!(t.schedule||[]).some(g=>g.home===o.name||g.away===o.name))continue;
-  pairs.push({t,o,d:haversineMiles(t.lat||0,t.lon||0,o.lat||0,o.lon||0)});
- }
- pairs.sort((a,b)=>a.d-b.d||a.t.id-b.t.id);
- for(const {t,o,d} of pairs){
-  if(t.rivalry||o.rivalry)continue;
+ // v0.9.48: identity no longer depends on which opponents a season's rotation happened to
+ // include. Pairing is geographic and permanent; the schedule then guarantees the game.
+ // Anything already designated is honoured first, so a rivalry survives every rebuild.
+ const byId=new Map(teams.map(t=>[t.id,t]));
+ const dist=(a,b)=>haversineMiles(a.lat||0,a.lon||0,b.lat||0,b.lon||0);
+ const bind=(t,o,d)=>{
   const noun=TROPHY_NOUNS[Math.abs(Math.min(t.id,o.id))%TROPHY_NOUNS.length],
    place=t.state===o.state?t.state:'Border',trophy=`The ${place} ${noun}`,miles=Math.round(d),
    keep=(me,them)=>{const p=prev.get(me.id);return p&&p.rivalId===them.id?{...p.series,miles}:{w:0,l:0,streak:0,lastYear:null,lastResult:null,miles}};
   t.rivalry={rivalId:o.id,trophy,series:keep(t,o)};
   o.rivalry={rivalId:t.id,trophy,series:keep(o,t)};
+  t.protectedRivalId=o.id;o.protectedRivalId=t.id;
+ };
+ for(const t of teams){
+  if(t.rivalry||!t.protectedRivalId)continue;
+  const o=byId.get(t.protectedRivalId);
+  if(o&&!o.rivalry&&o.id!==t.id&&o.conference===t.conference&&o.protectedRivalId===t.id)bind(t,o,dist(t,o));
+ }
+ const pairs=[];
+ for(let i=0;i<teams.length;i++)for(let j=i+1;j<teams.length;j++){
+  const t=teams[i],o=teams[j];
+  if(t.conference!==o.conference)continue;
+  if(t.rivalry||o.rivalry)continue;
+  pairs.push({t,o,d:dist(t,o)});
+ }
+ pairs.sort((a,b)=>a.d-b.d||a.t.id-b.t.id);
+ for(const {t,o,d} of pairs){
+  if(t.rivalry||o.rivalry)continue;
+  bind(t,o,d);
  }
 }
 function rivalOf(t){return t?.rivalry?universe.teams.find(x=>x.id===t.rivalry.rivalId)||null:null}
@@ -2808,7 +2950,7 @@ function renderRecords(){const u=selected(),final=universe.awards?.[universe.yea
 function renderHistory(){renderGameArchive();let items=[];for(const h of universe.history){if(h.type==='season'){let np=h.awards?.find(a=>a.name==='National Player of the Year');items.push(`<div class="card"><div class="historyrow champ"><span>${h.year} National Champion</span><strong>${h.champion}</strong></div>${np?`<div class="historyrow"><span>National Player of the Year</span><span>${np.playerName} · ${np.team}</span></div>`:''}${h.top10.slice(0,5).map((t,i)=>`<div class="historyrow"><span>#${i+1} ${t.name}</span><span>${t.record}</span></div>`).join('')}</div>`)}else items.push(`<div class="historyrow"><span>${h.year} ${h.event||''}</span><span>${h.detail||''}</span></div>`)}$('#historyLog').innerHTML=items.join('')||'<div class="card muted">No completed seasons yet.</div>'}
 function packPlayer(p){return {...p,stats:packStats(p.stats),career:packStats(p.career)}}
 function packUniverse(u,includeArchive=true){if(includeArchive&&u===universe&&archiveIsDeferred())throw new Error("Load archived careers before exporting.");const {playerArchive,...core}=u;const out={...core,teams:u.teams.map(t=>({...t,roster:t.roster.map(packPlayer)}))};if(includeArchive)out.playerArchive=(playerArchive||[]).map(packPlayer);return out}
-function normalizeUniverse(){universe.gameArchive??=[];universe.gameArchiveVersion??=1;universe.gameCounter=universe.gameArchive.reduce((n,g)=>Math.max(n,Number(g.id.split('_').pop())||0),universe.gameCounter||0);universe.version=APP_VERSION;IDX.teams=null;IDX.players=null;universe.movementLog??=[];universe.lastDetailedGame??=null;normalizePortalState();universe.playerArchive??=[];universe.recoveredWeek??=-1;universe.weeklyHub??=[];universe.highSchools??=generateHighSchools();universe.awards??={};universe.records??={nationalSeason:{},nationalCareer:{}};universe.records.nationalSeason??={};universe.records.nationalCareer??={};universe.draftHistory??={};universe.recruitClassCounts??={};universe.campHistory??={};universe.developmentState??={year:universe.year,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]};if(!Object.keys(universe.recruitClassCounts).length)for(const r of universe.recruits||[])if(r.committed)universe.recruitClassCounts[r.committed]=(universe.recruitClassCounts[r.committed]||0)+1;universe.teams.forEach(t=>{let base=schools.find(s=>s.name===t.name);if(base){t.city??=base.city;t.state??=base.state;t.lat??=base.lat;t.lon??=base.lon}t.staff??=generateStaff(t);for(const c of Object.values(t.staff)){c.contractYears??=gi(1,4);c.salary??=1.2}t.offScheme??=pick(Object.keys(OFF_SCHEMES));t.defScheme??=pick(Object.keys(DEF_SCHEMES));t.nickname??='';t.commits??=[];t.pipelines??=makePipelines(t);t.records??={};ensureSchoolColors(t);ensureTeamDevelopment(t);t.roster.forEach(p=>{p.speed??=clamp(p.trueNow+gi(-8,8),25,99);p.power??=clamp(p.trueNow+gi(-8,8),25,99);p.technique??=clamp(p.trueNow+gi(-8,8),25,99);p.iq??=clamp(p.trueNow+gi(-10,10),20,99);p.composure??=65;p.durability??=70;p.versatility??=60;p.health??=100;p.wear??=0;p.injury??=null;p.injuryWeeks??=0;p.injuryHistory??=[];p.seasonHistory??=[];p.awards??=[];p.draftResult??=null;p.promise??=null;p.promiseBaseline??=p.perceived;p.eligibilityUsed??=({FR:0,SO:1,JR:2,SR:3}[p.year]??0);p.redshirtUsed??=false;p.redshirtActive??=false;p.redshirtSeason??=null;p.stats={...newStats(),...(p.stats||{})};p.career={...newStats(),...(p.career||{})};p.year=CLASS_NAMES[Math.min(3,eligibilityBase(p))]||'SR';ensurePlayerDevelopment(p,t)});ensureDepth(t);ensureRoleDepth(t)});universe.playerArchive.forEach(p=>{p.awards??=[];p.seasonHistory??=[];p.coachRelationships??={};p.primaryRecruiterCoachId??=p.recruitingMemory?.primaryRecruiterCoachId||p.recruitingMemory?.recruiterCoachId||null;p.career={...newStats(),...(p.career||{})};p.stats={...newStats(),...(p.stats||{})};p.eligibilityUsed??=3;p.redshirtUsed??=false;p.redshirtActive=false});if(Array.isArray(universe.schedule)){universe.teams.forEach(t=>t.schedule=[]);universe.schedule.flat().forEach(g=>{T(g.home)?.schedule.push(g);T(g.away)?.schedule.push(g)})}
+function normalizeUniverse(){universe.gameArchive??=[];universe.gameArchiveVersion??=1;universe.gameCounter=universe.gameArchive.reduce((n,g)=>Math.max(n,Number(g.id.split('_').pop())||0),universe.gameCounter||0);universe.version=APP_VERSION;IDX.teams=null;IDX.players=null;universe.movementLog??=[];universe.lastDetailedGame??=null;normalizePortalState();ensureScheduleRotation();migrateProtectedRivals();universe.playerArchive??=[];universe.recoveredWeek??=-1;universe.weeklyHub??=[];universe.highSchools??=generateHighSchools();universe.awards??={};universe.records??={nationalSeason:{},nationalCareer:{}};universe.records.nationalSeason??={};universe.records.nationalCareer??={};universe.draftHistory??={};universe.recruitClassCounts??={};universe.campHistory??={};universe.developmentState??={year:universe.year,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]};if(!Object.keys(universe.recruitClassCounts).length)for(const r of universe.recruits||[])if(r.committed)universe.recruitClassCounts[r.committed]=(universe.recruitClassCounts[r.committed]||0)+1;universe.teams.forEach(t=>{let base=schools.find(s=>s.name===t.name);if(base){t.city??=base.city;t.state??=base.state;t.lat??=base.lat;t.lon??=base.lon}t.staff??=generateStaff(t);for(const c of Object.values(t.staff)){c.contractYears??=gi(1,4);c.salary??=1.2}t.offScheme??=pick(Object.keys(OFF_SCHEMES));t.defScheme??=pick(Object.keys(DEF_SCHEMES));t.nickname??='';t.commits??=[];t.pipelines??=makePipelines(t);t.records??={};ensureSchoolColors(t);ensureTeamDevelopment(t);t.roster.forEach(p=>{p.speed??=clamp(p.trueNow+gi(-8,8),25,99);p.power??=clamp(p.trueNow+gi(-8,8),25,99);p.technique??=clamp(p.trueNow+gi(-8,8),25,99);p.iq??=clamp(p.trueNow+gi(-10,10),20,99);p.composure??=65;p.durability??=70;p.versatility??=60;p.health??=100;p.wear??=0;p.injury??=null;p.injuryWeeks??=0;p.injuryHistory??=[];p.seasonHistory??=[];p.awards??=[];p.draftResult??=null;p.promise??=null;p.promiseBaseline??=p.perceived;p.eligibilityUsed??=({FR:0,SO:1,JR:2,SR:3}[p.year]??0);p.redshirtUsed??=false;p.redshirtActive??=false;p.redshirtSeason??=null;p.stats={...newStats(),...(p.stats||{})};p.career={...newStats(),...(p.career||{})};p.year=CLASS_NAMES[Math.min(3,eligibilityBase(p))]||'SR';ensurePlayerDevelopment(p,t)});ensureDepth(t);ensureRoleDepth(t)});universe.playerArchive.forEach(p=>{p.awards??=[];p.seasonHistory??=[];p.coachRelationships??={};p.primaryRecruiterCoachId??=p.recruitingMemory?.primaryRecruiterCoachId||p.recruitingMemory?.recruiterCoachId||null;p.career={...newStats(),...(p.career||{})};p.stats={...newStats(),...(p.stats||{})};p.eligibilityUsed??=3;p.redshirtUsed??=false;p.redshirtActive=false});if(Array.isArray(universe.schedule)){universe.teams.forEach(t=>t.schedule=[]);universe.schedule.flat().forEach(g=>{T(g.home)?.schedule.push(g);T(g.away)?.schedule.push(g)})}
  universe.weeklyDecisions??=[];if(!universe.teams.some(t=>t.rivalry))deriveRivalries();universe.careerHistory??=[];universe.jobOffers??=[];universe.bowls??=[];universe.signingDay??=null;for(const t of universe.teams){t.fanBaseline??=t.fan_support??60;for(const p of t.roster)ensureAcademics(p,t)}for(const t of universe.teams){ensureAdminState(t);ensureNilState(t)}for(const d of universe.weeklyDecisions)d.source??='STAFF';normalizePromiseState();for(const r of universe.recruits||[])normalizeRecruitGeography(r,universe.highSchools);assignRecruitRanks(universe.recruits||[]);if(!universe.weeklyHub.length)buildPreseasonHub();rebuildIndexes()}
 function setStatus(x){if($('#saveStatus'))$('#saveStatus').textContent=x}
 // Browser persistence state is deliberately outside the portable universe.
