@@ -80,7 +80,7 @@ function luminance(hex){
 }
 function contrast(a,b){const hi=Math.max(luminance(a),luminance(b)),lo=Math.min(luminance(a),luminance(b));return (hi+0.05)/(lo+0.05)}
 
-test('v0.9.43 has one accessible three-color identity for every numeric team id',()=>{
+test('program branding has one accessible three-color identity for every numeric team id',()=>{
  const src=fs.readFileSync(path.join(__dirname,'..','program-branding.js'),'utf8');
  const context={window:{}};vm.runInNewContext(src,context);
  const branding=context.window.DynastyProgramBranding;
