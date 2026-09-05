@@ -1,0 +1,25 @@
+/* v0.9.44 conference crests and identity surfaces. */
+.conference-crest{
+  --conf-primary:#234875;--conf-secondary:#73a8ff;--conf-accent:#d6b45e;
+  position:relative;display:inline-grid;width:42px;height:48px;place-items:center;flex:0 0 auto;
+  clip-path:polygon(8% 0,92% 0,100% 17%,91% 76%,50% 100%,9% 76%,0 17%);
+  background:linear-gradient(145deg,var(--conf-secondary),var(--conf-accent));
+  filter:drop-shadow(0 7px 12px rgba(0,0,0,.28));vertical-align:middle;
+}
+.conference-crest::before{content:"";position:absolute;inset:2px;clip-path:inherit;background:linear-gradient(155deg,color-mix(in srgb,var(--conf-primary) 82%,#1a2939),color-mix(in srgb,var(--conf-primary) 96%,#080d13));}
+.conference-crest::after{content:"";position:absolute;left:9px;right:9px;top:9px;height:2px;background:var(--conf-secondary);box-shadow:0 22px 0 color-mix(in srgb,var(--conf-accent) 72%,transparent);opacity:.82}
+.conference-crest>span{position:relative;z-index:1;color:#fff;font-size:10px;font-weight:950;letter-spacing:.055em;text-shadow:0 2px 5px rgba(0,0,0,.55)}
+.conference-crest--sm{width:25px;height:29px;filter:drop-shadow(0 4px 7px rgba(0,0,0,.24))}.conference-crest--sm::after{left:6px;right:6px;top:6px;height:1px;box-shadow:0 13px 0 color-mix(in srgb,var(--conf-accent) 72%,transparent)}.conference-crest--sm>span{font-size:6px}
+.conference-crest--lg{width:58px;height:66px}.conference-crest--lg::after{left:12px;right:12px;top:12px;box-shadow:0 32px 0 color-mix(in srgb,var(--conf-accent) 72%,transparent)}.conference-crest--lg>span{font-size:13px}
+
+.conference-banner{position:relative;display:flex;align-items:center;gap:13px;overflow:hidden;margin:-2px 0 12px;padding:12px 14px;border:1px solid color-mix(in srgb,var(--conf-secondary) 40%,#31455c);border-radius:11px;background:linear-gradient(105deg,rgba(var(--conf-primary-rgb),.32),rgba(var(--conf-primary-rgb),.08) 62%,rgba(var(--conf-accent-rgb),.05));box-shadow:inset 3px 0 var(--conf-secondary)}
+.conference-banner::after{content:"";position:absolute;width:130px;height:130px;right:-72px;top:-78px;border:1px solid rgba(var(--conf-secondary-rgb),.12);border-radius:50%;box-shadow:0 0 0 20px rgba(var(--conf-secondary-rgb),.025)}
+.conference-banner-copy{position:relative;z-index:1;min-width:0}.conference-banner-copy span{display:block;color:var(--conf-secondary);font-size:8px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}.conference-banner-copy strong{display:block;margin-top:2px;color:#f3f7fb;font-size:16px;letter-spacing:-.02em}.conference-banner-copy small{display:block;margin-top:2px;color:#8fa1b5;font-size:8px;font-weight:750;letter-spacing:.1em}
+.team-conference-lockup{display:inline-flex;align-items:center;gap:6px;margin-right:7px}.team-conference-lockup .conference-crest{vertical-align:-8px}
+.conference-result-label{display:inline-flex!important;align-items:center;gap:5px;color:var(--conf-secondary)!important;font-weight:800}
+
+.gameday-conference{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 8px;color:#8da0b5;font-size:8px;font-weight:850;letter-spacing:.12em;text-transform:uppercase}.gameday-conference strong{color:var(--conf-secondary);font-size:8px;letter-spacing:.12em}
+.gameday-conference.is-split .conference-crest+.conference-crest{margin-left:-13px}
+
+@media(max-width:560px){.conference-banner{padding:10px 11px}.conference-banner .conference-crest--lg{width:46px;height:53px}.conference-banner-copy strong{font-size:14px}}
+@media(prefers-reduced-motion:reduce){.conference-crest{filter:none}}

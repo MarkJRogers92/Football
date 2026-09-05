@@ -33,7 +33,7 @@ simulation can be exercised and measured without a browser.
 
 ## Version
 
-The live release is **v0.9.42**. `VERSION.txt` is the single release-version
+The live release is **v0.9.43**. `VERSION.txt` is the single release-version
 source and the build/test pipeline checks it against the application/package
 version so mismatched labels fail before publishing.
 

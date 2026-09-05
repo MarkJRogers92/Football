@@ -2,6 +2,7 @@
 'use strict';
 
 // Presentation-only enhancement. Reads rendered DOM; never mutates universe/save data.
+const CONF=window.DynastyConferenceBranding;
 const palettes=[
  ['#173b67','#79b4ff','121,180,255'],['#6a1f2b','#f0c56f','240,197,111'],
  ['#1f513f','#79d7ad','121,215,173'],['#47306e','#b39cff','179,156,255'],
@@ -17,6 +18,12 @@ function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
 function team(){const p=document.querySelector('#userTeam'),n=document.querySelector('#teamName')?.textContent;return (n||p?.options[p.selectedIndex]?.text||'Program').trim()}
 function txt(el,sel){return (el?.querySelector(sel)?.textContent||'').trim()}
 function mark(name,size=''){const p=palette(name);return `<div class="sports-mark ${size}" style="--mark-primary:${p.primary};--mark-secondary:${p.secondary};--mark-rgb:${p.rgb}" aria-hidden="true">${esc(initials(name))}</div>`}
+function conferenceMark(name,size='md',extraClass=''){return CONF?.badgeHTML(name,size,extraClass)||''}
+function applyConferenceVars(root=document){
+ if(!CONF)return;
+ for(const crest of root.querySelectorAll?.('.conference-crest')||[]){const name=crest.dataset.conference;if(name)CONF.applyVars(crest,name)}
+ for(const host of root.querySelectorAll?.('[data-conference-brand]')||[]){const name=host.dataset.conferenceBrand;if(name)CONF.applyVars(host,name)}
+}
 function go(tab){document.querySelector(`.tabs button[data-tab="${tab}"]`)?.click()}
 const reducedMotion=()=>document.body.classList.contains('motion-reduced')||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 const preferredWatchSpeed=()=>{try{const v=String(JSON.parse(localStorage.getItem('dynastyLabPreferences')||'{}').watchSpeed||'850');return['1400','850','400'].includes(v)?v:'850'}catch{return'850'}};
@@ -45,7 +52,43 @@ function playerHero(){
 }
 
 function matchup(){
- const c=document.querySelector('#nextGameCard');if(!c||c.querySelector('.matchup-shell'))return;const title=c.querySelector('strong')?.textContent?.trim(),detail=c.querySelector('.muted')?.textContent?.trim();if(!title||!detail)return;const m=title.match(/^Week\s+(\d+):\s+(vs|@)\s+(.+)$/i);if(!m)return;const [,wk,loc,opp]=m,u=team(),halves=detail.split(/\s+·\s+/);c.innerHTML=`<div class="matchup-shell"><div class="matchup-label">WEEK ${esc(wk)} · GAME LAB PREVIEW</div><div class="matchup-board"><div class="matchup-team is-user">${mark(u,'xl')}<strong>${esc(u)}</strong><span>${esc((halves[0]||'').replace(u+':','').trim())}</span></div><div class="matchup-center"><b>${loc==='@'?'AT':'VS'}</b><span>TALE OF THE TAPE</span></div><div class="matchup-team">${mark(opp,'xl')}<strong>${esc(opp)}</strong><span>${esc((halves.slice(1).join(' · ')||'').replace(opp+':','').trim())}</span></div></div><div class="matchup-footer"><span>Current staff/game-model reads</span><strong>${loc==='@'?'ROAD GAME':'HOME GAME'}</strong></div></div>`
+ const c=document.querySelector('#nextGameCard');if(!c||c.querySelector('.matchup-shell'))return;
+ const data=c.querySelector('.gameday-data');
+ if(!data){
+  const title=c.querySelector('strong')?.textContent?.trim(),detail=c.querySelector('.muted')?.textContent?.trim();if(!title||!detail)return;
+  const m=title.match(/^Week\s+(\d+):\s+(vs|@)\s+(.+)$/i);if(!m)return;
+  const [,wk,loc,opp]=m,u=team(),halves=detail.split(/\s+·\s+/);
+  c.innerHTML=`<div class="matchup-shell"><div class="matchup-label">WEEK ${esc(wk)} · GAME LAB PREVIEW</div><div class="matchup-board"><div class="matchup-team is-user">${mark(u,'xl')}<strong>${esc(u)}</strong><span>${esc((halves[0]||'').replace(u+':','').trim())}</span></div><div class="matchup-center"><b>${loc==='@'?'AT':'VS'}</b><span>TALE OF THE TAPE</span></div><div class="matchup-team">${mark(opp,'xl')}<strong>${esc(opp)}</strong><span>${esc((halves.slice(1).join(' · ')||'').replace(opp+':','').trim())}</span></div></div><div class="matchup-footer"><span>Current staff/game-model reads</span><strong>${loc==='@'?'ROAD GAME':'HOME GAME'}</strong></div></div>`;
+  return;
+ }
+ const d=data.dataset,sameConference=d.userConference===d.opponentConference;
+ const confLockup=sameConference
+  ?`<div class="gameday-conference" data-conference-brand="${esc(d.userConference)}">${conferenceMark(d.userConference,'sm')}<strong>${esc(d.userConference)} CONFERENCE</strong></div>`
+  :`<div class="gameday-conference is-split"><span data-conference-brand="${esc(d.userConference)}">${conferenceMark(d.userConference,'sm')}</span><strong>NONCONFERENCE</strong><span data-conference-brand="${esc(d.opponentConference)}">${conferenceMark(d.opponentConference,'sm')}</span></div>`;
+ const side=(name,id,rank,record,conference,offense,defense,user=false)=>`<div class="matchup-team${user?' is-user':''}" data-team-id="${esc(id)}">${mark(name,'xl')}<div class="gameday-rank">${esc(rank)}</div><strong>${esc(name)}</strong><span>${esc(record)} · ${esc(conference)}</span><div class="gameday-ratings"><span>OFF <b>${esc(offense)}</b></span><span>DEF <b>${esc(defense)}</b></span></div></div>`;
+ const unavailable=(+d.userOut||+d.opponentOut)?`${d.userOut} yours / ${d.opponentOut} theirs`:'Both teams at full availability';
+ c.innerHTML=`<div class="matchup-shell gameday-shell${d.rivalry==='true'?' is-rivalry':''}"><div class="gameday-topline"><div><span class="matchup-label">WEEK ${esc(d.week)} · GAME LAB</span><strong>${esc(d.stakes)}</strong></div><span class="gameday-stakes">${d.rivalry==='true'?'RIVALRY':'MATCHUP'}</span></div>${confLockup}<div class="matchup-board">${side(d.userName,d.userId,d.userRank,d.userRecord,d.userConference,d.userOffense,d.userDefense,true)}<div class="matchup-center"><b>${d.location==='@'?'AT':'VS'}</b><span>${esc(d.venue)}</span></div>${side(d.opponentName,d.opponentId,d.opponentRank,d.opponentRecord,d.opponentConference,d.opponentOffense,d.opponentDefense)}</div><div class="gameday-intel"><div><span>ACTIVE PLAN</span><strong>${esc(d.activePlan)}</strong></div><div><span>OPPONENT TENDENCY</span><strong>${esc(d.opponentPassMix)}% pass</strong></div><div><span>AVAILABILITY</span><strong>${esc(unavailable)}</strong></div></div><div class="gameday-recommendation"><span>STAFF RECOMMENDATION</span><strong>${esc(d.recommendedPlan)}</strong><p>${esc(d.recommendation)}</p></div><div class="matchup-footer"><span>${esc(d.homeEdge)}</span><strong>${d.location==='@'?'ROAD GAME':'HOME GAME'}</strong></div></div>`;
+ applyConferenceVars(c)
+}
+
+function conferenceSurfaces(){
+ if(!CONF)return;
+ const meta=document.querySelector('#teamMeta');
+ if(meta){
+  const decorated=!!meta.querySelector('.conference-crest'),raw=decorated?(meta.dataset.conferenceSource||meta.textContent.trim()):meta.textContent.trim(),name=CONF.names.find(x=>raw.startsWith(x+' ·')||raw===x);
+  if(name&&(!decorated||meta.dataset.conferenceDecorated!==name)){meta.dataset.conferenceSource=raw;meta.dataset.conferenceDecorated=name;meta.classList.add('team-conference-meta');meta.innerHTML=`<span class="team-conference-lockup" data-conference-brand="${esc(name)}">${conferenceMark(name,'sm')}<span>${esc(raw)}</span></span>`}
+ }
+ const standings=document.querySelector('#confStandings'),card=standings?.closest('.card');
+ if(standings&&card){
+  const name=meta?.dataset.conferenceDecorated||CONF.names.find(x=>meta?.textContent.includes(x));
+  if(name){let banner=card.querySelector('.conference-banner');if(!banner){banner=document.createElement('div');banner.className='conference-banner';card.querySelector('h3')?.after(banner)}if(banner.dataset.conferenceBrand!==name){const brand=CONF.identity(name);banner.dataset.conferenceBrand=name;banner.innerHTML=`${conferenceMark(name,'lg')}<div class="conference-banner-copy"><span>CONFERENCE HQ</span><strong>${esc(name)} Conference</strong><small>${esc(brand.tagline)}</small></div>`}}
+ }
+ for(const label of document.querySelectorAll('#latestResults .resultrow.champ .small.muted')){
+  if(label.classList.contains('conference-result-label'))continue;
+  const name=CONF.names.find(x=>label.textContent.trim().startsWith(x+' Championship'));if(!name)continue;
+  label.classList.add('conference-result-label');label.dataset.conferenceBrand=name;label.innerHTML=`${conferenceMark(name,'sm')}<span>${esc(name)} CHAMPIONSHIP</span>`
+ }
+ applyConferenceVars(document)
 }
 function top15(){for(const row of document.querySelectorAll('#top15 .rankrow')){const cell=row.firstElementChild;if(!cell||cell.querySelector('.sports-mark'))continue;const name=[...cell.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();if(!name)continue;cell.querySelector('.rank')?.insertAdjacentHTML('afterend',mark(name,'small'))}}
 function gamecenter(){
@@ -55,10 +98,11 @@ function gamecenter(){
  // #gameDialogName carries real team-logo art (app.js's teamLogoHTML) that this dialog's own
  // CSS then visually clips to 1px once .sports-game-dialog is applied below — reuse that art in
  // the scoreboard slot instead of the generic initials mark, so the real logo is what's shown.
- const logos=[...h.querySelectorAll('.team-logo')];
+ const logos=[...h.querySelectorAll('.team-logo')],eventConference=CONF?.names.find(x=>(meta[3]||'').startsWith(x+' Championship'));
  let sb=head.querySelector('.scoreboard');if(!sb){sb=document.createElement('div');sb.className='scoreboard';h.after(sb)}
  const side=(name,score,win,role,logo)=>`<div class="sb-team${win?' winner':''}">${logo?`<div class="sports-mark large has-logo" style="${esc(logo.getAttribute('style')||'')}" aria-hidden="true"></div>`:mark(name,'large')}<div class="sb-copy"><span class="sb-role">${role}</span><strong>${esc(name)}</strong><small>${esc(rec(name))}</small></div><b class="sb-score">${esc(score)}</b></div>`;
- sb.innerHTML=side(away,as,aw,'AWAY',logos[0])+`<div class="sb-mid"><span class="sb-status">${esc(meta[0]||'FINAL')}</span><span>${esc(meta.slice(1,3).join(' · '))}</span><span>${esc(meta.slice(3).join(' · '))}</span></div>`+side(home,hs,hw,'HOME',logos[1]);
+ sb.innerHTML=side(away,as,aw,'AWAY',logos[0])+`<div class="sb-mid"${eventConference?` data-conference-brand="${esc(eventConference)}"`:''}>${eventConference?conferenceMark(eventConference,'sm'):''}<span class="sb-status">${esc(meta[0]||'FINAL')}</span><span>${esc(meta.slice(1,3).join(' · '))}</span><span>${esc(meta.slice(3).join(' · '))}</span></div>`+side(home,hs,hw,'HOME',logos[1]);
+ applyConferenceVars(sb);
  sb.classList.remove('scoreboard-enter');void sb.offsetWidth;sb.classList.add('scoreboard-enter');const scores=sb.querySelectorAll('.sb-score');animateNumber(scores[0],+as);animateNumber(scores[1],+hs);
  if(!dlg.dataset.motionCloseBound){dlg.dataset.motionCloseBound='1';dlg.addEventListener('close',()=>{delete dlg.dataset.sportsScoreKey;head.querySelector('.scoreboard')?.remove()})}
 }
@@ -87,8 +131,8 @@ function watchGame(){
  play.addEventListener('click',()=>{if(timer){stop();return}if(done)reset();play.textContent='Pause';play.setAttribute('aria-pressed','true');tick()});nextButton.addEventListener('click',()=>{stop();advance()});skip.addEventListener('click',()=>{stop();steps.forEach(x=>x.hidden=false);driveIndex=steps.length;playIndex=0;finish()});speed.addEventListener('change',()=>{if(timer){clearTimeout(timer);timer=setTimeout(tick,reducedMotion()?80:+speed.value)}});panel.querySelector('[data-watch-summary]')?.addEventListener('click',()=>document.querySelector('#gameTabs [data-game-tab="Summary"]')?.click());panel.closest('dialog')?.addEventListener('close',stop,{once:true});
 }
 function score(){document.querySelector('#detailedBox .big')?.classList.add('sports-scoreline')}
-let queued=false;function run(){queued=false;dashboard();top15();playerHero();matchup();gamecenter();driveReplay();watchGame();score()}function queue(){if(queued)return;queued=true;if(window.requestAnimationFrame)window.requestAnimationFrame(run);else setTimeout(run,0)}
+let queued=false;function run(){queued=false;dashboard();top15();playerHero();matchup();gamecenter();conferenceSurfaces();driveReplay();watchGame();score()}function queue(){if(queued)return;queued=true;if(window.requestAnimationFrame)window.requestAnimationFrame(run);else setTimeout(run,0)}
 document.addEventListener('click',e=>{if(e.target?.closest?.('[data-sports-final]')){e.preventDefault();[...document.querySelectorAll('#weeklyHub .hub-item')].find(x=>txt(x,'.hub-kicker').toUpperCase()==='FINAL')?.click();return}const tab=e.target?.closest?.('[data-sports-tab]')?.dataset?.sportsTab;if(tab){e.preventDefault();go(tab)}setTimeout(queue,0)});document.querySelector('#userTeam')?.addEventListener('change',()=>setTimeout(queue,0));
-if(window.MutationObserver){for(const sel of ['#weeklyHub','#top15','#playerDialog','#gameDialog','#nextGameCard','#detailedBox']){const el=document.querySelector(sel);if(el)new MutationObserver(queue).observe(el,{childList:true,subtree:true,characterData:true,attributes:sel==='#playerDialog'||sel==='#gameDialog'})}}
+if(window.MutationObserver){for(const sel of ['#weeklyHub','#top15','#playerDialog','#gameDialog','#nextGameCard','#detailedBox','#teamMeta','#confStandings','#latestResults']){const el=document.querySelector(sel);if(el)new MutationObserver(queue).observe(el,{childList:true,subtree:true,characterData:true,attributes:sel==='#playerDialog'||sel==='#gameDialog'})}}
 queue();
 })();
