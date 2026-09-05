@@ -2978,6 +2978,10 @@ function nonConferenceOpponentsFor(u,teamName){
 
 // Designation has to happen before the schedule is built, or round 0 is not the rivalry
 // round. Geographic only, so it needs nothing from the schedule it is about to shape.
+// Stored as an array so adding a second protected rivalry later is a data change, not a
+// schema rewrite. Index 0 is the one the schedule reserves a round for today.
+function primaryRivalId(t){return t?.protectedRivalIds?.[0]??null}
+function setPrimaryRival(t,o){t.protectedRivalIds=[o.id]}
 function ensureProtectedRivals(){
  const byId=new Map(universe.teams.map(t=>[t.id,t]));
  const dist=(a,b)=>haversineMiles(a.lat||0,a.lon||0,b.lat||0,b.lon||0);
@@ -2985,9 +2989,9 @@ function ensureProtectedRivals(){
   const arr=universe.teams.filter(t=>t.conference===c);
   const taken=new Set();
   for(const t of arr){
-   const o=byId.get(t.protectedRivalId);
-   if(o&&o.protectedRivalId===t.id&&o.conference===t.conference&&!taken.has(t.id)&&!taken.has(o.id)){taken.add(t.id);taken.add(o.id)}
-   else if(t.protectedRivalId&&!(o&&o.protectedRivalId===t.id))t.protectedRivalId=null;
+   const o=byId.get(primaryRivalId(t));
+   if(o&&primaryRivalId(o)===t.id&&o.conference===t.conference&&!taken.has(t.id)&&!taken.has(o.id)){taken.add(t.id);taken.add(o.id)}
+   else if(primaryRivalId(t)&&!(o&&primaryRivalId(o)===t.id))t.protectedRivalIds=[];
   }
   const free=arr.filter(t=>!taken.has(t.id));
   const pairs=[];
@@ -2995,7 +2999,7 @@ function ensureProtectedRivals(){
   pairs.sort((a,b)=>a.d-b.d||a.t.id-b.t.id);
   for(const {t,o} of pairs){
    if(taken.has(t.id)||taken.has(o.id))continue;
-   t.protectedRivalId=o.id;o.protectedRivalId=t.id;taken.add(t.id);taken.add(o.id);
+   setPrimaryRival(t,o);setPrimaryRival(o,t);taken.add(t.id);taken.add(o.id);
   }
  }
 }
@@ -3004,9 +3008,9 @@ function ensureProtectedRivals(){
 function migrateProtectedRivals(){
  const byId=new Map(universe.teams.map(t=>[t.id,t]));
  for(const t of universe.teams){
-  if(t.protectedRivalId||!t.rivalry?.rivalId)continue;
+  if(primaryRivalId(t)||!t.rivalry?.rivalId)continue;
   const o=byId.get(t.rivalry.rivalId);
-  if(o&&o.rivalry?.rivalId===t.id&&o.conference===t.conference){t.protectedRivalId=o.id;o.protectedRivalId=t.id}
+  if(o&&o.rivalry?.rivalId===t.id&&o.conference===t.conference){setPrimaryRival(t,o);setPrimaryRival(o,t)}
  }
  ensureProtectedRivals();
 }
@@ -3017,7 +3021,7 @@ function conferenceRotationOrder(arr){
  const byId=new Map(arr.map(t=>[t.id,t])),used=new Set(),left=[],right=[];
  for(const t of arr){
   if(used.has(t.id))continue;
-  const o=byId.get(t.protectedRivalId);
+  const o=byId.get(primaryRivalId(t));
   if(o&&o.id!==t.id&&!used.has(o.id)){left.push(t);right.unshift(o);used.add(t.id);used.add(o.id)}
  }
  const rest=arr.filter(t=>!used.has(t.id));
@@ -3443,12 +3447,12 @@ function deriveRivalries(){
    keep=(me,them)=>{const p=prev.get(me.id);return p&&p.rivalId===them.id?{...p.series,miles}:{w:0,l:0,streak:0,lastYear:null,lastResult:null,miles}};
   t.rivalry={rivalId:o.id,trophy,series:keep(t,o)};
   o.rivalry={rivalId:t.id,trophy,series:keep(o,t)};
-  t.protectedRivalId=o.id;o.protectedRivalId=t.id;
+  setPrimaryRival(t,o);setPrimaryRival(o,t);
  };
  for(const t of teams){
-  if(t.rivalry||!t.protectedRivalId)continue;
-  const o=byId.get(t.protectedRivalId);
-  if(o&&!o.rivalry&&o.id!==t.id&&o.conference===t.conference&&o.protectedRivalId===t.id)bind(t,o,dist(t,o));
+  if(t.rivalry||!primaryRivalId(t))continue;
+  const o=byId.get(primaryRivalId(t));
+  if(o&&!o.rivalry&&o.id!==t.id&&o.conference===t.conference&&primaryRivalId(o)===t.id)bind(t,o,dist(t,o));
  }
  const pairs=[];
  for(let i=0;i<teams.length;i++)for(let j=i+1;j<teams.length;j++){
@@ -3467,11 +3471,23 @@ function rivalOf(t){return t?.rivalry?universe.teams.find(x=>x.id===t.rivalry.ri
 function isRivalryGame(t,g){const o=rivalOf(t);return !!(o&&g&&(g.home===o.name||g.away===o.name))}
 function rivalryGameFor(t){const o=rivalOf(t);if(!o)return null;return (t.schedule||[]).find(g=>g.home===o.name||g.away===o.name)||null}
 // One result, recorded once, from both sides.
-function recordRivalryResult(t,won){
+const RIVALRY_POSTSEASON_CAP=12;
+function recordRivalryResult(t,won,ctx={}){
  const s=t.rivalry?.series;if(!s)return;
  if(s.lastYear===universe.year)return;
  s[won?'w':'l']++;s.lastYear=universe.year;s.lastResult=won?'W':'L';
  s.streak=won?(s.streak>0?s.streak+1:1):(s.streak<0?s.streak-1:-1);
+ // v0.9.48: who actually holds the trophy, the biggest win in the series, and the times
+ // it was settled somewhere that mattered. Bounded, so a long dynasty cannot grow the save.
+ s.holderId=won?t.id:(t.rivalry.rivalId??null);
+ const margin=Number(ctx.margin);
+ if(won&&Number.isFinite(margin)&&margin>(s.bestWin?.margin??-1))
+  s.bestWin={year:universe.year,margin,score:ctx.score||null};
+ if(ctx.label&&ctx.label!=='Regular season'){
+  s.postseason??=[];
+  s.postseason.push({year:universe.year,label:ctx.label,result:won?'W':'L',score:ctx.score||null});
+  if(s.postseason.length>RIVALRY_POSTSEASON_CAP)s.postseason.splice(0,s.postseason.length-RIVALRY_POSTSEASON_CAP);
+ }
 }
 function settleRivalryGame(g){
  if(!g?.played||g.winner==null)return;
@@ -3481,7 +3497,10 @@ function settleRivalryGame(g){
  // guard for fan changes and the event too, not just the win/loss counters.
  if(home.rivalry.series.lastYear===universe.year&&away.rivalry?.series.lastYear===universe.year)return;
  const homeWon=g.winner===g.home;
- recordRivalryResult(home,homeWon);recordRivalryResult(away,!homeWon);
+ const hs=g.score?.[1]??null,as=g.score?.[0]??null,gap=Number.isFinite(hs)&&Number.isFinite(as)?Math.abs(hs-as):null;
+ const score=gap==null?null:`${as}-${hs}`,label=g.label||'Regular season';
+ recordRivalryResult(home,homeWon,{margin:gap,score,label});
+ recordRivalryResult(away,!homeWon,{margin:gap,score,label});
  const loser=homeWon?away:home,winner=homeWon?home:away;
  winner.fan_support=clamp((winner.fan_support||60)+2,0,100);
  loser.fan_support=clamp((loser.fan_support||60)-2,0,100);

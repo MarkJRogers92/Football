@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.9.48 — Schedule rotation and protected rivalries
+
+Implements `docs/roadmap/04-v0948-scheduling-rivalries.md`. Commit 1 added a pure `validateSchedule()` and pointed it at the existing scheduler, which turned up three defects that had been live in production the whole time:
+
+- **Home and away were badly broken.** 83 of 120 teams fell outside 5–7 home games, ranging from 2 to 11. The real damage was in conference play, where teams came out **0/8 or 8/8** — half the league played every conference game on the road and the other half never left home. Nonconference was skewed too, by conference-index parity.
+- **Every season's schedule was identical.** `circlePair` was called with the same fixed rounds each year, so a twelve-season dynasty played the same opponents at the same venues twelve times.
+- **Three conference opponents were unreachable in any season, ever.** A 12-team conference has 11 possible opponents; the scheduler used 8 and the union across seasons was still 8.
+
+The fixes:
+
+- **Rivalry identity no longer depends on the schedule.** `deriveRivalries` used to consider only opponents already on the slate — which is why six teams had no rival at all, and why the rival was an accident of rotation. Designation is now geographic, mutual and permanent, made *before* the schedule exists. Existing saves keep their derived rival wherever both sides agree.
+- **The rivalry game is structural, not patched in.** Each conference is ordered so the circle method's round 0 pairs exactly the protected rivals, so that round is guaranteed every season and the other seven rotate through rounds 1–10.
+- **Home and away are decided after the pairings exist**, never inside them: fewer home dates hosts, an even split reverses the previous meeting's venue, and a convergent repair pass flips any game whose host holds two more home dates than its guest.
+- **Rival IDs are stored as an array** (`protectedRivalIds`), so adding a second protected rivalry later is a data change rather than a schema rewrite.
+- **Rivalry history now tracks** the trophy holder, the largest win in the series and any postseason meetings, the last bounded at 12 entries so a long dynasty cannot grow the save.
+
+Measured: validator problems **83 → 0**. Home games **2–11 with 83 teams outside the bound → every team inside it**, 90 at exactly 6. Teams playing 0/8 or 8/8 of conference games at home → none. Conference opponents reachable **8 of 11 forever → 11 of 11**. Twelve seasons produced valid schedules every year, full conference coverage, the protected rival in all twelve, and no nonconference opponent played more than three times.
+
+**A note for anyone writing multi-season tests.** The audit initially reported "only 6 distinct slates" — which was not a scheduling fault at all. Three separate things stop a headless season rollover, none of which error: `runOffseason` advances a *single* phase of v0.9.46's calendar; the camps must run *when the calendar reaches them* (running them earlier leaves the phase flag unset and it blocks forever); and a pending job offer deliberately halts everything until `acceptPost` answers it (v0.9.28). A fixed call order silently stopped advancing after six seasons, so the test was quietly running half of what it claimed. `tests/scheduling.js` now drives the calendar by phase and throws if a season fails to advance.
+
+Save format is additive (`universe.scheduleRotation`, `t.protectedRivalIds`, and `holderId`/`bestWin`/`postseason` on the rivalry series), backfilled in `normalizeUniverse`. IndexedDB stays at schema 3.
+
 ## v0.9.47 — The interactive transfer portal
 
 Implements `docs/roadmap/03-v0947-transfer-portal.md` in the five commits the packet specifies. Transfers were already simulated; this makes them something the controlled program competes for, using the systems that already existed rather than a parallel set built for the portal.

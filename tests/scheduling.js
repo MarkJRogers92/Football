@@ -8,7 +8,32 @@ const {loadEngine}=require('../tools/harness');
 // The gap tests below assert the CURRENT broken behavior on purpose, so that fixing it
 // fails them loudly rather than passing silently — each one says what it should become.
 async function setup(seed){const e=loadEngine({seed});e.setUserTeam('Chicago Metropolitan');await e.loadSchools();e.initUniverse();return e}
-function rollSeason(e){e.simSeason();e.simConferenceChampionships();e.simPlayoff();e.runOffseason();e.runSpringCamp();e.runFallCamp();e.runOffseason()}
+// Camps run before runOffseason and it is called once, matching tools/longrun.js. The
+// other order desynchronises v0.9.46's phase calendar and the year silently stops
+// advancing after about six seasons, which quietly shortens any multi-season test.
+// Drives one full season the way the game does. Three things make a fixed call order wrong
+// here: runOffseason advances a single phase of v0.9.46's calendar, the camps must run when
+// the calendar reaches them (running them earlier leaves the phase's flag unset and it
+// blocks forever), and a pending job offer deliberately halts everything until it is
+// answered (v0.9.28) with acceptPost, the only thing that clears one. These tests follow a
+// team's schedule rather than the user's, so where the coach ends up does not matter.
+function rollSeason(e){
+ const before=e.universe.year;
+ e.simSeason();e.simConferenceChampionships();e.simPlayoff();
+ for(let step=0;step<20&&e.universe.year===before;step++){
+  if(e.hasPendingCareerChoice()){
+   const offer=(e.universe.jobOffers||[])[0];
+   const res=offer?e.acceptPost(offer.schoolId):null;
+   if(res&&res.ok===false)throw new Error(`could not take a post: ${res.reason}`);
+  }
+  const phase=e.normalizeOffseasonState().phase;
+  if(phase==='spring')e.runSpringCamp();
+  else if(phase==='fall')e.runFallCamp();
+  e.runOffseason();
+ }
+ if(e.universe.year===before)throw new Error(`season did not advance past ${before}; phase=${e.normalizeOffseasonState().phase}`);
+}
+
 const kindOf=p=>/home games/.test(p)?'home':/conference games/.test(p)?'confCount':/plays \d+ games/.test(p)?'gameCount'
  :/appears twice/.test(p)?'doubleBooked':/protected rival/.test(p)?'rival':/twice in conference/.test(p)?'confTwice'
  :/against itself/.test(p)?'selfGame':/does not/.test(p)?'unshared':/unknown team/.test(p)?'unknownTeam':'other';
@@ -66,7 +91,7 @@ test('home and away are balanced across the whole league',async()=>{
 
 test('the schedule rotates: new opponents every season, and the whole conference within a cycle',async()=>{
  const e=await setup(9104),name='Chicago Metropolitan';
- const rivalName=e.universe.teams.find(t=>t.id===e.T(name).protectedRivalId)?.name;
+ const rivalName=e.universe.teams.find(t=>t.id===e.primaryRivalId(e.T(name)))?.name;
  assert.ok(rivalName,'a protected rival is designated');
  const confSets=[],nonConf=[];
  for(let season=0;season<6;season++){
@@ -91,16 +116,16 @@ test('a protected rivalry does not depend on the schedule that happens to be gen
  // opponents already on the schedule, which left six teams with no rival at all.
  const byId=new Map(e.universe.teams.map(t=>[t.id,t]));
  for(const t of e.universe.teams){
-  const o=byId.get(t.protectedRivalId);
+  const o=byId.get(e.primaryRivalId(t));
   assert.ok(o,`${t.name} has no protected rival`);
-  assert.equal(o.protectedRivalId,t.id,`${t.name} and ${o.name} do not agree`);
+  assert.equal(e.primaryRivalId(o),t.id,`${t.name} and ${o.name} do not agree`);
   assert.equal(o.conference,t.conference,`${t.name}'s rival is in another conference`);
   assert.notEqual(o.id,t.id);
  }
  // And it survives rebuilds rather than being re-picked each year.
- const before=new Map(e.universe.teams.map(t=>[t.id,t.protectedRivalId]));
+ const before=new Map(e.universe.teams.map(t=>[t.id,e.primaryRivalId(t)]));
  rollSeason(e);
- for(const t of e.universe.teams)assert.equal(t.protectedRivalId,before.get(t.id),`${t.name}'s rival changed between seasons`);
+ for(const t of e.universe.teams)assert.equal(e.primaryRivalId(t),before.get(t.id),`${t.name}'s rival changed between seasons`);
 });
 
 test('a played season keeps its schedule when the next one is generated',async()=>{
@@ -115,4 +140,53 @@ test('a played season keeps its schedule when the next one is generated',async()
  for(const id of archivedIds)assert.ok(e.universe.gameArchive.some(g=>g.id===id),`archived game ${id} vanished`);
  assert.equal(e.universe.schedule.flat().some(g=>g.played),false,'the new season starts unplayed');
  assert.equal(frozen.length,40,'the archived sample is intact');
+});
+
+// --- commit 5: rivalry history and a twelve-season schedule audit ------------
+
+test('a rivalry records its holder, its biggest win and any postseason meetings',async()=>{
+ const e=await setup(9107),t=e.T('Chicago Metropolitan');
+ const rival=e.universe.teams.find(x=>x.id===e.primaryRivalId(t));
+ for(let s=0;s<3;s++)rollSeason(e);
+ const series=t.rivalry.series;
+ assert.equal(series.w+series.l,3,'three meetings in three seasons');
+ assert.ok([t.id,rival.id].includes(series.holderId),'the trophy is held by one of the two');
+ // The holder must agree with who actually won last, not drift from it.
+ assert.equal(series.holderId===t.id,series.lastResult==='W');
+ assert.ok(Math.abs(series.streak)>=1&&Math.abs(series.streak)<=3,`streak ${series.streak} is impossible in three games`);
+ if(series.w>0){
+  assert.ok(series.bestWin,'a win was recorded, so a best win exists');
+  assert.ok(series.bestWin.margin>0,'a win has a positive margin');
+  assert.ok(series.bestWin.year>=e.universe.year-3);
+ }else assert.equal(series.bestWin,undefined,'no wins means no best win invented');
+ // The postseason log is bounded and only holds genuine postseason meetings.
+ for(const m of series.postseason||[])assert.notEqual(m.label,'Regular season');
+ assert.ok((series.postseason||[]).length<=e.RIVALRY_POSTSEASON_CAP);
+ // Both sides must agree on the same trophy holder.
+ assert.equal(rival.rivalry.series.holderId,series.holderId,'the two programs disagree on who holds the trophy');
+});
+
+test('twelve seasons of schedules stay valid, rotate fully and keep venues balanced',async()=>{
+ const e=await setup(9108),name='Chicago Metropolitan';
+ const rivalName=e.universe.teams.find(t=>t.id===e.primaryRivalId(e.T(name)))?.name;
+ const slates=[],nonConf=[],homeCounts=[];
+ for(let season=0;season<12;season++){
+  const problems=e.validateSchedule(e.universe);
+  assert.equal(problems.length,0,`season ${e.universe.year}: ${problems.slice(0,3).join(' / ')}`);
+  const met=[...e.conferenceOpponentsFor(e.universe,name)];
+  assert.ok(met.includes(rivalName),`rival skipped in ${e.universe.year}`);
+  slates.push(met.sort().join('|'));
+  nonConf.push(...e.nonConferenceOpponentsFor(e.universe,name));
+  homeCounts.push(e.T(name).schedule.filter(g=>g.home===name).length);
+  rollSeason(e);
+ }
+ // Full conference coverage, and no season is a rerun of another.
+ assert.equal(new Set(slates.flatMap(x=>x.split('|'))).size,11,'not every conference opponent was reached');
+ assert.ok(new Set(slates).size>=10,`only ${new Set(slates).size} distinct slates in twelve seasons`);
+ // Nonconference may eventually repeat over twelve years, but must not be dominated by one team.
+ const counts={};for(const n of nonConf)counts[n]=(counts[n]||0)+1;
+ const worst=Math.max(...Object.values(counts));
+ assert.ok(worst<=3,`played one nonconference opponent ${worst} times in twelve seasons`);
+ // Venue balance holds every year, not just on average.
+ for(const h of homeCounts)assert.ok(h>=e.SCHEDULE_HOME_MIN&&h<=e.SCHEDULE_HOME_MAX,`${h} home games in a season`);
 });

@@ -7,7 +7,7 @@ Last inspected source: `dc3c76c` (`0.9.44`)
 | v0.9.45 stabilization | IN PROGRESS · commits 1-3 complete | `codex/v0945-stabilization` | Browser binary unavailable locally |
 | v0.9.46 offseason calendar | VALIDATED · commits 1-5 complete, browser suites now pass | `claude/review-improvement-dwjemy` (merged) | None — ready to release |
 | v0.9.47 transfer portal | IMPLEMENTED · commits 1-5 complete, validated | `claude/review-improvement-dwjemy` | None — unpublished with v0.9.46 |
-| v0.9.48 schedules/rivalries | READY | — | None after v0.9.45 |
+| v0.9.48 schedules/rivalries | IMPLEMENTED · commits 1-5 complete, validated | `claude/review-improvement-dwjemy` | None — unpublished |
 | v0.9.49 saves/storage | READY | — | Set storage target after measurement |
 | v0.9.50 modules/RNG | READY | — | Preserve standalone build |
 | v0.10 Game Engine 2 | READY FOR SLICING | — | Begin only after v0.9.50 |
@@ -33,7 +33,13 @@ Chromium walkthrough of the Portal subview at 1280px and 390px. See the
 v0.9.47 section of `CHANGELOG.md` for the design decisions worth knowing
 before extending it.
 
-Next: `04-v0948-scheduling-rivalries.md`.
+v0.9.48 (schedule rotation and protected rivalries) is implemented across all
+five packet commits. Its validator found three defects that were live in
+production — see the v0.9.48 `CHANGELOG.md` entry, which also records the three
+separate reasons a headless season rollover can silently stop advancing.
+
+Next: `05-v0949-saves-storage.md`. The twelve-season soak measures save growth
+at ~11.5 MB/season reaching 162.9 MB, so that packet has real teeth.
 
 **Blocked on the owner, not on code:** neither v0.9.46 nor v0.9.47 has been
 published. `node tools/publish.js` is refused by this environment's permission
