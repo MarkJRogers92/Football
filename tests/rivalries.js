@@ -44,6 +44,42 @@ test('the rivalry game settles once and moves the series both ways',async()=>{
  // Re-settling the same played game must not double-count.
  const g=e.rivalryGameFor(me);e.settleRivalryGame(g);
  assert.equal(me.rivalry.series.w+me.rivalry.series.l,1,'settling twice changes nothing');
+ assert.equal(me.fan_support,before.fan+(won?2:-2),'fan effects are once-only too');
+ assert.equal(u.events.filter(x=>x.type==='RIVALRY_RESULT'&&x.schoolIds.includes(me.id)).length,1);
+});
+
+test('Watch rivalry settles immediately, survives save/load and is not counted again at week advance',async()=>{
+ const e=await setup(2190),u=e.universe,me=e.T('Chicago Metropolitan'),opp=e.rivalOf(me),g=e.rivalryGameFor(me);
+ u.week=g.week-1;e.delegateWeeklyDecisions();
+ const before=me.fan_support;
+ e.simulateUserDetailed();
+ assert.ok(g.played&&g.detailed);
+ assert.equal(me.rivalry.series.w+me.rivalry.series.l,1);
+ assert.equal(opp.rivalry.series.w+opp.rivalry.series.l,1);
+ const won=g.winner===me.name;
+ assert.equal(me.fan_support,Math.max(0,Math.min(100,before+(won?2:-2))));
+ const events=()=>e.universe.events.filter(x=>x.type==='RIVALRY_RESULT'&&x.schoolIds.includes(me.id));
+ assert.equal(events().length,1);assert.ok(events()[0].gameIds.includes(g.gameId));
+ const portable=JSON.parse(JSON.stringify(e.packUniverse(u)));
+ e.installSave({version:'0.9.39',userTeam:me.name,universe:portable});
+ e.simWeek(true);
+ const loaded=e.T(me.name);
+ assert.equal(loaded.rivalry.series.w+loaded.rivalry.series.l,1);
+ assert.equal(loaded.fan_support,me.fan_support);assert.equal(events().length,1);
+ assert.equal(e.universe.gameArchive.filter(x=>x.id===g.gameId).length,1);
+});
+
+test('a played but unsettled current-week rivalry from an older save is settled on advance',async()=>{
+ const e=await setup(2191),u=e.universe,me=e.T('Chicago Metropolitan'),g=e.rivalryGameFor(me);
+ u.week=g.week-1;e.delegateWeeklyDecisions();
+ // Reproduce the old detailed path: a real archived game and schedule result,
+ // without the rivalry completion hook.
+ const r=e.detailedGame(e.T(g.home),e.T(g.away),false,g.conf);
+ Object.assign(g,{played:true,gameId:r.gameId,score:[r.ap,r.hp],winner:r.winner,detailed:true});
+ assert.equal(me.rivalry.series.w+me.rivalry.series.l,0);
+ e.simWeek(true);
+ assert.equal(me.rivalry.series.w+me.rivalry.series.l,1);
+ assert.equal(u.events.filter(x=>x.type==='RIVALRY_RESULT'&&x.schoolIds.includes(me.id)).length,1);
 });
 
 test('the wire flags rivalry week and then the result',async()=>{

@@ -54,7 +54,7 @@ test('regular season, championships, rollover and portable history preserve game
 });
 
 
-test('quick sim home-field bonus scales with fan support and vanishes on neutral sites',()=>{
+test('shared home-field bonus scales with fan support and vanishes on neutral sites',()=>{
  const e=loadEngine({seed:924}),low={fan_support:30},high={fan_support:95},samples=12000;
  const lowExpected=e.homeFieldFor(low),highExpected=e.homeFieldFor(high);
  assert.ok(Math.abs(lowExpected-1.3)<1e-9);assert.ok(Math.abs(highExpected-3.25)<1e-9);
@@ -68,4 +68,22 @@ test('quick sim home-field bonus scales with fan support and vanishes on neutral
  for(let i=0;i<100;i++)assert.equal(e.homeFieldScoreBonus(high,true),0,'neutral sites receive no home-field bonus');
  const source=require('node:fs').readFileSync(require('node:path').join(__dirname,'..','app.js'),'utf8');
  assert.ok(source.includes('let hp=hs.pts+homeFieldScoreBonus(home,neutral),ap=as.pts;'),'quick sim must consume the dynamic home-field helper');
+});
+
+test('both actual game engines use fan support for home-field scoring and no edge on neutral sites',async()=>{
+ for(const mode of ['gameSim','detailedGame']){
+  const outcomes=[];
+  for(const [fan,neutral] of [[30,false],[95,false],[95,true]]){
+   const e=loadEngine({seed:929});await e.loadSchools();e.setUserTeam('Chicago Metropolitan');e.initUniverse();
+   const [home,away]=e.universe.teams;home.fan_support=fan;
+   const random=Math.random;
+   // A fixed draw isolates the score adjustment from game and tiebreak noise.
+   try{Math.random=()=>.99;e[mode](home,away,neutral)}finally{Math.random=random}
+   const record=e.universe.gameArchive.at(-1);
+   outcomes.push(record.scoreAdjustment.home);
+   assert.equal(record.score.home+record.score.away,
+    ['home','away'].reduce((sum,s)=>{const b=record.teamStats[s];return sum+(b.passTD+b.rushTD)*7+b.fgMade*3+record.scoreAdjustment[s]},0));
+  }
+  assert.deepEqual(outcomes,[0,3,0],mode+' applies dynamic crowd support only at home');
+ }
 });
