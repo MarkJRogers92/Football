@@ -1,54 +1,98 @@
-/* Team branding skin. Values are supplied by visual-identity.js and are intentionally
-   presentation-only so old/new saves and the simulation model remain untouched. */
+/* Team branding skin. Values come from program-branding.js and are intentionally
+   presentation-only so saves and simulation state remain untouched. */
 :root{
   --team-primary:#234875;
   --team-secondary:#73a8ff;
-  --team-rgb:115,168,255;
+  --team-accent:#d6b45e;
+  --team-primary-rgb:35,72,117;
+  --team-secondary-rgb:115,168,255;
+  --team-accent-rgb:214,180,94;
   --team-ink:#f7fbff;
+  --program-primary:var(--team-primary);
+  --program-secondary:var(--team-secondary);
+  --program-accent:var(--team-accent);
+  --program-primary-rgb:var(--team-primary-rgb);
+  --program-secondary-rgb:var(--team-secondary-rgb);
+  --program-accent-rgb:var(--team-accent-rgb);
 }
 
-.tabs button.active::after{background:var(--team-secondary);box-shadow:0 0 14px rgba(var(--team-rgb),.55)}
+.tabs button.active::after{background:linear-gradient(90deg,var(--team-secondary),var(--team-accent));box-shadow:0 0 14px rgba(var(--team-secondary-rgb),.48)}
 .player-button:hover,.player-button:focus{color:#fff;text-decoration-color:var(--team-secondary)}
 .hub-item.action{border-left-color:var(--team-secondary)}
-.hub-item.hub-link .hub-kicker::after{color:var(--team-secondary)}
+.hub-item.hub-link .hub-kicker::after{color:var(--team-accent)}
 .hub-item.hub-link:hover,.hub-item.hub-link:focus-visible{outline-color:color-mix(in srgb,var(--team-secondary) 58%,#39516e)}
 .pipeline-dot{background:var(--team-secondary)}
-.bar>span,.confidence-meter>i{background:linear-gradient(90deg,var(--team-primary),var(--team-secondary))}
+.bar>span,.confidence-meter>i{background:linear-gradient(90deg,var(--team-primary),var(--team-secondary),var(--team-accent))}
 
 #simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason{
   border-color:color-mix(in srgb,var(--team-secondary) 58%,#29405b);
   background:linear-gradient(180deg,color-mix(in srgb,var(--team-primary) 78%,#203f66),color-mix(in srgb,var(--team-primary) 88%,#142b45));
 }
 #simWeek:hover:not(:disabled),#simSeason:hover:not(:disabled),#hubAdvance:hover:not(:disabled),#seasonWeek:hover:not(:disabled),#simDetailedGame:hover:not(:disabled),#autoTarget:hover:not(:disabled),#applyProgramEdit:hover:not(:disabled),#runOffseason:hover:not(:disabled){
-  border-color:var(--team-secondary);
-  background:linear-gradient(180deg,color-mix(in srgb,var(--team-primary) 70%,var(--team-secondary)),var(--team-primary));
+  border-color:var(--team-accent);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--team-primary) 68%,var(--team-secondary)),var(--team-primary));
 }
 
 .topbar>div:first-child::before{
   content:attr(data-team-mark);
   border-color:color-mix(in srgb,var(--team-secondary) 55%,#39516e);
   background:linear-gradient(145deg,color-mix(in srgb,var(--team-primary) 78%,#203b5d),#101b29);
-  box-shadow:inset 0 1px rgba(255,255,255,.10),0 8px 22px rgba(0,0,0,.28),0 0 20px rgba(var(--team-rgb),.08);
+  box-shadow:inset 0 1px rgba(255,255,255,.10),0 8px 22px rgba(0,0,0,.28),0 0 20px rgba(var(--team-secondary-rgb),.08);
 }
-.topbar::after{background:linear-gradient(90deg,transparent,rgba(var(--team-rgb),.45),transparent)}
+.topbar::after{background:linear-gradient(90deg,transparent,rgba(var(--team-secondary-rgb),.44),rgba(var(--team-accent-rgb),.28),transparent)}
 
 .command-center{
   border-color:color-mix(in srgb,var(--team-secondary) 32%,#344a64);
   background:
-    linear-gradient(90deg,rgba(var(--team-rgb),.065),transparent 25%),
+    radial-gradient(circle at 94% 0,rgba(var(--team-accent-rgb),.06),transparent 23rem),
+    linear-gradient(90deg,rgba(var(--team-primary-rgb),.10),transparent 28%),
     linear-gradient(180deg,#151f2b,#101821);
 }
+.masthead-mark{filter:drop-shadow(0 0 10px rgba(var(--team-secondary-rgb),.14))}
 
-.player-dialog{
-  border-color:color-mix(in srgb,var(--team-secondary) 30%,#3a506c);
-}
+.player-dialog{border-color:color-mix(in srgb,var(--team-secondary) 30%,#3a506c)}
 .dialog-head{
   background:
-    radial-gradient(circle at 12% -50%,rgba(var(--team-rgb),.18),transparent 18rem),
+    radial-gradient(circle at 12% -50%,rgba(var(--team-secondary-rgb),.16),transparent 18rem),
+    radial-gradient(circle at 92% 0,rgba(var(--team-accent-rgb),.07),transparent 16rem),
     linear-gradient(180deg,#172333,#111923);
 }
 .dialog-portrait{border-color:color-mix(in srgb,var(--team-secondary) 46%,#344a64)}
 
+/* Every real logo gets its own program-level variables from team-logo-coverage.js.
+   The color ring is deliberately restrained so the atlas art remains the focal point. */
+.team-logo[data-brand-team-id],.coverage-real-logo[data-brand-team-id]{
+  border-radius:5px;
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--program-secondary) 46%,transparent),0 0 12px rgba(var(--program-secondary-rgb),.08);
+}
+.team-logo--inline[data-brand-team-id],.coverage-inline-team-logo[data-brand-team-id],.coverage-pair-logo[data-brand-team-id]{
+  background-color:color-mix(in srgb,var(--program-primary) 16%,#101821)!important;
+}
+
+/* Single-program rows/cards receive a low-opacity identity wash. Two-team scorelines
+   keep their colors on the individual logos so one program never visually owns the row. */
+#top15 .rankrow[data-brand-team-id],
+#confStandings .rankrow[data-brand-team-id],
+#teamSchedule .resultrow[data-brand-team-id],
+#recruitBattleBoard .battle-school[data-brand-team-id],
+#stats .leader-row[data-brand-team-id],
+#awardsBoard .award-card[data-brand-team-id],
+#archiveResults .lineitem[data-brand-team-id],
+#historyLog .historyrow[data-brand-team-id]{
+  background-image:linear-gradient(90deg,rgba(var(--program-primary-rgb),.10),transparent 58%);
+  box-shadow:inset 2px 0 rgba(var(--program-secondary-rgb),.48);
+}
+.broadcast-team[data-brand-team-id],.matchup-team[data-brand-team-id],.sb-team[data-brand-team-id]{
+  border-color:color-mix(in srgb,var(--program-secondary) 36%,#3b4b5e)!important;
+  background-image:linear-gradient(145deg,rgba(var(--program-primary-rgb),.13),rgba(var(--program-accent-rgb),.035) 52%,transparent)!important;
+}
+.player-hero-team-mark[data-brand-team-id],.commitment-school[data-brand-team-id]{
+  border-color:color-mix(in srgb,var(--program-secondary) 42%,#344a64)!important;
+  box-shadow:inset 3px 0 rgba(var(--program-accent-rgb),.55);
+}
+.battle-school[data-brand-team-id] strong,.leader-row[data-brand-team-id] strong{ text-decoration-color:var(--program-secondary) }
+
 @supports not (color:color-mix(in srgb,red,blue)){
   #simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason{border-color:#4a75ad}
+  .team-logo[data-brand-team-id],.coverage-real-logo[data-brand-team-id]{box-shadow:0 0 0 1px rgba(115,168,255,.45)}
 }
