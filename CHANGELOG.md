@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.9.44 — Conference identity and game-day presentation
+
+- Adds ten canonical conference crests, palettes and identity lines without changing universe or save data.
+- Brings conference identity into the controlled-program masthead, Season standings, conference-championship results and championship Game Center scoreboards.
+- Rebuilds the Game Lab preview around facts the engine already knows: real logos, ranks, records, conferences, venue city, rivalry trophy/series, home-field note, grades, availability, opponent tendency, active plan and staff recommendation.
+- Keeps the presentation layer honest: no invented stadium, weather, betting line, kickoff time or broadcast data.
+- Adds focused registry, structured-data and build-order regression coverage.
+
 ## v0.9.42 — Complete team-logo coverage
 
 - Completes the locked 120-program real-logo presentation pass across Game Lab, app header, dashboard matchups, recruiting, stats, records, history and coaching surfaces.
