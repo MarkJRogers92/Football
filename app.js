@@ -2020,6 +2020,7 @@ function ensurePortalEntry(entry){
  if(!entry||!entry.p)return entry;
  entry.candidateId??=portalCandidateId(entry);
  entry.finalists??=[];entry.interest??={};entry.exposure??=0;entry.decision??=null;
+ entry.promiseOffer??=null;entry.placed??=false;
  return entry;
 }
 function newPortalCycle(year){return {year,round:0,status:'idle',targets:[],resolutions:[],log:[]}}
@@ -2037,6 +2038,192 @@ function ensurePortalCycle(){
 function portalLog(message){const c=ensurePortalCycle();c.log.push({round:c.round,message:String(message)});if(c.log.length>PORTAL_LOG_CAP)c.log.splice(0,c.log.length-PORTAL_LOG_CAP);return c.log}
 function portalCandidates(){return (universe.transferPortal||[]).map(ensurePortalEntry)}
 function normalizePortalState(){universe.transferPortal??=[];universe.transferPortal.forEach(ensurePortalEntry);return ensurePortalCycle()}
+
+// --- v0.9.47 commit 2: targeting, interest, rounds and AI competition ---------
+// Attention is a fixed pool, so chasing one player is chasing fewer others.
+const PORTAL_ATTENTION_POOL=10,PORTAL_ATTENTION_MAX=4,PORTAL_FINALISTS=4;
+function portalEntry(candidateId){return portalCandidates().find(x=>x.candidateId===candidateId)||null}
+function portalOrigin(entry){return universe.teams.find(t=>t.id===entry.fromSchoolId)||T(entry.from)||null}
+// One shared decision model with the automatic path: transferFit already exposes the
+// explainable categories (prior, opportunity, relationship, follow) the packet asks for.
+function portalFit(entry,team){
+ const from=portalOrigin(entry);
+ if(!from||!team||team.id===entry.fromSchoolId||team.roster.length>=105)return null;
+ return transferFit(entry.p,team,from,entry.reason);
+}
+// The field is narrowed once, at open, then only the finalists (plus anyone the user
+// targets) are tracked — a 120-team recompute every round would be both slow and false
+// to how a portal actually works.
+function portalOpenFinalists(entry,limit=PORTAL_FINALISTS){
+ const from=portalOrigin(entry);
+ if(!from)return [];
+ const scored=[];
+ for(const t of universe.teams){const fit=portalFit(entry,t);if(fit)scored.push({schoolId:t.id,score:fit.score})}
+ scored.sort((a,b)=>b.score-a.score);
+ return scored.slice(0,limit).map(x=>x.schoolId);
+}
+function portalSetInterest(entry,schoolId,value){entry.interest[schoolId]=clamp(Math.round(value),0,100);return entry.interest[schoolId]}
+function openPortalCycle(){
+ const c=ensurePortalCycle();
+ if(c.status!=='idle')return c;
+ for(const entry of portalCandidates()){
+  entry.finalists=portalOpenFinalists(entry);
+  entry.interest={};
+  for(const id of entry.finalists){const fit=portalFit(entry,universe.teams.find(t=>t.id===id));if(fit)portalSetInterest(entry,id,fit.score)}
+ }
+ c.status='open';c.round=1;
+ portalLog(`Portal opened with ${portalCandidates().length} entrants.`);
+ return c;
+}
+function portalAttentionSpent(){return ensurePortalCycle().targets.reduce((n,t)=>n+(t.attention||0),0)}
+function portalAttentionLeft(){return Math.max(0,PORTAL_ATTENTION_POOL-portalAttentionSpent())}
+function portalTargetFor(candidateId){return ensurePortalCycle().targets.find(t=>t.candidateId===candidateId)||null}
+// Returns a reason string on refusal rather than throwing: every caller is a UI action.
+function targetPortalCandidate(candidateId,attention=1){
+ const c=ensurePortalCycle(),entry=portalEntry(candidateId);
+ if(!entry)return 'No such portal candidate.';
+ if(entry.decision)return `${entry.p.name} has already decided.`;
+ const want=clamp(Math.round(Number(attention)||0),1,PORTAL_ATTENTION_MAX);
+ const existing=portalTargetFor(candidateId);
+ if(!existing&&c.targets.length>=PORTAL_TARGET_CAP)return `You can only chase ${PORTAL_TARGET_CAP} players at once.`;
+ const spentElsewhere=portalAttentionSpent()-(existing?.attention||0);
+ if(spentElsewhere+want>PORTAL_ATTENTION_POOL)return `Only ${PORTAL_ATTENTION_POOL-spentElsewhere} attention left.`;
+ if(existing)existing.attention=want;
+ else c.targets.push({candidateId,attention:want});
+ // Targeting puts the program in the running even when it did not make the opening cut.
+ const u=T($('#userTeam').value);
+ if(u&&!entry.finalists.includes(u.id)&&portalFit(entry,u)){entry.finalists.push(u.id);portalSetInterest(entry,u.id,portalFit(entry,u).score)}
+ return null;
+}
+function untargetPortalCandidate(candidateId){
+ const c=ensurePortalCycle(),i=c.targets.findIndex(t=>t.candidateId===candidateId);
+ if(i<0)return 'That player is not targeted.';
+ c.targets.splice(i,1);
+ return null;
+}
+// Chance a candidate decides this round: low early, certain at the final round, so the
+// user gets at least one round to move interest before the field closes.
+function portalCommitChance(round){return round>=PORTAL_ROUNDS?1:.18*round}
+function portalResolveEntry(entry){
+ const pool=entry.finalists.map(id=>({schoolId:id,interest:entry.interest[id]??0})).filter(x=>universe.teams.some(t=>t.id===x.schoolId));
+ if(!pool.length)return null;
+ // Same bounded weighted choice chooseTransferDestination uses — never a deterministic winner.
+ const best=Math.max(...pool.map(x=>x.interest));let total=0;
+ for(const x of pool){x.weight=Math.exp((x.interest-best)/7);total+=x.weight}
+ let roll=Math.random()*total,pick=pool.at(-1);
+ for(const x of pool){roll-=x.weight;if(roll<=0){pick=x;break}}
+ entry.decision={schoolId:pick.schoolId,round:ensurePortalCycle().round,interest:pick.interest};
+ return entry.decision;
+}
+// --- v0.9.47 commit 3: NIL, promises, capacity and destination resolution -----
+// Both levers spend the program's existing budgets — the portal gets no currency of its own.
+const PORTAL_NIL_INTEREST=9,PORTAL_PROMISE_INTEREST=6;
+// A transfer takes a roster spot, so the same 105 ceiling the automatic path respects.
+function portalRoomFor(team){return team?Math.max(0,105-team.roster.length):0}
+function portalUserTeam(){return T($('#userTeam').value)||null}
+function portalRequireOpen(entry){
+ if(!entry)return 'No such portal candidate.';
+ if(entry.decision)return `${entry.p.name} has already decided.`;
+ return null;
+}
+function offerPortalNil(candidateId){
+ const entry=portalEntry(candidateId),blocked=portalRequireOpen(entry);
+ if(blocked)return blocked;
+ const u=portalUserTeam();if(!u)return 'No program selected.';
+ // signNilDeal owns the budget rule, so the portal can never overspend it.
+ const res=signNilDeal(u,entry.p,false);
+ if(!res.ok)return res.reason;
+ if(!entry.finalists.includes(u.id)&&portalFit(entry,u))entry.finalists.push(u.id);
+ portalSetInterest(entry,u.id,(entry.interest[u.id]??0)+PORTAL_NIL_INTEREST);
+ portalLog(`Offered ${entry.p.name} a ${res.cost}-unit NIL deal.`);
+ return null;
+}
+function withdrawPortalNil(candidateId){
+ const entry=portalEntry(candidateId),blocked=portalRequireOpen(entry);
+ if(blocked)return blocked;
+ const u=portalUserTeam();if(!u)return 'No program selected.';
+ const res=cancelNilDeal(u,entry.p);
+ if(!res.ok)return res.reason;
+ portalSetInterest(entry,u.id,(entry.interest[u.id]??0)-PORTAL_NIL_INTEREST);
+ return null;
+}
+// Recorded as an offer here and only written onto the player once he lands, so a promise
+// can never attach to the school he was leaving.
+function promisePortalCandidate(candidateId,label){
+ const entry=portalEntry(candidateId),blocked=portalRequireOpen(entry);
+ if(blocked)return blocked;
+ const u=portalUserTeam();if(!u)return 'No program selected.';
+ if(!PROMISES.includes(label))return `Unknown promise "${label}".`;
+ const had=!!entry.promiseOffer;
+ if(label==='None'){
+  entry.promiseOffer=null;
+  if(had)portalSetInterest(entry,u.id,(entry.interest[u.id]??0)-PORTAL_PROMISE_INTEREST);
+  return null;
+ }
+ entry.promiseOffer={type:PROMISE_TYPES[label],schoolId:u.id,coachId:u.staff.HC.id,coachName:u.staff.HC.name,
+  seasonMade:universe.year,madeWeek:universe.week,targetPosition:entry.p.pos,expectedGames:8,expectedFocus:'Technique'};
+ if(!entry.finalists.includes(u.id)&&portalFit(entry,u))entry.finalists.push(u.id);
+ if(!had)portalSetInterest(entry,u.id,(entry.interest[u.id]??0)+PORTAL_PROMISE_INTEREST);
+ return null;
+}
+function attachPortalPromise(entry,dest){
+ const offer=entry.promiseOffer;
+ if(!offer||offer.schoolId!==dest.id)return null;
+ promiseState();
+ const q={...offer,id:`PR_${universe.nextPromiseId++}`,firstSeason:universe.year+1,
+  status:offer.type==='NIL_PRIORITY'?'PASSIVE':'ACTIVE',resolvedSeason:null,result:null,severity:0,notes:[],trainingPhases:[]};
+ entry.p.promises??=[];entry.p.promises.push(q);entry.p.promise=promiseLabel(q.type);
+ addDynastyEvent('PROMISE_MADE',entry.p,dest,q);
+ return q;
+}
+// Applies decisions already made. A destination with no room simply does not land the
+// player: he stays in universe.transferPortal for the existing automatic fallback.
+function resolvePortalCommitments(){
+ const placed=[],blocked=[];
+ for(const entry of portalCandidates()){
+  if(!entry.decision||entry.placed)continue;
+  const dest=universe.teams.find(t=>t.id===entry.decision.schoolId);
+  if(!dest||portalRoomFor(dest)<=0){blocked.push({candidateId:entry.candidateId,reason:dest?'no room':'no school'});continue}
+  const landed=placeTransfer(entry,dest);
+  if(!landed){blocked.push({candidateId:entry.candidateId,reason:'placement refused'});continue}
+  entry.placed=true;
+  attachPortalPromise(entry,landed);
+  placed.push({candidateId:entry.candidateId,playerId:entry.p.id,schoolId:landed.id});
+ }
+ universe.transferPortal=(universe.transferPortal||[]).filter(x=>!x.placed);
+ if(placed.length)portalLog(`${placed.length} portal commitment${placed.length===1?'':'s'} finalized.`);
+ return {placed,blocked};
+}
+
+function advancePortalRound(){
+ const c=ensurePortalCycle();
+ if(c.status!=='open')return c;
+ const u=T($('#userTeam').value),resolutions=[];
+ for(const entry of portalCandidates()){
+  if(entry.decision)continue;
+  entry.exposure=(entry.exposure||0)+1;
+  for(const id of entry.finalists){
+   const team=universe.teams.find(t=>t.id===id);if(!team)continue;
+   // AI schools drift on their own; the user's attention is the one lever the player has.
+   let next=(entry.interest[id]??0)+gi(-3,4);
+   const target=u&&id===u.id?portalTargetFor(entry.candidateId):null;
+   if(target)next+=target.attention*3;
+   portalSetInterest(entry,id,next);
+  }
+  if(Math.random()<portalCommitChance(c.round)){
+   const decision=portalResolveEntry(entry);
+   if(decision){
+    const school=universe.teams.find(t=>t.id===decision.schoolId);
+    resolutions.push({candidateId:entry.candidateId,playerId:entry.p.id,schoolId:decision.schoolId,round:c.round});
+    portalLog(`${entry.p.pos} ${entry.p.name} committed to ${school?.name||'a program'}.`);
+   }
+  }
+ }
+ c.resolutions.push(...resolutions);
+ if(c.round>=PORTAL_ROUNDS){c.status='resolved';portalLog('Portal closed.')}
+ else c.round+=1;
+ return c;
+}
 
 function transferFit(p,t,from,reason){
  const m=p.recruitingMemory||{},rank=(m.topFiveSchoolIds||[]).indexOf(t.id);
@@ -2064,13 +2251,16 @@ function chooseTransferDestination(p,from,reason){
  let roll=Math.random()*total;for(const x of candidates){roll-=x.weight;if(roll<=0)return x}return candidates.at(-1);
 }
 function releasePlayerPromises(p,t,reason){for(const q of p.promises||[])if(q.status==='ACTIVE'&&q.schoolId===t.id){q.status='RELEASED';q.resolvedSeason=universe.year;q.result=reason;q.severity=0;q.transferPenalty=0;addDynastyEvent('PROMISE_RELEASED',p,t,q,{result:reason})}}
-function placeTransfer(entry){
+// `forced` lets the portal land a player at the school he actually chose; everything after
+// the choice — history, promise release, roster move, event — stays one shared path.
+function placeTransfer(entry,forced=null){
  const {p,reason}=entry,from=universe.teams.find(t=>t.id===entry.fromSchoolId)||T(entry.from);
  if(!from)throw new Error('Transfer origin is missing.');
  p.transferHistory??=[];
  // Defensive replay guard: never duplicate a transfer or a roster entry.
  if(p.transferHistory.some(h=>h.season===universe.year))return null;
- const match=chooseTransferDestination(p,from,reason);if(!match)return null;
+ const match=forced&&forced.id!==from.id?{t:forced,...transferFit(p,forced,from,reason)}:chooseTransferDestination(p,from,reason);
+ if(!match)return null;
  const dest=match.t;
  releasePlayerPromises(p,from,'Player left through the transfer portal; remaining obligation released.');
  const history={season:universe.year,fromSchoolId:from.id,toSchoolId:dest.id,fromSchool:from.name,toSchool:dest.name,reason,priorRelationship:match.relationship,coachId:match.coachId,recruiterCoachId:p.recruitingMemory?.recruiterCoachId||null,wasStarter:entry.wasStarter||false};
