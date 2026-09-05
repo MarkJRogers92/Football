@@ -37,7 +37,12 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   assert.equal(record.coreHasArchive,false);assert.ok(record.ref.count>128);
   console.log('PASS real browser save stores archived careers separately');
   assert.equal(record.coreHasGames,false);assert.equal(record.games.length,record.gameRef.count);
-  assert.equal(record.games.length,745);const historical=record.games.find(g=>g.home.name==='Chicago Metropolitan'||g.away.name==='Chicago Metropolitan');
+  // 720 regular-season + 10 conference championships + 15 playoff games are fixed.
+  // Bowl season (v0.9.23+) adds a variable number of eligible-team games, so the old
+  // hard-coded 745 assertion was stale and failed whenever any bowls were actually played.
+  const bowlGames=record.games.filter(g=>/ Bowl$/.test(g.label||''));
+  assert.equal(record.games.length,745+bowlGames.length);
+  const historical=record.games.find(g=>g.home.name==='Chicago Metropolitan'||g.away.name==='Chicago Metropolitan');
   // Loading and saving before any archive access must preserve stored careers.
   await page.click('#loadBrowser');await status('^Loaded');await page.click('#saveBrowser');await status('^Saved');
   await tab('history');await page.fill('#archiveSearch',record.first.name);
