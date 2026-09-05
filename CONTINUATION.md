@@ -36,6 +36,11 @@ Player identity batch 4 makes specialists functional. Field-goal accuracy/range
 now reads K technique, power and composure in both engines; punt distance reads P
 power and technique. Watch names the active specialist, and profiles disclose
 that hang time, direction and returns remain untracked. No save field was added.
+
+Strategy integrity batch 5 moves position traits upstream into team profiles and
+therefore both game engines: QB, skill, OL, front and coverage units each use a
+position-specific blend alongside current overall/health/wear. A controlled test
+verifies relevant matchup movement and irrelevant-edge isolation.
 User requested small committed/pushed batches for easy Claude/chat takeover,
 covering every position, ratings, descriptions and actual statistical behavior.
 Production remains v0.9.39. These are source checkpoints, not a new release.

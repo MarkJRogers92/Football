@@ -59,6 +59,21 @@ test('matchup edges and the Game Lab use the profiles adjusted for the active pl
  assert.match(e.$el('#keyMatchups').innerHTML,/Your pass protection vs their rush/);
 });
 
+test('position-specific ratings move their real matchup edge',async()=>{
+ const e=await setup(3110),me=e.T('Chicago Metropolitan'),opp=e.universe.teams.find(t=>t!==me);
+ const set=(roles,keys,value)=>{for(const id of roles){const p=e.roleStarter(me,id);for(const key of keys)p[key]=value}};
+ set(['LT','LG','C1','RG','RT'],['power','technique','iq','durability'],40);
+ const before=e.gameMatchup(me,opp);
+ set(['LT','LG','C1','RG','RT'],['power','technique','iq','durability'],99);
+ const lineBoost=e.gameMatchup(me,opp);
+ assert.ok(lineBoost.teamEdges.passProtection>before.teamEdges.passProtection,'line traits improve pass protection');
+ assert.equal(lineBoost.teamEdges.passGame,before.teamEdges.passGame,'line traits do not alter target coverage');
+ set(['BCB','FCB','NICKEL','FS','BOXS'],['speed','technique','iq','composure'],99);
+ const coverageBoost=e.gameMatchup(me,opp);
+ assert.ok(coverageBoost.opponentEdges.passGame<lineBoost.opponentEdges.passGame,'coverage traits reduce the opponent pass edge');
+ assert.equal(coverageBoost.teamEdges.passProtection,lineBoost.teamEdges.passProtection,'coverage traits do not alter pass protection');
+});
+
 test('staff recommendation uses personnel matchup as well as scheme tendency',async()=>{
  const e=await setup(3109),u=e.universe,me=e.T('Chicago Metropolitan'),opp=u.teams.find(t=>t!==me);
  opp.offScheme='Vertical Strike';

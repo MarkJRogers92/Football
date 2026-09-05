@@ -1,5 +1,18 @@
 # WORKLOG
 
+## Strategy integrity batch 5 — position traits reach the matchup
+
+Team profiles now blend current overall/health/wear with role-specific traits:
+QB technique and processing, skill speed/technique, line power/technique/IQ,
+front power/technique/speed, and coverage technique/speed/IQ. Those profiles feed
+the same matchup edges, recommendations, quick sim and detailed sim already used
+by Game Lab, so changing the relevant player ratings changes team success rather
+than merely reallocating a predetermined box score.
+
+A controlled matchup test holds overall and the opponent fixed, then verifies
+that line traits move pass protection without moving pass-game skill and coverage
+traits reduce the opponent pass edge without changing protection.
+
 ## Player identity batch 4 — specialist outcomes
 
 Quick and detailed field-goal results now use the active kicker's technique,

@@ -28,8 +28,8 @@ Scouted descriptions must respect uncertainty instead of exposing hidden ability
    rating emphases and supported usage prose. Generation assigns a correlated but
    varied style from the actual traits. Existing saves are neither relabeled nor
    rerolled; their identities and history remain intact.
-3. Offensive opportunities and efficiency — initial quick-sim allocation implemented
-   for RB, WR, TE and OL; fuller QB
+3. Offensive opportunities and efficiency — upstream unit profiles and initial
+   quick-sim allocation implemented for QB, RB, WR, TE and OL; fuller QB
    behavior. Review stacked SLOT/3DRB/MOVETE usage and caps; receiving attributes
    must support target/catch efficiency. Add passing depth, catch/YAC and run-type
    tendencies where modeled. Separate QB accuracy/decisions/mobility from generic
@@ -41,7 +41,8 @@ Scouted descriptions must respect uncertainty instead of exposing hidden ability
    Watch text and box scores from those plays; remove post-game redistribution
    for detailed games. Fix random TD-type reassignment at the goal line. Verify
    named players, plays, drives, TDs and box totals agree, including sacks/turnovers.
-5. Defense — initial quick-sim allocation implemented. EDGE/DT: rush vs run responsibilities, pressure and sack efficiency;
+5. Defense — upstream front/coverage profiles and initial quick-sim allocation
+   implemented. EDGE/DT: rush vs run responsibilities, pressure and sack efficiency;
    LB: box, pursuit, coverage and blitz; CB/S: coverage roles, targets allowed,
    breakups and interceptions only if those events are tracked. Use opportunity
    denominators; do not invent individual tackles/coverage facts from narration.

@@ -24,7 +24,7 @@ replace the matchup. The desired chain is:
 | Defensive scheme pressure and run control | Functional/partial | Pressure and run values affect relevant formulas. | Scheme coverage barely affects quick sim and does not directly enter detailed completion outcomes. |
 | Scheme fit | Partial | Core attribute averages affect team profiles; transition familiarity imposes a real penalty. | Only QB archetype gets an explicit style-fit bonus. Team fit is a broad average rather than package/on-field fit. |
 | Overall/current rating | Functional but blunt | `trueNow`, health and wear drive unit strength; unit strength drives most game probabilities. | A generic overall often matters more than the position-specific ratings the UI invites the player to study. |
-| Position ratings | Partial | They select role starters and distribute individual yards, tackles, sacks, interceptions and negative OL events. Detailed QB/RB/WR plays read a few attributes directly. | Many ratings rearrange the box score after team totals are generated instead of changing whether the team succeeds. |
+| Position ratings | Functional/partial, improved on branch | Role-specific traits now blend with overall/health/wear in QB, skill, OL, front and coverage profiles consumed by both engines; they also direct individual production. | Package-level and situational technique remain shallow, and detailed defensive actors are still allocated after the game. |
 | Specialists | Functional for tracked outcomes | K technique, power and composure drive field-goal accuracy/range/pressure; P power and technique drive punt distance in both game paths. | Hang time, direction and returns are not tracked and are disclosed as unavailable. |
 | Player archetype | Functional/partial, improved on branch | New talent receives a label derived from three real rating emphases; shared usage logic directs QB/RB/receiver/defender/OL production and Watch offensive actors. | Existing saves retain their prior labels, and some archetypes still describe only allocation rather than upstream team efficiency. |
 | Role depth chart | Functional/partial | Chooses the players used by unit ratings and individual stat allocation. Availability fallbacks work. | Overlapping roles can stack usage and packages/formations are not simulated explicitly. |
@@ -48,9 +48,9 @@ replace the matchup. The desired chain is:
 2. `runOffseason` calls `generatePlayer` at signing, then overwrites identity and
    overall fields from the recruit while retaining newly randomized attributes
    and the recruit's old scouting history.
-3. `unit` reduces active role starters to `conditionRating`, which is overall
-   minus health/wear. Most team-level outcomes therefore do not read the richer
-   role-fit rating directly.
+3. `modeledUnit` now blends active role starters' position traits with
+   `conditionRating`; the resulting QB, skill, OL, front and coverage values feed
+   both engines. This is still a unit abstraction rather than package simulation.
 4. Quick sim creates team totals first; `applyGameStats` allocates those totals.
    The branch's archetype work makes allocation more honest but cannot make a
    player's skills change team success without an upstream matchup change.

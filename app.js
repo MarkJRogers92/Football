@@ -598,6 +598,7 @@ let unitCache=null;
 function clearUnitCache(){unitCache=null;if(distCache.size>200000)distCache.clear()}
 function unitCached(team,pos){unitCache??=new Map();let k=team.name+'|'+pos,v=unitCache.get(k);if(v===undefined){v=unit(team,[pos]);unitCache.set(k,v)}return v}
 function unit(team,positions){let ids=[];let key=positions.slice().sort().join(',');if(key==='QB')ids=['QB1'];else if(key==='RB,TE,WR')ids=['RB1','X','Z','SLOT','TE1'];else if(key==='C,OG,OT')ids=['LT','LG','C1','RG','RT'];else if(key==='DT,EDGE,LB')ids=['RUSH','SETEDGE','NT','3TECH','MIKE','WILL'];else if(key==='CB,S')ids=['BCB','FCB','NICKEL','FS','BOXS'];if(ids.length){let v=ids.map(id=>roleStarter(team,id)).filter(gameAvailable).map(conditionRating);return avg(v)}let v=[];positions.forEach(pos=>{const a=orderedAt(team,pos).filter(gameAvailable);const n=(pos==='WR'||pos==='CB')?3:['OT','OG','EDGE','DT','LB','S'].includes(pos)?2:1;v.push(...a.slice(0,n).map(conditionRating))});return avg(v)}
+function modeledUnit(team,positions,roles,weights){const base=unit(team,positions),players=[...new Map(roles.map(id=>roleStarter(team,id)).filter(gameAvailable).map(p=>[p.id,p])).values()];if(!players.length)return base;const traits=avg(players.map(p=>Object.entries(weights).reduce((n,[key,w])=>n+(p[key]??p.trueNow)*w,0)));return clamp(base*.62+traits*.38,35,99)}
 // --- v0.9.10: scheme transitions -------------------------------------------
 // A coordinator brings a system with him. Installing it costs a season or two
 // of fit rather than a blunt rating penalty: while familiarity is low the
@@ -665,7 +666,7 @@ function playerSchemeFit(p,t){
  return clamp(Math.round(fit),35,99);
 }
 function profiles(t){
- const qb=unit(t,['QB']),skill=unit(t,['RB','WR','TE']),ol=unit(t,['OT','OG','C']),front=unit(t,['EDGE','DT','LB']),coverage=unit(t,['CB','S']);
+ const qb=modeledUnit(t,['QB'],['QB1'],{technique:.40,iq:.35,composure:.15,power:.10}),skill=modeledUnit(t,['RB','WR','TE'],['RB1','X','Z','SLOT','TE1','3DRB','PWRB','MOVETE'],{speed:.30,technique:.30,power:.15,iq:.15,versatility:.10}),ol=modeledUnit(t,['OT','OG','C'],['LT','LG','C1','RG','RT'],{power:.35,technique:.35,iq:.20,durability:.10}),front=modeledUnit(t,['EDGE','DT','LB'],['RUSH','SETEDGE','NT','3TECH','MIKE','WILL'],{power:.30,technique:.30,speed:.20,iq:.10,durability:.10}),coverage=modeledUnit(t,['CB','S'],['BCB','FCB','NICKEL','FS','BOXS'],{speed:.30,technique:.35,iq:.25,composure:.10});
  const offPlayers=t.roster.filter(p=>OFF_POS.has(p.pos)&&(p.injuryWeeks||0)===0).sort((a,b)=>conditionRating(b)-conditionRating(a)).slice(0,22),defPlayers=t.roster.filter(p=>!OFF_POS.has(p.pos)&&(p.injuryWeeks||0)===0).sort((a,b)=>conditionRating(b)-conditionRating(a)).slice(0,22);
  const offFit=avg(offPlayers.map(p=>playerSchemeFit(p,t))),defFit=avg(defPlayers.map(p=>playerSchemeFit(p,t))),oc=t.staff.OC,dc=t.staff.DC;
  const offense=clamp(qb*.29+skill*.27+ol*.22+offFit*.08+oc.playCall*.07+oc.development*.03+t.facilities*.04,35,99),defense=clamp(front*.39+coverage*.32+defFit*.09+dc.playCall*.08+dc.development*.04+t.facilities*.04+DEF_SCHEMES[t.defScheme].run*.02+DEF_SCHEMES[t.defScheme].coverage*.02,35,99);
