@@ -9,7 +9,8 @@ browser checks (164 total), all passing. The browser pass covered desktop and
 iPhone layouts and reported no console errors or horizontal page overflow.
 
 The full suite, not a new 15-season calibration, was the only broad run. Production
-remains v0.9.39; the validated build is eligible for preview publication only.
+remains v0.9.39. The validated preview was published at `/preview/v0940/` in
+`gh-pages` commit `48e47e8` and its live version labels were verified.
 
 ## Player identity batch 5 — downstream recognition
 

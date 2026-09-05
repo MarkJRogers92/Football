@@ -2,7 +2,9 @@
 
 Validation is complete: v0.9.40 builds cleanly; 53 smoke checks, 164 Node groups
 and 164 desktop/iPhone browser checks pass. No extended calibration was run.
-Publish only to `preview/v0940/`; production remains v0.9.39 until review.
+Preview published and live-verified at
+https://markjrogers92.github.io/Football/preview/v0940/ (`gh-pages` `48e47e8`).
+Production remains v0.9.39 until review and explicit approval.
 
 Active source branch: `codex/player-identity-batches`, based on `ba26de1`.
 Read [the all-position roadmap](docs/PLAYER_IDENTITY_ROADMAP.md) first.
