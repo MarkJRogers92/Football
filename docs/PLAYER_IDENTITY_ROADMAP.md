@@ -29,7 +29,8 @@ Scouted descriptions must respect uncertainty instead of exposing hidden ability
    audit recruits, signings, development and position changes too. Do not silently
    reroll existing players. Decide and document how existing labels become honest
    without altering saved ratings or retroactively changing history.
-3. Offensive opportunities and efficiency — RB, WR, TE and OL plus fuller QB
+3. Offensive opportunities and efficiency — initial quick-sim allocation implemented
+   for RB, WR, TE and OL; fuller QB
    behavior. Review stacked SLOT/3DRB/MOVETE usage and caps; receiving attributes
    must support target/catch efficiency. Add passing depth, catch/YAC and run-type
    tendencies where modeled. Separate QB accuracy/decisions/mobility from generic
@@ -41,7 +42,7 @@ Scouted descriptions must respect uncertainty instead of exposing hidden ability
    Watch text and box scores from those plays; remove post-game redistribution
    for detailed games. Fix random TD-type reassignment at the goal line. Verify
    named players, plays, drives, TDs and box totals agree, including sacks/turnovers.
-5. Defense — EDGE/DT: rush vs run responsibilities, pressure and sack efficiency;
+5. Defense — initial quick-sim allocation implemented. EDGE/DT: rush vs run responsibilities, pressure and sack efficiency;
    LB: box, pursuit, coverage and blitz; CB/S: coverage roles, targets allowed,
    breakups and interceptions only if those events are tracked. Use opportunity
    denominators; do not invent individual tackles/coverage facts from narration.

@@ -17,6 +17,19 @@ test('QB rushing opportunity follows the actual player identity and scheme',()=>
  assert.ok(e.qbRushWeight({...q,speed:95,versatility:95},{offScheme:'Multiple'})>e.qbRushWeight({...q,speed:55,versatility:55},{offScheme:'Multiple'}),'mobility ratings change usage within a style');
 });
 
+test('position archetypes direct opportunity without replacing ratings',()=>{
+ const e=loadEngine({seed:942}),p=(style,attrs={})=>({style,...attrs});
+ assert.ok(e.playerUsageWeight(p('One-Cut Burner'),'carry')>e.playerUsageWeight(p('Third-Down Weapon'),'carry'));
+ assert.ok(e.playerUsageWeight(p('One-Cut Burner'),'target')<e.playerUsageWeight(p('Third-Down Weapon'),'target'));
+ assert.ok(e.playerUsageWeight(p('Route Sculptor'),'target')>e.playerUsageWeight(p('Vertical Glider'),'target'));
+ assert.ok(e.playerUsageWeight(p('Pocket Wrecker'),'rush')>e.playerUsageWeight(p('Run-Side Anchor'),'rush'));
+ assert.ok(e.playerUsageWeight(p('Run-Side Anchor'),'tackle')>e.playerUsageWeight(p('Pocket Wrecker'),'tackle'));
+ assert.ok(e.playerUsageWeight(p('Ball Hunter'),'takeaway')>e.playerUsageWeight(p('Mirror Corner'),'takeaway'));
+ assert.ok(e.playerUsageWeight(p('Coverage Eraser'),'coverage')>e.playerUsageWeight(p('Box Hammer'),'coverage'));
+ assert.ok(e.playerUsageWeight(p('Island Protector'),'protect')<e.playerUsageWeight(p('Movement Tackle'),'protect'),'lower protection weight means fewer negative events');
+ assert.equal(e.playerUsageWeight(p('Range Kicker'),'fieldGoal'),1,'a starter-only opportunity retains its role allocation');
+});
+
 async function optionGame(style){
  const e=loadEngine({seed:941});await e.loadSchools();
  e.setUserTeam('Chicago Metropolitan');e.initUniverse();

@@ -12,6 +12,16 @@ play attribution before its narration can credit actual QB runs and scrambles.
 Focused validation: 6 player-identity and games tests passed. No long simulation
 or full suite was run for this source checkpoint.
 
+## Player identity batch 2 — all-position quick-sim allocation
+
+Added a shared archetype opportunity layer. Back styles now distinguish carries
+from receiving work, receiver and tight-end styles affect target share, front
+and coverage identities direct the defensive production they describe, and line
+styles affect the distribution of sacks and pressures allowed. Existing rating
+formulas still control role fit and production efficiency. K1 and P1 already own
+all team attempts by role; Watch attribution and specialist outcomes remain
+explicit roadmap work.
+
 ## v0.9.39 — Game-completion consistency
 
 First built and ran the focused games suite for the existing quick-sim

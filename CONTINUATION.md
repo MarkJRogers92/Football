@@ -10,7 +10,13 @@ the actual QB style, speed and versatility plus scheme context. It does not yet
 change Watch play attribution. Remaining batches
 and acceptance criteria are in the roadmap; do not claim the full overhaul done.
 Focused validation: `node --test tests/playeridentity.js tests/games.js` passes
-all 6 tests, including both real game engines' existing reconciliation coverage.
+all 7 tests, including both real game engines' existing reconciliation coverage.
+
+Batch 2 complete: shared style opportunity multipliers now direct RB carries,
+RB/WR/TE targets and production, defensive tackles/rush/coverage/takeaways, and
+offensive-line negative protection events. Ratings remain in each efficiency
+formula. Specialist opportunities already belong to the K1/P1 role starters;
+their outcome tuning and Watch's actual-play attribution remain later batches.
 
 ## Previous production checkpoint
 
