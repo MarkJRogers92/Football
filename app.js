@@ -697,6 +697,70 @@ function profiles(t){
  return {qb,skill,ol,front,coverage,offFit,defFit,offense,defense,overall:(offense+defense)/2};
 }
 function circlePair(arr,round){let a=[...arr],fixed=a[0],rest=a.slice(1);for(let r=0;r<round;r++)rest=[rest.at(-1),...rest.slice(0,-1)];a=[fixed,...rest];let o=[];for(let i=0;i<a.length/2;i++)o.push([a[i],a[a.length-1-i]]);return o}
+// --- v0.9.48 commit 1: a pure schedule validator ------------------------------
+// Reports problems instead of throwing, and reads only what it is handed, so it can check
+// a freshly built schedule, a loaded save, or an archived season without side effects.
+const SCHEDULE_GAMES=12,SCHEDULE_CONF_GAMES=8,SCHEDULE_HOME_MIN=5,SCHEDULE_HOME_MAX=7;
+function validateSchedule(u=universe){
+ const problems=[],weeks=Array.isArray(u?.schedule)?u.schedule:[];
+ if(!u?.teams?.length)return ['no teams to validate'];
+ const byTeam=new Map(u.teams.map(t=>[t.name,[]]));
+ weeks.forEach((games,wi)=>{
+  const week=wi+1,seen=new Set();
+  for(const g of games||[]){
+   if(g.home===g.away){problems.push(`week ${week}: ${g.home} is scheduled against itself`);continue}
+   for(const side of [g.home,g.away]){
+    if(!byTeam.has(side)){problems.push(`week ${week}: unknown team "${side}"`);continue}
+    if(seen.has(side))problems.push(`week ${week}: ${side} appears twice`);
+    seen.add(side);byTeam.get(side).push(g);
+   }
+  }
+ });
+ const flat=weeks.flat(),shared=new Set(flat);
+ for(const t of u.teams){
+  const games=byTeam.get(t.name)||[];
+  if(games.length!==SCHEDULE_GAMES)problems.push(`${t.name} plays ${games.length} games, expected ${SCHEDULE_GAMES}`);
+  const conf=games.filter(g=>g.conf).length;
+  if(conf!==SCHEDULE_CONF_GAMES)problems.push(`${t.name} plays ${conf} conference games, expected ${SCHEDULE_CONF_GAMES}`);
+  const home=games.filter(g=>g.home===t.name).length;
+  if(games.length&&(home<SCHEDULE_HOME_MIN||home>SCHEDULE_HOME_MAX))
+   problems.push(`${t.name} has ${home} home games, outside ${SCHEDULE_HOME_MIN}-${SCHEDULE_HOME_MAX}`);
+  // A conference opponent must never appear twice in one regular season.
+  const confOpponents=games.filter(g=>g.conf).map(g=>g.home===t.name?g.away:g.home);
+  const dupes=confOpponents.filter((x,i)=>confOpponents.indexOf(x)!==i);
+  if(dupes.length)problems.push(`${t.name} plays ${[...new Set(dupes)].join(', ')} twice in conference`);
+  // The rival is the whole point of a protected game; it must be on the schedule.
+  const rival=t.rivalry?u.teams.find(x=>x.id===t.rivalry.rivalId):null;
+  if(rival){
+   const met=games.filter(g=>g.home===rival.name||g.away===rival.name).length;
+   if(met!==1)problems.push(`${t.name} meets protected rival ${rival.name} ${met} times, expected 1`);
+  }
+  // The team's own schedule must hold the same objects the universe does, or a played
+  // result would land on one view and not the other.
+  for(const g of t.schedule||[])if(!shared.has(g))problems.push(`${t.name} holds a game the universe schedule does not`);
+ }
+ return problems;
+}
+// Which conference opponents a team has actually met, for rotation-coverage checks.
+function conferenceOpponentsFor(u,teamName){
+ const out=new Set();
+ for(const g of (u?.schedule||[]).flat()){
+  if(!g.conf)continue;
+  if(g.home===teamName)out.add(g.away);
+  else if(g.away===teamName)out.add(g.home);
+ }
+ return out;
+}
+function nonConferenceOpponentsFor(u,teamName){
+ const out=[];
+ for(const g of (u?.schedule||[]).flat()){
+  if(g.conf)continue;
+  if(g.home===teamName)out.push(g.away);
+  else if(g.away===teamName)out.push(g.home);
+ }
+ return out;
+}
+
 function buildSchedule(){universe.teams.forEach(t=>t.schedule=[]);universe.schedule=Array.from({length:12},()=>[]);const cn=allConfs();for(let w=0;w<4;w++)circlePair(cn,w).forEach(([ca,cb])=>{const A=universe.teams.filter(t=>t.conference===ca),B=universe.teams.filter(t=>t.conference===cb);for(let i=0;i<Math.min(A.length,B.length);i++){let j=(i+w)%B.length,home=(i+w)%2===0?A[i]:B[j],away=home===A[i]?B[j]:A[i];universe.schedule[w].push({week:w+1,home:home.name,away:away.name,conf:false,played:false})}});allConfs().forEach(c=>{let arr=universe.teams.filter(t=>t.conference===c);if(arr.length%2)return;for(let r=0;r<8;r++)circlePair(arr,r).forEach(([a,b],k)=>{let home=(r+k)%2===0?a:b,away=home===a?b:a;universe.schedule[4+r].push({week:r+5,home:home.name,away:away.name,conf:true,played:false})})});universe.schedule.flat().forEach(g=>{T(g.home)?.schedule.push(g);T(g.away)?.schedule.push(g)})}
 // Immutable game snapshots. Sparse player deltas retain only actual game production.
 function beginGame(home,away,neutral,context={}){
