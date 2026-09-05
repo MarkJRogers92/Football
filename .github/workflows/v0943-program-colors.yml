@@ -1,0 +1,66 @@
+name: Validate Dynasty Lab v0.9.43 program colors
+
+on:
+  push:
+    branches:
+      - codex/v0943-program-colors
+    paths:
+      - .v0943-validate
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Build standalone
+        run: npm run build
+      - name: Program branding regression tests
+        run: node --test tests/teambranding.js
+      - name: Browser UI and visual regression tests
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then
+            npx playwright-core install chromium
+            CHROME="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$CHROME"
+          CHROMIUM_PATH="$CHROME" npm run test:browser
+      - name: Verify program colors paint real UI surfaces
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then CHROME="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"; fi
+          CHROMIUM_PATH="$CHROME" node - <<'NODE'
+          const {chromium}=require('playwright-core');
+          const path=require('node:path');
+          const assert=require('node:assert/strict');
+          (async()=>{
+            const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,args:['--no-sandbox']});
+            try{
+              for(const viewport of [{width:1440,height:900},{width:390,height:844}]){
+                const page=await browser.newPage({viewport});
+                const errors=[];page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
+                await page.goto('file://'+path.join(process.cwd(),'index.html'));
+                await page.waitForSelector('#titleNew',{timeout:30000});await page.click('#titleNew');await page.waitForSelector('#titleStart',{state:'visible'});await page.click('#titleStart');
+                await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length===120,{timeout:60000});
+                await page.waitForFunction(()=>document.documentElement.dataset.teamBrandId==='1',{timeout:10000});
+                const root=await page.evaluate(()=>({id:document.documentElement.dataset.teamBrandId,primary:getComputedStyle(document.documentElement).getPropertyValue('--team-primary').trim(),secondary:getComputedStyle(document.documentElement).getPropertyValue('--team-secondary').trim(),accent:getComputedStyle(document.documentElement).getPropertyValue('--team-accent').trim()}));
+                assert.deepEqual(root,{id:'1',primary:'#12355B',secondary:'#6CB4EE',accent:'#F2C14E'});
+                await page.waitForFunction(()=>document.querySelectorAll('#top15 .rankrow[data-brand-team-id]').length===15,{timeout:10000});
+                assert.equal(await page.locator('#top15 .rankrow[data-brand-team-id]').count(),15);
+                await page.click('.tab-groups button[data-group="games"]');await page.click('.tabs button[data-tab="gamelab"]');
+                await page.waitForFunction(()=>document.querySelectorAll('#gamelab [data-brand-team-id]').length>=2,{timeout:10000});
+                if(viewport.width<500)assert.equal(await page.evaluate(()=>Math.max(0,document.documentElement.scrollWidth-innerWidth)),0);
+                assert.deepEqual(errors,[]);
+                await page.close();
+              }
+              console.log('program color DOM coverage PASS — desktop + iPhone');
+            }finally{await browser.close()}
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          NODE
