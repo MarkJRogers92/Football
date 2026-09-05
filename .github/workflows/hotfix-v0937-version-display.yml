@@ -1,0 +1,67 @@
+name: Hotfix v0.9.37 visible version labels
+
+on:
+  push:
+    branches:
+      - codex/v0937-version-display-hotfix
+    paths:
+      - .github/workflows/hotfix-v0937-version-display.yml
+      - tools/build.js
+      - tests/version.js
+      - package.json
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Verify canonical release metadata
+        shell: bash
+        run: |
+          test "$(tr -d '\r\n' < VERSION.txt)" = "0.9.37"
+          grep -q "const APP_VERSION='0.9.37';" app.js
+          grep -q '"version": "0.9.37"' package.json
+
+      - name: Install dependencies
+        run: npm install --no-package-lock
+
+      - name: Build and verify version plumbing
+        run: |
+          npm run build
+          node tests/version.js
+          grep -q '<title>Dynasty Lab v0.9.37</title>' index.html
+          grep -q 'data-title-version>v0.9.37</b>' index.html
+          grep -q 'data-app-version>v0.9.37</span>' index.html
+
+      - name: Engine and persistence tests
+        run: npm test
+
+      - name: Browser UI tests
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then
+            npx playwright-core install chromium
+            CHROME="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$CHROME"
+          CHROMIUM_PATH="$CHROME" npm run test:browser
+
+      - name: Publish and verify preview
+        shell: bash
+        run: |
+          node tools/publish.js --preview version-display-hotfix
+          grep -q 'data-title-version>v0.9.37</b>' .pages/preview/version-display-hotfix/index.html
+          grep -q 'data-app-version>v0.9.37</span>' .pages/preview/version-display-hotfix/index.html
+
+      - name: Publish production hotfix
+        run: node tools/publish.js
