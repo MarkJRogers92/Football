@@ -311,6 +311,32 @@
         <div class="card"><h3>Development Candidates</h3><div id="developmentWatch"></div></div>
       </div>
       <div class="card"><h3>Offseason Report</h3><div id="offseasonReport" class="muted">Complete the season first.</div></div>
+      <div class="card portal-shell stacked-table">
+        <div class="section-head">
+          <div><h3>Transfer Portal</h3><div id="portalStatus" class="muted">The portal opens after departures and signing.</div></div>
+          <div class="portal-actions">
+            <button id="portalOpen">Open Portal</button>
+            <button id="portalAdvance" disabled>Advance Round</button>
+            <button id="portalFinalize" disabled>Finalize Commitments</button>
+          </div>
+        </div>
+        <div id="portalPanels" class="metric-grid"></div>
+        <div class="portal-filters">
+          <label>Position <select id="portalPos"><option value="ALL">All</option></select></label>
+          <label>Class <select id="portalElig"><option value="ALL">All</option></select></label>
+          <label>From <select id="portalConf"><option value="ALL">All conferences</option></select></label>
+          <label>Sort <select id="portalSort">
+            <option value="interest">Your interest</option>
+            <option value="rating">Rating</option>
+            <option value="pos">Position</option>
+          </select></label>
+          <label class="portal-toggle"><input type="checkbox" id="portalTargetedOnly"> Targeted only</label>
+        </div>
+        <div class="table-wrap"><table><thead><tr>
+          <th>Player</th><th>Pos</th><th>Class</th><th>From</th><th>Reason</th><th>Rating</th><th>Your interest</th><th>Field</th><th>Attention</th><th>NIL</th><th>Promise</th><th>Status</th>
+        </tr></thead><tbody id="portalBoard"></tbody></table></div>
+        <div id="portalLog" class="muted small">No portal activity yet.</div>
+      </div>
       <div class="card"><h3>Carousel / Transfer Log</h3><div id="movementLog" class="muted">No offseason movement yet.</div></div>
     </section>
 

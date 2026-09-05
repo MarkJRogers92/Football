@@ -2643,7 +2643,96 @@ function renderDevelopment(){const u=selected(),ds=ensureDevelopmentState();ensu
 function renderPositionChangeOptions(){let u=selected(),p=u.roster.find(x=>x.id===$('#positionChangePlayer').value),target=$('#positionChangeTarget');if(!p||!target)return;let opts=positionOptions(p);target.innerHTML=opts.map(x=>`<option value="${x}">${x}</option>`).join('');let to=target.value;if(!to){$('#positionChangePreview').textContent='No realistic transition available.';$('#applyPositionChange').disabled=true;return}const will=positionChangeWillingness(p,u,to);
  $('#applyPositionChange').disabled=universe.phase!=='complete'||will.state==='REFUSES';
  $('#positionChangePreview').innerHTML=`Projected transition fit: <strong>${positionTransitionFit(p,to)}/100</strong>. Current ${p.pos} familiarity: ${familiarity(p,p.pos)}%. Moving to ${to} starts with a learning penalty that camp can reduce.<br><span class="pill${will.state==='REFUSES'?' bad':''}">${positionWillingnessLabel(will.state)}</span> <span class="small muted">${gameEscape(will.reasons.slice(0,2).join('; ')||'no strong feelings either way')}${will.state==='RELUCTANT'?' — forcing it will cost morale and staff trust.':will.state==='REFUSES'?' — he will not agree to this move.':''}</span>`}
-function renderOffseason(){const u=selected(),risks=u.roster.map(p=>({p,risk:transferRisk(p)})).sort((a,b)=>b.risk-a.risk).slice(0,8);$('#transferWatch').innerHTML=risks.map(x=>`<div class="lineitem"><span>${x.p.pos} ${x.p.name}</span><span class="${x.risk>45?'bad':x.risk>25?'warn':''}">${Math.round(x.risk)} risk</span></div>`).join('');const dev=u.roster.slice().sort((a,b)=>(b.dev+b.work)-(a.dev+a.work)).slice(0,8);$('#developmentWatch').innerHTML=dev.map(p=>`<div class="lineitem"><span>${p.pos} ${p.name}</span><span>${p.year} · ${p.style}</span></div>`).join('');let ds=ensureDevelopmentState();$('#offseasonReport').textContent=universe.phase==='complete'?(ds.fallRun?`Fall camp is complete. Finalize the offseason to advance to ${universe.year+1}.`:`Complete spring development and fall camp before advancing.`):'Complete the season first.';$('#movementLog').innerHTML=universe.movementLog.length?universe.movementLog.map(x=>`<div class="lineitem"><span>${x}</span></div>`).join(''):'<span class="muted">No offseason movement yet.</span>';for(const x of universe.transferPortal||[])if(x.fromSchoolId===u.id)$('#movementLog').innerHTML+=`<div class="lineitem"><button class="player-button" data-player="${x.p.id}">${x.p.name}</button><span>In portal — awaiting a roster opening</span></div>`;attachPlayerLinks()}
+function renderOffseason(){const u=selected(),risks=u.roster.map(p=>({p,risk:transferRisk(p)})).sort((a,b)=>b.risk-a.risk).slice(0,8);$('#transferWatch').innerHTML=risks.map(x=>`<div class="lineitem"><span>${x.p.pos} ${x.p.name}</span><span class="${x.risk>45?'bad':x.risk>25?'warn':''}">${Math.round(x.risk)} risk</span></div>`).join('');const dev=u.roster.slice().sort((a,b)=>(b.dev+b.work)-(a.dev+a.work)).slice(0,8);$('#developmentWatch').innerHTML=dev.map(p=>`<div class="lineitem"><span>${p.pos} ${p.name}</span><span>${p.year} · ${p.style}</span></div>`).join('');let ds=ensureDevelopmentState();$('#offseasonReport').textContent=universe.phase==='complete'?(ds.fallRun?`Fall camp is complete. Finalize the offseason to advance to ${universe.year+1}.`:`Complete spring development and fall camp before advancing.`):'Complete the season first.';$('#movementLog').innerHTML=universe.movementLog.length?universe.movementLog.map(x=>`<div class="lineitem"><span>${x}</span></div>`).join(''):'<span class="muted">No offseason movement yet.</span>';for(const x of universe.transferPortal||[])if(x.fromSchoolId===u.id)$('#movementLog').innerHTML+=`<div class="lineitem"><button class="player-button" data-player="${x.p.id}">${x.p.name}</button><span>In portal — awaiting a roster opening</span></div>`;renderPortal();attachPlayerLinks()}
+
+// --- v0.9.47 commit 4: the Portal subview -------------------------------------
+// Rows link to the existing player profile via data-player; there is deliberately no
+// second profile implementation here.
+function portalFilterValue(id,fallback='ALL'){return $(id)?.value||fallback}
+function portalVisibleCandidates(){
+ const pos=portalFilterValue('#portalPos'),elig=portalFilterValue('#portalElig'),conf=portalFilterValue('#portalConf');
+ const sort=portalFilterValue('#portalSort','interest'),onlyTargets=!!$('#portalTargetedOnly')?.checked,u=portalUserTeam();
+ let rows=portalCandidates().filter(x=>!x.placed);
+ if(pos!=='ALL')rows=rows.filter(x=>x.p.pos===pos);
+ if(elig!=='ALL')rows=rows.filter(x=>x.p.year===elig);
+ if(conf!=='ALL')rows=rows.filter(x=>(universe.teams.find(t=>t.id===x.fromSchoolId)?.conference||'')===conf);
+ if(onlyTargets)rows=rows.filter(x=>portalTargetFor(x.candidateId));
+ const mine=x=>u?(x.interest[u.id]??-1):-1;
+ if(sort==='rating')rows.sort((a,b)=>b.p.perceived-a.p.perceived);
+ else if(sort==='pos')rows.sort((a,b)=>POS.indexOf(a.p.pos)-POS.indexOf(b.p.pos)||b.p.perceived-a.p.perceived);
+ else rows.sort((a,b)=>mine(b)-mine(a)||b.p.perceived-a.p.perceived);
+ return rows;
+}
+function portalSyncFilterOptions(){
+ const rows=portalCandidates().filter(x=>!x.placed);
+ const fill=(sel,values,label)=>{
+  const el=$(sel);if(!el)return;
+  const keep=el.value;
+  el.innerHTML=`<option value="ALL">${label}</option>`+values.map(v=>`<option>${v}</option>`).join('');
+  if([...el.options].some(o=>o.value===keep))el.value=keep;
+ };
+ fill('#portalPos',[...new Set(rows.map(x=>x.p.pos))].sort((a,b)=>POS.indexOf(a)-POS.indexOf(b)),'All');
+ fill('#portalElig',[...new Set(rows.map(x=>x.p.year))].sort(),'All');
+ fill('#portalConf',[...new Set(rows.map(x=>universe.teams.find(t=>t.id===x.fromSchoolId)?.conference).filter(Boolean))].sort(),'All conferences');
+}
+function renderPortal(){
+ if(!$('#portalBoard'))return;
+ const c=ensurePortalCycle(),u=portalUserTeam();
+ const open=c.status==='open',entries=portalCandidates().filter(x=>!x.placed);
+ $('#portalStatus').textContent=c.status==='idle'
+  ?`${entries.length} player${entries.length===1?'':'s'} in the portal. Open it to start recruiting them.`
+  :c.status==='open'?`Round ${c.round} of ${PORTAL_ROUNDS} · ${entries.filter(x=>!x.decision).length} still deciding`
+  :`Portal closed · ${entries.filter(x=>x.decision).length} decided, ${c.resolutions.length} recorded`;
+ $('#portalOpen').disabled=c.status!=='idle'||!entries.length;
+ $('#portalAdvance').disabled=!open;
+ $('#portalFinalize').disabled=!entries.some(x=>x.decision);
+ $('#portalPanels').innerHTML=[
+  ['Attention left',`${portalAttentionLeft()} / ${PORTAL_ATTENTION_POOL}`],
+  ['Targets',`${c.targets.length} / ${PORTAL_TARGET_CAP}`],
+  ['NIL available',u?nilSummaryText(u):'—'],
+  ['Roster room',u?`${portalRoomFor(u)} spots`:'—'],
+ ].map(([k,v])=>`<div class="metric"><div class="small muted">${k}</div><div class="v">${v}</div></div>`).join('');
+ portalSyncFilterOptions();
+ const rows=portalVisibleCandidates();
+ $('#portalBoard').innerHTML=rows.length?rows.map(x=>{
+  const from=universe.teams.find(t=>t.id===x.fromSchoolId),target=portalTargetFor(x.candidateId);
+  const mine=u?(x.interest[u.id]??null):null,deal=u?nilDealActive(x.p,u):null;
+  const field=x.finalists.map(id=>universe.teams.find(t=>t.id===id)?.name).filter(Boolean).slice(0,3).join(', ')||'—';
+  const decided=x.decision?universe.teams.find(t=>t.id===x.decision.schoolId):null;
+  const status=decided?(decided.id===u?.id?'<span class="pill pill--commit">COMMITTED TO YOU</span>':`<span class="muted">Chose ${decided.name}</span>`):open?'<span class="muted">Deciding</span>':'<span class="muted">Available</span>';
+  return `<tr class="${target?'target':''}">
+   <td data-label="Player"><div class="player-cell">${portraitTag(x.p,64,'list')}<div class="player-cell-text"><button class="player-button" data-player="${x.p.id}">${x.p.name}</button><div class="small muted">${x.p.style||''}</div></div></div></td>
+   <td data-label="Pos">${x.p.pos}</td>
+   <td data-label="Class">${x.p.year}</td>
+   <td data-label="From">${from?.name||x.from}<div class="small muted">${from?.conference||''}</div></td>
+   <td data-label="Reason">${transferReasonLabel(x.reason)}</td>
+   <td data-label="Rating">${grade(x.p.perceived)}</td>
+   <td data-label="Your interest">${mine==null?'<span class="muted">Not in the running</span>':`<strong class="interest-val">${mine}%</strong>`}</td>
+   <td data-label="Field">${field}</td>
+   <td data-label="Attention">${x.decision?'—':`<select data-portal-attention="${x.candidateId}"><option value="0">None</option>${[1,2,3,4].slice(0,PORTAL_ATTENTION_MAX).map(n=>`<option value="${n}" ${target?.attention===n?'selected':''}>${n}</option>`).join('')}</select>`}</td>
+   <td data-label="NIL">${x.decision?'—':deal?`<button data-portal-nil-off="${x.candidateId}">Withdraw ${deal.amount}</button>`:`<button data-portal-nil="${x.candidateId}">Offer</button>`}</td>
+   <td data-label="Promise">${x.decision?'—':`<select data-portal-promise="${x.candidateId}">${PROMISES.map(p=>`<option ${promiseLabel(x.promiseOffer?.type)===p?'selected':''}>${p}</option>`).join('')}</select>`}</td>
+   <td data-label="Status">${status}</td>
+  </tr>`}).join(''):'<tr><td colspan="12" class="muted">No portal candidates match these filters.</td></tr>';
+ const log=c.log.slice(-8).reverse();
+ $('#portalLog').innerHTML=log.length?log.map(x=>`<div class="lineitem"><span>Round ${x.round}</span><span>${x.message}</span></div>`).join(''):'No portal activity yet.';
+ bindPortalControls();
+ attachPlayerLinks();
+}
+// setStatus carries every refusal, so a rule the engine enforces is never silently swallowed.
+function bindPortalControls(){
+ const act=(res,ok)=>{if(res)setStatus(res);else if(ok)setStatus(ok);renderPortal()};
+ $$('[data-portal-attention]').forEach(s=>s.onchange=()=>{
+  const id=s.dataset.portalAttention,n=Number(s.value);
+  act(n>0?targetPortalCandidate(id,n):untargetPortalCandidate(id));
+ });
+ $$('[data-portal-nil]').forEach(b=>b.onclick=()=>act(offerPortalNil(b.dataset.portalNil),'NIL offer made.'));
+ $$('[data-portal-nil-off]').forEach(b=>b.onclick=()=>act(withdrawPortalNil(b.dataset.portalNilOff),'NIL offer withdrawn.'));
+ $$('[data-portal-promise]').forEach(s=>s.onchange=()=>act(promisePortalCandidate(s.dataset.portalPromise,s.value)));
+ for(const [sel,fn] of [['#portalPos',0],['#portalElig',0],['#portalConf',0],['#portalSort',0],['#portalTargetedOnly',0]]){
+  const el=$(sel);if(el)el.onchange=()=>renderPortal();
+ }
+}
 
 function findPlayer(id){const pending=(universe.transferPortal||[]).find(x=>x.p.id===id);if(pending)return {p:pending.p,team:null,active:false,portal:true};if(!IDX.players)rebuildIndexes();let h=IDX.players.get(id);if(h&&universe.teams[h.i]===h.t&&h.t.roster.includes(h.p))return {p:h.p,team:h.t,active:true};if(IDX.pop!==rosterPopulation()||(h&&!IDX.archive.has(id))){rebuildIndexes();h=IDX.players.get(id);if(h)return {p:h.p,team:h.t,active:true}}indexArchive();let p=IDX.archive.get(id);if(p)return {p,team:p.lastTeam?{name:p.lastTeam}:null,active:false};if(IDX.miss!==id){IDX.miss=id;rebuildIndexes();h=IDX.players.get(id);if(h)return {p:h.p,team:h.t,active:true}}return null}
 function statLine(s){if(!s)return 'No recorded statistics.';let a=[];if(s.passAtt||s.passYds){let pct=s.passAtt?Math.round((s.passComp||0)/s.passAtt*1000)/10:0;a.push(`${s.passComp||0}/${s.passAtt||0} (${pct}%) · ${s.passYds||0} pass yds · ${s.passTD||0} TD · ${s.int||0} INT`)}if(s.rushAtt||s.rushYds)a.push(`${s.rushAtt||0} car · ${s.rushYds||0} rush yds · ${s.rushTD||0} TD`);if(s.targets||s.recYds)a.push(`${s.receptions||0}/${s.targets||0} rec · ${s.recYds||0} yds · ${s.recTD||0} TD`);if(s.tackles||s.sacks||s.intDef)a.push(`${s.tackles||0} tackles · ${s.tfl||0} TFL · ${s.sacks||0} sacks · ${s.pressures||0} pressures · ${s.intDef||0} INT`);if(s.snaps&&!(s.passYds||s.rushYds||s.recYds||s.tackles))a.push(`${s.snaps} snaps · ${s.sacksAllowed||0} sacks allowed · ${s.pressuresAllowed||0} pressures allowed`);return a.join(' · ')||`${s.games||0} games`}
@@ -2819,7 +2908,7 @@ function bind(){
 
  $$('.tab-groups button').forEach(b=>b.onclick=()=>showTabGroup(b.dataset.group));
 $$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.classList.remove('active'));$$('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.tab).classList.add('active');setActiveTab(b.dataset.tab)});
- $('#simWeek').onclick=simWeek;$('#hubAdvance').onclick=simWeek;$('#seasonWeek').onclick=simWeek;$('#simSeason').onclick=simSeason;$('#simConf').onclick=simConferenceChampionships;$('#simPlayoff').onclick=simPlayoff;$('#simDetailedGame').onclick=simulateUserDetailed;$('#autoTarget').onclick=autoTarget;$('#autoDepth').onclick=()=>{autoDepthTeam(selected(),true);render()};$('#archiveSearch').oninput=renderArchiveSearch;$('#runOffseason').onclick=runOffseason;$('#runSpringCamp').onclick=runSpringCamp;$('#runFallCamp').onclick=runFallCamp;$('#applyCampWinners').onclick=applyCampRecommendations;$('#teamTrainingFocus').onchange=e=>{selected().trainingFocus=e.target.value;renderDevelopment()};$('#positionChangePlayer').onchange=renderPositionChangeOptions;$('#positionChangeTarget').onchange=renderPositionChangeOptions;$('#applyPositionChange').onclick=applyPositionChange;$('#newsWeek').onchange=renderNewsletter;$('#newsScope').onchange=renderNewsletter;$('#statsScope').onchange=renderStats;$('#positionFilter').onchange=renderRoster;$('#userTeam').onchange=()=>{candidateOfferDraft=null;render()};$('#applyProgramEdit').onclick=applyProgramEdit;
+ $('#simWeek').onclick=simWeek;$('#hubAdvance').onclick=simWeek;$('#seasonWeek').onclick=simWeek;$('#simSeason').onclick=simSeason;$('#simConf').onclick=simConferenceChampionships;$('#simPlayoff').onclick=simPlayoff;$('#simDetailedGame').onclick=simulateUserDetailed;$('#autoTarget').onclick=autoTarget;$('#autoDepth').onclick=()=>{autoDepthTeam(selected(),true);render()};$('#archiveSearch').oninput=renderArchiveSearch;$('#runOffseason').onclick=runOffseason;$('#portalOpen').onclick=()=>{openPortalCycle();renderPortal()};$('#portalAdvance').onclick=()=>{advancePortalRound();renderPortal()};$('#portalFinalize').onclick=()=>{const r=resolvePortalCommitments();setStatus(`${r.placed.length} transfer${r.placed.length===1?'':'s'} finalized${r.blocked.length?`, ${r.blocked.length} could not be placed`:''}.`);render()};$('#runSpringCamp').onclick=runSpringCamp;$('#runFallCamp').onclick=runFallCamp;$('#applyCampWinners').onclick=applyCampRecommendations;$('#teamTrainingFocus').onchange=e=>{selected().trainingFocus=e.target.value;renderDevelopment()};$('#positionChangePlayer').onchange=renderPositionChangeOptions;$('#positionChangeTarget').onchange=renderPositionChangeOptions;$('#applyPositionChange').onclick=applyPositionChange;$('#newsWeek').onchange=renderNewsletter;$('#newsScope').onchange=renderNewsletter;$('#statsScope').onchange=renderStats;$('#positionFilter').onchange=renderRoster;$('#userTeam').onchange=()=>{candidateOfferDraft=null;render()};$('#applyProgramEdit').onclick=applyProgramEdit;
  $('#watchDetailedGame').onclick=watchUserDetailed;
  $('#applyProgramEdit').onclick=()=>commissionerMode()?applyProgramEdit():setStatus('Institutional editing is locked in Dynasty Mode.');
  $('#saveBrowser').onclick=saveBrowser;$('#loadBrowser').onclick=loadBrowser;$('#exportSave').onclick=exportSave;$('#importSave').onclick=()=>$('#importFile').click();$('#importFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;const fromTitle=!$('#titleScreen').hidden,ok=await importSave(file);e.target.value='';if(ok&&fromTitle)enterDynasty();else if(!ok&&fromTitle)setTitleStatus($('#saveStatus').textContent)};
