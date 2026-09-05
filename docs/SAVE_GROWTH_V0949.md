@@ -72,3 +72,36 @@ game, which puts the only field that matters explicitly out of scope.
 The packet says the storage target must come from measurement, "not an invented
 target in this file" — so the target should be set alongside whichever option is
 chosen, not before.
+
+## Chosen: option 1, and what it actually saved
+
+Tiering was applied to `playerStats`. Protected from compaction: conference
+titles, bowls, playoff games, the controlled program's own games, rivalry games,
+and any game carrying drive detail (one the player watched through the Game Lab).
+On routine AI-versus-AI games older than three seasons, a stat line survives if
+it scored, forced a turnover, or led its side in passing, rushing or receiving
+yards — the leaders the permanent tier requires. Score, participants, context,
+team box and injuries are untouched, and game ids never change.
+
+Measured at season five (seed 4945, 3,858 games archived):
+
+| | Before | After | Saved |
+| --- | --- | --- | --- |
+| `gameArchive` | 29.99 MB | 19.20 MB | **36.0%** |
+| Whole save | 75.38 MB | 64.59 MB | **14.3%** |
+
+1,947 games compacted, 116,519 stat lines dropped. Compacted games still open to
+both Summary and Box Score, and the box score says its individual lines were
+reduced — without that note a short list would read as though everyone had a
+quiet night, which would make the archive lie about its own history.
+
+The whole-save figure understates the steady state: at season five with a
+three-season horizon only two seasons are eligible. In a longer dynasty a far
+larger share of seasons sits past the horizon, so the saving tends toward the
+36% figure on the fastest-growing component.
+
+### Storage target
+
+On this evidence: **hold twelve-season growth at or below 10 MB/season**, down
+from the measured 11.9. Compaction alone accounts for most of that at the
+horizon, without touching anything the retention tier calls permanent.

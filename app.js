@@ -1107,7 +1107,10 @@ function weeklyNewsletter(season,week,scope,teamName){
 function gameBoxHTML(g){
  const fields=[['First downs','firstDowns'],['Plays','plays'],['Passing yards','passYds'],['Rushing yards','rushYds'],['Turnovers','turnovers'],['Sacks taken','sacksTaken'],['Field goals made','fgMade'],['Field goal attempts','fgAtt'],['Punts','punts']];
  let rows=[['Total yards',...['away','home'].map(s=>g.teamStats[s].passYds+g.teamStats[s].rushYds)],...fields.map(([n,k])=>[n,g.teamStats.away[k],g.teamStats.home[k]])];
- let html='<h3>Team statistics</h3>'+gameTable(['Statistic',g.away.name,g.home.name],rows)+'<p class="muted">Quarter scores, possession, third/fourth downs, penalties and long gains are not tracked. Player totals are allocated by the simulation from team production.</p>';
+ // A compacted game keeps its leaders and scorers; say so rather than let the shorter list
+ // read as a quiet night from everyone else.
+ const compactNote=g.compacted?`<p class="muted">Individual lines for this game were compacted to its leaders and scorers to keep long dynasties small. Team statistics, the score and injuries are unchanged.</p>`:'';
+ let html=compactNote+'<h3>Team statistics</h3>'+gameTable(['Statistic',g.away.name,g.home.name],rows)+'<p class="muted">Quarter scores, possession, third/fourth downs, penalties and long gains are not tracked. Player totals are allocated by the simulation from team production.</p>';
  const groups=[['Passing',['Cmp','Att','Yds','TD','INT','Sacks'],['passComp','passAtt','passYds','passTD','int','sacksTaken'],'passAtt'],['Rushing',['Car','Yds','Avg','TD'],['rushAtt','rushYds','rushAvg','rushTD'],'rushAtt'],['Receiving',['Rec','Targets','Yds','Avg','TD'],['receptions','targets','recYds','recAvg','recTD'],'targets'],['Defense',['Tkl','TFL','Sack','INT','PD','Pressures'],['tackles','tfl','sacks','intDef','passBreakups','pressures'],'tackles'],['Kicking',['FGM','FGA'],['fgMade','fgAtt'],'fgAtt'],['Punting',['Punts','Yds','Avg'],['punts','puntYds','puntAvg'],'punts']];
  for(const side of ['away','home']){html+=`<h3>${gameEscape(g[side].name)}</h3>`;for(const [title,cols,keys,filter] of groups){const list=g.playerStats[side].filter(p=>p.stats[filter]||keys.some(k=>p.stats[k]));if(!list.length)continue;html+=`<h4>${title}</h4>`+gameTable(['Player','Pos',...cols],list.map(p=>[p.name,p.pos,...keys.map(k=>{const s=p.stats;if(k==='rushAvg')return s.rushAtt?((s.rushYds||0)/s.rushAtt).toFixed(1):'—';if(k==='recAvg')return s.receptions?((s.recYds||0)/s.receptions).toFixed(1):'—';if(k==='puntAvg')return s.punts?((s.puntYds||0)/s.punts).toFixed(1):'—';return s[k]||0})]))}}
  return html;
@@ -1130,6 +1133,70 @@ function coachingReportHTML(g){
  });
  return `<section class="coaching-report"><h3>Postgame coaching report</h3><p class="muted">Recorded results and suggestions for next week. These numbers do not isolate the effect of a gameplan.</p><div class="profile-sections">${sections.join('')}</div></section>`;
 }
+// --- v0.9.49 commit 4: tiered game-detail compaction --------------------------
+// Measured first (docs/SAVE_GROWTH_V0949.md): per-game player deltas are 87.9% of the game
+// archive and ~44% of all save growth. The packet's proposed target, drive/play detail, is
+// 0.0% of routine games because only the Game Lab's detailed engine ever produces it — so
+// the packet's own tiering is applied to the field that actually holds the bytes instead.
+const GAME_DETAIL_HORIZON=3,COMPACTION_MANIFEST_CAP=40;
+// Never compacted: anything a player would go back and read. Everything the permanent tier
+// names — score, participants, context, team box, injuries, leaders — is kept either way.
+function gameIsProtected(g,userTeamName){
+ if(!g)return true;
+ if(g.label&&g.label!=='Regular season')return true;          // titles, bowls, playoff
+ if(g.drives?.length||g.plays?.length)return true;            // a Game Lab game the player watched
+ const names=[g.home?.name,g.away?.name];
+ if(userTeamName&&names.includes(userTeamName))return true;
+ const home=T(g.home?.name),away=T(g.away?.name);
+ if(home&&away&&(primaryRivalId(home)===away.id||primaryRivalId(away)===home.id))return true;
+ return false;
+}
+// A line survives if it carries a scoring or turnover contribution, or leads its side in
+// passing, rushing or receiving yards — the "leaders" the permanent tier requires.
+function keptStatLines(lines){
+ if(!Array.isArray(lines)||!lines.length)return lines||[];
+ const lead=key=>{
+  let best=null,bestVal=0;
+  for(const p of lines){const v=p.stats?.[key]||0;if(v>bestVal){bestVal=v;best=p}}
+  return best;
+ };
+ const keep=new Set([lead('passYds'),lead('rushYds'),lead('recYds')].filter(Boolean));
+ for(const p of lines){
+  const st=p.stats||{};
+  if(st.passTD||st.rushTD||st.recTD||st.int||st.fgMade)keep.add(p);
+ }
+ return lines.filter(p=>keep.has(p));
+}
+function compactGame(g){
+ if(!g||g.compacted||!g.playerStats)return null;
+ const before={home:g.playerStats.home||[],away:g.playerStats.away||[]};
+ const kept={home:keptStatLines(before.home),away:keptStatLines(before.away)};
+ const dropped=(before.home.length-kept.home.length)+(before.away.length-kept.away.length);
+ if(!dropped)return null;
+ g.playerStats=kept;
+ // The marker is what tells the box score to say so rather than imply the game was quiet.
+ g.compacted={season:universe.year,dropped,kept:kept.home.length+kept.away.length};
+ return g.compacted;
+}
+// Runs over seasons older than the horizon. Game ids and every link to them are untouched.
+function compactGameArchive({horizon=GAME_DETAIL_HORIZON}={}){
+ const cutoff=universe.year-horizon,user=$('#userTeam')?.value||null;
+ let games=0,dropped=0;
+ for(const g of universe.gameArchive||[]){
+  if((g.season??universe.year)>cutoff)continue;
+  if(gameIsProtected(g,user))continue;
+  const res=compactGame(g);
+  if(res){games++;dropped+=res.dropped}
+ }
+ if(games){
+  universe.compactionManifest??=[];
+  universe.compactionManifest.push({at:universe.year,cutoff,games,dropped});
+  if(universe.compactionManifest.length>COMPACTION_MANIFEST_CAP)
+   universe.compactionManifest.splice(0,universe.compactionManifest.length-COMPACTION_MANIFEST_CAP);
+ }
+ return {games,dropped};
+}
+
 function gameSummaryHTML(g){
  const winner=g.score.home>g.score.away?g.home:g.away;
  let html=`<p class="recap">${gameRecap(g).body}</p><p><strong>${gameEscape(winner.name)} wins by ${Math.abs(g.score.home-g.score.away)}.</strong> Total offense: ${gameEscape(g.away.name)} ${g.teamStats.away.passYds+g.teamStats.away.rushYds} yards; ${gameEscape(g.home.name)} ${g.teamStats.home.passYds+g.teamStats.home.rushYds} yards.</p><p class="muted">The recap above is written from this box score. Quarter-by-quarter scores, attendance and game clock are unavailable.</p>${coachingReportHTML(g)}<h3>Game leaders</h3>`;

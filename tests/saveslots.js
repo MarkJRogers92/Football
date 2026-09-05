@@ -201,3 +201,96 @@ test('a failed autosave reports itself and leaves the dynasty playable',async()=
  await e.loadBrowser();
  assert.equal(e.universe.week,week,'a later manual save still lands');
 });
+
+// --- commit 4: tiered game-detail compaction --------------------------------
+
+function rollSeasons(e,n){
+ for(let s=0;s<n;s++){
+  const before=e.universe.year;
+  e.simSeason();e.simConferenceChampionships();e.simPlayoff();
+  for(let i=0;i<20&&e.universe.year===before;i++){
+   if(e.hasPendingCareerChoice()){const o=(e.universe.jobOffers||[])[0];if(o)e.acceptPost(o.schoolId)}
+   const ph=e.normalizeOffseasonState().phase;
+   if(ph==='spring')e.runSpringCamp();else if(ph==='fall')e.runFallCamp();
+   e.runOffseason();
+  }
+  if(e.universe.year===before)throw new Error(`season did not advance past ${before}`);
+ }
+}
+
+test('compaction never touches a game a player would go back and read',async()=>{
+ const e=await engine(4906);
+ rollSeasons(e,5);
+ const user=e.T('Chicago Metropolitan')?.name;
+ e.compactGameArchive();
+ for(const g of e.universe.gameArchive){
+  if(!g.compacted)continue;
+  assert.equal(g.label==='Regular season'||!g.label,true,`compacted a ${g.label}`);
+  assert.notEqual(g.home.name,user,'compacted a controlled-team game');
+  assert.notEqual(g.away.name,user,'compacted a controlled-team game');
+  assert.equal((g.drives||[]).length,0,'compacted a game that carries drive detail');
+  assert.ok((g.season??0)<=e.universe.year-e.GAME_DETAIL_HORIZON,'compacted a game inside the horizon');
+ }
+});
+
+test('a compacted game keeps its score, team box, injuries and leaders',async()=>{
+ const e=await engine(4907);
+ rollSeasons(e,5);
+ const target=e.universe.gameArchive.find(g=>!e.gameIsProtected(g,e.T('Chicago Metropolitan')?.name)&&(g.season??0)<=e.universe.year-e.GAME_DETAIL_HORIZON);
+ assert.ok(target,'a compactable game exists');
+ const before={id:target.id,score:JSON.stringify(target.score),team:JSON.stringify(target.teamStats),
+  injuries:JSON.stringify(target.injuries||[]),lines:target.playerStats.home.length+target.playerStats.away.length};
+ e.compactGameArchive();
+ assert.ok(target.compacted,'it was compacted');
+ assert.equal(target.id,before.id,'the id never changes, so no link breaks');
+ assert.equal(JSON.stringify(target.score),before.score);
+ assert.equal(JSON.stringify(target.teamStats),before.team,'the team box is permanent');
+ assert.equal(JSON.stringify(target.injuries||[]),before.injuries,'injuries are permanent');
+ const kept=[...target.playerStats.home,...target.playerStats.away];
+ assert.ok(kept.length<before.lines,'the long tail is gone');
+ assert.ok(kept.length>0,'but leaders remain');
+ // Everyone kept must have earned it: a score, a turnover, or a yardage lead.
+ for(const p of kept){
+  const st=p.stats||{};
+  const scored=st.passTD||st.rushTD||st.recTD||st.int||st.fgMade;
+  const leads=['passYds','rushYds','recYds'].some(k=>(st[k]||0)>0);
+  assert.ok(scored||leads,`${p.name} was kept with nothing to show for it`);
+ }
+});
+
+test('a compacted game still opens to Summary and Box Score, and says it was compacted',async()=>{
+ const e=await engine(4908);
+ rollSeasons(e,5);
+ e.compactGameArchive();
+ const g=e.universe.gameArchive.find(x=>x.compacted);
+ assert.ok(g,'something was compacted');
+ const box=e.gameBoxHTML(g);
+ assert.match(box,/Team statistics/,'the box score still renders');
+ assert.match(box,/compacted/i,'and discloses it, so a short list does not read as a quiet night');
+ assert.doesNotThrow(()=>e.gameSummaryHTML(g));
+});
+
+test('compaction is idempotent and recorded in a bounded manifest',async()=>{
+ const e=await engine(4909);
+ rollSeasons(e,5);
+ const first=e.compactGameArchive();
+ assert.ok(first.games>0,'the first pass did work');
+ const second=e.compactGameArchive();
+ assert.equal(second.games,0,'a second pass finds nothing left to do');
+ assert.equal(e.universe.compactionManifest.length,1,'and records nothing new');
+ const m=e.universe.compactionManifest[0];
+ assert.equal(m.games,first.games);
+ assert.equal(m.dropped,first.dropped);
+});
+
+test('compaction measurably shrinks the archive without losing a single game',async()=>{
+ const e=await engine(4910);
+ rollSeasons(e,5);
+ const size=o=>Buffer.byteLength(JSON.stringify(o));
+ const ids=e.universe.gameArchive.map(g=>g.id);
+ const before=size(e.universe.gameArchive);
+ e.compactGameArchive();
+ const after=size(e.universe.gameArchive);
+ assert.deepEqual(e.universe.gameArchive.map(g=>g.id),ids,'every game is still present, in order');
+ assert.ok(after<before*0.85,`expected a real saving, got ${(100*(before-after)/before).toFixed(1)}%`);
+});
