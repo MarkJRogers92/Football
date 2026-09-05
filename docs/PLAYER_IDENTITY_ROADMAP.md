@@ -19,7 +19,7 @@ Scouted descriptions must respect uncertainty instead of exposing hidden ability
 ## Batches and acceptance criteria
 
 0. Roadmap and durable handoff — complete in the first documentation commit.
-1. QB rushing allocation — first implementation batch. Read the actual QB style
+1. QB rushing allocation — implemented. Read the actual QB style
    and mobility, with scheme affecting usage. Test all seven schemes, equal-rating
    style comparisons, mobility changes and team/player total conservation. This
    fixes allocation only; designed runs and scrambles in Watch remain batch 4.

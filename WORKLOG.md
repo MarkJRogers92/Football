@@ -1,5 +1,17 @@
 # WORKLOG
 
+## Player identity batch 1 — QB quick-sim rushing allocation
+
+The old allocation inspected whether the scheme's list contained the words
+Run-First, so every quarterback in that scheme received the same rushing share.
+The replacement combines the active quarterback's style, speed and versatility
+with a bounded scheme adjustment. Team rushing volume is unchanged; the fix only
+assigns that existing production more honestly. Watch Mode still needs structured
+play attribution before its narration can credit actual QB runs and scrambles.
+
+Focused validation: 6 player-identity and games tests passed. No long simulation
+or full suite was run for this source checkpoint.
+
 ## v0.9.39 — Game-completion consistency
 
 First built and ran the focused games suite for the existing quick-sim

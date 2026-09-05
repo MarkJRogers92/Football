@@ -5,8 +5,12 @@ Read [the all-position roadmap](docs/PLAYER_IDENTITY_ROADMAP.md) first.
 User requested small committed/pushed batches for easy Claude/chat takeover,
 covering every position, ratings, descriptions and actual statistical behavior.
 Production remains v0.9.39. These are source checkpoints, not a new release.
-Batch 0: roadmap saved. Batch 1: QB allocation fix is next. Remaining batches
+Batch 0: roadmap saved. Batch 1 now makes quick-sim QB rushing share depend on
+the actual QB style, speed and versatility plus scheme context. It does not yet
+change Watch play attribution. Remaining batches
 and acceptance criteria are in the roadmap; do not claim the full overhaul done.
+Focused validation: `node --test tests/playeridentity.js tests/games.js` passes
+all 6 tests, including both real game engines' existing reconciliation coverage.
 
 ## Previous production checkpoint
 

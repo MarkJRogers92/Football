@@ -81,7 +81,7 @@ globalThis.__ENGINE__ = {
   gameSim, detailedGame, simulateUserDetailed, gameBoxHTML, gameSummaryHTML, renderGameArchive, showGameCenter, simWeek, simSeason, simConferenceChampionships, simPlayoff, runOffseason,
   runSpringCamp, runFallCamp, advanceRecruiting, finalizeRecruiting,
   generateRecruitPool, generatePlayer, generateRoster, conditionRating,
-  roleFit, unit, starter, roleStarter, participants, eligibilityBase,
+  roleFit, unit, starter, roleStarter, participants, eligibilityBase, qbRushWeight,
   transferRisk, draftProjection, seasonScore, normalizeUniverse, recruitPitch, recruitCoachRelationshipBoost, ensureRecruitRelationships, assignPrimaryRecruiter, growRecruiterRelationship, coachTransferPressure,
   scoutingDefs, ensureScoutingIntel, scoutingDomainView, scoutingConfidenceLabel, refreshScoutingIntel, snapshotScouting, firstRecruitEvaluation, scoutingPanelHTML, scoutingHistoryHTML,
   ensurePortrait, portraitSeedFor, jerseyFor, schoolColors, ensureSchoolColors, PORTRAIT_VERSION,
