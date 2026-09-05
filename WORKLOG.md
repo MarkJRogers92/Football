@@ -1,5 +1,16 @@
 # WORKLOG
 
+## Player identity batch 5 — downstream recognition
+
+Season awards and draft production now value the usage the game actually models:
+QB rushing, RB receiving, broader defensive disruption, OL protection, kicker
+results and punter distance. This closes the contradiction where an archetype
+could affect Saturday production but that production was ignored by honors or
+pro evaluation.
+
+Focused tests hold overall constant and verify QB rushing, RB receiving and
+specialist results move their downstream scores in the intended direction.
+
 ## Strategy integrity batch 6 — actual Watch defenders
 
 Detailed plays now choose defenders from the same role, archetype and rating

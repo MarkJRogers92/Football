@@ -53,10 +53,11 @@ Scouted descriptions must respect uncertainty instead of exposing hidden ability
    drive accuracy, range and pressure attempts; P power/technique drive distance.
    Hang time, direction and returns remain explicitly untracked rather than being
    presented as decorative effects.
-7. UI, progression and downstream consumers — audit player/recruit cards,
+7. UI, progression and downstream consumers — core identity descriptions,
+   awards and draft evaluation implemented; continue to audit player/recruit cards,
    scouting prose/confidence, role fit, auto depth, scheme fit, position changes,
    training, awards, records, draft evaluation, recaps and career production.
-   QB awards must recognize rushing; RB evaluation must recognize receiving.
+   QB awards now recognize rushing; RB evaluation now recognizes receiving.
    Ensure stronger displayed ratings imply the described ability, while retaining
    meaningful scouting error. Explain scheme fit separately from overall ability.
 8. Release validation — paired seeded isolated games for each position/style,

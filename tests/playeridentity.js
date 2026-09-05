@@ -60,6 +60,15 @@ test('specialist ratings drive the outcomes the game records',()=>{
  assert.match(punt,/Hang time and direction are not tracked/);
 });
 
+test('awards and draft production value the position usage they model',()=>{
+ const e=loadEngine({seed:944}),team={w:8,offScheme:'Multiple',defScheme:'Balanced Front'},zero={passYds:0,passTD:0,int:0,passAtt:0,passComp:0,rushYds:0,rushTD:0,fumbles:0,receptions:0,recYds:0,recTD:0,fgMade:0,fgAtt:0},base={perceived:80,trueNow:80,speed:80,power:80,technique:80,iq:80,composure:80,durability:80,versatility:80,stats:zero,career:{}};
+ assert.ok(e.seasonScore({...base,pos:'QB',stats:{...zero,rushYds:700,rushTD:9}},team)>e.seasonScore({...base,pos:'QB'},team)+25,'QB awards include rushing production');
+ assert.ok(e.seasonScore({...base,pos:'RB',stats:{...zero,recYds:700,recTD:7,receptions:55}},team)>e.seasonScore({...base,pos:'RB'},team)+20,'RB awards include receiving production');
+ assert.ok(e.productionRating({...base,pos:'QB',career:{rushYds:1600,rushTD:20}})>e.productionRating({...base,pos:'QB',career:{}})+10,'QB draft production includes rushing');
+ assert.ok(e.productionRating({...base,pos:'RB',career:{recYds:1500,recTD:12}})>e.productionRating({...base,pos:'RB',career:{}})+8,'RB draft production includes receiving');
+ assert.ok(e.seasonScore({...base,pos:'K',stats:{...zero,fgMade:20,fgAtt:22}},team)>e.seasonScore({...base,pos:'K',stats:{...zero,fgMade:12,fgAtt:22}},team),'specialist recognition rewards recorded results');
+});
+
 async function optionGame(style){
  const e=loadEngine({seed:941});await e.loadSchools();
  e.setUserTeam('Chicago Metropolitan');e.initUniverse();

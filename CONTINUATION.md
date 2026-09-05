@@ -47,6 +47,11 @@ name the defender responsible for pressures, sacks, tackles/TFLs, interceptions
 and breakups, then credit that same player directly. The detailed box no longer
 redistributes defense afterward. Existing drive strings carry the names, so save
 shape is unchanged; focused game persistence and attribution checks pass.
+
+Player identity batch 5 aligns awards and draft production with modeled roles:
+QB rushing, RB receiving, expanded disruption/coverage, OL protection, kicking
+and punting now count. Controlled score tests pass. This changes evaluation only,
+not stored history or previously awarded honors.
 User requested small committed/pushed batches for easy Claude/chat takeover,
 covering every position, ratings, descriptions and actual statistical behavior.
 Production remains v0.9.39. These are source checkpoints, not a new release.

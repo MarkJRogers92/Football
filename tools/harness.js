@@ -82,7 +82,7 @@ globalThis.__ENGINE__ = {
   runSpringCamp, runFallCamp, advanceRecruiting, finalizeRecruiting,
   generateRecruitPool, generatePlayer, generateRoster, conditionRating,
   roleFit, unit, starter, roleStarter, participants, eligibilityBase, qbRushWeight, playerUsageWeight, STYLE_USAGE, defensiveShares, defensiveActor, fieldGoalChance, quickFieldGoals, puntAverage,
-  transferRisk, draftProjection, seasonScore, normalizeUniverse, recruitPitch, recruitPitchBreakdown, recruitSchemeFit, recruitSchemePriority, recruitCoachRelationshipBoost, ensureRecruitRelationships, assignPrimaryRecruiter, growRecruiterRelationship, coachTransferPressure,
+  transferRisk, draftProjection, seasonScore, productionRating, normalizeUniverse, recruitPitch, recruitPitchBreakdown, recruitSchemeFit, recruitSchemePriority, recruitCoachRelationshipBoost, ensureRecruitRelationships, assignPrimaryRecruiter, growRecruiterRelationship, coachTransferPressure,
   scoutingDefs, scoutingTruth, ensureScoutingIntel, scoutingDomainView, scoutingConfidenceLabel, refreshScoutingIntel, snapshotScouting, firstRecruitEvaluation, scoutingPanelHTML, scoutingHistoryHTML, hasPlayerTraits, playerTraitFields, inheritRecruitTraits,
   ensurePortrait, portraitSeedFor, jerseyFor, schoolColors, ensureSchoolColors, PORTRAIT_VERSION,
   APP_VERSION,

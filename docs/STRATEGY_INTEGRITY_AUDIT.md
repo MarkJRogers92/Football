@@ -36,7 +36,7 @@ replace the matchup. The desired chain is:
 | Injuries, availability and wear | Functional | Remove or weaken players used by role and unit calculations. | The matchup UI does not explain the resulting personnel edge well. |
 | Morale | Context-specific | Drives transfer risk and some player-management systems. | It does not affect game performance; any performance implication would be decorative. |
 | Staff | Functional/partial | Play-calling affects team profiles and detailed plays; development/evaluation/recruiting ratings affect their named systems. | Generated specialty text mostly describes rating shape rather than adding a distinct tactical effect. |
-| Individual statistics | Functional downstream | Drive awards, records, career history and draft production components; detailed-game offense and defense now come from the named play actors. | They do not yet inform opponent tendencies, gameplan recommendations or adaptive defensive choices. |
+| Individual statistics | Functional downstream | Drive awards, records, career history and draft production components; QB rushing, RB receiving, OL, defense and specialists feed evaluation, and detailed-game stats come from named actors. | They do not yet inform opponent tendencies or adaptive defensive choices. |
 | Home field | Functional | Fan support creates a bounded score bonus and neutral games suppress it. | It is omitted from the pregame matchup explanation. |
 | Watch Mode attribution | Functional for modeled events | Each play directly credits its passer, runner, target and relevant defender from shared role/archetype weights; scoring type follows the scoring play. | Exact clock, field coordinates, return plays and assists remain untracked and are not invented. |
 
