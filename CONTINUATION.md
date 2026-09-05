@@ -20,6 +20,11 @@ Strategy integrity batch 3 adds shared current-profile matchup edges and renders
 them in Game Lab after the active gameplan is applied. Staff recommendations now
 use personnel edges plus opponent tendency, and the reversed defensive outcome
 test was corrected. Focused gameplan validation passes all 9 tests.
+
+Strategy integrity batch 4 makes Watch offensive attribution real. Each play
+selects its runner/target from shared role and archetype usage, credits that exact
+player, and derives touchdown type from the scoring play. No new archive field
+was added. Eleven focused game/Game Lab/identity checks pass.
 User requested small committed/pushed batches for easy Claude/chat takeover,
 covering every position, ratings, descriptions and actual statistical behavior.
 Production remains v0.9.39. These are source checkpoints, not a new release.

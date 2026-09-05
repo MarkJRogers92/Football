@@ -122,7 +122,7 @@ causal checks pass and only when a season-level question requires it.
 2. Add shared matchup edges for pass protection/rush, run game/front and targets/coverage. **Implemented.**
 3. Render those edges plus gameplan adjustments and replace the shallow recommendation. **Implemented.**
 4. Correct the gameplan outcome test and add paired directional tests. **Implemented for the current gameplan layer.**
-5. Convert detailed play attribution in a separate storage-measured batch.
+5. Convert detailed play attribution in a separate storage-measured batch. **Implemented for offensive actors.** Existing drive text stores the names, so no new archive field or save growth was required.
 
 Production remains v0.9.39. Each batch should be committed and pushed separately;
 run one full validation only when the combined milestone is ready for preview.

@@ -13,13 +13,15 @@ test('permanent boxes match actual player deltas, snapshot identity and retain d
  // work (v0.9.29-32) on top of this branch's v0.9.21-28 — a RNG-sequence-dependent number, not
  // an invariant. What actually matters, and still holds: drive scoring reconciles to the final
  // score, which the next line checks.
- assert.equal(g.drives.length,23);assert.equal(g.drives.reduce((n,d)=>n+d.points,0)+g.scoreAdjustment.home+g.scoreAdjustment.away,g.score.home+g.score.away);
+ assert.ok(g.drives.length>=18&&g.drives.length<=30,`dynamic drive count ${g.drives.length} stays in bounds`);assert.equal(g.drives.reduce((n,d)=>n+d.points,0)+g.scoreAdjustment.home+g.scoreAdjustment.away,g.score.home+g.score.away);
+ for(const d of g.drives){const credited=g.playerStats[d.side];for(const line of d.playByPlay||[]){let m=line.match(/^.+? to (.+?) for -?\d+\.$/)||line.match(/^.+? incomplete for (.+?)\.$/)||line.match(/^.+? intercepted targeting (.+?) near/);if(m)assert.ok(credited.some(x=>x.name===m[1]&&(x.stats.targets||0)>0),`${m[1]} owns a target credited by the play log`);m=line.match(/^(.+?) (?:keeps|runs) for -?\d+\.$/);if(m)assert.ok(credited.some(x=>x.name===m[1]&&(x.stats.rushAtt||0)>0),`${m[1]} owns a carry credited by the play log`)}}
  assert.equal(g.plays,undefined,'full play logs are not duplicated into permanent archive');
  const frozen=JSON.stringify(g);e.simWeek();assert.equal(u.gameArchive.length,60,'detailed game is not simulated twice');assert.equal(new Set(u.gameArchive.map(x=>x.id)).size,60);
  for(const game of u.gameArchive){for(const side of ['away','home']){
   const b=game.teamStats[side],players=game.playerStats[side];
   for(const key of ['passAtt','passComp','passYds','passTD','int','rushAtt','rushYds','rushTD','fgMade','fgAtt','punts'])assert.equal(players.reduce((n,p)=>n+(p.stats[key]||0),0),b[key]||0,`${side} ${key}`);
   assert.equal(players.reduce((n,p)=>n+(p.stats.receptions||0),0),b.passComp);
+  assert.equal(players.reduce((n,p)=>n+(p.stats.targets||0),0),b.passAtt);
   assert.equal(players.reduce((n,p)=>n+(p.stats.recYds||0),0),b.passYds);
   assert.equal(game.score[side],(b.passTD+b.rushTD)*7+b.fgMade*3+game.scoreAdjustment[side]);
  }}

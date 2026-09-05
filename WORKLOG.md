@@ -1,5 +1,20 @@
 # WORKLOG
 
+## Strategy integrity batch 4 — actual Watch participants
+
+Detailed games now choose each runner and target from the same role/archetype
+usage shares used by quick simulation. QB keepers therefore occur according to
+QB style, mobility and scheme. Passing outcomes also read the selected target's
+technique. The play updates that passer, runner or receiver directly, and the
+box consumes those exact lines instead of redistributing offense afterward.
+Touchdown type and player credit come from the scoring play.
+
+No structured play payload was added to permanent saves; existing drive text is
+retained, so this batch adds no new archive field. Eleven focused game, Game Lab
+and identity tests pass. They verify dynamic drive bounds, team/player totals,
+targets/completions, and that every named runner or target has the corresponding
+credited opportunity.
+
 ## Strategy integrity batch 3 — shared matchup decisions
 
 Added a shared matchup evaluator over the current game profiles: passing versus
