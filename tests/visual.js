@@ -16,15 +16,22 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);
   await page.waitForSelector('#broadcastFeature .broadcast-feature-main');
   await page.waitForSelector('.topbar-team-logo.coverage-real-logo');
+  await page.waitForSelector('#teamMeta .conference-crest');
   check(`[${label}] dashboard broadcast desk renders`,(await page.locator('#broadcastFeature').innerText()).length>30);
   check(`[${label}] app header uses real atlas logo instead of initials`,await page.locator('.topbar-team-logo.coverage-real-logo').count()===1);
+  check(`[${label}] program masthead carries its conference crest`,await page.locator('#teamMeta .conference-crest[data-conference="Great Lakes"]').count()===1);
   check(`[${label}] Top 15 keeps one real logo per ranked team`,await page.locator('#top15 .team-logo').count()===15&&await page.locator('#top15 .sports-mark').count()===0);
   await goTab(page, 'gamelab');await page.waitForSelector('#nextGameCard .matchup-shell');
   await page.waitForFunction(()=>document.querySelectorAll('#nextGameCard .matchup-team .sports-mark.coverage-real-logo').length===2);
   check(`[${label}] Game Lab matchup card renders`,await page.locator('#nextGameCard .sports-mark').count()===2);
   check(`[${label}] Game Lab replaces both initials badges with real logos`,await page.locator('#nextGameCard .matchup-team .sports-mark.coverage-real-logo').count()===2);
+  check(`[${label}] Game Lab presents ranks, records and matchup intelligence`,await page.locator('#nextGameCard .gameday-rank').count()===2&&await page.locator('#nextGameCard .gameday-intel>div').count()===3&&await page.locator('#nextGameCard .gameday-recommendation').count()===1);
+  check(`[${label}] Game Lab carries real conference identity`,await page.locator('#nextGameCard .conference-crest').count()>=1);
   const markText=await page.locator('#nextGameCard .matchup-team .sports-mark').allTextContents();
   check(`[${label}] Game Lab no longer exposes CH/PH-style initials`,markText.every(x=>x.trim()===''),markText.join(' | '));
+  if(label==='iphone'){const gameLabOverflow=await page.$eval('#nextGameCard',el=>el.scrollWidth-el.clientWidth);check(`[${label}] game-day card has no horizontal overflow`,gameLabOverflow<=1,`${gameLabOverflow}px`)}
+  await goTab(page, 'season');await page.waitForSelector('#season .conference-banner');
+  check(`[${label}] Season standings have the selected conference identity`,await page.locator('#season .conference-banner[data-conference-brand="Great Lakes"] .conference-crest').count()===1);
   await goTab(page, 'roster');await page.click('#rosterBody .player-button');await page.waitForSelector('#playerDialog[open] .player-hero-rail');
   check(`[${label}] player profile becomes hero card`,await page.locator('#playerDialog .player-hero-rating').count()===3);
   check(`[${label}] player hero keeps portrait`,await page.locator('#playerDialogPortrait canvas').count()===1);
