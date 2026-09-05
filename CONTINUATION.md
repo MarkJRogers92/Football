@@ -11,6 +11,10 @@ seven hidden position traits their
 domains evaluate, those exact traits follow them onto the roster, and legacy
 recruits retain the prior fallback with an honest UI label. Fresh-save growth is
 259,835 bytes (+1.56%) for 2,800 recruits. Focused scouting validation passes.
+
+Strategy integrity batch 2 replaces the decorative Scheme Fit recruiting bonus.
+The recruit's real traits now determine fit with the school's actual offensive
+or defensive scheme; the visible pitch breakdown consumes that same value.
 User requested small committed/pushed batches for easy Claude/chat takeover,
 covering every position, ratings, descriptions and actual statistical behavior.
 Production remains v0.9.39. These are source checkpoints, not a new release.

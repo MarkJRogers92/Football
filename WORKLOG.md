@@ -13,6 +13,14 @@ A seeded fresh save with 2,800 recruits grew from 16,606,083 to 16,865,918 bytes
 an increase of 259,835 bytes (1.56%). Focused scouting checks cover real-domain
 truth, portable persistence, signing continuity and legacy compatibility.
 
+## Strategy integrity batch 2 — real scheme-fit recruiting priority
+
+The Scheme Fit preference previously awarded a fixed bonus based only on whether
+the school ran Multiple. It now evaluates the recruit's persistent position
+traits against the offered offensive or defensive scheme and can reward a strong
+fit or penalize a poor one. The profile's pitch breakdown uses the same helper as
+the recruiting engine, so the displayed reason and actual decision cannot drift.
+
 ## Player identity batch 1 — QB quick-sim rushing allocation
 
 The old allocation inspected whether the scheme's list contained the words

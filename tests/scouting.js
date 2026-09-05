@@ -46,3 +46,14 @@ test('legacy recruits remain loadable and are labeled honestly',async()=>{
  assert.doesNotThrow(()=>e.scoutingDomainView(r,t,true));
  assert.match(e.scoutingPanelHTML(r,t,true),/Legacy evaluation/);
 });
+
+test('scheme-fit recruits react to their actual traits and the offered scheme',async()=>{
+ const {e,u,t}=await setup(1605),r=u.recruits.find(x=>x.pos==='RB');
+ Object.assign(r,{priority:'Scheme Fit',speed:95,versatility:94,iq:91,power:42,technique:44,durability:46});
+ t.offScheme='Option Motion';const optionFit=e.recruitSchemeFit(t,r),optionPriority=e.recruitSchemePriority(t,r);
+ t.offScheme='Ground Pressure';const groundFit=e.recruitSchemeFit(t,r),groundPriority=e.recruitSchemePriority(t,r);
+ assert.ok(optionFit>groundFit+35,`${optionFit} option fit vs ${groundFit} ground fit`);
+ assert.ok(optionPriority>groundPriority,'the recruiting preference follows the same fit');
+ const shown=e.recruitPitchBreakdown(t,r).find(x=>x[0]==='Scheme Fit priority');
+ assert.equal(shown[1],groundPriority,'the visible pitch breakdown matches the recruiting engine');
+});
