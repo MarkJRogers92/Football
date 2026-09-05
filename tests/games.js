@@ -52,3 +52,20 @@ test('regular season, championships, rollover and portable history preserve game
  e.simWeek();assert.equal(e.universe.gameArchive.length,expected+60);assert.equal(new Set(e.universe.gameArchive.map(g=>g.id)).size,expected+60);
  console.log('Game archive bytes/season:',Buffer.byteLength(JSON.stringify(save.gameArchive)));
 });
+
+
+test('quick sim home-field bonus scales with fan support and vanishes on neutral sites',()=>{
+ const e=loadEngine({seed:924}),low={fan_support:30},high={fan_support:95},samples=12000;
+ const lowExpected=e.homeFieldFor(low),highExpected=e.homeFieldFor(high);
+ assert.ok(Math.abs(lowExpected-1.3)<1e-9);assert.ok(Math.abs(highExpected-3.25)<1e-9);
+ let lowTotal=0,highTotal=0;
+ for(let i=0;i<samples;i++)lowTotal+=e.homeFieldScoreBonus(low,false);
+ for(let i=0;i<samples;i++)highTotal+=e.homeFieldScoreBonus(high,false);
+ const lowMean=lowTotal/samples,highMean=highTotal/samples;
+ assert.ok(Math.abs(lowMean-lowExpected)<.08,`low-support mean ${lowMean} vs expected ${lowExpected}`);
+ assert.ok(Math.abs(highMean-highExpected)<.08,`high-support mean ${highMean} vs expected ${highExpected}`);
+ assert.ok(highMean>lowMean+1.7,`high-support edge ${highMean} should materially exceed low-support edge ${lowMean}`);
+ for(let i=0;i<100;i++)assert.equal(e.homeFieldScoreBonus(high,true),0,'neutral sites receive no home-field bonus');
+ const source=require('node:fs').readFileSync(require('node:path').join(__dirname,'..','app.js'),'utf8');
+ assert.ok(source.includes('let hp=hs.pts+homeFieldScoreBonus(home,neutral),ap=as.pts;'),'quick sim must consume the dynamic home-field helper');
+});
