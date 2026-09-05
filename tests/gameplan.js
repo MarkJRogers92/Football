@@ -46,6 +46,28 @@ test('applyGameplanEdge scales with prep tier and stays within profile bounds',a
  assert.equal(e.applyGameplanEdge(null,'scout'),null,'tolerates no profile');
 });
 
+test('matchup edges and the Game Lab use the profiles adjusted for the active plan',async()=>{
+ const e=await setup(3108),u=e.universe,me=e.T('Chicago Metropolitan');
+ const g=u.schedule[0].find(x=>x.home===me.name||x.away===me.name),opp=e.T(g.home===me.name?g.away:g.home);
+ const standard=e.gameMatchup(me,opp);
+ me.gameplan={year:u.year,week:u.week,opponent:opp.name,prep:'stop_run'};
+ const planned=e.gameMatchup(me,opp);
+ assert.ok(planned.opponentEdges.runGame<standard.opponentEdges.runGame,'the stop-run plan reduces the displayed opponent run edge');
+ assert.ok(planned.opponentEdges.passGame>standard.opponentEdges.passGame,'and exposes the stated coverage tradeoff');
+ e.renderMatchupStrategy();
+ assert.match(e.$el('#nextGameCard').innerHTML,/Active plan:<\/strong> Stop the run/);
+ assert.match(e.$el('#keyMatchups').innerHTML,/Your pass protection vs their rush/);
+});
+
+test('staff recommendation uses personnel matchup as well as scheme tendency',async()=>{
+ const e=await setup(3109),u=e.universe,me=e.T('Chicago Metropolitan'),opp=u.teams.find(t=>t!==me);
+ opp.offScheme='Vertical Strike';
+ let model=e.gameMatchup(me,opp);model.opponentEdges.passProtection=-10;
+ assert.equal(e.gameplanRecommendation(me,opp,model).id,'pressure','attack a vulnerable protection unit');
+ model={...model,opponentEdges:{...model.opponentEdges,passProtection:8}};
+ assert.equal(e.gameplanRecommendation(me,opp,model).id,'protect_pass','respect the same pass scheme when protection is sound');
+});
+
 test('scouting costs extra scheme familiarity only while a program is mid-installation',async()=>{
  const e=await setup(3104),u=e.universe,me=e.T('Chicago Metropolitan');
  me.schemeTransition={off:{to:me.offScheme,from:'Pro Style',familiarity:40},def:null};
@@ -116,5 +138,5 @@ test('the edge actually reaches gameSim: a fully-scouted defense concedes fewer 
   const r2=e.gameSim(a,b,true);without+=r2.ap;
  }
  // A noisy sim over 30 draws; assert the direction, not an exact number.
- assert.ok(withPrep/n>=without/n-1,'scouting should not make the prepared team worse on average');
+ assert.ok(withPrep/n<=without/n+1,'scouting should not make the prepared defense concede more on average');
 });

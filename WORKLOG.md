@@ -1,5 +1,18 @@
 # WORKLOG
 
+## Strategy integrity batch 3 — shared matchup decisions
+
+Added a shared matchup evaluator over the current game profiles: passing versus
+coverage, run game versus front, and pass protection versus rush for both teams.
+The Game Lab now shows those numeric edges after health, wear, scheme, staff and
+the active gameplan are applied. It also exposes expected opponent pass mix,
+home-field context and unavailable-player counts.
+
+The staff recommendation now combines scheme tendency with personnel edges; for
+example, it recommends pressure against a pass-heavy offense only when protection
+is vulnerable. Corrected the existing outcome test's reversed inequality. Nine
+focused gameplan checks pass, including displayed gameplan tradeoffs.
+
 ## Strategy integrity batch 1 — persistent recruit truth
 
 Recruit position-domain scouting previously evaluated deterministic variations

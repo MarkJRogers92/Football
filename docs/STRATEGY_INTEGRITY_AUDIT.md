@@ -119,9 +119,9 @@ causal checks pass and only when a season-level question requires it.
    16,606,083 to 16,865,918 bytes: +259,835 bytes (+1.56%).
    Scheme Fit recruiting priority now also reads those actual traits against the
    offered offensive or defensive scheme instead of awarding a fixed label bonus.
-2. Add shared matchup edges for pass protection/rush, run game/front and targets/coverage.
-3. Render those edges plus gameplan adjustments and replace the shallow recommendation.
-4. Correct the gameplan outcome test and add paired directional tests.
+2. Add shared matchup edges for pass protection/rush, run game/front and targets/coverage. **Implemented.**
+3. Render those edges plus gameplan adjustments and replace the shallow recommendation. **Implemented.**
+4. Correct the gameplan outcome test and add paired directional tests. **Implemented for the current gameplan layer.**
 5. Convert detailed play attribution in a separate storage-measured batch.
 
 Production remains v0.9.39. Each batch should be committed and pushed separately;
