@@ -22,10 +22,10 @@ const TEAM_ID_BY_NAME=new Map(TEAM_NAMES.map((name,index)=>[name,index+1]));
 const TEAM_NAMES_LONGEST=[...TEAM_NAMES].sort((a,b)=>b.length-a.length);
 
 function idsInText(value){
- const text=String(value||'');
- const ids=[];
- for(const name of TEAM_NAMES_LONGEST)if(text.includes(name))ids.push(TEAM_ID_BY_NAME.get(name));
- return [...new Set(ids)];
+ const text=String(value||''),hits=[];
+ for(const name of TEAM_NAMES_LONGEST){const at=text.indexOf(name);if(at>=0)hits.push({id:TEAM_ID_BY_NAME.get(name),at})}
+ hits.sort((a,b)=>a.at-b.at);
+ return [...new Set(hits.map(x=>x.id))];
 }
 function idForExactName(value){return TEAM_ID_BY_NAME.get(String(value||'').trim())||null}
 function selectedTeamId(){
@@ -86,6 +86,9 @@ function ensureStyles(){
 .coverage-inline-team-logo{display:inline-block;flex:0 0 auto;margin-right:6px;vertical-align:-4px;border-radius:4px;background-color:transparent!important}
 .battle-school .coverage-inline-team-logo{margin-right:4px;vertical-align:-5px}
 .historyrow .coverage-inline-team-logo,.lineitem .coverage-inline-team-logo,.award-card .coverage-inline-team-logo,.leader-row .coverage-inline-team-logo{margin-right:6px}
+.coverage-pair-team-logos{display:inline-flex;align-items:center;gap:4px;margin-right:7px;vertical-align:middle}
+.coverage-pair-team-logos .coverage-real-logo{display:inline-block;flex:0 0 auto;border-radius:4px}
+#detailedBox .coverage-pair-team-logos,#newsletterBody h3 .coverage-pair-team-logos{vertical-align:-4px}
 `;
  document.head.appendChild(style);
 }
@@ -141,6 +144,17 @@ function decorateSingleTeam(el,size=18){
  existing?.remove();
  el.prepend(createLogo(id,size));
 }
+function decorateTeamPair(el,size=18){
+ if(!el)return;
+ const ids=idsInText(el.textContent).slice(0,2);
+ if(ids.length!==2)return;
+ const key=ids.join('-'),existing=el.querySelector(':scope > .coverage-pair-team-logos');
+ if(existing?.dataset.coveragePair===key)return;
+ existing?.remove();
+ const wrap=document.createElement('span');wrap.className='coverage-pair-team-logos';wrap.dataset.coveragePair=key;
+ for(const id of ids)wrap.append(createLogo(id,size,'coverage-pair-logo'));
+ el.prepend(wrap);
+}
 function patchInlineIdentity(){
  const targets=[
   ['#recruitBattleBoard .battle-school',16],
@@ -158,6 +172,14 @@ function patchInlineIdentity(){
   ['#coachDialogBody .timeline-row strong',18]
  ];
  for(const [selector,size] of targets)for(const el of document.querySelectorAll(selector))decorateSingleTeam(el,size);
+ const pairs=[
+  ['#detailedBox .sports-scoreline',24],
+  ['#detailedBox .big',24],
+  ['#newsletterBody .news-lead h3',20],
+  ['#newsletterBody .news-item .strong',18],
+  ['#gameHistoryList [data-game]',18]
+ ];
+ for(const [selector,size] of pairs)for(const el of document.querySelectorAll(selector))decorateTeamPair(el,size);
 }
 
 let queued=false;
