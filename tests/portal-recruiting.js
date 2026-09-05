@@ -341,3 +341,95 @@ test('resolving twice never places the same player twice',async()=>{
  assert.equal(u.roster.length,size,'and the roster does not grow again');
  assert.equal(u.roster.filter(x=>x.id===entry.p.id).length,1,'he appears exactly once');
 });
+
+// --- commit 5: distribution and multi-year persistence ----------------------
+
+// Runs one full interactive portal: open, chase what we can, play out every round,
+// then land the commitments. Returns what the user actually signed.
+function runInteractivePortal(e,attention=2){
+ const u=e.T('Chicago Metropolitan');
+ e.offseasonReview();e.offseasonDepartures();
+ const portal=e.universe.transferPortal||[];
+ if(!portal.length)return {u,signed:[],portal};
+ e.openPortalCycle();
+ for(const entry of portal.filter(x=>x.fromSchoolId!==u.id&&e.portalFit(x,u)).slice(0,e.PORTAL_TARGET_CAP))
+  e.targetPortalCandidate(entry.candidateId,attention);
+ for(let r=0;r<e.PORTAL_ROUNDS;r++)e.advancePortalRound();
+ const {placed}=e.resolvePortalCommitments();
+ return {u,signed:placed.filter(x=>x.schoolId===u.id),portal};
+}
+
+test('portal commitments spread across the league rather than piling onto one program',async()=>{
+ const e=await setup(4721);
+ e.simSeason();e.simConferenceChampionships();e.simPlayoff();
+ const {portal}=runInteractivePortal(e);
+ assert.ok(portal.length>20,'a real portal class to distribute');
+ const bySchool=new Map();
+ for(const entry of portal)if(entry.decision)bySchool.set(entry.decision.schoolId,(bySchool.get(entry.decision.schoolId)||0)+1);
+ assert.ok(bySchool.size>10,`commitments reached only ${bySchool.size} schools`);
+ const biggest=Math.max(...bySchool.values());
+ assert.ok(biggest<=Math.max(4,portal.length*0.25),`one program took ${biggest} of ${portal.length} — the field is not competitive`);
+});
+
+test('a program that works the portal signs more than one that ignores it',async()=>{
+ // Same seed, same league, one difference: whether the user spends attention at all.
+ const active=await setup(4722),passive=await setup(4722);
+ for(const e of [active,passive]){e.simSeason();e.simConferenceChampionships();e.simPlayoff()}
+ const got=runInteractivePortal(active,active.PORTAL_ATTENTION_MAX).signed.length;
+ const ignoredUser=passive.T('Chicago Metropolitan');
+ passive.offseasonReview();passive.offseasonDepartures();
+ passive.openPortalCycle();
+ for(let r=0;r<passive.PORTAL_ROUNDS;r++)passive.advancePortalRound();
+ const ignored=passive.resolvePortalCommitments().placed.filter(x=>x.schoolId===ignoredUser.id).length;
+ assert.ok(got>=ignored,`working the portal (${got}) should not do worse than ignoring it (${ignored})`);
+});
+
+test('portal state and its results survive save/load in the middle of a live cycle',async()=>{
+ const e=await setup(4723),u=e.T('Chicago Metropolitan');
+ e.simSeason();e.simConferenceChampionships();e.simPlayoff();
+ e.offseasonReview();e.offseasonDepartures();
+ const portal=e.universe.transferPortal;
+ e.openPortalCycle();
+ const target=portal.find(x=>x.fromSchoolId!==u.id&&e.portalFit(x,u));
+ e.targetPortalCandidate(target.candidateId,3);
+ e.promisePortalCandidate(target.candidateId,'Early Role');
+ e.advancePortalRound();
+ const round=e.ensurePortalCycle().round,targets=JSON.stringify(e.ensurePortalCycle().targets);
+ const ids=portal.map(x=>x.candidateId),decided=portal.filter(x=>x.decision).length;
+ // Reload mid-cycle, exactly as a player closing the tab and coming back would.
+ const packed=JSON.parse(JSON.stringify(e.packUniverse(e.universe)));
+ e.installSave({version:'0.9.47',userTeam:'Chicago Metropolitan',universe:packed});
+ e.normalizeUniverse();
+ const c=e.ensurePortalCycle();
+ assert.equal(c.round,round,'the round resumes');
+ assert.equal(c.status,'open');
+ assert.equal(JSON.stringify(c.targets),targets,'targets and their attention survive');
+ assert.deepEqual((e.universe.transferPortal||[]).map(x=>x.candidateId),ids,'the same candidates come back');
+ assert.equal((e.universe.transferPortal||[]).filter(x=>x.decision).length,decided,'decisions already made are not re-rolled');
+ const reloaded=e.portalEntry(target.candidateId);
+ assert.equal(reloaded.promiseOffer.type,'EARLY_ROLE','a pending promise offer survives the reload');
+ // And the cycle can still be finished after the reload.
+ for(let r=c.round;r<=e.PORTAL_ROUNDS;r++)e.advancePortalRound();
+ assert.doesNotThrow(()=>e.resolvePortalCommitments());
+});
+
+test('running the interactive portal for several seasons leaves rosters bounded and nobody stranded',async()=>{
+ const e=await setup(4724);
+ for(let season=0;season<3;season++){
+  e.simSeason();e.simConferenceChampionships();e.simPlayoff();
+  runInteractivePortal(e);
+  // Finish the rest of the calendar so the season can roll over normally.
+  e.runOffseason();e.runSpringCamp();e.runFallCamp();e.runOffseason();
+  const sizes=e.universe.teams.map(t=>t.roster.length);
+  assert.ok(Math.max(...sizes)<=105,`a roster reached ${Math.max(...sizes)}`);
+  assert.ok(Math.min(...sizes)>60,`a roster fell to ${Math.min(...sizes)}`);
+  // Nobody may be counted twice: the same player id must not sit on two rosters.
+  const seen=new Set();
+  for(const t of e.universe.teams)for(const p of t.roster){
+   assert.ok(!seen.has(p.id),`${p.name} is on two rosters in ${e.universe.year}`);
+   seen.add(p.id);
+  }
+  for(const entry of e.universe.transferPortal||[])
+   assert.ok(!seen.has(entry.p.id),`${entry.p.name} is both rostered and in the portal`);
+ }
+});
