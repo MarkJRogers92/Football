@@ -1,4 +1,8 @@
-# Dynasty Lab — player identity batches in progress
+# Dynasty Lab v0.9.40 — strategy integrity release candidate
+
+Validation is complete: v0.9.40 builds cleanly; 53 smoke checks, 164 Node groups
+and 164 desktop/iPhone browser checks pass. No extended calibration was run.
+Publish only to `preview/v0940/`; production remains v0.9.39 until review.
 
 Active source branch: `codex/player-identity-batches`, based on `ba26de1`.
 Read [the all-position roadmap](docs/PLAYER_IDENTITY_ROADMAP.md) first.
@@ -54,7 +58,8 @@ and punting now count. Controlled score tests pass. This changes evaluation only
 not stored history or previously awarded honors.
 User requested small committed/pushed batches for easy Claude/chat takeover,
 covering every position, ratings, descriptions and actual statistical behavior.
-Production remains v0.9.39. These are source checkpoints, not a new release.
+Production remains v0.9.39. v0.9.40 is for preview review only until the user
+explicitly approves promotion.
 Batch 0: roadmap saved. Batch 1 now makes quick-sim QB rushing share depend on
 the actual QB style, speed and versatility plus scheme context. It does not yet
 change Watch play attribution. Remaining batches

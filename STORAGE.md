@@ -1,5 +1,18 @@
 # Browser archive persistence (v0.8.1 continuation)
 
+## v0.9.40 strategy-integrity storage
+
+No IndexedDB schema change. Newly generated recruits now carry the same seven
+position traits already stored on roster players; these fields survive signing
+and portable export/import. A seeded fresh 2,800-recruit save grew from 16,606,083
+to 16,865,918 bytes: +259,835 bytes (+1.56%). Existing-cycle legacy recruits are
+not backfilled or silently rerolled.
+
+Shared matchup profiles, archetype assignment, specialist formulas and downstream
+evaluation are derived at runtime. Detailed play attribution stores added actor
+names only inside the existing drive play-by-play strings; no new game-archive
+field was added.
+
 ## v0.9.39 consistency fixes
 
 No new persisted fields or schema changes. Existing rivalry series lastYear

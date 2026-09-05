@@ -1,7 +1,7 @@
 # Strategy integrity audit
 
-Checkpoint: v0.9.39 plus player-identity commits through `2e4427f` on
-`codex/player-identity-batches`. This is a source audit, not a release claim.
+Checkpoint: validated v0.9.40 candidate on `codex/player-identity-batches`.
+Production remains v0.9.39 until explicit approval.
 
 ## Standard
 

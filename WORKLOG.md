@@ -1,5 +1,16 @@
 # WORKLOG
 
+## v0.9.40 — release validation
+
+Built the v0.9.40 standalone and ran one full validation pass after all small
+source checkpoints were pushed: 53 smoke checks, 157 existing Node groups plus
+7 player-identity groups (164 total), and 129 core + 14 visual + 21 recruiting
+browser checks (164 total), all passing. The browser pass covered desktop and
+iPhone layouts and reported no console errors or horizontal page overflow.
+
+The full suite, not a new 15-season calibration, was the only broad run. Production
+remains v0.9.39; the validated build is eligible for preview publication only.
+
 ## Player identity batch 5 — downstream recognition
 
 Season awards and draft production now value the usage the game actually models:

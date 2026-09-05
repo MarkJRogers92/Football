@@ -1,5 +1,36 @@
 # Changelog
 
+## v0.9.40 — Strategy integrity and player identity
+
+Recruit scouting now evaluates persistent position traits that survive signing,
+and Scheme Fit pitches use those real traits against the offered system. New
+players and recruits receive archetypes derived from their rating shape; profiles
+explain each label's actual rating emphasis and modeled usage. Existing saves are
+not relabeled or historical stats rewritten.
+
+Game Lab now presents the gameplan-adjusted pass, run and protection matchups used
+at kickoff, plus expected play mix, home field, unavailable players and a roster-
+aware staff recommendation. QB, skill, line, front and coverage traits feed those
+shared profiles, so position ratings affect success in both engines rather than
+only distributing stats afterward.
+
+Quick and detailed games share archetype-based opportunity. Detailed games now
+select and directly credit the actual passer, runner, target and defender on every
+modeled event; touchdown type follows the scoring play. Kicker traits drive field-
+goal accuracy/range/pressure and punter traits drive distance. Awards and draft
+evaluation now recognize QB rushing, RB receiving, line play, defensive disruption
+and specialist results.
+
+No IndexedDB schema change. Seven traits are additive on newly generated recruits;
+a fresh 2,800-recruit save grew 259,835 bytes (1.56%). Existing drive strings hold
+the added Watch names, so detailed attribution adds no new archive field. Hang
+time, directional punting, returns, exact clock/field coordinates and assists
+remain explicitly untracked.
+
+Validation: 53/53 engine smoke checks, 164/164 Node test groups including the
+new identity suite, and 164/164 desktop/iPhone browser checks. No long multi-
+season calibration was run beyond the standard smoke suite's existing coverage.
+
 ## v0.9.39 — Consistent rivalry and home-field consequences
 
 Watch and instant detailed games now settle rivalry results through the same
