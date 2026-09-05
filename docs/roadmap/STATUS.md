@@ -5,7 +5,7 @@ Last inspected source: `dc3c76c` (`0.9.44`)
 | Packet | Status | Active branch | Blocking decision |
 | --- | --- | --- | --- |
 | v0.9.45 stabilization | IN PROGRESS · commits 1-3 complete | `codex/v0945-stabilization` | Browser binary unavailable locally |
-| v0.9.46 offseason calendar | IMPLEMENTED · commits 1-5 complete | `codex/v0946-offseason-calendar` | Browser validation remains pending |
+| v0.9.46 offseason calendar | VALIDATED · commits 1-5 complete, browser suites now pass | `claude/review-improvement-dwjemy` (merged) | None — ready to release |
 | v0.9.47 transfer portal | READY | — | Tune rounds only after audit |
 | v0.9.48 schedules/rivalries | READY | — | None after v0.9.45 |
 | v0.9.49 saves/storage | READY | — | Set storage target after measurement |
@@ -20,10 +20,15 @@ slices, but the whole major version must not be attempted in one branch.
 
 ## Next action
 
-Run the complete Node regression command for `codex/v0946-offseason-calendar`,
-then begin `03-v0947-transfer-portal.md` from this local head if it passes.
-Keep browser validation recorded as pending. Do not push, publish, deploy, or
-merge.
+Browser validation is no longer pending — it ran on a Chromium-equipped
+environment and is recorded in `V0946_VALIDATION.md`, including one real
+mobile-layout bug it caught (live since v0.9.44) and the fix for it.
+`codex/v0946-offseason-calendar` is merged into
+`claude/review-improvement-dwjemy` and the full Node + browser suites pass on
+that head.
+
+Next: begin `03-v0947-transfer-portal.md`. v0.9.46 is releasable whenever the
+owner wants it published; it has not been published yet.
 
 ## Current validation checkpoint
 

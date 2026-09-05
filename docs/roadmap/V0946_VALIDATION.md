@@ -33,7 +33,33 @@ MB after twelve seasons, roughly 11.5 MB per additional season. That confirms
 the existing archive-growth concern and belongs to the measured v0.9.49 storage
 packet; it is not caused by duplicated v0.9.46 phase execution.
 
-## Remaining environmental check
+## Browser validation — RESOLVED
 
-Browser UI, visual and real IndexedDB suites still require Chromium. The local
-download timed out repeatedly, so no browser result is claimed here.
+Run on a environment with Chromium available, against the merged v0.9.46 head:
+
+- `tests/browser.js`: 113/113 pass (desktop + iPhone).
+- `tests/visual.js`: 35/35 pass (after the fix below; 34/35 before it).
+- `tests/recruit-visual.js`: 21/21 pass.
+
+### One real failure, found and fixed
+
+`[iphone] game-day card has no horizontal overflow — 10px`. This was not a
+test artifact and not caused by v0.9.46; it shipped live in v0.9.44.
+
+At `max-width:720px` the game-day board is laid out as
+`minmax(0,1fr) 54px minmax(0,1fr)` with only 8px of side padding, so its two
+`.matchup-team` cards already sit flush to the card edge. The entry animation
+(`matchup-in-left` / `matchup-in-right`) starts them at `translateX(±18px)`,
+which puts them outside the card before settling — clipped by
+`#nextGameCard`'s `overflow:hidden`, so on a phone the cards slid in from
+behind a hard cut edge, and `scrollWidth` exceeded `clientWidth` by 10px for
+the animation's duration.
+
+Fixed by entering vertically instead of horizontally at that breakpoint
+(`matchup-in-up`, `translateY(10px)`). The desktop horizontal slide is
+unchanged, since it has the room for it.
+
+This is the second bug of exactly this shape in this file's mobile rules
+(see the v0.9.41 `.scoreboard` cascade fix): narrow-width overrides in
+`sports-presentation.css` are worth checking against the animation and
+cascade rules around them, not just in isolation.
