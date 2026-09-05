@@ -25,6 +25,12 @@ Strategy integrity batch 4 makes Watch offensive attribution real. Each play
 selects its runner/target from shared role and archetype usage, credits that exact
 player, and derives touchdown type from the scoring play. No new archive field
 was added. Eleven focused game/Game Lab/identity checks pass.
+
+Player identity batch 3 connects every existing position archetype to three real
+rating emphases. New players and recruits receive a label derived from their
+generated traits, while scouting panels state both the emphasis and the modeled
+usage. Existing saves are not relabeled or rerolled. Focused identity/scouting
+checks pass; this source checkpoint does not change the save schema.
 User requested small committed/pushed batches for easy Claude/chat takeover,
 covering every position, ratings, descriptions and actual statistical behavior.
 Production remains v0.9.39. These are source checkpoints, not a new release.

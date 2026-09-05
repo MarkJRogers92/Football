@@ -3,6 +3,26 @@ const assert=require('node:assert/strict');
 const {loadEngine}=require('../tools/harness');
 
 const QB_STYLES=['Rhythm Distributor','Field Architect','Off-Script Creator','Vertical Hunter','Power Creator','Run-First Weapon','Toolsy Project','Backyard Magician'];
+const PLAYER_TRAITS=['speed','power','technique','iq','composure','durability','versatility'];
+
+test('every archetype is defined by real player traits',()=>{
+ const e=loadEngine({seed:939}),styles=Object.values(e.STYLES).flat();
+ assert.equal(new Set(styles).size,styles.length,'archetype labels remain unique');
+ for(const style of styles){
+  assert.equal(e.STYLE_TRAITS[style]?.length,3,`${style} has three rating emphases`);
+  assert.ok(e.STYLE_TRAITS[style].every(x=>PLAYER_TRAITS.includes(x)),`${style} uses modeled ratings`);
+ }
+});
+
+test('archetype assignment follows the generated rating shape',()=>{
+ const e=loadEngine({seed:940}),base={speed:40,power:40,technique:40,iq:40,composure:40,durability:40,versatility:40};
+ assert.equal(e.styleForTraits('RB',{...base,speed:99,technique:95,iq:90},0),'One-Cut Burner');
+ assert.equal(e.styleForTraits('RB',{...base,power:99,durability:95,technique:90},0),'Gap Hammer');
+ assert.equal(e.styleForTraits('EDGE',{...base,speed:99,technique:95,versatility:90},0),'Speed Bender');
+ const desc=e.styleDescription({pos:'RB',style:'Third-Down Weapon'});
+ assert.match(desc,/Archetype emphasis: technique, versatility, processing/);
+ assert.match(desc,/receiving opportunity/);
+});
 
 test('QB rushing opportunity follows the actual player identity and scheme',()=>{
  const e=loadEngine({seed:940});

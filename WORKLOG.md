@@ -1,5 +1,18 @@
 # WORKLOG
 
+## Player identity batch 3 — ratings-backed archetypes
+
+Every existing position archetype now declares three real rating emphases. New
+roster players and recruits receive the best-supported archetype for their
+generated rating shape, with small bounded variation so similar players are not
+forced into one label. Recruiting and player scouting panels explain both the
+archetype emphasis and the usage the engine actually models.
+
+Existing saves are deliberately not relabeled or rerolled. Their identities and
+history remain intact; the new assignment rule applies only when the game creates
+a new player or recruit. Focused tests cover all archetype definitions, controlled
+rating shapes and the visible usage explanation.
+
 ## Strategy integrity batch 4 — actual Watch participants
 
 Detailed games now choose each runner and target from the same role/archetype

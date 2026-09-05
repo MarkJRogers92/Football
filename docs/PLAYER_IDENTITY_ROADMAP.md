@@ -23,12 +23,11 @@ Scouted descriptions must respect uncertainty instead of exposing hidden ability
    and mobility, with scheme affecting usage. Test all seven schemes, equal-rating
    style comparisons, mobility changes and team/player total conservation. This
    fixes allocation only; designed runs and scrambles in Watch remain batch 4.
-2. Identity definitions and generation — central table for EVERY existing style
-   and position: intended attributes, tendencies, role compatibility, supported
-   descriptions and limitations. Generate correlated but varied attributes/style;
-   audit recruits, signings, development and position changes too. Do not silently
-   reroll existing players. Decide and document how existing labels become honest
-   without altering saved ratings or retroactively changing history.
+2. Identity definitions and generation — implemented for new players and recruits.
+   A central table covers EVERY existing style and position with three intended
+   rating emphases and supported usage prose. Generation assigns a correlated but
+   varied style from the actual traits. Existing saves are neither relabeled nor
+   rerolled; their identities and history remain intact.
 3. Offensive opportunities and efficiency — initial quick-sim allocation implemented
    for RB, WR, TE and OL; fuller QB
    behavior. Review stacked SLOT/3DRB/MOVETE usage and caps; receiving attributes

@@ -25,7 +25,7 @@ replace the matchup. The desired chain is:
 | Scheme fit | Partial | Core attribute averages affect team profiles; transition familiarity imposes a real penalty. | Only QB archetype gets an explicit style-fit bonus. Team fit is a broad average rather than package/on-field fit. |
 | Overall/current rating | Functional but blunt | `trueNow`, health and wear drive unit strength; unit strength drives most game probabilities. | A generic overall often matters more than the position-specific ratings the UI invites the player to study. |
 | Position ratings | Partial | They select role starters and distribute individual yards, tackles, sacks, interceptions and negative OL events. Detailed QB/RB/WR plays read a few attributes directly. | Many ratings rearrange the box score after team totals are generated instead of changing whether the team succeeds. |
-| Player archetype | Partial, improved on branch | New branch logic directs QB/RB/receiver/defender/OL statistical usage. | Generated ratings are still independent of the label; Watch Mode does not yet use the same actors/tendencies. |
+| Player archetype | Functional/partial, improved on branch | New talent receives a label derived from three real rating emphases; shared usage logic directs QB/RB/receiver/defender/OL production and Watch offensive actors. | Existing saves retain their prior labels, and some archetypes still describe only allocation rather than upstream team efficiency. |
 | Role depth chart | Functional/partial | Chooses the players used by unit ratings and individual stat allocation. Availability fallbacks work. | Overlapping roles can stack usage and packages/formations are not simulated explicitly. |
 | Weekly gameplan | Functional | Stop-run, protect-pass and pressure trade one component for another; full/balanced prep add smaller general edges and charge wear. | Recommendation reads only opponent scheme pass rate, ignoring roster strength, injuries, role matchups and observed production. Existing outcome test asserts the wrong defensive direction and is not a trustworthy balance gate. |
 | Matchup screen | Partial | Displays real raw unit/profile values. | It does not display gameplan-adjusted values, home field, likely play mix, numeric edges, opponent injuries, role mismatches or uncertainty. “Scheme fit” is team-wide, not opponent-specific. |
@@ -37,7 +37,7 @@ replace the matchup. The desired chain is:
 | Staff | Functional/partial | Play-calling affects team profiles and detailed plays; development/evaluation/recruiting ratings affect their named systems. | Generated specialty text mostly describes rating shape rather than adding a distinct tactical effect. |
 | Individual statistics | Functional downstream | Drive awards, records, career history and draft production components. | They do not inform opponent tendencies, gameplan recommendations or adaptive defensive choices. Detailed stats are still redistributed after narration. |
 | Home field | Functional | Fan support creates a bounded score bonus and neutral games suppress it. | It is omitted from the pregame matchup explanation. |
-| Watch Mode attribution | Disconnected | Team outcomes use matchup formulas, then individual stats are allocated. | Narration names one RB/WR while the box credits multiple players; QB runs and targets are not actual recorded play actors. |
+| Watch Mode attribution | Functional/partial | Each offensive play selects and directly credits its runner or target from shared role/archetype usage; touchdown type follows the scoring play. | Relevant defenders are not yet recorded per play, so defensive production is still allocated from team totals. |
 
 ## Critical code evidence
 
@@ -123,6 +123,9 @@ causal checks pass and only when a season-level question requires it.
 3. Render those edges plus gameplan adjustments and replace the shallow recommendation. **Implemented.**
 4. Correct the gameplan outcome test and add paired directional tests. **Implemented for the current gameplan layer.**
 5. Convert detailed play attribution in a separate storage-measured batch. **Implemented for offensive actors.** Existing drive text stores the names, so no new archive field or save growth was required.
+6. Correlate every generated archetype with its real rating shape and explain its
+   modeled emphasis/usage in scouting. **Implemented for new players and recruits.**
+   Existing saves retain their identities and history unchanged.
 
 Production remains v0.9.39. Each batch should be committed and pushed separately;
 run one full validation only when the combined milestone is ready for preview.

@@ -93,7 +93,7 @@ globalThis.__ENGINE__ = {
   teamStaffBudget, teamStaffSpend, candidateFitScore, generateCandidatePool, createOpening, interviewCandidate, candidateAcceptChance, extendOffer, hireCandidate, coachOpeningHubItems, COACH_SLOT_ROLES,
   captureRecruitment, transferFit, chooseTransferDestination, placeTransfer, familiarFaceItems, buildWeeklyHub, releasePlayerPromises, transferHistoryHTML, archivePlayerSeason,
   saveBrowser, loadBrowser, exportSave, importSave, installSave, ensureArchiveLoaded, archiveIsDeferred, ensureGamesLoaded, gamesAreDeferred,
-  POS, POS_COUNTS, ROLE_DEFS, OFF_SCHEMES, DEF_SCHEMES, GROWTH_CURVES, OFF_POS,
+  POS, POS_COUNTS, ROLE_DEFS, OFF_SCHEMES, DEF_SCHEMES, GROWTH_CURVES, OFF_POS, STYLES, STYLE_TRAITS, styleForTraits, styleDescription,
   render: () => {},
 };
 })();`;
