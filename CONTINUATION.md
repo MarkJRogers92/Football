@@ -2,6 +2,9 @@
 
 Active source branch: `codex/player-identity-batches`, based on `ba26de1`.
 Read [the all-position roadmap](docs/PLAYER_IDENTITY_ROADMAP.md) first.
+Then read [the strategy integrity audit](docs/STRATEGY_INTEGRITY_AUDIT.md), which
+maps game, stats, scouting and matchup surfaces to actual engine behavior and
+sets the repair order. Recruit scouting continuity is the first critical defect.
 User requested small committed/pushed batches for easy Claude/chat takeover,
 covering every position, ratings, descriptions and actual statistical behavior.
 Production remains v0.9.39. These are source checkpoints, not a new release.
