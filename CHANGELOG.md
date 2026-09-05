@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.9.47 — The interactive transfer portal
+
+Implements `docs/roadmap/03-v0947-transfer-portal.md` in the five commits the packet specifies. Transfers were already simulated; this makes them something the controlled program competes for, using the systems that already existed rather than a parallel set built for the portal.
+
+- **State and identity.** `universe.portalCycle` holds the year, round, status, targets, resolutions and a capped event log. Every entry gets a stable per-season `candidateId`, minted where the entry is created rather than in a later normalize pass — a candidate should not exist without identity. Old saves migrate without the entry ever losing the player record it already owns; the portal entry keeps owning `entry.p`, nothing is cloned.
+- **A field, not a free-for-all.** Opening the portal narrows each candidate to a bounded set of finalists once, then tracks only those (plus anyone the user targets). Recomputing all 120 schools every round would be both slow and false to how a portal actually narrows.
+- **Attention is a fixed pool.** Chasing one player costs you another: 10 units across at most 8 targets, capped at 4 per player. The per-candidate cap binds before the pool does, which is why no single player can absorb the whole budget.
+- **The decision model is the one that already existed.** Interest is built from `transferFit()`, which already exposed exactly the explainable categories the packet asks for (prior relationship, opportunity, scheme fit, coach relationship, proximity, prestige, pipeline). Resolution reuses the same bounded weighted choice as `chooseTransferDestination()` — never a deterministic highest-score winner. A test runs one resolution 200 times to hold that line.
+- **NIL and promises spend the budgets that already exist.** NIL offers go through `signNilDeal`, so the portal cannot overspend what the recruiting board already committed. A promise is recorded as an *offer* on the entry and only written onto the player once he lands — which is precisely what keeps it attached to the destination rather than the school he was leaving, since `placeTransfer` releases origin promises on the way out.
+- **`placeTransfer` now accepts a chosen destination.** The portal and the automatic path share one code path for history, promise release, the roster move and the event, instead of the portal reimplementing any of it.
+- **A full roster simply does not land the player.** He stays in `universe.transferPortal` for the existing automatic fallback, which is why the audit still reports `pending=0`.
+- **The Portal subview** lives on the Offseason tab with roster/NIL/attention panels and filters for position, class, former conference, sort and target status. Rows link to the existing player profile via `data-player`; there is deliberately no second profile implementation.
+
+Validation: 196/196 Node, 169/169 browser. The subview was driven in Chromium at 1280px and 390px through a full season, departures, three portal rounds and finalization — 51 and 48 transfers landed, the profile opens from a portal row with its portrait intact, no console errors, no horizontal overflow. Distribution checks confirm commitments spread across the league rather than piling onto one program, that working the portal is never worse than ignoring it on identical seeds, that a live cycle survives save/load mid-round, and that three consecutive interactive seasons leave rosters bounded with no player on two rosters.
+
+Twelve-season soak (2027–2038) completed without an exception: prestige mean held at 66.5, mean ability 64.4–66.5, and eleven different programs won the national title across twelve seasons — no runaway dynasty. Prestige standard deviation narrowed 16.7 → 14.0, matching the pre-existing long-run behavior recorded for v0.9.46 rather than anything this packet introduced. Save growth remains ~11.5 MB/season (36.0 MB after one season, 162.9 MB after twelve), which is the known v0.9.49 storage concern and unchanged by the portal.
+
+Save format is additive (`universe.portalCycle`, plus `candidateId`/`finalists`/`interest`/`exposure`/`decision`/`promiseOffer`/`placed` on portal entries), all backfilled in `normalizeUniverse`. IndexedDB stays at schema 3.
+
 ## v0.9.44 — Conference identity and game-day presentation
 
 - Adds ten canonical conference crests, palettes and identity lines without changing universe or save data.

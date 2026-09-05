@@ -6,7 +6,7 @@ Last inspected source: `dc3c76c` (`0.9.44`)
 | --- | --- | --- | --- |
 | v0.9.45 stabilization | IN PROGRESS · commits 1-3 complete | `codex/v0945-stabilization` | Browser binary unavailable locally |
 | v0.9.46 offseason calendar | VALIDATED · commits 1-5 complete, browser suites now pass | `claude/review-improvement-dwjemy` (merged) | None — ready to release |
-| v0.9.47 transfer portal | READY | — | Tune rounds only after audit |
+| v0.9.47 transfer portal | IMPLEMENTED · commits 1-5 complete, validated | `claude/review-improvement-dwjemy` | None — unpublished with v0.9.46 |
 | v0.9.48 schedules/rivalries | READY | — | None after v0.9.45 |
 | v0.9.49 saves/storage | READY | — | Set storage target after measurement |
 | v0.9.50 modules/RNG | READY | — | Preserve standalone build |
@@ -27,8 +27,19 @@ mobile-layout bug it caught (live since v0.9.44) and the fix for it.
 `claude/review-improvement-dwjemy` and the full Node + browser suites pass on
 that head.
 
-Next: begin `03-v0947-transfer-portal.md`. v0.9.46 is releasable whenever the
-owner wants it published; it has not been published yet.
+v0.9.47 (interactive transfer portal) is now implemented across all five of
+its packet commits and validated: 196/196 Node, 169/169 browser, plus a
+Chromium walkthrough of the Portal subview at 1280px and 390px. See the
+v0.9.47 section of `CHANGELOG.md` for the design decisions worth knowing
+before extending it.
+
+Next: `04-v0948-scheduling-rivalries.md`.
+
+**Blocked on the owner, not on code:** neither v0.9.46 nor v0.9.47 has been
+published. `node tools/publish.js` is refused by this environment's permission
+classifier, so a human has to run it (or allow it in settings). Everything is
+committed and pushed; VERSION.txt reads 0.9.46, so bump it before publishing
+if v0.9.47 is meant to ship under its own number.
 
 ## Current validation checkpoint
 
