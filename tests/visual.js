@@ -15,16 +15,27 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   const page=await browser.newPage({viewport}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
   await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);
   await page.waitForSelector('#broadcastFeature .broadcast-feature-main');
+  await page.waitForSelector('.topbar-team-logo.coverage-real-logo');
   check(`[${label}] dashboard broadcast desk renders`,(await page.locator('#broadcastFeature').innerText()).length>30);
+  check(`[${label}] app header uses real atlas logo instead of initials`,await page.locator('.topbar-team-logo.coverage-real-logo').count()===1);
+  check(`[${label}] Top 15 keeps one real logo per ranked team`,await page.locator('#top15 .team-logo').count()===15&&await page.locator('#top15 .sports-mark').count()===0);
   await goTab(page, 'gamelab');await page.waitForSelector('#nextGameCard .matchup-shell');
+  await page.waitForFunction(()=>document.querySelectorAll('#nextGameCard .matchup-team .sports-mark.coverage-real-logo').length===2);
   check(`[${label}] Game Lab matchup card renders`,await page.locator('#nextGameCard .sports-mark').count()===2);
+  check(`[${label}] Game Lab replaces both initials badges with real logos`,await page.locator('#nextGameCard .matchup-team .sports-mark.coverage-real-logo').count()===2);
+  const markText=await page.locator('#nextGameCard .matchup-team .sports-mark').allTextContents();
+  check(`[${label}] Game Lab no longer exposes CH/PH-style initials`,markText.every(x=>x.trim()===''),markText.join(' | '));
   await goTab(page, 'roster');await page.click('#rosterBody .player-button');await page.waitForSelector('#playerDialog[open] .player-hero-rail');
   check(`[${label}] player profile becomes hero card`,await page.locator('#playerDialog .player-hero-rating').count()===3);
   check(`[${label}] player hero keeps portrait`,await page.locator('#playerDialogPortrait canvas').count()===1);
+  await page.waitForFunction(()=>document.querySelectorAll('#playerDialog .player-hero-team-mark .coverage-real-logo').length===1);
+  check(`[${label}] player hero uses the real school logo`,await page.locator('#playerDialog .player-hero-team-mark .coverage-real-logo').count()===1);
   if(label==='iphone'){const overflow=await page.$eval('#playerDialog',el=>el.scrollWidth-el.clientWidth);check(`[${label}] scouting profile has no horizontal overflow`,overflow<=1,`${overflow}px`)}
   await page.evaluate(()=>document.querySelector('#playerDialog').close());
   await goTab(page, 'dashboard');await page.click('#simWeek');await page.waitForFunction(()=>/Week 1/.test(document.querySelector('#weekLine')?.textContent),{timeout:60000});await page.waitForSelector('#broadcastFeature .broadcast-matchup');
+  await page.waitForFunction(()=>document.querySelectorAll('#broadcastFeature .sports-mark.coverage-real-logo').length>=2);
   check(`[${label}] dashboard promotes next matchup after sim`,/NEXT MATCHUP/.test(await page.locator('#broadcastFeature').innerText()));
+  check(`[${label}] dashboard matchup uses real team logos`,await page.locator('#broadcastFeature .sports-mark.coverage-real-logo').count()>=2);
   if(label==='iphone'){const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);check(`[${label}] visual layer has no horizontal overflow`,overflow<=1,`${overflow}px`)}
   check(`[${label}] visual layer throws no console errors`,errors.length===0,errors.slice(0,2).join(' | '));await page.close();
  }
