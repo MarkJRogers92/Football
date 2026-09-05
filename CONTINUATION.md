@@ -1,3 +1,13 @@
+# Dynasty Lab — v0.9.44 working checkpoint
+
+Branch: `codex/v0944-conference-gameday`
+
+v0.9.44 is a presentation-only conference identity and game-day pass. It adds ten CSS-rendered conference crests/identities and upgrades Game Lab using only existing engine facts. No simulation rules, save schema, migration or IndexedDB behavior changed.
+
+Production remains v0.9.43 until this branch is approved and published.
+
+## Prior checkpoint
+
 # Dynasty Lab — v0.9.42 checkpoint
 
 Production: v0.9.42 at https://markjrogers92.github.io/Football/
