@@ -31,6 +31,11 @@ rating emphases. New players and recruits receive a label derived from their
 generated traits, while scouting panels state both the emphasis and the modeled
 usage. Existing saves are not relabeled or rerolled. Focused identity/scouting
 checks pass; this source checkpoint does not change the save schema.
+
+Player identity batch 4 makes specialists functional. Field-goal accuracy/range
+now reads K technique, power and composure in both engines; punt distance reads P
+power and technique. Watch names the active specialist, and profiles disclose
+that hang time, direction and returns remain untracked. No save field was added.
 User requested small committed/pushed batches for easy Claude/chat takeover,
 covering every position, ratings, descriptions and actual statistical behavior.
 Production remains v0.9.39. These are source checkpoints, not a new release.

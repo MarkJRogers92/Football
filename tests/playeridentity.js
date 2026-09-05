@@ -50,6 +50,16 @@ test('position archetypes direct opportunity without replacing ratings',()=>{
  assert.equal(e.playerUsageWeight(p('Range Kicker'),'fieldGoal'),1,'a starter-only opportunity retains its role allocation');
 });
 
+test('specialist ratings drive the outcomes the game records',()=>{
+ const e=loadEngine({seed:943}),weak={power:52,technique:52,composure:52},strong={power:92,technique:92,composure:92};
+ assert.ok(e.fieldGoalChance(strong,48,true)>e.fieldGoalChance(weak,48,true)+.25,'kicking traits materially change a pressure attempt');
+ assert.ok(e.fieldGoalChance(strong,32)>e.fieldGoalChance(strong,55),'distance lowers the same kicker chance');
+ assert.ok(e.puntAverage({power:92,technique:88},0)>e.puntAverage({power:52,technique:56},0)+8,'power and technique change punt distance');
+ const kick=e.styleDescription({pos:'K',style:'Pressure Leg'}),punt=e.styleDescription({pos:'P',style:'Directional Punter'});
+ assert.match(kick,/accuracy\/range/);
+ assert.match(punt,/Hang time and direction are not tracked/);
+});
+
 async function optionGame(style){
  const e=loadEngine({seed:941});await e.loadSchools();
  e.setUserTeam('Chicago Metropolitan');e.initUniverse();

@@ -1,5 +1,17 @@
 # WORKLOG
 
+## Player identity batch 4 — specialist outcomes
+
+Quick and detailed field-goal results now use the active kicker's technique,
+power and composure plus attempt distance. Detailed broadcasts name that kicker.
+Punt distance now uses both the punter's power and technique, and Watch names the
+active punter. K/P scouting prose explains those real effects and explicitly says
+that hang time and direction are not tracked.
+
+No return statistics or invented specialist events were added. Existing boxes
+and saves retain the same fields. Focused game and identity checks cover rating
+direction, distance, K/P play-log attribution and team/player reconciliation.
+
 ## Player identity batch 3 — ratings-backed archetypes
 
 Every existing position archetype now declares three real rating emphases. New

@@ -46,9 +46,10 @@ Scouted descriptions must respect uncertainty instead of exposing hidden ability
    breakups and interceptions only if those events are tracked. Use opportunity
    denominators; do not invent individual tackles/coverage facts from narration.
    Keep untracked fields explicitly unavailable in profiles and historical saves.
-6. Specialists — K accuracy/range/pressure and P distance/hang time/direction.
-   Returners need actual return opportunities and outcomes before style claims.
-   Tie descriptions to supported outcomes; do not add decorative statistics.
+6. Specialists — implemented for tracked outcomes. K technique/power/composure
+   drive accuracy, range and pressure attempts; P power/technique drive distance.
+   Hang time, direction and returns remain explicitly untracked rather than being
+   presented as decorative effects.
 7. UI, progression and downstream consumers — audit player/recruit cards,
    scouting prose/confidence, role fit, auto depth, scheme fit, position changes,
    training, awards, records, draft evaluation, recaps and career production.
