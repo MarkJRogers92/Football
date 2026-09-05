@@ -5248,6 +5248,10 @@ async function ensureArchiveLoaded(){
   await state.loading;
 }
 async function storageOperation(action){
+  // A user-initiated save or load always outranks a background checkpoint. Without this,
+  // an autosave holding storageBusy makes the Load button silently do nothing:
+  // storageOperation returns early and the player gets no feedback at all.
+  await yieldToUserAction();
   if(storageBusy)return;
   storageBusy=true;
   const controls=$$('button,input,select'),disabled=controls.map(el=>el.disabled);
@@ -5315,7 +5319,14 @@ function saveBrowser(){return storageOperation(async()=>{
 // coalesces a burst (simming a season fires one per week) into a single write.
 const AUTOSAVE_DEBOUNCE_MS=900;
 const AUTOSAVE_KINDS=['week','postseason','signing','portal','camp','preseason'];
-let autosaveTimer=null,autosaveKind=null,autosaveEnabled=true;
+let autosaveTimer=null,autosaveKind=null,autosaveEnabled=true,autosaveInFlight=null;
+// Drops a queued checkpoint and waits out one already writing, so the caller finds the
+// store free. Never rejects: a failed checkpoint must not break the action the player asked for.
+async function yieldToUserAction(){
+ if(typeof clearTimeout==='function')clearTimeout(autosaveTimer);
+ autosaveTimer=null;autosaveKind=null;
+ if(autosaveInFlight)await autosaveInFlight.catch(()=>{});
+}
 function autosaveBlocked(){
  if(!universe||!autosaveEnabled)return 'no dynasty';
  // A pending career choice or an open dialog means the player is mid-decision; a checkpoint
@@ -5340,6 +5351,8 @@ async function runAutosave(){
  // A manual save owns the store while it runs; come back rather than racing it.
  if(storageBusy){autosaveAfter(kind);return false}
  autosaveKind=null;storageBusy=true;
+ let settle;
+ autosaveInFlight=new Promise(r=>{settle=r});
  try{
   await writeBrowserSave();
   universe.lastCheckpoint={kind,year:universe.year,week:universe.week,at:new Date().toISOString()};
@@ -5348,7 +5361,7 @@ async function runAutosave(){
   // Never block play on a failed checkpoint: the dynasty in memory is still fine.
   setStatus(`Autosave failed (${e.message||'unknown error'}). Your dynasty is still open — use Save or Export.`);
   return false;
- }finally{storageBusy=false}
+ }finally{storageBusy=false;autosaveInFlight=null;settle()}
 }
 function loadBrowser(){return storageOperation(async()=>{
   const d=await browserStore.load();
