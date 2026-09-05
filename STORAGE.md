@@ -1,5 +1,13 @@
 # Browser archive persistence (v0.8.1 continuation)
 
+## v0.9.39 consistency fixes
+
+No new persisted fields or schema changes. Existing rivalry series lastYear
+guards all settlement effects, including fans/events, across save/load. An
+already-played current-week schedule row can settle a previously missed rivalry
+on advance; past seasons and immutable game records are not rewritten. The
+home-field adjustment continues through the existing scoreAdjustment snapshot.
+
 ## Scope
 
 Previously every browser save packed and structured-cloned the entire alumni

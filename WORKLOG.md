@@ -1,5 +1,39 @@
 # WORKLOG
 
+## v0.9.39 — Game-completion consistency
+
+First built and ran the focused games suite for the existing quick-sim
+home-field patch (fafbb1b), committed its generated HTML at 9f33ae3, pushed
+source and published production with explicit user approval. Verified the live
+HTML against that source build. The subsequent work is preview-only v0.9.39.
+
+The detailed-game path wrote the schedule directly, bypassing the rivalry hook.
+simWeek then skipped the already-played row, so the rivalry never settled.
+completeScheduledGame now owns the shared completion step. Already-played rows
+are also offered to the idempotent rivalry settlement when advancing, covering
+an unsettled current-week game in an older save. No historical backfill occurs.
+
+The existing lastYear guard previously protected only series counters, allowing
+repeat calls to change fans and emit events again. Moved that guard ahead of all
+effects. Tests cover immediate detailed results, save/load then advance, repeat
+settlement, and the old current-week case. Actual fast and detailed simulations
+are tested with controlled draws for low/high crowd support and neutral sites.
+
+Restored original title/save browser tests directly from the v0.9.36 source
+branch, retaining current gameplay and version hotfixes. Focused gate: 13 games,
+rivalries and Game Lab tests passed. Final gate recorded in CONTINUATION.md.
+Only the standard final suite is run; no separate long calibration.
+
+The full engine pass found a test-only name collision: two Tyler Whitakers in
+the same game's injury list, one with a 1-week hamstring strain and one with a
+3-week back strain. The recap correctly named the latter; the test found the
+former by name alone. It now matches the quoted type and duration as well.
+Only that failed check is rerun, followed by the remaining browser suites.
+The visual-only fixture also encountered a legitimate opening-week decision
+from random player generation. Browser setup now resolves blocking choices
+through the real UI before clicking Sim Week, rather than waiting forever on
+a correctly disabled button. Both affected browser suites are rerun.
+
 ## v0.9.37 — merging two parallel v0.9.36 releases
 
 The collision this session had been risking finally happened: GPT and this

@@ -1,12 +1,40 @@
-# Dynasty Lab — v0.9.37 checkpoint
+# Dynasty Lab — v0.9.39 consistency preview
 
 Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `claude/review-improvement-dwjemy` (reconciled directly —
-see below)
+Current source branch: `codex/v0939-game-consistency`
 Production branch: `gh-pages`
 Production: v0.9.37 at https://markjrogers92.github.io/Football/
 
-## Current release
+## Current work
+
+The user authorized publishing the existing quick-sim home-field patch first.
+That patch is now production (still v0.9.37), from source branch
+`codex/v0937-homefield-release`, commit `9f33ae3`; production was verified
+byte-identical to that build. It adds the fan-support-based homeFieldScoreBonus.
+
+v0.9.39 is the subsequent preview milestone. v0.9.38 was already used for
+Claude's storage measurement work, so its number is not reused here.
+
+- Shared completeScheduledGame writes schedule results and settles rivalry
+  consequences for both quick games and Watch/instant detailed games.
+- Rivalry settlement guards the series, fan effects and event together, using
+  the existing lastYear values. Advancing past an already-played current-week
+  rivalry settles it if an older detailed-game save had skipped the hook.
+- Detailed games now use the same dynamic home-field helper as quick games.
+  Neutral sites get no crowd bonus; recorded score adjustments still reconcile.
+- Restored the v0.9.36 title/Continue/Load regression coverage and bowl-aware
+  browser-storage count. Kept the newer version-label test and Game Lab fixes.
+
+No new save fields, archive rewrites, schema migration, or historical inference.
+Validation: version-label check and 53 smoke checks passed. Of 152 Node tests,
+151 passed in the full run; the remaining name-collision assertion was corrected
+and passed its targeted rerun. All 164 desktop/mobile browser checks and 8 real
+browser persistence scenarios passed. See WORKLOG for the two test-fixture fixes.
+Preview target: https://markjrogers92.github.io/Football/preview/v0939/
+Stop after preview verification; production promotion of this milestone needs
+review. Next feature candidate remains bounded captains/mentorship.
+
+## Previous release
 
 v0.9.37 merges two parallel v0.9.36 releases — GPT's and this branch's — after
 both cut from v0.9.35 and this branch's publish overwrote GPT's in production.

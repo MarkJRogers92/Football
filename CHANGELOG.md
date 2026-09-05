@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.9.39 — Consistent rivalry and home-field consequences
+
+Watch and instant detailed games now settle rivalry results through the same
+schedule-completion helper as quick games. Fan reactions and rivalry events,
+as well as the series counters, are protected against duplicate settlement.
+An unsettled current-week rivalry from an older save is handled when that week
+advances. No past-season results are invented or historical archives rewritten.
+
+Both engines now use fan support for the home-field score bonus and suppress it
+on neutral sites. The quick-sim half was published separately as an authorized
+v0.9.37 patch before this preview milestone.
+
+Restored title-screen artwork/version/options, live Continue, saved Load, and
+JSON/IndexedDB checks lost in reconciliation. The storage test counts the actual
+bowl field instead of assuming exactly 745 games. Version 0.9.38 remains reserved
+for the previously committed save-size measurement. No storage schema change.
+
 ## v0.9.37 — Merging two parallel v0.9.36 releases
 
 GPT and this branch both built on v0.9.35 and both published as 0.9.36. Mine landed second and overwrote theirs in production. Nothing was lost — theirs remained in `gh-pages` history at `5e293d2` — and this release is the actual merge of the two, with GPT's work taken as the base because it is the better of the two designs.
