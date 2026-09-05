@@ -1,8 +1,8 @@
 # Player identity, ratings and production roadmap
 
 Branch: `codex/player-identity-batches`
-Base: validated v0.9.39 source `ba26de1`; assembled as v0.9.40 preview candidate
-(production remains v0.9.39 until explicit approval).
+Base: validated v0.9.39 source `ba26de1`; completed and published as v0.9.40
+after preview review and explicit production approval.
 User authorization: cover all positions, ratings and descriptions; work and push
 in small, independently reviewable batches so Claude or another chat can resume.
 Budget: focused deterministic checks first; no long season calibration per batch.

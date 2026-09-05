@@ -1,7 +1,7 @@
 # Strategy integrity audit
 
-Checkpoint: validated v0.9.40 candidate on `codex/player-identity-batches`.
-Production remains v0.9.39 until explicit approval.
+Checkpoint: validated v0.9.40 on `codex/player-identity-batches`, promoted to
+production after explicit approval.
 
 ## Standard
 

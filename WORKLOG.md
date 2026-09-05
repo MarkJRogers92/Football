@@ -1,5 +1,17 @@
 # WORKLOG
 
+## v0.9.40 — fresh-world audit and production
+
+With the user confirming there were no saves to preserve, ran a seeded fresh
+dynasty generation without a season simulation: all 120 programs, 11,160 roster
+players and 2,800 recruits generated successfully, and every player/recruit had
+all seven traits plus a supported ratings-backed archetype. No long calibration
+was needed.
+
+After explicit approval, promoted the exact validated v0.9.40 preview build to
+production in `gh-pages` commit `be3eb75` and verified the live title and both
+visible version labels. The source worktree remained clean before publication.
+
 ## v0.9.40 — release validation
 
 Built the v0.9.40 standalone and ran one full validation pass after all small

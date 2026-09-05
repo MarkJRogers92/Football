@@ -4,7 +4,10 @@ Validation is complete: v0.9.40 builds cleanly; 53 smoke checks, 164 Node groups
 and 164 desktop/iPhone browser checks pass. No extended calibration was run.
 Preview published and live-verified at
 https://markjrogers92.github.io/Football/preview/v0940/ (`gh-pages` `48e47e8`).
-Production remains v0.9.39 until review and explicit approval.
+After explicit approval, the same validated build was promoted and live-verified
+as production at https://markjrogers92.github.io/Football/ (`gh-pages` `be3eb75`).
+A separate seeded fresh-world audit generated 11,160 players and 2,800 recruits;
+all carried complete traits and ratings-backed archetypes.
 
 Active source branch: `codex/player-identity-batches`, based on `ba26de1`.
 Read [the all-position roadmap](docs/PLAYER_IDENTITY_ROADMAP.md) first.
@@ -60,8 +63,7 @@ and punting now count. Controlled score tests pass. This changes evaluation only
 not stored history or previously awarded honors.
 User requested small committed/pushed batches for easy Claude/chat takeover,
 covering every position, ratings, descriptions and actual statistical behavior.
-Production remains v0.9.39. v0.9.40 is for preview review only until the user
-explicitly approves promotion.
+Production is v0.9.40 after explicit user approval.
 Batch 0: roadmap saved. Batch 1 now makes quick-sim QB rushing share depend on
 the actual QB style, speed and versatility plus scheme context. It does not yet
 change Watch play attribution. Remaining batches
