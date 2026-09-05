@@ -7,17 +7,6 @@ const TAB_GROUP={"dashboard": "program", "program": "program", "history": "progr
 const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${TAB_GROUP[id]}"]`);await page.click(`.tabs button[data-tab="${id}"]`)};
 
 
-// v0.9.34 added a title screen in front of the app; every browser test now has to click
-// through it (New Dynasty -> Start Dynasty, which defaults to Chicago Metropolitan) before
-// #userTeam and the rest of the dashboard exist at all.
-const startNewDynasty=async page=>{
- await page.waitForSelector('#titleNew',{timeout:30000});
- await page.click('#titleNew');
- await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});
- await page.click('#titleStart');
- await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000});
-};
-
 (async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--no-sandbox'] });
   const results = [];
@@ -34,12 +23,34 @@ const startNewDynasty=async page=>{
     page.on('pageerror', e => errors.push(String(e)));
 
     await page.goto('file://' + path.join(__dirname, '..', 'index.html'));
-    await startNewDynasty(page);
+    await page.waitForFunction(() => document.querySelector('#titleTeam')?.options.length === 120, { timeout: 60000 });
+    const titleState=await page.evaluate(()=>({title:!document.querySelector('#titleScreen').hidden,app:!document.querySelector('#app').hidden,programs:document.querySelector('#titleTeam').options.length,background:getComputedStyle(document.querySelector('.title-screen-art')).backgroundImage}));
+    check(`[${label}] title screen opens before a dynasty exists`,titleState.title&&!titleState.app&&titleState.programs===120&&titleState.background.includes('title-stadium-v1.jpg'),JSON.stringify(titleState));
+    if(label==='iphone')check(`[${label}] title screen has no horizontal overflow`,await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth<=1));
+    check(`[${label}] title version matches release`,await page.locator('[data-title-version]').innerText()==='v'+require('../package.json').version);
+    const artwork=await page.evaluate(()=>new Promise(resolve=>{const img=new Image();img.onload=()=>resolve(img.naturalWidth>1000);img.onerror=()=>resolve(false);img.src='assets/title-stadium-v1.jpg'}));
+    check(`[${label}] actual stadium artwork loads`,artwork);
+    await page.click('#titleHowTo');
+    check(`[${label}] How to Play hides the main menu`,await page.locator('#titleHowPanel').isVisible()&&!await page.locator('#titleMainMenu').isVisible());
+    await page.click('#titleHowPanel [data-title-back]');
+    await page.click('#titleOptions');await page.uncheck('#titleMotion');await page.selectOption('#titleWatchSpeed','400');await page.click('#titleSaveOptions');
+    await page.reload();await page.waitForFunction(()=>document.querySelector('#titleTeam')?.options.length===120);
+    await page.click('#titleOptions');
+    check(`[${label}] presentation options survive reload`,!await page.isChecked('#titleMotion')&&await page.inputValue('#titleWatchSpeed')==='400');
+    await page.check('#titleMotion');await page.selectOption('#titleWatchSpeed','850');await page.click('#titleSaveOptions');
+    await page.click('#titleLoad');
+    check(`[${label}] Load panel offers JSON import`,await page.locator('#titleLoadPanel').isVisible()&&await page.locator('#titleImport').isVisible());
+    await page.click('#titleLoadPanel [data-title-back]');
+    await page.click('#titleNew');
+    check(`[${label}] New Dynasty opens program selection`,await page.locator('#titleNewPanel').isVisible());
+    if(label==='iphone')check(`[${label}] program selection has no horizontal overflow`,await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth<=1));
+    await page.selectOption('#titleTeam','Chicago Metropolitan');await page.click('#titleStart');
+    await page.waitForFunction(() => document.querySelector('#userTeam')?.options.length > 0, { timeout: 60000 });
 
     check(`[${label}] 120 programs in the picker`,
       await page.$eval('#userTeam', el => el.options.length) === 120);
     check(`[${label}] team name rendered`,
-      (await page.$eval('#teamName', el => el.textContent)).length > 2);
+      (await page.$eval('#teamName', el => el.textContent)) === 'Chicago Metropolitan');
     check(`[${label}] Top 15 populated`,
       await page.$$eval('#top15 .rankrow', els => els.length) === 15);
     check(`[${label}] command center populated`,
@@ -57,6 +68,10 @@ const startNewDynasty=async page=>{
 
     // Simulate a week and confirm the UI advances.
     await goTab(page, 'dashboard');
+    await page.click('#newUniverse');await page.click('#titleContinue');
+    check(`[${label}] Continue resumes the live session`,await page.locator('#app').isVisible()&&await page.locator('#teamName').innerText()==='Chicago Metropolitan');
+    await page.click('[data-choice="stop_run"]');
+    for(let i=0;i<3&&await page.locator('#simWeek').isDisabled();i++)await page.locator('#weeklyDecisions [data-decision]').first().click();
     const t0 = Date.now();
     await page.click('#simWeek');
     await page.waitForFunction(() => /Week 1/.test(document.querySelector('#weekLine').textContent), { timeout: 60000 });
@@ -77,6 +92,7 @@ const startNewDynasty=async page=>{
     await goTab(page, 'season');
     await page.click('#teamSchedule [data-game]');
     const gameTitle=await page.locator('#gameDialogName').innerText();
+    check(`[${label}] coaching report records the chosen plan`,await page.locator('.coaching-report').isVisible()&&(await page.locator('.coaching-report').innerText()).includes('Stop the run'));
     check(`[${label}] completed schedule opens permanent Game Center`,await page.locator('#gameDialog').isVisible()&&gameTitle.includes('—'));
     for(const section of ['Summary','Box Score','Drives','Play-by-Play']){
       await page.locator('#gameTabs button').filter({hasText:new RegExp('^'+section.replace(/-/g,'\\-')+'$')}).click();

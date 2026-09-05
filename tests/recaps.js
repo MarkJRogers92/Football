@@ -76,7 +76,9 @@ test('a mentioned injury is a real, multi-week injury from that game',async()=>{
  for(const g of e.universe.gameArchive){
   const {body}=e.gameRecap(g),m=body.match(/lost ([^)]+?) to injury \(([^,)]+)(?:, (\d+) weeks?)?\)/);
   if(!m)continue;
-  const hit=(g.injuries||[]).find(x=>x.name===m[1]);
+  // Generated names are not unique. Match the quoted injury and duration too;
+  // the first namesake may have a different, minor injury in the same game.
+  const hit=(g.injuries||[]).find(x=>x.name===m[1]&&x.type===m[2]&&(!m[3]||x.weeks===Number(m[3])));
   assert.ok(hit,`recap named an injury that is not in the record: ${body}`);
   assert.ok((hit.weeks||0)>=3,`a minor knock should not be reported as news: ${body}`);
  }

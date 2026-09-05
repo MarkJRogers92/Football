@@ -6,9 +6,6 @@ const assert=require('node:assert/strict');
 // Tabs live inside groups since v0.9.26; selecting the group is part of navigating to a tab.
 const TAB_GROUP={"dashboard": "program", "program": "program", "history": "program", "roster": "team", "depth": "team", "development": "team", "recruiting": "recruiting", "gamelab": "games", "season": "games", "stats": "games", "newsletter": "games", "staff": "staff", "offseason": "staff", "records": "staff"};
 const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${TAB_GROUP[id]}"]`);await page.click(`.tabs button[data-tab="${id}"]`)};
-// v0.9.34 added a title screen in front of the app; every browser test now has to click through
-// it (New Dynasty -> Start Dynasty, which defaults to Chicago Metropolitan) before #userTeam exists.
-const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeout:30000});await page.click('#titleNew');await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});await page.click('#titleStart');await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000})};
 
 (async()=>{
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});
@@ -16,7 +13,7 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   const page=await browser.newPage({viewport:{width:390,height:844},acceptDownloads:true});
   const errors=[];page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
   await page.goto('file://'+path.join(__dirname,'..','index.html'));
-  await startNewDynasty(page);
+  await page.waitForFunction(()=>document.querySelector('#titleTeam').options.length===120);await page.click('#titleNew');await page.click('#titleStart');
   await page.waitForFunction(()=>document.querySelector('#userTeam').options.length===120);
   const tab=id=>goTab(page, id);
   const status=pattern=>page.waitForFunction(source=>new RegExp(source).test(document.querySelector('#saveStatus').textContent),pattern,{timeout:30000});
@@ -25,19 +22,33 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   await tab('offseason');await page.click('#runOffseason');
   await page.waitForFunction(()=>document.querySelector('#weekLine').textContent.includes('2028'));
   await page.click('#saveBrowser');await status('^Saved');
+  // Saved slot and live session are deliberately different. Load must restore
+  // the slot, while Continue must resume the current session.
+  await page.click('#newUniverse');await page.click('#titleLoad');
+  assert.equal(await page.locator('#titleLoadBrowser').isEnabled(),true,'new save updates title metadata immediately');
+  await page.click('#titleLoadPanel [data-title-back]');await page.click('#titleNew');
+  page.once('dialog',d=>d.accept());await page.click('#titleStart');
+  await page.waitForFunction(()=>document.querySelector('#weekLine').textContent.includes('2027'));
+  await page.click('#newUniverse');await page.click('#titleLoad');
+  page.once('dialog',d=>d.accept());await page.click('#titleLoadBrowser');
+  await page.waitForFunction(()=>!document.querySelector('#app').hidden&&document.querySelector('#weekLine').textContent.includes('2028'));
+  console.log('PASS title Load restores the saved dynasty instead of resuming an unsaved session');
+  await page.reload();await page.waitForFunction(()=>!document.querySelector('#titleContinue').disabled,{timeout:30000});
+  assert.equal(await page.locator('#app').getAttribute('hidden'),'');await page.click('#titleContinue');await page.waitForFunction(()=>!document.querySelector('#app').hidden&&document.querySelector('#weekLine').textContent.includes('2028'),{timeout:30000});
+  console.log('PASS startup Continue loads the real browser dynasty before showing the game');
   const record=await page.evaluate(()=>new Promise((resolve,reject)=>{
    const r=indexedDB.open('DynastyLabDB',3);r.onerror=()=>reject(r.error);r.onsuccess=()=>{
     const db=r.result,tx=db.transaction(['saves','archives','games'],'readonly');let main,first,gameChunks=[];
     const a=tx.objectStore('saves').get('main');a.onsuccess=()=>{main=a.result};
     const b=tx.objectStore('archives').get(0);b.onsuccess=()=>{first=b.result[0]};
     const c=tx.objectStore('games').getAll();c.onsuccess=()=>{gameChunks=c.result};
-    tx.oncomplete=()=>{db.close();resolve({coreHasArchive:'playerArchive' in main.universe,coreHasGames:'gameArchive' in main.universe,ref:main.archiveRef,gameRef:main.gameRef,first,games:gameChunks.flat()})};tx.onabort=()=>{db.close();reject(tx.error)};
+    tx.oncomplete=()=>{db.close();resolve({coreHasArchive:'playerArchive' in main.universe,coreHasGames:'gameArchive' in main.universe,ref:main.archiveRef,gameRef:main.gameRef,bowlCount:main.universe.bowls.length,first,games:gameChunks.flat()})};tx.onabort=()=>{db.close();reject(tx.error)};
    };
   }));
   assert.equal(record.coreHasArchive,false);assert.ok(record.ref.count>128);
   console.log('PASS real browser save stores archived careers separately');
   assert.equal(record.coreHasGames,false);assert.equal(record.games.length,record.gameRef.count);
-  assert.equal(record.games.length,745);const historical=record.games.find(g=>g.home.name==='Chicago Metropolitan'||g.away.name==='Chicago Metropolitan');
+  assert.equal(record.games.length,745+record.bowlCount);const historical=record.games.find(g=>g.home.name==='Chicago Metropolitan'||g.away.name==='Chicago Metropolitan');
   // Loading and saving before any archive access must preserve stored careers.
   await page.click('#loadBrowser');await status('^Loaded');await page.click('#saveBrowser');await status('^Saved');
   await tab('history');await page.fill('#archiveSearch',record.first.name);
@@ -86,6 +97,6 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   await page.locator('#gameTabs button[data-game-tab="Box Score"]').click();assert.match(await page.textContent('#gameDialogBody'),/Passing/);
   assert.deepEqual(errors,[]);
   console.log('PASS permanent game reopens after rollover, real IndexedDB save/load and JSON export/import');
-  console.log('6 browser persistence scenarios passed; no console errors');
+  console.log('8 browser persistence scenarios passed; no console errors');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

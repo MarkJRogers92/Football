@@ -23,7 +23,11 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   check(`[${label}] player hero keeps portrait`,await page.locator('#playerDialogPortrait canvas').count()===1);
   if(label==='iphone'){const overflow=await page.$eval('#playerDialog',el=>el.scrollWidth-el.clientWidth);check(`[${label}] scouting profile has no horizontal overflow`,overflow<=1,`${overflow}px`)}
   await page.evaluate(()=>document.querySelector('#playerDialog').close());
-  await goTab(page, 'dashboard');await page.click('#simWeek');await page.waitForFunction(()=>/Week 1/.test(document.querySelector('#weekLine')?.textContent),{timeout:60000});await page.waitForSelector('#broadcastFeature .broadcast-matchup');
+  await goTab(page, 'dashboard');
+  // Randomly generated players can create real opening-week decisions. Resolve
+  // those through the UI before testing the visual state after a played week.
+  for(let i=0;i<3&&await page.locator('#simWeek').isDisabled();i++)await page.locator('#weeklyDecisions [data-decision]').first().click();
+  await page.click('#simWeek');await page.waitForFunction(()=>/Week 1/.test(document.querySelector('#weekLine')?.textContent),{timeout:60000});await page.waitForSelector('#broadcastFeature .broadcast-matchup');
   check(`[${label}] dashboard promotes next matchup after sim`,/NEXT MATCHUP/.test(await page.locator('#broadcastFeature').innerText()));
   if(label==='iphone'){const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);check(`[${label}] visual layer has no horizontal overflow`,overflow<=1,`${overflow}px`)}
   check(`[${label}] visual layer throws no console errors`,errors.length===0,errors.slice(0,2).join(' | '));await page.close();
