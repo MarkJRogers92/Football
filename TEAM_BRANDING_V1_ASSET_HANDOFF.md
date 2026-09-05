@@ -6,7 +6,7 @@ This branch is based on `claude/review-improvement-dwjemy` at commit `f87056f6f1
 Integrate the locked Dynasty Lab team branding into the current game without changing simulation logic.
 
 ## What is staged on this branch
-The GitHub connector used to stage this work cannot directly write binary PNG repository files through its normal contents endpoint. To avoid blocking implementation, the 120 official 32px logos are packed into one compact transparent PNG atlas and stored as four base64 text parts.
+The GitHub connector used to stage this work cannot directly write binary PNG repository files through its normal contents endpoint. To avoid blocking implementation, the 120 official 32px logos are packed into one compact transparent PNG atlas and stored as **byte-verified base64 text chunks**.
 
 Run:
 
@@ -14,7 +14,13 @@ Run:
 python3 team-branding-v1/unpack_assets.py
 ```
 
-This reconstructs:
+The script concatenates only the verified chunks, validates the encoded length, decodes the PNG, and then refuses to write it unless all of these checks pass:
+
+- decoded byte size: `46,169`
+- SHA-256: `b109832743538910bc1bbdbcc029821e48bc8a56ac4978249fbc2ce8804ce48f`
+- PNG dimensions: `384 × 320`
+
+On success it reconstructs:
 
 ```text
 team-branding-v1/team-logos-atlas-32.png
@@ -31,7 +37,8 @@ Atlas specification:
 Also staged:
 - `team-branding-v1/team-logo-map.compact.json` — authoritative ID/name/conference mapping for all 120 schools
 - `team-branding-v1/team-logo-sprite.js` — framework-free reference helper for atlas coordinates / CSS background positioning
-- `team-branding-v1/atlas-parts/part-00.b64` through `part-03.b64` — reconstructable atlas payload
+- `team-branding-v1/unpack_assets.py` — canonical reconstruction + integrity-check script
+- the verified text chunks consumed by that script
 
 The full production asset pack exists separately with transparent 512/256/128/64/32 PNGs for every team (600 files total). For this implementation pass, **use the staged 32px atlas to wire the game now, but keep the logo abstraction size-aware so 64/128/256 assets can replace the staging atlas later without rewriting UI surfaces.**
 
@@ -78,6 +85,7 @@ If the existing app architecture makes another helper shape cleaner, adapt it; t
 - Keep logos visually centered with consistent reserved space so rows do not jump when a mark has a different silhouette.
 
 ## Validation required
+- run `python3 team-branding-v1/unpack_assets.py` first and require a clean integrity-check pass;
 - all IDs 1–120 resolve to a logo cell;
 - no duplicate or off-by-one mapping;
 - invalid-ID fallback works;
