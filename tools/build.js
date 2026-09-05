@@ -1,6 +1,6 @@
 // Builds the standalone HTML from the real source files, so app.js / styles.css
 // / visual-identity.css / team-branding.css / sports-presentation.css / sports-layout.css /
-// / recruit-presentation.css / program-branding.js / visual-identity.js /
+// / recruit-presentation.css / conference-branding.css / program-branding.js / visual-identity.js /
 // / sports-presentation.js / recruit-presentation.js / team-logo-coverage.js /
 // / program-color-coverage.js / body.html / storage.js / portraits/renderer-v1.js
 // stay the single source of truth and the deployable artifact is always a byte-for-byte
@@ -41,11 +41,11 @@ const html = `<!doctype html><html lang="en"><head><meta charset="utf-8">` +
   `<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">\n<meta name="viewport" content="width=device-width,initial-scale=1">` +
   `<meta name="theme-color" content="#090d12">` +
   `<title>Dynasty Lab v${version}</title><style>` +
-  read('styles.css') + '\n' + read('visual-identity.css') + '\n' + read('team-branding.css') + '\n' + read('sports-presentation.css') + '\n' + read('sports-layout.css') + '\n' + read('recruit-presentation.css') + '\n' + read('polish.css') +
+  read('styles.css') + '\n' + read('visual-identity.css') + '\n' + read('team-branding.css') + '\n' + read('conference-branding.css') + '\n' + read('sports-presentation.css') + '\n' + read('sports-layout.css') + '\n' + read('recruit-presentation.css') + '\n' + read('polish.css') +
   `</style></head><body>\n` +
   body +
-  `<script>` + read('portraits/renderer-v1.js') + '\n' + read('storage.js') + '\n' + read('app.js') + '\n' + read('program-branding.js') + '\n' + read('visual-identity.js') + '\n' + read('sports-presentation.js') + '\n' + read('recruit-presentation.js') + '\n' + read('team-logo-coverage.js') + '\n' + read('program-color-coverage.js') + `</script></body></html>`;
+  `<script>` + read('portraits/renderer-v1.js') + '\n' + read('storage.js') + '\n' + read('app.js') + '\n' + read('program-branding.js') + '\n' + read('conference-branding.js') + '\n' + read('visual-identity.js') + '\n' + read('sports-presentation.js') + '\n' + read('recruit-presentation.js') + '\n' + read('team-logo-coverage.js') + '\n' + read('program-color-coverage.js') + `</script></body></html>`;
 
 const out = process.argv[2] || 'index.html';
 fs.writeFileSync(path.join(root, out), html);
-console.log(`built ${out} (${(html.length / 1024).toFixed(0)} KB) from renderer-v1.js + app.js + storage.js + styles.css + visual-identity.css + team-branding.css + sports-presentation.css + sports-layout.css + recruit-presentation.css + polish.css + body.html + program-branding.js + visual-identity.js + sports-presentation.js + recruit-presentation.js + team-logo-coverage.js + program-color-coverage.js`);
+console.log(`built ${out} (${(html.length / 1024).toFixed(0)} KB) from renderer-v1.js + app.js + storage.js + styles.css + visual-identity.css + team-branding.css + conference-branding.css + sports-presentation.css + sports-layout.css + recruit-presentation.css + polish.css + body.html + program-branding.js + conference-branding.js + visual-identity.js + sports-presentation.js + recruit-presentation.js + team-logo-coverage.js + program-color-coverage.js`);
