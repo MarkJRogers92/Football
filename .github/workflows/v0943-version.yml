@@ -1,0 +1,49 @@
+name: Checkpoint Dynasty Lab v0.9.43
+
+on:
+  push:
+    branches:
+      - codex/v0943-program-colors
+    paths:
+      - .v0943-version
+
+permissions:
+  contents: write
+
+jobs:
+  checkpoint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Bump branch to v0.9.43
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          app=Path('app.js'); text=app.read_text()
+          old="const APP_VERSION='0.9.42';"; new="const APP_VERSION='0.9.43';"
+          if new not in text:
+              if old not in text: raise SystemExit('Expected 0.9.42 APP_VERSION marker not found')
+              app.write_text(text.replace(old,new,1))
+          pkg=Path('package.json'); data=json.loads(pkg.read_text()); data['version']='0.9.43'; pkg.write_text(json.dumps(data,indent=2)+'\n')
+          Path('VERSION.txt').write_text('0.9.43\n')
+          PY
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Build and verify version plumbing
+        run: |
+          npm run build
+          node tests/version.js
+          node --test tests/teambranding.js
+      - name: Commit v0.9.43 checkpoint
+        run: |
+          git config user.name "Dynasty Lab Checkpoint"
+          git config user.email "136272503+MarkJRogers92@users.noreply.github.com"
+          git add app.js package.json VERSION.txt index.html
+          git diff --cached --quiet || git commit -m "Checkpoint Dynasty Lab v0.9.43 program colors"
+          git push origin HEAD:codex/v0943-program-colors
