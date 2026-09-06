@@ -1,67 +1,72 @@
 {
-  "generatedAt": "2026-09-06T22:04:15.954Z",
+  "generatedAt": "2026-09-06T22:07:37.544Z",
   "branch": "codex/v0100-game-engine-2",
   "baselineVersion": "0.9.56",
   "mode": "development-only shadow comparison",
-  "matchups": 40,
+  "matchups": 120,
+  "sample": "weeks 1-2, all 120 scheduled games",
   "old": {
-    "games": 40,
-    "meanPoints": 42.2,
-    "meanPlays": 119.73,
-    "meanYards": 587.5,
-    "meanTurnovers": 2.3,
-    "meanTouchdowns": 4.55,
-    "meanFgMade": 2.55,
-    "meanFgAtt": 3.13,
-    "meanPunts": 7.48,
-    "homeWinRate": 0.53,
-    "meanHomeFieldRating": 4.7
+    "games": 120,
+    "meanPoints": 42.66,
+    "meanPlays": 120.31,
+    "meanYards": 592.13,
+    "meanTurnovers": 2.48,
+    "meanTouchdowns": 4.68,
+    "meanFgMade": 2.39,
+    "meanFgAtt": 2.97,
+    "meanPunts": 7.59,
+    "homeWinRate": 0.55,
+    "meanHomeMargin": 1.94,
+    "meanHomeFieldRating": 4.76
   },
   "v2": {
-    "games": 40,
-    "meanPoints": 35.7,
-    "meanPlays": 123.43,
-    "meanYards": 601.42,
-    "meanTurnovers": 2.33,
-    "meanTouchdowns": 3.7,
-    "meanFgMade": 3.18,
-    "meanFgAtt": 4.35,
-    "meanPunts": 8.07,
-    "homeWinRate": 0.45,
-    "meanHomeFieldRating": 4.7
+    "games": 120,
+    "meanPoints": 42.47,
+    "meanPlays": 123.98,
+    "meanYards": 629.05,
+    "meanTurnovers": 2.68,
+    "meanTouchdowns": 5.28,
+    "meanFgMade": 1.72,
+    "meanFgAtt": 2.54,
+    "meanPunts": 8.39,
+    "homeWinRate": 0.61,
+    "meanHomeMargin": 3.88,
+    "meanHomeFieldRating": 4.76
   },
   "delta": {
-    "meanPoints": -6.5,
-    "meanPlays": 3.7,
-    "meanYards": 13.92,
-    "meanTurnovers": 0.03,
-    "meanTouchdowns": -0.85,
-    "meanFgMade": 0.63,
-    "meanFgAtt": 1.22,
-    "meanPunts": 0.59,
-    "homeWinRate": -0.08
+    "meanPoints": -0.19,
+    "meanPlays": 3.67,
+    "meanYards": 36.92,
+    "meanTurnovers": 0.2,
+    "meanTouchdowns": 0.6,
+    "meanFgMade": -0.67,
+    "meanFgAtt": -0.43,
+    "meanPunts": 0.8,
+    "homeWinRate": 0.06,
+    "meanHomeMargin": 1.94
   },
   "strengthSensitivity": {
     "favored": {
-      "games": 5,
-      "oldHomeWinRate": 0.4,
-      "v2HomeWinRate": 1
+      "games": 27,
+      "oldHomeWinRate": 0.74,
+      "v2HomeWinRate": 0.85
     },
     "even": {
-      "games": 26,
-      "oldHomeWinRate": 0.62,
-      "v2HomeWinRate": 0.5
+      "games": 72,
+      "oldHomeWinRate": 0.57,
+      "v2HomeWinRate": 0.61
     },
     "underdog": {
-      "games": 9,
-      "oldHomeWinRate": 0.33,
-      "v2HomeWinRate": 0
+      "games": 21,
+      "oldHomeWinRate": 0.24,
+      "v2HomeWinRate": 0.29
     }
   },
   "notes": [
     "The v0.9 simulator runs only on cloned team objects. Its temporary archive/event writes are removed after each sample.",
     "The v2 result is never installed into the dynasty.",
     "Home-field input is derived from the current homeFieldFor() value and converted to a bounded matchup-rating edge.",
+    "Red-zone finishing is a v2 calibration layer; it changes only shadow play outcomes, not live dynasty results.",
     "These are calibration observations, not release thresholds."
   ]
 }
