@@ -1,0 +1,30 @@
+name: v0952 weekly debug
+on:
+  push:
+    branches: [codex/v0952-program-goals-polish]
+permissions:
+  contents: read
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install --no-package-lock
+      - name: Reproduce weekly plan
+        run: |
+          node - <<'NODE'
+          const {loadEngine}=require('./tools/harness');
+          (async()=>{
+            const e=loadEngine({seed:1302});e.setUserTeam('Chicago Metropolitan');await e.loadSchools();e.initUniverse();
+            const me=e.T('Chicago Metropolitan');
+            for(let i=0;i<12;i++)e.simWeek();
+            e.simConferenceChampionships();e.simPlayoff();
+            console.log('before',JSON.stringify(e.weeklyPlan(me),null,2));
+            e.runSpringCamp();
+            console.log('offseason',JSON.stringify(e.universe.offseason,null,2));
+            console.log('after',JSON.stringify(e.weeklyPlan(me),null,2));
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
