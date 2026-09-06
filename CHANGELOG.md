@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.9.49 — Named saves, autosave and long-dynasty protection
+
+- Adds three independently revisioned browser save slots, editable slot names, and lightweight metadata for program, season, phase, record, version, checkpoint type and approximate size. The legacy `main` save becomes Dynasty 1 without moving or deleting its archive chunks.
+- Autosaves only after completed week, postseason, signing, portal, camp and preseason actions. User-triggered Save/Load operations outrank background checkpoints, and a failed autosave leaves the in-memory dynasty playable.
+- Measures actual growth before compacting it: per-game player deltas were 87.9% of `gameArchive`, while routine drive detail was 0.0%. Routine AI-versus-AI games older than three seasons now retain score, context, team statistics, injuries, and statistical leaders while dropping non-contributing individual lines. Controlled-team, rivalry, title, bowl, playoff and watched Game Lab games remain untouched.
+- Runs compaction automatically at the season boundary. Because historical game chunks were previously append-only, a compacted archive is explicitly rewritten once; otherwise the browser database would keep the large pre-compaction rows even though memory looked smaller.
+
+Measured at season five: `gameArchive` shrank 36.0% and the whole portable save 14.3%, with every game ID preserved. The evidence-based target is no more than 10 MB growth per season over twelve seasons, down from 11.9 MB.
+
 ## v0.9.48 — Schedule rotation and protected rivalries
 
 Implements `docs/roadmap/04-v0948-scheduling-rivalries.md`. Commit 1 added a pure `validateSchedule()` and pointed it at the existing scheduler, which turned up three defects that had been live in production the whole time:

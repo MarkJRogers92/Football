@@ -2247,9 +2247,11 @@ function offseasonPreseason(){
  const os=normalizeOffseasonState(),ds=ensureDevelopmentState();
  if(!offseasonPhaseDone('spring')||!offseasonPhaseDone('fall')){setStatus('Complete spring development and fall camp first.');return false}
  universe.campHistory[universe.year]=JSON.parse(JSON.stringify(ds));
+ const compacted=compactGameArchive();
+ if(compacted.games&&currentArchiveState())currentArchiveState().gamesDirty=true;
  universe.year++;universe.week=0;resetNilSeason();universe.recoveredWeek=-1;universe.phase='regular';universe.latest=[];universe.confChamps=[];universe.champion=null;universe.lastDetailedGame=null;universe.recruits=generateRecruitPool(2800,universe.highSchools);universe.recruitClassCounts={};
  universe.teams.forEach(t=>{t.w=t.l=t.cw=t.cl=t.pf=t.pa=t.sos=0;t.rank=null;t.champ=false;t.commits=[];while(t.roster.length<85)t.roster.push(generateFreshman(t,pick(POS)));if(t.roster.length>105){const keep=t.roster.sort((a,b)=>b.trueNow-a.trueNow).slice(0,105),cut=t.roster.filter(p=>!keep.includes(p));for(const p of cut)addToArchive(p,t,'Roster cut');t.roster=keep}autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)});
- normalizePromiseState();universe.developmentState={year:universe.year,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]};universe.offseasonDone=false;buildSchedule();ranked();buildPreseasonHub();
+ normalizePromiseState();universe.developmentState={year:universe.year,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]};universe.offseasonDone=false;buildSchedule();ranked();buildPreseasonHub();autosaveAfter('preseason');
  return true;
 }
 function advanceOffseasonPhase(){
@@ -2291,7 +2293,12 @@ function calendarFallCamp(){
 }
 function runOffseason(){
  if(universe.phase!=='complete')return;
- if(archiveIsDeferred())return storageOperation(async()=>{await ensureArchiveLoaded();runOffseason()});
+ const needsGames=normalizeOffseasonState().phase==='preseason'&&gamesAreDeferred();
+ if(archiveIsDeferred()||needsGames)return storageOperation(async()=>{
+  if(archiveIsDeferred())await ensureArchiveLoaded();
+  if(needsGames)await ensureGamesLoaded();
+  advanceOffseasonPhase();render();
+ });
  advanceOffseasonPhase();render();
 }
 runSpringCamp=calendarSpringCamp;
@@ -3041,11 +3048,22 @@ function normalizeUniverse(){universe.gameArchive??=[];universe.gameArchiveVersi
  universe.weeklyDecisions??=[];if(!universe.teams.some(t=>t.rivalry))deriveRivalries();universe.careerHistory??=[];universe.jobOffers??=[];universe.bowls??=[];universe.signingDay??=null;for(const t of universe.teams){t.fanBaseline??=t.fan_support??60;for(const p of t.roster)ensureAcademics(p,t)}for(const t of universe.teams){ensureAdminState(t);ensureNilState(t)}for(const d of universe.weeklyDecisions)d.source??='STAFF';normalizePromiseState();for(const r of universe.recruits||[])normalizeRecruitGeography(r,universe.highSchools);assignRecruitRanks(universe.recruits||[]);if(!universe.weeklyHub.length)buildPreseasonHub();rebuildIndexes()}
 function setStatus(x){if($('#saveStatus'))$('#saveStatus').textContent=x}
 // Browser persistence state is deliberately outside the portable universe.
-let browserArchive = null;
+const SAVE_SLOT_IDS=DynastyStorage.SLOT_IDS||['main','dynasty-2','dynasty-3'];
+let activeSaveSlot=SAVE_SLOT_IDS[0];
+const browserArchives=new Map();
 let storageBusy = false;
 let titleBrowserSave = null;
-const browserStore = DynastyStorage.create();
-function currentArchiveState(){return browserArchive?.universe===universe?browserArchive:null}
+let titleSaveSlots=[];
+let browserStore = DynastyStorage.create({slot:activeSaveSlot});
+function currentArchiveState(){const state=browserArchives.get(activeSaveSlot);return state?.universe===universe?state:null}
+function activeSlotMeta(){return titleSaveSlots.find(s=>s.slot===activeSaveSlot)||null}
+function setActiveSaveSlot(slot){
+ if(!SAVE_SLOT_IDS.includes(slot))throw new Error('Unknown browser save slot.');
+ activeSaveSlot=slot;browserStore=DynastyStorage.create({slot});
+ if($('#saveSlot'))$('#saveSlot').value=slot;if($('#titleSaveSlot'))$('#titleSaveSlot').value=slot;
+ titleBrowserSave=activeSlotMeta()?.empty?null:activeSlotMeta();
+ renderTitleState();return slot;
+}
 function archiveIsDeferred(){const s=currentArchiveState();return !!s&&!s.loaded}
 // v0.9.12: permanent box scores live in their own append-only chunks. They are
 // immutable once written, so an ordinary save appends only the week just played
@@ -3099,18 +3117,20 @@ function validateSave(d){
   return u;
 }
 function installSave(d,state=null){
-  const candidate=validateSave(d),previous=universe,previousArchive=browserArchive,previousTeam=$('#userTeam').value;
+  const candidate=validateSave(d),previous=universe,previousArchive=browserArchives.get(activeSaveSlot),previousTeam=$('#userTeam').value;
   try{
-    universe=candidate;if(!universe.mode)universe.mode=legacyControlMode(d,universe);browserArchive=state?{...state,universe:candidate,loading:null,gamesLoading:null}:null;
+    universe=candidate;if(!universe.mode)universe.mode=legacyControlMode(d,universe);
+    if(state)browserArchives.set(activeSaveSlot,{...state,slot:activeSaveSlot,universe:candidate,loading:null,gamesLoading:null,gamesDirty:false});
+    else browserArchives.delete(activeSaveSlot);
     normalizeUniverse();normalizeOffseasonState();refreshTeamOptions(d.userTeam||universe.teams[0].name);render();
   }catch(e){
-    universe=previous;browserArchive=previousArchive;rebuildIndexes();refreshTeamOptions(previousTeam);throw e;
+    universe=previous;if(previousArchive)browserArchives.set(activeSaveSlot,previousArchive);else browserArchives.delete(activeSaveSlot);rebuildIndexes();refreshTeamOptions(previousTeam);throw e;
   }
 }
 // v0.9.49 commit 3: one write path, two callers. A manual save reports success and may
 // disable the UI while it runs; an autosave must never do either, because a checkpoint the
 // player did not ask for should be invisible unless it fails.
-async function writeBrowserSave(){
+async function writeBrowserSave(checkpointType='manual'){
   const state=currentArchiveState();
   const rows=universe.playerArchive||[];
   // Existing archive rows never change after retirement. Only append new rows.
@@ -3120,26 +3140,31 @@ async function writeBrowserSave(){
   // Box scores never change after the whistle, so only the ones written since
   // the last save are appended. A twelve-season dynasty stops rewriting itself.
   const games=universe.gameArchive||[];
-  const gameStart=state?.gamesLoaded?state.gameRef?.count||0:0;
+  const rewriteGames=!!state?.gamesDirty;
+  const gameStart=state?.gamesLoaded&&!rewriteGames?state.gameRef?.count||0:0;
   if(gameStart>games.length)throw new Error('The game archive changed unexpectedly. Export before saving.');
   const gameAdditions=games.slice(gameStart);
   const snapshot={universe:packUniverse(universe,false),userTeam:$('#userTeam').value,savedAt:new Date().toISOString(),version:APP_VERSION};
   const saved=await browserStore.save(snapshot,{expectedRevision:state?.revision??null,archiveRef:state?.archiveRef||null,additions,
-    gameRef:state?.gameRef||null,gameAdditions});
-  browserArchive={universe,revision:saved.revision,archiveRef:saved.archiveRef,loaded:state?.loaded??true,loading:null,
-    gameRef:saved.gameRef,gamesLoaded:state?.gamesLoaded??true,gamesLoading:null};
+    gameRef:rewriteGames?null:state?.gameRef||null,gameAdditions,checkpointType});
+  const browserArchive={slot:activeSaveSlot,universe,revision:saved.revision,archiveRef:saved.archiveRef,loaded:state?.loaded??true,loading:null,
+    gameRef:saved.gameRef,gamesLoaded:state?.gamesLoaded??true,gamesLoading:null,gamesDirty:false};
+  browserArchives.set(activeSaveSlot,browserArchive);
   // Committed box scores now live in storage; they must not also stay pending.
   if(!browserArchive.gamesLoaded)universe.gameArchive=[];
   // A deferred archive can have freshly appended rows; after committing them,
   // all of its rows now live in storage and must not also remain as pending rows.
   if(!browserArchive.loaded){universe.playerArchive=[];rebuildIndexes()}
   // Keep only title metadata, not a second complete league in memory.
-  titleBrowserSave={userTeam:snapshot.userTeam,universe:{year:universe.year,week:universe.week,phase:universe.phase,teams:universe.teams.map(t=>({name:t.name,w:t.w,l:t.l}))}};
+  titleSaveSlots=titleSaveSlots.filter(s=>s.slot!==activeSaveSlot).concat(saved.meta).sort((a,b)=>SAVE_SLOT_IDS.indexOf(a.slot)-SAVE_SLOT_IDS.indexOf(b.slot));
+  titleBrowserSave=saved.meta;renderSaveSlotControls();
   return saved;
 }
 function saveBrowser(){return storageOperation(async()=>{
-  await writeBrowserSave();
-  setStatus(`Saved ${universe.year}, Week ${universe.week} to browser storage.`);
+  const occupied=activeSlotMeta()&&!activeSlotMeta().empty&&!currentArchiveState();
+  if(occupied&&!confirm(`Replace ${activeSlotMeta().label}? Its current dynasty will be overwritten.`))return false;
+  await writeBrowserSave('manual');
+  setStatus(`Saved ${universe.year}, Week ${universe.week} to ${activeSlotMeta()?.label||'browser storage'}.`);
 })}
 
 // Autosave fires only after a completed atomic action, never mid-transaction. The debounce
@@ -3156,6 +3181,7 @@ async function yieldToUserAction(){
 }
 function autosaveBlocked(){
  if(!universe||!autosaveEnabled)return 'no dynasty';
+ if(activeSlotMeta()&&!activeSlotMeta().empty&&!currentArchiveState())return 'the selected slot belongs to another dynasty';
  // A pending career choice or an open dialog means the player is mid-decision; a checkpoint
  // taken now could capture a state they are still resolving.
  if(hasPendingCareerChoice())return 'a career decision is open';
@@ -3181,7 +3207,7 @@ async function runAutosave(){
  let settle;
  autosaveInFlight=new Promise(r=>{settle=r});
  try{
-  await writeBrowserSave();
+  await writeBrowserSave(kind);
   universe.lastCheckpoint={kind,year:universe.year,week:universe.week,at:new Date().toISOString()};
   return true;
  }catch(e){
@@ -3197,8 +3223,8 @@ function loadBrowser(){return storageOperation(async()=>{
   // older carried both inline and is already fully resident.
   installSave(d,{revision:DynastyStorage.revisionOf(d),archiveRef:d.archiveRef||null,loaded:!(d.storageVersion>=2),
     gameRef:d.gameRef||null,gamesLoaded:d.storageVersion!==3});
-  titleBrowserSave=d;
-  setStatus(`Loaded browser save from ${d.savedAt||'earlier session'}.`);
+  titleBrowserSave=activeSlotMeta()||d;
+  setStatus(`Loaded ${activeSlotMeta()?.label||'browser save'} from ${d.savedAt||'an earlier session'}.`);
   return true;
 })}
 function exportSave(){return storageOperation(async()=>{
@@ -3224,13 +3250,23 @@ function titlePreferences(){
 function applyTitlePreferences(){const p=titlePreferences();document.body.classList.toggle('motion-reduced',!p.motion);$('#titleMotion').checked=p.motion;$('#titleWatchSpeed').value=String(p.watchSpeed)}
 function saveTitlePreferences(){const p={motion:$('#titleMotion').checked,watchSpeed:$('#titleWatchSpeed').value};try{localStorage.setItem('dynastyLabPreferences',JSON.stringify(p))}catch{setTitleStatus('Options could not be saved. Check your browser storage settings.');return}applyTitlePreferences();setTitleStatus('Options saved on this device.');showTitlePanel()}
 function setTitleStatus(x){if($('#titleStatus'))$('#titleStatus').textContent=x}
+function slotBytes(n){if(!Number.isFinite(n)||n<=0)return'';const mb=n/1048576;return mb>=10?`${mb.toFixed(0)} MB`:`${mb.toFixed(1)} MB`}
 function titleSummary(d){
+ if(d?.program){const stage=d.phase==='regular'?(d.week?`Week ${d.week}`:'Preseason'):d.phase==='complete'?'Season complete':'Postseason';return `${d.program} · ${d.year} · ${stage}${d.record?` · ${d.record}`:''}${d.approximateBytes?` · ${slotBytes(d.approximateBytes)}`:''}`}
  const u=d?.universe;if(!u||!Array.isArray(u.teams))return'';const name=d.userTeam||u.teams[0]?.name||'Unknown program',t=u.teams.find(x=>x.name===name),stage=u.phase==='regular'?(u.week?`Week ${u.week}`:'Preseason'):u.phase==='complete'?'Season complete':'Postseason';return `${name} · ${u.year} · ${stage}${t?` · ${t.w}-${t.l}`:''}`;
+}
+function renderSaveSlotControls(){
+ for(const id of ['saveSlot','titleSaveSlot']){
+  const el=$('#'+id);if(!el)continue;el.innerHTML='';
+  for(const slot of titleSaveSlots){const o=document.createElement('option');o.value=slot.slot;o.textContent=`${slot.label}${slot.empty?' · Empty':slot.program?` · ${slot.program}`:''}`;el.appendChild(o)}
+  el.value=activeSaveSlot;
+ }
+ const meta=activeSlotMeta();if($('#titleSlotName'))$('#titleSlotName').value=meta?.label||'';
 }
 function renderTitleState(){
  const current=universe?{universe,userTeam:$('#userTeam').value}:null,continuation=current||titleBrowserSave,summary=titleSummary(continuation),has=!!summary;
  $('#titleContinue').disabled=!has;$('#titleContinueMeta').textContent=has?summary:'No browser save found on this device';
- $('#titleLoadBrowser').disabled=!titleBrowserSave;$('#titleLoadMeta').textContent=titleBrowserSave?titleSummary(titleBrowserSave):'No browser save found on this device';
+ $('#titleLoadBrowser').disabled=!titleBrowserSave;$('#titleLoadMeta').textContent=titleBrowserSave?titleSummary(titleBrowserSave):'This slot is empty';
  $('#titleContinue').classList.toggle('title-action--primary',has);$('#titleNew').classList.toggle('title-action--primary',!has);
 }
 function showTitlePanel(id=null){
@@ -3245,12 +3281,18 @@ function populateTitleTeams(){
  $('#titleTeam').innerHTML='';schools.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(s=>{const o=document.createElement('option');o.value=s.name;o.textContent=`${s.name} · ${s.conference}`;$('#titleTeam').appendChild(o)});$('#titleTeam').value='Chicago Metropolitan';
 }
 async function refreshTitleSave(){
- try{titleBrowserSave=await browserStore.load();renderTitleState();setTitleStatus(titleBrowserSave?'Browser save ready.':'No browser save found. Start a new dynasty when you are ready.')}
+ try{titleSaveSlots=await browserStore.listSlots();titleBrowserSave=activeSlotMeta()?.empty?null:activeSlotMeta();renderSaveSlotControls();renderTitleState();setTitleStatus(titleBrowserSave?'Browser save ready.':'This slot is empty. Start a new dynasty when you are ready.')}
  catch(e){titleBrowserSave=null;renderTitleState();setTitleStatus(e.message||'The browser save could not be read. You can still import a backup.')}
+}
+async function chooseSaveSlot(slot){setActiveSaveSlot(slot);await refreshTitleSave()}
+async function renameSaveSlot(){
+ try{await browserStore.rename($('#titleSlotName').value);await refreshTitleSave();setTitleStatus('Save slot renamed.')}
+ catch(e){setTitleStatus(e.message||'The save slot could not be renamed.')}
 }
 function startTitleDynasty(){
  if(universe&&!confirm('Start a new dynasty? Save the current session first if you want to keep it.'))return;
- const program=$('#titleTeam').value||'Chicago Metropolitan',mode=$('#titleMode').value||'dynasty';initUniverse(mode);browserArchive=null;refreshTeamOptions(program);enterDynasty();setStatus(`New ${program} ${mode==='commissioner'?'commissioner universe':'dynasty'} ready. Save to preserve it.`);
+ const empty=titleSaveSlots.find(s=>s.empty);if(empty)setActiveSaveSlot(empty.slot);
+ const program=$('#titleTeam').value||'Chicago Metropolitan',mode=$('#titleMode').value||'dynasty';initUniverse(mode);refreshTeamOptions(program);enterDynasty();setStatus(`New ${program} ${mode==='commissioner'?'commissioner universe':'dynasty'} ready in ${activeSlotMeta()?.label||'the selected slot'}. Save to preserve it.`);
 }
 async function continueTitleDynasty(){if(universe){enterDynasty();return}setTitleStatus('Loading browser dynasty…');const ok=await loadBrowser();if(ok)enterDynasty();else setTitleStatus($('#saveStatus').textContent)}
 async function loadTitleDynasty(){if(universe&&!confirm('Load the saved dynasty? Unsaved changes in the current session will be replaced.'))return;setTitleStatus('Loading browser dynasty…');const ok=await loadBrowser();if(ok)enterDynasty();else setTitleStatus($('#saveStatus').textContent)}
@@ -3265,9 +3307,10 @@ $$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.cla
  $('#watchDetailedGame').onclick=watchUserDetailed;
  $('#applyProgramEdit').onclick=()=>commissionerMode()?applyProgramEdit():setStatus('Institutional editing is locked in Dynasty Mode.');
  $('#saveBrowser').onclick=saveBrowser;$('#loadBrowser').onclick=loadBrowser;$('#exportSave').onclick=exportSave;$('#importSave').onclick=()=>$('#importFile').click();$('#importFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;const fromTitle=!$('#titleScreen').hidden,ok=await importSave(file);e.target.value='';if(ok&&fromTitle)enterDynasty();else if(!ok&&fromTitle)setTitleStatus($('#saveStatus').textContent)};
+ $('#saveSlot').onchange=e=>{chooseSaveSlot(e.target.value);setStatus(`Active save slot: ${activeSlotMeta()?.label||e.target.value}.`)};
  $('#newUniverse').onclick=showTitleScreen;
  $('#titleContinue').onclick=continueTitleDynasty;$('#titleNew').onclick=()=>showTitlePanel('titleNewPanel');$('#titleLoad').onclick=()=>showTitlePanel('titleLoadPanel');$('#titleOptions').onclick=()=>showTitlePanel('titleOptionsPanel');$('#titleHowTo').onclick=()=>showTitlePanel('titleHowPanel');
- $('#titleStart').onclick=startTitleDynasty;$('#titleLoadBrowser').onclick=loadTitleDynasty;$('#titleImport').onclick=()=>$('#importFile').click();$('#titleSaveOptions').onclick=saveTitlePreferences;$$('[data-title-back]').forEach(b=>b.onclick=()=>showTitlePanel());
+ $('#titleStart').onclick=startTitleDynasty;$('#titleLoadBrowser').onclick=loadTitleDynasty;$('#titleSaveSlot').onchange=e=>chooseSaveSlot(e.target.value);$('#titleRenameSlot').onclick=renameSaveSlot;$('#titleImport').onclick=()=>$('#importFile').click();$('#titleSaveOptions').onclick=saveTitlePreferences;$$('[data-title-back]').forEach(b=>b.onclick=()=>showTitlePanel());
 }
 if(typeof window!=='undefined')window.__DL_TEST__={selected,createOpening,renderStaff,setTeamScheme,schemeTransition,positionChangeWillingness,commissionerMode,renderControlMode};
 loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});[...new Set(schools.map(t=>t.conference))].forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();applyTitlePreferences();showTitleScreen();refreshTitleSave();}).catch(e=>{$('#titleStatus').textContent='Could not initialize Dynasty Lab. '+e.message});

@@ -127,6 +127,34 @@ test('a slot name that could collide with the key scheme is refused outright',as
  assert.doesNotThrow(()=>Storage.create({indexedDB,name:'X',slot:'dynasty-2'}));
 });
 
+test('the picker lists three named slots with lightweight save metadata',async()=>{
+ const db=freshDb(),first=db('main'),second=db('dynasty-2');
+ let listed=await first.listSlots();
+ assert.deepEqual(listed.map(s=>s.slot),Storage.SLOT_IDS);
+ assert.ok(listed.every(s=>s.empty),'a new database starts with three empty slots');
+ await second.rename('The Rebuild');
+ await second.save(snapshot('Great Lakes University',2034,{phase:'regular',week:7,teams:[{id:1,name:'Great Lakes University',w:6,l:1}]}),
+  {checkpointType:'week',additions:rows('career',4),gameAdditions:rows('game',3)});
+ listed=await first.listSlots();
+ const meta=listed.find(s=>s.slot==='dynasty-2');
+ assert.equal(meta.label,'The Rebuild');
+ assert.equal(meta.program,'Great Lakes University');
+ assert.equal(meta.year,2034);assert.equal(meta.week,7);
+ assert.equal(meta.record,'6-1');assert.equal(meta.checkpointType,'week');
+ assert.ok(meta.approximateBytes>0,'the picker gets an approximate resident size');
+ assert.equal('teams' in meta,false,'metadata does not duplicate the league');
+});
+
+test('slot names are bounded and remain independent',async()=>{
+ const db=freshDb(),first=db('main'),second=db('dynasty-2');
+ await first.rename('Career One');await second.rename('Career Two');
+ await assert.rejects(()=>first.rename(''),/1–40/);
+ await assert.rejects(()=>first.rename('x'.repeat(41)),/1–40/);
+ const listed=await first.listSlots();
+ assert.equal(listed.find(s=>s.slot==='main').label,'Career One');
+ assert.equal(listed.find(s=>s.slot==='dynasty-2').label,'Career Two');
+});
+
 // --- commit 3: safe autosave orchestration ----------------------------------
 
 const {loadEngine}=require('../tools/harness');
@@ -222,7 +250,7 @@ test('compaction never touches a game a player would go back and read',async()=>
  const e=await engine(4906);
  rollSeasons(e,5);
  const user=e.T('Chicago Metropolitan')?.name;
- e.compactGameArchive();
+ assert.ok(e.universe.gameArchive.some(g=>g.compacted),'season rollover compacted eligible history automatically');
  for(const g of e.universe.gameArchive){
   if(!g.compacted)continue;
   assert.equal(g.label==='Regular season'||!g.label,true,`compacted a ${g.label}`);
@@ -235,12 +263,12 @@ test('compaction never touches a game a player would go back and read',async()=>
 
 test('a compacted game keeps its score, team box, injuries and leaders',async()=>{
  const e=await engine(4907);
- rollSeasons(e,5);
- const target=e.universe.gameArchive.find(g=>!e.gameIsProtected(g,e.T('Chicago Metropolitan')?.name)&&(g.season??0)<=e.universe.year-e.GAME_DETAIL_HORIZON);
+ rollSeasons(e,1);
+ const target=e.universe.gameArchive.find(g=>!e.gameIsProtected(g,e.T('Chicago Metropolitan')?.name));
  assert.ok(target,'a compactable game exists');
  const before={id:target.id,score:JSON.stringify(target.score),team:JSON.stringify(target.teamStats),
   injuries:JSON.stringify(target.injuries||[]),lines:target.playerStats.home.length+target.playerStats.away.length};
- e.compactGameArchive();
+ e.compactGame(target);
  assert.ok(target.compacted,'it was compacted');
  assert.equal(target.id,before.id,'the id never changes, so no link breaks');
  assert.equal(JSON.stringify(target.score),before.score);
@@ -261,7 +289,6 @@ test('a compacted game keeps its score, team box, injuries and leaders',async()=
 test('a compacted game still opens to Summary and Box Score, and says it was compacted',async()=>{
  const e=await engine(4908);
  rollSeasons(e,5);
- e.compactGameArchive();
  const g=e.universe.gameArchive.find(x=>x.compacted);
  assert.ok(g,'something was compacted');
  const box=e.gameBoxHTML(g);
@@ -273,12 +300,13 @@ test('a compacted game still opens to Summary and Box Score, and says it was com
 test('compaction is idempotent and recorded in a bounded manifest',async()=>{
  const e=await engine(4909);
  rollSeasons(e,5);
- const first=e.compactGameArchive();
+ const prior=e.universe.compactionManifest.length;
+ const first=e.compactGameArchive({horizon:0});
  assert.ok(first.games>0,'the first pass did work');
- const second=e.compactGameArchive();
+ const second=e.compactGameArchive({horizon:0});
  assert.equal(second.games,0,'a second pass finds nothing left to do');
- assert.equal(e.universe.compactionManifest.length,1,'and records nothing new');
- const m=e.universe.compactionManifest[0];
+ assert.equal(e.universe.compactionManifest.length,prior+1,'and records nothing new');
+ const m=e.universe.compactionManifest.at(-1);
  assert.equal(m.games,first.games);
  assert.equal(m.dropped,first.dropped);
 });
@@ -289,8 +317,18 @@ test('compaction measurably shrinks the archive without losing a single game',as
  const size=o=>Buffer.byteLength(JSON.stringify(o));
  const ids=e.universe.gameArchive.map(g=>g.id);
  const before=size(e.universe.gameArchive);
- e.compactGameArchive();
+ e.compactGameArchive({horizon:0});
  const after=size(e.universe.gameArchive);
  assert.deepEqual(e.universe.gameArchive.map(g=>g.id),ids,'every game is still present, in order');
  assert.ok(after<before*0.85,`expected a real saving, got ${(100*(before-after)/before).toFixed(1)}%`);
+});
+
+test('season-boundary compaction is written back to the active slot',async()=>{
+ const e=await engine(4911);
+ await e.saveBrowser();
+ rollSeasons(e,5);
+ assert.ok(e.universe.gameArchive.some(g=>g.compacted),'the rollover compacted eligible games');
+ e.autosaveAfter('preseason');await e.runAutosave();
+ await e.loadBrowser();await e.ensureGamesLoaded();
+ assert.ok(e.universe.gameArchive.some(g=>g.compacted),'the rewritten game chunks retain compaction after reload');
 });

@@ -10,7 +10,14 @@
   // dynasty can never read or clear another's archives — the old bare-index keys and the
   // store-wide clear() below made that a real hazard the moment a second slot existed.
   const DEFAULT_SLOT = 'main';
+  const SLOT_IDS = [DEFAULT_SLOT, 'dynasty-2', 'dynasty-3'];
   const slotKey = (slot, i) => `${slot}:${i}`;
+  const defaultLabel = id => `Dynasty ${SLOT_IDS.indexOf(id) + 1}`;
+  const byteSize = value => {
+    const text = JSON.stringify(value);
+    if (typeof TextEncoder === 'function') return new TextEncoder().encode(text).length;
+    return unescape(encodeURIComponent(text)).length;
+  };
 
   function create({indexedDB = root.indexedDB, name = 'DynastyLabDB', slot = DEFAULT_SLOT} = {}) {
     if (typeof slot !== 'string' || !slot || /[:;]/.test(slot))
@@ -116,6 +123,62 @@
       });
     }
 
+    // Slot summaries are intentionally separate from the save rows. The title screen can
+    // list three careers without hydrating a league or either archive.
+    function listSlots() {
+      return transact(['saves', 'meta'], 'readonly', (tx, done) => {
+        const saves = tx.objectStore('saves'), meta = tx.objectStore('meta');
+        const rows = new Array(SLOT_IDS.length);
+        let remaining = SLOT_IDS.length * 2;
+        const found = SLOT_IDS.map(() => ({save: null, meta: null}));
+        const finish = () => {
+          if (--remaining) return;
+          for (let i = 0; i < SLOT_IDS.length; i++) {
+            const id = SLOT_IDS[i], saved = found[i].save, summary = found[i].meta;
+            rows[i] = summary || (saved ? summaryFromSnapshot(id, saved, null) : {
+              slot: id, label: defaultLabel(id), empty: true,
+            });
+          }
+          done(rows);
+        };
+        SLOT_IDS.forEach((id, i) => {
+          const s = saves.get(id), m = meta.get(id);
+          s.onsuccess = () => { found[i].save = s.result || null; finish(); };
+          m.onsuccess = () => { found[i].meta = m.result || null; finish(); };
+        });
+      });
+    }
+
+    function rename(label) {
+      const clean = String(label || '').trim().replace(/\s+/g, ' ');
+      if (!clean || clean.length > 40) return Promise.reject(new Error('Save slot names must be 1–40 characters.'));
+      return transact(['meta'], 'readwrite', (tx, done) => {
+        const store = tx.objectStore('meta'), req = store.get(slot);
+        req.onsuccess = () => {
+          const row = {...(req.result || {slot, empty: true}), slot, label: clean};
+          store.put(row, slot);done(row);
+        };
+      });
+    }
+
+    function summaryFromSnapshot(id, snapshot, prior, details = {}) {
+      const u = snapshot?.universe || {}, program = snapshot?.userTeam || 'Unknown program';
+      const team = Array.isArray(u.teams) ? u.teams.find(t => t.name === program) : null;
+      const {playerArchive, gameArchive, ...coreUniverse} = u;
+      const coreBytes = byteSize({...snapshot, universe: coreUniverse});
+      const archiveBytes = details.archiveBytes ?? prior?.archiveBytes ?? 0;
+      const gameBytes = details.gameBytes ?? prior?.gameBytes ?? 0;
+      return {
+        slot: id, label: details.label || prior?.label || defaultLabel(id), empty: false,
+        program, year: u.year, week: u.week, phase: u.phase,
+        record: team ? `${team.w || 0}-${team.l || 0}` : null,
+        version: snapshot?.version || null, savedAt: snapshot?.savedAt || null,
+        checkpointType: details.checkpointType || 'manual',
+        approximateBytes: coreBytes + archiveBytes + gameBytes,
+        coreBytes, archiveBytes, gameBytes,
+      };
+    }
+
     function readArchive(ref) {
       if (!validRef(ref)) return Promise.reject(new Error('Invalid archive reference.'));
       return transact(['saves', 'archives'], 'readonly', (tx, done, fail) => {
@@ -176,13 +239,15 @@
     // A new/imported universe replaces both stores atomically; a loaded universe
     // must still match its last saved revision to avoid overwriting another tab.
     function save(snapshot, {expectedRevision = null, archiveRef = null, additions = [],
-                             gameRef = null, gameAdditions = []} = {}) {
+                             gameRef = null, gameAdditions = [], checkpointType = 'manual'} = {}) {
       if (archiveRef && !validRef(archiveRef)) return Promise.reject(new Error('Invalid archive reference.'));
       if (gameRef && !validRef(gameRef)) return Promise.reject(new Error('Invalid game archive reference.'));
-      return transact(['saves', 'archives', 'games'], 'readwrite', (tx, done, fail) => {
-        const saves = tx.objectStore('saves'), archives = tx.objectStore('archives'), games = tx.objectStore('games');
+      return transact(['saves', 'archives', 'games', 'meta'], 'readwrite', (tx, done, fail) => {
+        const saves = tx.objectStore('saves'), archives = tx.objectStore('archives'), games = tx.objectStore('games'), meta = tx.objectStore('meta');
         const req = saves.get(slot);
         req.onsuccess = () => {
+          const metaReq = meta.get(slot);
+          metaReq.onsuccess = () => {
           try {
             if (expectedRevision !== null && revisionOf(req.result) !== expectedRevision)
               return fail(new Error('Another tab changed this browser save. Export this dynasty or reload before saving.'));
@@ -204,15 +269,21 @@
             const gRef = {id: gameRef?.id || token(), count: (gameRef?.count || 0) + gameAdditions.length, chunks: gameChunks};
             const {playerArchive, gameArchive, ...core} = snapshot.universe;
             const data = {...snapshot, universe: core, storageVersion: 3, archiveRef: ref, gameRef: gRef, revision: token()};
+            const priorMeta = metaReq.result || null;
+            const archiveBytes = (archiveRef ? priorMeta?.archiveBytes || 0 : 0) + byteSize(additions);
+            const gameBytes = (gameRef ? priorMeta?.gameBytes || 0 : 0) + byteSize(gameAdditions);
+            const summary = summaryFromSnapshot(slot, snapshot, priorMeta, {archiveBytes, gameBytes, checkpointType});
             saves.put(data, slot);
-            done({revision: data.revision, archiveRef: ref, gameRef: gRef});
+            meta.put(summary, slot);
+            done({revision: data.revision, archiveRef: ref, gameRef: gRef, meta: summary});
           } catch (e) { fail(e); }
+          };
         };
       });
     }
-    return {load, readArchive, readGames, save};
+    return {load, readArchive, readGames, save, listSlots, rename, slot};
   }
-  const api = {create, revisionOf};
+  const api = {create, revisionOf, SLOT_IDS};
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.DynastyStorage = api;
 })(typeof window === 'object' ? window : globalThis);

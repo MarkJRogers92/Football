@@ -6,8 +6,8 @@ which is where all of this lives and where production is published from.
 ## Where things stand
 
 Shipped and live this session: **v0.9.47** (interactive transfer portal),
-**v0.9.48** (schedule rotation and protected rivalries). **v0.9.49** (save slots,
-autosave, game compaction) is committed and pushed; publish status is in
+**v0.9.48** (schedule rotation and protected rivalries). **v0.9.49** (three named
+save slots, autosave, automatic game compaction) is complete; publish status is in
 `docs/roadmap/STATUS.md`.
 
 Roadmap packets live in `docs/roadmap/`. STATUS.md names the next one and is the
@@ -84,14 +84,11 @@ container that clips. Check the cascade *and* the animations together.
 
 ## Suggested next work
 
-`docs/roadmap/STATUS.md` names the next packet. Two things are worth doing
-regardless:
-
-1. **Finish v0.9.49 commit 2**, the slot picker UI. The storage layer supports
-   multiple slots and nothing exposes them yet, so the feature is invisible.
-2. **Wire compaction to run automatically.** `compactGameArchive()` works and is
-   tested but nothing calls it during normal play; it needs a trigger at a season
-   boundary.
+`docs/roadmap/STATUS.md` names the next packet. v0.9.49 commit 2 and automatic
+season-boundary compaction are finished. The compaction path deliberately loads
+deferred games before rollover and marks their append-only chunks for one atomic
+rewrite; removing that dirty-rewrite path would make memory look compacted while
+IndexedDB silently retained the larger rows.
 
 If you disagree with a roadmap packet after measuring, say so and bring the
 numbers rather than implementing something you know will not work. That happened

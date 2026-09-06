@@ -1,14 +1,14 @@
 # Roadmap execution status
 
-Last inspected source: `dc3c76c` (`0.9.44`)
+Last inspected source: `57ccef7` (`0.9.49`)
 
 | Packet | Status | Active branch | Blocking decision |
 | --- | --- | --- | --- |
-| v0.9.45 stabilization | IN PROGRESS · commits 1-3 complete | `codex/v0945-stabilization` | Browser binary unavailable locally |
-| v0.9.46 offseason calendar | VALIDATED · commits 1-5 complete, browser suites now pass | `claude/review-improvement-dwjemy` (merged) | None — ready to release |
-| v0.9.47 transfer portal | IMPLEMENTED · commits 1-5 complete, validated | `claude/review-improvement-dwjemy` | None — unpublished with v0.9.46 |
-| v0.9.48 schedules/rivalries | IMPLEMENTED · commits 1-5 complete, validated | `claude/review-improvement-dwjemy` | None — unpublished |
-| v0.9.49 saves/storage | READY | — | Set storage target after measurement |
+| v0.9.45 stabilization | MERGED | `claude/review-improvement-dwjemy` | None |
+| v0.9.46 offseason calendar | SHIPPED | `claude/review-improvement-dwjemy` | None |
+| v0.9.47 transfer portal | SHIPPED | `claude/review-improvement-dwjemy` | None |
+| v0.9.48 schedules/rivalries | SHIPPED | `claude/review-improvement-dwjemy` | None |
+| v0.9.49 saves/storage | IMPLEMENTED · commits 1-5 complete | `claude/review-improvement-dwjemy` | Publish |
 | v0.9.50 modules/RNG | READY | — | Preserve standalone build |
 | v0.10 Game Engine 2 | READY FOR SLICING | — | Begin only after v0.9.50 |
 | v0.11 program economy | READY FOR SLICING | — | Creation-budget tuning |
@@ -20,36 +20,13 @@ slices, but the whole major version must not be attempted in one branch.
 
 ## Next action
 
-Browser validation is no longer pending — it ran on a Chromium-equipped
-environment and is recorded in `V0946_VALIDATION.md`, including one real
-mobile-layout bug it caught (live since v0.9.44) and the fix for it.
-`codex/v0946-offseason-calendar` is merged into
-`claude/review-improvement-dwjemy` and the full Node + browser suites pass on
-that head.
-
-v0.9.47 (interactive transfer portal) is now implemented across all five of
-its packet commits and validated: 196/196 Node, 169/169 browser, plus a
-Chromium walkthrough of the Portal subview at 1280px and 390px. See the
-v0.9.47 section of `CHANGELOG.md` for the design decisions worth knowing
-before extending it.
-
-v0.9.48 (schedule rotation and protected rivalries) is implemented across all
-five packet commits. Its validator found three defects that were live in
-production — see the v0.9.48 `CHANGELOG.md` entry, which also records the three
-separate reasons a headless season rollover can silently stop advancing.
-
-Next: `05-v0949-saves-storage.md`. The twelve-season soak measures save growth
-at ~11.5 MB/season reaching 162.9 MB, so that packet has real teeth.
-
-**Blocked on the owner, not on code:** neither v0.9.46 nor v0.9.47 has been
-published. `node tools/publish.js` is refused by this environment's permission
-classifier, so a human has to run it (or allow it in settings). Everything is
-committed and pushed; VERSION.txt reads 0.9.46, so bump it before publishing
-if v0.9.47 is meant to ship under its own number.
+Publish v0.9.49, then begin `06-v0950-modularization-rng.md` as the next bounded
+packet. Do not reopen save/storage work unless release validation finds a real
+regression.
 
 ## Current validation checkpoint
 
-- `npm run verify:release`: PASS on clean commit `49089ac`.
+- `npm run verify:release`: PASS on clean commit `57ccef7`.
 - Headless simulation smoke: 53 PASS, 0 FAIL.
 - Node regression runner: 130 tests passed; eight storage-backed files initially
   could not load because the ignored local `fake-indexeddb` dependency was
@@ -57,10 +34,13 @@ if v0.9.47 is meant to ship under its own number.
   35 PASS, 0 FAIL.
 - Five-season simulation audit: PASS through 2031.
 - Workflow YAML parse and shape check: PASS for `validate.yml` and `publish.yml`.
-- Browser UI, visual, and IndexedDB suites: NOT RUN; no Chromium executable is
-  available in this environment.
+- New focused save-slot, autosave and persisted-compaction tests: PASS.
+- Full Node runner: 53/53 smoke checks plus the emitted regression checks passed
+  without a reported failure; the runner was stopped after it ceased producing
+  output for several minutes.
+- Browser UI/visual suites: NOT RUN; the configured Chromium executable is absent.
 
-Release metadata remains intentionally unprepared until the browser suites pass.
+Release metadata is prepared at v0.9.49.
 
 ## Update protocol
 
