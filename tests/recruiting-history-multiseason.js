@@ -25,11 +25,11 @@ const {makeRecruitingHistorySystem}=require('../recruiting-history.js');
  assert.equal(snap.schoolId,team().id);
  for(const hidden of ['trueNow','upside','growthProfile'])assert.equal(Object.hasOwn(snap,hidden),false);
 
- // Complete the real season/offseason. Enrollment must carry recruitingMemory + receipt into the player record.
+ // Complete the real season/offseason. Enrollment assigns a new player id, so the durable bridge is the signing receipt's recruitId.
  e.simSeason();e.simConferenceChampionships();e.simPlayoff();e.runSpringCamp();e.runFallCamp();e.runOffseason();
  let controlled=team();
- let player=controlled.roster.find(p=>p.id===recruit.id);
- assert.ok(player,`expected recruit id ${recruit.id} (${recruit.name}) to enroll on the controlled roster`);
+ let player=controlled.roster.find(p=>p.recruitingMemory?.scoutingReceipt?.recruitId===recruit.id);
+ assert.ok(player,`expected recruit id ${recruit.id} (${recruit.name}) to enroll with its signing receipt`);
  const trackedId=player.id;
  assert.deepEqual(player.recruitingMemory?.scoutingReceipt,snap,'enrollment must preserve the signing receipt');
 
