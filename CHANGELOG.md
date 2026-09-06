@@ -1,3 +1,11 @@
+## v0.9.54 — Recruiting Intelligence
+
+- Makes Staff Shortlist materially faster with exact branch-and-bound pruning: identical top-eight recommendations with an average 85.7% reduction in Staff Verdict calls across five generated 2,800-recruit universes.
+- Adds Recruiting Class History so signing-day staff beliefs can mature into Diamonds, Hits, Busts, Misses, As Scouted and provisional watch states using only later observed evidence.
+- Adds a Recruit Evaluation Trail showing how Quick Film and Full Evaluation changed confidence, range width and Staff Verdict.
+- Adds Recruiting Board filters for position, evaluation stage, Staff Verdict and targeted-only status across the full recruit pool before the 220-row display cap.
+- Keeps the full scouting feedback loop uncertainty-safe: hidden true ratings, hidden upside, hidden development curve/volatility and hidden traits never drive player-facing verdicts, filters or historical grades.
+
 ## v0.9.53 — Recruiting and development polish
 
 - Gives all 69 player archetypes clear, save-safe identities without changing their simulation keys.
