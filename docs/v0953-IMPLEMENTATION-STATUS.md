@@ -12,7 +12,7 @@ Production baseline: v0.9.52. Production publishing is not authorized by this wo
 
 Implementation follows the September 6 recruiting/development polish handoff. Work is divided into bounded commits that can be resumed by another model. Existing simulation mechanics and save keys are preserved unless a later milestone explicitly requires additive state.
 
-Scouting features must preserve uncertainty. Player-facing recommendations may use current scouting ranges, confidence, visible recruiting context and staff evaluation, but must not expose or rank directly from hidden `trueNow`, hidden upside, hidden development profile or hidden trait values.
+Scouting and development-intelligence features must preserve uncertainty. Player-facing recommendations may use current scouting ranges, confidence, visible recruiting context, staff evaluation and already-observed camp/season receipts, but must not expose or rank directly from hidden `trueNow`, hidden upside, hidden development profile, hidden volatility or hidden trait values.
 
 ## Completed checkpoint: Milestone A — Archetype foundation
 
@@ -104,13 +104,11 @@ Commit: `5667c87c53a4651a48dc0acde8dce45a3144fb61`
 Latest source commits include `5a2ecc8ff651aa2c62dcf33d4eb3b3cd480e49b1`, `9f7fbc37a67a764e56a4ceff7c44cd4405c237e4`, and `92c2b055b613271f0b515d9e41079e54962199a0`.
 
 - Preliminary Staff Verdict, Compare and Staff Shortlist views no longer create persistent `manualScouting` state merely by being rendered.
-- Preliminary verdicts use the existing visible `scout`, `scoutUp` and confidence summary until detailed scouting domains actually exist.
+- Preliminary verdicts use the existing visible `scout`, `scoutUp` and confidence summary until detailed `scoutingDomains` actually exist.
 - Detailed scouting domains are created only when the player explicitly targets/evaluates a prospect through the existing evaluation path.
 - Added regressions proving preliminary browsing is read-only and that a real scouting action is the point where persistent detailed state begins.
 
 ## Completed checkpoint: Milestone J — Delayed scouting receipts and recruiting recap
-
-Latest synced standalone checkpoint before this documentation trigger: `3162db85ceb82931302863872f03025ff8d484a2`.
 
 - A recruit committed to the controlled program now freezes a compact signing receipt inside `recruitingMemory` containing only the staff-visible signing belief: visible current/upside reads, Staff Verdict, confidence, evaluation stage, hours spent, rank/stars and interest.
 - Receipt snapshots never store hidden `trueNow`, hidden upside, hidden growth profile or hidden trait values.
@@ -122,6 +120,20 @@ Latest synced standalone checkpoint before this documentation trigger: `3162db85
 - The final scouting extension refreshes the tab router after all recruiting/roster render wrappers are installed so tab navigation reaches the complete UI chain.
 - Added pure regression coverage for receipt immutability, maturation gates, diamond/bust outcomes, team recap arithmetic and hidden-rating independence.
 
+## Completed checkpoint: Milestone K — Progressive development tendency clues
+
+Source slice: `c91600fae5d33079ab9ba13f963de3de4a002989` through `b9da0f9697ebe0f34b6965d03a0b129e4ae0a380`.
+Latest synced standalone checkpoint: `45178951085f707390bf967a075827e431a40050`.
+
+- Added a pure development-tendency system that reads only accumulated Spring/Fall camp receipts plus current staff confidence.
+- Possible evidence-backed labels include `Steady Riser`, `Accelerating`, `Camp Surge`, `Uneven Progress`, `Plateau Watch`, `Gradual Progress`, and `Development Concern`.
+- The system refuses to call a pattern with fewer than two observations or low staff confidence.
+- Roster rows can show concise tendency badges once evidence is meaningful.
+- Development & Camp gains an `Observed Growth Patterns` staff panel with the evidence count and confidence behind every label.
+- The UI explicitly states that labels do not reveal a hidden development curve or ceiling.
+- Added regression coverage for evidence thresholds, steady/accelerating/volatile/plateau patterns, team summaries and hidden-field independence.
+- The final extension refreshes the Roster and Development tab-router callbacks after wrapping their renderers.
+
 ## Standalone build handling during this workstream
 
 The repository's validator requires committed `index.html` to exactly match `npm run build`. Because this session cannot clone GitHub through the shell, a temporary branch-only workflow `.github/workflows/sync-v0953-build.yml` was added to build and commit the generated standalone artifact after source pushes. It is guarded against bot recursion.
@@ -131,13 +143,15 @@ The repository's validator requires committed `index.html` to exactly match `npm
 ## Validation status
 
 - Source pushes intentionally hit the `index.html` freshness gate until the branch-only sync workflow commits the generated standalone artifact.
-- The latest standalone sync completed successfully at `3162db85ceb82931302863872f03025ff8d484a2`.
-- This documentation-only checkpoint is being pushed specifically to trigger the normal validator against the already-synced source tree so it can proceed into release verification, engine/presentation tests, browser tests, browser storage and the simulation audit.
-- Do not publish v0.9.53 until that full validation is green or any real failures are diagnosed and fixed.
+- The latest standalone sync completed successfully at `45178951085f707390bf967a075827e431a40050`.
+- An earlier clean validator reached the real engine/presentation test step before subsequent source pushes cancelled superseded runs.
+- This documentation-only checkpoint is intended to trigger a clean validator against the now-synced Milestone K tree. Leave source unchanged while that run proceeds so it can reach engine, browser, browser-storage and simulation-audit stages.
+- Do not publish v0.9.53 until full validation is green or any real failures are diagnosed and fixed.
 
 ## Next bounded slices
 
-1. Diagnose and fix any real full-validator failure after the synced-tree validation run.
-2. Add progressive development-tendency clues derived only from accumulated camp/season evidence, never directly from hidden growth profile or volatility.
-3. Consider a fuller historical recruiting-class receipt view once current-roster/archive loading behavior is confirmed under browser validation.
-4. Remove the temporary build-sync workflow, run final full validation, then prepare release notes. Production remains v0.9.52 until separately authorized.
+1. Diagnose and fix any real full-validator failure from the synced Milestone K tree.
+2. If validation is green, audit the combined Recruiting page for density/performance and consider a fuller historical recruiting-class receipt view.
+3. Add/refresh a final v0.9.53 release handoff and release notes.
+4. Remove the temporary build-sync workflow and run final validation on the release tree.
+5. Production remains v0.9.52 until separately authorized.
