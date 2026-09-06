@@ -1,0 +1,40 @@
+name: Sync v0.9.53 standalone build
+
+on:
+  push:
+    branches:
+      - codex/v0953-recruiting-development-polish
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v0953-build-sync
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v0953-recruiting-development-polish
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install --no-package-lock
+      - run: npm run build
+      - name: Commit generated standalone artifact
+        shell: bash
+        run: |
+          if git diff --quiet -- index.html; then
+            echo "index.html already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "build: sync v0.9.53 standalone artifact"
+          git push origin HEAD:codex/v0953-recruiting-development-polish
