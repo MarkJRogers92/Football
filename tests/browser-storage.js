@@ -21,6 +21,9 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   const tab=id=>goTab(page, id);
   const status=pattern=>page.waitForFunction(source=>new RegExp(source).test(document.querySelector('#saveStatus').textContent),pattern,{timeout:30000});
   await page.click('#simSeason');await tab('season');await page.click('#simConf');await page.click('#simPlayoff');
+  // The ordered offseason calendar introduced before v0.9.52 requires review, departures,
+  // signing and portal resolution before Spring Development becomes actionable.
+  await tab('offseason');for(let i=0;i<4;i++)await page.click('#runOffseason');
   await tab('development');await page.click('#runSpringCamp');await page.click('#runFallCamp');
   await tab('offseason');await page.click('#runOffseason');
   await page.waitForFunction(()=>document.querySelector('#weekLine').textContent.includes('2028'));
