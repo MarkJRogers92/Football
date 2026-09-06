@@ -685,6 +685,8 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 .signing-card-avatar canvas,.commitment-avatar canvas,.recruit-hero-avatar canvas{display:block;width:100%;height:100%;border-radius:inherit}
 .signing-card-avatar:has(canvas),.commitment-avatar:has(canvas),.recruit-hero-avatar:has(canvas){padding:0}
 
+.scouting-budget-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding:9px 11px;border:1px solid rgba(255,255,255,.12);border-radius:8px}.scouting-budget-strip strong{letter-spacing:.04em;text-transform:uppercase;font-size:.78rem}.scouting-budget-strip span{font-weight:700}.scouting-budget-strip small{opacity:.7}.scouting-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.scouting-actions button{font-size:.72rem;padding:4px 7px;white-space:nowrap}.scouting-actions button:disabled{opacity:.45}.scouting-profile-actions{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px;margin-bottom:12px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.scouting-profile-actions>div:first-child{display:grid;gap:2px}.scouting-profile-actions>div:first-child span{font-size:.82rem;opacity:.72}@media(max-width:760px){.scouting-profile-actions{align-items:flex-start}.scouting-actions{width:100%}.scouting-actions button{flex:1 1 130px}}
+
 /* Dynasty Lab commercial polish layer (v0.9.14 pass).
    Loaded last. Presentation only: no simulation, storage or save-format code depends on it.
    Section 1 — flagship Dashboard. Later sections add shared primitives. */
@@ -5835,6 +5837,108 @@ $$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.cla
  $('#titleStart').onclick=startTitleDynasty;$('#titleLoadBrowser').onclick=loadTitleDynasty;$('#titleSaveSlot').onchange=e=>chooseSaveSlot(e.target.value);$('#titleRenameSlot').onclick=renameSaveSlot;$('#titleImport').onclick=()=>$('#importFile').click();$('#titleSaveOptions').onclick=saveTitlePreferences;$$('[data-title-back]').forEach(b=>b.onclick=()=>showTitlePanel());
 }
 if(typeof window!=='undefined')window.__DL_TEST__={selected,createOpening,renderStaff,setTeamScheme,schemeTransition,positionChangeWillingness,commissionerMode,renderControlMode,prepareDevelopmentResults(){universe.phase='complete';universe.offseason=makeOffseasonState(universe.year,'spring',['review','departures','signing','portal']);runSpringCamp()}};
+function makeScoutingActionSystem(env){
+ 'use strict';
+ const COSTS={quick:1,full:3};
+ const gainFor=kind=>kind==='full'?10:4;
+ const phaseFor=kind=>kind==='full'?'FULL_EVALUATION':'QUICK_FILM';
+ const labelFor=kind=>kind==='full'?'Full Evaluation':'Quick Film';
+ function universe(){return env.getUniverse()}
+ function scoutingBudgetFor(t){
+  const rc=t?.staff?.RC||{},hc=t?.staff?.HC||{};
+  return env.clamp(Math.round(5+(rc.evaluation||60)/18+(rc.recruiting||60)/32+(hc.evaluation||60)/55),8,14);
+ }
+ function ensureScoutingWeek(t){
+  const u=universe(),budget=scoutingBudgetFor(t),old=t.scoutingWeek;
+  if(!old||old.year!==u.year||old.week!==u.week)t.scoutingWeek={year:u.year,week:u.week,budget,spent:0};
+  else{old.budget=budget;old.spent=env.clamp(Math.round(old.spent||0),0,budget)}
+  return t.scoutingWeek;
+ }
+ function scoutingHoursLeft(t){const s=ensureScoutingWeek(t);return Math.max(0,s.budget-s.spent)}
+ function recruitScoutingRecord(r,t){
+  const u=universe();r.manualScouting??={};const key=String(t.id);let row=r.manualScouting[key];
+  if(!row||row.season!==u.year)row=r.manualScouting[key]={season:u.year,quick:false,full:false,receipts:[]};
+  row.receipts=Array.isArray(row.receipts)?row.receipts:[];return row;
+ }
+ function actionAvailability(r,t,kind){
+  if(!COSTS[kind])return{ok:false,reason:'Unknown scouting action.'};
+  if(!r||!t)return{ok:false,reason:'No recruit selected.'};
+  if(universe().phase!=='regular')return{ok:false,reason:'Manual recruit evaluation is available during the regular recruiting season.'};
+  if(r.committed&&r.committed!==t.name)return{ok:false,reason:`${r.name} is committed elsewhere.`};
+  const rec=recruitScoutingRecord(r,t);
+  if(kind==='quick'&&(rec.quick||rec.full))return{ok:false,reason:'Quick Film is already complete for this recruit.'};
+  if(kind==='full'&&rec.full)return{ok:false,reason:'Full Evaluation is already complete for this recruit.'};
+  const cost=COSTS[kind],left=scoutingHoursLeft(t);
+  if(cost>left)return{ok:false,reason:`Only ${left} evaluation hour${left===1?'':'s'} remain this week.`};
+  return{ok:true,cost,left,record:rec};
+ }
+ function width(rows){return rows.length?Math.round(env.avg(rows.map(x=>Math.max(0,(x.high||0)-(x.low||0))))*10)/10:0}
+ function confidence(rows){return rows.length?Math.round(env.avg(rows.map(x=>x.confidence||0))):0}
+ function performScoutingAction(r,t,kind){
+  const check=actionAvailability(r,t,kind);if(!check.ok)return check;
+  const before=env.scoutingDomainView(r,t,true),beforeConfidence=confidence(before),beforeWidth=width(before);
+  if(!(r.scoutingHistory||[]).length)env.firstRecruitEvaluation(r,t);
+  env.refreshScoutingIntel(r,t,gainFor(kind),phaseFor(kind),true);
+  env.snapshotScouting(r,t,phaseFor(kind),'MANUAL_SCOUT',true);
+  const after=env.scoutingDomainView(r,t,true),afterConfidence=confidence(after),afterWidth=width(after),week=ensureScoutingWeek(t),rec=check.record;
+  week.spent+=check.cost;
+  if(kind==='quick')rec.quick=true;else{rec.quick=true;rec.full=true}
+  const receipt={season:universe().year,week:universe().week,kind,cost:check.cost,beforeConfidence,afterConfidence,beforeWidth,afterWidth};
+  rec.receipts.push(receipt);if(rec.receipts.length>8)rec.receipts.splice(0,rec.receipts.length-8);
+  return{ok:true,label:labelFor(kind),cost:check.cost,remaining:scoutingHoursLeft(t),receipt};
+ }
+ return{COSTS,scoutingBudgetFor,ensureScoutingWeek,scoutingHoursLeft,recruitScoutingRecord,actionAvailability,performScoutingAction};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeScoutingActionSystem};
+}else{
+ const recruitScoutingActions=makeScoutingActionSystem({
+  getUniverse:()=>universe,clamp,avg,scoutingDomainView,firstRecruitEvaluation,refreshScoutingIntel,snapshotScouting
+ });
+ const scoutingBudgetFor=recruitScoutingActions.scoutingBudgetFor;
+ const ensureScoutingWeek=recruitScoutingActions.ensureScoutingWeek;
+ const scoutingHoursLeft=recruitScoutingActions.scoutingHoursLeft;
+ const recruitScoutingRecord=recruitScoutingActions.recruitScoutingRecord;
+ const scoutingActionAvailability=recruitScoutingActions.actionAvailability;
+ const performRecruitScoutingAction=recruitScoutingActions.performScoutingAction;
+ function scoutingActionButtonsHTML(r,t){
+  const q=scoutingActionAvailability(r,t,'quick'),f=scoutingActionAvailability(r,t,'full'),rec=recruitScoutingRecord(r,t),title=x=>String(x.reason||'').replace(/"/g,'&quot;');
+  return `<div class="scouting-actions"><button type="button" data-scout-action="quick" data-scout-recruit="${r.id}" ${q.ok?'':`disabled title="${title(q)}"`}>${rec.quick||rec.full?'Film Reviewed':'Quick Film · 1h'}</button><button type="button" data-scout-action="full" data-scout-recruit="${r.id}" ${f.ok?'':`disabled title="${title(f)}"`}>${rec.full?'Full Eval Complete':'Full Evaluation · 3h'}</button></div>`;
+ }
+ function bindScoutingActionButtons(){
+  $$('[data-scout-action]').forEach(b=>b.onclick=()=>{
+   const r=universe.recruits.find(x=>String(x.id)===String(b.dataset.scoutRecruit)),t=selected(),dialog=b.closest?.('#recruitDialog');
+   const res=performRecruitScoutingAction(r,t,b.dataset.scoutAction);
+   setStatus(res.ok?`${res.label}: ${r.name}. ${res.remaining} evaluation hour${res.remaining===1?'':'s'} left this week.`:res.reason);
+   renderRecruiting();
+   if(dialog&&res.ok){const d=$('#recruitDialog');if(d?.open)d.close();showRecruitProfile(r.id)}
+  });
+ }
+ function renderScoutingActionUI(){
+  const t=selected(),summary=$('#classSummary');if(!t||!summary)return;
+  const week=ensureScoutingWeek(t),left=scoutingHoursLeft(t),strip=`<div class="scouting-budget-strip"><strong>Evaluation Hours</strong><span>${left} / ${week.budget} left this week</span><small>Quick Film costs 1 · Full Evaluation costs 3 · unused hours do not roll over</small></div>`;
+  summary.insertAdjacentHTML?.('beforeend',strip);
+  $$('[data-recruit]').forEach(link=>{
+   const r=universe.recruits.find(x=>String(x.id)===String(link.dataset.recruit)),row=link.closest?.('tr'),cell=row?.querySelector?.('td[data-label="Scout"]');
+   if(!r||!cell||cell.querySelector?.('.scouting-actions'))return;
+   cell.insertAdjacentHTML?.('beforeend',scoutingActionButtonsHTML(r,t));
+  });
+  bindScoutingActionButtons();
+ }
+ const renderRecruitingBeforeScoutingActions=renderRecruiting;
+ renderRecruiting=function(){renderRecruitingBeforeScoutingActions();renderScoutingActionUI()};
+ const showRecruitProfileBeforeScoutingActions=showRecruitProfile;
+ showRecruitProfile=function(id){
+  showRecruitProfileBeforeScoutingActions(id);
+  const r=universe.recruits.find(x=>String(x.id)===String(id)),t=selected(),body=$('#recruitDialogBody');
+  if(r&&t&&body&&!body.querySelector?.('.scouting-profile-actions')){
+   const week=ensureScoutingWeek(t);body.insertAdjacentHTML?.('afterbegin',`<div class="scouting-profile-actions"><div><strong>Evaluation room</strong><span>${scoutingHoursLeft(t)} of ${week.budget} hours left this week</span></div>${scoutingActionButtonsHTML(r,t)}</div>`);
+   bindScoutingActionButtons();
+  }
+ };
+}
+
 loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});[...new Set(schools.map(t=>t.conference))].forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();applyTitlePreferences();showTitleScreen();refreshTitleSave();}).catch(e=>{$('#titleStatus').textContent='Could not initialize Dynasty Lab. '+e.message});
 })();
 
@@ -6272,6 +6376,55 @@ document.addEventListener('click',()=>setTimeout(queue,0));document.querySelecto
 if(window.MutationObserver){for(const [sel,attrs] of [['#recruitBody',false],['#classSummary',false],['#weeklyHub',false],['#recruitDialog',true]]){const el=document.querySelector(sel);if(el)new MutationObserver(queue).observe(el,{childList:true,subtree:true,characterData:true,attributes:attrs})}}
 queue();
 })();
+
+(function(root,factory){
+ const api=factory();
+ if(typeof module==='object'&&module.exports)module.exports=api;
+ else{root.DynastyNextAction=api;api.install(root.document)}
+})(typeof globalThis!=='undefined'?globalThis:this,function(){
+ 'use strict';
+ function model({decisionCount=0,items=[]}={}){
+  if(decisionCount>0)return{kind:'decision',label:decisionCount===1?'Resolve decision':`Resolve ${decisionCount} decisions`};
+  const item=items.find(x=>!x.done);
+  return item?{kind:'plan',label:item.label||'Next action',tab:item.tab||null,index:item.index??0}:{kind:'clear',label:'All caught up'};
+ }
+ function readState(doc){
+  const decisions=[...(doc.querySelectorAll?.('#weeklyDecisions .decision-card')||[])];
+  const nodes=[...(doc.querySelectorAll?.('#weeklyPlan .plan-item')||[])];
+  const items=nodes.map((el,index)=>({index,done:el.classList?.contains('plan-done'),label:el.querySelector?.('.plan-label')?.textContent?.trim()||'',tab:el.dataset?.tab||null,node:el}));
+  return{decisions,items,next:model({decisionCount:decisions.length,items})};
+ }
+ function install(doc){
+  if(!doc?.querySelector)return false;
+  const button=doc.querySelector('#hubAdvance'),plan=doc.querySelector('#weeklyPlan'),decisions=doc.querySelector('#weeklyDecisions');
+  if(!button||!plan)return false;
+  button.dataset.nextActionController='1';
+  const refresh=()=>{
+   const state=readState(doc),next=state.next;
+   button.textContent=next.kind==='clear'?'All caught up':`Next: ${next.label}`;
+   button.disabled=next.kind==='clear';
+   button.title=next.kind==='decision'?'Resolve the Coach’s Desk item before advancing.':'Open the next unfinished item from the weekly plan.';
+   return state;
+  };
+  button.addEventListener('click',e=>{
+   const state=refresh();
+   e.preventDefault();e.stopImmediatePropagation();
+   if(state.next.kind==='decision'){
+    const target=state.decisions[0]?.querySelector?.('.decision-option')||state.decisions[0];
+    target?.scrollIntoView?.({block:'center'});target?.focus?.();return;
+   }
+   if(state.next.kind==='plan'){
+    const item=state.items.find(x=>!x.done)?.node;
+    item?.click?.();item?.focus?.();
+   }
+  },true);
+  const Observer=doc.defaultView?.MutationObserver||root.MutationObserver;
+  if(Observer){const observer=new Observer(refresh);observer.observe(plan,{childList:true,subtree:true,attributes:true});if(decisions)observer.observe(decisions,{childList:true,subtree:true});button.__nextActionObserver=observer}
+  refresh();
+  return true;
+ }
+ return{model,readState,install};
+});
 
 (() => {
 'use strict';
