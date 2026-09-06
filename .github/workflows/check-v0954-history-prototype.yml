@@ -22,3 +22,7 @@ jobs:
         run: node --test tests/scouting-receipts.js tests/recruiting-history.js
       - name: Build standalone prototype
         run: npm run build
+      - name: Verify history surface is bundled
+        run: |
+          grep -q "Recruiting Class History" index.html
+          grep -q "Historical classes use the same maturation gates" index.html
