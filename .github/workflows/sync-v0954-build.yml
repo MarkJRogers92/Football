@@ -25,8 +25,8 @@ jobs:
         with:
           node-version: '24'
       - run: npm install --no-package-lock
-      - name: Focused shortlist regression
-        run: node --test tests/recruiting-shortlist.js
+      - name: Focused recruiting/scouting regressions
+        run: node --test tests/scouting-actions.js tests/scouting-trail.js tests/recruiting-filters.js tests/scouting-receipts.js tests/recruiting-history.js tests/recruiting-shortlist.js
       - run: npm run build
       - name: Commit generated standalone artifact
         shell: bash
