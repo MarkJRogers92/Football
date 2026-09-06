@@ -15,14 +15,13 @@ async function startNewDynasty(page){
   page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
   try{
     await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);await goTab(page,'gamelab');
-    await page.waitForSelector('#v2RecordGate',{timeout:10000});
-    assert.equal(await page.locator('[data-v2-record]').isEnabled(),true,'v2 record gate should be enabled for current scheduled game');
+    assert.equal(await page.locator('#v2RecordGate').count(),0,'temporary development record button should be absent after Detailed Game cutover');
     const rollback=await page.evaluate(()=>window.__DL_TEST__.v2RollbackProbe('afterArchive'));
     assert.equal(rollback.ok,true,`rollback probe failed: ${rollback.message}\n${JSON.stringify({before:rollback.before,after:rollback.after})}`);
     await page.click('[data-v2-shadow-run]');
     await page.waitForFunction(()=>/Archive transaction dry run: PASS/.test(document.querySelector('#v2ShadowLab')?.textContent||''),{timeout:20000});
     const before=await page.evaluate(()=>window.DynastyGameEngineV2LabBridge.debug());
-    page.once('dialog',d=>d.accept());await page.click('[data-v2-record]');
+    await page.evaluate(()=>window.DynastyGameEngineV2LabBridge.recordCurrent());
     await page.waitForFunction(()=>window.DynastyGameEngineV2LabBridge.debug().lastArchive?.engine==='v2',{timeout:30000});
     const after=await page.evaluate(()=>window.DynastyGameEngineV2LabBridge.debug());
     assert.equal(after.archiveLength,before.archiveLength+1,'one permanent archive record should be added');
@@ -42,6 +41,6 @@ async function startNewDynasty(page){
     await page.locator('#gameTabs button').filter({hasText:/^Box Score$/}).click();assert.ok((await page.locator('#gameDialogBody').innerText()).length>100,'v2 box score should render');
     await page.locator('#gameTabs button').filter({hasText:/^Play-by-Play$/}).click();const pbp=await page.locator('#gameDialogBody').innerText(),playlines=await page.locator('#gameDialogBody .playline').count();assert.ok(playlines>10&&/Archived generated play log/i.test(pbp),'v2 archived play-by-play should render durable generated lines');
     assert.deepEqual(errors,[],`browser emitted errors: ${errors.join('\n')}`);
-    console.log('PASS v0.10.1 recorded Game Engine 2 browser transaction + rollback gate');
+    console.log('PASS v0.10.2 recorded Game Engine 2 browser transaction + rollback API gate');
   }finally{await browser.close()}
 })().catch(err=>{console.error(err);process.exit(1)});
