@@ -1,0 +1,38 @@
+name: v0951 Program Lab hotfix
+
+on:
+  push:
+    branches:
+      - codex/v0951-program-hotfix
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-build:
+    if: ${{ !contains(github.event.head_commit.message, '[skip hotfix ci]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v0951-program-hotfix
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install --no-package-lock
+      - name: Season-goal render regression
+        run: node --test tests/season-goals.js
+      - name: Build standalone artifact
+        run: npm run build
+      - name: Verify helper is bundled before app
+        run: grep -q "DynastyEscape" index.html
+      - name: Commit generated artifact
+        run: |
+          if ! git diff --quiet -- index.html; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add index.html
+            git commit -m "Rebuild v0.9.51 Program Lab hotfix [skip hotfix ci]"
+            git push origin HEAD:codex/v0951-program-hotfix
+          fi
