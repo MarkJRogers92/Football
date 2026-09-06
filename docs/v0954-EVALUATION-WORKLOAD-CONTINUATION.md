@@ -2,9 +2,10 @@
 
 Updated: September 6, 2026
 
-Continuation branch: `codex/v0954-evaluation-workload-resume`
-Feature parent: `83c50655b75ed73aaaac8fa96d85f68f38685117`
-Active upstream workstream: `codex/v0954-recruiting-performance`
+Active workstream: `codex/v0954-recruiting-performance`
+Former continuation branch: `codex/v0954-evaluation-workload-resume`
+Feature commit: `83c50655b75ed73aaaac8fa96d85f68f38685117`
+Integration/handoff commit: `0789181370da6f71be8f7c7c1b118bf96916651c`
 Production remains v0.9.52.
 
 ## Completed bounded slice
@@ -18,23 +19,26 @@ Added read-only scouting workload context to the existing Evaluation Hours strip
 - Does not read hidden true rating, hidden upside, hidden development profile, hidden volatility, or hidden traits.
 - Added focused regression coverage for count/capacity arithmetic, read-only behavior and hidden-rating independence.
 
-## Validation state
+## Current integration state
 
-The parent v0.9.54 combined checkpoint is fully green: validator run `34042843431`.
+The previously blocked fast-forward is now complete: `codex/v0954-recruiting-performance` was advanced from `623291b...` through `0789181...`.
 
-Validator run `34046150865` for this slice failed immediately at committed-build freshness because the temporary `sync-v0954-build.yml` workflow only watches `codex/v0954-recruiting-performance`. This is expected development-plumbing behavior; no engine/browser regression stage ran.
+The branch-only v0.9.54 build-sync workflow then regenerated `index.html`; a comparison from `0789181...` to the active branch shows exactly one subsequent commit changing only `index.html` (+8/-2), matching the source scouting workload change.
 
-Container-side clone/build validation was unavailable because the runtime has no external DNS access.
+The parent v0.9.54 combined checkpoint remains fully green at validator run `34042843431`.
 
-## Connector limitation encountered
+The earlier validator run `34046150865` failed only because the temporary build-sync workflow did not watch the former continuation branch. That specific freshness condition is now resolved by integration into the watched active branch.
 
-The connector allowed creation of Git objects and branches but refused to move the existing `codex/v0954-recruiting-performance` ref directly. The work was therefore preserved on a bounded continuation branch rather than forcing upstream.
+## Validation still required
+
+Run the focused `tests/scouting-actions.js` regression against the active synchronized branch, then run the coherent full validator. Do not treat the slice as fully closed until those checks are green.
+
+If a browser/Playwright/Chrome stage is slow or unavailable, record it and continue with independent non-browser validation instead of blocking the workstream.
 
 ## Exact next step
 
-1. Resume from `codex/v0954-evaluation-workload-resume`.
-2. Integrate the feature commit into `codex/v0954-recruiting-performance` by fast-forward/merge.
-3. Let the branch-only v0.9.54 build-sync workflow regenerate and commit `index.html`.
-4. Run the focused scouting-actions regression and then the coherent full validator.
-5. If green, mark this slice complete and continue with the next recruiting/scouting/development legibility improvement.
-6. Do not publish production without explicit authorization.
+1. Validate the synchronized `codex/v0954-recruiting-performance` head with the focused scouting-actions test.
+2. Run the coherent full validator.
+3. If green, mark Evaluation Workload complete.
+4. Then inspect the remaining recruiting/scouting/development flow for the next bounded legibility/decision-quality slice.
+5. Do not publish production without explicit authorization.
