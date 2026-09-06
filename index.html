@@ -5989,8 +5989,8 @@ function makeRecruitCompareSystem(env){
 if(typeof module==='object'&&module.exports){
  module.exports={makeRecruitCompareSystem};
 }else{
- const recruitCompareScoutingApi=makeScoutingActionSystem({getUniverse:()=>universe,clamp,avg,scoutingDomainView,firstRecruitEvaluation,refreshScoutingIntel,snapshotScouting,staffEval,staffBias:(r,t)=>scoutHash(r,'staff_verdict',String(t.id))*12});
- const recruitCompareSystem=makeRecruitCompareSystem({staffVerdict:recruitCompareScoutingApi.staffVerdict,scoutingRecord:recruitCompareScoutingApi.recruitScoutingRecord});
+ const recruitCompareScoutingApi=makeScoutingActionSystem({getUniverse:()=>universe,clamp,avg,scoutingDomainView,firstRecruitEvaluation,refreshScoutingIntel,snapshotScouting,staffEval,staffBias:(r,t)=>scoutHash(r,'staff_verdict',String(t.id))*12,hasDetailedScouting:r=>!!(r?.scoutingDomains&&Object.keys(r.scoutingDomains).length)});
+ const recruitCompareSystem=makeRecruitCompareSystem({staffVerdict:recruitCompareScoutingApi.staffVerdict,scoutingRecord:(r,t)=>recruitCompareScoutingApi.recruitScoutingRecord(r,t,false)});
  let recruitCompareIds=[];
  function compareToggleHTML(r){const on=recruitCompareIds.includes(String(r.id));return `<button type="button" class="recruit-compare-toggle${on?' active':''}" data-compare-recruit="${r.id}">${on?'Compared':'Compare'}</button>`}
  function recruitCompareTrayHTML(t){
