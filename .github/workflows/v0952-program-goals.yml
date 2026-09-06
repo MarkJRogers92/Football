@@ -27,8 +27,6 @@ jobs:
         run: node --test tests/season-goals.js tests/season-goals-v0952.js
       - name: Build standalone artifact
         run: npm run build
-      - name: Release-source verification
-        run: npm run verify:release
       - name: Commit v0.9.52 source and artifact
         run: |
           git config user.name "github-actions[bot]"
@@ -38,3 +36,5 @@ jobs:
             git commit -m "Implement v0.9.52 Program Lab and season-goal polish [skip v0952 ci]"
             git push origin HEAD:codex/v0952-program-goals-polish
           fi
+      - name: Release-source verification
+        run: npm run verify:release
