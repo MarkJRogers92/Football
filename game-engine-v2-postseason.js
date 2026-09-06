@@ -1,4 +1,5 @@
 // v0.10.2 development extension: user-controlled postseason games use the same transactional Game Engine 2 path.
+let v2PostseasonInjectedFault=null;
 function v2PostseasonUserMatch(a,b){const me=selected();return !!me&&(a?.id===me.id||b?.id===me.id)}
 function v2PostseasonStageCapture(){syncGameplayRng();return v2RecordClone(universe)}
 function v2PostseasonStageRestore(snapshot){universe=v2RecordClone(snapshot);rebuildIndexes();activateGameplayRng(universe.rng,universe);render()}
@@ -30,7 +31,10 @@ function v2PostseasonRecordMatch(home,away,options={}){
     syncGameplayRng();v2GameLabPreview={key,...preview,recorded:true,gameId:result.gameId};return{ok:true,result,record,candidate,validation,preview};
   }catch(err){v2RecordRestore(rollback,stub,home,away);throw err}
 }
-function v2PostseasonSim(a,b,options){return v2PostseasonUserMatch(a,b)?v2PostseasonRecordMatch(a,b,options).result:gameSim(a,b,options?.neutral!==false,options?.conference??false,{week:options?.week,label:options?.label})}
+function v2PostseasonSim(a,b,options){
+  if(!v2PostseasonUserMatch(a,b))return gameSim(a,b,options?.neutral!==false,options?.conference??false,{week:options?.week,label:options?.label});
+  const fault=v2PostseasonInjectedFault;v2PostseasonInjectedFault=null;return v2PostseasonRecordMatch(a,b,{...options,testFault:fault}).result
+}
 function v2PostseasonFail(stage,stageSnapshot,err){console.error(err);v2PostseasonStageRestore(stageSnapshot);setStatus(`${stage} rolled back: ${err.message||err}`)}
 
 simConferenceChampionships=function simConferenceChampionshipsV2(){
@@ -71,6 +75,9 @@ function v2PostseasonArchiveSummary(){
   const me=selected(),rows=(universe.gameArchive||[]).filter(r=>r.engine==='v2'&&r.label!=='Regular season'&&me&&(r.home?.id===me.id||r.away?.id===me.id));
   return rows.map(r=>({id:r.id,label:r.label,week:r.week,engine:r.engine,drives:r.drives?.length||0,playerLines:(r.playerStats?.home?.length||0)+(r.playerStats?.away?.length||0)}))
 }
+function v2PostseasonStateDigest(){
+  syncGameplayRng();const text=JSON.stringify(universe);let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)}return`${text.length}:${(h>>>0).toString(16)}`
+}
 function v2PostseasonTestPrepare(stage){
   const me=selected();if(!me)throw new Error('No controlled program.');
   const others=universe.teams.filter(t=>t.id!==me.id);
@@ -80,12 +87,18 @@ function v2PostseasonTestPrepare(stage){
   }
   if(stage==='bowl'){
     universe.phase='bowlReady';for(const t of universe.teams){t.champ=false;t.w=Math.max(6,t.w||0);t.l=Math.max(0,12-t.w)}
-    me.w=6;me.l=6;const elite=others.slice(0,20);for(const t of elite){t.w=12;t.l=0}universe.confChamps=elite.slice(0,10);ranked();return{stage,field:bowlField().map(t=>t.id),userId:me.id}
+    me.w=6;me.l=6;const elite=others.slice(0,20);for(const t of elite){t.w=12;t.l=0}universe.confChamps=elite.slice(0,10);ranked();const field=bowlField().map(t=>t.id);if(!field.includes(me.id))throw new Error('Bowl test fixture did not place the controlled program in a bowl.');return{stage,field,userId:me.id}
   }
   if(stage==='playoff'){
-    universe.phase='playoffReady';for(const t of universe.teams){t.champ=false}me.w=12;me.l=0;const champs=[me,...others.slice(0,9)];for(const t of champs){t.w=Math.max(10,t.w||0);t.l=Math.min(2,t.l||0)}universe.confChamps=champs;ranked();return{stage,field:seedField().map(t=>t.id),userId:me.id}
+    universe.phase='playoffReady';for(const t of universe.teams){t.champ=false}me.w=12;me.l=0;const champs=[me,...others.slice(0,9)];for(const t of champs){t.w=Math.max(10,t.w||0);t.l=Math.min(2,t.l||0)}universe.confChamps=champs;ranked();const field=seedField().map(t=>t.id);if(!field.includes(me.id))throw new Error('Playoff test fixture did not place the controlled program in the field.');return{stage,field,userId:me.id}
   }
   throw new Error(`Unknown postseason test stage: ${stage}`)
 }
 globalThis.DynastyGameEngineV2LabBridge.postseasonSummary=v2PostseasonArchiveSummary;
-if(globalThis.__DL_TEST__){globalThis.__DL_TEST__.v2PostseasonRecordMatch=v2PostseasonRecordMatch;globalThis.__DL_TEST__.v2PostseasonPrepare=v2PostseasonTestPrepare;globalThis.__DL_TEST__.v2PostseasonSummary=v2PostseasonArchiveSummary}
+if(globalThis.__DL_TEST__){
+  globalThis.__DL_TEST__.v2PostseasonRecordMatch=v2PostseasonRecordMatch;
+  globalThis.__DL_TEST__.v2PostseasonPrepare=v2PostseasonTestPrepare;
+  globalThis.__DL_TEST__.v2PostseasonSummary=v2PostseasonArchiveSummary;
+  globalThis.__DL_TEST__.v2PostseasonStateDigest=v2PostseasonStateDigest;
+  globalThis.__DL_TEST__.v2PostseasonInjectFault=fault=>{v2PostseasonInjectedFault=fault};
+}
