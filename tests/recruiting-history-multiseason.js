@@ -65,18 +65,21 @@ function rollSeason(e){
  assert.equal(tracked.result.final,false,'one-season evidence must remain provisional');
  assert.ok(['DIAMOND_WATCH','UP','TRACKING'].includes(tracked.result.code),`unexpected one-year result ${tracked.result.code}`);
 
- // Preserve observed first-year evidence, then force this test player to senior status and drive another
- // complete real season/offseason. The normal departures phase must archive the same player + receipt.
+ // Preserve observed first-year evidence, then put the player on his final season of eligibility.
+ // Departures advances eligibilityUsed from 3 to 4; the display-only `year` label is not the engine gate.
  player.seasonHistory??=[];
  player.seasonHistory.push({year:e.universe.year,games:7,starts:5,stats:{games:7,starts:5}});
  player.perceived=Math.max(90,snap.currentRead+18);
  player.scoutConfidence=86;
+ player.stats={...(player.stats||{}),games:7,starts:5};
+ player.eligibilityUsed=3;
+ player.redshirtActive=false;
  player.year='SR';
  rollSeason(e);
  assert.equal(e.universe.year,signingYear+2,'second full season should advance exactly one more year');
  controlled=team();
  const archived=(e.universe.playerArchive||[]).find(p=>p.id===trackedId);
- assert.ok(archived,'normal senior departure should archive the tracked recruit');
+ assert.ok(archived,'normal eligibility-exhaustion departure should archive the tracked recruit');
  assert.deepEqual(archived.recruitingMemory?.scoutingReceipt,snap,'archive record must preserve the signing receipt');
 
  pool=history.playerPool(controlled,e.universe.playerArchive||[]);
