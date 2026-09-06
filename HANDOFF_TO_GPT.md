@@ -1,3 +1,29 @@
+# Handoff — Dynasty Lab v0.9.51 integrated
+
+## Current state
+
+- Repository: `MarkJRogers92/Football`
+- Working branch: `codex/v0951-integrated`
+- Baseline incorporated: Claude RNG-routing commit `4ba3657d`
+- Production remains v0.9.50 on `gh-pages`; do not publish until combined validation is green.
+- PR #8 is the validation PR for this integrated branch.
+
+## Integrated work
+
+This branch preserves Claude's completed gameplay RNG routing (all gameplay domains on the saved gameplay RNG, with only non-gameplay identity/portrait randomness left outside it) and adds v0.9.51 season goals. Season goals are persistent for the season, context-generated from program stature/rivalry/recruiting expectations, visible on the dashboard and Program Lab, and feed secondary/stretch results into the year-end administration review without replacing the existing wins-vs-expectation model.
+
+Tests included: Claude's RNG domain suites plus `tests/season-goals.js`. Version metadata is synchronized at 0.9.51.
+
+## Release gate
+
+1. Rebuild `index.html` from the integrated source tree.
+2. Run the full Node suite.
+3. Run browser UI/visual regression suites and browser storage regression.
+4. Run the simulation audit.
+5. Only then publish v0.9.51.
+
+## Earlier RNG handoff details
+
 # Handoff — Dynasty Lab
 
 ## State
