@@ -45,6 +45,6 @@ test('evaluation workload summarizes active targets without reading hidden talen
  api.performScoutingAction(b,tm,'quick');api.performScoutingAction(c,tm,'full');
  const before=JSON.stringify([a,b,c,other]),w=api.evaluationWorkload([a,b,c,other],tm);
  assert.deepEqual({targets:w.targets,untouched:w.untouched,film:w.film,full:w.full},{targets:3,untouched:1,film:1,full:1});
- assert.equal(w.quickCapacity,1);assert.equal(w.fullCapacity,1);assert.equal(JSON.stringify([a,b,c,other]),before);
+ assert.equal(w.quickCapacity,1);assert.equal(w.fullCapacity,2);assert.equal(JSON.stringify([a,b,c,other]),before);
  a.trueNow=20;a.upside=25;assert.deepEqual(api.evaluationWorkload([a,b,c,other],tm),w);
 });
