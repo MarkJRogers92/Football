@@ -99,25 +99,45 @@ Commit: `5667c87c53a4651a48dc0acde8dce45a3144fb61`
 - Shortlist cards can add/remove a prospect from the board and use the same bounded scouting actions.
 - Added pure regression coverage for roster-need arithmetic, need-vs-grade ranking, commitment exclusion and hidden-rating independence.
 
+## Completed checkpoint: Milestone I — Lightweight scouting presentation
+
+Latest source commits include `5a2ecc8ff651aa2c62dcf33d4eb3b3cd480e49b1`, `9f7fbc37a67a764e56a4ceff7c44cd4405c237e4`, and `92c2b055b613271f0b515d9e41079e54962199a0`.
+
+- Preliminary Staff Verdict, Compare and Staff Shortlist views no longer create persistent `manualScouting` state merely by being rendered.
+- Preliminary verdicts use the existing visible `scout`, `scoutUp` and confidence summary until detailed scouting domains actually exist.
+- Detailed scouting domains are created only when the player explicitly targets/evaluates a prospect through the existing evaluation path.
+- Added regressions proving preliminary browsing is read-only and that a real scouting action is the point where persistent detailed state begins.
+
+## Completed checkpoint: Milestone J — Delayed scouting receipts and recruiting recap
+
+Latest synced standalone checkpoint before this documentation trigger: `3162db85ceb82931302863872f03025ff8d484a2`.
+
+- A recruit committed to the controlled program now freezes a compact signing receipt inside `recruitingMemory` containing only the staff-visible signing belief: visible current/upside reads, Staff Verdict, confidence, evaluation stage, hours spent, rank/stars and interest.
+- Receipt snapshots never store hidden `trueNow`, hidden upside, hidden growth profile or hidden trait values.
+- Enrolled players are compared later against observed staff ratings, confidence, games, starts and awards.
+- Early evidence can produce provisional `Diamond Watch` / `Bust Watch` labels; final `Diamond`, `Bust`, `Hit`, `Miss` and `As Scouted` labels require at least two seasons, 12 games and stronger confidence.
+- Added a costly-misread flag for mature Bust/Miss outcomes that consumed a full evaluation or carried a high signing verdict.
+- Roster rows can show scouting-receipt badges.
+- Recruiting now gains a Scouting Receipts recap with settled outcomes, developing/watch cases, costly misreads and notable player receipts.
+- The final scouting extension refreshes the tab router after all recruiting/roster render wrappers are installed so tab navigation reaches the complete UI chain.
+- Added pure regression coverage for receipt immutability, maturation gates, diamond/bust outcomes, team recap arithmetic and hidden-rating independence.
+
 ## Standalone build handling during this workstream
 
 The repository's validator requires committed `index.html` to exactly match `npm run build`. Because this session cannot clone GitHub through the shell, a temporary branch-only workflow `.github/workflows/sync-v0953-build.yml` was added to build and commit the generated standalone artifact after source pushes. It is guarded against bot recursion.
-
-Latest synced standalone checkpoint before this status update: `44cd96bca0c826c3f376ae0c8eed1818b72a2965`.
 
 **Remove the temporary build-sync workflow before merge/release.** It is development plumbing, not a production feature.
 
 ## Validation status
 
-- Source pushes before the build-sync bot commit fail the normal validator only at `git diff --exit-code -- index.html`, as expected.
-- The build step itself has succeeded on those runs.
-- This documentation checkpoint is intentionally being pushed after the standalone artifact is current so the normal full validator can exercise verify-release, engine tests, browser tests, browser storage and simulation audit on the coherent package.
+- Source pushes intentionally hit the `index.html` freshness gate until the branch-only sync workflow commits the generated standalone artifact.
+- The latest standalone sync completed successfully at `3162db85ceb82931302863872f03025ff8d484a2`.
+- This documentation-only checkpoint is being pushed specifically to trigger the normal validator against the already-synced source tree so it can proceed into release verification, engine/presentation tests, browser tests, browser storage and the simulation audit.
 - Do not publish v0.9.53 until that full validation is green or any real failures are diagnosed and fixed.
 
 ## Next bounded slices
 
-1. Diagnose and fix any full-validator failures on the coherent package.
-2. Build delayed scouting receipts: preserve what the staff believed at signing and later compare it with only information the program could legitimately know after enrollment/development/production.
-3. Add recruiting-cycle recap surfaces for hits, misses, high-confidence wins and costly misreads without revealing future hidden ceilings prematurely.
-4. Consider progressive development-tendency reveal for enrolled players after the scouting-receipt foundation is stable.
-5. Remove the temporary build-sync workflow, run final full validation, then prepare release notes. Production remains v0.9.52 until separately authorized.
+1. Diagnose and fix any real full-validator failure after the synced-tree validation run.
+2. Add progressive development-tendency clues derived only from accumulated camp/season evidence, never directly from hidden growth profile or volatility.
+3. Consider a fuller historical recruiting-class receipt view once current-roster/archive loading behavior is confirmed under browser validation.
+4. Remove the temporary build-sync workflow, run final full validation, then prepare release notes. Production remains v0.9.52 until separately authorized.
