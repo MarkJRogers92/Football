@@ -40,17 +40,36 @@ Coverage includes the pre-existing roster-need, hidden-rating and commitment tes
 
 The branch-only build workflow then rebuilt and committed the standalone artifact successfully.
 
+## Real generated-pool measurement
+
+Measurement was run independently from the exact v0.9.54 checkpoint on temporary branch `codex/v0954-shortlist-measure`, workflow run `34041195616`. The measurement branch is diagnostic only and is not part of the release tree.
+
+Five deterministic fresh Dynasty Lab universes were generated through the real headless engine harness. Each contained 2,800 recruits. For every universe, the optimized shortlist and exhaustive shortlist were required to produce identical top-eight IDs, scores and reasons before call counts were accepted.
+
+| Seed | Optimized verdict calls | Exhaustive verdict calls | Reduction |
+| ---: | ---: | ---: | ---: |
+| 95401 | 865 | 2,800 | 69.1% |
+| 95402 | 465 | 2,800 | 83.4% |
+| 95403 | 227 | 2,800 | 91.9% |
+| 95404 | 208 | 2,800 | 92.6% |
+| 95405 | 237 | 2,800 | 91.5% |
+
+Average Staff Verdict call reduction: **85.7%**, with exact ranking equivalence in all five generated pools.
+
+Conclusion: do **not** add shortlist caching at this stage. The stateless exact-pruning change already removes most expensive verdict work while avoiding cache invalidation complexity across targeting, scouting actions, commitments, weekly changes, staff changes and roster changes. Revisit caching only if later browser profiling shows a remaining user-visible bottleneck.
+
 ## Temporary development plumbing
 
 `.github/workflows/sync-v0954-build.yml` exists only to keep committed `index.html` synchronized while this branch is being developed through the GitHub connector. Remove it before any eventual release candidate is prepared.
 
 ## Validation state
 
-This documentation checkpoint is intended to trigger the normal full validator against the already-synced `index.html` tree. Do not claim full v0.9.54 validation until that run completes.
+Full validator run `34040297906` is still running on the coherent v0.9.54 checkpoint. Build generation, committed-build freshness and releasable-source verification have already passed; the long engine/presentation suite is currently in progress. Do not claim full v0.9.54 validation until that run completes.
 
 ## Exact next steps
 
-1. Inspect the full validator triggered by this checkpoint; fix any real regression before adding another source slice.
-2. If validation is clean or the long suite is still running, measure shortlist pruning against a real generated Dynasty Lab recruiting pool and record verdict-call reduction without changing ranking behavior.
-3. Consider caching only after measurement demonstrates additional value; do not add stateful caching unless invalidation is proven safe across targeting, scouting actions, commitments, weekly changes, staff changes and roster changes.
-4. Keep the v0.9.53 preview/release candidate frozen and keep production at v0.9.52 unless separately authorized.
+1. Inspect full validator run `34040297906`; fix any real regression before adding another source slice.
+2. If validation is clean, treat the shortlist optimization as complete and avoid stateful caching for now.
+3. Continue with the next bounded recruiting/scouting/development polish item rather than doing more speculative performance work; the best current candidate is a historical recruiting-class/scouting-receipt view that lets the user review old staff calls and resulting player outcomes without exposing hidden truth.
+4. Remove temporary v0.9.54 build-sync plumbing before any eventual release candidate is prepared.
+5. Keep the frozen v0.9.53 preview/release candidate untouched and keep production at v0.9.52 unless separately authorized.
