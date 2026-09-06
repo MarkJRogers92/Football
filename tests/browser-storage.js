@@ -8,7 +8,7 @@ const TAB_GROUP={"dashboard": "program", "program": "program", "history": "progr
 const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${TAB_GROUP[id]}"]`);await page.click(`.tabs button[data-tab="${id}"]`)};
 // v0.9.34 added a title screen in front of the app; every browser test now has to click through
 // it (New Dynasty -> Start Dynasty, which defaults to Chicago Metropolitan) before #userTeam exists.
-const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeout:30000});await page.click('#titleNew');await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});await page.click('#titleStart');await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000})};
+const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeout:30000});await page.waitForFunction(()=>document.querySelector('#titleTeam')?.options.length>0,{timeout:60000});await page.click('#titleNew');await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});await page.click('#titleStart');await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000})};
 
 (async()=>{
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});
@@ -20,6 +20,7 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   await page.waitForFunction(()=>document.querySelector('#userTeam').options.length===120);
   const tab=id=>goTab(page, id);
   const status=pattern=>page.waitForFunction(source=>new RegExp(source).test(document.querySelector('#saveStatus').textContent),pattern,{timeout:30000});
+  const replaceSavedSlot=async()=>{page.once('dialog',dialog=>dialog.accept());await page.click('#saveBrowser');await status('^Saved')};
   await page.click('#simSeason');await tab('season');await page.click('#simConf');await page.click('#simPlayoff');
   // The ordered offseason calendar introduced before v0.9.52 requires review, departures,
   // signing and portal resolution before Spring Development becomes actionable.
@@ -29,10 +30,12 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   await page.waitForFunction(()=>document.querySelector('#weekLine').textContent.includes('2028'));
   await page.click('#saveBrowser');await status('^Saved');
   const record=await page.evaluate(()=>new Promise((resolve,reject)=>{
-   const r=indexedDB.open('DynastyLabDB',3);r.onerror=()=>reject(r.error);r.onsuccess=()=>{
+   // Open the app-created database at its current schema version. This check
+   // validates stored data, not an obsolete historical version number.
+   const r=indexedDB.open('DynastyLabDB');r.onerror=()=>reject(r.error);r.onsuccess=()=>{
     const db=r.result,tx=db.transaction(['saves','archives','games'],'readonly');let main,first,gameChunks=[];
     const a=tx.objectStore('saves').get('main');a.onsuccess=()=>{main=a.result};
-    const b=tx.objectStore('archives').get(0);b.onsuccess=()=>{first=b.result[0]};
+    const b=tx.objectStore('archives').get('main:0');b.onsuccess=()=>{first=b.result[0]};
     const c=tx.objectStore('games').getAll();c.onsuccess=()=>{gameChunks=c.result};
     tx.oncomplete=()=>{db.close();resolve({coreHasArchive:'playerArchive' in main.universe,coreHasGames:'gameArchive' in main.universe,ref:main.archiveRef,gameRef:main.gameRef,first,games:gameChunks.flat()})};tx.onabort=()=>{db.close();reject(tx.error)};
    };
@@ -71,7 +74,7 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   console.log('PASS complete portable JSON export hydrates deferred history');
   // Import the actual downloaded JSON through the app's file input.
   await page.locator('#importFile').setInputFiles(await download.path());await status('^Imported');
-  await page.click('#saveBrowser');await status('^Saved');await page.click('#loadBrowser');await status('^Loaded');
+  await replaceSavedSlot();await page.click('#loadBrowser');await status('^Loaded');
   await tab('history');await page.fill('#archiveSearch',record.first.name);
   await page.click(`#archiveResults [data-player="${record.first.id}"]`);
   assert.equal(await page.textContent('#playerDialogName'),record.first.name);
@@ -84,7 +87,7 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   await page.locator('#playerDialog button').filter({hasText:'Close'}).click();
   await tab('dashboard');
   await page.locator('#importFile').setInputFiles({name:'promise-save.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(exported))});await status('^Imported');
-  await page.click('#saveBrowser');await status('^Saved');await page.click('#loadBrowser');await status('^Loaded');
+  await replaceSavedSlot();await page.click('#loadBrowser');await status('^Loaded');
   await tab('history');await page.fill('#archiveSearch',record.first.name);await page.click(`#archiveResults [data-player="${record.first.id}"]`);
   assert.match(await page.textContent('#playerDialogBody'),/Early Role · BROKEN/);
   assert.match(await page.textContent('#playerDialogBody'),/Coach <Test>/);
