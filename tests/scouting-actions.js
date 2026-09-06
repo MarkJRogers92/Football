@@ -39,3 +39,12 @@ test('staff verdict conviction improves after a full evaluation',()=>{const {api
 test('preliminary verdict browsing does not create persistent scouting state',()=>{const {api,domainReads}=fixture(),t=team(),r=recruit();const before=JSON.stringify(r);const v=api.staffVerdict(r,t);assert.equal(v.conviction,'Preliminary');assert.equal(r.manualScouting,undefined);assert.equal(r.scoutingDomains,undefined);assert.equal(domainReads(),0);assert.equal(JSON.stringify(r),before)});
 
 test('action availability is read-only until an evaluation is actually performed',()=>{const {api}=fixture(),t=team(),r=recruit();assert.equal(api.actionAvailability(r,t,'quick').ok,true);assert.equal(r.manualScouting,undefined);api.performScoutingAction(r,t,'quick');assert.ok(r.manualScouting?.['1']);assert.ok(r.scoutingDomains)});
+
+test('evaluation workload summarizes active targets without reading hidden talent',()=>{
+ const {api}=fixture(),tm=team(),a={...recruit(),id:'A',targeted:true},b={...recruit(),id:'B',targeted:true},c={...recruit(),id:'C',targeted:true},other={...recruit(),id:'D',targeted:false};
+ api.performScoutingAction(b,tm,'quick');api.performScoutingAction(c,tm,'full');
+ const before=JSON.stringify([a,b,c,other]),w=api.evaluationWorkload([a,b,c,other],tm);
+ assert.deepEqual({targets:w.targets,untouched:w.untouched,film:w.film,full:w.full},{targets:3,untouched:1,film:1,full:1});
+ assert.equal(w.quickCapacity,1);assert.equal(w.fullCapacity,1);assert.equal(JSON.stringify([a,b,c,other]),before);
+ a.trueNow=20;a.upside=25;assert.deepEqual(api.evaluationWorkload([a,b,c,other],tm),w);
+});
