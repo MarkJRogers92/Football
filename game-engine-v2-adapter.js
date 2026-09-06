@@ -42,23 +42,23 @@ function profileOutcome(state,homeInput,awayInput,homeFieldRating=0){
   const venueEdge=isHome?homeFieldRating:-homeFieldRating,matchup=offense.offense-defense.defense+venueEdge,edge=matchup/18,roll=rng.next(),pass=rng.next()<.53;
   let outcome;
   if(pass){
-    const intRate=clamp(.0115-matchup*.00014,.005,.026),fumbleRate=clamp(.004-matchup*.00003,.002,.008),sackRate=clamp(.060-matchup*.00045,.035,.095);
+    const intRate=clamp(.0145-matchup*.00014,.006,.032),fumbleRate=clamp(.005-matchup*.00003,.0025,.010),sackRate=clamp(.052-matchup*.00045,.030,.088);
     if(roll<intRate)outcome={turnover:'interception',kind:'pass',completed:false,yards:clamp(Math.round(8+rng.gauss()*9),-5,35),clock:rng.int(8,18)};
     else if(roll<intRate+fumbleRate)outcome={turnover:'fumble',kind:'pass',completed:false,sack:true,yards:-clamp(Math.round(6+rng.gauss()*2),2,12),clock:rng.int(22,38)};
     else if(roll<intRate+fumbleRate+sackRate)outcome={kind:'pass',completed:false,sack:true,yards:-clamp(Math.round(6+rng.gauss()*2),2,12),clock:rng.int(22,38)};
     else{
-      const comp=clamp(.64+matchup*.0032,.48,.79),completed=rng.next()<comp;
+      const comp=clamp(.67+matchup*.0032,.50,.80),completed=rng.next()<comp;
       if(!completed)outcome={kind:'pass',completed:false,yards:0,clock:rng.int(6,12)};
       else{
-        const redZoneFinish=state.fieldPosition>=80?1.25:state.fieldPosition>=65?.45:0;
+        const redZoneFinish=state.fieldPosition>=80?2.6:state.fieldPosition>=65?.9:0;
         outcome={kind:'pass',completed:true,yards:clamp(Math.round(9.6+edge*1.15+redZoneFinish+rng.gauss()*7.2),-3,55),clock:rng.int(26,42)};
       }
     }
   }else{
-    const fumbleRate=clamp(.012-matchup*.00008,.006,.022);
+    const fumbleRate=clamp(.015-matchup*.00008,.007,.026);
     if(roll<fumbleRate)outcome={turnover:'fumble',kind:'rush',yards:clamp(Math.round(3+rng.gauss()*6),-8,18),clock:rng.int(18,34)};
     else{
-      const redZoneFinish=state.fieldPosition>=80?1.6:state.fieldPosition>=65?.6:0;
+      const redZoneFinish=state.fieldPosition>=80?2.6:state.fieldPosition>=65?1.0:0;
       outcome={kind:'rush',yards:clamp(Math.round(4.3+edge*.7+redZoneFinish+rng.gauss()*4.8),-14,55),clock:rng.int(27,42)};
     }
   }
@@ -79,6 +79,7 @@ function annotateOutcomeEvent(state,startIndex,outcome){
 }
 function shadowDecision(state){
   if(state.down!==4)return'play';
+  if(state.distance<=2&&state.fieldPosition>=45)return'play';
   if(state.fieldPosition>=58&&state.distance>2)return'field_goal';
   if(state.fieldPosition<60&&state.distance>1)return'punt';
   return'play';
