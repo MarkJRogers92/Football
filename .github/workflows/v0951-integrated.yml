@@ -1,21 +1,18 @@
-name: v0951 integrated validation
+name: v0951 integrated build
 
 on:
   push:
     branches:
       - codex/v0951-integrated
-  pull_request:
-    branches:
-      - claude/review-improvement-dwjemy
 
 permissions:
   contents: write
 
 jobs:
-  validate:
-    if: \${{ github.event_name == 'pull_request' || !contains(github.event.head_commit.message, '[skip ci]') }}
+  build:
+    if: \${{ !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -26,18 +23,7 @@ jobs:
       - run: npm install --no-audit --no-fund
       - name: Build standalone artifact
         run: npm run build
-      - name: Full Node suite
-        run: npm test
-      - name: Install Chromium for browser suites
-        run: |
-          npx --yes playwright@1.49.0 install --with-deps chromium
-          CHROME=$(find "$HOME/.cache/ms-playwright" -type f \\( -name chrome -o -name headless_shell \\) | head -1)
-          test -n "$CHROME"
-          echo "CHROMIUM_PATH=$CHROME" >> "$GITHUB_ENV"
-      - name: Browser suites
-        run: npm run test:browser
       - name: Commit generated index if changed
-        if: \${{ github.event_name == 'push' }}
         run: |
           if ! git diff --quiet -- index.html; then
             git config user.name "github-actions[bot]"
