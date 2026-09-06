@@ -100,7 +100,9 @@ The diagnostic branches `codex/v0954-shortlist-measure` and `codex/v0954-receipt
 
 ## Current validation state
 
-This documentation checkpoint is intentionally pushed after the historical feature's standalone artifact is synchronized. It should trigger the normal full validator against the coherent active tree containing both the exact shortlist optimization and Recruiting Class History.
+The first combined-tree validator attempts after Recruiting Class History failed at Verify committed build is current because each source or documentation push raced the temporary development build-sync workflow: validation checked the pre-sync commit, then the sync workflow committed the rebuilt index.html afterward. No engine, browser, storage or audit step ran on those failed attempts.
+
+The synchronized standalone artifact is now committed at 7032f0a585573ce6ebe1bcbbf5d0937c0a46e4ca. This documentation-only checkpoint is intentionally being pushed after that artifact commit to trigger validation from a tree whose generated build is already current.
 
 Do not claim the combined v0.9.54 tree is fully green until that validator completes.
 
