@@ -14,6 +14,15 @@ test('season goals are contextual, persistent, and include a primary wins target
  assert.ok(g.some(x=>x.type==='bluechips'));
 });
 
+test('season goals render into Program Lab HTML without throwing',async()=>{
+ const e=await setup(953),t=e.T('Chicago Metropolitan');
+ const html=e.seasonGoalsHTML(t);
+ assert.match(html,/Primary/);
+ assert.match(html,/Win at least/);
+ assert.match(html,/blue-chip recruits/);
+ assert.match(html,/goals currently satisfied/);
+});
+
 test('completed secondary goals move the administration review',async()=>{
  const e=await setup(952),t=e.T('Chicago Metropolitan');
  const goals=e.ensureSeasonGoals(t),rival=goals.find(x=>x.type==='rivalry');
