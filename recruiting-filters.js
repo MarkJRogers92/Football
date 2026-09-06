@@ -1,5 +1,6 @@
-function makeRecruitingFilterSystem(env={}){
+function makeRecruitingFilterSystem(env){
  'use strict';
+ env=env||{};
  const verdictLabels=['Priority take','Take','Strong target','Boardable','Developmental','Pass'];
  function stageOf(r,t){
   if(env.stageOf)return env.stageOf(r,t);
