@@ -1,0 +1,78 @@
+name: Smoke v0.9.53 Published Preview Once
+
+on:
+  push:
+    branches:
+      - codex/v0953-preview-publish
+    paths:
+      - .github/workflows/smoke-v0953-preview-once.yml
+
+permissions:
+  contents: read
+
+jobs:
+  live-preview-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install --no-package-lock
+      - name: Locate Chromium
+        id: chromium
+        shell: bash
+        run: |
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$browser" ]; then
+            npx playwright-core install chromium
+            browser="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$browser"
+          echo "path=$browser" >> "$GITHUB_OUTPUT"
+      - name: Exercise served v0953 preview
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: |
+          node <<'NODE'
+          const { chromium } = require('playwright-core');
+          (async()=>{
+            const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,args:['--no-sandbox']});
+            const page=await browser.newPage({viewport:{width:1280,height:900}});
+            const errors=[];
+            page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
+            page.on('pageerror',e=>errors.push(String(e)));
+            const url='https://markjrogers92.github.io/Football/preview/v0953/';
+            await page.goto(url,{waitUntil:'domcontentloaded',timeout:60000});
+            await page.waitForFunction(()=>document.querySelector('#titleTeam')?.options.length>0,{timeout:60000});
+            const title=await page.title();
+            const label=await page.locator('[data-title-version]').innerText();
+            if(!/v0\.9\.53/.test(title)||!/v0\.9\.53/.test(label))throw new Error(`wrong preview version: ${title} / ${label}`);
+            await page.click('#titleNew');
+            await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});
+            await page.click('#titleStart');
+            await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length===120,{timeout:60000});
+            await page.click('.tab-groups button[data-group="recruiting"]');
+            await page.click('.tabs button[data-tab="recruiting"]');
+            await page.waitForSelector('#recruiting.active');
+            await page.waitForSelector('#staffRecruitShortlist');
+            const recruitingText=await page.locator('#recruiting').innerText();
+            if(!/Evaluation Hours/i.test(recruitingText)||!/Roster Outlook|Staff Shortlist/i.test(recruitingText))throw new Error('new recruiting surfaces missing');
+            const compare=page.locator('.recruit-compare-toggle').first();
+            await compare.click();
+            await page.waitForSelector('.recruit-compare-tray');
+            await page.click('.tab-groups button[data-group="team"]');
+            await page.click('.tabs button[data-tab="development"]');
+            await page.waitForSelector('#development.active');
+            if((await page.locator('#development').innerText()).trim().length<40)throw new Error('development tab did not render');
+            await page.click('#saveBrowser');
+            await page.waitForTimeout(500);
+            await page.click('#loadBrowser');
+            await page.waitForTimeout(500);
+            if(!(await page.locator('#app').isVisible()))throw new Error('app not visible after save/load cycle');
+            if(errors.length)throw new Error(`browser errors: ${errors.join(' | ')}`);
+            console.log('LIVE PREVIEW SMOKE PASS — v0.9.53 startup, Recruiting, Compare, Development, save/load');
+            await browser.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
