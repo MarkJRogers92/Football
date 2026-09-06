@@ -1,3 +1,12 @@
+## v0.9.55 — Staff, Recruiting Battles and Development Plans
+
+- Gives coaching staffs durable scouting identities with deterministic evaluation specialties tied to coach identity.
+- Adds a Staff Evaluation Ledger that grades settled recruiting reads from observed player outcomes without exposing hidden ratings or growth curves.
+- Makes recruiting races more legible with race position, leader gaps, momentum, decision pressure, challenged commitments and bounded battle history.
+- Adds three weekly Priority Pushes, each worth a modest +4 pitch boost, so attention can matter without overwhelming the existing recruiting model.
+- Adds up to five Featured Development Plans per offseason. Plans concentrate existing training effects and preserve the underlying hidden-potential ceiling rather than creating guaranteed growth.
+- Adds spring/fall development-plan receipts and keeps the new systems additive to existing saves.
+
 ## v0.9.54 — Recruiting Intelligence
 
 - Makes Staff Shortlist materially faster with exact branch-and-bound pruning: identical top-eight recommendations with an average 85.7% reduction in Staff Verdict calls across five generated 2,800-recruit universes.
