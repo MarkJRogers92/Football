@@ -160,15 +160,15 @@ The repository's validator requires committed `index.html` to exactly match `npm
 
 ## Validation status
 
-- Source pushes intentionally hit the `index.html` freshness gate until the branch-only sync workflow commits the generated standalone artifact.
-- The latest standalone sync completed successfully at `45178951085f707390bf967a075827e431a40050`.
-- An earlier clean validator reached the real engine/presentation test step before subsequent source pushes cancelled superseded runs.
-- This documentation-only checkpoint is intended to trigger a clean validator against the now-synced Milestone K tree. Leave source unchanged while that run proceeds so it can reach engine, browser, browser-storage and simulation-audit stages.
+- Validator run `34022762903` completed after 22m52s: all 289 engine/presentation tests passed and Chrome was located, but the browser suite timed out waiting for the title-team picker.
+- Local browser console inspection found the concrete startup failure: `ReferenceError: recruitStaffVerdict is not defined` while initializing `scouting-receipts.js`.
+- Root cause was extension scope, not async school loading. The app runs in strict mode, and `recruitStaffVerdict` plus companion UI helpers were block-scoped inside the scouting-actions browser branch, making them invisible to sibling shortlist and receipt extension blocks.
+- The shared browser bindings now live in the enclosing app closure. The build inserts one combined extension block in declared dependency order, and the version/build regression executes all five extensions in a strict-mode harness to catch another startup-scope failure.
 - Do not publish v0.9.53 until full validation is green or any real failures are diagnosed and fixed.
 
 ## Next bounded slices
 
-1. Inspect validator run `34022762903` on `bea0ed3ccc3bd85ed894312209e8cb7dc4caf354` and fix only any concrete remaining browser/storage/audit regression.
+1. Run focused build/startup verification for the extension-order fix, then push a clean checkpoint and let the validator advance beyond the browser startup gate.
 2. If the browser-storage suite hits the same title-screen race, add the same populated-`#titleTeam` readiness guard there.
 3. If full validation is green, consider a measured Staff Shortlist performance optimization with ranking-equivalence regression coverage, or proceed to the fuller historical recruiting-class receipt view.
 4. Add/refresh final v0.9.53 release notes, remove the temporary build-sync workflow, and run final validation on the release tree.

@@ -6,9 +6,13 @@ const root = path.join(__dirname, '..');
 const read = f => fs.readFileSync(path.join(root, f), 'utf8');
 const version = read('VERSION.txt').trim().replace(/^Dynasty Lab\s*/, '').replace(/^v/, '');
 const baseAppSource=read('app.js');
-function injectEngineExtension(src,file){const anchor='loadSchools().then(',at=src.lastIndexOf(anchor);if(at<0)throw new Error(`engine extension anchor not found while adding ${file}`);return src.slice(0,at)+read(file)+'\n'+src.slice(at)}
-let appSource=baseAppSource;
-for(const file of ['scouting-actions.js','recruit-compare.js','recruiting-shortlist.js','scouting-receipts.js','development-tendencies.js'])appSource=injectEngineExtension(appSource,file);
+const engineExtensionFiles=['scouting-actions.js','recruit-compare.js','recruiting-shortlist.js','scouting-receipts.js','development-tendencies.js'];
+const engineExtensionAnchor='loadSchools().then(';
+const engineExtensionAt=baseAppSource.lastIndexOf(engineExtensionAnchor);
+if(engineExtensionAt<0)throw new Error('engine extension anchor not found');
+// Preserve dependency order: later extensions use helpers exported by earlier ones.
+const engineExtensionSource=engineExtensionFiles.map(read).join('\n');
+const appSource=baseAppSource.slice(0,engineExtensionAt)+engineExtensionSource+'\n'+baseAppSource.slice(engineExtensionAt);
 const appVersion = (baseAppSource.match(/APP_VERSION='([^']+)'/) || [])[1];
 if (!appVersion) throw new Error('APP_VERSION not found in app.js');
 if (appVersion !== version) throw new Error(`version drift: VERSION.txt says ${version}, app.js APP_VERSION says ${appVersion}`);

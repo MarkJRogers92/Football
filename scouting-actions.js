@@ -71,6 +71,10 @@ function makeScoutingActionSystem(env){
  return{COSTS,scoutingBudgetFor,ensureScoutingWeek,scoutingHoursLeft,recruitScoutingRecord,actionAvailability,staffVerdict,performScoutingAction};
 }
 
+// Shared with later browser-only recruiting extensions in the same app closure.
+// `var` is intentional: block-scoped declarations in this branch are invisible
+// to sibling extension blocks when the standalone page runs in strict mode.
+var recruitScoutingRecord,recruitStaffVerdict,scoutingActionButtonsHTML,bindScoutingActionButtons;
 if(typeof module==='object'&&module.exports){
  module.exports={makeScoutingActionSystem};
 }else{
@@ -80,20 +84,20 @@ if(typeof module==='object'&&module.exports){
  const scoutingBudgetFor=recruitScoutingActions.scoutingBudgetFor;
  const ensureScoutingWeek=recruitScoutingActions.ensureScoutingWeek;
  const scoutingHoursLeft=recruitScoutingActions.scoutingHoursLeft;
- const recruitScoutingRecord=recruitScoutingActions.recruitScoutingRecord;
+ recruitScoutingRecord=recruitScoutingActions.recruitScoutingRecord;
  const scoutingActionAvailability=recruitScoutingActions.actionAvailability;
- const recruitStaffVerdict=recruitScoutingActions.staffVerdict;
+ recruitStaffVerdict=recruitScoutingActions.staffVerdict;
  const performRecruitScoutingAction=recruitScoutingActions.performScoutingAction;
  function scoutingVerdictHTML(r,t,compact=false){
   const v=recruitStaffVerdict(r,t),rec=recruitScoutingRecord(r,t,false),tag=rec.full?'FULL EVAL':rec.quick?'FILM REVIEW':'PRELIMINARY';
   if(compact)return `<div class="staff-verdict-compact"><strong>${v.label}</strong><span>${v.conviction} conviction · ${v.confidence}% confidence</span></div>`;
   return `<div class="staff-verdict-card"><div class="staff-verdict-head"><div><span class="eyebrow">STAFF VERDICT · ${tag}</span><strong>${v.label}</strong></div><b>${v.score}</b></div><p>${v.summary}</p><div class="small muted">${v.conviction} conviction · ${v.confidence}% report confidence · average range width ${v.spread}. This is a staff opinion, not hidden truth.</div></div>`;
  }
- function scoutingActionButtonsHTML(r,t){
+ scoutingActionButtonsHTML=function(r,t){
   const q=scoutingActionAvailability(r,t,'quick'),f=scoutingActionAvailability(r,t,'full'),rec=recruitScoutingRecord(r,t,false),title=x=>String(x.reason||'').replace(/"/g,'&quot;');
   return `<div class="scouting-actions"><button type="button" data-scout-action="quick" data-scout-recruit="${r.id}" ${q.ok?'':`disabled title="${title(q)}"`}>${rec.quick||rec.full?'Film Reviewed':'Quick Film · 1h'}</button><button type="button" data-scout-action="full" data-scout-recruit="${r.id}" ${f.ok?'':`disabled title="${title(f)}"`}>${rec.full?'Full Eval Complete':'Full Evaluation · 3h'}</button></div>`;
- }
- function bindScoutingActionButtons(){
+ };
+ bindScoutingActionButtons=function(){
   $$('[data-scout-action]').forEach(b=>b.onclick=()=>{
    const r=universe.recruits.find(x=>String(x.id)===String(b.dataset.scoutRecruit)),t=selected(),dialog=b.closest?.('#recruitDialog');
    const res=performRecruitScoutingAction(r,t,b.dataset.scoutAction);
@@ -101,7 +105,7 @@ if(typeof module==='object'&&module.exports){
    renderRecruiting();
    if(dialog&&res.ok){const d=$('#recruitDialog');if(d?.open)d.close();showRecruitProfile(r.id)}
   });
- }
+ };
  function renderScoutingActionUI(){
   const t=selected(),summary=$('#classSummary');if(!t||!summary)return;
   const week=ensureScoutingWeek(t),left=scoutingHoursLeft(t),strip=`<div class="scouting-budget-strip"><strong>Evaluation Hours</strong><span>${left} / ${week.budget} left this week</span><small>Quick Film costs 1 · Full Evaluation costs 3 · unused hours do not roll over</small></div>`;
