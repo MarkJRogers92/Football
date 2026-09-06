@@ -1,68 +1,173 @@
-# Handoff — Dynasty Lab v0.9.50
+# Handoff — Dynasty Lab
 
-## Checkpoint
+## State
 
 - Repository: `MarkJRogers92/Football`
-- Working branch: `codex/v0950-continuation`
-- Baseline: `1492070` (`claude/review-improvement-dwjemy`)
-- Completed commits:
-  - `de5a14f` — deterministic RNG implementation and characterization tests
-  - `5e059e0` — saved gameplay RNG lifecycle and shared utility routing
-- Release version remains **v0.9.49**. Nothing here is merged or published.
-- Production `gh-pages`: `bdcf0d2`; rollback: `23e8aeb`.
+- Branch: `claude/review-improvement-dwjemy`
+- Pushed HEAD: see `git log -1` on that branch.
+- Version: **v0.9.50 is live in production**, `gh-pages` @ `ca1edd6`. This chunk is
+  **committed and pushed to source only** — nothing here has been rebuilt into a
+  new production release, and no version bump has happened for it.
+- Rollback: `23e8aeb` (last v0.9.49 production build, before the slot work — one
+  step further back than current production).
+- Working tree: clean at time of writing.
 
-## Completed
+## What this chunk did: v0.9.50 commit 3, all four domains
 
-`rng.js` is a standalone UMD Mulberry32 stream with versioned snapshots,
-reported-seed replay, helpers, and named substreams. It is included exactly once
-in the generated standalone build before `app.js`.
+GPT's own v0.9.50 handoff (commits `de5a14f`/`5e059e0`, now merged into this branch)
+built the RNG infrastructure and left every gameplay `Math.random()` call site
+untouched on purpose, with instructions to route them one domain at a time. This
+chunk finished that routing:
 
-New universes now establish the gameplay stream before generating high schools,
-staff, rosters, and recruits, then store `{version, seed, state, draws}` on the
-universe. The shared `rng`, `gi`, `pick`, and `gauss` utilities use that
-stream. Save/export synchronizes the current snapshot; load and normalization
-restore it. Legacy saves receive a stable zero-draw seed derived from existing
-save identity before any migration defaults run.
+- **Domain 1 (schedule/rivalry): already clean.** `buildSchedule`,
+  `deriveRivalries`, `ensureProtectedRivals`, `conferenceRotationOrder` and
+  `assignHomeAway` contain zero direct `Math.random()` calls — schedule
+  generation is geographic/deterministic already. No change needed.
+- **Domain 2 (recruiting/portal/transfers): routed.** `weightedHighSchool`,
+  `generatePlayer` (redshirt + height-growth rolls), `buildSigningDay`,
+  `pressureCommit`, `advanceRecruiting`, `offseasonDepartures` (portal entry
+  roll), `portalResolveEntry`, `advancePortalRound`, `chooseTransferDestination`.
+- **Domain 3 (offseason/coaching): routed.** `ensurePlayerDevelopment`,
+  `applyPhysicalGrowth`, `applyDevelopmentPhase`, `runSpringCamp`,
+  `candidateAcceptChance` callsite, `earlyDeclaration`,
+  `chooseCoachMoveDestination`, and the full HC/OC/DC/RC/SC carousel logic.
+- **Domain 4 (game sim): routed.** `postGameCondition` (injury rolls),
+  `weightedPlayer`, `quickFieldGoals`, `homeFieldScoreBonus`, and the entire
+  `drive()` play-by-play function plus the outer game loop (penalties, pressure,
+  completions, drops, coverage, fumbles, the tie-score coin flip, the
+  opening-possession coin flip).
 
-The numeric seed stored in a save can recreate the stream from draw zero. IDs
-remain on Web Crypto, portrait identity remains on its separate non-game path,
-and recap text remains on its existing isolated hash stream. Direct
-`Math.random` calls in gameplay domains have deliberately not been mass-edited.
+`Math.random()` count in `app.js`: **36 → 2**. The two remaining calls are
+`uid()` and `portraitSeedFor()`, deliberately left on the non-gameplay path per
+the packet (Web Crypto / Date-based identity, not gameplay randomness).
 
-The harness now loads `rng.js` explicitly and exposes only the two RNG adapter
-hooks needed by integration tests. Its deterministic Web Crypto shim uses a
-separate state from `Math.random`, preserving persistence tests that forbid
-gameplay randomness during a save.
+### Two real bugs found and fixed along the way (not caused by the routing, just exposed by it drawing a different sequence than before)
 
-## Validation
+1. **`buildSigningDay`'s failed-flip restore could strand a recruit uncommitted.**
+   When a flip roll succeeded but the challenger school then failed to actually
+   take him (a cap/block reached between the roll and the attempt), the code
+   called `commitRecruit(r,from)` to put him back — but that call can itself
+   fail for the same reasons, and the old code didn't check. Fixed: if the
+   restore fails, the original school unconditionally reclaims him (he was
+   occupying that scholarship a moment earlier, so this is always safe).
+2. **`enforceScholarshipLimits()` could invalidate a signing-day board.** It
+   runs at the very end of `finalizeRecruiting()`, after the signing-day board
+   has already resolved and been shown to represent final reality. It could
+   pull a recruit who was correctly marked "stays at `from`" on that board,
+   leaving `r.committed=null` while the board still said otherwise. Fixed:
+   `enforceScholarshipLimits` now takes an optional `protect` set of recruit
+   ids; the one call site passes today's signing-day board's recruit ids, so a
+   scholarship cleanup can no longer undo what signing day just told the player
+   happened.
 
-- RNG unit + lifecycle integration: 10 PASS, 0 FAIL
-- Focused control-mode/portrait/RNG set: 21 PASS, 0 FAIL
-- Persistence save/load/lazy archive/export/import/offseason: PASS
-- Headless eight-season smoke: 53 PASS, 0 FAIL
-- Standalone build: PASS, 673 KB; `root.DynastyRng` occurs exactly once
-- Version plumbing and `git diff --check`: PASS
-- Claude's immediately preceding v0.9.49 browser run: 169/169 PASS
+Both were caught by `tests/signingday.js`'s existing `'a flip actually moves the
+recruit and is recorded as one'` test, which started failing once
+`buildSigningDay`'s roll moved to `gameplayRandom()` and hit a seed/board
+combination the old `Math.random()` sequence never produced. This is the same
+class of thing recorded in earlier entries here: routing/reordering exposes a
+latent bug at a seed that used to get lucky. Fix the bug, don't loosen the test.
 
-The full Node runner was not used because it is known to go quiet for long
-periods and the user asked to conserve credits. A combined targeted runner was
-stopped after its scheduling portion went silent; every emitted test except one
-diagnosed harness-entropy interaction passed. That interaction was fixed, and
-the previously failing persistence test then passed in isolation.
+### Determinism, verified directly (not just tests)
+
+Ran two independent `loadEngine({seed:X})` runs for the same X and diffed the
+full serialized outcome, for every domain:
+
+- Recruiting (8 weeks of `advanceRecruiting`): identical committed lists, rng snapshot.
+- Signing day (`buildSigningDay`): identical board.
+- Portal (season → departures → open → 2 rounds): identical entrant/decision lists (67 entrants, 33 resolved, matched).
+- Development + camps + coaching carousel (season → both camps → offseason): identical roster stat lines and movement log (4 carousel moves, matched).
+- Fast-sim game: identical score/box/injuries.
+- Detailed drive-by-drive game: identical score, drives, and play-by-play log.
+- A full simulated season of fast-sim games: identical for every game id.
+- Two *different* seeds: produce *different* games (the stream is not stuck/degenerate).
+
+### Tests added and run
+
+- `tests/rng-domain2.js` (4 tests), `tests/rng-domain3.js` (4), `tests/rng-domain4.js` (5) — all **pass**, all added to `package.json`'s `test` script.
+- Re-ran after the signing-day fix: `tests/signingday.js` **5/5**, `tests/transfers.js` **2/2**, `tests/scouting.js`/`tests/portal-recruiting.js` (part of the 34-test domain-2 regression sweep) — **all pass**.
+- `tests/games.js`, `tests/gamelab.js`, `tests/bowls.js`, `tests/gameplan.js` — **19/19 pass** (domain 4 regression check).
+- `node tools/build.js` — **pass**, 673 KB standalone, single `root.DynastyRng` occurrence preserved.
+
+### Not run, and why
+
+- The full `npm test` Node runner (all files, not just the domains touched):
+  **not run this chunk**, to conserve credits — every file that plausibly
+  touches routed randomness was run individually instead (see above). This is
+  the same gap noted in the previous handoff; it has not gotten smaller.
+- `npm run test:browser`: not run this chunk. The routing is engine-only; no
+  DOM/presentation code changed. Still worth a run before any publish.
 
 ## Next precise task
 
-Continue suggested commit 3 in separate domain commits. Route direct gameplay
-`Math.random` calls through `gameplayRandom()` one domain at a time, starting
-with schedule/rivalry, then recruiting/portal, offseason/coaching, and game sim.
-Do not combine domains or change probability thresholds.
+Per the packet (`docs/roadmap/06-v0950-modularization-rng.md`), the routing
+suggested-commit is now complete. Next:
 
-For each domain, add a fixed-seed save/resume test at a boundary inside that
-domain. Do not route `uid()`, `portraitSeedFor()`, or recap hash selection.
-Synchronizing the snapshot at save boundaries is already handled.
+1. **Grep `Math.random` and classify every remaining occurrence explicitly**
+   (the packet's own instruction after all gameplay domains are routed) —
+   confirm the two remaining hits (`uid`, `portraitSeedFor`) are the only ones,
+   and document that decision somewhere durable (this file, or a comment).
+2. Run the full `npm test` suite once, in full, to close the "not run" gap
+   above — it is the largest remaining unknown.
+3. Run `npm run test:browser` if Chromium is available.
+4. Only after both pass: begin suggested commit 4, extracting pure engine
+   modules one domain at a time. Do not combine extraction with any further
+   RNG or gameplay changes.
 
-After all gameplay domains are routed, grep `Math.random` and classify every
-remaining occurrence explicitly before beginning module extraction. Keep
-`index.html` self-contained and rebuild it after every source change.
+Do not merge this branch anywhere else, publish, or touch `gh-pages` without
+explicit authorization. Do not bump `VERSION.txt`/`APP_VERSION`/`package.json`
+until a release is actually being prepared — this chunk is infrastructure, not
+a release.
 
-Do not merge, publish, deploy, or touch `gh-pages` without explicit approval.
+## Traps that do not announce themselves
+
+All of these cost real time and none of them throw.
+
+**Two engines cannot be alive in the same test at once.** `loadEngine()`
+mutates shared globals (`global.document`, `global.crypto`, and the seeded
+`Math.random`/`getRandomValues` shims). Creating a second engine before fully
+finishing with the first corrupts both — symptoms look like an unrelated crash
+deep in engine code (`Cannot read properties of undefined`), not an obviously
+wrong RNG. Always fully exercise and discard one engine before creating the
+next.
+
+**`freshGameplaySeed()` reads `crypto.getRandomValues`, not `Math.random`.**
+The test harness seeds *both* shims from the same input seed, so this is
+transparent in tests — but it means `universe.rng`'s seed and any code still on
+bare `Math.random()` are, in production, two genuinely different sources
+(Web Crypto vs. `Math.random`). Only `universe.rng` (via `gameplayRandom()`) is
+saved/restored across sessions; anything still on `Math.random()` is not
+reproducible from a saved seed at all.
+
+**Routing a call to a different RNG stream can flip a test from lucky to
+unlucky at the same fixed seed.** A test asserting a specific probabilistic
+*outcome* (not just structural correctness) is implicitly pinned to whichever
+sequence a given seed used to produce. Moving that call to `gameplayRandom()`
+changes the sequence it draws from entirely. If a test fails after routing,
+check whether it's exposing a real bug (as `signingday.js` did, twice) before
+assuming it's just "unlucky now" — the second finding in this chunk was a
+genuine cross-system ordering bug, not test flakiness.
+
+**A headless season rollover stops for three separate reasons, silently.**
+`runOffseason()` advances a *single phase* of the v0.9.46 calendar. Camps must
+run *when the calendar reaches them*. A pending job offer halts everything
+until `acceptPost()` answers it. Copy `rollSeason` from `tests/scheduling.js`.
+
+**`storageOperation` returns silently when the store is busy.** Background
+writers must yield to user actions — see `yieldToUserAction()`.
+
+**`app.js` is wrapped in an IIFE.** Nothing is on `window`; browser tests must
+drive real UI.
+
+**Presentation is layered and later files win.** `sports-presentation.js`
+rewrites DOM `app.js` rendered. Presence in the DOM is not visibility.
+
+## How to work here
+
+- `node tools/build.js` refuses to build if `VERSION.txt`, `APP_VERSION` and
+  `package.json` disagree. Bump all three together, only for an actual release.
+- `npm test` is Node; `npm run test:browser` needs Chromium and is not optional
+  before any publish.
+- `node tools/publish.js` refuses to reuse a version number already shipped
+  from different source.
+- Do not merge `claude/v0950-*`/`codex/v0950-*` branches into the source branch
+  or touch `gh-pages` without explicit authorization.

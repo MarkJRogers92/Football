@@ -1,6 +1,6 @@
 # Roadmap execution status
 
-Last inspected source: `5e059e0` (`0.9.50 in progress`)
+Last inspected source: commit 3 (RNG routing) complete on `claude/review-improvement-dwjemy`; production is `ca1edd6` (v0.9.50, RNG infra only, no routing yet).
 
 | Packet | Status | Active branch | Blocking decision |
 | --- | --- | --- | --- |
@@ -9,7 +9,7 @@ Last inspected source: `5e059e0` (`0.9.50 in progress`)
 | v0.9.47 transfer portal | SHIPPED | `claude/review-improvement-dwjemy` | None |
 | v0.9.48 schedules/rivalries | SHIPPED | `claude/review-improvement-dwjemy` | None |
 | v0.9.49 saves/storage | SHIPPED `bdcf0d2` | `claude/review-improvement-dwjemy` | None |
-| v0.9.50 modules/RNG | IN PROGRESS | `codex/v0950-continuation` | Preserve standalone build |
+| v0.9.50 modules/RNG | IN PROGRESS — commits 1-3 done (RNG + all 4 domains routed), not published | `claude/review-improvement-dwjemy` | Full `npm test` not yet run on the routed tree |
 | v0.10 Game Engine 2 | READY FOR SLICING | — | Begin only after v0.9.50 |
 | v0.11 program economy | READY FOR SLICING | — | Creation-budget tuning |
 | v0.12 encyclopedia | READY FOR SLICING | — | Begin after archive contracts stabilize |
