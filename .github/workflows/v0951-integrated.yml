@@ -1,4 +1,4 @@
-name: v0951 targeted validation
+name: v0951 matrix validation
 
 on:
   push:
@@ -12,23 +12,61 @@ permissions:
   contents: read
 
 jobs:
-  validate:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Install dependencies
-        run: npm install --no-package-lock
-      - name: Build and release checks
-        run: |
-          npm run build
-          git diff --exit-code -- index.html
-          npm run verify:release
-      - name: Focused integrated Node regression
-        run: node --test tests/rng.js tests/rng-integration.js tests/rng-domain2.js tests/rng-domain3.js tests/rng-domain4.js tests/adminconfidence.js tests/season-goals.js tests/signingday.js tests/transfers.js tests/scouting.js tests/portal-recruiting.js tests/games.js tests/gamelab.js tests/bowls.js tests/gameplan.js tests/persistence.js tests/storage.js
+      - run: npm install --no-package-lock
+      - run: npm run build
+      - run: git diff --exit-code -- index.html
+      - run: npm run verify:release
+
+  node-targeted:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        test:
+          - tests/rng.js
+          - tests/rng-integration.js
+          - tests/rng-domain2.js
+          - tests/rng-domain3.js
+          - tests/rng-domain4.js
+          - tests/adminconfidence.js
+          - tests/season-goals.js
+          - tests/signingday.js
+          - tests/transfers.js
+          - tests/scouting.js
+          - tests/portal-recruiting.js
+          - tests/games.js
+          - tests/gamelab.js
+          - tests/bowls.js
+          - tests/gameplan.js
+          - tests/persistence.js
+          - tests/storage.js
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install --no-package-lock
+      - run: node --test \${{ matrix.test }}
+
+  browser:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install --no-package-lock
       - name: Locate Chromium
         id: chromium
         shell: bash
@@ -40,11 +78,9 @@ jobs:
           fi
           test -n "$browser"
           echo "path=$browser" >> "$GITHUB_OUTPUT"
-      - name: Browser UI and visual regression
-        run: npm run test:browser
+      - run: npm run test:browser
         env:
           CHROMIUM_PATH: \${{ steps.chromium.outputs.path }}
-      - name: Browser storage regression
-        run: npm run test:browser-storage
+      - run: npm run test:browser-storage
         env:
           CHROMIUM_PATH: \${{ steps.chromium.outputs.path }}
