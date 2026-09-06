@@ -3,6 +3,23 @@ const {loadEngine}=require('../tools/harness.js');
 const {makeScoutingReceiptSystem}=require('../scouting-receipts.js');
 const {makeRecruitingHistorySystem}=require('../recruiting-history.js');
 
+function rollSeason(e){
+ const before=e.universe.year;
+ e.simSeason();e.simConferenceChampionships();e.simPlayoff();
+ for(let step=0;step<20&&e.universe.year===before;step++){
+  if(e.hasPendingCareerChoice()){
+   const offer=(e.universe.jobOffers||[])[0];
+   const res=offer?e.acceptPost(offer.schoolId):null;
+   if(res&&res.ok===false)throw new Error(`could not clear career choice: ${res.reason}`);
+  }
+  const phase=e.normalizeOffseasonState().phase;
+  if(phase==='spring')e.runSpringCamp();
+  else if(phase==='fall')e.runFallCamp();
+  e.runOffseason();
+ }
+ if(e.universe.year===before)throw new Error(`season did not advance past ${before}; phase=${e.normalizeOffseasonState().phase}`);
+}
+
 (async()=>{
  const e=loadEngine({seed:95454});
  await e.loadSchools();
@@ -25,8 +42,10 @@ const {makeRecruitingHistorySystem}=require('../recruiting-history.js');
  assert.equal(snap.schoolId,team().id);
  for(const hidden of ['trueNow','upside','growthProfile'])assert.equal(Object.hasOwn(snap,hidden),false);
 
- // Complete the real season/offseason. Enrollment assigns a new player id, so the durable bridge is the signing receipt's recruitId.
- e.simSeason();e.simConferenceChampionships();e.simPlayoff();e.runSpringCamp();e.runFallCamp();e.runOffseason();
+ // Drive the real calendar through the complete season/offseason. Enrollment assigns a new player id,
+ // so the durable recruit -> player bridge is the receipt's recruitId.
+ rollSeason(e);
+ assert.equal(e.universe.year,signingYear+1,'first full season should advance exactly one year');
  let controlled=team();
  let player=controlled.roster.find(p=>p.recruitingMemory?.scoutingReceipt?.recruitId===recruit.id);
  assert.ok(player,`expected recruit id ${recruit.id} (${recruit.name}) to enroll with its signing receipt`);
@@ -46,19 +65,18 @@ const {makeRecruitingHistorySystem}=require('../recruiting-history.js');
  assert.equal(tracked.result.final,false,'one-season evidence must remain provisional');
  assert.ok(['DIAMOND_WATCH','UP','TRACKING'].includes(tracked.result.code),`unexpected one-year result ${tracked.result.code}`);
 
- // Run the next real season, then force this test player through the normal senior-departure/archive path.
- e.simSeason();e.simConferenceChampionships();e.simPlayoff();e.runSpringCamp();e.runFallCamp();
- controlled=team();
- player=controlled.roster.find(p=>p.id===trackedId);
- assert.ok(player,'tracked recruit should still be present before senior departure');
+ // Preserve observed first-year evidence, then force this test player to senior status and drive another
+ // complete real season/offseason. The normal departures phase must archive the same player + receipt.
+ player.seasonHistory??=[];
+ player.seasonHistory.push({year:e.universe.year,games:7,starts:5,stats:{games:7,starts:5}});
  player.perceived=Math.max(90,snap.currentRead+18);
  player.scoutConfidence=86;
- player.stats={...(player.stats||{}),games:14,starts:10};
  player.year='SR';
- e.runOffseason();
+ rollSeason(e);
+ assert.equal(e.universe.year,signingYear+2,'second full season should advance exactly one more year');
  controlled=team();
  const archived=(e.universe.playerArchive||[]).find(p=>p.id===trackedId);
- assert.ok(archived,'senior departure should archive the tracked recruit');
+ assert.ok(archived,'normal senior departure should archive the tracked recruit');
  assert.deepEqual(archived.recruitingMemory?.scoutingReceipt,snap,'archive record must preserve the signing receipt');
 
  pool=history.playerPool(controlled,e.universe.playerArchive||[]);
