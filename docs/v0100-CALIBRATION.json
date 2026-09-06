@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-06T22:13:59.041Z",
+  "generatedAt": "2026-09-06T22:49:21.117Z",
   "branch": "codex/v0100-game-engine-2",
   "baselineVersion": "0.9.56",
   "mode": "development-only shadow comparison",
@@ -21,40 +21,40 @@
   },
   "v2": {
     "games": 120,
-    "meanPoints": 40.87,
-    "meanPlays": 124.53,
-    "meanYards": 625.9,
-    "meanTurnovers": 2.47,
-    "meanTouchdowns": 4.88,
-    "meanFgMade": 2.17,
-    "meanFgAtt": 2.95,
-    "meanPunts": 8.34,
+    "meanPoints": 40.86,
+    "meanPlays": 120.06,
+    "meanYards": 614.94,
+    "meanTurnovers": 2.08,
+    "meanTouchdowns": 4.98,
+    "meanFgMade": 2.04,
+    "meanFgAtt": 2.87,
+    "meanPunts": 8.57,
     "homeWinRate": 0.53,
-    "meanHomeMargin": 1.45,
+    "meanHomeMargin": 1.61,
     "meanHomeFieldRating": 2.38
   },
   "delta": {
-    "meanPoints": -1.79,
-    "meanPlays": 4.22,
-    "meanYards": 33.77,
-    "meanTurnovers": -0.01,
-    "meanTouchdowns": 0.2,
-    "meanFgMade": -0.22,
-    "meanFgAtt": -0.02,
-    "meanPunts": 0.75,
+    "meanPoints": -1.8,
+    "meanPlays": -0.25,
+    "meanYards": 22.81,
+    "meanTurnovers": -0.4,
+    "meanTouchdowns": 0.3,
+    "meanFgMade": -0.35,
+    "meanFgAtt": -0.1,
+    "meanPunts": 0.98,
     "homeWinRate": -0.02,
-    "meanHomeMargin": -0.49
+    "meanHomeMargin": -0.33
   },
   "strengthSensitivity": {
     "favored": {
       "games": 27,
       "oldHomeWinRate": 0.74,
-      "v2HomeWinRate": 0.63
+      "v2HomeWinRate": 0.7
     },
     "even": {
       "games": 72,
       "oldHomeWinRate": 0.57,
-      "v2HomeWinRate": 0.53
+      "v2HomeWinRate": 0.5
     },
     "underdog": {
       "games": 21,
@@ -70,7 +70,7 @@
     "These are calibration observations, not release thresholds."
   ],
   "calibrationContract": 1,
-  "sourceSha256": "f0baaec3a60c2791b72d8cc06e1a785d66c9d6533ff952b1d99ce98936abeef2",
+  "sourceSha256": "9e15b1597f12367aa1e87768146b27290773de1ba2b85606be9012269296ec48",
   "sourceFiles": [
     "game-engine-v2.js",
     "game-engine-v2-adapter.js",
