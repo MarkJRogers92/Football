@@ -1,0 +1,52 @@
+{
+  "generatedAt": "2026-09-06T21:59:44.183Z",
+  "branch": "codex/v0100-game-engine-2",
+  "baselineVersion": "0.9.56",
+  "mode": "development-only shadow comparison",
+  "matchups": 40,
+  "old": {
+    "games": 40,
+    "meanPoints": 42.2,
+    "meanPlays": 119.73,
+    "meanYards": 587.5,
+    "meanTurnovers": 2.3,
+    "homeWinRate": 0.53
+  },
+  "v2": {
+    "games": 40,
+    "meanPoints": 42,
+    "meanPlays": 141.8,
+    "meanYards": 690.33,
+    "meanTurnovers": 4.28,
+    "homeWinRate": 0.4
+  },
+  "delta": {
+    "meanPoints": -0.2,
+    "meanPlays": 22.07,
+    "meanYards": 102.83,
+    "meanTurnovers": 1.98,
+    "homeWinRate": -0.13
+  },
+  "strengthSensitivity": {
+    "favored": {
+      "games": 5,
+      "oldHomeWinRate": 0.4,
+      "v2HomeWinRate": 0.6
+    },
+    "even": {
+      "games": 26,
+      "oldHomeWinRate": 0.62,
+      "v2HomeWinRate": 0.38
+    },
+    "underdog": {
+      "games": 9,
+      "oldHomeWinRate": 0.33,
+      "v2HomeWinRate": 0.33
+    }
+  },
+  "notes": [
+    "The v0.9 simulator runs only on cloned team objects. Its temporary archive/event writes are removed after each sample.",
+    "The v2 result is never installed into the dynasty.",
+    "These are calibration observations, not release thresholds."
+  ]
+}
