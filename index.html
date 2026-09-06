@@ -5865,6 +5865,12 @@ function makeScoutingActionSystem(env){
   return t.scoutingWeek;
  }
  function scoutingHoursLeft(t){const s=ensureScoutingWeek(t);return Math.max(0,s.budget-s.spent)}
+ function evaluationWorkload(recruits=[],t){
+  const active=(recruits||[]).filter(r=>r?.targeted&&!r.committed);let untouched=0,film=0,full=0;
+  for(const r of active){const rec=recruitScoutingRecord(r,t,false);if(rec.full)full++;else if(rec.quick)film++;else untouched++}
+  const remaining=scoutingHoursLeft(t);
+  return{targets:active.length,untouched,film,full,remaining,quickCapacity:Math.min(untouched,remaining),fullCapacity:Math.min(untouched+film,Math.floor(remaining/COSTS.full))};
+ }
  function blankScoutingRecord(){return{season:universe().year,quick:false,full:false,receipts:[]}}
  function recruitScoutingRecord(r,t,create=true){
   const u=universe(),key=String(t.id),existing=r?.manualScouting?.[key];
@@ -5917,7 +5923,7 @@ function makeScoutingActionSystem(env){
   rec.receipts.push(receipt);if(rec.receipts.length>8)rec.receipts.splice(0,rec.receipts.length-8);
   return{ok:true,label:labelFor(kind),cost:check.cost,remaining:scoutingHoursLeft(t),receipt,verdict:afterVerdict};
  }
- return{COSTS,scoutingBudgetFor,ensureScoutingWeek,scoutingHoursLeft,recruitScoutingRecord,actionAvailability,staffVerdict,performScoutingAction};
+ return{COSTS,scoutingBudgetFor,ensureScoutingWeek,scoutingHoursLeft,evaluationWorkload,recruitScoutingRecord,actionAvailability,staffVerdict,performScoutingAction};
 }
 
 // Shared with later browser-only recruiting extensions in the same app closure.
@@ -5957,7 +5963,7 @@ if(typeof module==='object'&&module.exports){
  };
  function renderScoutingActionUI(){
   const t=selected(),summary=$('#classSummary');if(!t||!summary)return;
-  const week=ensureScoutingWeek(t),left=scoutingHoursLeft(t),strip=`<div class="scouting-budget-strip"><strong>Evaluation Hours</strong><span>${left} / ${week.budget} left this week</span><small>Quick Film costs 1 · Full Evaluation costs 3 · unused hours do not roll over</small></div>`;
+  const week=ensureScoutingWeek(t),left=scoutingHoursLeft(t),work=recruitScoutingActions.evaluationWorkload(universe.recruits,t),strip=`<div class="scouting-budget-strip"><strong>Evaluation Hours</strong><span>${left} / ${week.budget} left this week</span><small>${work.targets} active target${work.targets===1?'':'s'} · ${work.untouched} untouched · ${work.film} film-reviewed · ${work.full} fully evaluated</small><small>Remaining hours can cover ${work.quickCapacity} new Quick Film${work.quickCapacity===1?'':'s'} or ${work.fullCapacity} Full Evaluation${work.fullCapacity===1?'':'s'}. Quick Film costs 1 · Full Evaluation costs 3 · unused hours do not roll over.</small></div>`;
   summary.insertAdjacentHTML?.('beforeend',strip);
   $$('[data-recruit]').forEach(link=>{
    const r=universe.recruits.find(x=>String(x.id)===String(link.dataset.recruit)),row=link.closest?.('tr'),cell=row?.querySelector?.('td[data-label="Scout"]');
