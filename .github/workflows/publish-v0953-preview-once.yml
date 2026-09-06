@@ -1,0 +1,33 @@
+name: Publish v0.9.53 Preview Once
+
+on:
+  push:
+    branches:
+      - codex/v0953-preview-publish
+    paths:
+      - .github/workflows/publish-v0953-preview-once.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dynasty-v0953-preview-once
+  cancel-in-progress: false
+
+jobs:
+  publish-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Verify exact release artifact
+        run: npm run verify:release
+      - name: Publish isolated v0953 preview
+        run: node tools/publish.js --preview v0953
