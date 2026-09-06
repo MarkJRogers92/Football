@@ -1,0 +1,22 @@
+name: Measure v0.9.54 shortlist pruning
+
+on:
+  push:
+    branches:
+      - codex/v0954-shortlist-measure
+
+permissions:
+  contents: read
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install --no-package-lock
+      - name: Measure real generated recruiting pools
+        run: node tools/measure-v0954-shortlist.js
