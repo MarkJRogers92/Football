@@ -9,11 +9,10 @@ test('permanent boxes match actual player deltas, snapshot identity and retain d
  e.simulateUserDetailed();const u=e.universe,g=u.gameArchive[0],result=u.lastDetailedGame;
  assert.equal(g.id,result.gameId);assert.equal(u.schedule[0].find(x=>x.gameId===g.id).score[1],g.score.home);
  assert.ok(g.formerPlayers.some(x=>x.id===former.id));assert.ok(u.events.some(x=>x.gameIds.includes(g.id)&&x.playerIds.includes(former.id)));
- // The exact count for this seed keeps shifting (24 -> 23 -> 22) each time app.js reconciles more
- // of GPT's simulation work on top of this branch's — it is an RNG-sequence-dependent number, not
- // an invariant, and will drift again on the next reconciliation. What actually matters, and still
- // holds regardless of the count: drive scoring reconciles to the final score, the next line checks.
- assert.equal(g.drives.length,22);assert.equal(g.drives.reduce((n,d)=>n+d.points,0)+g.scoreAdjustment.home+g.scoreAdjustment.away,g.score.home+g.score.away);
+ // Drive count is deliberately pace- and RNG-dependent. The engine bounds the modeled range at
+ // 18–30 drives; pinning one seed to an exact count makes a normal RNG reconciliation look like a
+ // simulation regression. Preserve the plausibility bound and the scoring invariant instead.
+ assert.ok(g.drives.length>=18&&g.drives.length<=30,`detailed drive count ${g.drives.length} outside modeled 18–30 range`);assert.equal(g.drives.reduce((n,d)=>n+d.points,0)+g.scoreAdjustment.home+g.scoreAdjustment.away,g.score.home+g.score.away);
  assert.equal(g.plays,undefined,'full play logs are not duplicated into permanent archive');
  const frozen=JSON.stringify(g);e.simWeek();assert.equal(u.gameArchive.length,60,'detailed game is not simulated twice');assert.equal(new Set(u.gameArchive.map(x=>x.id)).size,60);
  for(const game of u.gameArchive){for(const side of ['away','home']){
