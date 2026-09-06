@@ -17,7 +17,7 @@ if(typeof module==='object'&&module.exports){module.exports={makeDevelopmentPlan
 else{
  const developmentPlanSystem=makeDevelopmentPlanSystem();
  const trainingAttrBoostBeforeV0955Plans=trainingAttrBoost;
- trainingAttrBoost=function(p,teamFocus,individual,phase){const out=trainingAttrBoostBeforeV0955Plans(p,teamFocus,individual,phase),bonus=developmentPlanSystem.modifier(p,universe);if(!bonus)return out;for(const k of Object.keys(out))out[k]-=.08;for(const [k,v] of Object.entries(bonus))out[k]=(out[k]||0)+v;return out};
+ trainingAttrBoost=function(p,teamFocus,individual,phase){const out=trainingAttrBoostBeforeV0955Plans(p,teamFocus,individual,phase),bonus=developmentPlanSystem.modifier(p,universe);if(!bonus)return out;const scale=phase==='spring'?1:.55;for(const k of Object.keys(out))out[k]-=.08*scale;for(const [k,v] of Object.entries(bonus))out[k]=(out[k]||0)+v*scale;return out};
  function captureDevelopmentPlanReceipts(phase){const t=selected(),ds=ensureDevelopmentState(),report=phase==='spring'?ds.springReport:ds.fallReport;if(!t)return;for(const x of report||[]){const p=t.roster.find(y=>y.id===x.id);if(p)developmentPlanSystem.record(p,universe,phase,x)}}
  const runSpringCampBeforeV0955Plans=runSpringCamp;
  runSpringCamp=function(){const before=ensureDevelopmentState().springRun,out=runSpringCampBeforeV0955Plans();if(!before&&ensureDevelopmentState().springRun)captureDevelopmentPlanReceipts('spring');return out};
