@@ -47,15 +47,15 @@ function profileOutcome(state,homeInput,awayInput,homeFieldRating=0){
   else if(roll<intRate+fumbleRate)outcome={turnover:'fumble',yards:clamp(Math.round(3+rng.gauss()*6),-8,18),clock:rng.int(10,20)};
   else{
     const mean=pass?5.6:4.3,spread=pass?8.2:4.8,edgeWeight=pass?1:.7;
-    outcome={yards:clamp(Math.round(mean+edge*edgeWeight+rng.gauss()*spread),-14,55),clock:pass?rng.int(12,38):rng.int(27,42),kind:pass?'pass':'rush'};
+    const redZoneFinish=state.fieldPosition>=80?2.2:state.fieldPosition>=65?.9:0;
+    outcome={yards:clamp(Math.round(mean+edge*edgeWeight+redZoneFinish+rng.gauss()*spread),-14,55),clock:pass?rng.int(12,38):rng.int(27,42),kind:pass?'pass':'rush'};
   }
   state.rng=rng.snapshot();return outcome;
 }
 function shadowDecision(state){
   if(state.down!==4)return'play';
-  if(state.fieldPosition>=75&&state.distance<=1)return'play';
-  if(state.fieldPosition>=58)return'field_goal';
-  if(state.distance>1)return'punt';
+  if(state.fieldPosition>=58&&state.distance>2)return'field_goal';
+  if(state.fieldPosition<60&&state.distance>1)return'punt';
   return'play';
 }
 function simulateShadow(options={}){
