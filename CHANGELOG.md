@@ -1,3 +1,9 @@
+## v0.9.52 — Program goals polish
+- Expands season-goal variety while keeping the primary win expectation tied to the existing administration model.
+- Adds Critical / Important / Bonus weighting and live Complete / On track / At risk / Failed status.
+- Adds a Program Overview card with board confidence, expectations, rivalry and goal health.
+- Tightens Program Lab layout and restores the dashboard Season Goals render hook when absent.
+
 ## v0.9.51 — Season Goals
 - Adds persistent, context-generated preseason objectives for the controlled program.
 - Goals include a primary win target, rivalry and recruiting objectives, plus a stature-based stretch goal.
