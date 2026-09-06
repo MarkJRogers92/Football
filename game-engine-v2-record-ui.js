@@ -1,0 +1,17 @@
+// v0.10.1 development-only UI/test surface for the recorded Game Engine 2 gate.
+function v2RecordDebugState(){
+  const me=selected(),g=(me?.schedule||[]).find(x=>x.week===universe.week+1)||null,last=(universe.gameArchive||[]).at(-1)||null;
+  return{year:universe.year,week:universe.week,phase:universe.phase,gameCounter:universe.gameCounter||0,nextEventId:universe.nextEventId??null,archiveLength:(universe.gameArchive||[]).length,eventLength:(universe.events||[]).length,rng:v2RecordClone(universe.rng),team:me?{id:me.id,name:me.name,w:me.w,l:me.l,cw:me.cw,cl:me.cl,pf:me.pf,pa:me.pa,sos:me.sos,stats:v2RosterStatChecksum(me)}:null,game:g?v2RecordClone(g):null,lastArchive:last?{id:last.id,engine:last.engine,transactionVersion:last.transactionVersion,score:v2RecordClone(last.score),scoreAdjustment:v2RecordClone(last.scoreAdjustment),drivePoints:{home:(last.drives||[]).filter(d=>d.side==='home').reduce((n,d)=>n+(Number(d.points)||0),0),away:(last.drives||[]).filter(d=>d.side==='away').reduce((n,d)=>n+(Number(d.points)||0),0)},playerLines:(last.playerStats?.home?.length||0)+(last.playerStats?.away?.length||0),drives:last.drives?.length||0}:null,lastDetailed:universe.lastDetailedGame?{gameId:universe.lastDetailedGame.gameId,engine:universe.lastDetailedGame.engine,week:universe.lastDetailedGame.week}:null}
+}
+function v2RollbackProbe(fault='afterArchive'){
+  recoverWeek();syncGameplayRng();const before=v2RecordDebugState();let message='';try{recordV2GameLabResult({testFault:fault});return{ok:false,before,after:v2RecordDebugState(),message:'fault did not throw'}}catch(err){message=String(err.message||err)}const after=v2RecordDebugState();return{ok:JSON.stringify(before)===JSON.stringify(after),before,after,message}
+}
+function ensureV2RecordGateHost(){let host=document.querySelector('#v2RecordGate');if(host)return host;const section=document.querySelector('#gamelab');if(!section)return null;host=document.createElement('div');host.id='v2RecordGate';host.className='card';section.appendChild(host);return host}
+function renderV2RecordGate(){
+  const host=ensureV2RecordGateHost();if(!host)return;const g=findUserGame(),disabled=!g||universe.phase!=='regular'||!globalThis.DynastyGameEngineV2Transaction;
+  host.innerHTML=`<div class="section-head"><div><div class="eyebrow">V0.10.1 DEVELOPMENT GATE</div><h3>Recorded Game Engine 2</h3><div class="muted">All-or-nothing scheduled-game commit using real-player v2 stats, the permanent Game Center archive and rollback protection.</div></div><button type="button" data-v2-record ${disabled?'disabled':''}>Record with V2 (Dev)</button></div><div class="v2-shadow-safety"><strong>Development only.</strong> This gate is not a production cutover and does not replace Quick Sim.</div>`;
+  const button=host.querySelector('[data-v2-record]');if(button)button.onclick=()=>{if(!confirm('Development-only Game Engine 2 test: permanently record this scheduled game with v2?'))return;try{const out=recordV2GameLabResult();setStatus(`Game Engine 2 recorded ${out.result.away} ${out.result.ap} – ${out.result.hp} ${out.result.home}.`);render()}catch(err){console.error(err);setStatus(`V2 recorded-game transaction rolled back: ${err.message||err}`)}}
+}
+const renderGameLabWithV2Recorded=TAB_RENDERERS.gamelab;TAB_RENDERERS.gamelab=()=>{renderGameLabWithV2Recorded();renderV2RecordGate()};
+globalThis.DynastyGameEngineV2LabBridge.recordCurrent=recordV2GameLabResult;globalThis.DynastyGameEngineV2LabBridge.debug=v2RecordDebugState;
+if(globalThis.__DL_TEST__)globalThis.__DL_TEST__.v2RollbackProbe=v2RollbackProbe;
