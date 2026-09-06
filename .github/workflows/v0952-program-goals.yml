@@ -1,0 +1,40 @@
+name: v0952 Program Lab polish
+
+on:
+  push:
+    branches:
+      - codex/v0952-program-goals-polish
+
+permissions:
+  contents: write
+
+jobs:
+  apply-test-build:
+    if: ${{ !contains(github.event.head_commit.message, '[skip v0952 ci]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v0952-program-goals-polish
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-package-lock
+      - name: Apply v0.9.52 patch
+        run: node tools/apply-v0952-program-goals.js
+      - name: Season goals regressions
+        run: node --test tests/season-goals.js tests/season-goals-v0952.js
+      - name: Build standalone artifact
+        run: npm run build
+      - name: Release-source verification
+        run: npm run verify:release
+      - name: Commit v0.9.52 source and artifact
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app.js body.html VERSION.txt package.json tools/harness.js index.html CHANGELOG.md CONTINUATION.md
+          if ! git diff --cached --quiet; then
+            git commit -m "Implement v0.9.52 Program Lab and season-goal polish [skip v0952 ci]"
+            git push origin HEAD:codex/v0952-program-goals-polish
+          fi
