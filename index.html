@@ -6175,6 +6175,7 @@ if(typeof module==='object'&&module.exports){
  renderRecruiting=function(){freezeControlledCommitReceipts();renderRecruitingBeforeScoutingReceipts();renderRecruitingReceiptRecap()};
  const renderRosterBeforeScoutingReceipts=renderRoster;
  renderRoster=function(){renderRosterBeforeScoutingReceipts();renderRosterReceiptBadges()};
+ if(typeof TAB_RENDERERS==='object'){TAB_RENDERERS.recruiting=renderRecruiting;TAB_RENDERERS.roster=renderRoster}
  globalThis.DynastyLabScoutingReceipts={classifyPlayer:p=>scoutingReceiptSystem.classifyPlayer(p,universe.year),summary:p=>scoutingReceiptSystem.receiptSummary(scoutingReceiptSystem.classifyPlayer(p,universe.year)),teamSummary:t=>scoutingReceiptSystem.summarizePlayers(receiptPlayers(t),universe.year,t.id)};
 }
 
