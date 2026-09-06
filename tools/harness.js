@@ -50,6 +50,7 @@ function loadEngine({ seed, stubRender = true, indexedDB } = {}) {
   if (indexedDB) global.indexedDB = indexedDB;
   global.DynastyStorage = require('../storage.js');
   global.DynastyRng = require('../rng.js');
+  global.esc = require('../escape.js');
   if (seed !== undefined) {
     // Deterministic xorshift so runs are reproducible across measurements.
     let s = seed >>> 0 || 1;
