@@ -688,6 +688,8 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 .scouting-budget-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding:9px 11px;border:1px solid rgba(255,255,255,.12);border-radius:8px}.scouting-budget-strip strong{letter-spacing:.04em;text-transform:uppercase;font-size:.78rem}.scouting-budget-strip span{font-weight:700}.scouting-budget-strip small{opacity:.7}.scouting-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.scouting-actions button{font-size:.72rem;padding:4px 7px;white-space:nowrap}.scouting-actions button:disabled{opacity:.45}.scouting-profile-actions{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px;margin-bottom:12px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.scouting-profile-actions>div:first-child{display:grid;gap:2px}.scouting-profile-actions>div:first-child span{font-size:.82rem;opacity:.72}.staff-verdict-compact{display:grid;gap:1px;margin-top:6px}.staff-verdict-compact strong{font-size:.78rem}.staff-verdict-compact span{font-size:.68rem;opacity:.7}.staff-verdict-card{margin:0 0 12px;padding:12px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.staff-verdict-card p{margin:.65rem 0}.staff-verdict-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.staff-verdict-head>div{display:grid;gap:3px}.staff-verdict-head>div>strong{font-size:1.05rem}.staff-verdict-head>b{font-size:1.5rem;line-height:1}@media(max-width:760px){.scouting-profile-actions{align-items:flex-start}.scouting-actions{width:100%}.scouting-actions button{flex:1 1 130px}}
 
 .recruit-compare-toggle{margin-top:5px;font-size:.72rem;padding:4px 7px}.recruit-compare-toggle.active{font-weight:700}.recruit-compare-tray{margin-top:10px;padding:10px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.recruit-compare-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}.recruit-compare-head>div{display:grid;gap:2px}.recruit-compare-head small{opacity:.68}.recruit-compare-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.recruit-compare-card{padding:9px;border:1px solid rgba(255,255,255,.1);border-radius:8px;display:grid;gap:5px}.recruit-compare-verdict{display:flex;align-items:center;justify-content:space-between;gap:8px}.recruit-compare-verdict b{font-size:1.15rem}@media(max-width:900px){.recruit-compare-grid{grid-template-columns:1fr}}
+.roster-need-strip{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 12px}.roster-need{display:grid;gap:1px;min-width:105px;padding:7px 9px;border:1px solid rgba(255,255,255,.1);border-radius:8px}.roster-need strong{font-size:.82rem}.roster-need span{font-weight:700}.roster-need small{opacity:.65}.roster-need.urgent{border-width:2px}.staff-shortlist-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.staff-shortlist-card{position:relative;display:grid;grid-template-columns:22px 1fr;gap:5px 7px;padding:10px;border:1px solid rgba(255,255,255,.1);border-radius:9px}.staff-shortlist-card.targeted{border-width:2px}.staff-shortlist-rank{grid-row:1/6;font-size:.78rem;opacity:.55}.staff-shortlist-verdict{display:flex;align-items:center;justify-content:space-between;gap:8px}.staff-shortlist-verdict span{font-size:.75rem;opacity:.72}.staff-shortlist-reason,.staff-shortlist-actions,.staff-shortlist-card>.small{grid-column:2}.staff-shortlist-actions{display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap}.staff-shortlist-actions>.scouting-actions{margin-top:0}.staff-shortlist-actions button{font-size:.72rem;padding:4px 7px}@media(max-width:1150px){.staff-shortlist-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.staff-shortlist-grid{grid-template-columns:1fr}.roster-need{flex:1 1 90px}}
+
 /* Dynasty Lab commercial polish layer (v0.9.14 pass).
    Loaded last. Presentation only: no simulation, storage or save-format code depends on it.
    Section 1 — flagship Dashboard. Later sections add shared primitives. */
@@ -6000,6 +6002,58 @@ if(typeof module==='object'&&module.exports){
   const r=universe.recruits.find(x=>String(x.id)===String(id)),host=$('#recruitDialogBody')?.querySelector?.('.scouting-profile-actions');
   if(r&&host&&!host.querySelector?.('.recruit-compare-toggle')){host.insertAdjacentHTML?.('beforeend',compareToggleHTML(r));bindRecruitCompare()}
  };
+}
+
+function makeStaffShortlistSystem(env){
+ 'use strict';
+ const LIMIT=8;
+ const num=v=>Number.isFinite(Number(v))?Number(v):0;
+ function positionNeeds(team,recruits=[]){
+  return Object.entries(env.posCounts||{}).map(([pos,target])=>{
+   const returning=(team.roster||[]).filter(p=>p.pos===pos&&env.eligibilityBase(p)<3).length;
+   const committed=recruits.filter(r=>r.pos===pos&&r.committed===team.name).length;
+   const targeted=recruits.filter(r=>r.pos===pos&&r.targeted&&!r.committed).length;
+   const gap=Math.max(0,Math.round(target)-returning-committed);
+   const urgency=Math.max(0,gap*18-targeted*4);
+   return{pos,target:Math.round(target),returning,committed,targeted,gap,urgency};
+  }).sort((a,b)=>b.urgency-a.urgency||b.gap-a.gap||a.pos.localeCompare(b.pos));
+ }
+ function shortlist(team,recruits=[],limit=LIMIT){
+  const needs=Object.fromEntries(positionNeeds(team,recruits).map(x=>[x.pos,x]));
+  return recruits.filter(r=>!r.committed).map(r=>{
+   const need=needs[r.pos]||{gap:0,urgency:0};
+   const verdict=env.staffVerdict(r,team),interest=num(r.interest),pipeline=num(env.pipelineStrength(team,r.homeRegion)),distance=num(env.distance(team,r));
+   const proximity=Math.max(0,20-Math.min(20,distance/100));
+   const score=verdict.score*.55+need.urgency*.65+interest*.12+pipeline*.06+num(r.stars)*1.6+proximity*.15;
+   const reason=[need.gap?`${need.gap} projected ${r.pos} opening${need.gap===1?'':'s'}`:'depth is covered',`${verdict.label} staff grade`,interest>=65?`${Math.round(interest)}% interest`:distance<=250?`${Math.round(distance)} miles away`:null].filter(Boolean).join(' · ');
+   return{r,score,need,verdict,reason};
+  }).sort((a,b)=>b.score-a.score||(a.r.nationalRank||9999)-(b.r.nationalRank||9999)).slice(0,Math.max(1,Math.min(12,limit)));
+ }
+ return{LIMIT,positionNeeds,shortlist};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeStaffShortlistSystem};
+}else{
+ const staffShortlistSystem=makeStaffShortlistSystem({
+  posCounts:POS_COUNTS,eligibilityBase,staffVerdict:recruitStaffVerdict,pipelineStrength,distance:recruitDistance
+ });
+ function staffShortlistHTML(t){
+  const needs=staffShortlistSystem.positionNeeds(t,universe.recruits),rows=staffShortlistSystem.shortlist(t,universe.recruits),urgent=needs.filter(x=>x.gap>0).slice(0,6);
+  return `<div class="section-head"><div><div class="eyebrow">STAFF ROOM</div><h3>Roster Outlook & Staff Shortlist</h3><div class="muted">Recommendations use projected openings and your current scouting information — never hidden ratings.</div></div></div><div class="roster-need-strip">${urgent.map(x=>`<div class="roster-need${x.gap>=3?' urgent':''}"><strong>${x.pos}</strong><span>${x.gap} need${x.gap===1?'':'s'}</span><small>${x.returning} returning · ${x.committed} committed</small></div>`).join('')||'<span class="muted">No obvious positional shortage after projected departures.</span>'}</div><div class="staff-shortlist-grid">${rows.map((x,i)=>{const r=x.r,rec=recruitScoutingRecord(r,t);return `<article class="staff-shortlist-card${r.targeted?' targeted':''}"><div class="staff-shortlist-rank">${i+1}</div><div><button class="player-button" data-recruit="${r.id}">${r.pos} ${r.name}</button><div class="small muted">#${r.nationalRank} · ${'★'.repeat(r.stars)} · ${r.homeCity}, ${r.homeState}</div></div><div class="staff-shortlist-verdict"><strong>${x.verdict.label}</strong><span>${x.verdict.score} · ${x.verdict.conviction}</span></div><div class="small muted staff-shortlist-reason">${x.reason}</div><div class="staff-shortlist-actions"><button type="button" data-shortlist-target="${r.id}">${r.targeted?'On Board':'Add to Board'}</button>${scoutingActionButtonsHTML(r,t)}</div><div class="small muted">${rec.full?'Full evaluation complete':rec.quick?'Film reviewed':'Preliminary evaluation'} · ${x.verdict.confidence}% confidence</div></article>`}).join('')}</div>`;
+ }
+ function bindStaffShortlist(){
+  $$('[data-shortlist-target]').forEach(b=>b.onclick=()=>{const r=universe.recruits.find(x=>String(x.id)===String(b.dataset.shortlistTarget));if(!r)return;r.targeted=!r.targeted;if(r.targeted)firstRecruitEvaluation(r,selected());setStatus(`${r.name} ${r.targeted?'added to':'removed from'} the recruiting board.`);renderRecruiting()});
+  bindScoutingActionButtons();attachRecruitLinks();
+ }
+ function renderStaffShortlist(){
+  const t=selected(),summary=$('#classSummary');if(!t||!summary)return;
+  let host=$('#staffRecruitShortlist');
+  if(!host){summary.insertAdjacentHTML?.('afterend','<div class="card" id="staffRecruitShortlist"></div>');host=$('#staffRecruitShortlist')}
+  if(!host)return;host.innerHTML=staffShortlistHTML(t);bindStaffShortlist();
+ }
+ const renderRecruitingBeforeStaffShortlist=renderRecruiting;
+ renderRecruiting=function(){renderRecruitingBeforeStaffShortlist();renderStaffShortlist()};
 }
 
 loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});[...new Set(schools.map(t=>t.conference))].forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();applyTitlePreferences();showTitleScreen();refreshTitleSave();}).catch(e=>{$('#titleStatus').textContent='Could not initialize Dynasty Lab. '+e.message});
