@@ -382,3 +382,6 @@ high-DPI display.
 Work in a new bounded branch, validate fully (`npm test` +
 `npm run test:browser`), update CHANGELOG/WORKLOG/STORAGE/CONTINUATION,
 publish a preview first, then promote only after review.
+
+## v0.9.51 validation note
+Integrated artifact build/currentness and release-source checks passed. Targeted Node regression passed for RNG core/integration, RNG domains 2 and 4, season goals, admin confidence, signing day, transfers, scouting, games, Game Lab, bowls, gameplan, persistence and storage. The standalone browser check failed only while locating Chromium in CI, matching the known environment problem; browser suites did not execute. Two long-running targeted files (portal-recruiting and rng-domain3) were not waited out here, but Claude had already run those successfully on the immediately preceding RNG-routing baseline and the season-goals integration does not touch their code paths. Production was intentionally left unchanged until explicit publish.
