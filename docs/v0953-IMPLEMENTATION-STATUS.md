@@ -6,7 +6,7 @@ Branch: `codex/v0953-recruiting-development-polish`
 
 Source baseline: `83815856c04cf6b00442e47958b25c79eb6848c9` (`codex/v0952-program-goals-polish`)
 
-Production baseline: v0.9.52. Production publishing is not authorized by this workstream.
+Production baseline: v0.9.52. Release-candidate source is now v0.9.53. Production publishing is not authorized by this workstream.
 
 ## Scope and working rules
 
@@ -156,7 +156,7 @@ Source commits: `848b1d8615db055bc88b5be4117c5affb6c12976`, `ae3729dbab0604d8c9c
 
 The repository's validator requires committed `index.html` to exactly match `npm run build`. Because this session cannot clone GitHub through the shell, a temporary branch-only workflow `.github/workflows/sync-v0953-build.yml` was added to build and commit the generated standalone artifact after source pushes. It is guarded against bot recursion.
 
-**Remove the temporary build-sync workflow before merge/release.** It is development plumbing, not a production feature.
+The temporary build-sync workflow was removed from the release-candidate tree after local build tooling became available. It was development plumbing, not a production feature.
 
 ## Validation status
 
@@ -169,12 +169,11 @@ The repository's validator requires committed `index.html` to exactly match `npm
 - Validator run `34029118162` then reached all 113 primary browser assertions; its only failure was a pre-existing nondeterministic coach-offer check because the test still mocked `Math.random` after gameplay had migrated to the seeded RNG. The browser-only test hook now resets the actual gameplay RNG to a known low first draw before sending the offer.
 - Validator run `34031688279` passed engine and all browser/visual suites, then exposed stale IndexedDB test assumptions: it explicitly reopened schema 3 after the app had created schema 4 and still addressed the first archive chunk with the pre-save-slot numeric key. The persistence check now opens the existing database at its current version, reads `main:0`, and uses the same title readiness signal as the other browser suites.
 - The same persistence scenario now explicitly confirms replacement of an occupied save slot after importing a portable save, matching the current three-slot safety prompt instead of silently dismissing it in Playwright.
+- GitHub Actions run `34033119393` passed completely on `2acd965`, including engine, browser, persistence and simulation-audit stages. The branch has advanced to release-candidate preparation: v0.9.53 version alignment, release/validation/publish notes and removal of the temporary build-sync workflow.
 - Do not publish v0.9.53 until full validation is green or any real failures are diagnosed and fixed.
 
 ## Next bounded slices
 
-1. Run focused build/startup verification for the extension-order fix, then push a clean checkpoint and let the validator advance beyond the browser startup gate.
-2. If the browser-storage suite hits the same title-screen race, add the same populated-`#titleTeam` readiness guard there.
-3. If full validation is green, consider a measured Staff Shortlist performance optimization with ranking-equivalence regression coverage, or proceed to the fuller historical recruiting-class receipt view.
-4. Add/refresh final v0.9.53 release notes, remove the temporary build-sync workflow, and run final validation on the release tree.
-5. Production remains v0.9.52 until separately authorized.
+1. Rebuild the standalone artifact at v0.9.53 and run focused release checks.
+2. Push the release-candidate checkpoint and require one final clean GitHub validation run.
+3. After green validation, create and verify a versioned preview only; production remains v0.9.52 until separately authorized.

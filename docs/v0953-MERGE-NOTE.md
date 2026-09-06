@@ -1,0 +1,1 @@
+Merge `codex/v0953-recruiting-development-polish` into the approved source baseline as the v0.9.53 release candidate. Preserve the source modules and generated `index.html` together. Do not publish production until the versioned preview is verified and explicitly approved.

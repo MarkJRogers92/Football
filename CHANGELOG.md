@@ -1,3 +1,12 @@
+## v0.9.53 — Recruiting and development polish
+
+- Gives all 69 player archetypes clear, save-safe identities without changing their simulation keys.
+- Adds detailed Spring and Fall development receipts, a visual Results Center, group summaries and observed growth-pattern clues.
+- Adds a persistent Next Action navigator built on the existing weekly plan.
+- Adds bounded recruit evaluations, fallible staff verdicts, three-player comparison and a roster-needs shortlist.
+- Preserves staff-visible signing beliefs and later grades them as scouting receipts without exposing hidden ratings or growth curves.
+- Adds focused regressions for uncertainty, hidden-information independence, extension startup, browser presentation and persistence.
+
 ## v0.9.52 — Program goals polish
 - Expands season-goal variety while keeping the primary win expectation tied to the existing administration model.
 - Adds Critical / Important / Bonus weighting and live Complete / On track / At risk / Failed status.
