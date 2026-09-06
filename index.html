@@ -687,6 +687,7 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 
 .scouting-budget-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding:9px 11px;border:1px solid rgba(255,255,255,.12);border-radius:8px}.scouting-budget-strip strong{letter-spacing:.04em;text-transform:uppercase;font-size:.78rem}.scouting-budget-strip span{font-weight:700}.scouting-budget-strip small{opacity:.7}.scouting-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.scouting-actions button{font-size:.72rem;padding:4px 7px;white-space:nowrap}.scouting-actions button:disabled{opacity:.45}.scouting-profile-actions{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px;margin-bottom:12px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.scouting-profile-actions>div:first-child{display:grid;gap:2px}.scouting-profile-actions>div:first-child span{font-size:.82rem;opacity:.72}.staff-verdict-compact{display:grid;gap:1px;margin-top:6px}.staff-verdict-compact strong{font-size:.78rem}.staff-verdict-compact span{font-size:.68rem;opacity:.7}.staff-verdict-card{margin:0 0 12px;padding:12px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.staff-verdict-card p{margin:.65rem 0}.staff-verdict-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.staff-verdict-head>div{display:grid;gap:3px}.staff-verdict-head>div>strong{font-size:1.05rem}.staff-verdict-head>b{font-size:1.5rem;line-height:1}@media(max-width:760px){.scouting-profile-actions{align-items:flex-start}.scouting-actions{width:100%}.scouting-actions button{flex:1 1 130px}}
 
+.recruit-compare-toggle{margin-top:5px;font-size:.72rem;padding:4px 7px}.recruit-compare-toggle.active{font-weight:700}.recruit-compare-tray{margin-top:10px;padding:10px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.recruit-compare-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}.recruit-compare-head>div{display:grid;gap:2px}.recruit-compare-head small{opacity:.68}.recruit-compare-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.recruit-compare-card{padding:9px;border:1px solid rgba(255,255,255,.1);border-radius:8px;display:grid;gap:5px}.recruit-compare-verdict{display:flex;align-items:center;justify-content:space-between;gap:8px}.recruit-compare-verdict b{font-size:1.15rem}@media(max-width:900px){.recruit-compare-grid{grid-template-columns:1fr}}
 /* Dynasty Lab commercial polish layer (v0.9.14 pass).
    Loaded last. Presentation only: no simulation, storage or save-format code depends on it.
    Section 1 — flagship Dashboard. Later sections add shared primitives. */
@@ -5951,6 +5952,53 @@ if(typeof module==='object'&&module.exports){
    const week=ensureScoutingWeek(t);body.insertAdjacentHTML?.('afterbegin',`<div class="scouting-profile-actions"><div><strong>Evaluation room</strong><span>${scoutingHoursLeft(t)} of ${week.budget} hours left this week</span></div>${scoutingActionButtonsHTML(r,t)}</div>${scoutingVerdictHTML(r,t,false)}`);
    bindScoutingActionButtons();
   }
+ };
+}
+
+function makeRecruitCompareSystem(env){
+ 'use strict';
+ const MAX=3;
+ function normalize(ids=[]){return [...new Set(ids.map(String))].slice(0,MAX)}
+ function toggle(ids,id){
+  const out=normalize(ids),key=String(id),at=out.indexOf(key);
+  if(at>=0){out.splice(at,1);return{ok:true,ids:out,removed:true}}
+  if(out.length>=MAX)return{ok:false,ids:out,reason:`Recruit Compare holds up to ${MAX} prospects.`};
+  out.push(key);return{ok:true,ids:out,removed:false};
+ }
+ function summary(r,t){
+  const v=env.staffVerdict(r,t),rec=env.scoutingRecord(r,t);
+  return{id:String(r.id),name:r.name,pos:r.pos,verdict:v.label,score:v.score,conviction:v.conviction,confidence:v.confidence,strengths:v.strong||[],risk:v.risk||null,stage:rec.full?'Full evaluation':rec.quick?'Film reviewed':'Preliminary'};
+ }
+ return{MAX,normalize,toggle,summary};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeRecruitCompareSystem};
+}else{
+ const recruitCompareScoutingApi=makeScoutingActionSystem({getUniverse:()=>universe,clamp,avg,scoutingDomainView,firstRecruitEvaluation,refreshScoutingIntel,snapshotScouting,staffEval,staffBias:(r,t)=>scoutHash(r,'staff_verdict',String(t.id))*12});
+ const recruitCompareSystem=makeRecruitCompareSystem({staffVerdict:recruitCompareScoutingApi.staffVerdict,scoutingRecord:recruitCompareScoutingApi.recruitScoutingRecord});
+ let recruitCompareIds=[];
+ function compareToggleHTML(r){const on=recruitCompareIds.includes(String(r.id));return `<button type="button" class="recruit-compare-toggle${on?' active':''}" data-compare-recruit="${r.id}">${on?'Compared':'Compare'}</button>`}
+ function recruitCompareTrayHTML(t){
+  const recruits=recruitCompareIds.map(id=>universe.recruits.find(r=>String(r.id)===id)).filter(Boolean);if(!recruits.length)return'';
+  return `<div class="recruit-compare-tray"><div class="recruit-compare-head"><div><strong>Recruit Compare</strong><small>Current staff information only</small></div><button type="button" data-compare-clear>Clear</button></div><div class="recruit-compare-grid">${recruits.map(r=>{const x=recruitCompareSystem.summary(r,t);return `<div class="recruit-compare-card"><button class="player-button" data-recruit="${r.id}">${r.pos} ${r.name}</button><div class="small muted">#${r.nationalRank} · ${'★'.repeat(r.stars)} · ${r.homeState} · ${r.priority}</div><div class="recruit-compare-verdict"><strong>${x.verdict}</strong><b>${x.score}</b></div><div class="small">${x.stage} · ${x.conviction} conviction · ${x.confidence}% confidence</div><div class="small muted">Best: ${x.strengths.join(', ')||'—'} · Risk: ${x.risk||'—'}</div><div class="small muted">Interest ${r.interest}% · ${recruitDistance(t,r)} mi</div></div>`}).join('')}</div></div>`;
+ }
+ function bindRecruitCompare(){
+  $$('[data-compare-recruit]').forEach(b=>b.onclick=()=>{const id=String(b.dataset.compareRecruit),dialog=b.closest?.('#recruitDialog'),result=recruitCompareSystem.toggle(recruitCompareIds,id);if(!result.ok){setStatus(result.reason);return}recruitCompareIds=result.ids;renderRecruiting();if(dialog){const d=$('#recruitDialog');if(d?.open)d.close();showRecruitProfile(id)}});
+  $$('[data-compare-clear]').forEach(b=>b.onclick=()=>{recruitCompareIds=[];renderRecruiting()});
+ }
+ function augmentRecruitCompare(){
+  const t=selected(),summary=$('#classSummary');if(!t||!summary)return;
+  $$('[data-recruit]').forEach(link=>{const r=universe.recruits.find(x=>String(x.id)===String(link.dataset.recruit)),row=link.closest?.('tr'),cell=row?.querySelector?.('td[data-label="Scout"]');if(!r||!cell||cell.querySelector?.('.recruit-compare-toggle'))return;cell.insertAdjacentHTML?.('beforeend',compareToggleHTML(r))});
+  summary.insertAdjacentHTML?.('beforeend',recruitCompareTrayHTML(t));bindRecruitCompare();attachRecruitLinks();
+ }
+ const renderRecruitingBeforeCompare=renderRecruiting;
+ renderRecruiting=function(){renderRecruitingBeforeCompare();augmentRecruitCompare()};
+ const showRecruitProfileBeforeCompare=showRecruitProfile;
+ showRecruitProfile=function(id){
+  showRecruitProfileBeforeCompare(id);
+  const r=universe.recruits.find(x=>String(x.id)===String(id)),host=$('#recruitDialogBody')?.querySelector?.('.scouting-profile-actions');
+  if(r&&host&&!host.querySelector?.('.recruit-compare-toggle')){host.insertAdjacentHTML?.('beforeend',compareToggleHTML(r));bindRecruitCompare()}
  };
 }
 
