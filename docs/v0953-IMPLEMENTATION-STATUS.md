@@ -26,13 +26,24 @@ Validation is intentionally time-bounded. Focused checks run with each slice. A 
 
 Focused validation: `node --test tests/archetypes.js tests/scouting.js` — 6/6 passing.
 
+## Completed checkpoint: Milestone B report capture
+
+- Added compact before/after snapshots for development-relevant fields.
+- Spring and Fall reports now retain exact overall, perceived-rating, upside-read, seven-trait, body, familiarity, scouting-confidence, health, and wear deltas.
+- Reports retain the player and team training focuses that produced each receipt.
+- Spring development now joins Fall camp in compact per-player camp history.
+- Added team and position-group summary helpers for the upcoming Results Center.
+- Added focused regression coverage for exact delta arithmetic, separate Spring/Fall reports, compact storage, save packing, and summary reconciliation.
+
+Focused validation: `npm run test:development` — 9/9 passing.
+
 ## Next bounded slice
 
 1. Finish display-label coverage on remaining roster/recruit summaries without touching internal keys.
-2. Capture full Spring and Fall development deltas (`developmentSnapshot` plus report builder).
-3. Add focused development-report tests.
+2. Build the Development Results Center from the stored report data.
+3. Add focused presentation checks for the results view.
 4. Rebuild, checkpoint, and push.
 
 ## Deferred validation
 
-No full browser suite or long-run simulation was run at this checkpoint. The change is presentation-only and focused engine/scouting regressions passed. Full validation should be performed after the first coherent UI package, not after every small slice.
+No full browser suite or long-run simulation was run at these checkpoints. Focused archetype, development, and scouting regressions passed. Full validation should be performed after the first coherent UI package, not after every small slice.

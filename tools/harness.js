@@ -93,7 +93,7 @@ globalThis.__ENGINE__ = {
   setTeamScheme, schemeTransition, schemeFamiliarity, advanceSchemeInstall, schemeFitFor, schemeDefFor, schemeFitPressure, applyCoachScheme, ensureCoachScheme, positionOptions, positionChangeWillingness, positionTransitionFit, applyPositionChangeCost, playerSchemeFit, SCHEME_SIDE,
   gameRecap, recapFacts, recapPicker, weeklyNewsletter, newsWeight, newsGames, newsWeeks,
   gameSim, detailedGame, simulateUserDetailed, gameBoxHTML, gameSummaryHTML, renderGameArchive, showGameCenter, simWeek, simSeason, simConferenceChampionships, simPlayoff, runOffseason, advanceOffseasonPhase, advanceOffseasonTo, offseasonPhaseDone, finishOffseasonPhase, offseasonReview, offseasonDepartures, offseasonEnrollment, offseasonPortal, offseasonPreseason,
-  runSpringCamp, runFallCamp, makeOffseasonState, normalizeOffseasonState, OFFSEASON_PHASES, advanceRecruiting, finalizeRecruiting,
+  runSpringCamp, runFallCamp, developmentSnapshot, developmentDelta, developmentResult, developmentTeamSummary, developmentGroupSummary, makeOffseasonState, normalizeOffseasonState, OFFSEASON_PHASES, advanceRecruiting, finalizeRecruiting,
   generateRecruitPool, generatePlayer, generateRoster, conditionRating,
   roleFit, unit, starter, roleStarter, participants, eligibilityBase,
   transferRisk, draftProjection, seasonScore, normalizeUniverse, recruitPitch, recruitCoachRelationshipBoost, ensureRecruitRelationships, assignPrimaryRecruiter, growRecruiterRelationship, coachTransferPressure,
