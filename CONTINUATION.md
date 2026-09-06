@@ -365,3 +365,8 @@ high-DPI display.
 Work in a new bounded branch, validate fully (`npm test` +
 `npm run test:browser`), update CHANGELOG/WORKLOG/STORAGE/CONTINUATION,
 publish a preview first, then promote only after review.
+
+## v0.9.51 season goals work
+Active branch: `codex/v0951-season-goals`.
+
+Implemented: context-generated season goals, live dashboard/Program Lab progress, preseason goal briefing, year-end administration adjustment, version bump to 0.9.51, standalone artifact update, and `tests/season-goals.js`. Production remains on v0.9.50 until this branch is validated and explicitly published.
