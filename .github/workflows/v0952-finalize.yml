@@ -1,0 +1,39 @@
+name: v0952 finalize
+
+on:
+  push:
+    branches:
+      - codex/v0952-program-goals-polish
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: ${{ !contains(github.event.head_commit.message, '[skip v0952 finalize]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v0952-program-goals-polish
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-package-lock
+      - name: Apply save compatibility migration
+        run: node tools/apply-v0952-save-migration.js
+      - name: Season-goal regressions
+        run: node --test tests/season-goals.js tests/season-goals-v0952.js
+      - name: Build standalone artifact
+        run: npm run build
+      - name: Commit final v0.9.52 tree
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/v0952-finalize.yml tools/apply-v0952-save-migration.js tools/apply-v0952-program-goals.js
+          git add app.js index.html
+          git commit -m "Finalize v0.9.52 Program Lab compatibility [skip v0952 finalize]"
+          git push origin HEAD:codex/v0952-program-goals-polish
+      - name: Verify release source
+        run: npm run verify:release
