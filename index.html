@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.9.52</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.9.54</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -685,6 +685,29 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 .signing-card-avatar canvas,.commitment-avatar canvas,.recruit-hero-avatar canvas{display:block;width:100%;height:100%;border-radius:inherit}
 .signing-card-avatar:has(canvas),.commitment-avatar:has(canvas),.recruit-hero-avatar:has(canvas){padding:0}
 
+.scouting-budget-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding:9px 11px;border:1px solid rgba(255,255,255,.12);border-radius:8px}.scouting-budget-strip strong{letter-spacing:.04em;text-transform:uppercase;font-size:.78rem}.scouting-budget-strip span{font-weight:700}.scouting-budget-strip small{opacity:.7}.scouting-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.scouting-actions button{font-size:.72rem;padding:4px 7px;white-space:nowrap}.scouting-actions button:disabled{opacity:.45}.scouting-profile-actions{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px;margin-bottom:12px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.scouting-profile-actions>div:first-child{display:grid;gap:2px}.scouting-profile-actions>div:first-child span{font-size:.82rem;opacity:.72}.staff-verdict-compact{display:grid;gap:1px;margin-top:6px}.staff-verdict-compact strong{font-size:.78rem}.staff-verdict-compact span{font-size:.68rem;opacity:.7}.staff-verdict-card{margin:0 0 12px;padding:12px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.staff-verdict-card p{margin:.65rem 0}.staff-verdict-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.staff-verdict-head>div{display:grid;gap:3px}.staff-verdict-head>div>strong{font-size:1.05rem}.staff-verdict-head>b{font-size:1.5rem;line-height:1}@media(max-width:760px){.scouting-profile-actions{align-items:flex-start}.scouting-actions{width:100%}.scouting-actions button{flex:1 1 130px}}
+@media(max-width:700px){#recruiting td[data-label="Scout"]{grid-column:1/-1;white-space:normal;flex-wrap:wrap;align-items:flex-start}#recruiting td[data-label="Scout"]::before{width:100%}#recruiting td[data-label="Scout"] .staff-verdict-compact{min-width:0}#recruiting td[data-label="Scout"] .staff-verdict-compact span{white-space:normal}}
+
+.scouting-trail-card{margin:0 0 12px;padding:12px;border:1px solid rgba(255,255,255,.12);border-radius:10px}.scouting-trail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.scouting-trail-head>div{display:grid;gap:2px}.scouting-trail-head>span{font-size:.72rem;opacity:.72;text-align:right}.scouting-trail-list{display:grid;margin-top:9px}.scouting-trail-row{display:grid;grid-template-columns:minmax(105px,.55fr) minmax(0,1.45fr);gap:10px;padding:8px 0;border-top:1px solid rgba(255,255,255,.08)}.scouting-trail-row>div{display:grid;gap:2px}.scouting-trail-row b{font-size:.76rem}.scouting-trail-row small,.scouting-trail-note{font-size:.68rem;opacity:.68}.scouting-trail-note{display:block;margin-top:7px}@media(max-width:700px){.scouting-trail-head,.scouting-trail-row{display:grid;grid-template-columns:1fr}.scouting-trail-head>span{text-align:left}}
+
+.recruiting-filter-strip{display:grid;grid-template-columns:repeat(3,minmax(140px,1fr)) auto auto auto;gap:10px;align-items:end;margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.025)}
+.recruiting-filter-strip label{display:grid;gap:5px;font-size:.76rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.recruiting-filter-strip select{min-width:0;width:100%}
+.recruiting-filter-toggle{display:flex!important;align-items:center;gap:7px;min-height:38px;text-transform:none!important;letter-spacing:0!important;white-space:nowrap}
+.recruiting-filter-toggle input{margin:0}
+.recruiting-filter-count{align-self:center;color:var(--muted);font-size:.78rem;white-space:nowrap}
+.recruiting-filter-count strong{color:var(--text)}
+.recruiting-filter-strip button{white-space:nowrap}
+@media(max-width:900px){.recruiting-filter-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.recruiting-filter-count{white-space:normal}}
+@media(max-width:560px){.recruiting-filter-strip{grid-template-columns:1fr}.recruiting-filter-toggle{min-height:auto}.recruiting-filter-strip button{width:100%}}
+
+.recruit-compare-toggle{margin-top:5px;font-size:.72rem;padding:4px 7px}.recruit-compare-toggle.active{font-weight:700}.recruit-compare-tray{margin-top:10px;padding:10px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.recruit-compare-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}.recruit-compare-head>div{display:grid;gap:2px}.recruit-compare-head small{opacity:.68}.recruit-compare-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.recruit-compare-card{padding:9px;border:1px solid rgba(255,255,255,.1);border-radius:8px;display:grid;gap:5px}.recruit-compare-verdict{display:flex;align-items:center;justify-content:space-between;gap:8px}.recruit-compare-verdict b{font-size:1.15rem}@media(max-width:900px){.recruit-compare-grid{grid-template-columns:1fr}}
+.roster-need-strip{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 12px}.roster-need{display:grid;gap:1px;min-width:105px;padding:7px 9px;border:1px solid rgba(255,255,255,.1);border-radius:8px}.roster-need strong{font-size:.82rem}.roster-need span{font-weight:700}.roster-need small{opacity:.65}.roster-need.urgent{border-width:2px}.staff-shortlist-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.staff-shortlist-card{position:relative;display:grid;grid-template-columns:22px 1fr;gap:5px 7px;padding:10px;border:1px solid rgba(255,255,255,.1);border-radius:9px}.staff-shortlist-card.targeted{border-width:2px}.staff-shortlist-rank{grid-row:1/6;font-size:.78rem;opacity:.55}.staff-shortlist-verdict{display:flex;align-items:center;justify-content:space-between;gap:8px}.staff-shortlist-verdict span{font-size:.75rem;opacity:.72}.staff-shortlist-reason,.staff-shortlist-actions,.staff-shortlist-card>.small{grid-column:2}.staff-shortlist-actions{display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap}.staff-shortlist-actions>.scouting-actions{margin-top:0}.staff-shortlist-actions button{font-size:.72rem;padding:4px 7px}@media(max-width:1150px){.staff-shortlist-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.staff-shortlist-grid{grid-template-columns:1fr}.roster-need{flex:1 1 90px}}
+
+.scouting-receipt-badge{display:inline-flex;align-items:center;margin-left:7px;padding:2px 6px;border:1px solid rgba(255,255,255,.16);border-radius:999px;font-size:.66rem;font-weight:800;letter-spacing:.03em;vertical-align:middle}.scouting-receipt-good{color:#bde9c7}.scouting-receipt-bad{color:#f0b7b7}.scouting-receipt-neutral{color:#cbd3dc}.scouting-receipt-recap{margin-top:12px;padding:12px;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:rgba(255,255,255,.025)}.scouting-receipt-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.scouting-receipt-head>div{display:grid;gap:3px}.scouting-receipt-head small,.scouting-receipt-note{opacity:.7}.scouting-receipt-head>span{font-size:.72rem;font-weight:800;white-space:nowrap}.scouting-receipt-kpis{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.scouting-receipt-kpis span{display:flex;gap:5px;align-items:baseline;padding:5px 7px;border:1px solid rgba(255,255,255,.10);border-radius:7px;font-size:.7rem}.scouting-receipt-kpis b{font-size:.9rem}.scouting-receipt-list{display:grid;gap:5px;margin-top:10px}.scouting-receipt-row{display:flex;justify-content:space-between;gap:12px;padding-top:6px;border-top:1px solid rgba(255,255,255,.08)}.scouting-receipt-row span{display:grid;gap:1px}.scouting-receipt-row small{opacity:.68}.scouting-receipt-row>b{font-size:.72rem;white-space:nowrap}.scouting-receipt-note{display:block;margin-top:9px;font-size:.68rem}@media(max-width:760px){.scouting-receipt-head,.scouting-receipt-row{align-items:flex-start;flex-direction:column}.scouting-receipt-row>b{white-space:normal}}
+.recruiting-history{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.12)}.recruiting-history-head{display:grid;gap:2px;margin-bottom:8px}.recruiting-history-head strong{font-size:.9rem}.recruiting-history-head small{opacity:.68}.recruiting-history-classes{display:grid;gap:7px}.recruiting-history-class{border:1px solid rgba(255,255,255,.1);border-radius:8px;overflow:hidden}.recruiting-history-class>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 10px;cursor:pointer;list-style:none}.recruiting-history-class>summary::-webkit-details-marker{display:none}.recruiting-history-class>summary>span:first-child{display:grid;gap:1px}.recruiting-history-class>summary small{font-size:.7rem;opacity:.66}.recruiting-history-summary{display:flex;gap:6px;flex-wrap:wrap}.recruiting-history-summary b{font-size:.68rem;padding:2px 5px;border:1px solid rgba(255,255,255,.12);border-radius:999px}.recruiting-history-meta{display:flex;gap:12px;flex-wrap:wrap;padding:7px 10px;border-top:1px solid rgba(255,255,255,.08);font-size:.72rem;opacity:.78}.recruiting-history-rows{display:grid}.recruiting-history-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:8px 10px;border-top:1px solid rgba(255,255,255,.07)}.recruiting-history-row>span{display:grid;gap:1px}.recruiting-history-row>span:last-child{text-align:right}.recruiting-history-row small{font-size:.69rem;opacity:.64}@media(max-width:700px){.recruiting-history-class>summary,.recruiting-history-row{grid-template-columns:1fr;display:grid}.recruiting-history-summary{justify-content:flex-start}.recruiting-history-row>span:last-child{text-align:left}}
+
+.development-tendency-badge{display:inline-flex;align-items:center;margin-left:6px;padding:2px 6px;border:1px solid rgba(255,255,255,.14);border-radius:999px;font-size:.64rem;font-weight:800;letter-spacing:.02em}.development-tendency-good{color:#bde9c7}.development-tendency-alert{color:#ead39a}.development-tendency-bad{color:#f0b7b7}.development-tendency-neutral{color:#cbd3dc}.development-tendency-panel{margin-top:14px;padding:13px;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:rgba(255,255,255,.025)}.development-tendency-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.development-tendency-head h3{margin:.2rem 0 0}.development-tendency-head>span{font-size:.72rem;font-weight:800}.development-tendency-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:10px}.development-tendency-card{text-align:left;display:grid;gap:4px;padding:10px;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(0,0,0,.12)}.development-tendency-card b{font-size:.8rem}.development-tendency-card small{opacity:.78;line-height:1.35}.development-tendency-card span{font-size:.66rem;opacity:.62}.development-tendency-note{margin-top:9px}@media(max-width:760px){.development-tendency-head{flex-direction:column}.development-tendency-grid{grid-template-columns:1fr}}
 /* Dynasty Lab commercial polish layer (v0.9.14 pass).
    Loaded last. Presentation only: no simulation, storage or save-format code depends on it.
    Section 1 — flagship Dashboard. Later sections add shared primitives. */
@@ -839,6 +862,33 @@ body::before{opacity:.12}
 .tabs button:nth-child(2),.tabs button:nth-child(5),.tabs button:nth-child(9),.tabs button:nth-child(13){margin-left:10px;position:relative}
 .tabs button:nth-child(2)::before,.tabs button:nth-child(5)::before,.tabs button:nth-child(9)::before,.tabs button:nth-child(13)::before{content:"";position:absolute;left:-7px;top:9px;bottom:9px;width:1px;background:var(--line-2)}
 .save-status{font-size:11px}
+
+/* Archetype clarity: presentation only; simulation keys remain unchanged. */
+.archetype-chip{display:inline-flex;align-items:center;padding:4px 8px;border-color:color-mix(in srgb,var(--team-secondary) 45%,var(--line-3));background:rgba(var(--team-rgb),.12);color:var(--ink-1);font-size:11px;line-height:1.2;white-space:normal;text-align:left}
+.archetype-chip:hover,.archetype-chip:focus-visible{border-color:var(--team-secondary);background:rgba(var(--team-rgb),.2)}
+.archetype-dialog{max-width:560px}
+.archetype-guide{display:grid;gap:20px;padding-top:8px}
+.archetype-guide-lead{margin:0;font-size:17px;line-height:1.55;color:var(--ink-1)}
+.archetype-guide section{display:grid;gap:9px}
+.archetype-guide section p{margin:0;color:var(--ink-2);line-height:1.55}
+.archetype-strengths{display:flex;flex-wrap:wrap;gap:7px}
+
+/* Development Results Center */
+.development-phase-tabs button.active,.development-groups button.active,.development-results-controls button.active{border-color:var(--team-secondary);background:rgba(var(--team-rgb),.2);color:#fff}
+.development-results-empty{padding:28px 4px;text-align:center}
+.development-results-hero{display:grid;grid-template-columns:minmax(220px,.7fr) minmax(0,1.3fr);gap:24px;padding:18px;border:1px solid var(--line-2);border-top:3px solid var(--team-secondary);border-radius:var(--radius);background:linear-gradient(135deg,rgba(var(--team-rgb),.12),transparent 52%),var(--surf-2)}
+.development-results-hero h3{margin:4px 0}.development-results-hero p{margin:5px 0 0;color:var(--ink-3);line-height:1.45}
+.development-kpis{display:grid;grid-template-columns:repeat(5,minmax(80px,1fr));gap:8px}.development-kpis>div{padding:10px;border:1px solid var(--line-2);border-radius:8px;background:rgba(8,14,21,.45)}.development-kpis span,.development-detail-grid span,.development-overall span{display:block;color:var(--ink-3);font-size:9px;font-weight:750;letter-spacing:.09em;text-transform:uppercase}.development-kpis strong{display:block;margin-top:4px;font-size:18px;font-variant-numeric:tabular-nums}
+.development-results-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.development-results-grid section{padding:14px;border:1px solid var(--line-2);border-radius:var(--radius);background:var(--surf-2)}.development-results-grid h4{margin:0 0 10px}.development-results-grid p{margin:7px 0;line-height:1.5}
+.development-distribution{display:grid;gap:5px}.development-distribution-row{display:grid;grid-template-columns:28px minmax(0,1fr) 24px;gap:8px;align-items:center;font-size:11px;font-variant-numeric:tabular-nums}.development-distribution-row i{display:block;width:var(--bar);height:7px;border-radius:4px;background:var(--team-secondary)}
+.development-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(62px,1fr));gap:6px;margin:14px 0}.development-groups button{display:flex;justify-content:space-between;gap:6px;padding:7px 8px;font-size:11px}.development-groups strong{font-variant-numeric:tabular-nums}
+.development-results-controls{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.development-results-controls>div{display:flex;gap:6px;flex-wrap:wrap}.development-results-controls button,.development-results-controls select{font-size:11px;padding:6px 8px}
+.development-results-body{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.7fr);gap:14px;align-items:start}.development-results-body table{font-size:12px}.development-results-body td{vertical-align:top}.development-results-body aside{position:sticky;top:76px;padding:16px;border:1px solid var(--line-2);border-radius:var(--radius);background:var(--surf-2)}
+.development-detail-head{display:flex;justify-content:space-between;gap:14px;align-items:start}.development-detail-head h3{margin:3px 0}.development-overall{text-align:right}.development-overall strong,.development-overall b{display:block;font-variant-numeric:tabular-nums}.development-overall strong{margin-top:3px;font-size:18px}.development-overall b{margin-top:2px}
+.development-attributes{display:grid;gap:5px;margin:16px 0}.development-attribute{display:grid;grid-template-columns:1fr auto 32px;gap:8px;padding:5px 0;border-bottom:1px solid var(--line-1);font-size:12px;font-variant-numeric:tabular-nums}.development-attribute strong{text-align:right}
+.development-detail-grid{display:grid;gap:9px}.development-detail-grid>div{padding:8px;border-radius:7px;background:var(--surf-1)}.development-detail-grid strong{display:block;margin-top:3px;font-size:12px;line-height:1.4}
+@media(max-width:900px){.development-results-hero,.development-results-body{grid-template-columns:1fr}.development-kpis{grid-template-columns:repeat(3,1fr)}.development-results-body aside{position:static}.development-results-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.development-kpis{grid-template-columns:repeat(2,1fr)}.development-results-controls{align-items:stretch;flex-direction:column}.development-results-controls label{display:flex;justify-content:space-between;align-items:center}.development-groups{grid-template-columns:repeat(4,1fr)}}
 
 /* ---- Typography ------------------------------------------------------------------- */
 .section-head h2{font-size:var(--t-page)}
@@ -1247,7 +1297,7 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.9.52</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.9.54</b></span></footer>
   </div>
 </section>
 
@@ -1255,7 +1305,7 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.9.52</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.9.54</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -1495,6 +1545,10 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
         <div class="section-head"><div><h3>Individual Training Plans</h3><div class="muted">Young players and transition projects benefit most, but every focus has tradeoffs.</div></div></div>
         <div class="table-wrap"><table><thead><tr><th>Player</th><th>Elig</th><th>Current Read</th><th>Potential Read</th><th>Body</th><th>Focus</th><th>Staff Note</th></tr></thead><tbody id="trainingBody"></tbody></table></div>
       </div>
+      <div class="card development-results-card">
+        <div class="section-head"><div><h3>Development Results Center</h3><div class="muted">A complete receipt for roster growth, physical changes and staff re-evaluation.</div></div><div class="button-row development-phase-tabs"><button type="button" data-development-phase="SPRING">Spring</button><button type="button" data-development-phase="FALL">Fall</button></div></div>
+        <div id="developmentResults"></div>
+      </div>
       <div class="two-col">
         <div class="card"><h3>Camp Risers & Fallers</h3><div id="campReport" class="muted">Complete the season to begin offseason development.</div></div>
         <div class="card"><h3>Position Battles</h3><div id="campBattles" class="muted">Fall camp will identify the closest battles.</div></div>
@@ -1580,6 +1634,13 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
   <form method="dialog" class="dialog-shell">
     <div class="dialog-head"><div><div class="eyebrow">RECRUIT PROFILE</div><h2 id="recruitDialogName">Recruit</h2><div id="recruitDialogMeta" class="muted"></div></div><button class="dialog-close" value="close">Close</button></div>
     <div id="recruitDialogBody"></div>
+  </form>
+</dialog>
+
+<dialog id="archetypeDialog" class="player-dialog archetype-dialog" aria-labelledby="archetypeDialogName">
+  <form method="dialog" class="dialog-shell">
+    <div class="dialog-head"><div><div class="eyebrow">ARCHETYPE GUIDE</div><h2 id="archetypeDialogName">Archetype</h2><div id="archetypeDialogMeta" class="muted"></div></div><button class="dialog-close" value="close" aria-label="Close archetype guide">Close</button></div>
+    <div id="archetypeDialogBody"></div>
   </form>
 </dialog>
 
@@ -2384,7 +2445,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=[{"id":1,"name":"Chicago Metropolitan","conference":"Great Lakes","prestige":92,"resources":93,"development":81,"nil":86,"academics":81,"fan_support":92,"facilities":94,"admin_patience":25,"program_ceiling":100,"city":"Chicago","state":"IL","lat":41.8781,"lon":-87.6298},{"id":2,"name":"Great Lakes University","conference":"Great Lakes","prestige":60,"resources":62,"development":58,"nil":59,"academics":63,"fan_support":68,"facilities":60,"admin_patience":78,"program_ceiling":67,"city":"Evanston","state":"IL","lat":42.0451,"lon":-87.6877},{"id":3,"name":"Wisconsin Commonwealth","conference":"Great Lakes","prestige":89,"resources":88,"development":84,"nil":98,"academics":61,"fan_support":83,"facilities":85,"admin_patience":61,"program_ceiling":100,"city":"Madison","state":"WI","lat":43.0731,"lon":-89.4012},{"id":4,"name":"Milwaukee State","conference":"Great Lakes","prestige":59,"resources":70,"development":55,"nil":70,"academics":60,"fan_support":67,"facilities":62,"admin_patience":66,"program_ceiling":74,"city":"Milwaukee","state":"WI","lat":43.0389,"lon":-87.9065},{"id":5,"name":"Michigan Commonwealth","conference":"Great Lakes","prestige":94,"resources":97,"development":82,"nil":94,"academics":66,"fan_support":75,"facilities":99,"admin_patience":50,"program_ceiling":100,"city":"Lansing","state":"MI","lat":42.7325,"lon":-84.5555},{"id":6,"name":"Detroit Metropolitan","conference":"Great Lakes","prestige":75,"resources":93,"development":47,"nil":90,"academics":37,"fan_support":76,"facilities":85,"admin_patience":42,"program_ceiling":90,"city":"Detroit","state":"MI","lat":42.3314,"lon":-83.0458},{"id":7,"name":"Lake Erie University","conference":"Great Lakes","prestige":62,"resources":63,"development":67,"nil":66,"academics":70,"fan_support":63,"facilities":62,"admin_patience":87,"program_ceiling":71,"city":"Cleveland","state":"OH","lat":41.4993,"lon":-81.6944},{"id":8,"name":"Ohio Western","conference":"Great Lakes","prestige":49,"resources":62,"development":40,"nil":62,"academics":58,"fan_support":82,"facilities":54,"admin_patience":63,"program_ceiling":54,"city":"Toledo","state":"OH","lat":41.6528,"lon":-83.5379},{"id":9,"name":"Indiana Commonwealth","conference":"Great Lakes","prestige":65,"resources":57,"development":53,"nil":50,"academics":78,"fan_support":67,"facilities":57,"admin_patience":58,"program_ceiling":70,"city":"Indianapolis","state":"IN","lat":39.7684,"lon":-86.1581},{"id":10,"name":"Fort Wayne State","conference":"Great Lakes","prestige":59,"resources":40,"development":62,"nil":47,"academics":66,"fan_support":47,"facilities":47,"admin_patience":65,"program_ceiling":66,"city":"Fort Wayne","state":"IN","lat":41.0793,"lon":-85.1394},{"id":11,"name":"Twin Cities University","conference":"Great Lakes","prestige":84,"resources":84,"development":65,"nil":79,"academics":76,"fan_support":73,"facilities":79,"admin_patience":63,"program_ceiling":97,"city":"Minneapolis","state":"MN","lat":44.9778,"lon":-93.265},{"id":12,"name":"Iowa Lakes University","conference":"Great Lakes","prestige":41,"resources":38,"development":58,"nil":29,"academics":72,"fan_support":39,"facilities":35,"admin_patience":81,"program_ceiling":51,"city":"Cedar Rapids","state":"IA","lat":41.9779,"lon":-91.6656},{"id":13,"name":"New England Commonwealth","conference":"Northeast","prestige":82,"resources":85,"development":57,"nil":99,"academics":42,"fan_support":72,"facilities":77,"admin_patience":46,"program_ceiling":91,"city":"Boston","state":"MA","lat":42.3601,"lon":-71.0589},{"id":14,"name":"Massachusetts Bay University","conference":"Northeast","prestige":58,"resources":58,"development":49,"nil":63,"academics":79,"fan_support":48,"facilities":46,"admin_patience":68,"program_ceiling":66,"city":"Worcester","state":"MA","lat":42.2626,"lon":-71.8023},{"id":15,"name":"Hudson University","conference":"Northeast","prestige":47,"resources":45,"development":43,"nil":38,"academics":60,"fan_support":38,"facilities":44,"admin_patience":65,"program_ceiling":59,"city":"Albany","state":"NY","lat":42.6526,"lon":-73.7562},{"id":16,"name":"New York Metropolitan","conference":"Northeast","prestige":80,"resources":75,"development":72,"nil":76,"academics":81,"fan_support":78,"facilities":76,"admin_patience":66,"program_ceiling":90,"city":"New York","state":"NY","lat":40.7128,"lon":-74.006},{"id":17,"name":"Long Island State","conference":"Northeast","prestige":58,"resources":53,"development":59,"nil":40,"academics":64,"fan_support":72,"facilities":61,"admin_patience":48,"program_ceiling":74,"city":"Hempstead","state":"NY","lat":40.7062,"lon":-73.6187},{"id":18,"name":"Connecticut Commonwealth","conference":"Northeast","prestige":47,"resources":48,"development":37,"nil":48,"academics":77,"fan_support":44,"facilities":49,"admin_patience":43,"program_ceiling":56,"city":"Hartford","state":"CT","lat":41.7658,"lon":-72.6734},{"id":19,"name":"Rhode Island Maritime","conference":"Northeast","prestige":57,"resources":55,"development":62,"nil":51,"academics":97,"fan_support":61,"facilities":58,"admin_patience":44,"program_ceiling":74,"city":"Providence","state":"RI","lat":41.824,"lon":-71.4128},{"id":20,"name":"Vermont State","conference":"Northeast","prestige":28,"resources":27,"development":57,"nil":29,"academics":77,"fan_support":36,"facilities":35,"admin_patience":70,"program_ceiling":38,"city":"Burlington","state":"VT","lat":44.4759,"lon":-73.2121},{"id":21,"name":"New Hampshire Tech","conference":"Northeast","prestige":60,"resources":58,"development":48,"nil":30,"academics":73,"fan_support":64,"facilities":63,"admin_patience":43,"program_ceiling":69,"city":"Manchester","state":"NH","lat":42.9956,"lon":-71.4548},{"id":22,"name":"Maine Commonwealth","conference":"Northeast","prestige":47,"resources":40,"development":52,"nil":29,"academics":72,"fan_support":50,"facilities":39,"admin_patience":74,"program_ceiling":55,"city":"Portland","state":"ME","lat":43.6591,"lon":-70.2568},{"id":23,"name":"Delaware Valley University","conference":"Northeast","prestige":41,"resources":33,"development":44,"nil":35,"academics":56,"fan_support":53,"facilities":28,"admin_patience":75,"program_ceiling":54,"city":"Wilmington","state":"DE","lat":39.7391,"lon":-75.5398},{"id":24,"name":"Jersey Coastal University","conference":"Northeast","prestige":32,"resources":36,"development":65,"nil":29,"academics":57,"fan_support":28,"facilities":34,"admin_patience":68,"program_ceiling":79,"city":"Newark","state":"NJ","lat":40.7357,"lon":-74.1724},{"id":25,"name":"Chesapeake University","conference":"Atlantic","prestige":82,"resources":96,"development":53,"nil":89,"academics":69,"fan_support":99,"facilities":84,"admin_patience":50,"program_ceiling":90,"city":"Baltimore","state":"MD","lat":39.2904,"lon":-76.6122},{"id":26,"name":"Potomac Commonwealth","conference":"Atlantic","prestige":53,"resources":46,"development":46,"nil":67,"academics":78,"fan_support":50,"facilities":47,"admin_patience":67,"program_ceiling":63,"city":"Washington","state":"DC","lat":38.9072,"lon":-77.0369},{"id":27,"name":"Virginia Commonwealth Tech","conference":"Atlantic","prestige":84,"resources":93,"development":72,"nil":99,"academics":59,"fan_support":75,"facilities":85,"admin_patience":53,"program_ceiling":100,"city":"Richmond","state":"VA","lat":37.5407,"lon":-77.436},{"id":28,"name":"Tidewater State","conference":"Atlantic","prestige":62,"resources":72,"development":57,"nil":62,"academics":85,"fan_support":58,"facilities":71,"admin_patience":61,"program_ceiling":75,"city":"Norfolk","state":"VA","lat":36.8508,"lon":-76.2859},{"id":29,"name":"Blue Ridge University","conference":"Atlantic","prestige":49,"resources":55,"development":83,"nil":50,"academics":62,"fan_support":62,"facilities":56,"admin_patience":56,"program_ceiling":63,"city":"Roanoke","state":"VA","lat":37.2709,"lon":-79.9414},{"id":30,"name":"Carolina Commonwealth","conference":"Atlantic","prestige":88,"resources":88,"development":64,"nil":99,"academics":69,"fan_support":98,"facilities":93,"admin_patience":57,"program_ceiling":100,"city":"Charlotte","state":"NC","lat":35.2271,"lon":-80.8431},{"id":31,"name":"Piedmont University","conference":"Atlantic","prestige":69,"resources":67,"development":55,"nil":64,"academics":95,"fan_support":73,"facilities":72,"admin_patience":56,"program_ceiling":81,"city":"Raleigh","state":"NC","lat":35.7796,"lon":-78.6382},{"id":32,"name":"Cape Fear State","conference":"Atlantic","prestige":67,"resources":53,"development":68,"nil":47,"academics":66,"fan_support":69,"facilities":56,"admin_patience":78,"program_ceiling":76,"city":"Wilmington","state":"NC","lat":34.2257,"lon":-77.9447},{"id":33,"name":"Palmetto University","conference":"Atlantic","prestige":70,"resources":67,"development":68,"nil":65,"academics":81,"fan_support":62,"facilities":65,"admin_patience":52,"program_ceiling":86,"city":"Columbia","state":"SC","lat":34.0007,"lon":-81.0348},{"id":34,"name":"Charleston Maritime","conference":"Atlantic","prestige":60,"resources":68,"development":73,"nil":56,"academics":70,"fan_support":49,"facilities":60,"admin_patience":52,"program_ceiling":77,"city":"Charleston","state":"SC","lat":32.7765,"lon":-79.9311},{"id":35,"name":"Appalachian Commonwealth","conference":"Atlantic","prestige":48,"resources":49,"development":63,"nil":45,"academics":58,"fan_support":44,"facilities":47,"admin_patience":78,"program_ceiling":54,"city":"Asheville","state":"NC","lat":35.5951,"lon":-82.5515},{"id":36,"name":"Shenandoah University","conference":"Atlantic","prestige":71,"resources":72,"development":53,"nil":75,"academics":67,"fan_support":81,"facilities":62,"admin_patience":85,"program_ceiling":78,"city":"Charlottesville","state":"VA","lat":38.0293,"lon":-78.4767},{"id":37,"name":"Georgia Commonwealth","conference":"Southeastern","prestige":96,"resources":99,"development":73,"nil":99,"academics":83,"fan_support":99,"facilities":98,"admin_patience":51,"program_ceiling":100,"city":"Atlanta","state":"GA","lat":33.749,"lon":-84.388},{"id":38,"name":"Georgia Coastal","conference":"Southeastern","prestige":84,"resources":85,"development":63,"nil":84,"academics":74,"fan_support":95,"facilities":86,"admin_patience":38,"program_ceiling":95,"city":"Savannah","state":"GA","lat":32.0809,"lon":-81.0912},{"id":39,"name":"Florida Commonwealth","conference":"Southeastern","prestige":92,"resources":94,"development":90,"nil":84,"academics":72,"fan_support":91,"facilities":92,"admin_patience":54,"program_ceiling":97,"city":"Orlando","state":"FL","lat":28.5383,"lon":-81.3792},{"id":40,"name":"South Florida Metropolitan","conference":"Southeastern","prestige":52,"resources":51,"development":48,"nil":48,"academics":59,"fan_support":40,"facilities":55,"admin_patience":71,"program_ceiling":90,"city":"Miami","state":"FL","lat":25.7617,"lon":-80.1918},{"id":41,"name":"Florida Gulf University","conference":"Southeastern","prestige":69,"resources":73,"development":59,"nil":91,"academics":44,"fan_support":71,"facilities":75,"admin_patience":53,"program_ceiling":78,"city":"Tampa","state":"FL","lat":27.9506,"lon":-82.4572},{"id":42,"name":"Alabama Commonwealth","conference":"Southeastern","prestige":97,"resources":91,"development":86,"nil":88,"academics":61,"fan_support":85,"facilities":99,"admin_patience":16,"program_ceiling":100,"city":"Birmingham","state":"AL","lat":33.5186,"lon":-86.8104},{"id":43,"name":"Mobile State","conference":"Southeastern","prestige":40,"resources":35,"development":42,"nil":33,"academics":62,"fan_support":34,"facilities":29,"admin_patience":68,"program_ceiling":56,"city":"Mobile","state":"AL","lat":30.6954,"lon":-88.0399},{"id":44,"name":"Tennessee Commonwealth","conference":"Southeastern","prestige":85,"resources":78,"development":74,"nil":84,"academics":75,"fan_support":66,"facilities":88,"admin_patience":30,"program_ceiling":100,"city":"Nashville","state":"TN","lat":36.1627,"lon":-86.7816},{"id":45,"name":"Knoxville Tech","conference":"Southeastern","prestige":48,"resources":45,"development":54,"nil":50,"academics":72,"fan_support":53,"facilities":44,"admin_patience":65,"program_ceiling":65,"city":"Knoxville","state":"TN","lat":35.9606,"lon":-83.9207},{"id":46,"name":"Mississippi Commonwealth","conference":"Southeastern","prestige":54,"resources":53,"development":64,"nil":63,"academics":77,"fan_support":59,"facilities":65,"admin_patience":41,"program_ceiling":66,"city":"Jackson","state":"MS","lat":32.2988,"lon":-90.1848},{"id":47,"name":"Magnolia State","conference":"Southeastern","prestige":52,"resources":54,"development":71,"nil":34,"academics":82,"fan_support":63,"facilities":53,"admin_patience":67,"program_ceiling":60,"city":"Hattiesburg","state":"MS","lat":31.3271,"lon":-89.2903},{"id":48,"name":"Kentucky Commonwealth","conference":"Southeastern","prestige":65,"resources":76,"development":65,"nil":75,"academics":79,"fan_support":43,"facilities":73,"admin_patience":50,"program_ceiling":80,"city":"Lexington","state":"KY","lat":38.0406,"lon":-84.5037},{"id":49,"name":"Louisiana Commonwealth","conference":"Gulf","prestige":91,"resources":99,"development":66,"nil":96,"academics":79,"fan_support":96,"facilities":92,"admin_patience":61,"program_ceiling":100,"city":"Baton Rouge","state":"LA","lat":30.4515,"lon":-91.1871},{"id":50,"name":"New Orleans University","conference":"Gulf","prestige":83,"resources":64,"development":57,"nil":66,"academics":67,"fan_support":80,"facilities":73,"admin_patience":40,"program_ceiling":93,"city":"New Orleans","state":"LA","lat":29.9511,"lon":-90.0715},{"id":51,"name":"Acadiana State","conference":"Gulf","prestige":66,"resources":57,"development":44,"nil":50,"academics":72,"fan_support":81,"facilities":68,"admin_patience":78,"program_ceiling":72,"city":"Lafayette","state":"LA","lat":30.2241,"lon":-92.0198},{"id":52,"name":"Gulf Coast Tech","conference":"Gulf","prestige":67,"resources":78,"development":83,"nil":77,"academics":57,"fan_support":77,"facilities":67,"admin_patience":31,"program_ceiling":79,"city":"Biloxi","state":"MS","lat":30.396,"lon":-88.8853},{"id":53,"name":"Houston Metropolitan","conference":"Gulf","prestige":84,"resources":94,"development":59,"nil":84,"academics":77,"fan_support":86,"facilities":99,"admin_patience":53,"program_ceiling":99,"city":"Houston","state":"TX","lat":29.7604,"lon":-95.3698},{"id":54,"name":"East Texas University","conference":"Gulf","prestige":67,"resources":54,"development":57,"nil":53,"academics":64,"fan_support":56,"facilities":68,"admin_patience":51,"program_ceiling":84,"city":"Beaumont","state":"TX","lat":30.0802,"lon":-94.1266},{"id":55,"name":"Arkansas Delta","conference":"Gulf","prestige":68,"resources":62,"development":50,"nil":63,"academics":57,"fan_support":56,"facilities":72,"admin_patience":66,"program_ceiling":85,"city":"Little Rock","state":"AR","lat":34.7465,"lon":-92.2896},{"id":56,"name":"Ozark Commonwealth","conference":"Gulf","prestige":67,"resources":79,"development":71,"nil":88,"academics":57,"fan_support":53,"facilities":70,"admin_patience":57,"program_ceiling":75,"city":"Fayetteville","state":"AR","lat":36.0822,"lon":-94.1719},{"id":57,"name":"Memphis Metropolitan","conference":"Gulf","prestige":64,"resources":65,"development":67,"nil":75,"academics":68,"fan_support":60,"facilities":55,"admin_patience":58,"program_ceiling":77,"city":"Memphis","state":"TN","lat":35.1495,"lon":-90.049},{"id":58,"name":"Red River University","conference":"Gulf","prestige":77,"resources":75,"development":60,"nil":76,"academics":78,"fan_support":81,"facilities":88,"admin_patience":52,"program_ceiling":90,"city":"Shreveport","state":"LA","lat":32.5252,"lon":-93.7502},{"id":59,"name":"Coastal Bend State","conference":"Gulf","prestige":63,"resources":70,"development":57,"nil":74,"academics":47,"fan_support":59,"facilities":69,"admin_patience":42,"program_ceiling":72,"city":"Corpus Christi","state":"TX","lat":27.8006,"lon":-97.3964},{"id":60,"name":"Gulf Plains University","conference":"Gulf","prestige":31,"resources":28,"development":60,"nil":22,"academics":73,"fan_support":29,"facilities":25,"admin_patience":60,"program_ceiling":44,"city":"Lake Charles","state":"LA","lat":30.2266,"lon":-93.2174},{"id":61,"name":"Missouri Commonwealth","conference":"Heartland","prestige":82,"resources":83,"development":85,"nil":65,"academics":69,"fan_support":99,"facilities":85,"admin_patience":59,"program_ceiling":98,"city":"Columbia","state":"MO","lat":38.9517,"lon":-92.3341},{"id":62,"name":"St. Louis Metropolitan","conference":"Heartland","prestige":65,"resources":74,"development":50,"nil":67,"academics":69,"fan_support":54,"facilities":72,"admin_patience":67,"program_ceiling":76,"city":"St. Louis","state":"MO","lat":38.627,"lon":-90.1994},{"id":63,"name":"Kansas Commonwealth","conference":"Heartland","prestige":81,"resources":91,"development":74,"nil":91,"academics":75,"fan_support":84,"facilities":82,"admin_patience":81,"program_ceiling":86,"city":"Wichita","state":"KS","lat":37.6872,"lon":-97.3301},{"id":64,"name":"Prairie Tech","conference":"Heartland","prestige":65,"resources":65,"development":64,"nil":77,"academics":72,"fan_support":73,"facilities":64,"admin_patience":48,"program_ceiling":82,"city":"Manhattan","state":"KS","lat":39.1836,"lon":-96.5717},{"id":65,"name":"Nebraska Commonwealth","conference":"Heartland","prestige":87,"resources":94,"development":65,"nil":83,"academics":95,"fan_support":61,"facilities":87,"admin_patience":54,"program_ceiling":97,"city":"Lincoln","state":"NE","lat":40.8136,"lon":-96.7026},{"id":66,"name":"Omaha State","conference":"Heartland","prestige":73,"resources":75,"development":64,"nil":76,"academics":74,"fan_support":63,"facilities":70,"admin_patience":58,"program_ceiling":84,"city":"Omaha","state":"NE","lat":41.2565,"lon":-95.9345},{"id":67,"name":"Iowa Commonwealth","conference":"Heartland","prestige":69,"resources":75,"development":51,"nil":73,"academics":64,"fan_support":70,"facilities":73,"admin_patience":57,"program_ceiling":77,"city":"Des Moines","state":"IA","lat":41.5868,"lon":-93.625},{"id":68,"name":"Dakota University","conference":"Heartland","prestige":79,"resources":89,"development":68,"nil":82,"academics":70,"fan_support":82,"facilities":80,"admin_patience":58,"program_ceiling":94,"city":"Sioux Falls","state":"SD","lat":43.5446,"lon":-96.7311},{"id":69,"name":"North Dakota Commonwealth","conference":"Heartland","prestige":66,"resources":73,"development":63,"nil":73,"academics":82,"fan_support":73,"facilities":68,"admin_patience":62,"program_ceiling":77,"city":"Fargo","state":"ND","lat":46.8772,"lon":-96.7898},{"id":70,"name":"Oklahoma Northern","conference":"Heartland","prestige":60,"resources":47,"development":74,"nil":59,"academics":75,"fan_support":59,"facilities":47,"admin_patience":55,"program_ceiling":77,"city":"Tulsa","state":"OK","lat":36.154,"lon":-95.9928},{"id":71,"name":"Springfield State","conference":"Heartland","prestige":51,"resources":64,"development":51,"nil":64,"academics":58,"fan_support":35,"facilities":57,"admin_patience":78,"program_ceiling":68,"city":"Springfield","state":"MO","lat":37.209,"lon":-93.2923},{"id":72,"name":"Central Plains University","conference":"Heartland","prestige":71,"resources":70,"development":73,"nil":65,"academics":85,"fan_support":61,"facilities":67,"admin_patience":65,"program_ceiling":78,"city":"Topeka","state":"KS","lat":39.0473,"lon":-95.6752},{"id":73,"name":"Texas Republic University","conference":"Southwest","prestige":98,"resources":99,"development":73,"nil":99,"academics":71,"fan_support":78,"facilities":83,"admin_patience":46,"program_ceiling":100,"city":"Austin","state":"TX","lat":30.2672,"lon":-97.7431},{"id":74,"name":"Lone Star Tech","conference":"Southwest","prestige":90,"resources":79,"development":65,"nil":73,"academics":73,"fan_support":83,"facilities":83,"admin_patience":58,"program_ceiling":100,"city":"Dallas","state":"TX","lat":32.7767,"lon":-96.797},{"id":75,"name":"Fort Worth State","conference":"Southwest","prestige":70,"resources":62,"development":75,"nil":60,"academics":84,"fan_support":71,"facilities":64,"admin_patience":79,"program_ceiling":83,"city":"Fort Worth","state":"TX","lat":32.7555,"lon":-97.3308},{"id":76,"name":"San Antonio Commonwealth","conference":"Southwest","prestige":69,"resources":91,"development":74,"nil":92,"academics":66,"fan_support":52,"facilities":82,"admin_patience":62,"program_ceiling":81,"city":"San Antonio","state":"TX","lat":29.4241,"lon":-98.4936},{"id":77,"name":"West Texas University","conference":"Southwest","prestige":56,"resources":40,"development":60,"nil":50,"academics":75,"fan_support":68,"facilities":41,"admin_patience":50,"program_ceiling":61,"city":"Lubbock","state":"TX","lat":33.5779,"lon":-101.8552},{"id":78,"name":"Rio Grande State","conference":"Southwest","prestige":68,"resources":67,"development":74,"nil":70,"academics":88,"fan_support":74,"facilities":61,"admin_patience":45,"program_ceiling":74,"city":"El Paso","state":"TX","lat":31.7619,"lon":-106.485},{"id":79,"name":"Oklahoma Commonwealth","conference":"Southwest","prestige":87,"resources":87,"development":69,"nil":85,"academics":60,"fan_support":88,"facilities":84,"admin_patience":52,"program_ceiling":94,"city":"Oklahoma City","state":"OK","lat":35.4676,"lon":-97.5164},{"id":80,"name":"Red Dirt University","conference":"Southwest","prestige":65,"resources":60,"development":76,"nil":71,"academics":73,"fan_support":73,"facilities":59,"admin_patience":44,"program_ceiling":73,"city":"Norman","state":"OK","lat":35.2226,"lon":-97.4395},{"id":81,"name":"New Mexico Commonwealth","conference":"Southwest","prestige":60,"resources":51,"development":50,"nil":63,"academics":76,"fan_support":64,"facilities":64,"admin_patience":65,"program_ceiling":72,"city":"Albuquerque","state":"NM","lat":35.0844,"lon":-106.6504},{"id":82,"name":"Santa Fe Tech","conference":"Southwest","prestige":53,"resources":51,"development":73,"nil":54,"academics":57,"fan_support":61,"facilities":53,"admin_patience":70,"program_ceiling":60,"city":"Santa Fe","state":"NM","lat":35.687,"lon":-105.9378},{"id":83,"name":"Arizona Commonwealth","conference":"Southwest","prestige":82,"resources":91,"development":65,"nil":81,"academics":72,"fan_support":99,"facilities":85,"admin_patience":64,"program_ceiling":90,"city":"Phoenix","state":"AZ","lat":33.4484,"lon":-112.074},{"id":84,"name":"Desert State University","conference":"Southwest","prestige":56,"resources":68,"development":36,"nil":54,"academics":46,"fan_support":46,"facilities":62,"admin_patience":68,"program_ceiling":67,"city":"Tucson","state":"AZ","lat":32.2226,"lon":-110.9747},{"id":85,"name":"Colorado Commonwealth","conference":"Mountain","prestige":82,"resources":86,"development":67,"nil":81,"academics":57,"fan_support":73,"facilities":85,"admin_patience":40,"program_ceiling":100,"city":"Denver","state":"CO","lat":39.7392,"lon":-104.9903},{"id":86,"name":"Front Range University","conference":"Mountain","prestige":56,"resources":59,"development":56,"nil":69,"academics":65,"fan_support":71,"facilities":55,"admin_patience":66,"program_ceiling":60,"city":"Colorado Springs","state":"CO","lat":38.8339,"lon":-104.8214},{"id":87,"name":"Utah Commonwealth","conference":"Mountain","prestige":84,"resources":88,"development":71,"nil":89,"academics":65,"fan_support":89,"facilities":89,"admin_patience":48,"program_ceiling":92,"city":"Salt Lake City","state":"UT","lat":40.7608,"lon":-111.891},{"id":88,"name":"Wasatch Tech","conference":"Mountain","prestige":82,"resources":74,"development":60,"nil":79,"academics":74,"fan_support":82,"facilities":88,"admin_patience":57,"program_ceiling":91,"city":"Provo","state":"UT","lat":40.2338,"lon":-111.6585},{"id":89,"name":"Boise Commonwealth","conference":"Mountain","prestige":81,"resources":87,"development":80,"nil":93,"academics":65,"fan_support":79,"facilities":84,"admin_patience":63,"program_ceiling":95,"city":"Boise","state":"ID","lat":43.615,"lon":-116.2023},{"id":90,"name":"Montana Commonwealth","conference":"Mountain","prestige":55,"resources":62,"development":45,"nil":54,"academics":55,"fan_support":59,"facilities":68,"admin_patience":68,"program_ceiling":68,"city":"Missoula","state":"MT","lat":46.8721,"lon":-113.994},{"id":91,"name":"Big Sky State","conference":"Mountain","prestige":76,"resources":67,"development":67,"nil":44,"academics":79,"fan_support":98,"facilities":74,"admin_patience":53,"program_ceiling":88,"city":"Bozeman","state":"MT","lat":45.677,"lon":-111.0429},{"id":92,"name":"Wyoming State","conference":"Mountain","prestige":35,"resources":45,"development":39,"nil":36,"academics":51,"fan_support":43,"facilities":36,"admin_patience":76,"program_ceiling":46,"city":"Cheyenne","state":"WY","lat":41.14,"lon":-104.8202},{"id":93,"name":"Nevada Commonwealth","conference":"Mountain","prestige":38,"resources":44,"development":58,"nil":48,"academics":53,"fan_support":26,"facilities":50,"admin_patience":57,"program_ceiling":42,"city":"Reno","state":"NV","lat":39.5296,"lon":-119.8138},{"id":94,"name":"Las Vegas Metropolitan","conference":"Mountain","prestige":78,"resources":69,"development":78,"nil":74,"academics":76,"fan_support":76,"facilities":74,"admin_patience":79,"program_ceiling":90,"city":"Las Vegas","state":"NV","lat":36.1699,"lon":-115.1398},{"id":95,"name":"Idaho Northern","conference":"Mountain","prestige":61,"resources":56,"development":63,"nil":53,"academics":66,"fan_support":60,"facilities":59,"admin_patience":59,"program_ceiling":69,"city":"Coeur d'Alene","state":"ID","lat":47.6777,"lon":-116.7805},{"id":96,"name":"Rocky Mountain University","conference":"Mountain","prestige":49,"resources":49,"development":47,"nil":39,"academics":84,"fan_support":52,"facilities":51,"admin_patience":48,"program_ceiling":65,"city":"Grand Junction","state":"CO","lat":39.0639,"lon":-108.5506},{"id":97,"name":"Southern California Commonwealth","conference":"Pacific","prestige":95,"resources":99,"development":70,"nil":92,"academics":64,"fan_support":95,"facilities":99,"admin_patience":38,"program_ceiling":100,"city":"Los Angeles","state":"CA","lat":34.0522,"lon":-118.2437},{"id":98,"name":"Los Angeles Metropolitan","conference":"Pacific","prestige":54,"resources":67,"development":56,"nil":55,"academics":45,"fan_support":54,"facilities":68,"admin_patience":52,"program_ceiling":69,"city":"Los Angeles","state":"CA","lat":34.0522,"lon":-118.2437},{"id":99,"name":"California Pacific","conference":"Pacific","prestige":75,"resources":79,"development":72,"nil":70,"academics":79,"fan_support":57,"facilities":81,"admin_patience":74,"program_ceiling":83,"city":"San Diego","state":"CA","lat":32.7157,"lon":-117.1611},{"id":100,"name":"Bay Area University","conference":"Pacific","prestige":84,"resources":79,"development":68,"nil":71,"academics":72,"fan_support":78,"facilities":76,"admin_patience":35,"program_ceiling":91,"city":"San Francisco","state":"CA","lat":37.7749,"lon":-122.4194},{"id":101,"name":"Sacramento State College","conference":"Pacific","prestige":74,"resources":82,"development":73,"nil":88,"academics":83,"fan_support":74,"facilities":85,"admin_patience":73,"program_ceiling":80,"city":"Sacramento","state":"CA","lat":38.5816,"lon":-121.4944},{"id":102,"name":"Central California Tech","conference":"Pacific","prestige":48,"resources":46,"development":65,"nil":34,"academics":62,"fan_support":35,"facilities":45,"admin_patience":63,"program_ceiling":64,"city":"Fresno","state":"CA","lat":36.7378,"lon":-119.7871},{"id":103,"name":"Oregon Commonwealth","conference":"Pacific","prestige":87,"resources":92,"development":81,"nil":98,"academics":82,"fan_support":89,"facilities":85,"admin_patience":68,"program_ceiling":96,"city":"Portland","state":"OR","lat":45.5152,"lon":-122.6784},{"id":104,"name":"Cascade University","conference":"Pacific","prestige":48,"resources":58,"development":54,"nil":58,"academics":55,"fan_support":37,"facilities":46,"admin_patience":52,"program_ceiling":58,"city":"Eugene","state":"OR","lat":44.0521,"lon":-123.0868},{"id":105,"name":"Washington Commonwealth","conference":"Pacific","prestige":90,"resources":88,"development":82,"nil":93,"academics":81,"fan_support":68,"facilities":81,"admin_patience":46,"program_ceiling":100,"city":"Seattle","state":"WA","lat":47.6062,"lon":-122.3321},{"id":106,"name":"Puget Sound State","conference":"Pacific","prestige":62,"resources":60,"development":56,"nil":57,"academics":59,"fan_support":63,"facilities":64,"admin_patience":72,"program_ceiling":75,"city":"Tacoma","state":"WA","lat":47.2529,"lon":-122.4443},{"id":107,"name":"Hawaii Commonwealth","conference":"Pacific","prestige":53,"resources":56,"development":55,"nil":63,"academics":61,"fan_support":47,"facilities":54,"admin_patience":60,"program_ceiling":65,"city":"Honolulu","state":"HI","lat":21.3069,"lon":-157.8583},{"id":108,"name":"Alaska Pacific","conference":"Pacific","prestige":22,"resources":21,"development":49,"nil":39,"academics":90,"fan_support":25,"facilities":25,"admin_patience":50,"program_ceiling":36,"city":"Anchorage","state":"AK","lat":61.2181,"lon":-149.9003},{"id":109,"name":"Philadelphia Metropolitan","conference":"Metro","prestige":80,"resources":93,"development":68,"nil":99,"academics":63,"fan_support":92,"facilities":92,"admin_patience":48,"program_ceiling":94,"city":"Philadelphia","state":"PA","lat":39.9526,"lon":-75.1652},{"id":110,"name":"Pittsburgh Commonwealth","conference":"Metro","prestige":82,"resources":71,"development":81,"nil":52,"academics":60,"fan_support":73,"facilities":85,"admin_patience":49,"program_ceiling":89,"city":"Pittsburgh","state":"PA","lat":40.4406,"lon":-79.9959},{"id":111,"name":"Baltimore Metropolitan","conference":"Metro","prestige":43,"resources":39,"development":62,"nil":41,"academics":75,"fan_support":39,"facilities":36,"admin_patience":67,"program_ceiling":60,"city":"Baltimore","state":"MD","lat":39.2904,"lon":-76.6122},{"id":112,"name":"Cincinnati Commonwealth","conference":"Metro","prestige":79,"resources":60,"development":66,"nil":61,"academics":54,"fan_support":72,"facilities":63,"admin_patience":77,"program_ceiling":87,"city":"Cincinnati","state":"OH","lat":39.1031,"lon":-84.512},{"id":113,"name":"Louisville Metropolitan","conference":"Metro","prestige":77,"resources":68,"development":73,"nil":87,"academics":76,"fan_support":84,"facilities":82,"admin_patience":66,"program_ceiling":82,"city":"Louisville","state":"KY","lat":38.2527,"lon":-85.7585},{"id":114,"name":"Nashville Tech","conference":"Metro","prestige":51,"resources":41,"development":52,"nil":24,"academics":63,"fan_support":48,"facilities":41,"admin_patience":62,"program_ceiling":69,"city":"Nashville","state":"TN","lat":36.1627,"lon":-86.7816},{"id":115,"name":"Indianapolis Metropolitan","conference":"Metro","prestige":60,"resources":63,"development":49,"nil":58,"academics":54,"fan_support":56,"facilities":74,"admin_patience":64,"program_ceiling":75,"city":"Indianapolis","state":"IN","lat":39.7684,"lon":-86.1581},{"id":116,"name":"Columbus Metropolitan","conference":"Metro","prestige":78,"resources":67,"development":62,"nil":68,"academics":77,"fan_support":60,"facilities":76,"admin_patience":44,"program_ceiling":91,"city":"Columbus","state":"OH","lat":39.9612,"lon":-82.9988},{"id":117,"name":"Buffalo State University","conference":"Metro","prestige":46,"resources":47,"development":71,"nil":41,"academics":77,"fan_support":30,"facilities":47,"admin_patience":65,"program_ceiling":55,"city":"Buffalo","state":"NY","lat":42.8864,"lon":-78.8784},{"id":118,"name":"Pittsburgh Tech","conference":"Metro","prestige":42,"resources":28,"development":54,"nil":27,"academics":49,"fan_support":33,"facilities":29,"admin_patience":56,"program_ceiling":59,"city":"Pittsburgh","state":"PA","lat":40.4406,"lon":-79.9959},{"id":119,"name":"Richmond Metropolitan","conference":"Metro","prestige":69,"resources":62,"development":61,"nil":51,"academics":62,"fan_support":70,"facilities":68,"admin_patience":65,"program_ceiling":85,"city":"Richmond","state":"VA","lat":37.5407,"lon":-77.436},{"id":120,"name":"Toronto International University","conference":"Metro","prestige":62,"resources":49,"development":49,"nil":56,"academics":53,"fan_support":67,"facilities":39,"admin_patience":67,"program_ceiling":72,"city":"Toronto","state":"ON","lat":43.6532,"lon":-79.3832}];
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.9.52';
+const APP_VERSION='0.9.54';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -2408,6 +2469,25 @@ const STYLE_TRAITS={
  'Range Hunter':['speed','iq','technique'],'Box Enforcer':['power','durability','composure'],'Coverage Rover':['versatility','speed','iq'],'Pressure Backer':['speed','power','technique'],'Traffic Director':['iq','composure','technique'],'Mirror Corner':['technique','speed','composure'],'Press Eraser':['power','technique','composure'],'Ball Hunter':['iq','technique','speed'],'Boundary Fighter':['power','durability','technique'],'Slot Shadow':['speed','versatility','iq'],'Centerfielder':['speed','iq','composure'],'Box Hammer':['power','durability','composure'],'Coverage Eraser':['technique','speed','iq'],'Hybrid Rover':['versatility','speed','power'],'Trigger Safety':['iq','speed','composure'],
  'Pressure Leg':['composure','power','technique'],'Range Kicker':['power','technique','durability'],'Placement Specialist':['technique','iq','composure'],'Field Flipper':['power','technique','durability'],'Hang-Time Specialist':['technique','power','composure'],'Directional Punter':['technique','iq','composure']
 };
+const ARCHETYPE_LABELS={
+ 'Vertical Hunter':'Deep-Ball Hunter','Power Creator':'Power Dual-Threat','Toolsy Project':'Traits Project','Contact Glider':'Contact-Balance Back','Space Hunter':'Space Separator','Vertical Glider':'Vertical Burner','Move Chesspiece':'Move Weapon','Power Edge':'Power Tackle','Protection Quarterback':'Line General','Pressure Leg':'Pressure Kicker'
+};
+const ARCHETYPE_DESCRIPTIONS={
+ 'Rhythm Distributor':'Timing passer who wins with accuracy, processing and composure. Gets the ball out and keeps the offense on schedule.','Field Architect':'Cerebral pocket quarterback who diagnoses coverage and controls structure.','Off-Script Creator':'Mobile passer who creates after the original play breaks down.','Vertical Hunter':'Aggressive downfield passer built around arm strength and vertical shots.','Power Creator':'Strong runner-passer whose physicality creates offense inside and outside structure.','Run-First Weapon':'Quarterback whose legs are a primary offensive weapon rather than an emergency option.','Toolsy Project':'High-end tools with significant technical development still required.','Backyard Magician':'Improvisational creator whose versatility and composure generate unconventional plays.',
+ 'Gap Hammer':'Downhill runner built to attack designed lanes and finish through contact.','Space Cutter':'Quick-space runner who turns leverage and angles into chunk plays.','Contact Glider':'Runner who stays upright through glancing contact and consistently falls forward.','Third-Down Weapon':'Receiving and pass-down specialist with route and space versatility.','One-Cut Burner':'Fast runner who plants once and explodes vertically.','Patient Slasher':'Vision-based runner who waits for blocks and attacks the correct crease.',
+ 'Boundary Bully':'Physical outside receiver who wins through contact and at the catch point.','Space Hunter':'Finds leverage and open grass; thrives against zones and off coverage.','Route Sculptor':'Technical route runner who creates separation with timing and precision.','Vertical Glider':'Long-speed threat designed to stretch coverage.','Catch-Point Ace':'Wins contested catches and difficult throws.','YAC Creator':'Turns ordinary completions into explosive plays after the catch.','Motion Weapon':'Versatile receiver used through motion, alignment changes and manufactured touches.',
+ 'Seam Hunter':'Vertical receiving tight end who attacks linebackers and safeties.','Inline Mauler':'Traditional attached tight end whose blocking value drives his role.','Move Chesspiece':'Flexible receiver who aligns in the slot, wing or detached formations.','Red-Zone Tower':'Size and ball-skill specialist who becomes most valuable near the goal line.','Backfield Hybrid':'H-back and fullback-style player who moves between backfield and tight-end responsibilities.',
+ 'Island Protector':'Pass-protection tackle trusted alone against premium rushers.','Movement Tackle':'Athletic tackle suited for space, movement and wide run concepts.','Power Edge':'Strength-first tackle who wins through anchor and displacement.','Long-Frame Project':'Prototype body with traits that require technical development.','Drive Blocker':'Displacement blocker built for downhill run concepts.','Phone-Booth Anchor':'Compact interior protector who wins in tight space.','Pulling Guard':'Athletic guard who is most valuable on movement assignments.','Interior Technician':'Precision blocker with hand use, awareness and consistency.','Protection Quarterback':'Smart center who organizes protection and wins through recognition.','Leverage Center':'Technique and power center who wins through pad level and positioning.','Movement Pivot':'Athletic center designed for reach blocks, space and movement.','Power Pivot':'Strength-heavy center for physical interior run games.',
+ 'Pocket Wrecker':'Complete pass rusher with enough speed, technique and power to collapse protections.','Speed Bender':'Outside rusher who wins with first-step burst and cornering ability.','Power Setter':'Strength-first edge who can rush and adds substantial edge-setting value.','Chaos Rusher':'Unpredictable, high-variance athlete who creates pressure from multiple paths.','Run-Side Anchor':'Edge defender whose primary value is controlling the run and maintaining structure.','Pocket Crusher':'Interior power rusher who compresses the pocket.','Gap Eater':'Space-eating interior defender built to absorb blocks and control the run.','Penetrator':'Quick upfield tackle who attacks gaps before blocks develop.','Two-Gap Anchor':'Heavy interior defender who reads and controls multiple gaps.','Interior Disruptor':'Balanced interior playmaker capable of pressure and backfield disruption.',
+ 'Range Hunter':'Pursuit linebacker built to cover ground and finish plays.','Box Enforcer':'Physical downhill linebacker strongest against the run.','Coverage Rover':'Space linebacker used against backs, tight ends and underneath passing concepts.','Pressure Backer':'Blitz and rush-oriented linebacker who threatens the backfield.','Traffic Director':'Smart communicator who organizes the defense and consistently finds the football.','Mirror Corner':'Man-coverage technician who stays attached through route movement.','Press Eraser':'Physical press corner designed to disrupt receivers at the line.','Ball Hunter':'Aggressive playmaker who trades some conservatism for takeaways.','Boundary Fighter':'Physical outside corner who handles contact and run-support duties.','Slot Shadow':'Quick-processing nickel corner built to survive inside traffic.','Centerfielder':'Deep-range safety who closes space and hunts throws.','Box Hammer':'Physical safety whose strongest work happens near the line of scrimmage.','Coverage Eraser':'Versatile coverage safety who repairs mistakes and eliminates passing windows.','Hybrid Rover':'Multi-role safety capable of box, slot and deep assignments.','Trigger Safety':'Fast-processing safety who diagnoses quickly and attacks the play downhill.',
+ 'Pressure Leg':'Composure-driven kicker whose value increases in high-leverage attempts.','Range Kicker':'Power specialist capable of extending field-goal range.','Placement Specialist':'Accuracy and control kicker who prioritizes repeatable mechanics.','Field Flipper':'Distance-oriented punter who changes field position.','Hang-Time Specialist':'Control and power punter built to reduce return opportunities.','Directional Punter':'Placement-focused punter who prioritizes location and control.'
+};
+const ARCHETYPE_META=Object.fromEntries(Object.values(STYLES).flat().map(style=>[style,{display:ARCHETYPE_LABELS[style]||style,short:ARCHETYPE_DESCRIPTIONS[style]||'Player identity.',strengths:[...(STYLE_TRAITS[style]||[])]}]));
+function archetypeMeta(style){return ARCHETYPE_META[style]||{display:style||'Unknown archetype',short:'Player identity.',strengths:[...(STYLE_TRAITS[style]||[])]}}
+function archetypeLabel(style){return archetypeMeta(style).display}
+function archetypeDescription(style){return archetypeMeta(style).short}
+function archetypePosition(style){return Object.keys(STYLES).find(pos=>STYLES[pos].includes(style))||''}
+function archetypeChipHTML(style){return `<button type="button" class="archetype-chip" data-archetype="${style}">${archetypeLabel(style)}</button>`}
 const BODY={QB:[[70,78],[185,245]],RB:[[66,73],[175,235]],WR:[[67,78],[165,230]],TE:[[73,80],[220,275]],OT:[[75,81],[275,350]],OG:[[72,78],[280,350]],C:[[71,77],[275,335]],EDGE:[[72,79],[215,285]],DT:[[71,78],[270,350]],LB:[[70,77],[205,255]],CB:[[67,75],[165,215]],S:[[68,77],[180,225]],K:[[68,76],[165,225]],P:[[70,78],[175,230]]};
 const OFF_SCHEMES={
  'Tempo Spread':{pass:.61,pace:91,traits:['speed','iq','technique'],qb:['Rhythm Distributor','Off-Script Creator','Run-First Weapon']},
@@ -2492,7 +2572,7 @@ const POS_ROLE={QB:'QB1',RB:'RB1',WR:'X',TE:'TE1',OT:'LT',OG:'LG',C:'C1',EDGE:'R
 const RECORD_CATS={passYds:'Passing Yards',passTD:'Passing TD',rushYds:'Rushing Yards',rushTD:'Rushing TD',recYds:'Receiving Yards',recTD:'Receiving TD',receptions:'Receptions',tackles:'Tackles',tfl:'Tackles for Loss',sacks:'Sacks',pressures:'Pressures',intDef:'Interceptions'};
 const OFF_POS=new Set(['QB','RB','WR','TE','OT','OG','C','K','P']);
 const PLAYER_TRAITS=['speed','power','technique','iq','composure','durability','versatility'];
-let schools=[],universe=null;
+let schools=[],universe=null,developmentResultsPhase='',developmentResultsFilter='ALL',developmentResultsSort='jump';
 
 let gameplayRng=null,gameplayRngUniverse=null;
 function freshGameplaySeed(){const words=new Uint32Array(2),c=globalThis.crypto;if(c?.getRandomValues){c.getRandomValues(words);return `${words[0].toString(16).padStart(8,'0')}${words[1].toString(16).padStart(8,'0')}`}return `local-${Date.now().toString(36)}`}
@@ -2529,7 +2609,7 @@ function scoutingConfidenceLabel(c){return c>=85?'Very High':c>=70?'High':c>=50?
 function refreshScoutingIntel(s,t,gain,source,recruit=false){let domains=ensureScoutingIntel(s,t,recruit);for(const d of scoutingDefs(s)){let x=domains[d[0]],before=Math.max(x.confidence,scoutingConfidence(s,t,d,recruit)),step=d[0]==='upside'?Math.ceil(gain*.65):gain;x.confidence=clamp(before+step,20,96);let truth=scoutingTruth(s,d,recruit),move=clamp(Math.round((truth-x.estimate)*Math.min(.28,gain/28)),-3,3);x.estimate=clamp(x.estimate+move,20,99)}if(!recruit)s.scoutConfidence=clamp(Math.max(s.scoutConfidence||0,Math.round(avg(Object.values(domains).map(x=>x.confidence)))),25,98);else s.scoutConfidence=Math.round(avg(Object.values(domains).map(x=>x.confidence)));return domains}
 function snapshotScouting(s,t,phase,source,recruit=false,major=false){let history=(normalizeScoutingRecord(s).scoutingHistory),rows=scoutingDomainView(s,t,recruit),confidence=Math.round(avg(rows.map(x=>x.confidence))),currentEstimate=recruit?s.scout:s.perceived,upsideEstimate=recruit?s.scoutUp:s.perceivedUpside,last=history.at(-1);if(history.some(h=>(phase==='FIRST_FALL_CAMP'?h.phase===phase:h.season===universe.year&&h.phase===phase)))return false;if(major&&(!last||(Math.abs(currentEstimate-last.currentEstimate)<4&&Math.abs(confidence-last.confidence)<12)))return false;history.push({season:universe.year,week:universe.week,phase,source,currentEstimate,upsideEstimate,confidence,domains:Object.fromEntries(rows.map(x=>[x.key,{low:x.low,high:x.high,confidence:x.confidence}]))});return true}
 function firstRecruitEvaluation(r,t){ensureScoutingIntel(r,t,true);if(snapshotScouting(r,t,'FIRST_EVALUATION','RECRUITING',true))refreshScoutingIntel(r,t,5,'RECRUITING',true)}
-function scoutingPanelHTML(s,t,recruit=false){let rows=scoutingDomainView(s,t,recruit),legacy=recruit&&!hasPlayerTraits(s)?'<div class="small muted">Legacy evaluation: position traits will be established when this recruit enrolls.</div>':'';return `<h3 class="scouting-heading">Scouting Intelligence</h3><div class="profile-note"><strong>${s.style}</strong> · ${styleDescription(s)}</div>${legacy}<div class="scouting-domains">${rows.map(x=>`<div class="scouting-domain"><span>${x.label}</span><strong>${x.low}–${x.high}</strong><small>${scoutingConfidenceLabel(x.confidence)} confidence</small></div>`).join('')}</div>`}
+function scoutingPanelHTML(s,t,recruit=false){let rows=scoutingDomainView(s,t,recruit),legacy=recruit&&!hasPlayerTraits(s)?'<div class="small muted">Legacy evaluation: position traits will be established when this recruit enrolls.</div>':'';return `<h3 class="scouting-heading">Scouting Intelligence</h3><div class="profile-note">${archetypeChipHTML(s.style)} · ${archetypeDescription(s.style)}</div>${legacy}<div class="scouting-domains">${rows.map(x=>`<div class="scouting-domain"><span>${x.label}</span><strong>${x.low}–${x.high}</strong><small>${scoutingConfidenceLabel(x.confidence)} confidence</small></div>`).join('')}</div>`}
 function scoutingHistoryHTML(s){let h=(s.scoutingHistory||[]).slice().reverse();return `<h3 class="scouting-heading">Scouting History</h3><div class="scouting-history">${h.length?h.map(x=>`<div class="timeline-row"><strong>${x.season} · ${String(x.phase).replaceAll('_',' ')}</strong><div class="muted">${x.currentEstimate} current · ${x.upsideEstimate} upside · ${scoutingConfidenceLabel(x.confidence)} confidence</div><div class="small scouting-snapshot">${Object.entries(x.domains||{}).map(([k,d])=>`${k.replaceAll('_',' ')} ${d.low}–${d.high}`).join(' · ')}</div></div>`).join(''):'<div class="muted">No meaningful scouting checkpoint recorded yet.</div>'}</div>`}
 function ensureTeamDevelopment(t){t.trainingFocus??='Balanced';t.developmentNotes??=[]}
 function inheritRecruitTraits(p){if(p.recruitTraitsInherited||!universe?.recruits?.length)return false;const r=universe.recruits.find(r=>r.name===p.name&&r.pos===p.pos&&r.portraitSeed===p.portraitSeed&&hasPlayerTraits(r));if(!r)return false;Object.assign(p,playerTraitFields(r));p.recruitTraitsInherited=true;return true}
@@ -2545,6 +2625,15 @@ function devStaffNote(p,t){ensurePlayerDevelopment(p,t);let notes=[];if(p.scoutC
 function trainingAttrBoost(p,teamFocus,individual,phase){let m={speed:0,power:0,technique:0,iq:0,composure:0,durability:0,versatility:0},scale=phase==='spring'?1:.55;for(const [k,v] of Object.entries(TEAM_TRAINING[teamFocus]?.attrs||{}))m[k]+=v*scale;let add=(k,v)=>m[k]+=v*scale;switch(individual){case'Technique':add('technique',1.8);break;case'Athleticism':add('speed',1.3);add('versatility',.7);break;case'Strength':add('power',1.8);add('durability',.4);break;case'Football IQ':add('iq',1.7);add('composure',.5);break;case'Conditioning':add('durability',1.5);add('composure',.4);break;case'Rehab':add('durability',.8);break;case'Position Transition':add('versatility',.9);add('iq',.7);break;default:add('technique',.35);add('iq',.25)}return m}
 function applyPhysicalGrowth(p,t){ensurePlayerDevelopment(p,t);let oldH=p.height,oldW=p.weight,elig=eligibilityBase(p),skill=['QB','RB','WR','CB','S','K','P'].includes(p.pos),line=['OT','OG','C','DT'].includes(p.pos);let baseGain=(line?rng(4,12):skill?rng(0,5):rng(2,8))*(p.framePotential/75)*(elig===0?1.15:elig===1?1:.65);if(t.trainingFocus==='Strength & Mass')baseGain*=1.35;if(t.trainingFocus==='Speed & Explosion')baseGain*=.65;let gain=Math.max(0,Math.round(baseGain+gauss()*1.5));p.weight=clamp(p.weight+gain,BODY[p.pos]?.[1]?.[0]||150,(BODY[p.pos]?.[1]?.[1]||360)+15);if(p.heightGrowthRemaining>0&&elig===0&&gameplayRandom()<.55){p.height+=1;p.heightGrowthRemaining=0}let excess=Math.max(0,gain-5),lossChance=excess*(100-p.speedRetention)/260;if(gameplayRandom()<lossChance)p.speed=clamp(p.speed-gi(1,2),20,99);p.lastPhysicalChange=`${p.height>oldH?'+1 in, ':''}${p.weight-oldW>=0?'+':''}${p.weight-oldW} lb`}
 function applyDevelopmentPhase(p,t,phase){ensurePlayerDevelopment(p,t);recordPromiseTraining(p,phase);let curve=growthFactor(p),staff=OFF_POS.has(p.pos)?t.staff.OC.development:t.staff.DC.development,base=(p.dev*.27+p.work*.22+p.coach*.10+t.development*.16+t.facilities*.09+t.staff.SC.development*.08+staff*.08-52)/9,vol=phase==='spring'?1.45:.85,raw=base*curve*(phase==='spring'?1:.5)+gauss()*vol*(.65+p.growthVolatility/150),carried=(p.devFraction||0)+raw,delta=clamp(Math.round(carried),-3,phase==='spring'?7:4),ceiling=p.upside+(p.growthProfile==='volatile'?2:0);p.devFraction=clamp(carried-delta,-2.5,2.5);p.trueNow=clamp(p.trueNow+delta,30,Math.min(99,ceiling));let mods=trainingAttrBoost(p,t.trainingFocus,p.trainingFocus,phase);for(const k of Object.keys(mods)){let chance=clamp(.35+mods[k]*.28+(p.work-50)/180,.15,.92);if(gameplayRandom()<chance)p[k]=clamp(Math.round((p[k]||p.trueNow)+Math.max(0,mods[k]+gauss()*.6)),20,99)}if(p.trainingFocus==='Rehab'){p.health=clamp((p.health??100)+gi(5,12),40,100);p.wear=clamp((p.wear||0)-gi(8,18),0,100)}let famGain=phase==='spring'?gi(8,18):gi(5,12);if(p.trainingFocus==='Position Transition'||t.trainingFocus==='Scheme Installation')famGain+=gi(4,9);p.positionFamiliarity[p.pos]=clamp(familiarity(p,p.pos)+famGain,0,100);p.scoutConfidence=clamp(p.scoutConfidence+(phase==='spring'?gi(8,15):gi(6,12))+((p.stats?.games||0)>6?3:0),25,98);let err=gauss()*Math.max(1,(100-p.scoutConfidence)/12);p.perceived=clamp(Math.round(p.trueNow+err),30,99);p.perceivedUpside=clamp(Math.round(p.upside+gauss()*Math.max(1,(100-p.scoutConfidence)/10)),p.perceived,99);p.lastDevelopmentDelta=(p.lastDevelopmentDelta||0)+delta;if(phase==='spring')applyPhysicalGrowth(p,t);return delta}
+function developmentSnapshot(p){return{trueNow:p.trueNow,perceived:p.perceived,perceivedUpside:p.perceivedUpside,speed:p.speed,power:p.power,technique:p.technique,iq:p.iq,composure:p.composure,durability:p.durability,versatility:p.versatility,height:p.height,weight:p.weight,familiarity:familiarity(p,p.pos),scoutConfidence:p.scoutConfidence,health:p.health,wear:p.wear}}
+function developmentDelta(before,after){const change=key=>(after[key]??0)-(before[key]??0);return{overallDelta:change('trueNow'),perceivedDelta:change('perceived'),upsideEstimateDelta:change('perceivedUpside'),attr:Object.fromEntries(PLAYER_TRAITS.map(key=>[key,change(key)])),weightDelta:change('weight'),heightDelta:change('height'),familiarityDelta:change('familiarity'),confidenceDelta:change('scoutConfidence'),healthDelta:change('health'),wearDelta:change('wear')}}
+function developmentResult(p,t,phase,before,extra={}){const after=developmentSnapshot(p),delta=developmentDelta(before,after);return{id:p.id,name:p.name,pos:p.pos,phase:phase.toUpperCase(),delta:delta.overallDelta,...delta,overallAfter:after.trueNow,perceivedAfter:after.perceived,upsideEstimateAfter:after.perceivedUpside,attrAfter:Object.fromEntries(PLAYER_TRAITS.map(key=>[key,after[key]])),heightAfter:after.height,weightAfter:after.weight,familiarityAfter:after.familiarity,confidenceAfter:after.scoutConfidence,healthAfter:after.health,wearAfter:after.wear,physical:p.lastPhysicalChange||'',focus:p.trainingFocus||'Balanced',teamFocus:t.trainingFocus||'Balanced',...extra}}
+function developmentTeamSummary(report=[]){return{players:report.length,averageOverall:report.length?Math.round(avg(report.map(x=>x.overallDelta))*10)/10:0,improved:report.filter(x=>x.overallDelta>0).length,declined:report.filter(x=>x.overallDelta<0).length,biggestRise:Math.max(0,...report.map(x=>x.overallDelta)),totalWeight:report.reduce((n,x)=>n+x.weightDelta,0)}}
+function developmentGroupSummary(report=[]){return Object.values(report.reduce((out,x)=>{const g=out[x.pos]??={pos:x.pos,players:0,totalOverall:0,improved:0};g.players++;g.totalOverall+=x.overallDelta;if(x.overallDelta>0)g.improved++;return out},{})).map(g=>({...g,averageOverall:Math.round(g.totalOverall/g.players*10)/10})).sort((a,b)=>b.averageOverall-a.averageOverall||a.pos.localeCompare(b.pos))}
+function developmentFocusSummary(report=[]){const teamFocus=report[0]?.teamFocus||'Balanced',targets=Object.keys(TEAM_TRAINING[teamFocus]?.attrs||{});return{teamFocus,targets:targets.map(key=>({key,improved:report.filter(x=>(x.attr?.[key]||0)>0).length,average:report.length?Math.round(avg(report.map(x=>x.attr?.[key]||0))*10)/10:0}))}}
+function developmentMovementDistribution(report=[]){const counts={};for(const x of report)counts[x.overallDelta]=(counts[x.overallDelta]||0)+1;return Object.entries(counts).map(([delta,count])=>({delta:+delta,count})).sort((a,b)=>b.delta-a.delta)}
+function developmentResultDetailHTML(x,p){if(!x)return'<div class="muted">Select a player result for details.</div>';const traitNames={speed:'Speed',power:'Power',technique:'Technique',iq:'Processing',composure:'Composure',durability:'Durability',versatility:'Versatility'},signed=n=>`${n>0?'+':''}${n}`,attrs=PLAYER_TRAITS.map(key=>{const after=x.attrAfter?.[key]??p?.[key]??0,before=after-(x.attr?.[key]||0);return `<div class="development-attribute"><span>${traitNames[key]}</span><span>${before} <b aria-hidden="true">→</b> ${after}</span><strong class="${x.attr?.[key]>0?'dev-rise':x.attr?.[key]<0?'dev-fall':'dev-flat'}">${signed(x.attr?.[key]||0)}</strong></div>`}).join('');return `<div class="development-detail-head"><div><div class="eyebrow">${x.phase} RESULT</div><h3>${x.name}</h3><div class="muted">${x.pos}${p?.style?` · ${archetypeLabel(p.style)}`:''}</div></div><div class="development-overall"><span>OVERALL</span><strong>${x.overallAfter-x.overallDelta} → ${x.overallAfter}</strong><b class="${x.overallDelta>0?'dev-rise':x.overallDelta<0?'dev-fall':'dev-flat'}">${signed(x.overallDelta)}</b></div></div><div class="development-attributes">${attrs}</div><div class="development-detail-grid"><div><span>Physical</span><strong>${x.heightAfter-x.heightDelta===x.heightAfter?heightStr(x.heightAfter):`${heightStr(x.heightAfter-x.heightDelta)} → ${heightStr(x.heightAfter)}`} · ${x.weightAfter-x.weightDelta} → ${x.weightAfter} lb</strong></div><div><span>Position familiarity</span><strong>${x.familiarityAfter-x.familiarityDelta}% → ${x.familiarityAfter}%</strong></div><div><span>Staff confidence</span><strong>${x.confidenceAfter-x.confidenceDelta}% → ${x.confidenceAfter}%</strong></div><div><span>Training plan</span><strong>${x.teamFocus} · ${x.focus}</strong></div></div>`}
+function developmentResultsHTML(report=[],t,filter='ALL',sort='jump'){if(!report.length)return'<div class="development-results-empty muted">Complete Spring Development or Fall Camp to generate a full results receipt.</div>';const summary=developmentTeamSummary(report),groups=developmentGroupSummary(report),focus=developmentFocusSummary(report),distribution=developmentMovementDistribution(report),maxCount=Math.max(1,...distribution.map(x=>x.count)),signed=n=>`${n>0?'+':''}${n}`,traits={speed:'Speed',power:'Power',technique:'Technique',iq:'Processing',composure:'Composure',durability:'Durability',versatility:'Versatility'};let rows=report.filter(x=>filter==='ALL'||x.pos===filter||filter==='IMPROVED'&&x.overallDelta>0||filter==='REGRESSED'&&x.overallDelta<0||filter==='PHYSICAL'&&(x.weightDelta||x.heightDelta));rows.sort(sort==='position'?(a,b)=>POS.indexOf(a.pos)-POS.indexOf(b.pos)||b.overallDelta-a.overallDelta:sort==='decline'?(a,b)=>a.overallDelta-b.overallDelta:(a,b)=>b.overallDelta-a.overallDelta);const first=rows[0]||report[0],movement=distribution.map(x=>`<div class="development-distribution-row"><span>${signed(x.delta)}</span><i style="--bar:${Math.round(x.count/maxCount*100)}%"></i><strong>${x.count}</strong></div>`).join(''),groupButtons=groups.map(g=>`<button type="button" data-development-filter="${g.pos}" class="${filter===g.pos?'active':''}"><span>${g.pos}</span><strong>${signed(g.averageOverall)}</strong></button>`).join(''),focusText=focus.targets.length?focus.targets.map(x=>`${traits[x.key]||x.key}: ${x.improved} improved · ${signed(x.average)} avg`).join('<br>'):'Balanced work across the roster';const table=rows.map(x=>{const p=t.roster.find(p=>p.id===x.id),gains=Object.entries(x.attr||{}).filter(([,n])=>n>0).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([key,n])=>`${traits[key]||key} ${signed(n)}`).join(' · ')||'No attribute increase';return `<tr><td data-label="Player"><button type="button" class="player-button" data-development-result="${x.id}">${x.name}</button><div class="small muted">${p?eligibilityLabel(p):x.pos} · ${p?archetypeLabel(p.style):x.pos}</div></td><td data-label="OVR"><strong>${x.overallAfter-x.overallDelta} → ${x.overallAfter}</strong></td><td data-label="Change"><strong class="${x.overallDelta>0?'dev-rise':x.overallDelta<0?'dev-fall':'dev-flat'}">${signed(x.overallDelta)}</strong></td><td data-label="Attribute gains">${gains}</td><td data-label="Physical">${x.physical||'—'}</td><td data-label="Confidence">${signed(x.confidenceDelta)}</td><td data-label="Focus">${x.focus}</td></tr>`}).join('');return `<div class="development-results-hero"><div><div class="eyebrow">${report[0].phase} DEVELOPMENT</div><h3>${t.name} · ${universe.year}</h3><p>${report[0].phase==='SPRING'?'The major growth window: development, body maturation and staff evaluation.':'Final evaluation, camp grades and depth-chart competition.'}</p></div><div class="development-kpis"><div><span>Team growth</span><strong>${signed(summary.averageOverall)} avg</strong></div><div><span>Players improved</span><strong>${summary.improved}</strong></div><div><span>Big jumps</span><strong>${report.filter(x=>x.overallDelta>=5).length}</strong></div><div><span>Regressions</span><strong>${summary.declined}</strong></div><div><span>Total weight</span><strong>${signed(summary.totalWeight)} lb</strong></div></div></div><div class="development-results-grid"><section><h4>Player movement</h4><div class="development-distribution">${movement}</div></section><section><h4>Your development plan</h4><p><strong>Team focus: ${focus.teamFocus}</strong></p><p class="compact muted">Observed outcomes<br>${focusText}</p></section></div><div class="development-groups"><button type="button" data-development-filter="ALL" class="${filter==='ALL'?'active':''}"><span>ALL</span><strong>${report.length}</strong></button>${groupButtons}</div><div class="development-results-controls"><div><button type="button" data-development-filter="IMPROVED" class="${filter==='IMPROVED'?'active':''}">Improved</button><button type="button" data-development-filter="REGRESSED" class="${filter==='REGRESSED'?'active':''}">Regressed</button><button type="button" data-development-filter="PHYSICAL" class="${filter==='PHYSICAL'?'active':''}">Physical change</button></div><label>Sort <select id="developmentResultsSort"><option value="jump" ${sort==='jump'?'selected':''}>Biggest jump</option><option value="decline" ${sort==='decline'?'selected':''}>Biggest decline</option><option value="position" ${sort==='position'?'selected':''}>Position</option></select></label></div><div class="development-results-body"><div class="table-wrap"><table><thead><tr><th>Player</th><th>OVR</th><th>Change</th><th>Attribute gains</th><th>Physical</th><th>Confidence</th><th>Focus</th></tr></thead><tbody>${table}</tbody></table></div><aside id="developmentResultDetail">${developmentResultDetailHTML(first,t.roster.find(p=>p.id===first.id))}</aside></div>`}
 function campScore(p,t,role,phase){let base=roleFit(p,t,role,false),practice=p.work*.10+p.composure*.08+p.iq*.07,noise=gauss()*(phase==='fall'?5:7);return Math.round(base*.75+practice*.25+noise)}
 function buildCampBattles(t,phase){ensureRoleDepth(t);let out=[];for(const role of ROLE_DEFS.filter(r=>r.base||['3DRB','SLOT','NICKEL','KR','PR'].includes(r.id))){let cand=rolePlayers(t,role.id).filter(p=>(p.injuryWeeks||0)===0).slice(0,3);if(cand.length<2)continue;let rows=cand.map(p=>({id:p.id,name:p.name,pos:p.pos,score:campScore(p,t,role,phase)})).sort((a,b)=>b.score-a.score),gap=rows[0].score-rows[1].score;if(gap<=10||phase==='fall'){out.push({roleId:role.id,label:role.label,candidates:rows,recommended:rows[0].id,gap})}}return out.sort((a,b)=>a.gap-b.gap).slice(0,phase==='fall'?10:7)}
 function ensureDevelopmentState(){universe.campHistory??={};if(!universe.developmentState||universe.developmentState.year!==universe.year)universe.developmentState={year:universe.year,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]};return universe.developmentState}
@@ -2567,8 +2656,8 @@ function normalizeOffseasonState(target=universe){
  target.offseason=makeOffseasonState(target.year,complete?'review':'preseason',complete?completed:['preseason'],reports);
  return target.offseason;
 }
-function runSpringCamp(){if(universe.phase!=='complete'){setStatus('Finish the season before spring development.');return}let ds=ensureDevelopmentState();if(ds.springRun){setStatus('Spring development has already been completed.');return}for(const t of universe.teams)advanceSchemeInstall(t,'spring');let u=selected(),report=[];for(const t of universe.teams){for(const p of t.roster){p.lastDevelopmentDelta=0;let d=applyDevelopmentPhase(p,t,'spring');if(t===u){refreshScoutingIntel(p,t,9,'CAMP');snapshotScouting(p,t,'MAJOR_REVISION','CAMP',false,true);report.push({id:p.id,name:p.name,pos:p.pos,delta:d,physical:p.lastPhysicalChange})}}if(t!==u&&gameplayRandom()<.35)t.trainingFocus=pick(Object.keys(TEAM_TRAINING));autoRoleDepth(t,false)}ds.springRun=true;ds.springReport=report.sort((a,b)=>b.delta-a.delta);ds.battles=buildCampBattles(u,'spring');setStatus('Spring development complete. Staff evaluations have tightened.');render()}
-function runFallCamp(){if(universe.phase!=='complete'){setStatus('Finish the season before fall camp.');return}let ds=ensureDevelopmentState();if(!ds.springRun){setStatus('Run spring development first.');return}for(const t of universe.teams)advanceSchemeInstall(t,'fall');if(ds.fallRun){setStatus('Fall camp has already been completed.');return}let u=selected(),report=[];for(const t of universe.teams){for(const p of t.roster){let before=p.trueNow,d=applyDevelopmentPhase(p,t,'fall');p.campGrade=grade(clamp(Math.round(p.perceived+p.work*.08+p.composure*.05+gauss()*5),25,99));p.campHistory.push({year:universe.year,phase:'Fall',grade:p.campGrade,delta:p.trueNow-before});if(t===u){refreshScoutingIntel(p,t,7,'CAMP');snapshotScouting(p,t,'FIRST_FALL_CAMP','CAMP');report.push({id:p.id,name:p.name,pos:p.pos,delta:d,grade:p.campGrade})}}if(t!==u)autoRoleDepth(t,false)}ds.fallRun=true;ds.fallReport=report.sort((a,b)=>b.delta-a.delta);ds.battles=buildCampBattles(u,'fall');setStatus('Fall camp complete. Position battles are ready for decisions.');render()}
+function runSpringCamp(){if(universe.phase!=='complete'){setStatus('Finish the season before spring development.');return}let ds=ensureDevelopmentState();if(ds.springRun){setStatus('Spring development has already been completed.');return}for(const t of universe.teams)advanceSchemeInstall(t,'spring');let u=selected(),report=[];for(const t of universe.teams){for(const p of t.roster){p.lastDevelopmentDelta=0;const before=developmentSnapshot(p);applyDevelopmentPhase(p,t,'spring');if(t===u){refreshScoutingIntel(p,t,9,'CAMP');snapshotScouting(p,t,'MAJOR_REVISION','CAMP',false,true);const result=developmentResult(p,t,'spring',before);report.push(result);p.campHistory.push({year:universe.year,phase:'Spring',delta:result.overallDelta,attr:{...result.attr},weightDelta:result.weightDelta,focus:result.focus,teamFocus:result.teamFocus})}}if(t!==u&&gameplayRandom()<.35)t.trainingFocus=pick(Object.keys(TEAM_TRAINING));autoRoleDepth(t,false)}ds.springRun=true;ds.springReport=report.sort((a,b)=>b.delta-a.delta);ds.battles=buildCampBattles(u,'spring');setStatus('Spring development complete. Staff evaluations have tightened.');render()}
+function runFallCamp(){if(universe.phase!=='complete'){setStatus('Finish the season before fall camp.');return}let ds=ensureDevelopmentState();if(!ds.springRun){setStatus('Run spring development first.');return}for(const t of universe.teams)advanceSchemeInstall(t,'fall');if(ds.fallRun){setStatus('Fall camp has already been completed.');return}let u=selected(),report=[];for(const t of universe.teams){for(const p of t.roster){const before=developmentSnapshot(p);applyDevelopmentPhase(p,t,'fall');p.campGrade=grade(clamp(Math.round(p.perceived+p.work*.08+p.composure*.05+gauss()*5),25,99));if(t===u){refreshScoutingIntel(p,t,7,'CAMP');snapshotScouting(p,t,'FIRST_FALL_CAMP','CAMP');const result=developmentResult(p,t,'fall',before,{grade:p.campGrade});report.push(result);p.campHistory.push({year:universe.year,phase:'Fall',grade:p.campGrade,delta:result.overallDelta,attr:{...result.attr},focus:result.focus,teamFocus:result.teamFocus})}else p.campHistory.push({year:universe.year,phase:'Fall',grade:p.campGrade,delta:p.trueNow-before.trueNow})}if(t!==u)autoRoleDepth(t,false)}ds.fallRun=true;ds.fallReport=report.sort((a,b)=>b.delta-a.delta);ds.battles=buildCampBattles(u,'fall');setStatus('Fall camp complete. Position battles are ready for decisions.');render()}
 function applyCampRecommendations(){let ds=ensureDevelopmentState(),u=selected();if(!ds.battles?.length){setStatus('No camp recommendations are available yet.');return}ensureRoleDepth(u);for(const b of ds.battles){let arr=u.roleDepth[b.roleId]||[],id=b.recommended;u.roleDepth[b.roleId]=[id,...arr.filter(x=>x!==id)]}setStatus('Staff camp recommendations applied to the role depth chart.');render()}
 function positionOptions(p){return (POSITION_TRANSITIONS[p.pos]||[]).filter(x=>BODY[x])}
 function positionTransitionFit(p,pos){if(!BODY[pos])return 0;let [hr,wr]=BODY[pos],heightFit=p.height>=hr[0]-1&&p.height<=hr[1]+1?90:60,weightMid=(wr[0]+wr[1])/2,weightFit=clamp(100-Math.abs(p.weight-weightMid)*1.25,35,100),skill=pos==='WR'||pos==='CB'||pos==='S'?p.speed:pos==='OT'||pos==='OG'||pos==='C'||pos==='DT'?p.power:avg([p.speed,p.power,p.technique]);return Math.round(heightFit*.20+weightFit*.25+skill*.35+p.versatility*.20)}
@@ -4731,7 +4820,7 @@ function calendarSpringCamp(){
  const os=normalizeOffseasonState();
  if(offseasonPhaseDone('spring')){os.phase='fall';render();return}
  runPreCalendarSpringCamp();
- if(ensureDevelopmentState().springRun)autosaveAfter('camp'),finishOffseasonPhase('spring','fall',{rosterSize:universe.teams.reduce((n,t)=>n+t.roster.length,0)});
+ if(ensureDevelopmentState().springRun)developmentResultsPhase='SPRING',developmentResultsFilter='ALL',autosaveAfter('camp'),finishOffseasonPhase('spring','fall',{rosterSize:universe.teams.reduce((n,t)=>n+t.roster.length,0)});
  render();
 }
 function calendarFallCamp(){
@@ -4741,7 +4830,7 @@ function calendarFallCamp(){
  if(os.phase!=='fall'){setStatus('Complete the earlier offseason phases first.');return}
  if(offseasonPhaseDone('fall')){os.phase='preseason';render();return}
  runPreCalendarFallCamp();
- if(ensureDevelopmentState().fallRun)autosaveAfter('camp'),finishOffseasonPhase('fall','preseason',{rosterSize:universe.teams.reduce((n,t)=>n+t.roster.length,0)});
+ if(ensureDevelopmentState().fallRun)developmentResultsPhase='FALL',developmentResultsFilter='ALL',autosaveAfter('camp'),finishOffseasonPhase('fall','preseason',{rosterSize:universe.teams.reduce((n,t)=>n+t.roster.length,0)});
  render();
 }
 function runOffseason(){
@@ -5129,6 +5218,7 @@ function teamLogoHTML(teamId,size=24,extraClass=''){
 }
 function render(){const order=ranked();const u=selected();if(!u)return;ensureSeasonGoals(u);$('#seasonGoalsDashboard')&&($('#seasonGoalsDashboard').innerHTML=seasonGoalsHTML(u));const p=profiles(u);$('#teamName').textContent=u.name;const mm=$('.masthead-mark');if(mm){mm.innerHTML=teamLogoHTML(u.id,48);mm.classList.add('has-logo')}$('#teamMeta').textContent=`${u.conference} · ${u.offScheme} / ${u.defScheme} · Prestige ${u.prestige} · Ceiling ${u.program_ceiling}`;$('#teamMetrics').innerHTML=[['Offense',grade(p.offense)],['Defense',grade(p.defense)],['Scheme Fit',grade((p.offFit+p.defFit)/2)],['Development',grade(u.development)]].map(x=>`<div class="metric"><div class="small muted">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');$('#recordBig').textContent=`${u.w}–${u.l}`;$('#rankLine').textContent=u.rank<=25?`#${u.rank} nationally`:`#${u.rank} nationally · outside the top 25`;$('#weekLine').textContent=`${universe.year} · Week ${universe.week}`;$('#top15').innerHTML=order.slice(0,15).map((t,i)=>`<div class="rankrow${t.name===u.name?' target':''}"><div><span class="rank">${i+1}.</span> ${teamLogoHTML(t.id,20,'team-logo--inline')} ${t.name}</div><div>${t.w}-${t.l}</div></div>`).join('');const leaders=u.roster.slice().sort((a,b)=>b.perceived-a.perceived).slice(0,5);$('#snapshot').innerHTML=`<div class="lineitem"><span>Roster</span><strong>${u.roster.length}</strong></div><div class="lineitem"><span>Protected redshirts</span><strong>${u.roster.filter(p=>p.redshirtActive).length}</strong></div><div class="lineitem"><span>Commits</span><strong>${u.commits.length}</strong></div><div class="lineitem"><span>Head Coach</span><strong>${u.staff.HC.name}</strong></div><div class="lineitem"><span>PF / PA</span><strong>${u.pf} / ${u.pa}</strong></div>`+leaders.map(x=>`<div class="lineitem compact"><span>${x.pos} ${x.name}</span><span>${playerGrade(x)} · ${x.style}</span></div>`).join('');renderWeeklyPlan();renderWeeklyHub();renderActiveTab();$('#simConf').disabled=universe.phase!=='confReady';$('#simPlayoff').disabled=!['bowlReady','playoffReady'].includes(universe.phase);let devState=ensureDevelopmentState(),offseason=normalizeOffseasonState(),advance=$('#runOffseason');if(advance){const labels={review:'Run Season Review',departures:'Process Departures',signing:'Enroll Signing Class',portal:'Resolve Transfer Portal',preseason:'Open New Season'};advance.disabled=universe.phase!=='complete'||['spring','fall'].includes(offseason.phase);advance.textContent=labels[offseason.phase]||'Advance Offseason Phase'}const noGame=!findUserGame();$('#simDetailedGame').disabled=noGame;$('#watchDetailedGame').disabled=noGame}
 function attachPlayerLinks(){$$('[data-player]').forEach(b=>b.onclick=()=>showPlayerProfile(b.dataset.player));paintPortraits()}
+function showArchetypeGuide(style){const meta=archetypeMeta(style),pos=archetypePosition(style),traitNames={speed:'Speed',power:'Power',technique:'Technique',iq:'Processing',composure:'Composure',durability:'Durability',versatility:'Versatility'};$('#archetypeDialogName').textContent=meta.display;$('#archetypeDialogMeta').textContent=`${pos||'Player'} archetype · internal identity preserved as ${style}`;$('#archetypeDialogBody').innerHTML=`<div class="archetype-guide"><p class="archetype-guide-lead">${meta.short}</p><section><div class="eyebrow">WINS WITH</div><div class="archetype-strengths">${meta.strengths.map(x=>`<span class="pill">${traitNames[x]||x}</span>`).join('')}</div></section><section><div class="eyebrow">SIMULATION ROLE</div><p>${styleDescription({style,pos})}</p></section></div>`;const d=$('#archetypeDialog');if(d.showModal)d.showModal();else d.setAttribute('open','')}
 
 // --- v0.9.14: the coach's desk --------------------------------------------
 // A few state-backed choices sit above the existing weekly checklist. They
@@ -5298,7 +5388,7 @@ function renderRecruitBattles(){const u=selected(),targets=universe.recruits.fil
 function attachRecruitLinks(){$$('[data-recruit]').forEach(b=>b.onclick=()=>showRecruitProfile(b.dataset.recruit))}
 function showRecruitProfile(id){let r=universe.recruits.find(x=>x.id===id);if(!r)return;const u=selected(),top=recruitTopSchools(r,5),primary=coachById(r.primaryRecruiterCoachId)?.coach;ensureScoutingIntel(r,u,true);$('#recruitDialogName').textContent=r.name;$('#recruitDialogMeta').textContent=`${r.pos} · ${'★'.repeat(r.stars)} · #${r.nationalRank} national / #${r.positionRank} ${r.pos} / #${r.stateRank} ${r.homeState}`;let reasons=recruitPitchBreakdown(u,r).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])).slice(0,8);$('#recruitDialogBody').innerHTML=`${scoutingPanelHTML(r,u,true)}<div class="profile-grid"><div class="profile-stat"><div class="small muted">Hometown</div><div class="v">${r.homeCity}, ${r.homeState}</div></div><div class="profile-stat"><div class="small muted">High School</div><div class="v">${r.highSchool}</div></div><div class="profile-stat"><div class="small muted">Distance</div><div class="v">${recruitDistance(u,r)} mi</div></div><div class="profile-stat"><div class="small muted">Interest</div><div class="v">${r.interest}%</div></div></div><div class="profile-sections"><section class="profile-section"><h3>Recruiting Race</h3>${top.map((x,i)=>`<div class="lineitem"><span>${i+1}. ${x.t.name}</span><strong>${Math.round(x.score)}</strong></div>`).join('')}</section><section class="profile-section"><h3>Your Pitch</h3>${reasons.map(x=>`<div class="lineitem"><span>${x[0]}</span><strong class="${x[1]>5?'pitch-positive':x[1]<0?'pitch-negative':'pitch-neutral'}">${x[1]>=0?'+':''}${Math.round(x[1])}</strong></div>`).join('')}</section><section class="profile-section profile-section--wide"><h3>Recruitment</h3><div class="lineitem"><span>Distance preference</span><strong>${r.distanceImportance}/100 · comfort about ${r.distanceTolerance} mi</strong></div><div class="lineitem"><span>Primary recruiter</span><strong>${primary?coachEscape(primary.name):'Not established'}</strong></div><div class="lineitem"><span>Current promise</span><strong>${r.promise||'None'}</strong></div>${scoutingHistoryHTML(r)}</section></div>`;$('#recruitDialog').showModal()}
 
-function renderRoster(){const u=selected(),f=$('#positionFilter').value||'ALL';let rows=u.roster.filter(p=>f==='ALL'||p.pos===f).sort((a,b)=>POS.indexOf(a.pos)-POS.indexOf(b.pos)||b.perceived-a.perceived);$('#rosterBody').innerHTML=rows.map(p=>`<tr><td data-label="Player"><div class="player-cell">${portraitTag(p,64,'list')}<div class="player-cell-text"><button class="player-button" data-player="${p.id}">${p.name}</button><div class="small muted">#${p.jerseyNumber??0} · ${p.origin}</div></div></div></td><td data-label="Pos">${p.pos}</td><td data-label="Elig">${eligibilityLabel(p)}</td><td data-label="Redshirt">${p.redshirtUsed?'<span class="pill rs-used">Used</span>':`<button class="rs-button ${p.redshirtActive?'rs-active':''}" data-redshirt="${p.id}" ${canRedshirt(p)?'':'disabled'}>${p.redshirtActive?'Protecting':'Available'}</button>`}</td><td data-label="Ht/Wt">${heightStr(p.height)} / ${p.weight}</td><td data-label="Style"><span class="pill">${p.style}</span></td><td data-label="Current">${scoutRangeText(p,u,false)}</td><td data-label="Upside">${scoutRangeText(p,u,true)}</td><td data-label="Scheme Fit">${grade(playerSchemeFit(p,u))}</td><td data-label="Health" class="${p.injuryWeeks?'health-out':p.health<78?'health-warn':'health-ok'}">${healthText(p)}</td><td data-label="Morale">${p.morale}</td><td data-label="NIL">${nilCellHTML(p,u)}</td><td data-label="Academics" class="${academicallyIneligible(p)?'health-out':academicRisk(p)?'health-warn':'health-ok'}">${academicStatusText(p)}</td></tr>`).join('');$$('[data-redshirt]').forEach(b=>b.onclick=()=>toggleRedshirt(b.dataset.redshirt));$$('[data-nil-player]').forEach(b=>b.onclick=()=>toggleNilPlayer(b.dataset.nilPlayer));attachPlayerLinks()}
+function renderRoster(){const u=selected(),f=$('#positionFilter').value||'ALL';let rows=u.roster.filter(p=>f==='ALL'||p.pos===f).sort((a,b)=>POS.indexOf(a.pos)-POS.indexOf(b.pos)||b.perceived-a.perceived);$('#rosterBody').innerHTML=rows.map(p=>`<tr><td data-label="Player"><div class="player-cell">${portraitTag(p,64,'list')}<div class="player-cell-text"><button class="player-button" data-player="${p.id}">${p.name}</button><div class="small muted">#${p.jerseyNumber??0} · ${p.origin}</div></div></div></td><td data-label="Pos">${p.pos}</td><td data-label="Elig">${eligibilityLabel(p)}</td><td data-label="Redshirt">${p.redshirtUsed?'<span class="pill rs-used">Used</span>':`<button class="rs-button ${p.redshirtActive?'rs-active':''}" data-redshirt="${p.id}" ${canRedshirt(p)?'':'disabled'}>${p.redshirtActive?'Protecting':'Available'}</button>`}</td><td data-label="Ht/Wt">${heightStr(p.height)} / ${p.weight}</td><td data-label="Style">${archetypeChipHTML(p.style)}</td><td data-label="Current">${scoutRangeText(p,u,false)}</td><td data-label="Upside">${scoutRangeText(p,u,true)}</td><td data-label="Scheme Fit">${grade(playerSchemeFit(p,u))}</td><td data-label="Health" class="${p.injuryWeeks?'health-out':p.health<78?'health-warn':'health-ok'}">${healthText(p)}</td><td data-label="Morale">${p.morale}</td><td data-label="NIL">${nilCellHTML(p,u)}</td><td data-label="Academics" class="${academicallyIneligible(p)?'health-out':academicRisk(p)?'health-warn':'health-ok'}">${academicStatusText(p)}</td></tr>`).join('');$$('[data-redshirt]').forEach(b=>b.onclick=()=>toggleRedshirt(b.dataset.redshirt));$$('[data-nil-player]').forEach(b=>b.onclick=()=>toggleNilPlayer(b.dataset.nilPlayer));attachPlayerLinks()}
 function renderDepth(){const u=selected();ensureRoleDepth(u);const off=OFF_SCHEMES[u.offScheme],def=DEF_SCHEMES[u.defScheme];$('#offPackages').innerHTML=`<div class="scheme-badge">${u.offScheme}</div><div class="lineitem"><span>Base pass rate</span><strong>${Math.round(off.pass*100)}%</strong></div><div class="lineitem"><span>Primary skill package</span><strong>${off.pass>.60?'X / Z / Slot':off.pass<.42?'Lead back / TE / Power':'Multiple personnel'}</strong></div><div class="lineitem"><span>Protected redshirts</span><strong>${u.roster.filter(p=>p.redshirtActive).length}</strong></div>`;$('#defPackages').innerHTML=`<div class="scheme-badge">${u.defScheme}</div><div class="lineitem"><span>Pressure</span><strong>${def.pressure}</strong></div><div class="lineitem"><span>Coverage</span><strong>${def.coverage}</strong></div><div class="lineitem"><span>Sub package</span><strong>Nickel / Slot / Rush roles</strong></div>`;$('#depthGrid').innerHTML=ROLE_DEFS.map(role=>{let a=rolePlayers(u,role.id),top=a.slice(0,4),active=roleStarter(u,role.id);return `<div class="depth-card role-card"><div class="role-side">${role.side}</div><div class="strong">${role.label}</div><select data-role="${role.id}">${a.map(p=>`<option value="${p.id}" ${a[0]?.id===p.id?'selected':''}>${p.name} · ${grade(p.perceived)} · ${grade(roleFit(p,u,role,true))}${p.injuryWeeks?' · OUT':p.redshirtActive?' · RS':''}</option>`).join('')}</select><div class="role-note">Role fit uses traits + scheme, not universal OVR.</div><div class="depth-list">${top.map((p,i)=>`<div>${i+1}. <button class="player-button" data-player="${p.id}">${p.name}</button> · ${grade(roleFit(p,u,role,true))} fit ${p===active?'<span class="good">• active</span>':''}${p.injuryWeeks?` · <span class="health-out">${p.injuryWeeks} wk</span>`:p.redshirtActive?' · <span class="warn">RS protected</span>':''}</div>`).join('')}</div></div>`}).join('');$$('[data-role]').forEach(s=>s.onchange=()=>{let id=s.dataset.role,pid=s.value,arr=u.roleDepth[id]||[];u.roleDepth[id]=[pid,...arr.filter(x=>x!==pid)];render()});attachPlayerLinks()}
 function renderStaff(){const u=selected();$('#staffList').innerHTML=Object.values(u.staff).map(c=>{ensureCoachCareer(c,u,coachSlot(u,c));return `<div class="coach-card"><div class="strong"><button class="player-button" data-coach="${coachEscape(c.id)}">${coachEscape(c.name)}</button> <span class="pill">${coachEscape(c.role)}</span>${c.interim?' <span class="pill bad">INTERIM</span>':''}</div><div class="compact muted">Age ${c.age} · Year ${c.years+1} · ${c.contractYears??2} yr contract · $${c.salary??1.2}M${c.playCallAuthority?` · ${c.playCallAuthority==='full'?'Full play-calling':'Shared authority'}`:''}</div><div class="compact">Recruit ${grade(c.recruiting)} · Develop ${grade(c.development)} · Evaluate ${grade(c.evaluation)} · Call ${grade(c.playCall)} · Adapt ${grade(c.adaptability)}</div><div class="small muted">${coachEscape((c.specialties||coachSpecialties(c)).join(' · '))} · ${coachEscape(coachTraitText(c))}${c.preferredScheme?` · runs ${coachEscape(c.preferredScheme)}`:''}</div></div>`}).join('');const o=OFF_SCHEMES[u.offScheme],d=DEF_SCHEMES[u.defScheme];const bar=side=>{const tr=schemeTransition(u,side);return tr?`<div class="compact warn">${gameEscape(schemeInstallNote(u,side))}</div><div class="bar"><span style="width:${tr.familiarity}%"></span></div>`:'<div class="small muted">Fully installed.</div>'};
  $('#schemeCard').innerHTML=`<div class="scheme-badge">OFF: ${u.offScheme}</div><div class="compact muted">Pass tendency ${Math.round(o.pass*100)}% · Pace ${o.pace}/100 · Core traits: ${o.traits.join(', ')}</div>${bar('off')}<br><div class="scheme-badge">DEF: ${u.defScheme}</div><div class="compact muted">Pressure ${d.pressure} · Coverage ${d.coverage} · Run control ${d.run} · Core traits: ${d.traits.join(', ')}</div>${bar('def')}`;$('#coachingTree')&&($('#coachingTree').innerHTML=coachingTreeHTML(selected()));$('#schemeFitLeaders').innerHTML=u.roster.slice().sort((a,b)=>playerSchemeFit(b,u)-playerSchemeFit(a,u)).slice(0,10).map(p=>`<div class="lineitem"><span>${p.pos} ${p.name} · ${p.style}</span><strong>${grade(playerSchemeFit(p,u))} (${playerSchemeFit(p,u)})</strong></div>`).join('');renderCoachHistory(u);attachCoachLinks();$('#coachMarket').innerHTML=coachMarketHTML(u);attachCoachMarketLinks()}
@@ -5390,7 +5480,8 @@ function renderRecruiting(){renderSigningDay();const u=selected(),rank=recruitin
   if(pullOffer(r,u.name,'Pulled by the staff')){setStatus(`Offer pulled: ${r.name} is no longer committed.`);render()}});$$('[data-promise]').forEach(s=>s.onchange=()=>{let r=universe.recruits.find(x=>x.id===s.dataset.promise);setRecruitPromise(r,s.value,u)});attachRecruitLinks()}
 function renderProgram(){const u=selected();ensureSeasonGoals(u);$('#programOverview')&&($('#programOverview').innerHTML=programOverviewHTML(u));$('#programGoals')&&($('#programGoals').innerHTML=seasonGoalsHTML(u));$('#editName').value=u.name;$('#editConference').value=u.conference;$('#editPrestige').value=u.prestige;$('#editResources').value=u.resources;$('#editNil').value=u.nil;$('#editDevelopment').value=u.development;$('#editFacilities').value=u.facilities;$('#editAcademics').value=u.academics;$('#careerHistory')&&($('#careerHistory').innerHTML=careerHistoryHTML());renderCareerPost();$('#programHistory')&&($('#programHistory').innerHTML=programHistoryHTML(selected()));$('#programDNA').innerHTML=[['Prestige',u.prestige],['Resources',u.resources],['NIL',u.nil],['Development',u.development],['Facilities',u.facilities],['Academics',u.academics],['Fan Support',u.fan_support],['Admin Patience',u.admin_patience],['Program Ceiling',u.program_ceiling],['Rivalry',u.rivalry?(rivalOf(u)?.name||'—'):'—'],['Trophy',u.rivalry?.trophy||'—'],['All-time series',rivalrySeriesText(u)||'—'],['Season expectation',seasonExpectation(u)+' wins'],['Admin confidence',(u.adminConfidence??'—')+' · '+adminConfidenceLabel(u.adminConfidence??50)],['Mandate',u.mandate?u.mandate.text:'None'],['NIL budget',nilSummaryText(u)],['Career',careerSummaryText()]].map(x=>`<div class="lineitem"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join('')}
 function applyProgramEdit(){const u=selected(),old=u.name,newName=$('#editName').value.trim()||old;if(newName!==old&&T(newName)){alert('A program already uses that name.');return}u.name=newName;for(const [id,key] of [['editPrestige','prestige'],['editResources','resources'],['editNil','nil'],['editDevelopment','development'],['editFacilities','facilities'],['editAcademics','academics']])u[key]=clamp(parseInt($('#'+id).value||u[key],10),1,100);if(newName!==old){universe.schedule.flat().forEach(g=>{if(g.home===old)g.home=newName;if(g.away===old)g.away=newName});universe.teams.forEach(t=>t.schedule.forEach(g=>{if(g.home===old)g.home=newName;if(g.away===old)g.away=newName}));universe.recruits.forEach(r=>{if(r.leader===old)r.leader=newName;if(r.committed===old)r.committed=newName});let opt=[...$('#userTeam').options].find(o=>o.value===old);if(opt){opt.value=newName;opt.textContent=newName}$('#userTeam').value=newName}ranked();render();setStatus('Program changes applied. Conference schedule will fully rebalance next season.')}
-function renderDevelopment(){const u=selected(),ds=ensureDevelopmentState();ensureTeamDevelopment(u);for(const p of u.roster)ensurePlayerDevelopment(p,u);let focus=$('#teamTrainingFocus');if(focus){if(!focus.options.length)Object.keys(TEAM_TRAINING).forEach(x=>focus.add(new Option(x,x)));focus.value=u.trainingFocus;$('#trainingImpact').textContent=TEAM_TRAINING[u.trainingFocus]?.desc||''}let complete=universe.phase==='complete',os=normalizeOffseasonState();$('#runSpringCamp').disabled=!complete||os.phase!=='spring'||os.completed.includes('spring');$('#runFallCamp').disabled=!complete||os.phase!=='fall'||os.completed.includes('fall');$('#applyCampWinners').disabled=!ds.battles?.length;$('#campPhaseCard').innerHTML=complete?`<strong>${universe.year} offseason</strong><div class="compact muted">Spring development: ${ds.springRun?'complete':'not run'} · Fall camp: ${ds.fallRun?'complete':'not run'}</div>`:`<strong>In season</strong><div class="compact muted">Development planning is visible now; camp actions unlock after the national championship.</div>`;let avgConf=Math.round(avg(u.roster.map(p=>{ensurePlayerDevelopment(p,u);return p.scoutConfidence}))),transition=u.roster.filter(p=>familiarity(p,p.pos)<80).length,young=u.roster.filter(p=>eligibilityBase(p)<=1).length;$('#developmentSummary').innerHTML=`<div class="lineitem"><span>Average scouting confidence</span><strong>${avgConf}%</strong></div><div class="lineitem"><span>Freshmen / sophomores</span><strong>${young}</strong></div><div class="lineitem"><span>Position-transition projects</span><strong>${transition}</strong></div><div class="lineitem"><span>Program development</span><strong>${grade(u.development)}</strong></div>`;
+function renderDevelopmentResults(u,ds){const available={SPRING:ds.springReport||[],FALL:ds.fallReport||[]};if(!available[developmentResultsPhase]?.length)developmentResultsPhase=available.FALL.length?'FALL':available.SPRING.length?'SPRING':'';const report=available[developmentResultsPhase]||[];$('#developmentResults').innerHTML=developmentResultsHTML(report,u,developmentResultsFilter,developmentResultsSort);$$('[data-development-phase]').forEach(b=>{b.disabled=!available[b.dataset.developmentPhase]?.length;b.classList.toggle('active',b.dataset.developmentPhase===developmentResultsPhase);b.onclick=()=>{developmentResultsPhase=b.dataset.developmentPhase;developmentResultsFilter='ALL';renderDevelopment()}});$$('[data-development-filter]').forEach(b=>b.onclick=()=>{developmentResultsFilter=b.dataset.developmentFilter;renderDevelopment()});const sort=$('#developmentResultsSort');if(sort)sort.onchange=()=>{developmentResultsSort=sort.value;renderDevelopment()};$$('[data-development-result]').forEach(b=>b.onclick=()=>{const x=report.find(x=>x.id===b.dataset.developmentResult),p=u.roster.find(p=>p.id===b.dataset.developmentResult);$('#developmentResultDetail').innerHTML=developmentResultDetailHTML(x,p)})}
+function renderDevelopment(){const u=selected(),ds=ensureDevelopmentState();ensureTeamDevelopment(u);for(const p of u.roster)ensurePlayerDevelopment(p,u);let focus=$('#teamTrainingFocus');if(focus){if(!focus.options.length)Object.keys(TEAM_TRAINING).forEach(x=>focus.add(new Option(x,x)));focus.value=u.trainingFocus;$('#trainingImpact').textContent=TEAM_TRAINING[u.trainingFocus]?.desc||''}let complete=universe.phase==='complete',os=normalizeOffseasonState();$('#runSpringCamp').disabled=!complete||os.phase!=='spring'||os.completed.includes('spring');$('#runFallCamp').disabled=!complete||os.phase!=='fall'||os.completed.includes('fall');$('#applyCampWinners').disabled=!ds.battles?.length;$('#campPhaseCard').innerHTML=complete?`<strong>${universe.year} offseason</strong><div class="compact muted">Spring development: ${ds.springRun?'complete':'not run'} · Fall camp: ${ds.fallRun?'complete':'not run'}</div>`:`<strong>In season</strong><div class="compact muted">Development planning is visible now; camp actions unlock after the national championship.</div>`;let avgConf=Math.round(avg(u.roster.map(p=>{ensurePlayerDevelopment(p,u);return p.scoutConfidence}))),transition=u.roster.filter(p=>familiarity(p,p.pos)<80).length,young=u.roster.filter(p=>eligibilityBase(p)<=1).length;$('#developmentSummary').innerHTML=`<div class="lineitem"><span>Average scouting confidence</span><strong>${avgConf}%</strong></div><div class="lineitem"><span>Freshmen / sophomores</span><strong>${young}</strong></div><div class="lineitem"><span>Position-transition projects</span><strong>${transition}</strong></div><div class="lineitem"><span>Program development</span><strong>${grade(u.development)}</strong></div>`;renderDevelopmentResults(u,ds);
  let players=u.roster.slice().sort((a,b)=>eligibilityBase(a)-eligibilityBase(b)||b.perceivedUpside-a.perceivedUpside);$('#trainingBody').innerHTML=players.map(p=>`<tr><td data-label="Player"><button class="player-button" data-player="${p.id}">${p.name}</button><div class="small muted">${p.pos}${familiarity(p,p.pos)<80?` · <span class="transition-tag">${familiarity(p,p.pos)}% familiar</span>`:''}</div></td><td data-label="Elig">${eligibilityLabel(p)}</td><td data-label="Current Read">${scoutRangeText(p,u,false)}<div class="small muted">${confidenceText(p)}</div></td><td data-label="Potential Read">${scoutRangeText(p,u,true)}</td><td data-label="Body">${heightStr(p.height)} / ${p.weight}<div class="small muted">${p.lastPhysicalChange||'—'}</div></td><td data-label="Focus"><select class="training-focus" data-training="${p.id}">${INDIVIDUAL_TRAINING.map(x=>`<option ${x===p.trainingFocus?'selected':''}>${x}</option>`).join('')}</select></td><td class="staff-note" data-label="Staff Note">${devStaffNote(p,u)}</td></tr>`).join('');$$('[data-training]').forEach(s=>s.onchange=()=>{let p=u.roster.find(x=>x.id===s.dataset.training);if(p)p.trainingFocus=s.value});attachPlayerLinks();
  let pc=$('#positionChangePlayer'),old=pc.value;pc.innerHTML=u.roster.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=>`<option value="${p.id}">${p.pos} ${p.name}</option>`).join('');if(u.roster.some(p=>p.id===old))pc.value=old;renderPositionChangeOptions();let rep=ds.fallRun?ds.fallReport:ds.springReport;$('#campReport').innerHTML=rep?.length?rep.slice(0,7).map(x=>`<div class="lineitem"><span><button class="player-button" data-player="${x.id}">${x.pos} ${x.name}</button>${x.grade?` · ${x.grade} camp`:''}</span><strong class="${x.delta>1?'dev-rise':x.delta<0?'dev-fall':'dev-flat'}">${x.delta>0?'+':''}${x.delta}${x.physical?` · ${x.physical}`:''}</strong></div>`).join(''):'<span class="muted">No camp results yet.</span>';$('#campBattles').innerHTML=ds.battles?.length?ds.battles.map(b=>`<div class="camp-battle"><div class="battle-head"><strong>${b.label}</strong><span class="small muted">gap ${b.gap}</span></div><div class="battle-candidates">${b.candidates.slice(0,3).map((c,i)=>`<div class="battle-candidate"><span>${i+1}. <button class="player-button" data-player="${c.id}">${c.name}</button>${c.id===b.recommended?' <span class="staff-rec">• staff pick</span>':''}</span><strong>${c.score}</strong></div>`).join('')}</div></div>`).join(''):'<span class="muted">Fall camp will identify the closest competitions.</span>';attachPlayerLinks()}
 function renderPositionChangeOptions(){let u=selected(),p=u.roster.find(x=>x.id===$('#positionChangePlayer').value),target=$('#positionChangeTarget');if(!p||!target)return;let opts=positionOptions(p);target.innerHTML=opts.map(x=>`<option value="${x}">${x}</option>`).join('');let to=target.value;if(!to){$('#positionChangePreview').textContent='No realistic transition available.';$('#applyPositionChange').disabled=true;return}const will=positionChangeWillingness(p,u,to);
@@ -5751,6 +5842,7 @@ async function continueTitleDynasty(){if(universe){enterDynasty();return}setTitl
 async function loadTitleDynasty(){if(universe&&!confirm('Load the saved dynasty? Unsaved changes in the current session will be replaced.'))return;setTitleStatus('Loading browser dynasty…');const ok=await loadBrowser();if(ok)enterDynasty();else setTitleStatus($('#saveStatus').textContent)}
 function bind(){
  document.addEventListener('click',e=>{const b=e.target.closest('[data-game]');if(b){e.preventDefault();showGameCenter(b.dataset.game)}});
+ document.addEventListener('click',e=>{const b=e.target.closest('[data-archetype]');if(b){e.preventDefault();showArchetypeGuide(b.dataset.archetype)}});
  $$('#gameTabs button').forEach(b=>b.onclick=()=>showGameCenter(openedGameId,b.dataset.gameTab));
  $('#gameHistoryYear').onchange=renderGameArchive;
 
@@ -5765,7 +5857,586 @@ $$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.cla
  $('#titleContinue').onclick=continueTitleDynasty;$('#titleNew').onclick=()=>showTitlePanel('titleNewPanel');$('#titleLoad').onclick=()=>showTitlePanel('titleLoadPanel');$('#titleOptions').onclick=()=>showTitlePanel('titleOptionsPanel');$('#titleHowTo').onclick=()=>showTitlePanel('titleHowPanel');
  $('#titleStart').onclick=startTitleDynasty;$('#titleLoadBrowser').onclick=loadTitleDynasty;$('#titleSaveSlot').onchange=e=>chooseSaveSlot(e.target.value);$('#titleRenameSlot').onclick=renameSaveSlot;$('#titleImport').onclick=()=>$('#importFile').click();$('#titleSaveOptions').onclick=saveTitlePreferences;$$('[data-title-back]').forEach(b=>b.onclick=()=>showTitlePanel());
 }
-if(typeof window!=='undefined')window.__DL_TEST__={selected,createOpening,renderStaff,setTeamScheme,schemeTransition,positionChangeWillingness,commissionerMode,renderControlMode};
+if(typeof window!=='undefined')window.__DL_TEST__={selected,createOpening,renderStaff,setTeamScheme,schemeTransition,positionChangeWillingness,commissionerMode,renderControlMode,setGameplayRng(seed){activateGameplayRng(seed,universe);syncGameplayRng()},prepareDevelopmentResults(){universe.phase='complete';universe.offseason=makeOffseasonState(universe.year,'spring',['review','departures','signing','portal']);runSpringCamp()}};
+function makeScoutingActionSystem(env){
+ 'use strict';
+ const COSTS={quick:1,full:3};
+ const gainFor=kind=>kind==='full'?10:4;
+ const phaseFor=kind=>kind==='full'?'FULL_EVALUATION':'QUICK_FILM';
+ const labelFor=kind=>kind==='full'?'Full Evaluation':'Quick Film';
+ function universe(){return env.getUniverse()}
+ function scoutingBudgetFor(t){
+  const rc=t?.staff?.RC||{},hc=t?.staff?.HC||{};
+  return env.clamp(Math.round(5+(rc.evaluation||60)/18+(rc.recruiting||60)/32+(hc.evaluation||60)/55),8,14);
+ }
+ function ensureScoutingWeek(t){
+  const u=universe(),budget=scoutingBudgetFor(t),old=t.scoutingWeek;
+  if(!old||old.year!==u.year||old.week!==u.week)t.scoutingWeek={year:u.year,week:u.week,budget,spent:0};
+  else{old.budget=budget;old.spent=env.clamp(Math.round(old.spent||0),0,budget)}
+  return t.scoutingWeek;
+ }
+ function scoutingHoursLeft(t){const s=ensureScoutingWeek(t);return Math.max(0,s.budget-s.spent)}
+ function evaluationWorkload(recruits=[],t){
+  const active=(recruits||[]).filter(r=>r?.targeted&&!r.committed);let untouched=0,film=0,full=0;
+  for(const r of active){const rec=recruitScoutingRecord(r,t,false);if(rec.full)full++;else if(rec.quick)film++;else untouched++}
+  const remaining=scoutingHoursLeft(t);
+  return{targets:active.length,untouched,film,full,remaining,quickCapacity:Math.min(untouched,remaining),fullCapacity:Math.min(untouched+film,Math.floor(remaining/COSTS.full))};
+ }
+ function blankScoutingRecord(){return{season:universe().year,quick:false,full:false,receipts:[]}}
+ function recruitScoutingRecord(r,t,create=true){
+  const u=universe(),key=String(t.id),existing=r?.manualScouting?.[key];
+  if(existing&&existing.season===u.year){existing.receipts=Array.isArray(existing.receipts)?existing.receipts:[];return existing}
+  if(!create)return blankScoutingRecord();
+  r.manualScouting??={};const row=r.manualScouting[key]={season:u.year,quick:false,full:false,receipts:[]};return row;
+ }
+ function actionAvailability(r,t,kind){
+  if(!COSTS[kind])return{ok:false,reason:'Unknown scouting action.'};
+  if(!r||!t)return{ok:false,reason:'No recruit selected.'};
+  if(universe().phase!=='regular')return{ok:false,reason:'Manual recruit evaluation is available during the regular recruiting season.'};
+  if(r.committed&&r.committed!==t.name)return{ok:false,reason:`${r.name} is committed elsewhere.`};
+  const rec=recruitScoutingRecord(r,t,false);
+  if(kind==='quick'&&(rec.quick||rec.full))return{ok:false,reason:'Quick Film is already complete for this recruit.'};
+  if(kind==='full'&&rec.full)return{ok:false,reason:'Full Evaluation is already complete for this recruit.'};
+  const cost=COSTS[kind],left=scoutingHoursLeft(t);
+  if(cost>left)return{ok:false,reason:`Only ${left} evaluation hour${left===1?'':'s'} remain this week.`};
+  return{ok:true,cost,left};
+ }
+ function width(rows){return rows.length?Math.round(env.avg(rows.map(x=>Math.max(0,(x.high||0)-(x.low||0))))*10)/10:0}
+ function confidence(rows){return rows.length?Math.round(env.avg(rows.map(x=>x.confidence||0))):0}
+ function midpoint(x){return ((x.low||0)+(x.high||0))/2}
+ function hasDetailedScouting(r){return env.hasDetailedScouting?env.hasDetailedScouting(r):!!(r?.scoutingDomains||(Array.isArray(r?.domains)&&r.domains.length))}
+ function preliminaryRows(r){
+  const current=Number.isFinite(r?.scout)?r.scout:Number.isFinite(r?.perceived)?r.perceived:60,upside=Number.isFinite(r?.scoutUp)?r.scoutUp:Number.isFinite(r?.perceivedUpside)?r.perceivedUpside:Math.max(current,68),conf=env.clamp(Math.round(r?.scoutConfidence??38),20,75),margin=env.clamp(Math.round((100-conf)/6),5,14);
+  return[
+   {key:'current',label:'Current ability',low:env.clamp(current-margin,20,99),high:env.clamp(current+margin,20,99),confidence:conf},
+   {key:'upside',label:'Upside',low:env.clamp(upside-margin,20,99),high:env.clamp(upside+margin,20,99),confidence:Math.max(20,conf-4)}
+  ];
+ }
+ function verdictRows(r,t){return hasDetailedScouting(r)?env.scoutingDomainView(r,t,true):preliminaryRows(r)}
+ function verdictLabel(score){return score>=88?'Priority take':score>=82?'Take':score>=76?'Strong target':score>=70?'Boardable':score>=64?'Developmental':'Pass'}
+ function staffVerdict(r,t){
+  const rows=verdictRows(r,t),rec=recruitScoutingRecord(r,t,false),up=rows.find(x=>x.key==='upside')||rows.at(-1),current=rows.filter(x=>x!==up),currentRead=current.length?env.avg(current.map(midpoint)):midpoint(up),upside=midpoint(up),conf=confidence(rows),spread=width(rows),staff=env.staffEval?env.staffEval(t):65,bias=env.staffBias?env.staffBias(r,t):0,uncertainty=(100-conf)/100;
+  const score=env.clamp(Math.round(currentRead*.64+upside*.24+staff*.12+bias*uncertainty),20,99),sorted=current.slice().sort((a,b)=>midpoint(b)-midpoint(a)),strong=sorted.slice(0,2).map(x=>x.label),risk=current.slice().sort((a,b)=>((b.high-b.low)-(a.high-a.low))||midpoint(a)-midpoint(b))[0];
+  const conviction=rec.full&&conf>=70?'High':(rec.quick||rec.full)&&conf>=52?'Medium':rec.quick||rec.full?'Low':'Preliminary';
+  const label=verdictLabel(score),summary=`${label}. ${strong.length?`Best current reads: ${strong.join(' and ')}.`:''} ${risk?`Biggest uncertainty: ${risk.label}.`:''}`.trim();
+  return{score,label,conviction,confidence:conf,spread,strong,risk:risk?.label||null,summary,detailed:hasDetailedScouting(r)};
+ }
+ function performScoutingAction(r,t,kind){
+  const check=actionAvailability(r,t,kind);if(!check.ok)return check;
+  if(!(r.scoutingHistory||[]).length)env.firstRecruitEvaluation(r,t);
+  const before=env.scoutingDomainView(r,t,true),beforeConfidence=confidence(before),beforeWidth=width(before),beforeVerdict=staffVerdict(r,t);
+  env.refreshScoutingIntel(r,t,gainFor(kind),phaseFor(kind),true);
+  env.snapshotScouting(r,t,phaseFor(kind),'MANUAL_SCOUT',true);
+  const after=env.scoutingDomainView(r,t,true),afterConfidence=confidence(after),afterWidth=width(after),week=ensureScoutingWeek(t),rec=recruitScoutingRecord(r,t,true);
+  week.spent+=check.cost;
+  if(kind==='quick')rec.quick=true;else{rec.quick=true;rec.full=true}
+  const afterVerdict=staffVerdict(r,t),receipt={season:universe().year,week:universe().week,kind,cost:check.cost,beforeConfidence,afterConfidence,beforeWidth,afterWidth,beforeVerdict:beforeVerdict.label,afterVerdict:afterVerdict.label};
+  rec.receipts.push(receipt);if(rec.receipts.length>8)rec.receipts.splice(0,rec.receipts.length-8);
+  return{ok:true,label:labelFor(kind),cost:check.cost,remaining:scoutingHoursLeft(t),receipt,verdict:afterVerdict};
+ }
+ return{COSTS,scoutingBudgetFor,ensureScoutingWeek,scoutingHoursLeft,evaluationWorkload,recruitScoutingRecord,actionAvailability,staffVerdict,performScoutingAction};
+}
+
+// Shared with later browser-only recruiting extensions in the same app closure.
+// `var` is intentional: block-scoped declarations in this branch are invisible
+// to sibling extension blocks when the standalone page runs in strict mode.
+var recruitScoutingRecord,recruitStaffVerdict,scoutingActionButtonsHTML,bindScoutingActionButtons;
+if(typeof module==='object'&&module.exports){
+ module.exports={makeScoutingActionSystem};
+}else{
+ const recruitScoutingActions=makeScoutingActionSystem({
+  getUniverse:()=>universe,clamp,avg,scoutingDomainView,firstRecruitEvaluation,refreshScoutingIntel,snapshotScouting,staffEval,staffBias:(r,t)=>scoutHash(r,'staff_verdict',String(t.id))*12,hasDetailedScouting:r=>!!(r?.scoutingDomains&&Object.keys(r.scoutingDomains).length)
+ });
+ const scoutingBudgetFor=recruitScoutingActions.scoutingBudgetFor;
+ const ensureScoutingWeek=recruitScoutingActions.ensureScoutingWeek;
+ const scoutingHoursLeft=recruitScoutingActions.scoutingHoursLeft;
+ recruitScoutingRecord=recruitScoutingActions.recruitScoutingRecord;
+ const scoutingActionAvailability=recruitScoutingActions.actionAvailability;
+ recruitStaffVerdict=recruitScoutingActions.staffVerdict;
+ const performRecruitScoutingAction=recruitScoutingActions.performScoutingAction;
+ function scoutingVerdictHTML(r,t,compact=false){
+  const v=recruitStaffVerdict(r,t),rec=recruitScoutingRecord(r,t,false),tag=rec.full?'FULL EVAL':rec.quick?'FILM REVIEW':'PRELIMINARY';
+  if(compact)return `<div class="staff-verdict-compact"><strong>${v.label}</strong><span>${v.conviction} conviction · ${v.confidence}% confidence</span></div>`;
+  return `<div class="staff-verdict-card"><div class="staff-verdict-head"><div><span class="eyebrow">STAFF VERDICT · ${tag}</span><strong>${v.label}</strong></div><b>${v.score}</b></div><p>${v.summary}</p><div class="small muted">${v.conviction} conviction · ${v.confidence}% report confidence · average range width ${v.spread}. This is a staff opinion, not hidden truth.</div></div>`;
+ }
+ scoutingActionButtonsHTML=function(r,t){
+  const q=scoutingActionAvailability(r,t,'quick'),f=scoutingActionAvailability(r,t,'full'),rec=recruitScoutingRecord(r,t,false),title=x=>String(x.reason||'').replace(/"/g,'&quot;');
+  return `<div class="scouting-actions"><button type="button" data-scout-action="quick" data-scout-recruit="${r.id}" ${q.ok?'':`disabled title="${title(q)}"`}>${rec.quick||rec.full?'Film Reviewed':'Quick Film · 1h'}</button><button type="button" data-scout-action="full" data-scout-recruit="${r.id}" ${f.ok?'':`disabled title="${title(f)}"`}>${rec.full?'Full Eval Complete':'Full Evaluation · 3h'}</button></div>`;
+ };
+ bindScoutingActionButtons=function(){
+  $$('[data-scout-action]').forEach(b=>b.onclick=()=>{
+   const r=universe.recruits.find(x=>String(x.id)===String(b.dataset.scoutRecruit)),t=selected(),dialog=b.closest?.('#recruitDialog');
+   const res=performRecruitScoutingAction(r,t,b.dataset.scoutAction);
+   setStatus(res.ok?`${res.label}: ${r.name}. Staff verdict: ${res.verdict.label}. ${res.remaining} evaluation hour${res.remaining===1?'':'s'} left this week.`:res.reason);
+   renderRecruiting();
+   if(dialog&&res.ok){const d=$('#recruitDialog');if(d?.open)d.close();showRecruitProfile(r.id)}
+  });
+ };
+ function renderScoutingActionUI(){
+  const t=selected(),summary=$('#classSummary');if(!t||!summary)return;
+  const week=ensureScoutingWeek(t),left=scoutingHoursLeft(t),work=recruitScoutingActions.evaluationWorkload(universe.recruits,t),strip=`<div class="scouting-budget-strip"><strong>Evaluation Hours</strong><span>${left} / ${week.budget} left this week</span><small>${work.targets} active target${work.targets===1?'':'s'} · ${work.untouched} untouched · ${work.film} film-reviewed · ${work.full} fully evaluated</small><small>Remaining hours can cover ${work.quickCapacity} new Quick Film${work.quickCapacity===1?'':'s'} or ${work.fullCapacity} Full Evaluation${work.fullCapacity===1?'':'s'}. Quick Film costs 1 · Full Evaluation costs 3 · unused hours do not roll over.</small></div>`;
+  summary.insertAdjacentHTML?.('beforeend',strip);
+  $$('[data-recruit]').forEach(link=>{
+   const r=universe.recruits.find(x=>String(x.id)===String(link.dataset.recruit)),row=link.closest?.('tr'),cell=row?.querySelector?.('td[data-label="Scout"]');
+   if(!r||!cell||cell.querySelector?.('.scouting-actions'))return;
+   cell.insertAdjacentHTML?.('beforeend',scoutingVerdictHTML(r,t,true)+scoutingActionButtonsHTML(r,t));
+  });
+  bindScoutingActionButtons();
+ }
+ const renderRecruitingBeforeScoutingActions=renderRecruiting;
+ renderRecruiting=function(){renderRecruitingBeforeScoutingActions();renderScoutingActionUI()};
+ const showRecruitProfileBeforeScoutingActions=showRecruitProfile;
+ showRecruitProfile=function(id){
+  showRecruitProfileBeforeScoutingActions(id);
+  const r=universe.recruits.find(x=>String(x.id)===String(id)),t=selected(),body=$('#recruitDialogBody');
+  if(r&&t&&body&&!body.querySelector?.('.scouting-profile-actions')){
+   const week=ensureScoutingWeek(t);body.insertAdjacentHTML?.('afterbegin',`<div class="scouting-profile-actions"><div><strong>Evaluation room</strong><span>${scoutingHoursLeft(t)} of ${week.budget} hours left this week</span></div>${scoutingActionButtonsHTML(r,t)}</div>${scoutingVerdictHTML(r,t,false)}`);
+   bindScoutingActionButtons();
+  }
+ };
+}
+
+function makeScoutingTrailSystem(){
+ 'use strict';
+ const num=v=>Number.isFinite(Number(v))?Number(v):0;
+ function actionLabel(kind){return kind==='full'?'Full Evaluation':kind==='quick'?'Quick Film':'Evaluation'}
+ function rows(record={}){
+  return (Array.isArray(record.receipts)?record.receipts:[]).map((x,index)=>{
+   const beforeConfidence=num(x.beforeConfidence),afterConfidence=num(x.afterConfidence),beforeWidth=num(x.beforeWidth),afterWidth=num(x.afterWidth),beforeVerdict=x.beforeVerdict||'—',afterVerdict=x.afterVerdict||beforeVerdict;
+   return{index,season:x.season??null,week:x.week??null,kind:x.kind||'evaluation',label:actionLabel(x.kind),cost:num(x.cost),beforeConfidence,afterConfidence,confidenceGain:afterConfidence-beforeConfidence,beforeWidth,afterWidth,rangeTightening:Math.round((beforeWidth-afterWidth)*10)/10,beforeVerdict,afterVerdict,verdictChanged:beforeVerdict!==afterVerdict};
+  });
+ }
+ function summary(record={}){
+  const list=rows(record);if(!list.length)return{actions:0,hours:0,confidenceGain:0,rangeTightening:0,verdictChanges:0,lastVerdict:null};
+  const first=list[0],last=list.at(-1);
+  return{actions:list.length,hours:list.reduce((n,x)=>n+x.cost,0),confidenceGain:last.afterConfidence-first.beforeConfidence,rangeTightening:Math.round((first.beforeWidth-last.afterWidth)*10)/10,verdictChanges:list.filter(x=>x.verdictChanged).length,lastVerdict:last.afterVerdict};
+ }
+ return{actionLabel,rows,summary};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeScoutingTrailSystem};
+}else{
+ const scoutingTrailSystem=makeScoutingTrailSystem();
+ const scoutingTrailEscape=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function scoutingTrailHTML(r,t){
+  const rec=recruitScoutingRecord(r,t,false),rows=scoutingTrailSystem.rows(rec),summary=scoutingTrailSystem.summary(rec);
+  if(!rows.length)return `<div class="scouting-trail-card"><div class="scouting-trail-head"><div><span class="eyebrow">EVALUATION TRAIL</span><strong>No manual evaluation yet</strong></div></div><p class="small muted">Quick Film and Full Evaluation receipts will appear here so you can see exactly what your staff learned for the hours spent.</p></div>`;
+  const signed=n=>n>0?`+${n}`:String(n),tight=n=>n>0?`${n} tighter`:n<0?`${Math.abs(n)} wider`:'unchanged';
+  return `<div class="scouting-trail-card"><div class="scouting-trail-head"><div><span class="eyebrow">EVALUATION TRAIL</span><strong>${summary.actions} action${summary.actions===1?'':'s'} · ${summary.hours} hour${summary.hours===1?'':'s'} spent</strong></div><span>${signed(summary.confidenceGain)} confidence · ${tight(summary.rangeTightening)}</span></div><div class="scouting-trail-list">${rows.map(x=>`<div class="scouting-trail-row"><div><strong>${scoutingTrailEscape(x.label)}</strong><small>${x.week==null?'':`Week ${x.week} · `}${x.cost}h</small></div><div><b>${scoutingTrailEscape(x.beforeVerdict)}${x.verdictChanged?` → ${scoutingTrailEscape(x.afterVerdict)}`:''}</b><small>Confidence ${x.beforeConfidence}% → ${x.afterConfidence}% (${signed(x.confidenceGain)}) · avg range ${x.beforeWidth} → ${x.afterWidth} (${tight(x.rangeTightening)})</small></div></div>`).join('')}</div><small class="scouting-trail-note">This is a receipt of changes to the staff report, not a reveal of hidden true talent.</small></div>`;
+ }
+ const showRecruitProfileBeforeScoutingTrail=showRecruitProfile;
+ showRecruitProfile=function(id){
+  showRecruitProfileBeforeScoutingTrail(id);
+  const r=universe.recruits.find(x=>String(x.id)===String(id)),t=selected(),body=$('#recruitDialogBody');if(!r||!t||!body||body.querySelector?.('.scouting-trail-card'))return;
+  const verdict=body.querySelector?.('.staff-verdict-card'),html=scoutingTrailHTML(r,t);if(verdict)verdict.insertAdjacentHTML?.('afterend',html);else body.insertAdjacentHTML?.('afterbegin',html);
+ };
+ globalThis.DynastyLabScoutingTrail={rows:(r,t)=>scoutingTrailSystem.rows(recruitScoutingRecord(r,t,false)),summary:(r,t)=>scoutingTrailSystem.summary(recruitScoutingRecord(r,t,false))};
+}
+
+function makeRecruitingFilterSystem(env){
+ 'use strict';
+ env=env||{};
+ const verdictLabels=['Priority take','Take','Strong target','Boardable','Developmental','Pass'];
+ function stageOf(r,t){
+  if(env.stageOf)return env.stageOf(r,t);
+  const rec=env.recordOf?env.recordOf(r,t):null;
+  return rec?.full?'FULL_EVALUATION':rec?.quick?'QUICK_FILM':'PRELIMINARY';
+ }
+ function normalize(state={}){
+  const pos=state.pos&&state.pos!=='ALL'?String(state.pos):'ALL';
+  const stage=['PRELIMINARY','QUICK_FILM','FULL_EVALUATION'].includes(state.stage)?state.stage:'ALL';
+  const verdict=verdictLabels.includes(state.verdict)?state.verdict:'ALL';
+  return{pos,stage,verdict,targetedOnly:!!state.targetedOnly};
+ }
+ function apply(list=[],state={},team=null){
+  const s=normalize(state);
+  let out=list.filter(r=>(s.pos==='ALL'||r.pos===s.pos)&&(!s.targetedOnly||!!r.targeted)&&(s.stage==='ALL'||stageOf(r,team)===s.stage));
+  if(s.verdict!=='ALL'&&env.verdictOf)out=out.filter(r=>env.verdictOf(r,team)?.label===s.verdict);
+  return out;
+ }
+ return{verdictLabels,normalize,stageOf,apply};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeRecruitingFilterSystem};
+}else{
+ const recruitingFilterSystem=makeRecruitingFilterSystem({
+  recordOf:(r,t)=>recruitScoutingRecord(r,t,false),
+  verdictOf:(r,t)=>recruitStaffVerdict(r,t)
+ });
+ let recruitBoardFilters={pos:'ALL',stage:'ALL',verdict:'ALL',targetedOnly:false},recruitFilterMatchCount=0;
+ const sortRecruitsBeforeRecruitingFilters=sortRecruits;
+ sortRecruits=function(list){
+  const t=selected(),filtered=recruitingFilterSystem.apply(list,recruitBoardFilters,t);
+  recruitFilterMatchCount=filtered.length;
+  return sortRecruitsBeforeRecruitingFilters(filtered);
+ };
+ const filterEscape=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function filterOptions(values,current){return values.map(([value,label])=>`<option value="${filterEscape(value)}" ${value===current?'selected':''}>${filterEscape(label)}</option>`).join('')}
+ function recruitingFilterHTML(){
+  const s=recruitingFilterSystem.normalize(recruitBoardFilters),displayed=Math.min(220,recruitFilterMatchCount),positions=[['ALL','All positions'],...POS.map(p=>[p,p])],stages=[['ALL','All evaluation stages'],['PRELIMINARY','Preliminary'],['QUICK_FILM','Film reviewed'],['FULL_EVALUATION','Full evaluation']],verdicts=[['ALL','All staff verdicts'],...recruitingFilterSystem.verdictLabels.map(v=>[v,v])];
+  return `<div class="recruiting-filter-strip" data-recruiting-filters><label>Position<select data-recruit-filter="pos">${filterOptions(positions,s.pos)}</select></label><label>Evaluation<select data-recruit-filter="stage">${filterOptions(stages,s.stage)}</select></label><label>Staff Verdict<select data-recruit-filter="verdict">${filterOptions(verdicts,s.verdict)}</select></label><label class="recruiting-filter-toggle"><input type="checkbox" data-recruit-filter="targetedOnly" ${s.targetedOnly?'checked':''}> Targeted only</label><span class="recruiting-filter-count"><strong>${displayed}</strong> shown · ${recruitFilterMatchCount} matching</span><button type="button" data-recruit-filter-reset ${s.pos==='ALL'&&s.stage==='ALL'&&s.verdict==='ALL'&&!s.targetedOnly?'disabled':''}>Reset</button></div>`;
+ }
+ function bindRecruitingFilters(){
+  $$('[data-recruit-filter]').forEach(el=>el.onchange=()=>{
+   const key=el.dataset.recruitFilter;
+   recruitBoardFilters={...recruitBoardFilters,[key]:key==='targetedOnly'?!!el.checked:el.value};
+   renderRecruiting();
+  });
+  const reset=$('[data-recruit-filter-reset]');if(reset)reset.onclick=()=>{recruitBoardFilters={pos:'ALL',stage:'ALL',verdict:'ALL',targetedOnly:false};renderRecruiting()};
+ }
+ function renderRecruitingFilters(){
+  const root=$('#recruiting'),table=root?.querySelector?.('.table-wrap');if(!root||!table)return;
+  root.querySelector?.('[data-recruiting-filters]')?.remove();
+  table.insertAdjacentHTML?.('beforebegin',recruitingFilterHTML());
+  bindRecruitingFilters();
+ }
+ const renderRecruitingBeforeFilters=renderRecruiting;
+ renderRecruiting=function(){renderRecruitingBeforeFilters();renderRecruitingFilters()};
+ if(typeof TAB_RENDERERS==='object')TAB_RENDERERS.recruiting=renderRecruiting;
+ globalThis.DynastyLabRecruitingFilters={
+  getState:()=>({...recruitBoardFilters}),
+  setState:s=>{recruitBoardFilters=recruitingFilterSystem.normalize({...recruitBoardFilters,...s});renderRecruiting()},
+  reset:()=>{recruitBoardFilters={pos:'ALL',stage:'ALL',verdict:'ALL',targetedOnly:false};renderRecruiting()}
+ };
+}
+
+function makeRecruitCompareSystem(env){
+ 'use strict';
+ const MAX=3;
+ function normalize(ids=[]){return [...new Set(ids.map(String))].slice(0,MAX)}
+ function toggle(ids,id){
+  const out=normalize(ids),key=String(id),at=out.indexOf(key);
+  if(at>=0){out.splice(at,1);return{ok:true,ids:out,removed:true}}
+  if(out.length>=MAX)return{ok:false,ids:out,reason:`Recruit Compare holds up to ${MAX} prospects.`};
+  out.push(key);return{ok:true,ids:out,removed:false};
+ }
+ function summary(r,t){
+  const v=env.staffVerdict(r,t),rec=env.scoutingRecord(r,t);
+  return{id:String(r.id),name:r.name,pos:r.pos,verdict:v.label,score:v.score,conviction:v.conviction,confidence:v.confidence,strengths:v.strong||[],risk:v.risk||null,stage:rec.full?'Full evaluation':rec.quick?'Film reviewed':'Preliminary'};
+ }
+ return{MAX,normalize,toggle,summary};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeRecruitCompareSystem};
+}else{
+ const recruitCompareScoutingApi=makeScoutingActionSystem({getUniverse:()=>universe,clamp,avg,scoutingDomainView,firstRecruitEvaluation,refreshScoutingIntel,snapshotScouting,staffEval,staffBias:(r,t)=>scoutHash(r,'staff_verdict',String(t.id))*12,hasDetailedScouting:r=>!!(r?.scoutingDomains&&Object.keys(r.scoutingDomains).length)});
+ const recruitCompareSystem=makeRecruitCompareSystem({staffVerdict:recruitCompareScoutingApi.staffVerdict,scoutingRecord:(r,t)=>recruitCompareScoutingApi.recruitScoutingRecord(r,t,false)});
+ let recruitCompareIds=[];
+ function compareToggleHTML(r){const on=recruitCompareIds.includes(String(r.id));return `<button type="button" class="recruit-compare-toggle${on?' active':''}" data-compare-recruit="${r.id}">${on?'Compared':'Compare'}</button>`}
+ function recruitCompareTrayHTML(t){
+  const recruits=recruitCompareIds.map(id=>universe.recruits.find(r=>String(r.id)===id)).filter(Boolean);if(!recruits.length)return'';
+  return `<div class="recruit-compare-tray"><div class="recruit-compare-head"><div><strong>Recruit Compare</strong><small>Current staff information only</small></div><button type="button" data-compare-clear>Clear</button></div><div class="recruit-compare-grid">${recruits.map(r=>{const x=recruitCompareSystem.summary(r,t);return `<div class="recruit-compare-card"><button class="player-button" data-recruit="${r.id}">${r.pos} ${r.name}</button><div class="small muted">#${r.nationalRank} · ${'★'.repeat(r.stars)} · ${r.homeState} · ${r.priority}</div><div class="recruit-compare-verdict"><strong>${x.verdict}</strong><b>${x.score}</b></div><div class="small">${x.stage} · ${x.conviction} conviction · ${x.confidence}% confidence</div><div class="small muted">Best: ${x.strengths.join(', ')||'—'} · Risk: ${x.risk||'—'}</div><div class="small muted">Interest ${r.interest}% · ${recruitDistance(t,r)} mi</div></div>`}).join('')}</div></div>`;
+ }
+ function bindRecruitCompare(){
+  $$('[data-compare-recruit]').forEach(b=>b.onclick=()=>{const id=String(b.dataset.compareRecruit),dialog=b.closest?.('#recruitDialog'),result=recruitCompareSystem.toggle(recruitCompareIds,id);if(!result.ok){setStatus(result.reason);return}recruitCompareIds=result.ids;renderRecruiting();if(dialog){const d=$('#recruitDialog');if(d?.open)d.close();showRecruitProfile(id)}});
+  $$('[data-compare-clear]').forEach(b=>b.onclick=()=>{recruitCompareIds=[];renderRecruiting()});
+ }
+ function augmentRecruitCompare(){
+  const t=selected(),summary=$('#classSummary');if(!t||!summary)return;
+  $$('[data-recruit]').forEach(link=>{const r=universe.recruits.find(x=>String(x.id)===String(link.dataset.recruit)),row=link.closest?.('tr'),cell=row?.querySelector?.('td[data-label="Scout"]');if(!r||!cell||cell.querySelector?.('.recruit-compare-toggle'))return;cell.insertAdjacentHTML?.('beforeend',compareToggleHTML(r))});
+  summary.insertAdjacentHTML?.('beforeend',recruitCompareTrayHTML(t));bindRecruitCompare();attachRecruitLinks();
+ }
+ const renderRecruitingBeforeCompare=renderRecruiting;
+ renderRecruiting=function(){renderRecruitingBeforeCompare();augmentRecruitCompare()};
+ const showRecruitProfileBeforeCompare=showRecruitProfile;
+ showRecruitProfile=function(id){
+  showRecruitProfileBeforeCompare(id);
+  const r=universe.recruits.find(x=>String(x.id)===String(id)),host=$('#recruitDialogBody')?.querySelector?.('.scouting-profile-actions');
+  if(r&&host&&!host.querySelector?.('.recruit-compare-toggle')){host.insertAdjacentHTML?.('beforeend',compareToggleHTML(r));bindRecruitCompare()}
+ };
+}
+
+function makeStaffShortlistSystem(env){
+ 'use strict';
+ const LIMIT=8,MAX_VERDICT_SCORE=99;
+ const num=v=>Number.isFinite(Number(v))?Number(v):0;
+ const rankRows=(a,b)=>b.score-a.score||(a.r.nationalRank||9999)-(b.r.nationalRank||9999);
+ const boundedLimit=limit=>Math.max(1,Math.min(12,limit));
+ function positionNeeds(team,recruits=[]){
+  return Object.entries(env.posCounts||{}).map(([pos,target])=>{
+   const returning=(team.roster||[]).filter(p=>p.pos===pos&&env.eligibilityBase(p)<3).length;
+   const committed=recruits.filter(r=>r.pos===pos&&r.committed===team.name).length;
+   const targeted=recruits.filter(r=>r.pos===pos&&r.targeted&&!r.committed).length;
+   const gap=Math.max(0,Math.round(target)-returning-committed);
+   const urgency=Math.max(0,gap*18-targeted*4);
+   return{pos,target:Math.round(target),returning,committed,targeted,gap,urgency};
+  }).sort((a,b)=>b.urgency-a.urgency||b.gap-a.gap||a.pos.localeCompare(b.pos));
+ }
+ function cheapCandidate(team,r,need){
+  const interest=num(r.interest),pipeline=num(env.pipelineStrength(team,r.homeRegion)),distance=num(env.distance(team,r));
+  const proximity=Math.max(0,20-Math.min(20,distance/100));
+  const base=need.urgency*.65+interest*.12+pipeline*.06+num(r.stars)*1.6+proximity*.15;
+  // Staff Verdict is clamped to 99 by the scouting system. This upper bound lets us
+  // stop before evaluating prospects who cannot mathematically reach the current cut.
+  return{r,need,interest,pipeline,distance,proximity,base,upperBound:base+MAX_VERDICT_SCORE*.55};
+ }
+ function resolveCandidate(team,c){
+  const verdict=env.staffVerdict(c.r,team),score=verdict.score*.55+c.base;
+  const reason=[c.need.gap?`${c.need.gap} projected ${c.r.pos} opening${c.need.gap===1?'':'s'}`:'depth is covered',`${verdict.label} staff grade`,c.interest>=65?`${Math.round(c.interest)}% interest`:c.distance<=250?`${Math.round(c.distance)} miles away`:null].filter(Boolean).join(' · ');
+  return{r:c.r,score,need:c.need,verdict,reason};
+ }
+ function candidatesFor(team,recruits,needs){
+  return recruits.filter(r=>!r.committed).map(r=>cheapCandidate(team,r,needs[r.pos]||{gap:0,urgency:0}));
+ }
+ function shortlistExhaustive(team,recruits=[],limit=LIMIT){
+  const needs=Object.fromEntries(positionNeeds(team,recruits).map(x=>[x.pos,x])),take=boundedLimit(limit);
+  return candidatesFor(team,recruits,needs).map(c=>resolveCandidate(team,c)).sort(rankRows).slice(0,take);
+ }
+ function shortlist(team,recruits=[],limit=LIMIT){
+  const needs=Object.fromEntries(positionNeeds(team,recruits).map(x=>[x.pos,x])),take=boundedLimit(limit);
+  const candidates=candidatesFor(team,recruits,needs).sort((a,b)=>b.upperBound-a.upperBound||(a.r.nationalRank||9999)-(b.r.nationalRank||9999));
+  const resolved=[];
+  for(const c of candidates){
+   if(resolved.length>=take){
+    resolved.sort(rankRows);
+    const cutoff=resolved[take-1];
+    // Strictly-less is intentional. At equality the prospect could tie the cut score
+    // and win the existing national-rank tiebreak, so that candidate still gets graded.
+    if(c.upperBound<cutoff.score)break;
+   }
+   resolved.push(resolveCandidate(team,c));
+  }
+  return resolved.sort(rankRows).slice(0,take);
+ }
+ return{LIMIT,MAX_VERDICT_SCORE,positionNeeds,shortlist,shortlistExhaustive};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeStaffShortlistSystem};
+}else{
+ const staffShortlistSystem=makeStaffShortlistSystem({
+  posCounts:POS_COUNTS,eligibilityBase,staffVerdict:recruitStaffVerdict,pipelineStrength,distance:recruitDistance
+ });
+ function staffShortlistHTML(t){
+  const needs=staffShortlistSystem.positionNeeds(t,universe.recruits),rows=staffShortlistSystem.shortlist(t,universe.recruits),urgent=needs.filter(x=>x.gap>0).slice(0,6);
+  return `<div class="section-head"><div><div class="eyebrow">STAFF ROOM</div><h3>Roster Outlook & Staff Shortlist</h3><div class="muted">Recommendations use projected openings and your current scouting information — never hidden ratings.</div></div></div><div class="roster-need-strip">${urgent.map(x=>`<div class="roster-need${x.gap>=3?' urgent':''}"><strong>${x.pos}</strong><span>${x.gap} need${x.gap===1?'':'s'}</span><small>${x.returning} returning · ${x.committed} committed</small></div>`).join('')||'<span class="muted">No obvious positional shortage after projected departures.</span>'}</div><div class="staff-shortlist-grid">${rows.map((x,i)=>{const r=x.r,rec=recruitScoutingRecord(r,t,false);return `<article class="staff-shortlist-card${r.targeted?' targeted':''}"><div class="staff-shortlist-rank">${i+1}</div><div><button class="player-button" data-recruit="${r.id}">${r.pos} ${r.name}</button><div class="small muted">#${r.nationalRank} · ${'★'.repeat(r.stars)} · ${r.homeCity}, ${r.homeState}</div></div><div class="staff-shortlist-verdict"><strong>${x.verdict.label}</strong><span>${x.verdict.score} · ${x.verdict.conviction}</span></div><div class="small muted staff-shortlist-reason">${x.reason}</div><div class="staff-shortlist-actions"><button type="button" data-shortlist-target="${r.id}">${r.targeted?'On Board':'Add to Board'}</button>${scoutingActionButtonsHTML(r,t)}</div><div class="small muted">${rec.full?'Full evaluation complete':rec.quick?'Film reviewed':'Preliminary evaluation'} · ${x.verdict.confidence}% confidence</div></article>`}).join('')}</div>`;
+ }
+ function bindStaffShortlist(){
+  $$('[data-shortlist-target]').forEach(b=>b.onclick=()=>{const r=universe.recruits.find(x=>String(x.id)===String(b.dataset.shortlistTarget));if(!r)return;r.targeted=!r.targeted;if(r.targeted)firstRecruitEvaluation(r,selected());setStatus(`${r.name} ${r.targeted?'added to':'removed from'} the recruiting board.`);renderRecruiting()});
+  bindScoutingActionButtons();attachRecruitLinks();
+ }
+ function renderStaffShortlist(){
+  const t=selected(),summary=$('#classSummary');if(!t||!summary)return;
+  let host=$('#staffRecruitShortlist');
+  if(!host){summary.insertAdjacentHTML?.('afterend','<div class="card" id="staffRecruitShortlist"></div>');host=$('#staffRecruitShortlist')}
+  if(!host)return;host.innerHTML=staffShortlistHTML(t);bindStaffShortlist();
+ }
+ const renderRecruitingBeforeStaffShortlist=renderRecruiting;
+ renderRecruiting=function(){renderRecruitingBeforeStaffShortlist();renderStaffShortlist()};
+}
+
+function makeScoutingReceiptSystem(env){
+ 'use strict';
+ const clamp=env.clamp;
+ function universe(){return env.getUniverse()}
+ function stageFromRecord(rec){return rec?.full?'FULL_EVALUATION':rec?.quick?'QUICK_FILM':'PRELIMINARY'}
+ function receiptHours(rec){return (rec?.receipts||[]).reduce((n,x)=>n+(Number(x.cost)||0),0)}
+ function signingSnapshot(r,t,verdict,rec={}){
+  const u=universe(),current=Number.isFinite(r?.scout)?r.scout:Number.isFinite(r?.perceived)?r.perceived:60,upside=Number.isFinite(r?.scoutUp)?r.scoutUp:Number.isFinite(r?.perceivedUpside)?r.perceivedUpside:Math.max(current,68);
+  return{
+   version:1,schoolId:t.id,schoolName:t.name,recruitId:r.id,name:r.name,pos:r.pos,style:r.style||null,
+   season:u.year,week:r.commitWeek??u.week,stars:r.stars??null,nationalRank:r.nationalRank??null,positionRank:r.positionRank??null,
+   currentRead:Math.round(current),upsideRead:Math.round(upside),verdictScore:Math.round(verdict.score),verdictLabel:verdict.label,
+   conviction:verdict.conviction,confidence:Math.round(verdict.confidence||0),rangeWidth:Number(verdict.spread||0),
+   stage:stageFromRecord(rec),hoursSpent:receiptHours(rec),interest:Number.isFinite(r.interest)?Math.round(r.interest):null
+  };
+ }
+ function freezeSigningReceipt(r,t,verdict,rec={}){
+  if(!r||!t||r.committed!==t.name)return null;
+  r.recruitingMemory??={season:universe().year,schoolId:t.id,stars:r.stars,homeRegion:r.homeRegion};
+  if(r.recruitingMemory.scoutingReceipt)return r.recruitingMemory.scoutingReceipt;
+  const snap=signingSnapshot(r,t,verdict,rec);r.recruitingMemory.scoutingReceipt=snap;return snap;
+ }
+ function totals(p){
+  let games=0,starts=0;
+  for(const s of p?.seasonHistory||[]){games+=Number(s.games??s.stats?.games)||0;starts+=Number(s.starts??s.stats?.starts)||0}
+  games+=Number(p?.stats?.games)||0;starts+=Number(p?.stats?.starts)||0;
+  return{games,starts,awards:(p?.awards||[]).length};
+ }
+ function observedEvidence(p,year){
+  const snap=p?.recruitingMemory?.scoutingReceipt;if(!snap)return null;
+  const count=totals(p),observed=Number.isFinite(p.perceived)?p.perceived:snap.currentRead,confidence=clamp(Math.round(p.scoutConfidence??50),0,100),seasons=Math.max(0,(year??universe().year)-snap.season),startRate=count.games?count.starts/count.games:0;
+  const experienceBonus=count.games>=6?Math.min(3,count.games/10):0,roleBonus=count.games>=6?Math.min(4,startRate*5):0,awardBonus=Math.min(5,count.awards*2),outcomeScore=clamp(Math.round(observed+experienceBonus+roleBonus+awardBonus),20,99);
+  const expectedScore=clamp(Math.round(snap.currentRead*.65+snap.upsideRead*.20+snap.verdictScore*.15),20,99),delta=outcomeScore-expectedScore;
+  return{snapshot:snap,seasons,games:count.games,starts:count.starts,awards:count.awards,startRate,observed:Math.round(observed),confidence,outcomeScore,expectedScore,delta};
+ }
+ function classifyPlayer(p,year){
+  const e=observedEvidence(p,year);if(!e)return null;
+  const highExpectation=e.snapshot.verdictScore>=80||(e.snapshot.stars??0)>=4,lowExpectation=e.snapshot.verdictScore<=73||(e.snapshot.stars??5)<=3;
+  const watchReady=e.seasons>=1&&e.games>=4&&e.confidence>=55,mature=e.seasons>=2&&e.games>=12&&e.confidence>=68;
+  let code='TOO_EARLY',label='Too Early',tone='neutral';
+  if(watchReady&&!mature){
+   if(lowExpectation&&e.delta>=7){code='DIAMOND_WATCH';label='Diamond Watch';tone='good'}
+   else if(highExpectation&&e.delta<=-7){code='BUST_WATCH';label='Bust Watch';tone='bad'}
+   else if(e.delta>=6){code='UP';label='Trending Up';tone='good'}
+   else if(e.delta<=-6){code='DOWN';label='Concern';tone='bad'}
+   else{code='TRACKING';label='Tracking';tone='neutral'}
+  }else if(mature){
+   if(lowExpectation&&e.delta>=8&&e.observed>=74){code='DIAMOND';label='Diamond';tone='good'}
+   else if(highExpectation&&e.delta<=-9&&e.observed<=75){code='BUST';label='Bust';tone='bad'}
+   else if(highExpectation&&e.delta>=-3){code='HIT';label='Hit';tone='good'}
+   else if(e.delta<=-6){code='MISS';label='Miss';tone='bad'}
+   else if(e.delta>=5){code='HIT';label='Hit';tone='good'}
+   else{code='AS_SCOUTED';label='As Scouted';tone='neutral'}
+  }
+  const final=['DIAMOND','BUST','HIT','MISS','AS_SCOUTED'].includes(code),costly=(code==='BUST'||code==='MISS')&&(e.snapshot.hoursSpent>=3||e.snapshot.verdictScore>=80);
+  return{...e,code,label,tone,final,costly};
+ }
+ function receiptSummary(result){
+  if(!result)return'';
+  const s=result.snapshot,signing=`${s.verdictLabel} (${s.verdictScore})`,now=`${result.observed} observed`,delta=`${result.delta>=0?'+':''}${result.delta} vs signing expectation`;
+  if(result.code==='TOO_EARLY')return `${signing} at signing · ${now}. Too early for a scouting grade.`;
+  return `${result.label}: ${signing} at signing · ${now} · ${delta} · ${result.games} games / ${result.starts} starts.`;
+ }
+ function summarizePlayers(players,year,schoolId=null){
+  const rows=(players||[]).map(p=>({p,result:classifyPlayer(p,year)})).filter(x=>x.result&&(!schoolId||x.result.snapshot.schoolId===schoolId));
+  const visible=rows.filter(x=>x.result.code!=='TOO_EARLY'),final=visible.filter(x=>x.result.final),watch=visible.filter(x=>!x.result.final),counts={};
+  for(const x of visible)counts[x.result.code]=(counts[x.result.code]||0)+1;
+  const notable=visible.slice().sort((a,b)=>(b.result.final?1:0)-(a.result.final?1:0)||Math.abs(b.result.delta)-Math.abs(a.result.delta)||b.result.games-a.result.games).slice(0,6);
+  return{tracked:rows.length,visible:visible.length,pending:rows.length-visible.length,final:final.length,watch:watch.length,costly:final.filter(x=>x.result.costly).length,counts,notable};
+ }
+ return{stageFromRecord,signingSnapshot,freezeSigningReceipt,observedEvidence,classifyPlayer,receiptSummary,summarizePlayers};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeScoutingReceiptSystem};
+}else{
+ const scoutingReceiptSystem=makeScoutingReceiptSystem({getUniverse:()=>universe,clamp});
+ const receiptEscape=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function freezeRecruitReceipt(r,t){if(!r||!t||r.committed!==t.name)return null;return scoutingReceiptSystem.freezeSigningReceipt(r,t,recruitStaffVerdict(r,t),recruitScoutingRecord(r,t,false))}
+ function freezeControlledCommitReceipts(){const t=selected();if(!t)return;for(const r of universe.recruits||[])if(r.committed===t.name)freezeRecruitReceipt(r,t)}
+ function receiptPlayers(t){
+  const active=(t?.roster||[]),archive=(universe.playerArchive||[]).filter(p=>p?.recruitingMemory?.scoutingReceipt?.schoolId===t?.id),seen=new Set();
+  return [...active,...archive].filter(p=>{if(!p?.id||seen.has(p.id))return false;seen.add(p.id);return true});
+ }
+ function receiptBadgeHTML(result){if(!result||result.code==='TOO_EARLY'||result.code==='TRACKING')return'';return `<span class="scouting-receipt-badge scouting-receipt-${result.tone}" title="${receiptEscape(scoutingReceiptSystem.receiptSummary(result))}">${receiptEscape(result.label)}</span>`}
+ function renderRosterReceiptBadges(){
+  const t=selected(),body=$('#rosterBody');if(!t||!body)return;
+  for(const link of body.querySelectorAll?.('[data-player]')||[]){
+   const p=t.roster.find(x=>String(x.id)===String(link.dataset.player));if(!p)continue;
+   const result=scoutingReceiptSystem.classifyPlayer(p,universe.year),badge=receiptBadgeHTML(result);if(!badge)continue;
+   const cell=link.closest?.('td')||link.parentElement;if(cell&&!cell.querySelector?.('.scouting-receipt-badge'))cell.insertAdjacentHTML?.('beforeend',badge);
+  }
+ }
+ function renderRecruitingReceiptRecap(){
+  const t=selected(),host=$('#classSummary');if(!t||!host||host.querySelector?.('.scouting-receipt-recap'))return;
+  const summary=scoutingReceiptSystem.summarizePlayers(receiptPlayers(t),universe.year,t.id);if(!summary.tracked)return;
+  const count=code=>summary.counts[code]||0,top=summary.notable.map(({p,result})=>`<div class="scouting-receipt-row"><span><strong>${receiptEscape(p.pos)} ${receiptEscape(p.name)}</strong><small>${receiptEscape(result.snapshot.verdictLabel)} at signing · ${result.games} games / ${result.starts} starts</small></span><b class="scouting-receipt-${result.tone}">${receiptEscape(result.label)} · ${result.delta>=0?'+':''}${result.delta}</b></div>`).join('');
+  host.insertAdjacentHTML?.('beforeend',`<div class="scouting-receipt-recap"><div class="scouting-receipt-head"><div><strong>Scouting Receipts</strong><small>What the staff believed at signing versus what has actually been observed later.</small></div><span>${summary.final} settled · ${summary.watch} developing</span></div><div class="scouting-receipt-kpis"><span><b>${count('DIAMOND')}</b> Diamonds</span><span><b>${count('HIT')}</b> Hits</span><span><b>${count('BUST')}</b> Busts</span><span><b>${count('MISS')}</b> Misses</span><span><b>${summary.costly}</b> Costly misreads</span></div>${top?`<div class="scouting-receipt-list">${top}</div>`:''}<small class="scouting-receipt-note">Watch labels are provisional. Final labels require at least two seasons, 12 games and strong staff confidence. Hidden true ratings are never used.</small></div>`);
+ }
+ const commitRecruitBeforeScoutingReceipts=commitRecruit;
+ commitRecruit=function(r,name){const ok=commitRecruitBeforeScoutingReceipts(r,name);if(ok){const t=T(name);if(t&&selected()?.id===t.id)freezeRecruitReceipt(r,t)}return ok};
+ const finalizeRecruitingBeforeScoutingReceipts=finalizeRecruiting;
+ finalizeRecruiting=function(){const out=finalizeRecruitingBeforeScoutingReceipts();freezeControlledCommitReceipts();return out};
+ const renderRecruitingBeforeScoutingReceipts=renderRecruiting;
+ renderRecruiting=function(){freezeControlledCommitReceipts();renderRecruitingBeforeScoutingReceipts();renderRecruitingReceiptRecap()};
+ const renderRosterBeforeScoutingReceipts=renderRoster;
+ renderRoster=function(){renderRosterBeforeScoutingReceipts();renderRosterReceiptBadges()};
+ if(typeof TAB_RENDERERS==='object'){TAB_RENDERERS.recruiting=renderRecruiting;TAB_RENDERERS.roster=renderRoster}
+ globalThis.DynastyLabScoutingReceipts={classifyPlayer:p=>scoutingReceiptSystem.classifyPlayer(p,universe.year),summary:p=>scoutingReceiptSystem.receiptSummary(scoutingReceiptSystem.classifyPlayer(p,universe.year)),teamSummary:t=>scoutingReceiptSystem.summarizePlayers(receiptPlayers(t),universe.year,t.id)};
+}
+
+function makeRecruitingHistorySystem(env){
+ 'use strict';
+ function playerPool(team,archive=[]){
+  const active=team?.roster||[],schoolId=team?.id,archived=(archive||[]).filter(p=>p?.recruitingMemory?.scoutingReceipt?.schoolId===schoolId),seen=new Set();
+  return [...active,...archived].filter(p=>{if(!p?.id||seen.has(p.id))return false;seen.add(p.id);return true});
+ }
+ function rows(players=[],year,schoolId=null){
+  return players.map(p=>({p,result:env.classifyPlayer(p,year)})).filter(x=>x.result&&(!schoolId||x.result.snapshot.schoolId===schoolId));
+ }
+ function classSummary(entries,season){
+  const visible=entries.filter(x=>x.result.code!=='TOO_EARLY'),settled=visible.filter(x=>x.result.final),developing=visible.filter(x=>!x.result.final),counts={};
+  for(const x of visible)counts[x.result.code]=(counts[x.result.code]||0)+1;
+  const deltas=visible.map(x=>x.result.delta),hours=entries.reduce((n,x)=>n+(Number(x.result.snapshot.hoursSpent)||0),0);
+  return{season,signed:entries.length,settled:settled.length,developing:developing.length,pending:entries.length-visible.length,costly:settled.filter(x=>x.result.costly).length,counts,hoursSpent:hours,averageDelta:deltas.length?Math.round(deltas.reduce((a,b)=>a+b,0)/deltas.length*10)/10:0};
+ }
+ function history(players=[],year,schoolId=null){
+  const grouped=new Map();
+  for(const entry of rows(players,year,schoolId)){
+   const season=entry.result.snapshot.season;
+   if(!grouped.has(season))grouped.set(season,[]);
+   grouped.get(season).push(entry);
+  }
+  return [...grouped.entries()].map(([season,entries])=>{
+   const sorted=entries.slice().sort((a,b)=>(b.result.final?1:0)-(a.result.final?1:0)||Math.abs(b.result.delta)-Math.abs(a.result.delta)||(a.p.pos||'').localeCompare(b.p.pos||'')||(a.p.name||'').localeCompare(b.p.name||''));
+   return{...classSummary(entries,season),players:sorted};
+  }).sort((a,b)=>b.season-a.season);
+ }
+ return{playerPool,rows,classSummary,history};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeRecruitingHistorySystem};
+}else{
+ const recruitingHistorySystem=makeRecruitingHistorySystem({classifyPlayer:p=>globalThis.DynastyLabScoutingReceipts?.classifyPlayer?.(p)||null});
+ const recruitingHistoryEscape=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function recruitingHistoryPlayers(t){return recruitingHistorySystem.playerPool(t,universe.playerArchive||[])}
+ function recruitingHistoryHTML(t){
+  const classes=recruitingHistorySystem.history(recruitingHistoryPlayers(t),universe.year,t.id);if(!classes.length)return'';
+  const count=(c,code)=>c.counts[code]||0;
+  return `<div class="recruiting-history"><div class="recruiting-history-head"><strong>Recruiting Class History</strong><small>Review the staff's signing-day calls against only what the program has actually observed since.</small></div><div class="recruiting-history-classes">${classes.slice(0,6).map((c,i)=>`<details class="recruiting-history-class" ${i===0?'open':''}><summary><span><strong>Class of ${c.season}</strong><small>${c.signed} signed · ${c.settled} settled · ${c.developing} developing${c.pending?` · ${c.pending} pending`:''}</small></span><span class="recruiting-history-summary"><b>${count(c,'DIAMOND')} D</b><b>${count(c,'HIT')} H</b><b>${count(c,'BUST')} B</b><b>${count(c,'MISS')} M</b></span></summary><div class="recruiting-history-meta"><span>Avg outcome vs expectation <b>${c.averageDelta>=0?'+':''}${c.averageDelta}</b></span><span>Evaluation hours <b>${c.hoursSpent}</b></span><span>Costly misreads <b>${c.costly}</b></span></div><div class="recruiting-history-rows">${c.players.map(({p,result})=>`<div class="recruiting-history-row"><span><strong>${recruitingHistoryEscape(p.pos)} ${recruitingHistoryEscape(p.name)}</strong><small>${result.snapshot.stars??'—'}★ · ${recruitingHistoryEscape(result.snapshot.verdictLabel)} (${result.snapshot.verdictScore}) · ${result.snapshot.stage.replaceAll('_',' ')}</small></span><span><b class="scouting-receipt-${result.tone}">${recruitingHistoryEscape(result.label)}</b><small>${result.code==='TOO_EARLY'?'Awaiting evidence':`${result.delta>=0?'+':''}${result.delta} vs expectation · ${result.games} G / ${result.starts} GS`}</small></span></div>`).join('')}</div></details>`).join('')}</div><small class="scouting-receipt-note">Historical classes use the same maturation gates as Scouting Receipts. Hidden true ratings, upside and growth profile are not used.</small></div>`;
+ }
+ function renderRecruitingHistory(){const t=selected(),recap=$('.scouting-receipt-recap');if(!t||!recap||recap.querySelector?.('.recruiting-history'))return;recap.insertAdjacentHTML?.('beforeend',recruitingHistoryHTML(t))}
+ const renderRecruitingBeforeHistory=renderRecruiting;
+ renderRecruiting=function(){renderRecruitingBeforeHistory();renderRecruitingHistory()};
+ if(typeof TAB_RENDERERS==='object')TAB_RENDERERS.recruiting=renderRecruiting;
+ globalThis.DynastyLabRecruitingHistory={history:t=>recruitingHistorySystem.history(recruitingHistoryPlayers(t),universe.year,t.id)};
+}
+
+function makeDevelopmentTendencySystem(env){
+ 'use strict';
+ const avg=a=>a.length?a.reduce((n,x)=>n+x,0)/a.length:0;
+ const round1=n=>Math.round(n*10)/10;
+ function evidence(player){
+  return (player?.campHistory||[]).filter(x=>Number.isFinite(Number(x?.delta))).map(x=>({year:Number(x.year)||0,phase:String(x.phase||''),delta:Number(x.delta),grade:x.grade||null,focus:x.focus||null,teamFocus:x.teamFocus||null})).sort((a,b)=>a.year-b.year||(a.phase==='Spring'?-1:1)-(b.phase==='Spring'?-1:1));
+ }
+ function clue(player){
+  const rows=evidence(player),confidence=Math.max(0,Math.min(100,Math.round(Number(player?.scoutConfidence)||0)));
+  if(rows.length<2||confidence<52)return{code:'LEARNING',label:'Still Learning',tone:'neutral',confidence,observations:rows.length,summary:rows.length<2?'Staff needs another camp result before calling a development pattern.':'Staff confidence is still too low to call a development pattern.'};
+  const deltas=rows.map(x=>x.delta),recent=deltas.slice(-2),older=deltas.slice(0,-2),mean=avg(deltas),recentMean=avg(recent),positive=deltas.filter(x=>x>0).length,flat=deltas.filter(x=>x===0).length,negative=deltas.filter(x=>x<0).length,positiveRate=positive/deltas.length,range=Math.max(...deltas)-Math.min(...deltas),swing=avg(deltas.map(x=>Math.abs(x-mean))),last=deltas.at(-1),previous=deltas.at(-2);
+  let code='TRACKING',label='Tracking',tone='neutral';
+  if(rows.length>=3&&positive>0&&negative>0&&(range>=5||swing>=2)){code='UNEVEN';label='Uneven Progress';tone='alert'}
+  else if(rows.length>=3&&recentMean<=0.5&&avg(older.length?older:deltas)<=1){code='PLATEAU';label='Plateau Watch';tone='alert'}
+  else if(rows.length>=3&&older.length&&recentMean>=avg(older)+1.5&&recentMean>=2){code='ACCELERATING';label='Accelerating';tone='good'}
+  else if(rows.length>=3&&positiveRate>=.75&&mean>=1.25&&range<=4){code='STEADY';label='Steady Riser';tone='good'}
+  else if(recentMean>=3&&last>0&&previous>0){code='SURGING';label='Camp Surge';tone='good'}
+  else if(mean>=.75&&positive>=Math.ceil(rows.length/2)){code='PROGRESS';label='Gradual Progress';tone='good'}
+  else if(negative>=Math.ceil(rows.length/2)&&mean<0){code='SLIPPING';label='Development Concern';tone='bad'}
+  const summary={STEADY:`Positive movement in ${positive} of ${rows.length} observed camps with limited swings.`,ACCELERATING:`The last two camps average ${round1(recentMean)} points, stronger than the earlier evidence.`,SURGING:`Back-to-back strong camp gains average ${round1(recentMean)} points.`,UNEVEN:`Observed results have swung across a ${round1(range)}-point range.`,PLATEAU:`Recent camp movement has flattened to ${round1(recentMean)} points on average.`,PROGRESS:`Observed camp movement averages ${round1(mean)} points across ${rows.length} results.`,SLIPPING:`More observed camps have moved backward than forward.`,TRACKING:`The staff has ${rows.length} camp results, but no strong pattern yet.`}[code];
+  return{code,label,tone,confidence,observations:rows.length,average:round1(mean),recentAverage:round1(recentMean),positive,flat,negative,range:round1(range),summary,last:rows.at(-1)||null};
+ }
+ function summarize(players=[]){
+  const rows=players.map(p=>({p,clue:clue(p)})),counts={};for(const x of rows)counts[x.clue.code]=(counts[x.clue.code]||0)+1;
+  const notable=rows.filter(x=>!['LEARNING','TRACKING'].includes(x.clue.code)).sort((a,b)=>b.clue.observations-a.clue.observations||Math.abs(b.clue.recentAverage||0)-Math.abs(a.clue.recentAverage||0)).slice(0,8);
+  return{rows,counts,notable};
+ }
+ return{evidence,clue,summarize};
+}
+
+if(typeof module==='object'&&module.exports){module.exports={makeDevelopmentTendencySystem};}
+else{
+ const developmentTendencySystem=makeDevelopmentTendencySystem({});
+ function developmentTendencyBadge(p){const x=developmentTendencySystem.clue(p);if(x.code==='LEARNING'||x.code==='TRACKING')return'';return `<span class="development-tendency-badge development-tendency-${x.tone}" title="${String(x.summary).replace(/"/g,'&quot;')}">${x.label}</span>`}
+ function renderDevelopmentTendencyBadges(){
+  const t=selected(),body=$('#rosterBody');if(!t||!body)return;
+  for(const link of body.querySelectorAll?.('[data-player]')||[]){const p=t.roster.find(x=>String(x.id)===String(link.dataset.player));if(!p)continue;const badge=developmentTendencyBadge(p);if(!badge)continue;const cell=link.closest?.('td')||link.parentElement;if(cell&&!cell.querySelector?.('.development-tendency-badge'))cell.insertAdjacentHTML?.('beforeend',badge)}
+ }
+ function developmentTendencyPanelHTML(t){
+  const summary=developmentTendencySystem.summarize(t?.roster||[]),rows=summary.notable;if(!rows.length)return'';
+  return `<div class="development-tendency-panel"><div class="development-tendency-head"><div><div class="eyebrow">STAFF DEVELOPMENT READ</div><h3>Observed Growth Patterns</h3></div><span>${rows.length} notable pattern${rows.length===1?'':'s'}</span></div><div class="development-tendency-grid">${rows.map(({p,clue:x})=>`<button type="button" class="development-tendency-card development-tendency-${x.tone}" data-player="${p.id}"><strong>${p.pos} ${p.name}</strong><b>${x.label}</b><small>${x.summary}</small><span>${x.observations} camp observations · ${x.confidence}% staff confidence</span></button>`).join('')}</div><div class="small muted development-tendency-note">These labels are inferred only from observed camp receipts and staff confidence. They do not reveal a hidden development curve or ceiling.</div></div>`;
+ }
+ const renderRosterBeforeDevelopmentTendencies=renderRoster;
+ renderRoster=function(){renderRosterBeforeDevelopmentTendencies();renderDevelopmentTendencyBadges()};
+ const renderDevelopmentBeforeTendencies=renderDevelopment;
+ renderDevelopment=function(){renderDevelopmentBeforeTendencies();const t=selected(),host=$('#development');if(host&&!host.querySelector?.('.development-tendency-panel')){const panel=developmentTendencyPanelHTML(t);if(panel)host.insertAdjacentHTML?.('beforeend',panel);attachPlayerLinks()}};
+ if(typeof TAB_RENDERERS==='object'){TAB_RENDERERS.roster=renderRoster;TAB_RENDERERS.development=renderDevelopment}
+ globalThis.DynastyLabDevelopmentTendencies={clue:p=>developmentTendencySystem.clue(p),summary:t=>developmentTendencySystem.summarize(t?.roster||[])};
+}
+
 loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});[...new Set(schools.map(t=>t.conference))].forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();applyTitlePreferences();showTitleScreen();refreshTitleSave();}).catch(e=>{$('#titleStatus').textContent='Could not initialize Dynasty Lab. '+e.message});
 })();
 
@@ -6187,7 +6858,10 @@ function renderSigningClass(){
  const cards=commits.slice(0,6).map(r=>`<button type="button" class="signing-card${/WAVERING/.test(r.status.toUpperCase())?' is-wavering':''}" data-signing-recruit="${esc(r.id)}"><span class="signing-card-rank">#${r.rank}</span><span class="signing-card-avatar">${portraitCanvas(r.id,r.name,96,'recruit-card')}</span><span class="signing-card-stars">${esc(r.stars)}</span><strong>${esc(r.name)}</strong><span>${esc(r.pos)} · ${esc(r.home||r.hs)}</span><em>${/WAVERING/.test(r.status.toUpperCase())?'WAVERING':'COMMITTED'}</em></button>`).join('');
  const empty=count?`<div class="signing-empty"><strong>${count} commitment${count===1?' is':'s are'} in the class.</strong><span>Recent and board-visible commitments appear as individual cards here.</span></div>`:`<div class="signing-empty"><strong>No commitments yet.</strong><span>Your first commitment will become a collectible-style signing card here.</span></div>`;
  feature.innerHTML=`${spotlight}<div class="signing-class-board"><div class="signing-class-head"><div><span class="signing-kicker">SIGNING CLASS</span><h3>${esc(classRank)}</h3><p>${count} commitment${count===1?'':'s'} · ${blue} blue chip${blue===1?'':'s'}</p></div><div class="signing-class-count"><strong>${count}</strong><span>of ${capacity} slots</span></div></div><div class="signing-meter" aria-label="${count} of ${capacity} signing slots"><i style="width:${Math.min(100,Math.round(count/Math.max(1,capacity)*100))}%"></i></div>${cards?`<div class="signing-card-grid">${cards}</div>`:empty}</div>`;
- feature.querySelectorAll('[data-signing-recruit]').forEach(b=>b.onclick=()=>document.querySelector(`#recruitBody [data-recruit="${CSS.escape(b.dataset.signingRecruit)}"]`)?.click());watchPortraits(feature);
+ feature.querySelectorAll('[data-signing-recruit]').forEach(b=>b.onclick=()=>document.querySelector(`#recruitBody [data-recruit="${CSS.escape(b.dataset.signingRecruit)}"]`)?.click());
+ // At most six small cards are rendered here. Paint them immediately so cards
+ // inserted below the fold are complete before scrolling or opening a profile.
+ globalThis.DynastyLabPortraits?.paint(feature);
 }
 
 function renderRecruitHero(){
@@ -6203,6 +6877,55 @@ document.addEventListener('click',()=>setTimeout(queue,0));document.querySelecto
 if(window.MutationObserver){for(const [sel,attrs] of [['#recruitBody',false],['#classSummary',false],['#weeklyHub',false],['#recruitDialog',true]]){const el=document.querySelector(sel);if(el)new MutationObserver(queue).observe(el,{childList:true,subtree:true,characterData:true,attributes:attrs})}}
 queue();
 })();
+
+(function(root,factory){
+ const api=factory();
+ if(typeof module==='object'&&module.exports)module.exports=api;
+ else{root.DynastyNextAction=api;api.install(root.document)}
+})(typeof globalThis!=='undefined'?globalThis:this,function(){
+ 'use strict';
+ function model({decisionCount=0,items=[]}={}){
+  if(decisionCount>0)return{kind:'decision',label:decisionCount===1?'Resolve decision':`Resolve ${decisionCount} decisions`};
+  const item=items.find(x=>!x.done);
+  return item?{kind:'plan',label:item.label||'Next action',tab:item.tab||null,index:item.index??0}:{kind:'clear',label:'All caught up'};
+ }
+ function readState(doc){
+  const decisions=[...(doc.querySelectorAll?.('#weeklyDecisions .decision-card')||[])];
+  const nodes=[...(doc.querySelectorAll?.('#weeklyPlan .plan-item')||[])];
+  const items=nodes.map((el,index)=>({index,done:el.classList?.contains('plan-done'),label:el.querySelector?.('.plan-label')?.textContent?.trim()||'',tab:el.dataset?.tab||null,node:el}));
+  return{decisions,items,next:model({decisionCount:decisions.length,items})};
+ }
+ function install(doc){
+  if(!doc?.querySelector)return false;
+  const button=doc.querySelector('#hubAdvance'),plan=doc.querySelector('#weeklyPlan'),decisions=doc.querySelector('#weeklyDecisions');
+  if(!button||!plan)return false;
+  button.dataset.nextActionController='1';
+  const refresh=()=>{
+   const state=readState(doc),next=state.next;
+   button.textContent=next.kind==='clear'?'All caught up':`Next: ${next.label}`;
+   button.disabled=next.kind==='clear';
+   button.title=next.kind==='decision'?'Resolve the Coach’s Desk item before advancing.':'Open the next unfinished item from the weekly plan.';
+   return state;
+  };
+  button.addEventListener('click',e=>{
+   const state=refresh();
+   e.preventDefault();e.stopImmediatePropagation();
+   if(state.next.kind==='decision'){
+    const target=state.decisions[0]?.querySelector?.('.decision-option')||state.decisions[0];
+    target?.scrollIntoView?.({block:'center'});target?.focus?.();return;
+   }
+   if(state.next.kind==='plan'){
+    const item=state.items.find(x=>!x.done)?.node;
+    item?.click?.();item?.focus?.();
+   }
+  },true);
+  const Observer=doc.defaultView?.MutationObserver||root.MutationObserver;
+  if(Observer){const observer=new Observer(refresh);observer.observe(plan,{childList:true,subtree:true,attributes:true});if(decisions)observer.observe(decisions,{childList:true,subtree:true});button.__nextActionObserver=observer}
+  refresh();
+  return true;
+ }
+ return{model,readState,install};
+});
 
 (() => {
 'use strict';
