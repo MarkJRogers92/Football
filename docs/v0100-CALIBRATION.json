@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-06T22:09:37.195Z",
+  "generatedAt": "2026-09-06T22:13:59.041Z",
   "branch": "codex/v0100-game-engine-2",
   "baselineVersion": "0.9.56",
   "mode": "development-only shadow comparison",
@@ -68,5 +68,12 @@
     "Home-field input uses the current homeFieldFor() value directly as a bounded matchup-rating edge.",
     "Red-zone finishing is a v2 calibration layer; it changes only shadow play outcomes, not live dynasty results.",
     "These are calibration observations, not release thresholds."
+  ],
+  "calibrationContract": 1,
+  "sourceSha256": "f0baaec3a60c2791b72d8cc06e1a785d66c9d6533ff952b1d99ce98936abeef2",
+  "sourceFiles": [
+    "game-engine-v2.js",
+    "game-engine-v2-adapter.js",
+    "tools/game-engine-v2-compare.js"
   ]
 }
