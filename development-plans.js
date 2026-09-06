@@ -1,0 +1,35 @@
+function makeDevelopmentPlanSystem(){
+ 'use strict';
+ const LIMIT=5;
+ const BONUS={Balanced:{technique:.25,iq:.25},Technique:{technique:.8},Athleticism:{speed:.6,versatility:.35},Strength:{power:.8,durability:.25},'Football IQ':{iq:.7,composure:.3},Conditioning:{durability:.65,composure:.25},Rehab:{durability:.6},'Position Transition':{versatility:.55,iq:.4}};
+ function cycleFor(u){return (u?.year||0)+(u?.phase==='complete'?1:0)}
+ function activePlan(p,u){return p?.developmentPlan?.season===cycleFor(u)&&p.developmentPlan.featured?p.developmentPlan:null}
+ function count(players,u){return (players||[]).filter(p=>activePlan(p,u)).length}
+ function toggle(p,u,focus,locked=false){
+  if(!p||!u)return{ok:false,reason:'No player selected.'};if(u.phase!=='complete')return{ok:false,reason:'Featured development plans are set during the offseason.'};if(locked)return{ok:false,reason:'Featured plans lock when spring development begins.'};const current=activePlan(p,u);if(current){const team=u.teams?.find?.(t=>t.roster?.includes(p));p.developmentPlan=null;return{ok:true,active:false,remaining:Math.max(0,LIMIT-count(team?.roster||[],u))}}
+  const team=u.teams?.find?.(t=>t.roster?.includes(p)),used=count(team?.roster||[],u);if(used>=LIMIT)return{ok:false,reason:`All ${LIMIT} featured development-plan slots are assigned.`};p.developmentPlan={season:cycleFor(u),featured:true,focus:focus||p.trainingFocus||'Balanced',createdYear:u.year,receipts:[]};return{ok:true,active:true,remaining:LIMIT-used-1,plan:p.developmentPlan};
+ }
+ function modifier(p,u){const plan=activePlan(p,u);if(!plan)return null;return BONUS[plan.focus]||BONUS.Balanced}
+ function record(p,u,phase,result){const plan=activePlan(p,u);if(!plan||!result)return null;plan.receipts??=[];const row={phase:String(phase).toUpperCase(),overallDelta:result.overallDelta??result.delta??0,attr:{...(result.attr||{})},weightDelta:result.weightDelta||0,confidenceDelta:result.confidenceDelta||0};const i=plan.receipts.findIndex(x=>x.phase===row.phase);if(i>=0)plan.receipts[i]=row;else plan.receipts.push(row);return row}
+ return{LIMIT,BONUS,cycleFor,activePlan,count,toggle,modifier,record};
+}
+if(typeof module==='object'&&module.exports){module.exports={makeDevelopmentPlanSystem}}
+else{
+ const developmentPlanSystem=makeDevelopmentPlanSystem();
+ const trainingAttrBoostBeforeV0955Plans=trainingAttrBoost;
+ trainingAttrBoost=function(p,teamFocus,individual,phase){const out=trainingAttrBoostBeforeV0955Plans(p,teamFocus,individual,phase),bonus=developmentPlanSystem.modifier(p,universe);if(!bonus)return out;for(const k of Object.keys(out))out[k]-=.08;for(const [k,v] of Object.entries(bonus))out[k]=(out[k]||0)+v;return out};
+ function captureDevelopmentPlanReceipts(phase){const t=selected(),ds=ensureDevelopmentState(),report=phase==='spring'?ds.springReport:ds.fallReport;if(!t)return;for(const x of report||[]){const p=t.roster.find(y=>y.id===x.id);if(p)developmentPlanSystem.record(p,universe,phase,x)}}
+ const runSpringCampBeforeV0955Plans=runSpringCamp;
+ runSpringCamp=function(){const before=ensureDevelopmentState().springRun,out=runSpringCampBeforeV0955Plans();if(!before&&ensureDevelopmentState().springRun)captureDevelopmentPlanReceipts('spring');return out};
+ const runFallCampBeforeV0955Plans=runFallCamp;
+ runFallCamp=function(){const before=ensureDevelopmentState().fallRun,out=runFallCampBeforeV0955Plans();if(!before&&ensureDevelopmentState().fallRun)captureDevelopmentPlanReceipts('fall');return out};
+ function devPlanEscape(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+ function planResultText(plan){const rows=plan?.receipts||[];if(!rows.length)return'Plan set · results pending';return rows.map(x=>`${x.phase}: ${x.overallDelta>=0?'+':''}${x.overallDelta} OVR`).join(' · ')}
+ function bindDevelopmentPlanButtons(){const t=selected(),ds=ensureDevelopmentState();$$('[data-feature-development]').forEach(b=>b.onclick=()=>{const p=t.roster.find(x=>String(x.id)===String(b.dataset.featureDevelopment)),res=developmentPlanSystem.toggle(p,universe,p?.trainingFocus,ds.springRun);setStatus(res.ok?(res.active?`${p.name}: featured ${p.trainingFocus} development plan assigned. ${res.remaining} slot${res.remaining===1?'':'s'} remain.`:`${p.name}: featured development plan removed.`):res.reason);renderDevelopment()})}
+ function renderDevelopmentPlanBoard(){const t=selected(),ds=ensureDevelopmentState(),host=$('#developmentSummary');if(!t||!host||host.querySelector('.development-plan-board'))return;const cycle=developmentPlanSystem.cycleFor(universe),active=t.roster.filter(p=>developmentPlanSystem.activePlan(p,universe)),rows=active.map(p=>{const plan=developmentPlanSystem.activePlan(p,universe);return `<div class="development-plan-row"><span><strong>${devPlanEscape(p.pos)} ${devPlanEscape(p.name)}</strong><small>${devPlanEscape(plan.focus)} · ${devPlanEscape(planResultText(plan))}</small></span><button type="button" data-feature-development="${devPlanEscape(p.id)}" ${ds.springRun?'disabled':''}>${ds.springRun?'Locked':'Remove'}</button></div>`}).join('');host.insertAdjacentHTML('beforeend',`<div class="development-plan-board"><div class="development-plan-head"><div><strong>Featured Development Plans</strong><small>${cycle} training cycle · ${active.length} / ${developmentPlanSystem.LIMIT} assigned</small></div><span>${ds.springRun?'Locked after spring development':'Choose up to five priority players before spring development'}</span></div>${rows||'<div class="muted small">No featured plans assigned yet. Use the buttons in the training table.</div>'}</div>`);bindDevelopmentPlanButtons()}
+ function augmentTrainingPlanControls(){const t=selected(),ds=ensureDevelopmentState();for(const s of $$('[data-training]')){const p=t.roster.find(x=>String(x.id)===String(s.dataset.training)),cell=s.closest('td');if(!p||!cell||cell.querySelector('[data-feature-development]'))continue;const plan=developmentPlanSystem.activePlan(p,universe),used=developmentPlanSystem.count(t.roster,universe),disabled=ds.springRun||(!plan&&used>=developmentPlanSystem.LIMIT)||universe.phase!=='complete';cell.insertAdjacentHTML('beforeend',`<button type="button" class="development-feature-btn${plan?' active':''}" data-feature-development="${devPlanEscape(p.id)}" ${disabled?'disabled':''}>${plan?'Featured Plan':'Feature Plan'}</button>${plan?`<div class="small muted">${devPlanEscape(planResultText(plan))}</div>`:''}`);if(plan)s.onchange=()=>{s.value=plan.focus;setStatus(`${p.name}'s featured plan is locked to ${plan.focus} for this training cycle.`)}}bindDevelopmentPlanButtons()}
+ const renderDevelopmentBeforeV0955Plans=renderDevelopment;
+ renderDevelopment=function(){renderDevelopmentBeforeV0955Plans();renderDevelopmentPlanBoard();augmentTrainingPlanControls()};
+ if(typeof TAB_RENDERERS==='object')TAB_RENDERERS.development=renderDevelopment;
+ globalThis.DynastyLabDevelopmentPlans={active:p=>developmentPlanSystem.activePlan(p,universe),count:()=>developmentPlanSystem.count(selected()?.roster||[],universe)};
+}
