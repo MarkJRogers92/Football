@@ -37,13 +37,27 @@ Focused validation: `node --test tests/archetypes.js tests/scouting.js` — 6/6 
 
 Focused validation: `npm run test:development` — 9/9 passing.
 
+## Completed checkpoint: Milestone C Development Results Center
+
+- Added a Spring/Fall results switcher with phase-specific presentation.
+- Added team-growth KPIs, movement distribution, position-group summaries, and observed training-focus outcomes.
+- Added position, improvement, regression, and physical-change filters plus result sorting.
+- Added a compact player results table with before/after overall, attribute gains, body changes, confidence movement, and training focus.
+- Added a player detail panel with before/after values for all seven traits, physical development, familiarity, staff confidence, and training plan.
+- Added responsive layouts for desktop and narrow screens.
+- Added focused HTML and result-data regression coverage.
+
+Focused validation: `npm run test:development` — 10/10 passing. Standalone build completed successfully.
+
+Browser layout validation is deferred because this fresh checkout does not have `playwright-core` installed. The check failed immediately with `Cannot find module 'playwright-core'`; no time was spent waiting or retrying.
+
 ## Next bounded slice
 
 1. Finish display-label coverage on remaining roster/recruit summaries without touching internal keys.
-2. Build the Development Results Center from the stored report data.
-3. Add focused presentation checks for the results view.
+2. Build the global Next Action controller on the existing `weeklyPlan()` engine.
+3. Add focused workflow tests.
 4. Rebuild, checkpoint, and push.
 
 ## Deferred validation
 
-No full browser suite or long-run simulation was run at these checkpoints. Focused archetype, development, and scouting regressions passed. Full validation should be performed after the first coherent UI package, not after every small slice.
+No full browser suite or long-run simulation was run at these checkpoints. Focused archetype, development, and scouting regressions passed. The dedicated results-layout check is ready in `tests/development-visual.js` and should run after dependencies are available. Full validation should be performed after the first coherent UI package, not after every small slice.

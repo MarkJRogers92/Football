@@ -16,6 +16,7 @@ test('spring and fall produce distinct detailed reports that survive packing',as
  e.runSpringCamp();
  const spring=structuredClone(u.developmentState.springReport);
  assert.equal(spring.length,rosterCount);assert.ok(spring.every(x=>x.phase==='SPRING'&&x.attr&&Number.isFinite(x.overallDelta)&&x.delta===x.overallDelta));
+ assert.ok(spring.every(x=>Number.isFinite(x.overallAfter)&&x.attrAfter&&Number.isFinite(x.weightAfter)&&Number.isFinite(x.confidenceAfter)));
  assert.ok(spring.every(x=>!('before' in x)&&!('after' in x)&&!('player' in x)),'reports store deltas, not duplicated players');
  assert.ok(t.roster.every(p=>p.campHistory.some(h=>h.year===u.year&&h.phase==='Spring')));
  e.runFallCamp();
@@ -28,4 +29,10 @@ test('development summaries reconcile to report entries',async()=>{
  const {e,u}=await setup(9533);e.runSpringCamp();const report=u.developmentState.springReport,summary=e.developmentTeamSummary(report),groups=e.developmentGroupSummary(report);
  assert.equal(summary.players,report.length);assert.equal(summary.improved,report.filter(x=>x.overallDelta>0).length);assert.equal(groups.reduce((n,g)=>n+g.players,0),report.length);
  for(const group of groups){const rows=report.filter(x=>x.pos===group.pos);assert.equal(group.totalOverall,rows.reduce((n,x)=>n+x.overallDelta,0));assert.equal(group.improved,rows.filter(x=>x.overallDelta>0).length)}
+});
+
+test('results center renders accessible summaries, filters and player details',async()=>{
+ const {e,u,t}=await setup(9534);e.runSpringCamp();const report=u.developmentState.springReport,html=e.developmentResultsHTML(report,t,'ALL','jump');
+ assert.match(html,/SPRING DEVELOPMENT/);assert.match(html,/Players improved/);assert.match(html,/data-development-filter="QB"/);assert.match(html,/developmentResultsSort/);assert.match(html,/data-development-result=/);assert.match(html,/Attribute gains/);
+ const first=report[0],detail=e.developmentResultDetailHTML(first,t.roster.find(p=>p.id===first.id));assert.match(detail,/OVERALL/);assert.match(detail,/Position familiarity/);assert.match(detail,/Staff confidence/);assert.match(detail,/Training plan/);
 });
