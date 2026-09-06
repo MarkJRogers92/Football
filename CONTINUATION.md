@@ -1,3 +1,20 @@
+# Dynasty Lab — v0.9.51 integrated checkpoint
+
+Branch: `codex/v0951-integrated`
+Baseline: Claude RNG-routing commit `4ba3657d`
+Production: v0.9.50 remains live on `gh-pages` until this branch passes validation and is deliberately published.
+
+This branch combines:
+- the completed persistent gameplay RNG routing across recruiting, portal, offseason/coaching and game simulation;
+- the two signing-day consistency fixes discovered during RNG routing;
+- v0.9.51 season goals with contextual primary/secondary/stretch objectives, dashboard + Program Lab progress, and year-end administration consequences;
+- RNG domain regression suites plus `tests/season-goals.js`;
+- synchronized 0.9.51 version metadata.
+
+Validation is being run on PR #8. The standalone `index.html` must be rebuilt from source and committed before release. Do not publish a stale generated artifact.
+
+## Prior continuation history
+
 # Dynasty Lab — v0.9.44 production checkpoint
 
 Source commit: `dc3c76c`
