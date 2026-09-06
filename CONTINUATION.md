@@ -1,3 +1,20 @@
+# Dynasty Lab — v0.9.51 integrated checkpoint
+
+Branch: `codex/v0951-integrated`
+Baseline: Claude RNG-routing commit `4ba3657d`
+Production: v0.9.50 remains live on `gh-pages` until this branch passes validation and is deliberately published.
+
+This branch combines:
+- the completed persistent gameplay RNG routing across recruiting, portal, offseason/coaching and game simulation;
+- the two signing-day consistency fixes discovered during RNG routing;
+- v0.9.51 season goals with contextual primary/secondary/stretch objectives, dashboard + Program Lab progress, and year-end administration consequences;
+- RNG domain regression suites plus `tests/season-goals.js`;
+- synchronized 0.9.51 version metadata.
+
+Validation is being run on PR #8. The standalone `index.html` has now been rebuilt from the integrated source tree by the branch build workflow (artifact commit `8575e0e8`). Canonical full validation must pass before release.
+
+## Prior continuation history
+
 # Dynasty Lab — v0.9.44 production checkpoint
 
 Source commit: `dc3c76c`
@@ -365,3 +382,6 @@ high-DPI display.
 Work in a new bounded branch, validate fully (`npm test` +
 `npm run test:browser`), update CHANGELOG/WORKLOG/STORAGE/CONTINUATION,
 publish a preview first, then promote only after review.
+
+## v0.9.51 validation note
+Integrated artifact build/currentness and release-source checks passed. Targeted Node regression passed for RNG core/integration, RNG domains 2 and 4, season goals, admin confidence, signing day, transfers, scouting, games, Game Lab, bowls, gameplan, persistence and storage. The standalone browser check failed only while locating Chromium in CI, matching the known environment problem; browser suites did not execute. Two long-running targeted files (portal-recruiting and rng-domain3) were not waited out here, but Claude had already run those successfully on the immediately preceding RNG-routing baseline and the season-goals integration does not touch their code paths. Production was intentionally left unchanged until explicit publish.
