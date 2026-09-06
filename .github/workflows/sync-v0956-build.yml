@@ -1,0 +1,37 @@
+name: Sync v0.9.56 My Board build
+
+on:
+  push:
+    branches:
+      - codex/v0956-my-board
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Build standalone artifact
+        run: npm run build
+      - name: Commit synchronized artifact and remove helper
+        shell: bash
+        run: |
+          git rm --ignore-unmatch .github/workflows/sync-v0956-build.yml
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No synchronized changes required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "build: sync v0.9.56 My Board artifact"
+          git push
