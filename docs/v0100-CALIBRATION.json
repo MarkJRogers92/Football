@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-06T22:02:14.402Z",
+  "generatedAt": "2026-09-06T22:04:15.954Z",
   "branch": "codex/v0100-game-engine-2",
   "baselineVersion": "0.9.56",
   "mode": "development-only shadow comparison",
@@ -10,24 +10,36 @@
     "meanPlays": 119.73,
     "meanYards": 587.5,
     "meanTurnovers": 2.3,
+    "meanTouchdowns": 4.55,
+    "meanFgMade": 2.55,
+    "meanFgAtt": 3.13,
+    "meanPunts": 7.48,
     "homeWinRate": 0.53,
     "meanHomeFieldRating": 4.7
   },
   "v2": {
     "games": 40,
-    "meanPoints": 35.83,
-    "meanPlays": 123.48,
-    "meanYards": 599.9,
-    "meanTurnovers": 2.38,
-    "homeWinRate": 0.53,
+    "meanPoints": 35.7,
+    "meanPlays": 123.43,
+    "meanYards": 601.42,
+    "meanTurnovers": 2.33,
+    "meanTouchdowns": 3.7,
+    "meanFgMade": 3.18,
+    "meanFgAtt": 4.35,
+    "meanPunts": 8.07,
+    "homeWinRate": 0.45,
     "meanHomeFieldRating": 4.7
   },
   "delta": {
-    "meanPoints": -6.37,
-    "meanPlays": 3.75,
-    "meanYards": 12.4,
-    "meanTurnovers": 0.08,
-    "homeWinRate": 0
+    "meanPoints": -6.5,
+    "meanPlays": 3.7,
+    "meanYards": 13.92,
+    "meanTurnovers": 0.03,
+    "meanTouchdowns": -0.85,
+    "meanFgMade": 0.63,
+    "meanFgAtt": 1.22,
+    "meanPunts": 0.59,
+    "homeWinRate": -0.08
   },
   "strengthSensitivity": {
     "favored": {
@@ -43,7 +55,7 @@
     "underdog": {
       "games": 9,
       "oldHomeWinRate": 0.33,
-      "v2HomeWinRate": 0.33
+      "v2HomeWinRate": 0
     }
   },
   "notes": [
