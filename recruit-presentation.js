@@ -26,7 +26,10 @@ function renderSigningClass(){
  const cards=commits.slice(0,6).map(r=>`<button type="button" class="signing-card${/WAVERING/.test(r.status.toUpperCase())?' is-wavering':''}" data-signing-recruit="${esc(r.id)}"><span class="signing-card-rank">#${r.rank}</span><span class="signing-card-avatar">${portraitCanvas(r.id,r.name,96,'recruit-card')}</span><span class="signing-card-stars">${esc(r.stars)}</span><strong>${esc(r.name)}</strong><span>${esc(r.pos)} · ${esc(r.home||r.hs)}</span><em>${/WAVERING/.test(r.status.toUpperCase())?'WAVERING':'COMMITTED'}</em></button>`).join('');
  const empty=count?`<div class="signing-empty"><strong>${count} commitment${count===1?' is':'s are'} in the class.</strong><span>Recent and board-visible commitments appear as individual cards here.</span></div>`:`<div class="signing-empty"><strong>No commitments yet.</strong><span>Your first commitment will become a collectible-style signing card here.</span></div>`;
  feature.innerHTML=`${spotlight}<div class="signing-class-board"><div class="signing-class-head"><div><span class="signing-kicker">SIGNING CLASS</span><h3>${esc(classRank)}</h3><p>${count} commitment${count===1?'':'s'} · ${blue} blue chip${blue===1?'':'s'}</p></div><div class="signing-class-count"><strong>${count}</strong><span>of ${capacity} slots</span></div></div><div class="signing-meter" aria-label="${count} of ${capacity} signing slots"><i style="width:${Math.min(100,Math.round(count/Math.max(1,capacity)*100))}%"></i></div>${cards?`<div class="signing-card-grid">${cards}</div>`:empty}</div>`;
- feature.querySelectorAll('[data-signing-recruit]').forEach(b=>b.onclick=()=>document.querySelector(`#recruitBody [data-recruit="${CSS.escape(b.dataset.signingRecruit)}"]`)?.click());watchPortraits(feature);
+ feature.querySelectorAll('[data-signing-recruit]').forEach(b=>b.onclick=()=>document.querySelector(`#recruitBody [data-recruit="${CSS.escape(b.dataset.signingRecruit)}"]`)?.click());
+ // At most six small cards are rendered here. Paint them immediately so cards
+ // inserted below the fold are complete before scrolling or opening a profile.
+ globalThis.DynastyLabPortraits?.paint(feature);
 }
 
 function renderRecruitHero(){
