@@ -2758,7 +2758,7 @@ function eventSummary(state){
     if(e.type==='overtime_possession'&&e.possession)out[e.possession].possessions++;
     const t=e.team;if(t!=='home'&&t!=='away')continue;
     if(e.type==='scrimmage'){out[t].plays++;out[t].yards+=Number(e.yards)||0;out.totalPlays++}
-    else if(e.type==='interception'||e.type==='fumble')out[t].turnovers++;
+    else if(e.type==='interception'||e.type==='fumble'){out[t].turnovers++;out[t].plays++;out.totalPlays++;if(e.type==='fumble')out[t].yards+=Number(e.yards)||0}
     else if(e.type==='punt')out[t].punts++;
     else if(e.type==='field_goal'){out[t].fieldGoals.attempted++;if(e.made)out[t].fieldGoals.made++}
     else if(e.type==='touchdown')out[t].touchdowns++;
@@ -2770,17 +2770,17 @@ function createShadowGame({gameId,seed,home,away,homeProfile,awayProfile,opening
   const state=GameEngineV2.createGame({gameId,seed,openingReceiver,home:homeInput,away:awayInput});
   return{state,homeInput,awayInput};
 }
-function profileOutcome(state,homeInput,awayInput){
-  const rng=DynastyRng.create(state.rng),offense=state.possession==='home'?homeInput:awayInput,defense=state.possession==='home'?awayInput:homeInput;
-  const edge=(offense.offense-defense.defense)/18,roll=rng.next(),pass=rng.next()<.53;
-  const intRate=clamp(.018+(defense.defense-offense.offense)*.00022,.008,.04);
-  const fumbleRate=clamp(.014+(defense.defense-offense.offense)*.00010,.007,.028);
+function profileOutcome(state,homeInput,awayInput,homeFieldRating=0){
+  const rng=DynastyRng.create(state.rng),isHome=state.possession==='home',offense=isHome?homeInput:awayInput,defense=isHome?awayInput:homeInput;
+  const venueEdge=isHome?homeFieldRating:-homeFieldRating,matchup=offense.offense-defense.defense+venueEdge,edge=matchup/18,roll=rng.next(),pass=rng.next()<.53;
+  const intRate=clamp(.0115-matchup*.00014,.005,.026);
+  const fumbleRate=clamp(.009-matchup*.00006,.004,.018);
   let outcome;
-  if(roll<intRate)outcome={turnover:'interception',yards:clamp(Math.round(8+rng.gauss()*9),-5,35),clock:rng.int(4,12)};
-  else if(roll<intRate+fumbleRate)outcome={turnover:'fumble',yards:clamp(Math.round(3+rng.gauss()*6),-8,18),clock:rng.int(5,14)};
+  if(roll<intRate)outcome={turnover:'interception',yards:clamp(Math.round(8+rng.gauss()*9),-5,35),clock:rng.int(8,18)};
+  else if(roll<intRate+fumbleRate)outcome={turnover:'fumble',yards:clamp(Math.round(3+rng.gauss()*6),-8,18),clock:rng.int(10,20)};
   else{
     const mean=pass?5.6:4.3,spread=pass?8.2:4.8,edgeWeight=pass?1:.7;
-    outcome={yards:clamp(Math.round(mean+edge*edgeWeight+rng.gauss()*spread),-14,55),clock:pass?rng.int(5,34):rng.int(22,40),kind:pass?'pass':'rush'};
+    outcome={yards:clamp(Math.round(mean+edge*edgeWeight+rng.gauss()*spread),-14,55),clock:pass?rng.int(12,38):rng.int(27,42),kind:pass?'pass':'rush'};
   }
   state.rng=rng.snapshot();return outcome;
 }
@@ -2791,16 +2791,16 @@ function shadowDecision(state){
   return'play';
 }
 function simulateShadow(options={}){
-  const {state,homeInput,awayInput}=createShadowGame(options);GameEngineV2.startGame(state);
+  const {state,homeInput,awayInput}=createShadowGame(options),homeFieldRating=clamp(finite(options.homeFieldRating,0),0,12);GameEngineV2.startGame(state);
   let steps=0;while(state.status!=='final'){
     if(++steps>500)throw new Error('Shadow Game Engine 2 step limit exceeded.');
     if(state.period>4){GameEngineV2.step(state);continue}
     const decision=shadowDecision(state);
     if(decision==='field_goal')GameEngineV2.attemptFieldGoal(state);
     else if(decision==='punt')GameEngineV2.punt(state);
-    else GameEngineV2.applyScrimmage(state,profileOutcome(state,homeInput,awayInput));
+    else GameEngineV2.applyScrimmage(state,profileOutcome(state,homeInput,awayInput,homeFieldRating));
   }
-  GameEngineV2.validateGame(state);return{state,summary:eventSummary(state),inputs:{home:homeInput,away:awayInput}};
+  GameEngineV2.validateGame(state);return{state,summary:eventSummary(state),inputs:{home:homeInput,away:awayInput},homeFieldRating};
 }
 function aggregate(samples){
   if(!Array.isArray(samples)||!samples.length)throw new Error('Shadow calibration needs at least one sample.');
