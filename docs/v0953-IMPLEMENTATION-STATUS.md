@@ -134,6 +134,24 @@ Latest synced standalone checkpoint: `45178951085f707390bf967a075827e431a40050`.
 - Added regression coverage for evidence thresholds, steady/accelerating/volatile/plateau patterns, team summaries and hidden-field independence.
 - The final extension refreshes the Roster and Development tab-router callbacks after wrapping their renderers.
 
+## Completed checkpoint: Milestone L — Browser startup readiness regression
+
+Source commits: `848b1d8615db055bc88b5be4117c5affb6c12976`, `ae3729dbab0604d8c9cb8774c11df1738d3e2355`, and `bea0ed3ccc3bd85ed894312209e8cb7dc4caf354`.
+
+- The first clean Milestone K validator passed all 289 engine/presentation tests and successfully located Chrome, then failed in the browser suite because Playwright clicked the statically visible `#titleNew` before async school loading/event binding finished.
+- Browser startup helpers now wait for the title-team picker to be populated before clicking New Dynasty. This uses an actual application-readiness signal instead of a timing sleep.
+- The readiness fix has been applied to the main browser smoke test, visual regression suite, and recruiting visual suite.
+- The standalone sync after the test-only changes completed successfully; no source/build mismatch was introduced.
+- A fresh full validator is running on commit `bea0ed3ccc3bd85ed894312209e8cb7dc4caf354`. Do not cancel it with additional source pushes while the long engine suite is executing.
+- If the later IndexedDB browser-storage suite shows the same startup race, apply the identical `#titleTeam option` readiness guard there before changing application logic.
+
+### Read-only Recruiting performance audit
+
+- Staff Shortlist remains the clearest performance target: each Recruiting render scans the recruit pool and computes one staff verdict per uncommitted prospect before sorting to eight recommendations.
+- Scouting Receipts performs one recruit-pool scan to freeze controlled commitments and one roster scan for the recap; this is linear and currently less concerning than shortlist verdict computation.
+- Compare only computes verdicts for the up-to-three selected prospects.
+- Do not optimize shortlist ranking by narrowing the candidate pool without regression coverage, because that could change roster-need recommendations and recruiting behavior.
+
 ## Standalone build handling during this workstream
 
 The repository's validator requires committed `index.html` to exactly match `npm run build`. Because this session cannot clone GitHub through the shell, a temporary branch-only workflow `.github/workflows/sync-v0953-build.yml` was added to build and commit the generated standalone artifact after source pushes. It is guarded against bot recursion.
@@ -150,8 +168,8 @@ The repository's validator requires committed `index.html` to exactly match `npm
 
 ## Next bounded slices
 
-1. Diagnose and fix any real full-validator failure from the synced Milestone K tree.
-2. If validation is green, audit the combined Recruiting page for density/performance and consider a fuller historical recruiting-class receipt view.
-3. Add/refresh a final v0.9.53 release handoff and release notes.
-4. Remove the temporary build-sync workflow and run final validation on the release tree.
+1. Inspect validator run `34022762903` on `bea0ed3ccc3bd85ed894312209e8cb7dc4caf354` and fix only any concrete remaining browser/storage/audit regression.
+2. If the browser-storage suite hits the same title-screen race, add the same populated-`#titleTeam` readiness guard there.
+3. If full validation is green, consider a measured Staff Shortlist performance optimization with ranking-equivalence regression coverage, or proceed to the fuller historical recruiting-class receipt view.
+4. Add/refresh final v0.9.53 release notes, remove the temporary build-sync workflow, and run final validation on the release tree.
 5. Production remains v0.9.52 until separately authorized.
