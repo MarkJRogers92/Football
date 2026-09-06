@@ -1,0 +1,30 @@
+name: Publish v0.9.52 Now
+
+on:
+  push:
+    branches:
+      - codex/v0952-program-goals-polish
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dynasty-v0952-publish-now
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: ${{ contains(github.event.head_commit.message, 'publish: deploy v0.9.52 now') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: codex/v0952-program-goals-polish
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install --no-package-lock
+      - name: Publish current v0.9.52 build to production
+        run: node tools/publish.js
