@@ -26,3 +26,18 @@ jobs:
         run: |
           grep -q "EVALUATION TRAIL" index.html
           grep -q "receipt of changes to the staff report" index.html
+      - name: Locate Chromium
+        id: chromium
+        shell: bash
+        run: |
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$browser" ]; then
+            npx playwright-core install chromium
+            browser="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$browser"
+          echo "path=$browser" >> "$GITHUB_OUTPUT"
+      - name: Browser evaluation trail lifecycle
+        run: node tests/scouting-trail-browser.js
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
