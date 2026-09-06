@@ -11,7 +11,7 @@ This branch combines:
 - RNG domain regression suites plus `tests/season-goals.js`;
 - synchronized 0.9.51 version metadata.
 
-Validation is being run on PR #8. The standalone `index.html` must be rebuilt from source and committed before release. Do not publish a stale generated artifact.
+Validation is being run on PR #8. The standalone `index.html` has now been rebuilt from the integrated source tree by the branch build workflow (artifact commit `8575e0e8`). Canonical full validation must pass before release.
 
 ## Prior continuation history
 
