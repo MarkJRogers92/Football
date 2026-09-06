@@ -8,7 +8,7 @@ Last inspected source: `57ccef7` (`0.9.49`)
 | v0.9.46 offseason calendar | SHIPPED | `claude/review-improvement-dwjemy` | None |
 | v0.9.47 transfer portal | SHIPPED | `claude/review-improvement-dwjemy` | None |
 | v0.9.48 schedules/rivalries | SHIPPED | `claude/review-improvement-dwjemy` | None |
-| v0.9.49 saves/storage | IMPLEMENTED · commits 1-5 complete | `claude/review-improvement-dwjemy` | Publish |
+| v0.9.49 saves/storage | SHIPPED `bdcf0d2` | `claude/review-improvement-dwjemy` | None |
 | v0.9.50 modules/RNG | READY | — | Preserve standalone build |
 | v0.10 Game Engine 2 | READY FOR SLICING | — | Begin only after v0.9.50 |
 | v0.11 program economy | READY FOR SLICING | — | Creation-budget tuning |
@@ -20,7 +20,7 @@ slices, but the whole major version must not be attempted in one branch.
 
 ## Next action
 
-Publish v0.9.49, then begin `06-v0950-modularization-rng.md` as the next bounded
+Begin `06-v0950-modularization-rng.md` as the next bounded
 packet. Do not reopen save/storage work unless release validation finds a real
 regression.
 
