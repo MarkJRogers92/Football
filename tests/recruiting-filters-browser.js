@@ -1,0 +1,21 @@
+const {chromium}=require('playwright-core');
+const path=require('path');
+const TAB_GROUP={recruiting:'recruiting'};
+const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${TAB_GROUP[id]}"]`);await page.click(`.tabs button[data-tab="${id}"]`)};
+const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeout:30000});await page.waitForFunction(()=>document.querySelector('#titleTeam')?.options.length>0,{timeout:60000});await page.click('#titleNew');await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});await page.click('#titleStart');await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000})};
+(async()=>{
+ const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});
+ const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
+ await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);await goTab(page,'recruiting');
+ await page.waitForSelector('[data-recruiting-filters]');
+ const controls=await page.locator('[data-recruiting-filters] [data-recruit-filter]').count();if(controls!==4)throw new Error(`expected 4 recruiting filters, found ${controls}`);
+ const pos=(await page.locator('#recruitBody tr').first().locator('td[data-label="Pos"]').innerText()).trim();
+ await page.selectOption('[data-recruit-filter="pos"]',pos);await page.waitForFunction(p=>[...document.querySelectorAll('#recruitBody tr td[data-label="Pos"]')].every(td=>td.textContent.trim()===p),pos);
+ const afterPos=await page.locator('#recruitBody tr').count();if(!afterPos)throw new Error('position filter returned no rows');
+ await page.click('[data-recruit-filter-reset]');await page.waitForFunction(()=>document.querySelector('[data-recruit-filter="pos"]')?.value==='ALL');
+ await page.locator('#recruitBody [data-target]').first().click();await page.waitForSelector('#recruitBody tr.target');
+ await page.check('[data-recruit-filter="targetedOnly"]');await page.waitForFunction(()=>{const rows=[...document.querySelectorAll('#recruitBody tr')];return rows.length>0&&rows.every(r=>r.classList.contains('target'))});
+ const countText=await page.locator('.recruiting-filter-count').innerText();if(!/matching/.test(countText))throw new Error('matching-count summary missing');
+ if(errors.length)throw new Error(errors.slice(0,3).join(' | '));
+ await browser.close();console.log('recruiting filter browser lifecycle passed');
+})().catch(e=>{console.error(e);process.exit(1)});
