@@ -6130,22 +6130,51 @@ function makeScoutingReceiptSystem(env){
   if(result.code==='TOO_EARLY')return `${signing} at signing · ${now}. Too early for a scouting grade.`;
   return `${result.label}: ${signing} at signing · ${now} · ${delta} · ${result.games} games / ${result.starts} starts.`;
  }
- return{stageFromRecord,signingSnapshot,freezeSigningReceipt,observedEvidence,classifyPlayer,receiptSummary};
+ function summarizePlayers(players,year,schoolId=null){
+  const rows=(players||[]).map(p=>({p,result:classifyPlayer(p,year)})).filter(x=>x.result&&(!schoolId||x.result.snapshot.schoolId===schoolId));
+  const visible=rows.filter(x=>x.result.code!=='TOO_EARLY'),final=visible.filter(x=>x.result.final),watch=visible.filter(x=>!x.result.final),counts={};
+  for(const x of visible)counts[x.result.code]=(counts[x.result.code]||0)+1;
+  const notable=visible.slice().sort((a,b)=>(b.result.final?1:0)-(a.result.final?1:0)||Math.abs(b.result.delta)-Math.abs(a.result.delta)||b.result.games-a.result.games).slice(0,6);
+  return{tracked:rows.length,visible:visible.length,pending:rows.length-visible.length,final:final.length,watch:watch.length,costly:final.filter(x=>x.result.costly).length,counts,notable};
+ }
+ return{stageFromRecord,signingSnapshot,freezeSigningReceipt,observedEvidence,classifyPlayer,receiptSummary,summarizePlayers};
 }
 
 if(typeof module==='object'&&module.exports){
  module.exports={makeScoutingReceiptSystem};
 }else{
  const scoutingReceiptSystem=makeScoutingReceiptSystem({getUniverse:()=>universe,clamp});
+ const receiptEscape=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function freezeRecruitReceipt(r,t){if(!r||!t||r.committed!==t.name)return null;return scoutingReceiptSystem.freezeSigningReceipt(r,t,recruitStaffVerdict(r,t),recruitScoutingRecord(r,t,false))}
  function freezeControlledCommitReceipts(){const t=selected();if(!t)return;for(const r of universe.recruits||[])if(r.committed===t.name)freezeRecruitReceipt(r,t)}
+ function receiptPlayers(t){
+  const active=(t?.roster||[]),archive=(universe.playerArchive||[]).filter(p=>p?.recruitingMemory?.scoutingReceipt?.schoolId===t?.id),seen=new Set();
+  return [...active,...archive].filter(p=>{if(!p?.id||seen.has(p.id))return false;seen.add(p.id);return true});
+ }
+ function receiptBadgeHTML(result){if(!result||result.code==='TOO_EARLY'||result.code==='TRACKING')return'';return `<span class="scouting-receipt-badge scouting-receipt-${result.tone}" title="${receiptEscape(scoutingReceiptSystem.receiptSummary(result))}">${receiptEscape(result.label)}</span>`}
+ function renderRosterReceiptBadges(){
+  const t=selected(),body=$('#rosterBody');if(!t||!body)return;
+  for(const link of body.querySelectorAll?.('[data-player]')||[]){
+   const p=t.roster.find(x=>String(x.id)===String(link.dataset.player));if(!p)continue;
+   const result=scoutingReceiptSystem.classifyPlayer(p,universe.year),badge=receiptBadgeHTML(result);if(!badge)continue;
+   const cell=link.closest?.('td')||link.parentElement;if(cell&&!cell.querySelector?.('.scouting-receipt-badge'))cell.insertAdjacentHTML?.('beforeend',badge);
+  }
+ }
+ function renderRecruitingReceiptRecap(){
+  const t=selected(),host=$('#classSummary');if(!t||!host||host.querySelector?.('.scouting-receipt-recap'))return;
+  const summary=scoutingReceiptSystem.summarizePlayers(receiptPlayers(t),universe.year,t.id);if(!summary.tracked)return;
+  const count=code=>summary.counts[code]||0,top=summary.notable.map(({p,result})=>`<div class="scouting-receipt-row"><span><strong>${receiptEscape(p.pos)} ${receiptEscape(p.name)}</strong><small>${receiptEscape(result.snapshot.verdictLabel)} at signing · ${result.games} games / ${result.starts} starts</small></span><b class="scouting-receipt-${result.tone}">${receiptEscape(result.label)} · ${result.delta>=0?'+':''}${result.delta}</b></div>`).join('');
+  host.insertAdjacentHTML?.('beforeend',`<div class="scouting-receipt-recap"><div class="scouting-receipt-head"><div><strong>Scouting Receipts</strong><small>What the staff believed at signing versus what has actually been observed later.</small></div><span>${summary.final} settled · ${summary.watch} developing</span></div><div class="scouting-receipt-kpis"><span><b>${count('DIAMOND')}</b> Diamonds</span><span><b>${count('HIT')}</b> Hits</span><span><b>${count('BUST')}</b> Busts</span><span><b>${count('MISS')}</b> Misses</span><span><b>${summary.costly}</b> Costly misreads</span></div>${top?`<div class="scouting-receipt-list">${top}</div>`:''}<small class="scouting-receipt-note">Watch labels are provisional. Final labels require at least two seasons, 12 games and strong staff confidence. Hidden true ratings are never used.</small></div>`);
+ }
  const commitRecruitBeforeScoutingReceipts=commitRecruit;
  commitRecruit=function(r,name){const ok=commitRecruitBeforeScoutingReceipts(r,name);if(ok){const t=T(name);if(t&&selected()?.id===t.id)freezeRecruitReceipt(r,t)}return ok};
  const finalizeRecruitingBeforeScoutingReceipts=finalizeRecruiting;
  finalizeRecruiting=function(){const out=finalizeRecruitingBeforeScoutingReceipts();freezeControlledCommitReceipts();return out};
  const renderRecruitingBeforeScoutingReceipts=renderRecruiting;
- renderRecruiting=function(){freezeControlledCommitReceipts();renderRecruitingBeforeScoutingReceipts()};
- globalThis.DynastyLabScoutingReceipts={classifyPlayer:p=>scoutingReceiptSystem.classifyPlayer(p,universe.year),summary:p=>scoutingReceiptSystem.receiptSummary(scoutingReceiptSystem.classifyPlayer(p,universe.year))};
+ renderRecruiting=function(){freezeControlledCommitReceipts();renderRecruitingBeforeScoutingReceipts();renderRecruitingReceiptRecap()};
+ const renderRosterBeforeScoutingReceipts=renderRoster;
+ renderRoster=function(){renderRosterBeforeScoutingReceipts();renderRosterReceiptBadges()};
+ globalThis.DynastyLabScoutingReceipts={classifyPlayer:p=>scoutingReceiptSystem.classifyPlayer(p,universe.year),summary:p=>scoutingReceiptSystem.receiptSummary(scoutingReceiptSystem.classifyPlayer(p,universe.year)),teamSummary:t=>scoutingReceiptSystem.summarizePlayers(receiptPlayers(t),universe.year,t.id)};
 }
 
 loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});[...new Set(schools.map(t=>t.conference))].forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();applyTitlePreferences();showTitleScreen();refreshTitleSave();}).catch(e=>{$('#titleStatus').textContent='Could not initialize Dynasty Lab. '+e.message});
