@@ -5842,7 +5842,7 @@ $$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.cla
  $('#titleContinue').onclick=continueTitleDynasty;$('#titleNew').onclick=()=>showTitlePanel('titleNewPanel');$('#titleLoad').onclick=()=>showTitlePanel('titleLoadPanel');$('#titleOptions').onclick=()=>showTitlePanel('titleOptionsPanel');$('#titleHowTo').onclick=()=>showTitlePanel('titleHowPanel');
  $('#titleStart').onclick=startTitleDynasty;$('#titleLoadBrowser').onclick=loadTitleDynasty;$('#titleSaveSlot').onchange=e=>chooseSaveSlot(e.target.value);$('#titleRenameSlot').onclick=renameSaveSlot;$('#titleImport').onclick=()=>$('#importFile').click();$('#titleSaveOptions').onclick=saveTitlePreferences;$$('[data-title-back]').forEach(b=>b.onclick=()=>showTitlePanel());
 }
-if(typeof window!=='undefined')window.__DL_TEST__={selected,createOpening,renderStaff,setTeamScheme,schemeTransition,positionChangeWillingness,commissionerMode,renderControlMode,prepareDevelopmentResults(){universe.phase='complete';universe.offseason=makeOffseasonState(universe.year,'spring',['review','departures','signing','portal']);runSpringCamp()}};
+if(typeof window!=='undefined')window.__DL_TEST__={selected,createOpening,renderStaff,setTeamScheme,schemeTransition,positionChangeWillingness,commissionerMode,renderControlMode,setGameplayRng(seed){activateGameplayRng(seed,universe);syncGameplayRng()},prepareDevelopmentResults(){universe.phase='complete';universe.offseason=makeOffseasonState(universe.year,'spring',['review','departures','signing','portal']);runSpringCamp()}};
 function makeScoutingActionSystem(env){
  'use strict';
  const COSTS={quick:1,full:3};

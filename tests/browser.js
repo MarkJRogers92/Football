@@ -111,8 +111,8 @@ const startNewDynasty=async page=>{
 
     // Coaching market: force a DC opening on the controlled team, interview a
     // fresh candidate, and hire through the same Interview/Offer buttons a
-    // player uses. Math.random is nudged low (never exactly 0 -- that stalls
-    // this build's gauss()) so the offer is accepted deterministically.
+    // player uses. The test hook resets the real gameplay RNG to a seed whose
+    // first draw is below every candidate's minimum acceptance chance.
     const marketBefore = await page.evaluate(() => {
       const { selected, createOpening, renderStaff } = window.__DL_TEST__;
       const t = selected(); createOpening(t, 'DC', 'Left for another opportunity', 'DEPARTED'); renderStaff();
@@ -129,10 +129,9 @@ const startNewDynasty=async page=>{
     await page.click('#coachMarket [data-start-offer]');
     await page.waitForTimeout(60);
     check(`[${label}] Make Offer reveals the offer form`, await page.$('#coachMarket .offer-form') !== null);
-    await page.evaluate(() => { window.__realRandom = Math.random; Math.random = () => 0.0001; });
+    await page.evaluate(() => window.__DL_TEST__.setGameplayRng(1216));
     await page.click('#coachMarket [data-send-offer]');
     await page.waitForTimeout(60);
-    await page.evaluate(() => { Math.random = window.__realRandom; });
     const hireResult = await page.evaluate((oldDcId) => {
       const t = window.__DL_TEST__.selected();
       return { interim: !!t.staff.DC.interim, hired: t.staff.DC.id !== oldDcId,

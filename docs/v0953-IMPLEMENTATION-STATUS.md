@@ -166,6 +166,7 @@ The repository's validator requires committed `index.html` to exactly match `npm
 - The shared browser bindings now live in the enclosing app closure. The build inserts one combined extension block in declared dependency order, and the version/build regression executes all five extensions in a strict-mode harness to catch another startup-scope failure.
 - A focused local browser run confirmed 113/113 primary browser checks and 35/35 visual-identity checks after the startup fix. The remaining recruiting-visual failure was isolated to lazy painting of a newly inserted signing-card portrait below the viewport; signing cards now paint their bounded set of at most six portraits immediately.
 - Re-running the focused recruiting visual test exposed a separate 171px mobile overflow in the expanded Scout cell. The mobile recruiting card now gives Scout the full row and allows verdict text/actions to wrap; the focused suite now passes 21/21 with 0px page overflow.
+- Validator run `34029118162` then reached all 113 primary browser assertions; its only failure was a pre-existing nondeterministic coach-offer check because the test still mocked `Math.random` after gameplay had migrated to the seeded RNG. The browser-only test hook now resets the actual gameplay RNG to a known low first draw before sending the offer.
 - Do not publish v0.9.53 until full validation is green or any real failures are diagnosed and fixed.
 
 ## Next bounded slices
