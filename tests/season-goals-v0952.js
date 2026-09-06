@@ -29,3 +29,20 @@ test('win goal can become visibly at risk and Program Overview renders board con
  assert.match(overview,/Season expectation/);
  assert.match(overview,/Goal status/);
 });
+
+test('v0.9.51 goal records migrate in place without rerolling the current season',async()=>{
+ const e=await setup(955),t=e.T('Chicago Metropolitan');
+ const legacy=[
+  {id:'wins',tier:'Primary',type:'wins',label:'Win at least 8 games',target:8,year:e.universe.year},
+  {id:'rivalry',tier:'Secondary',type:'rivalry',label:'Beat rival',target:2,year:e.universe.year},
+  {id:'recruiting',tier:'Secondary',type:'bluechips',label:'Sign 5 blue-chip recruits',target:5,year:e.universe.year},
+  {id:'stretch',tier:'Stretch',type:'top25',label:'Finish in the Top 25',target:25,year:e.universe.year},
+ ];
+ t.seasonGoalsYear=e.universe.year;t.seasonGoals=legacy;
+ const migrated=e.ensureSeasonGoals(t);
+ assert.equal(migrated,legacy,'current-season objectives should be preserved, not rerolled');
+ assert.deepEqual(migrated.map(g=>g.weight),['Critical','Important','Important','Bonus']);
+ assert.equal(migrated[3].type,'rank');
+ assert.equal(migrated[3].target,25);
+ assert.doesNotThrow(()=>e.seasonGoalsHTML(t));
+});
