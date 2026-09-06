@@ -47,8 +47,7 @@ browser DB would keep pre-compaction rows while memory looked smaller).
 - `npm run test:browser`: **169/169 pass** (113 browser + 35 visual + 21 recruit-visual), 0 failures.
 - `node tools/build.js`: **PASS**, 669 KB standalone.
 - Custom Chromium slot-control driver (not committed): **pass**, output above.
-- `node --test tests/saveslots.js`: started; see the commit message for its result
-  if it completed before this handoff was written.
+- `node --test tests/saveslots.js`: **19/19 pass**, 0 failures.
 
 ### Not run, and why
 
