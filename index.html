@@ -688,6 +688,11 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 .scouting-budget-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding:9px 11px;border:1px solid rgba(255,255,255,.12);border-radius:8px}.scouting-budget-strip strong{letter-spacing:.04em;text-transform:uppercase;font-size:.78rem}.scouting-budget-strip span{font-weight:700}.scouting-budget-strip small{opacity:.7}.scouting-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.scouting-actions button{font-size:.72rem;padding:4px 7px;white-space:nowrap}.scouting-actions button:disabled{opacity:.45}.scouting-profile-actions{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px;margin-bottom:12px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.scouting-profile-actions>div:first-child{display:grid;gap:2px}.scouting-profile-actions>div:first-child span{font-size:.82rem;opacity:.72}.staff-verdict-compact{display:grid;gap:1px;margin-top:6px}.staff-verdict-compact strong{font-size:.78rem}.staff-verdict-compact span{font-size:.68rem;opacity:.7}.staff-verdict-card{margin:0 0 12px;padding:12px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.staff-verdict-card p{margin:.65rem 0}.staff-verdict-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.staff-verdict-head>div{display:grid;gap:3px}.staff-verdict-head>div>strong{font-size:1.05rem}.staff-verdict-head>b{font-size:1.5rem;line-height:1}@media(max-width:760px){.scouting-profile-actions{align-items:flex-start}.scouting-actions{width:100%}.scouting-actions button{flex:1 1 130px}}
 @media(max-width:700px){#recruiting td[data-label="Scout"]{grid-column:1/-1;white-space:normal;flex-wrap:wrap;align-items:flex-start}#recruiting td[data-label="Scout"]::before{width:100%}#recruiting td[data-label="Scout"] .staff-verdict-compact{min-width:0}#recruiting td[data-label="Scout"] .staff-verdict-compact span{white-space:normal}}
 
+.staff-scouting-identity{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:7px;padding-top:7px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
+.staff-scouting-identity span{color:var(--accent)}
+.staff-scouting-ledger{margin-top:14px}.staff-scouting-ledger-row{display:grid;grid-template-columns:minmax(170px,1fr) minmax(220px,1.3fr);gap:4px 14px;padding:9px 0;border-bottom:1px solid var(--line);align-items:center}.staff-scouting-ledger-row>span{display:flex;flex-direction:column}.staff-scouting-ledger-row>small{grid-column:2;color:var(--muted)}
+@media(max-width:700px){.staff-scouting-ledger-row{grid-template-columns:1fr}.staff-scouting-ledger-row>small{grid-column:1}}
+
 .scouting-trail-card{margin:0 0 12px;padding:12px;border:1px solid rgba(255,255,255,.12);border-radius:10px}.scouting-trail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.scouting-trail-head>div{display:grid;gap:2px}.scouting-trail-head>span{font-size:.72rem;opacity:.72;text-align:right}.scouting-trail-list{display:grid;margin-top:9px}.scouting-trail-row{display:grid;grid-template-columns:minmax(105px,.55fr) minmax(0,1.45fr);gap:10px;padding:8px 0;border-top:1px solid rgba(255,255,255,.08)}.scouting-trail-row>div{display:grid;gap:2px}.scouting-trail-row b{font-size:.76rem}.scouting-trail-row small,.scouting-trail-note{font-size:.68rem;opacity:.68}.scouting-trail-note{display:block;margin-top:7px}@media(max-width:700px){.scouting-trail-head,.scouting-trail-row{display:grid;grid-template-columns:1fr}.scouting-trail-head>span{text-align:left}}
 
 .recruiting-filter-strip{display:grid;grid-template-columns:repeat(3,minmax(140px,1fr)) auto auto auto;gap:10px;align-items:end;margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.025)}
@@ -708,6 +713,13 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 .recruiting-history{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.12)}.recruiting-history-head{display:grid;gap:2px;margin-bottom:8px}.recruiting-history-head strong{font-size:.9rem}.recruiting-history-head small{opacity:.68}.recruiting-history-classes{display:grid;gap:7px}.recruiting-history-class{border:1px solid rgba(255,255,255,.1);border-radius:8px;overflow:hidden}.recruiting-history-class>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 10px;cursor:pointer;list-style:none}.recruiting-history-class>summary::-webkit-details-marker{display:none}.recruiting-history-class>summary>span:first-child{display:grid;gap:1px}.recruiting-history-class>summary small{font-size:.7rem;opacity:.66}.recruiting-history-summary{display:flex;gap:6px;flex-wrap:wrap}.recruiting-history-summary b{font-size:.68rem;padding:2px 5px;border:1px solid rgba(255,255,255,.12);border-radius:999px}.recruiting-history-meta{display:flex;gap:12px;flex-wrap:wrap;padding:7px 10px;border-top:1px solid rgba(255,255,255,.08);font-size:.72rem;opacity:.78}.recruiting-history-rows{display:grid}.recruiting-history-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:8px 10px;border-top:1px solid rgba(255,255,255,.07)}.recruiting-history-row>span{display:grid;gap:1px}.recruiting-history-row>span:last-child{text-align:right}.recruiting-history-row small{font-size:.69rem;opacity:.64}@media(max-width:700px){.recruiting-history-class>summary,.recruiting-history-row{grid-template-columns:1fr;display:grid}.recruiting-history-summary{justify-content:flex-start}.recruiting-history-row>span:last-child{text-align:left}}
 
 .development-tendency-badge{display:inline-flex;align-items:center;margin-left:6px;padding:2px 6px;border:1px solid rgba(255,255,255,.14);border-radius:999px;font-size:.64rem;font-weight:800;letter-spacing:.02em}.development-tendency-good{color:#bde9c7}.development-tendency-alert{color:#ead39a}.development-tendency-bad{color:#f0b7b7}.development-tendency-neutral{color:#cbd3dc}.development-tendency-panel{margin-top:14px;padding:13px;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:rgba(255,255,255,.025)}.development-tendency-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.development-tendency-head h3{margin:.2rem 0 0}.development-tendency-head>span{font-size:.72rem;font-weight:800}.development-tendency-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:10px}.development-tendency-card{text-align:left;display:grid;gap:4px;padding:10px;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(0,0,0,.12)}.development-tendency-card b{font-size:.8rem}.development-tendency-card small{opacity:.78;line-height:1.35}.development-tendency-card span{font-size:.66rem;opacity:.62}.development-tendency-note{margin-top:9px}@media(max-width:760px){.development-tendency-head{flex-direction:column}.development-tendency-grid{grid-template-columns:1fr}}
+.recruit-focus-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}.recruit-focus-strip small{width:100%;color:var(--muted)}
+.recruit-focus-btn.active{border-color:var(--good);color:var(--good)}.battle-card-v0955{display:grid;gap:7px}.battle-card-top,.battle-card-actions,.recruit-race-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.battle-card-actions{margin-top:2px}.battle-school.target{border-color:var(--accent2);color:var(--accent)}
+.recruit-race-card{border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:12px;background:linear-gradient(180deg,var(--panel2),var(--panel))}.recruit-race-head strong{display:block;font-size:18px}.recruit-race-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:10px 0}.recruit-race-kpis span{background:var(--panel2);padding:8px;border-radius:8px;font-size:11px;color:var(--muted)}.recruit-race-kpis b{display:block;color:var(--text);font-size:14px}.recruit-race-schools>div{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line)}.recruit-race-history{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.recruit-race-history span{font-size:10px;border:1px solid var(--line);border-radius:999px;padding:3px 6px;color:var(--muted)}.recruit-race-card>small{color:var(--muted)}
+@media(max-width:700px){.recruit-race-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.development-plan-board{grid-column:1/-1;margin-top:10px;border-top:1px solid var(--line);padding-top:10px}.development-plan-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:5px}.development-plan-head>div{display:flex;flex-direction:column}.development-plan-head small,.development-plan-head>span{color:var(--muted);font-size:11px}.development-plan-row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:7px 0;border-top:1px solid var(--line)}.development-plan-row>span{display:flex;flex-direction:column}.development-feature-btn{display:block;margin-top:6px;padding:5px 8px;font-size:11px}.development-feature-btn.active{border-color:var(--good);color:var(--good)}
+
 /* Dynasty Lab commercial polish layer (v0.9.14 pass).
    Loaded last. Presentation only: no simulation, storage or save-format code depends on it.
    Section 1 — flagship Dashboard. Later sections add shared primitives. */
@@ -5858,6 +5870,52 @@ $$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.cla
  $('#titleStart').onclick=startTitleDynasty;$('#titleLoadBrowser').onclick=loadTitleDynasty;$('#titleSaveSlot').onchange=e=>chooseSaveSlot(e.target.value);$('#titleRenameSlot').onclick=renameSaveSlot;$('#titleImport').onclick=()=>$('#importFile').click();$('#titleSaveOptions').onclick=saveTitlePreferences;$$('[data-title-back]').forEach(b=>b.onclick=()=>showTitlePanel());
 }
 if(typeof window!=='undefined')window.__DL_TEST__={selected,createOpening,renderStaff,setTeamScheme,schemeTransition,positionChangeWillingness,commissionerMode,renderControlMode,setGameplayRng(seed){activateGameplayRng(seed,universe);syncGameplayRng()},prepareDevelopmentResults(){universe.phase='complete';universe.offseason=makeOffseasonState(universe.year,'spring',['review','departures','signing','portal']);runSpringCamp()}};
+function makeStaffScoutingIdentitySystem(){
+ 'use strict';
+ const GROUPS=[
+  {key:'QB',label:'Quarterbacks',positions:['QB']},
+  {key:'SKILL',label:'Skill positions',positions:['RB','WR','TE']},
+  {key:'OL',label:'Offensive line',positions:['OT','OG','C']},
+  {key:'FRONT',label:'Front seven',positions:['EDGE','DT','LB']},
+  {key:'SECONDARY',label:'Secondary',positions:['CB','S']}
+ ];
+ function hash(value){let h=2166136261>>>0;for(const ch of String(value??'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+ function groupForPosition(pos){return GROUPS.find(g=>g.positions.includes(pos))||GROUPS[1]}
+ function profileForCoach(c){
+  const seed=hash(`${c?.id||c?.name||'coach'}|scouting-profile`),first=seed%GROUPS.length,second=(first+1+((seed>>>5)%(GROUPS.length-1)))%GROUPS.length;
+  return{primary:GROUPS[first],secondary:GROUPS[second]};
+ }
+ function coachBonus(c,pos){if(!c)return 0;const group=groupForPosition(pos),p=profileForCoach(c);if(group.key===p.primary.key)return 5;if(group.key===p.secondary.key)return 2;return 0}
+ function evaluationModifier(t,r){
+  if(!t||!r)return 0;const rc=t.staff?.RC,hc=t.staff?.HC,side=['QB','RB','WR','TE','OT','OG','C'].includes(r.pos)?t.staff?.OC:t.staff?.DC;
+  const raw=coachBonus(rc,r.pos)+Math.round(coachBonus(side,r.pos)*.55)+Math.round(coachBonus(hc,r.pos)*.25);
+  return Math.max(0,Math.min(8,raw));
+ }
+ function gainModifier(t,r){const m=evaluationModifier(t,r);return m>=7?3:m>=4?2:m>=2?1:0}
+ function classifyRecord(rows=[]){
+  const settled=rows.filter(x=>x?.result?.final),good=settled.filter(x=>['DIAMOND','HIT','AS_SCOUTED'].includes(x.result.code)),bad=settled.filter(x=>['BUST','MISS'].includes(x.result.code)),avgDelta=settled.length?settled.reduce((n,x)=>n+(Number(x.result.delta)||0),0)/settled.length:0,accuracy=settled.length?good.length/settled.length:null;
+  let label='Unproven';if(settled.length>=8)label=accuracy>=.78?'Excellent':accuracy>=.64?'Reliable':accuracy>=.50?'Mixed':'Questionable';else if(settled.length>=3)label=accuracy>=.75?'Strong start':accuracy>=.50?'Developing':'Early concerns';
+  return{settled:settled.length,good:good.length,bad:bad.length,diamonds:settled.filter(x=>x.result.code==='DIAMOND').length,busts:settled.filter(x=>x.result.code==='BUST').length,accuracy,avgDelta:Math.round(avgDelta*10)/10,label};
+ }
+ function summarizeCoach(coachId,players=[],classify){
+  const rows=[];for(const p of players||[]){const snap=p?.recruitingMemory?.scoutingReceipt;if(!snap||snap.recruiterCoachId!==coachId)continue;const result=classify?.(p);if(result)rows.push({p,result})}
+  const byGroup={};for(const x of rows){const key=groupForPosition(x.p.pos).key;(byGroup[key]??=[]).push(x)}
+  return{...classifyRecord(rows),tracked:rows.length,groups:Object.fromEntries(Object.entries(byGroup).map(([k,v])=>[k,classifyRecord(v)])),rows};
+ }
+ return{GROUPS,hash,groupForPosition,profileForCoach,coachBonus,evaluationModifier,gainModifier,classifyRecord,summarizeCoach};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeStaffScoutingIdentitySystem};
+}else{
+ var staffScoutingIdentity=makeStaffScoutingIdentitySystem();
+ const refreshScoutingIntelBeforeStaffIdentity=refreshScoutingIntel;
+ refreshScoutingIntel=function(subject,t,gain,source,recruit=false){
+  const manual=recruit&&(source==='QUICK_FILM'||source==='FULL_EVALUATION');
+  return refreshScoutingIntelBeforeStaffIdentity(subject,t,gain+(manual?staffScoutingIdentity.gainModifier(t,subject):0),source,recruit);
+ };
+}
+
 function makeScoutingActionSystem(env){
  'use strict';
  const COSTS={quick:1,full:3};
@@ -6339,6 +6397,34 @@ if(typeof module==='object'&&module.exports){
  globalThis.DynastyLabScoutingReceipts={classifyPlayer:p=>scoutingReceiptSystem.classifyPlayer(p,universe.year),summary:p=>scoutingReceiptSystem.receiptSummary(scoutingReceiptSystem.classifyPlayer(p,universe.year)),teamSummary:t=>scoutingReceiptSystem.summarizePlayers(receiptPlayers(t),universe.year,t.id)};
 }
 
+if(typeof module!=='object'||!module.exports){
+ const staffScoutEscape=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function staffScoutingPlayers(t){const seen=new Set(),all=[...(t?.roster||[]),...(universe.playerArchive||[]).filter(p=>p?.recruitingMemory?.scoutingReceipt?.schoolId===t?.id)];return all.filter(p=>p?.id&&!seen.has(p.id)&&seen.add(p.id))}
+ function backfillScoutingReceiptCoach(p){
+  const snap=p?.recruitingMemory?.scoutingReceipt;if(!snap||snap.recruiterCoachId)return snap;const id=p.primaryRecruiterCoachId||p.recruitingMemory?.primaryRecruiterCoachId||p.recruitingMemory?.recruiterCoachId;if(!id)return snap;snap.recruiterCoachId=id;const found=coachById(id)?.coach;snap.recruiterCoachName=found?.name||null;return snap;
+ }
+ function tagRecruitReceiptCoach(r,t){
+  const snap=r?.recruitingMemory?.scoutingReceipt;if(!snap)return;const id=r.primaryRecruiterCoachId||r.recruitingMemory?.primaryRecruiterCoachId||r.recruitingMemory?.recruiterCoachId||t?.staff?.RC?.id;if(!id)return;snap.recruiterCoachId??=id;snap.recruiterCoachName??=coachById(id)?.coach?.name||null;
+ }
+ function tagControlledScoutingReceipts(){const t=selected();if(!t)return;for(const r of universe.recruits||[])if(r.committed===t.name)tagRecruitReceiptCoach(r,t);for(const p of staffScoutingPlayers(t))backfillScoutingReceiptCoach(p)}
+ function staffRecordFor(c,t){return staffScoutingIdentity.summarizeCoach(c.id,staffScoutingPlayers(t),p=>globalThis.DynastyLabScoutingReceipts?.classifyPlayer?.(p))}
+ function profileLine(c){const p=staffScoutingIdentity.profileForCoach(c);return `${p.primary.label} specialist · ${p.secondary.label} secondary`}
+ function recordText(rec){if(!rec.settled)return `${rec.label} · no settled evaluations yet`;const pct=Math.round((rec.accuracy||0)*100);return `${rec.label} · ${pct}% on-track · ${rec.diamonds} diamond${rec.diamonds===1?'':'s'} · ${rec.busts} bust${rec.busts===1?'':'s'} · ${rec.settled} settled`}
+ function appendStaffScoutingIdentity(t){
+  tagControlledScoutingReceipts();const cards=[...($('#staffList')?.querySelectorAll?.('.coach-card')||[])],coaches=Object.values(t.staff||{});cards.forEach((card,i)=>{const c=coaches[i];if(!c||card.querySelector('.staff-scouting-identity'))return;const rec=staffRecordFor(c,t);card.insertAdjacentHTML('beforeend',`<div class="staff-scouting-identity"><span>${staffScoutEscape(profileLine(c))}</span><small>${staffScoutEscape(recordText(rec))}</small></div>`)});
+  const list=$('#staffList');if(!list||document.querySelector('.staff-scouting-ledger'))return;const rows=coaches.map(c=>{const p=staffScoutingIdentity.profileForCoach(c),rec=staffRecordFor(c,t),groupRows=Object.entries(rec.groups).filter(([,x])=>x.settled).sort((a,b)=>b[1].settled-a[1].settled).slice(0,2).map(([k,x])=>`${staffScoutingIdentity.GROUPS.find(g=>g.key===k)?.label||k}: ${x.label}`).join(' · ');return `<div class="staff-scouting-ledger-row"><span><strong>${staffScoutEscape(c.name)}</strong><small>${staffScoutEscape(c.role)} · ${staffScoutEscape(p.primary.label)} specialty</small></span><b>${staffScoutEscape(recordText(rec))}</b>${groupRows?`<small>${staffScoutEscape(groupRows)}</small>`:''}</div>`}).join('');
+  list.insertAdjacentHTML('afterend',`<div class="card staff-scouting-ledger"><div class="section-head"><div><div class="eyebrow">SCOUTING REPUTATION</div><h3>Staff Evaluation Ledger</h3></div><span class="muted">Reputation is earned from signing-day receipts versus later observed careers.</span></div>${rows}<div class="small muted">Position specialties improve how quickly manual evaluations tighten. They never reveal hidden ratings or guarantee a prospect is good.</div></div>`);
+ }
+ const commitRecruitBeforeStaffScoutingIdentity=commitRecruit;
+ commitRecruit=function(r,name){const ok=commitRecruitBeforeStaffScoutingIdentity(r,name);if(ok){const t=T(name);if(t&&selected()?.id===t.id)tagRecruitReceiptCoach(r,t)}return ok};
+ const renderStaffBeforeStaffScoutingIdentity=renderStaff;
+ renderStaff=function(){renderStaffBeforeStaffScoutingIdentity();const t=selected();if(t)appendStaffScoutingIdentity(t)};
+ const renderRecruitingBeforeStaffScoutingIdentity=renderRecruiting;
+ renderRecruiting=function(){renderRecruitingBeforeStaffScoutingIdentity();tagControlledScoutingReceipts()};
+ if(typeof TAB_RENDERERS==='object'){TAB_RENDERERS.staff=renderStaff;TAB_RENDERERS.recruiting=renderRecruiting}
+ globalThis.DynastyLabStaffScouting={profile:c=>staffScoutingIdentity.profileForCoach(c),record:(c,t=selected())=>staffRecordFor(c,t),modifier:(t,r)=>staffScoutingIdentity.evaluationModifier(t,r)};
+}
+
 function makeRecruitingHistorySystem(env){
  'use strict';
  function playerPool(team,archive=[]){
@@ -6435,6 +6521,88 @@ else{
  renderDevelopment=function(){renderDevelopmentBeforeTendencies();const t=selected(),host=$('#development');if(host&&!host.querySelector?.('.development-tendency-panel')){const panel=developmentTendencyPanelHTML(t);if(panel)host.insertAdjacentHTML?.('beforeend',panel);attachPlayerLinks()}};
  if(typeof TAB_RENDERERS==='object'){TAB_RENDERERS.roster=renderRoster;TAB_RENDERERS.development=renderDevelopment}
  globalThis.DynastyLabDevelopmentTendencies={clue:p=>developmentTendencySystem.clue(p),summary:t=>developmentTendencySystem.summarize(t?.roster||[])};
+}
+
+function makeRecruitingBattleSystem(){
+ 'use strict';
+ function focusKey(u){return `${u?.year??0}:${u?.week??0}`}
+ function focusRecord(r,teamId){return r?.recruitingFocus?.[String(teamId)]||null}
+ function activeFocus(r,t,u){const x=focusRecord(r,t?.id);return !!x&&x.key===focusKey(u)}
+ function focusCount(recruits,t,u){return (recruits||[]).filter(r=>activeFocus(r,t,u)).length}
+ function toggleFocus(r,t,u,limit=3){
+  if(!r||!t||!u)return{ok:false,reason:'No recruit selected.'};if(u.phase!=='regular')return{ok:false,reason:'Recruiting focus is available during the regular season.'};if(r.committed&&r.committed!==t.name)return{ok:false,reason:`${r.name||'This recruit'} is committed elsewhere.`};if(!r.targeted&&r.committed!==t.name)return{ok:false,reason:'Add this recruit to your board first.'};
+  r.recruitingFocus??={};const key=String(t.id);if(activeFocus(r,t,u)){delete r.recruitingFocus[key];return{ok:true,active:false,remaining:Math.max(0,limit-focusCount(u.recruits,t,u))}}
+  const used=focusCount(u.recruits,t,u);if(used>=limit)return{ok:false,reason:`All ${limit} weekly priority-push slots are already assigned.`};r.recruitingFocus[key]={key:focusKey(u),season:u.year,week:u.week};return{ok:true,active:true,remaining:Math.max(0,limit-used-1)};
+ }
+ function focusBoost(r,t,u){return activeFocus(r,t,u)?4:0}
+ function raceSummary(rows=[],userId=null){
+  if(!rows.length)return{rank:null,gap:null,leader:null,label:'No race'};const top=rows[0],userIndex=rows.findIndex(x=>x.t?.id===userId),user=userIndex>=0?rows[userIndex]:null,gap=user?Math.round((user.score-top.score)*10)/10:null;
+  let label=userIndex===0?'Leading':userIndex===1&&gap>=-4?'Neck-and-neck':userIndex>=0&&gap>=-9?'Within striking distance':userIndex>=0?'Chasing':'Outside top group';return{rank:userIndex>=0?userIndex+1:null,gap,leader:top.t?.name||null,label};
+ }
+ function decisionWindow(r,u,summary){const w=u?.week??0,interest=r?.interest??0;if(r?.committed)return r.challenger?'Flip pressure':'Committed';if(w>=9||interest>=88)return'Decision nearing';if(w>=6&&summary?.gap!=null&&summary.gap>=-6)return'Tight race';if(w>=5)return'Board taking shape';return'Open recruitment'}
+ function historyRow(r,summary,u){return{season:u.year,week:u.week,interest:Math.round(r.interest||0),trend:Math.round(r.trend||0),rank:summary.rank,gap:summary.gap,leader:summary.leader,committed:r.committed||null,challenger:r.challenger||null,pressure:Number.isFinite(r.pressure)?r.pressure:null}}
+ function pushHistory(r,row,limit=16){r.battleHistory??=[];const last=r.battleHistory.at(-1);if(last&&last.season===row.season&&last.week===row.week)r.battleHistory[r.battleHistory.length-1]=row;else r.battleHistory.push(row);if(r.battleHistory.length>limit)r.battleHistory.splice(0,r.battleHistory.length-limit);return r.battleHistory}
+ return{focusKey,focusRecord,activeFocus,focusCount,toggleFocus,focusBoost,raceSummary,decisionWindow,historyRow,pushHistory};
+}
+if(typeof module==='object'&&module.exports){module.exports={makeRecruitingBattleSystem}}
+else{
+ const recruitingBattleSystem=makeRecruitingBattleSystem(),RECRUITING_FOCUS_LIMIT=3;
+ const recruitPitchBeforeV0955Battles=recruitPitch;
+ recruitPitch=function(t,r){return recruitPitchBeforeV0955Battles(t,r)+(t?.id===selected()?.id?recruitingBattleSystem.focusBoost(r,t,universe):0)};
+ function battleRows(r,n=5){return universe.teams.map(t=>({t,score:recruitPitch(t,r)+(t.name===selected()?.name&&r.targeted?10+r.relationship*.12:0)})).sort((a,b)=>b.score-a.score).slice(0,n)}
+ function captureBattleHistory(){const t=selected();if(!t)return;for(const r of universe.recruits||[]){if(!r.targeted&&r.committed!==t.name)continue;const rows=battleRows(r,5),summary=recruitingBattleSystem.raceSummary(rows,t.id);recruitingBattleSystem.pushHistory(r,recruitingBattleSystem.historyRow(r,summary,universe))}}
+ const advanceRecruitingBeforeV0955Battles=advanceRecruiting;
+ advanceRecruiting=function(){const out=advanceRecruitingBeforeV0955Battles();captureBattleHistory();return out};
+ function battleEscape(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+ function focusButton(r,t){const active=recruitingBattleSystem.activeFocus(r,t,universe);return `<button type="button" class="recruit-focus-btn${active?' active':''}" data-recruit-focus="${battleEscape(r.id)}">${active?'Priority Push Active':'Priority Push'}</button>`}
+ function momentumLabel(r){const n=Math.round(r.trend||0);return n>=6?`Heating up +${n}`:n>=2?`Gaining +${n}`:n<=-6?`Sliding ${n}`:n<=-2?`Cooling ${n}`:'Steady'}
+ function raceCard(r,t){const rows=battleRows(r,5),s=recruitingBattleSystem.raceSummary(rows,t.id),window=recruitingBattleSystem.decisionWindow(r,universe,s),hist=(r.battleHistory||[]).slice(-4).reverse();return `<div class="recruit-race-card"><div class="recruit-race-head"><div><span class="eyebrow">RECRUITING BATTLE</span><strong>${battleEscape(s.label)}</strong></div><div><span class="pill">${battleEscape(window)}</span> ${focusButton(r,t)}</div></div><div class="recruit-race-kpis"><span><b>${s.rank?`#${s.rank}`:'—'}</b> your position</span><span><b>${s.gap==null?'—':`${s.gap>=0?'+':''}${s.gap}`}</b> gap to leader</span><span><b>${battleEscape(momentumLabel(r))}</b> momentum</span><span><b>${Math.round(r.interest||0)}%</b> interest</span></div><div class="recruit-race-schools">${rows.map((x,i)=>`<div><span>${i+1}. ${battleEscape(x.t.name)}</span><strong>${Math.round(x.score)}</strong></div>`).join('')}</div>${hist.length?`<div class="recruit-race-history">${hist.map(x=>`<span>W${x.week}: ${x.rank?`#${x.rank}`:'—'} · ${x.interest}% · ${x.trend>=0?'+':''}${x.trend}</span>`).join('')}</div>`:''}<small>Priority Push gives this recruit a modest +4 pitch boost for the current week. You may assign ${RECRUITING_FOCUS_LIMIT} per week.</small></div>`}
+ function bindRecruitFocus(){const t=selected();$$('[data-recruit-focus]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();const r=universe.recruits.find(x=>String(x.id)===String(b.dataset.recruitFocus)),res=recruitingBattleSystem.toggleFocus(r,t,universe,RECRUITING_FOCUS_LIMIT);setStatus(res.ok?(res.active?`${r.name} is a priority push this week. ${res.remaining} focus slot${res.remaining===1?'':'s'} remain.`:`Priority push removed from ${r.name}.`):res.reason);renderRecruiting();renderRecruitBattles()})}
+ function renderEnhancedBattleBoard(){const t=selected(),host=$('#recruitBattleBoard');if(!t||!host)return;const open=universe.recruits.filter(r=>r.targeted&&!r.committed),commits=universe.recruits.filter(r=>r.committed===t.name&&(r.challenger||recruitingBattleSystem.activeFocus(r,t,universe))),pool=[...open,...commits].sort((a,b)=>(b.challenger?1:0)-(a.challenger?1:0)||(b.interest||0)-(a.interest||0)).slice(0,8);host.innerHTML=pool.map(r=>{const rows=battleRows(r,3),s=recruitingBattleSystem.raceSummary(rows,t.id),window=recruitingBattleSystem.decisionWindow(r,universe,s);return `<div class="battle-card battle-card-v0955"><div class="battle-card-top"><div><button class="player-button" data-recruit="${battleEscape(r.id)}">${battleEscape(r.name)}</button> · ${battleEscape(r.pos)} · #${r.nationalRank} · ${'★'.repeat(r.stars)}</div><span class="pill">${battleEscape(window)}</span></div><div class="small muted">${battleEscape(r.highSchool)} · ${battleEscape(r.homeCity)}, ${battleEscape(r.homeState)} · ${battleEscape(momentumLabel(r))}${r.challenger?` · <span class="warn">challenged by ${battleEscape(r.challenger)}</span>`:''}</div><div class="battle-schools">${rows.map((x,i)=>`<span class="battle-school${x.t.id===t.id?' target':''}">${i+1}. ${battleEscape(x.t.name)} · ${Math.round(x.score)}</span>`).join('')}</div><div class="battle-card-actions">${focusButton(r,t)}<span class="small muted">${s.rank?`You: #${s.rank} · gap ${s.gap>=0?'+':''}${s.gap}`:'Outside top 3'}</span></div></div>`}).join('')||'<span class="muted">Target recruits to create active battles.</span>';attachRecruitLinks();bindRecruitFocus()}
+ const renderRecruitBattlesBeforeV0955=renderRecruitBattles;
+ renderRecruitBattles=function(){renderRecruitBattlesBeforeV0955();renderEnhancedBattleBoard()};
+ const showRecruitProfileBeforeV0955Battles=showRecruitProfile;
+ showRecruitProfile=function(id){showRecruitProfileBeforeV0955Battles(id);const r=universe.recruits.find(x=>String(x.id)===String(id)),t=selected(),body=$('#recruitDialogBody');if(r&&t&&body&&!body.querySelector('.recruit-race-card')){body.insertAdjacentHTML('afterbegin',raceCard(r,t));bindRecruitFocus()}};
+ const renderRecruitingBeforeV0955Battles=renderRecruiting;
+ renderRecruiting=function(){renderRecruitingBeforeV0955Battles();const t=selected(),summary=$('#classSummary');if(t&&summary&&!summary.querySelector('.recruit-focus-strip')){const used=recruitingBattleSystem.focusCount(universe.recruits,t,universe);summary.insertAdjacentHTML('beforeend',`<div class="recruit-focus-strip"><strong>Weekly Priority Push</strong><span>${used} / ${RECRUITING_FOCUS_LIMIT} assigned</span><small>Use these on your most important open battles or to help protect a challenged commitment.</small></div>`)}bindRecruitFocus()};
+ if(typeof TAB_RENDERERS==='object')TAB_RENDERERS.recruiting=renderRecruiting;
+ globalThis.DynastyLabRecruitingBattles={summary:r=>recruitingBattleSystem.raceSummary(battleRows(r,5),selected()?.id),toggle:r=>recruitingBattleSystem.toggleFocus(r,selected(),universe,RECRUITING_FOCUS_LIMIT)};
+}
+
+function makeDevelopmentPlanSystem(){
+ 'use strict';
+ const LIMIT=5;
+ const BONUS={Balanced:{technique:.25,iq:.25},Technique:{technique:.8},Athleticism:{speed:.6,versatility:.35},Strength:{power:.8,durability:.25},'Football IQ':{iq:.7,composure:.3},Conditioning:{durability:.65,composure:.25},Rehab:{durability:.6},'Position Transition':{versatility:.55,iq:.4}};
+ function cycleFor(u){return (u?.year||0)+(u?.phase==='complete'?1:0)}
+ function activePlan(p,u){return p?.developmentPlan?.season===cycleFor(u)&&p.developmentPlan.featured?p.developmentPlan:null}
+ function count(players,u){return (players||[]).filter(p=>activePlan(p,u)).length}
+ function toggle(p,u,focus,locked=false){
+  if(!p||!u)return{ok:false,reason:'No player selected.'};if(u.phase!=='complete')return{ok:false,reason:'Featured development plans are set during the offseason.'};if(locked)return{ok:false,reason:'Featured plans lock when spring development begins.'};const current=activePlan(p,u);if(current){const team=u.teams?.find?.(t=>t.roster?.includes(p));p.developmentPlan=null;return{ok:true,active:false,remaining:Math.max(0,LIMIT-count(team?.roster||[],u))}}
+  const team=u.teams?.find?.(t=>t.roster?.includes(p)),used=count(team?.roster||[],u);if(used>=LIMIT)return{ok:false,reason:`All ${LIMIT} featured development-plan slots are assigned.`};p.developmentPlan={season:cycleFor(u),featured:true,focus:focus||p.trainingFocus||'Balanced',createdYear:u.year,receipts:[]};return{ok:true,active:true,remaining:LIMIT-used-1,plan:p.developmentPlan};
+ }
+ function modifier(p,u){const plan=activePlan(p,u);if(!plan)return null;return BONUS[plan.focus]||BONUS.Balanced}
+ function record(p,u,phase,result){const plan=activePlan(p,u);if(!plan||!result)return null;plan.receipts??=[];const row={phase:String(phase).toUpperCase(),overallDelta:result.overallDelta??result.delta??0,attr:{...(result.attr||{})},weightDelta:result.weightDelta||0,confidenceDelta:result.confidenceDelta||0};const i=plan.receipts.findIndex(x=>x.phase===row.phase);if(i>=0)plan.receipts[i]=row;else plan.receipts.push(row);return row}
+ return{LIMIT,BONUS,cycleFor,activePlan,count,toggle,modifier,record};
+}
+if(typeof module==='object'&&module.exports){module.exports={makeDevelopmentPlanSystem}}
+else{
+ const developmentPlanSystem=makeDevelopmentPlanSystem();
+ const trainingAttrBoostBeforeV0955Plans=trainingAttrBoost;
+ trainingAttrBoost=function(p,teamFocus,individual,phase){const out=trainingAttrBoostBeforeV0955Plans(p,teamFocus,individual,phase),bonus=developmentPlanSystem.modifier(p,universe);if(!bonus)return out;for(const k of Object.keys(out))out[k]-=.08;for(const [k,v] of Object.entries(bonus))out[k]=(out[k]||0)+v;return out};
+ function captureDevelopmentPlanReceipts(phase){const t=selected(),ds=ensureDevelopmentState(),report=phase==='spring'?ds.springReport:ds.fallReport;if(!t)return;for(const x of report||[]){const p=t.roster.find(y=>y.id===x.id);if(p)developmentPlanSystem.record(p,universe,phase,x)}}
+ const runSpringCampBeforeV0955Plans=runSpringCamp;
+ runSpringCamp=function(){const before=ensureDevelopmentState().springRun,out=runSpringCampBeforeV0955Plans();if(!before&&ensureDevelopmentState().springRun)captureDevelopmentPlanReceipts('spring');return out};
+ const runFallCampBeforeV0955Plans=runFallCamp;
+ runFallCamp=function(){const before=ensureDevelopmentState().fallRun,out=runFallCampBeforeV0955Plans();if(!before&&ensureDevelopmentState().fallRun)captureDevelopmentPlanReceipts('fall');return out};
+ function devPlanEscape(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+ function planResultText(plan){const rows=plan?.receipts||[];if(!rows.length)return'Plan set · results pending';return rows.map(x=>`${x.phase}: ${x.overallDelta>=0?'+':''}${x.overallDelta} OVR`).join(' · ')}
+ function bindDevelopmentPlanButtons(){const t=selected(),ds=ensureDevelopmentState();$$('[data-feature-development]').forEach(b=>b.onclick=()=>{const p=t.roster.find(x=>String(x.id)===String(b.dataset.featureDevelopment)),res=developmentPlanSystem.toggle(p,universe,p?.trainingFocus,ds.springRun);setStatus(res.ok?(res.active?`${p.name}: featured ${p.trainingFocus} development plan assigned. ${res.remaining} slot${res.remaining===1?'':'s'} remain.`:`${p.name}: featured development plan removed.`):res.reason);renderDevelopment()})}
+ function renderDevelopmentPlanBoard(){const t=selected(),ds=ensureDevelopmentState(),host=$('#developmentSummary');if(!t||!host||host.querySelector('.development-plan-board'))return;const cycle=developmentPlanSystem.cycleFor(universe),active=t.roster.filter(p=>developmentPlanSystem.activePlan(p,universe)),rows=active.map(p=>{const plan=developmentPlanSystem.activePlan(p,universe);return `<div class="development-plan-row"><span><strong>${devPlanEscape(p.pos)} ${devPlanEscape(p.name)}</strong><small>${devPlanEscape(plan.focus)} · ${devPlanEscape(planResultText(plan))}</small></span><button type="button" data-feature-development="${devPlanEscape(p.id)}" ${ds.springRun?'disabled':''}>${ds.springRun?'Locked':'Remove'}</button></div>`}).join('');host.insertAdjacentHTML('beforeend',`<div class="development-plan-board"><div class="development-plan-head"><div><strong>Featured Development Plans</strong><small>${cycle} training cycle · ${active.length} / ${developmentPlanSystem.LIMIT} assigned</small></div><span>${ds.springRun?'Locked after spring development':'Choose up to five priority players before spring development'}</span></div>${rows||'<div class="muted small">No featured plans assigned yet. Use the buttons in the training table.</div>'}</div>`);bindDevelopmentPlanButtons()}
+ function augmentTrainingPlanControls(){const t=selected(),ds=ensureDevelopmentState();for(const s of $$('[data-training]')){const p=t.roster.find(x=>String(x.id)===String(s.dataset.training)),cell=s.closest('td');if(!p||!cell||cell.querySelector('[data-feature-development]'))continue;const plan=developmentPlanSystem.activePlan(p,universe),used=developmentPlanSystem.count(t.roster,universe),disabled=ds.springRun||(!plan&&used>=developmentPlanSystem.LIMIT)||universe.phase!=='complete';cell.insertAdjacentHTML('beforeend',`<button type="button" class="development-feature-btn${plan?' active':''}" data-feature-development="${devPlanEscape(p.id)}" ${disabled?'disabled':''}>${plan?'Featured Plan':'Feature Plan'}</button>${plan?`<div class="small muted">${devPlanEscape(planResultText(plan))}</div>`:''}`);if(plan)s.onchange=()=>{s.value=plan.focus;setStatus(`${p.name}'s featured plan is locked to ${plan.focus} for this training cycle.`)}}bindDevelopmentPlanButtons()}
+ const renderDevelopmentBeforeV0955Plans=renderDevelopment;
+ renderDevelopment=function(){renderDevelopmentBeforeV0955Plans();renderDevelopmentPlanBoard();augmentTrainingPlanControls()};
+ if(typeof TAB_RENDERERS==='object')TAB_RENDERERS.development=renderDevelopment;
+ globalThis.DynastyLabDevelopmentPlans={active:p=>developmentPlanSystem.activePlan(p,universe),count:()=>developmentPlanSystem.count(selected()?.roster||[],universe)};
 }
 
 loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});[...new Set(schools.map(t=>t.conference))].forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();applyTitlePreferences();showTitleScreen();refreshTitleSave();}).catch(e=>{$('#titleStatus').textContent='Could not initialize Dynasty Lab. '+e.message});
