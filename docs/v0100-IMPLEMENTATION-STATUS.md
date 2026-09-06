@@ -4,7 +4,7 @@
 - Source branch: `codex/v0100-game-engine-2`
 - Parent: validated v0.9.56 source `66c7375bc21d1edfa475aa173789da721935f07fbf`
 - Production remains v0.9.56.
-- Quick Sim and the current detailed Game Lab remain unchanged.
+- Quick Sim and the current detailed Game Lab remain unchanged as result-recording paths.
 
 ## Checkpoint 1 — state machine foundation
 `game-engine-v2.js` owns quarter/clock, elapsed time, possession, offense-relative field position, down/distance, score, timeouts, kickoff state, compact events, RNG snapshot, exact pause/resume and college overtime transitions.
@@ -27,7 +27,7 @@ Safety boundaries:
 - v2 results are never installed into the dynasty;
 - Quick Sim, standings, player stats and saves are untouched.
 
-Current 120-game calibration candidate (`8ac47a5473f6e78e3211b56fedbeb3157d0b04f3`):
+Current 120-game calibration candidate:
 
 | Metric | v0.9.56 | v2 | Delta |
 | --- | ---: | ---: | ---: |
@@ -45,19 +45,38 @@ Current 120-game calibration candidate (`8ac47a5473f6e78e3211b56fedbeb3157d0b04f
 These are close enough for a v0.10.0 shadow calibration baseline; v2 is not intended to reproduce every v0.9 box score exactly.
 
 ## Checkpoint 4 — frozen calibration contract
-The calibration report is now treated as generated evidence, not a hand-maintained note.
+The calibration report is generated evidence, not a hand-maintained note.
 
-- `tools/game-engine-v2-calibration-stamp.js` fingerprints `game-engine-v2.js`, `game-engine-v2-adapter.js` and the comparison harness.
+- `tools/game-engine-v2-calibration-stamp.js` fingerprints the v2 engine, adapter and comparison harness.
 - `tests/game-engine-v2-calibration-report.js` rejects stale reports.
-- Guardrails bound deltas for scoring, pace, yardage, turnovers, TD/FG/punt mix, home win rate, home margin and coarse team-strength buckets.
-- Any material v2 engine/adapter calibration change must regenerate `docs/v0100-CALIBRATION.json` before the normal full suite can pass.
+- Guardrails bound scoring, pace, yardage, turnovers, TD/FG/punt mix, home win rate, home margin and coarse team-strength buckets.
+- Material v2 engine/adapter calibration changes must regenerate `docs/v0100-CALIBRATION.json` before the normal full suite can pass.
+
+Frozen-guardrail synchronized checkpoint: `6e6be9dc632917641fe0e71452c0c193f5ce2d89`.
+
+## Checkpoint 5 — development-only Game Lab shadow preview
+New modules:
+- `game-engine-v2-lab.js`: pure preview/presentation helpers for deterministic v2 games, clock labels, down/field context, event prose and summary markup.
+- `game-engine-v2-lab-integration.js`: injected Game Lab bridge that builds gameplan-adjusted profiles from cloned live teams and runs the v2 preview entirely in memory.
+- `game-engine-v2-lab.css`: compact scoreboard/event-feed presentation.
+- `tests/game-engine-v2-lab.js`: deterministic preview and presentation coverage.
+
+The Game Lab panel is explicitly **shadow only**:
+- it does not mark the scheduled game played;
+- it does not call `recordGame()` or `completeScheduledGame()`;
+- it does not alter standings, player stats, game archive, event archive or save state;
+- gameplan wear is charged only to cloned teams;
+- an integrity snapshot is checked before/after every preview and throws if live dynasty state changes;
+- replaying uses the same deterministic seed for the same season/week/matchup.
+
+This is a development validation surface, not the v0.10.3 polished Watch/Broadcast mode.
 
 ## Explicit non-goals so far
 - No player stat attribution yet (v0.10.1).
 - No coaching decision windows yet (v0.10.2).
 - No polished Watch/Broadcast UI or persistent browser resume surface yet (v0.10.3).
-- No replacement of Quick Sim or the current detailed Game Lab.
+- No replacement of Quick Sim or the current detailed result-recording path.
 - No production publication.
 
 ## Next bounded slice
-Add a development-only Game Lab shadow preview using the real scheduled matchup and gameplan-adjusted profiles. It should show v2 score, clock/down/field state and event stream entirely in memory. It must not complete the scheduled game, alter standings/player stats, write saves or supersede the current detailed engine.
+Verify the shadow panel in the synchronized standalone artifact, then add a controlled v0.10.0 result adapter capable of converting a completed v2 state into the existing game-record shape **without enabling it by default**. Test score/identity/archive compatibility first. Only after that should a development toggle be allowed to complete one scheduled user game through v2.
