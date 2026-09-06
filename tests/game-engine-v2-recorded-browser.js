@@ -40,7 +40,7 @@ async function startNewDynasty(page){
     await page.waitForSelector('#gameDialog[open]',{timeout:10000});
     assert.match(await page.locator('#gameDialogMeta').innerText(),/FINAL/);
     await page.locator('#gameTabs button').filter({hasText:/^Box Score$/}).click();assert.ok((await page.locator('#gameDialogBody').innerText()).length>100,'v2 box score should render');
-    await page.locator('#gameTabs button').filter({hasText:/^Play-by-Play$/}).click();const pbp=await page.locator('#gameDialogBody').innerText();assert.ok(pbp.length>100&&!/unavailable/i.test(pbp),'v2 archived play-by-play should render');
+    await page.locator('#gameTabs button').filter({hasText:/^Play-by-Play$/}).click();const pbp=await page.locator('#gameDialogBody').innerText(),playlines=await page.locator('#gameDialogBody .playline').count();assert.ok(playlines>10&&/Archived generated play log/i.test(pbp),'v2 archived play-by-play should render durable generated lines');
     assert.deepEqual(errors,[],`browser emitted errors: ${errors.join('\n')}`);
     console.log('PASS v0.10.1 recorded Game Engine 2 browser transaction + rollback gate');
   }finally{await browser.close()}
