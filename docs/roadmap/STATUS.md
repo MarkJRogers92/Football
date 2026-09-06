@@ -1,6 +1,6 @@
 # Roadmap execution status
 
-Last inspected source: `de5a14f` (`0.9.50 in progress`)
+Last inspected source: `5e059e0` (`0.9.50 in progress`)
 
 | Packet | Status | Active branch | Blocking decision |
 | --- | --- | --- | --- |
@@ -20,10 +20,10 @@ slices, but the whole major version must not be attempted in one branch.
 
 ## Next action
 
-Suggested commit 1 of `06-v0950-modularization-rng.md` is complete at `de5a14f`:
-the isolated RNG implementation, characterization tests, and standalone build
-wiring are in place without switching callers. Next, route the shared utilities
-and explicitly chosen low-risk generators through a saved RNG with focused tests.
+Suggested commits 1 and 2 of `06-v0950-modularization-rng.md` are complete at
+`de5a14f` and `5e059e0`: the RNG contract is tested, saved/resumed with the
+universe, and used by the shared random utilities. Next, route direct gameplay
+randomness one domain per commit, beginning with schedule/rivalry.
 
 ## Current validation checkpoint
 

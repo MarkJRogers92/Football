@@ -7,6 +7,8 @@ test('a reported seed reproduces one pinned sequence',()=>{
  const sequence=Array.from({length:6},()=>a.next());
  assert.deepEqual(sequence,Array.from({length:6},()=>b.next()));
  assert.deepEqual(sequence.map(n=>Number(n.toFixed(10))),[0.8179193095,0.3936673529,0.1938901737,0.8502599176,0.6011525167,0.1030703797]);
+ const original=RNG.create('dynasty-950'),reported=original.snapshot().seed,replay=RNG.create(reported);
+ assert.deepEqual(Array.from({length:6},()=>replay.next()),Array.from({length:6},()=>original.next()));
  assert.equal(a.snapshot().draws,6);
 });
 test('a saved state resumes at the exact next draw',()=>{

@@ -23,7 +23,7 @@
       if(input.version!==VERSION)throw new Error('This RNG state needs a newer game version.');
       seed=word(input.seed,'seed')||STEP;state=word(input.state,'state')||STEP;draws=Number(input.draws);
       if(!Number.isSafeInteger(draws)||draws<0)throw new Error('Invalid RNG draw counter.');
-    }else{seed=hashSeed(input);state=seed;draws=0}
+    }else{seed=(typeof input==='number'?word(input,'seed'):hashSeed(input))||STEP;state=seed;draws=0}
 
     // Mulberry32. Once callers use this sequence, changes require a versioned migration.
     function next(){
