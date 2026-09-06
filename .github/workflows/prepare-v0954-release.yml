@@ -1,0 +1,84 @@
+name: Prepare v0.9.54 release candidate
+
+on:
+  push:
+    branches:
+      - codex/v0954-release-prep
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v0954-release-prep
+  cancel-in-progress: true
+
+jobs:
+  prepare:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v0954-release-prep
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install --no-package-lock
+      - name: Align v0.9.54 release markers
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          Path('VERSION.txt').write_text('0.9.54\n')
+
+          pkg_path = Path('package.json')
+          pkg = json.loads(pkg_path.read_text())
+          pkg['version'] = '0.9.54'
+          pkg_path.write_text(json.dumps(pkg, indent=2) + '\n')
+
+          app_path = Path('app.js')
+          app = app_path.read_text()
+          old = "const APP_VERSION='0.9.53';"
+          new = "const APP_VERSION='0.9.54';"
+          if old not in app:
+              raise SystemExit('APP_VERSION 0.9.53 marker not found')
+          app_path.write_text(app.replace(old, new, 1))
+
+          changelog = Path('CHANGELOG.md')
+          text = changelog.read_text()
+          heading = '## v0.9.54 — Recruiting Intelligence'
+          if heading not in text:
+              block = '''## v0.9.54 — Recruiting Intelligence
+
+- Makes Staff Shortlist materially faster with exact branch-and-bound pruning: identical top-eight recommendations with an average 85.7% reduction in Staff Verdict calls across five generated 2,800-recruit universes.
+- Adds Recruiting Class History so signing-day staff beliefs can mature into Diamonds, Hits, Busts, Misses, As Scouted and provisional watch states using only later observed evidence.
+- Adds a Recruit Evaluation Trail showing how Quick Film and Full Evaluation changed confidence, range width and Staff Verdict.
+- Adds Recruiting Board filters for position, evaluation stage, Staff Verdict and targeted-only status across the full recruit pool before the 220-row display cap.
+- Keeps the full scouting feedback loop uncertainty-safe: hidden true ratings, hidden upside, hidden development curve/volatility and hidden traits never drive player-facing verdicts, filters or historical grades.
+
+'''
+              changelog.write_text(block + text)
+          PY
+      - name: Remove development-only workflow plumbing
+        run: |
+          git rm -f .github/workflows/sync-v0954-build.yml
+          git rm -f .github/workflows/prepare-v0954-release.yml
+      - name: Build release candidate
+        run: npm run build
+      - name: Version regression
+        run: node tests/version.js
+      - name: Commit release candidate
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add VERSION.txt package.json app.js CHANGELOG.md index.html docs/v0954-RELEASE-NOTE.md docs/v0954-PUBLISH-CHECKLIST.md docs/v0954-VALIDATION.md
+          git add -u .github/workflows
+          git commit -m "release: prepare v0.9.54 candidate"
+      - name: Verify clean releasable tree
+        run: npm run verify:release
+      - name: Push candidate
+        run: git push origin HEAD:codex/v0954-release-prep
