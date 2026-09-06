@@ -688,6 +688,8 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 .scouting-budget-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding:9px 11px;border:1px solid rgba(255,255,255,.12);border-radius:8px}.scouting-budget-strip strong{letter-spacing:.04em;text-transform:uppercase;font-size:.78rem}.scouting-budget-strip span{font-weight:700}.scouting-budget-strip small{opacity:.7}.scouting-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.scouting-actions button{font-size:.72rem;padding:4px 7px;white-space:nowrap}.scouting-actions button:disabled{opacity:.45}.scouting-profile-actions{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px;margin-bottom:12px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.scouting-profile-actions>div:first-child{display:grid;gap:2px}.scouting-profile-actions>div:first-child span{font-size:.82rem;opacity:.72}.staff-verdict-compact{display:grid;gap:1px;margin-top:6px}.staff-verdict-compact strong{font-size:.78rem}.staff-verdict-compact span{font-size:.68rem;opacity:.7}.staff-verdict-card{margin:0 0 12px;padding:12px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.staff-verdict-card p{margin:.65rem 0}.staff-verdict-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.staff-verdict-head>div{display:grid;gap:3px}.staff-verdict-head>div>strong{font-size:1.05rem}.staff-verdict-head>b{font-size:1.5rem;line-height:1}@media(max-width:760px){.scouting-profile-actions{align-items:flex-start}.scouting-actions{width:100%}.scouting-actions button{flex:1 1 130px}}
 @media(max-width:700px){#recruiting td[data-label="Scout"]{grid-column:1/-1;white-space:normal;flex-wrap:wrap;align-items:flex-start}#recruiting td[data-label="Scout"]::before{width:100%}#recruiting td[data-label="Scout"] .staff-verdict-compact{min-width:0}#recruiting td[data-label="Scout"] .staff-verdict-compact span{white-space:normal}}
 
+.scouting-trail-card{margin:0 0 12px;padding:12px;border:1px solid rgba(255,255,255,.12);border-radius:10px}.scouting-trail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.scouting-trail-head>div{display:grid;gap:2px}.scouting-trail-head>span{font-size:.72rem;opacity:.72;text-align:right}.scouting-trail-list{display:grid;margin-top:9px}.scouting-trail-row{display:grid;grid-template-columns:minmax(105px,.55fr) minmax(0,1.45fr);gap:10px;padding:8px 0;border-top:1px solid rgba(255,255,255,.08)}.scouting-trail-row>div{display:grid;gap:2px}.scouting-trail-row b{font-size:.76rem}.scouting-trail-row small,.scouting-trail-note{font-size:.68rem;opacity:.68}.scouting-trail-note{display:block;margin-top:7px}@media(max-width:700px){.scouting-trail-head,.scouting-trail-row{display:grid;grid-template-columns:1fr}.scouting-trail-head>span{text-align:left}}
+
 .recruit-compare-toggle{margin-top:5px;font-size:.72rem;padding:4px 7px}.recruit-compare-toggle.active{font-weight:700}.recruit-compare-tray{margin-top:10px;padding:10px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.recruit-compare-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}.recruit-compare-head>div{display:grid;gap:2px}.recruit-compare-head small{opacity:.68}.recruit-compare-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.recruit-compare-card{padding:9px;border:1px solid rgba(255,255,255,.1);border-radius:8px;display:grid;gap:5px}.recruit-compare-verdict{display:flex;align-items:center;justify-content:space-between;gap:8px}.recruit-compare-verdict b{font-size:1.15rem}@media(max-width:900px){.recruit-compare-grid{grid-template-columns:1fr}}
 .roster-need-strip{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 12px}.roster-need{display:grid;gap:1px;min-width:105px;padding:7px 9px;border:1px solid rgba(255,255,255,.1);border-radius:8px}.roster-need strong{font-size:.82rem}.roster-need span{font-weight:700}.roster-need small{opacity:.65}.roster-need.urgent{border-width:2px}.staff-shortlist-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.staff-shortlist-card{position:relative;display:grid;grid-template-columns:22px 1fr;gap:5px 7px;padding:10px;border:1px solid rgba(255,255,255,.1);border-radius:9px}.staff-shortlist-card.targeted{border-width:2px}.staff-shortlist-rank{grid-row:1/6;font-size:.78rem;opacity:.55}.staff-shortlist-verdict{display:flex;align-items:center;justify-content:space-between;gap:8px}.staff-shortlist-verdict span{font-size:.75rem;opacity:.72}.staff-shortlist-reason,.staff-shortlist-actions,.staff-shortlist-card>.small{grid-column:2}.staff-shortlist-actions{display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap}.staff-shortlist-actions>.scouting-actions{margin-top:0}.staff-shortlist-actions button{font-size:.72rem;padding:4px 7px}@media(max-width:1150px){.staff-shortlist-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.staff-shortlist-grid{grid-template-columns:1fr}.roster-need{flex:1 1 90px}}
 
@@ -5975,6 +5977,44 @@ if(typeof module==='object'&&module.exports){
    bindScoutingActionButtons();
   }
  };
+}
+
+function makeScoutingTrailSystem(){
+ 'use strict';
+ const num=v=>Number.isFinite(Number(v))?Number(v):0;
+ function actionLabel(kind){return kind==='full'?'Full Evaluation':kind==='quick'?'Quick Film':'Evaluation'}
+ function rows(record={}){
+  return (Array.isArray(record.receipts)?record.receipts:[]).map((x,index)=>{
+   const beforeConfidence=num(x.beforeConfidence),afterConfidence=num(x.afterConfidence),beforeWidth=num(x.beforeWidth),afterWidth=num(x.afterWidth),beforeVerdict=x.beforeVerdict||'—',afterVerdict=x.afterVerdict||beforeVerdict;
+   return{index,season:x.season??null,week:x.week??null,kind:x.kind||'evaluation',label:actionLabel(x.kind),cost:num(x.cost),beforeConfidence,afterConfidence,confidenceGain:afterConfidence-beforeConfidence,beforeWidth,afterWidth,rangeTightening:Math.round((beforeWidth-afterWidth)*10)/10,beforeVerdict,afterVerdict,verdictChanged:beforeVerdict!==afterVerdict};
+  });
+ }
+ function summary(record={}){
+  const list=rows(record);if(!list.length)return{actions:0,hours:0,confidenceGain:0,rangeTightening:0,verdictChanges:0,lastVerdict:null};
+  const first=list[0],last=list.at(-1);
+  return{actions:list.length,hours:list.reduce((n,x)=>n+x.cost,0),confidenceGain:last.afterConfidence-first.beforeConfidence,rangeTightening:Math.round((first.beforeWidth-last.afterWidth)*10)/10,verdictChanges:list.filter(x=>x.verdictChanged).length,lastVerdict:last.afterVerdict};
+ }
+ return{actionLabel,rows,summary};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeScoutingTrailSystem};
+}else{
+ const scoutingTrailSystem=makeScoutingTrailSystem();
+ const scoutingTrailEscape=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function scoutingTrailHTML(r,t){
+  const rec=recruitScoutingRecord(r,t,false),rows=scoutingTrailSystem.rows(rec),summary=scoutingTrailSystem.summary(rec);
+  if(!rows.length)return `<div class="scouting-trail-card"><div class="scouting-trail-head"><div><span class="eyebrow">EVALUATION TRAIL</span><strong>No manual evaluation yet</strong></div></div><p class="small muted">Quick Film and Full Evaluation receipts will appear here so you can see exactly what your staff learned for the hours spent.</p></div>`;
+  const signed=n=>n>0?`+${n}`:String(n),tight=n=>n>0?`${n} tighter`:n<0?`${Math.abs(n)} wider`:'unchanged';
+  return `<div class="scouting-trail-card"><div class="scouting-trail-head"><div><span class="eyebrow">EVALUATION TRAIL</span><strong>${summary.actions} action${summary.actions===1?'':'s'} · ${summary.hours} hour${summary.hours===1?'':'s'} spent</strong></div><span>${signed(summary.confidenceGain)} confidence · ${tight(summary.rangeTightening)}</span></div><div class="scouting-trail-list">${rows.map(x=>`<div class="scouting-trail-row"><div><strong>${scoutingTrailEscape(x.label)}</strong><small>${x.week==null?'':`Week ${x.week} · `}${x.cost}h</small></div><div><b>${scoutingTrailEscape(x.beforeVerdict)}${x.verdictChanged?` → ${scoutingTrailEscape(x.afterVerdict)}`:''}</b><small>Confidence ${x.beforeConfidence}% → ${x.afterConfidence}% (${signed(x.confidenceGain)}) · avg range ${x.beforeWidth} → ${x.afterWidth} (${tight(x.rangeTightening)})</small></div></div>`).join('')}</div><small class="scouting-trail-note">This is a receipt of changes to the staff report, not a reveal of hidden true talent.</small></div>`;
+ }
+ const showRecruitProfileBeforeScoutingTrail=showRecruitProfile;
+ showRecruitProfile=function(id){
+  showRecruitProfileBeforeScoutingTrail(id);
+  const r=universe.recruits.find(x=>String(x.id)===String(id)),t=selected(),body=$('#recruitDialogBody');if(!r||!t||!body||body.querySelector?.('.scouting-trail-card'))return;
+  const verdict=body.querySelector?.('.staff-verdict-card'),html=scoutingTrailHTML(r,t);if(verdict)verdict.insertAdjacentHTML?.('afterend',html);else body.insertAdjacentHTML?.('afterbegin',html);
+ };
+ globalThis.DynastyLabScoutingTrail={rows:(r,t)=>scoutingTrailSystem.rows(recruitScoutingRecord(r,t,false)),summary:(r,t)=>scoutingTrailSystem.summary(recruitScoutingRecord(r,t,false))};
 }
 
 function makeRecruitCompareSystem(env){
