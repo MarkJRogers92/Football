@@ -20,9 +20,10 @@ slices, but the whole major version must not be attempted in one branch.
 
 ## Next action
 
-Begin `06-v0950-modularization-rng.md` as the next bounded
-packet. Do not reopen save/storage work unless release validation finds a real
-regression.
+A fast v0.9.49 review found **no definite defect**; see HANDOFF_TO_GPT.md for
+what was inspected and how. Begin `06-v0950-modularization-rng.md`, suggested
+commit 1 only: add the RNG implementation and characterization tests without
+switching any callers. Do not reopen save/storage work.
 
 ## Current validation checkpoint
 
@@ -38,7 +39,15 @@ regression.
 - Full Node runner: 53/53 smoke checks plus the emitted regression checks passed
   without a reported failure; the runner was stopped after it ceased producing
   output for several minutes.
-- Browser UI/visual suites: NOT RUN; the configured Chromium executable is absent.
+- Browser UI/visual suites: **169/169 PASS** (113 browser + 35 visual + 21
+  recruit-visual) on `a84de25` with Chromium available. This is the first browser
+  run against v0.9.49.
+- v0.9.49 slot controls driven in Chromium at 1280px and 390px: three slots listed
+  in both the title panel and the header, rename works, two dynasties saved to
+  separate slots reload without mixing archive chunks, zero horizontal overflow on
+  `#titleLoadPanel`, `.topbar` and the document at both widths, no console errors.
+- Full `npm test` Node runner: still NOT rerun this session. Largest open
+  verification gap; see HANDOFF_TO_GPT.md.
 
 Release metadata is prepared at v0.9.49.
 
