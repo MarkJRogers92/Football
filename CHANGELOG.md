@@ -1,3 +1,10 @@
+## v0.9.51 — Season Goals
+- Adds persistent, context-generated preseason objectives for the controlled program.
+- Goals include a primary win target, rivalry and recruiting objectives, plus a stature-based stretch goal.
+- Live progress appears on the dashboard and Program Lab and is introduced in the preseason briefing.
+- Secondary/stretch results now feed the year-end administration review without replacing the existing wins-against-expectation model.
+- Adds headless regression coverage for goal generation, persistence, and administration consequences.
+
 # Changelog
 
 ## v0.9.49 — Named saves, autosave and long-dynasty protection
