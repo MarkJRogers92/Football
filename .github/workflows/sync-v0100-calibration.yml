@@ -1,0 +1,48 @@
+name: Sync v0.10.0 Game Engine 2 calibration
+
+on:
+  push:
+    branches:
+      - codex/v0100-game-engine-2
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Targeted Game Engine 2 tests
+        run: npm run test:game-engine-v2
+      - name: Compare v0.9 and v2 distributions
+        run: node tools/game-engine-v2-compare.js docs/v0100-CALIBRATION.json
+      - name: Stamp and enforce calibration guardrails
+        run: |
+          node tools/game-engine-v2-calibration-stamp.js docs/v0100-CALIBRATION.json
+          npm run test:game-engine-v2-calibration
+      - name: Build standalone artifact
+        run: npm run build
+      - name: Commit synchronized artifact, calibration report and remove helper
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/sync-v0100-calibration.yml
+          git add index.html docs/v0100-CALIBRATION.json
+          git commit -m "chore: freeze v0.10.0 calibration guardrails"
+          git push
+      - name: Dispatch validator on synchronized head
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run validate.yml --ref "$GITHUB_REF_NAME"
