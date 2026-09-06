@@ -15,7 +15,7 @@ async function startNewDynasty(page){
   page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
   try{
     await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);await goTab(page,'gamelab');
-    await page.waitForSelector('#v2RecordGate',{timeout:10000});
+    assert.equal(await page.locator('#v2RecordGate').count(),0,'temporary development record gate should stay removed after Detailed Game cutover');
     const soak=await page.evaluate(()=>window.__DL_TEST__.v2RecordedSoakProbe(6));
     assert.equal(soak.ok,true,`six-week v2 soak failed: ${JSON.stringify(soak)}`);
     assert.equal(soak.weeks,6);assert.equal(soak.endWeek-soak.startWeek,6,'universe week should advance once per recorded v2 game');
@@ -26,6 +26,6 @@ async function startNewDynasty(page){
     await page.waitForSelector('#gameDialog[open]',{timeout:10000});await page.locator('#gameTabs button').filter({hasText:/^Play-by-Play$/}).click();
     assert.ok(await page.locator('#gameDialogBody .playline').count()>10,'multiweek v2 archive should retain durable play-by-play after later weeks');
     assert.deepEqual(errors,[],`browser emitted errors: ${errors.join('\n')}`);
-    console.log('PASS v0.10.1 six-week recorded Game Engine 2 soak');
+    console.log('PASS v0.10.2 six-week recorded Game Engine 2 soak after Detailed Game cutover');
   }finally{await browser.close()}
 })().catch(err=>{console.error(err);process.exit(1)});
