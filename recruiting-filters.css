@@ -1,0 +1,10 @@
+.recruiting-filter-strip{display:grid;grid-template-columns:repeat(3,minmax(140px,1fr)) auto auto auto;gap:10px;align-items:end;margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.025)}
+.recruiting-filter-strip label{display:grid;gap:5px;font-size:.76rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.recruiting-filter-strip select{min-width:0;width:100%}
+.recruiting-filter-toggle{display:flex!important;align-items:center;gap:7px;min-height:38px;text-transform:none!important;letter-spacing:0!important;white-space:nowrap}
+.recruiting-filter-toggle input{margin:0}
+.recruiting-filter-count{align-self:center;color:var(--muted);font-size:.78rem;white-space:nowrap}
+.recruiting-filter-count strong{color:var(--text)}
+.recruiting-filter-strip button{white-space:nowrap}
+@media(max-width:900px){.recruiting-filter-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.recruiting-filter-count{white-space:normal}}
+@media(max-width:560px){.recruiting-filter-strip{grid-template-columns:1fr}.recruiting-filter-toggle{min-height:auto}.recruiting-filter-strip button{width:100%}}
