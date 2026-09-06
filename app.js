@@ -1423,7 +1423,14 @@ function seasonGoalSeed(t){return (((universe.year||0)*131)+((t?.id||0)*17))>>>0
 function seasonGoalChoice(t,items,salt=0){return items[(seasonGoalSeed(t)+salt)%items.length]}
 function ensureSeasonGoals(t){
  if(!t)return[];
- if(t.seasonGoalsYear===universe.year&&Array.isArray(t.seasonGoals)&&t.seasonGoals.length)return t.seasonGoals;
+ if(t.seasonGoalsYear===universe.year&&Array.isArray(t.seasonGoals)&&t.seasonGoals.length){
+  for(const g of t.seasonGoals){
+    g.weight??=g.tier==='Primary'?'Critical':g.tier==='Secondary'?'Important':'Bonus';
+    g.tier??=g.weight==='Critical'?'Primary':g.weight==='Important'?'Secondary':'Stretch';
+    if(g.type==='top25'){g.type='rank';g.target??=25}
+  }
+  return t.seasonGoals;
+ }
  const exp=seasonExpectation(t),rival=rivalOf(t),blueTarget=t.prestige>=82?5:t.prestige>=62?4:3,goals=[];
  const add=(id,weight,type,label,target=null)=>goals.push({id,weight,tier:weight==='Critical'?'Primary':weight==='Important'?'Secondary':'Stretch',type,label,target,year:universe.year});
  add('wins','Critical','wins',`Win at least ${exp} games`,exp);
