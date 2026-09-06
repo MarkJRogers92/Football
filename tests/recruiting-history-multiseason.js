@@ -28,8 +28,9 @@ const {makeRecruitingHistorySystem}=require('../recruiting-history.js');
  // Complete the real season/offseason. Enrollment must carry recruitingMemory + receipt into the player record.
  e.simSeason();e.simConferenceChampionships();e.simPlayoff();e.runSpringCamp();e.runFallCamp();e.runOffseason();
  let controlled=team();
- let player=controlled.roster.find(p=>p.name===recruit.name);
- assert.ok(player,`expected ${recruit.name} to enroll on the controlled roster`);
+ let player=controlled.roster.find(p=>p.id===recruit.id);
+ assert.ok(player,`expected recruit id ${recruit.id} (${recruit.name}) to enroll on the controlled roster`);
+ const trackedId=player.id;
  assert.deepEqual(player.recruitingMemory?.scoutingReceipt,snap,'enrollment must preserve the signing receipt');
 
  // One season of observed evidence should create a provisional watch result, not a final grade.
@@ -40,7 +41,7 @@ const {makeRecruitingHistorySystem}=require('../recruiting-history.js');
  let classes=history.history(pool,e.universe.year,controlled.id);
  let signingClass=classes.find(c=>c.season===signingYear);
  assert.ok(signingClass,'signing class should appear after enrollment');
- let tracked=signingClass.players.find(x=>x.p.name===player.name);
+ let tracked=signingClass.players.find(x=>x.p.id===trackedId);
  assert.ok(tracked,'enrolled player should appear in signing class history');
  assert.equal(tracked.result.final,false,'one-season evidence must remain provisional');
  assert.ok(['DIAMOND_WATCH','UP','TRACKING'].includes(tracked.result.code),`unexpected one-year result ${tracked.result.code}`);
@@ -48,7 +49,7 @@ const {makeRecruitingHistorySystem}=require('../recruiting-history.js');
  // Run the next real season, then force this test player through the normal senior-departure/archive path.
  e.simSeason();e.simConferenceChampionships();e.simPlayoff();e.runSpringCamp();e.runFallCamp();
  controlled=team();
- player=controlled.roster.find(p=>p.name===recruit.name);
+ player=controlled.roster.find(p=>p.id===trackedId);
  assert.ok(player,'tracked recruit should still be present before senior departure');
  player.perceived=Math.max(90,snap.currentRead+18);
  player.scoutConfidence=86;
@@ -56,7 +57,7 @@ const {makeRecruitingHistorySystem}=require('../recruiting-history.js');
  player.year='SR';
  e.runOffseason();
  controlled=team();
- const archived=(e.universe.playerArchive||[]).find(p=>p.name===recruit.name);
+ const archived=(e.universe.playerArchive||[]).find(p=>p.id===trackedId);
  assert.ok(archived,'senior departure should archive the tracked recruit');
  assert.deepEqual(archived.recruitingMemory?.scoutingReceipt,snap,'archive record must preserve the signing receipt');
 
@@ -64,7 +65,7 @@ const {makeRecruitingHistorySystem}=require('../recruiting-history.js');
  classes=history.history(pool,e.universe.year,controlled.id);
  signingClass=classes.find(c=>c.season===signingYear);
  assert.ok(signingClass,'historical class must remain visible after the player leaves the active roster');
- tracked=signingClass.players.find(x=>x.p.name===recruit.name);
+ tracked=signingClass.players.find(x=>x.p.id===trackedId);
  assert.ok(tracked,'archived player must remain in the historical signing class');
  assert.equal(tracked.result.final,true,'two-season mature evidence should settle to a final scouting result');
  assert.ok(['DIAMOND','HIT','AS_SCOUTED','MISS','BUST'].includes(tracked.result.code),`unexpected mature result ${tracked.result.code}`);
@@ -75,7 +76,7 @@ const {makeRecruitingHistorySystem}=require('../recruiting-history.js');
  const before={code:tracked.result.code,delta:tracked.result.delta,label:tracked.result.label,settled:signingClass.settled,signed:signingClass.signed};
  archived.trueNow=25;archived.upside=30;archived.growthProfile='late';archived.growthVolatility=99;
  const afterClass=history.history(history.playerPool(controlled,e.universe.playerArchive||[]),e.universe.year,controlled.id).find(c=>c.season===signingYear);
- const afterTracked=afterClass.players.find(x=>x.p.name===recruit.name);
+ const afterTracked=afterClass.players.find(x=>x.p.id===trackedId);
  const after={code:afterTracked.result.code,delta:afterTracked.result.delta,label:afterTracked.result.label,settled:afterClass.settled,signed:afterClass.signed};
  assert.deepEqual(after,before,'hidden talent/development fields must not alter historical scouting results');
  console.log(`multi-season scouting history ok: ${recruit.name} ${signingYear} -> ${tracked.result.label} (${tracked.result.delta>=0?'+':''}${tracked.result.delta}), archived with receipt intact`);
