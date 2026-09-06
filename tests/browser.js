@@ -12,6 +12,9 @@ const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${
 // #userTeam and the rest of the dashboard exist at all.
 const startNewDynasty=async page=>{
  await page.waitForSelector('#titleNew',{timeout:30000});
+ // Static title markup appears before async school loading and event binding finish.
+ // A populated title-team picker is the stable signal that New Dynasty is interactive.
+ await page.waitForFunction(()=>document.querySelector('#titleTeam')?.options.length>0,{timeout:60000});
  await page.click('#titleNew');
  await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});
  await page.click('#titleStart');
