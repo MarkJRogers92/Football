@@ -6034,8 +6034,9 @@ if(typeof module==='object'&&module.exports){
  globalThis.DynastyLabScoutingTrail={rows:(r,t)=>scoutingTrailSystem.rows(recruitScoutingRecord(r,t,false)),summary:(r,t)=>scoutingTrailSystem.summary(recruitScoutingRecord(r,t,false))};
 }
 
-function makeRecruitingFilterSystem(env={}){
+function makeRecruitingFilterSystem(env){
  'use strict';
+ env=env||{};
  const verdictLabels=['Priority take','Take','Strong target','Boardable','Developmental','Pass'];
  function stageOf(r,t){
   if(env.stageOf)return env.stageOf(r,t);
