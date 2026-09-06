@@ -26,3 +26,18 @@ jobs:
         run: |
           grep -q "Recruiting Class History" index.html
           grep -q "Historical classes use the same maturation gates" index.html
+      - name: Locate Chromium
+        id: chromium
+        shell: bash
+        run: |
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$browser" ]; then
+            npx playwright-core install chromium
+            browser="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$browser"
+          echo "path=$browser" >> "$GITHUB_OUTPUT"
+      - name: Recruiting browser integration
+        run: node tests/recruit-visual.js
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
