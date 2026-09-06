@@ -40,17 +40,42 @@ function createShadowGame({gameId,seed,home,away,homeProfile,awayProfile,opening
 function profileOutcome(state,homeInput,awayInput,homeFieldRating=0){
   const rng=DynastyRng.create(state.rng),isHome=state.possession==='home',offense=isHome?homeInput:awayInput,defense=isHome?awayInput:homeInput;
   const venueEdge=isHome?homeFieldRating:-homeFieldRating,matchup=offense.offense-defense.defense+venueEdge,edge=matchup/18,roll=rng.next(),pass=rng.next()<.53;
-  const intRate=clamp(.0115-matchup*.00014,.005,.026);
-  const fumbleRate=clamp(.009-matchup*.00006,.004,.018);
   let outcome;
-  if(roll<intRate)outcome={turnover:'interception',yards:clamp(Math.round(8+rng.gauss()*9),-5,35),clock:rng.int(8,18)};
-  else if(roll<intRate+fumbleRate)outcome={turnover:'fumble',yards:clamp(Math.round(3+rng.gauss()*6),-8,18),clock:rng.int(10,20)};
-  else{
-    const mean=pass?5.6:4.3,spread=pass?8.2:4.8,edgeWeight=pass?1:.7;
-    const redZoneFinish=state.fieldPosition>=80?1.6:state.fieldPosition>=65?.6:0;
-    outcome={yards:clamp(Math.round(mean+edge*edgeWeight+redZoneFinish+rng.gauss()*spread),-14,55),clock:pass?rng.int(12,38):rng.int(27,42),kind:pass?'pass':'rush'};
+  if(pass){
+    const intRate=clamp(.0115-matchup*.00014,.005,.026),fumbleRate=clamp(.004-matchup*.00003,.002,.008),sackRate=clamp(.060-matchup*.00045,.035,.095);
+    if(roll<intRate)outcome={turnover:'interception',kind:'pass',completed:false,yards:clamp(Math.round(8+rng.gauss()*9),-5,35),clock:rng.int(8,18)};
+    else if(roll<intRate+fumbleRate)outcome={turnover:'fumble',kind:'pass',completed:false,sack:true,yards:-clamp(Math.round(6+rng.gauss()*2),2,12),clock:rng.int(22,38)};
+    else if(roll<intRate+fumbleRate+sackRate)outcome={kind:'pass',completed:false,sack:true,yards:-clamp(Math.round(6+rng.gauss()*2),2,12),clock:rng.int(22,38)};
+    else{
+      const comp=clamp(.64+matchup*.0032,.48,.79),completed=rng.next()<comp;
+      if(!completed)outcome={kind:'pass',completed:false,yards:0,clock:rng.int(6,12)};
+      else{
+        const redZoneFinish=state.fieldPosition>=80?1.25:state.fieldPosition>=65?.45:0;
+        outcome={kind:'pass',completed:true,yards:clamp(Math.round(9.6+edge*1.15+redZoneFinish+rng.gauss()*7.2),-3,55),clock:rng.int(26,42)};
+      }
+    }
+  }else{
+    const fumbleRate=clamp(.012-matchup*.00008,.006,.022);
+    if(roll<fumbleRate)outcome={turnover:'fumble',kind:'rush',yards:clamp(Math.round(3+rng.gauss()*6),-8,18),clock:rng.int(18,34)};
+    else{
+      const redZoneFinish=state.fieldPosition>=80?1.6:state.fieldPosition>=65?.6:0;
+      outcome={kind:'rush',yards:clamp(Math.round(4.3+edge*.7+redZoneFinish+rng.gauss()*4.8),-14,55),clock:rng.int(27,42)};
+    }
   }
-  state.rng=rng.snapshot();return outcome;
+  finishRng(state,rng);return outcome;
+  function finishRng(target,source){target.rng=source.snapshot()}
+}
+function annotateOutcomeEvent(state,startIndex,outcome){
+  const events=state.events||[];
+  for(let i=events.length-1;i>=startIndex;i--){
+    const e=events[i];if(!['scrimmage','interception','fumble'].includes(e.type))continue;
+    e.kind=outcome.kind||null;
+    if(typeof outcome.completed==='boolean')e.completed=outcome.completed;
+    if(outcome.sack)e.sack=true;
+    e.attributionVersion=1;
+    return e;
+  }
+  return null;
 }
 function shadowDecision(state){
   if(state.down!==4)return'play';
@@ -62,11 +87,18 @@ function simulateShadow(options={}){
   const {state,homeInput,awayInput}=createShadowGame(options),homeFieldRating=clamp(finite(options.homeFieldRating,0),0,12);GameEngineV2.startGame(state);
   let steps=0;while(state.status!=='final'){
     if(++steps>500)throw new Error('Shadow Game Engine 2 step limit exceeded.');
-    if(state.period>4){GameEngineV2.step(state);continue}
+    if(state.period>4){
+      if(state.ot?.period>=3||(state.down===4&&state.fieldPosition>=55)){GameEngineV2.step(state);continue}
+      const outcome=profileOutcome(state,homeInput,awayInput,homeFieldRating),start=state.events.length;
+      GameEngineV2.applyScrimmage(state,outcome);annotateOutcomeEvent(state,start,outcome);continue;
+    }
     const decision=shadowDecision(state);
     if(decision==='field_goal')GameEngineV2.attemptFieldGoal(state);
     else if(decision==='punt')GameEngineV2.punt(state);
-    else GameEngineV2.applyScrimmage(state,profileOutcome(state,homeInput,awayInput,homeFieldRating));
+    else{
+      const outcome=profileOutcome(state,homeInput,awayInput,homeFieldRating),start=state.events.length;
+      GameEngineV2.applyScrimmage(state,outcome);annotateOutcomeEvent(state,start,outcome);
+    }
   }
   GameEngineV2.validateGame(state);return{state,summary:eventSummary(state),inputs:{home:homeInput,away:awayInput},homeFieldRating};
 }
@@ -77,5 +109,5 @@ function aggregate(samples){
   for(const k of ['points','plays','yards','turnovers','overtime','homeWins'])result[k]/=result.games;
   return result;
 }
-return{profileTeam,eventSummary,createShadowGame,profileOutcome,shadowDecision,simulateShadow,aggregate};
+return{profileTeam,eventSummary,createShadowGame,profileOutcome,annotateOutcomeEvent,shadowDecision,simulateShadow,aggregate};
 });
