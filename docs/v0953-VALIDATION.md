@@ -15,4 +15,12 @@ The run completed:
 - six real-browser IndexedDB save/load/export/import scenarios;
 - simulation audit.
 
-This green checkpoint still identified the source as v0.9.52. The release-candidate version bump, documentation and removal of temporary build-sync plumbing require one final clean validation run.
+## Green release-candidate checkpoint
+
+GitHub Actions run `34034532106` passed on release-candidate commit `4bac39e` after:
+
+- aligning every tracked version source and generated page to v0.9.53;
+- removing the temporary build-sync workflow;
+- adding final release, merge and preview-first publication documentation.
+
+The v0.9.53 release candidate is therefore fully green. No preview or production publication was performed.

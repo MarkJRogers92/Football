@@ -170,10 +170,10 @@ The temporary build-sync workflow was removed from the release-candidate tree af
 - Validator run `34031688279` passed engine and all browser/visual suites, then exposed stale IndexedDB test assumptions: it explicitly reopened schema 3 after the app had created schema 4 and still addressed the first archive chunk with the pre-save-slot numeric key. The persistence check now opens the existing database at its current version, reads `main:0`, and uses the same title readiness signal as the other browser suites.
 - The same persistence scenario now explicitly confirms replacement of an occupied save slot after importing a portable save, matching the current three-slot safety prompt instead of silently dismissing it in Playwright.
 - GitHub Actions run `34033119393` passed completely on `2acd965`, including engine, browser, persistence and simulation-audit stages. The branch has advanced to release-candidate preparation: v0.9.53 version alignment, release/validation/publish notes and removal of the temporary build-sync workflow.
+- Final release-candidate run `34034532106` passed completely on `4bac39e`. The implementation is green and ready for a versioned preview when authorized; neither preview nor production was published during this workstream.
 - Do not publish v0.9.53 until full validation is green or any real failures are diagnosed and fixed.
 
 ## Next bounded slices
 
-1. Rebuild the standalone artifact at v0.9.53 and run focused release checks.
-2. Push the release-candidate checkpoint and require one final clean GitHub validation run.
-3. After green validation, create and verify a versioned preview only; production remains v0.9.52 until separately authorized.
+1. With authorization, create and verify the versioned v0.9.53 preview described in `docs/v0953-PUBLISH-CHECKLIST.md`.
+2. Production remains v0.9.52 until separately authorized after preview review.
