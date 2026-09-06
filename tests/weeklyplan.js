@@ -34,7 +34,12 @@ test('completed steps are marked done, sink to the bottom and stop counting',asy
  e.runSpringCamp();
  const after=e.weeklyPlan(me);
  assert.equal(after.items[0].key,'fall','the next unfinished phase rises to the top');
- assert.equal(after.remaining,2,'only fall camp and preseason remain');
+ // `remaining` counts every actionable item, including legitimate Coach's Desk decisions.
+ // Scope this assertion to the offseason phase sequence instead of assuming no other work exists.
+ const phaseKeys=['review','departures','signing','portal','spring','fall','preseason'];
+ const pendingPhaseKeys=after.items.filter(x=>phaseKeys.includes(x.key)&&!x.done).map(x=>x.key);
+ assert.deepEqual(pendingPhaseKeys,['fall','preseason'],'only fall camp and preseason remain in the offseason phase');
+ assert.equal(after.pending[0].key,'fall','fall camp remains the next calendar-moving action');
  assert.ok(['review','departures','signing','portal','spring'].every(x=>e.universe.offseason.completed.includes(x)));
  assert.ok(after.items.filter(x=>x.done).every(x=>after.items.indexOf(x)>after.items.findIndex(y=>!y.done)),'done steps sink below pending ones');
 });
