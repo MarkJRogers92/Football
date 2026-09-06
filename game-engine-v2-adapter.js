@@ -53,8 +53,9 @@ function profileOutcome(state,homeInput,awayInput,homeFieldRating=0){
 }
 function shadowDecision(state){
   if(state.down!==4)return'play';
-  if(state.fieldPosition>=58&&state.distance>2)return'field_goal';
-  if(state.fieldPosition<60&&state.distance>1)return'punt';
+  if(state.fieldPosition>=75&&state.distance<=1)return'play';
+  if(state.fieldPosition>=58)return'field_goal';
+  if(state.distance>1)return'punt';
   return'play';
 }
 function simulateShadow(options={}){
@@ -76,5 +77,5 @@ function aggregate(samples){
   for(const k of ['points','plays','yards','turnovers','overtime','homeWins'])result[k]/=result.games;
   return result;
 }
-return{profileTeam,eventSummary,createShadowGame,profileOutcome,simulateShadow,aggregate};
+return{profileTeam,eventSummary,createShadowGame,profileOutcome,shadowDecision,simulateShadow,aggregate};
 });

@@ -17,32 +17,33 @@ async function main(){
   const homeProfile=e.gameProfiles(ph,pa.name),awayProfile=e.gameProfiles(pa,ph.name),homeFieldRating=e.homeFieldFor(home)*2;
 
   const oh=clone(home),oa=clone(away),archiveLen=(u.gameArchive||[]).length,eventLen=(u.events||[]).length,counter=u.gameCounter||0;
-  const old=e.gameSim(oh,oa,false,false,{week:1,label:'V2 calibration'});
-  const box=old.box||{};
+  const old=e.gameSim(oh,oa,false,false,{week:1,label:'V2 calibration'}),box=old.box||{};
   oldRows.push({
    points:(old.hp||0)+(old.ap||0),homePoints:old.hp||0,awayPoints:old.ap||0,
    plays:(box.home?.plays||0)+(box.away?.plays||0),
    yards:(box.home?.passYds||0)+(box.home?.rushYds||0)+(box.away?.passYds||0)+(box.away?.rushYds||0),
-   turnovers:(box.home?.turnovers||0)+(box.away?.turnovers||0),homeWin:(old.hp||0)>(old.ap||0)?1:0,
+   turnovers:(box.home?.turnovers||0)+(box.away?.turnovers||0),
+   touchdowns:(box.home?.passTD||0)+(box.home?.rushTD||0)+(box.away?.passTD||0)+(box.away?.rushTD||0),
+   fgMade:(box.home?.fgMade||0)+(box.away?.fgMade||0),fgAtt:(box.home?.fgAtt||0)+(box.away?.fgAtt||0),
+   punts:(box.home?.punts||0)+(box.away?.punts||0),homeWin:(old.hp||0)>(old.ap||0)?1:0,
    profileGap:round(homeProfile.overall-awayProfile.overall),homeFieldRating:round(homeFieldRating)
   });
   if(u.gameArchive)u.gameArchive.length=archiveLen;if(u.events)u.events.length=eventLen;u.gameCounter=counter;
 
-  const shadow=adapter.simulateShadow({gameId:`cal-${i}-${home.id}-${away.id}`,seed:`v0100-cal-${i}-${home.id}-${away.id}`,home,away,homeProfile,awayProfile,homeFieldRating});
+  const shadow=adapter.simulateShadow({gameId:`cal-${i}-${home.id}-${away.id}`,seed:`v0100-cal-${i}-${home.id}-${away.id}`,home,away,homeProfile,awayProfile,homeFieldRating}),s=shadow.summary;
   v2Rows.push({
-   points:shadow.summary.totalPoints,homePoints:shadow.summary.home.points,awayPoints:shadow.summary.away.points,
-   plays:shadow.summary.totalPlays,yards:shadow.summary.home.yards+shadow.summary.away.yards,
-   turnovers:shadow.summary.home.turnovers+shadow.summary.away.turnovers,homeWin:shadow.state.score.home>shadow.state.score.away?1:0,
+   points:s.totalPoints,homePoints:s.home.points,awayPoints:s.away.points,plays:s.totalPlays,yards:s.home.yards+s.away.yards,
+   turnovers:s.home.turnovers+s.away.turnovers,touchdowns:s.home.touchdowns+s.away.touchdowns,
+   fgMade:s.home.fieldGoals.made+s.away.fieldGoals.made,fgAtt:s.home.fieldGoals.attempted+s.away.fieldGoals.attempted,
+   punts:s.home.punts+s.away.punts,homeWin:shadow.state.score.home>shadow.state.score.away?1:0,
    profileGap:round(homeProfile.overall-awayProfile.overall),homeFieldRating:round(homeFieldRating)
   });
  }
- const summarize=rows=>({games:rows.length,meanPoints:round(mean(rows,'points')),meanPlays:round(mean(rows,'plays')),meanYards:round(mean(rows,'yards')),meanTurnovers:round(mean(rows,'turnovers')),homeWinRate:round(mean(rows,'homeWin')),meanHomeFieldRating:round(mean(rows,'homeFieldRating'))});
+ const summarize=rows=>({games:rows.length,meanPoints:round(mean(rows,'points')),meanPlays:round(mean(rows,'plays')),meanYards:round(mean(rows,'yards')),meanTurnovers:round(mean(rows,'turnovers')),meanTouchdowns:round(mean(rows,'touchdowns')),meanFgMade:round(mean(rows,'fgMade')),meanFgAtt:round(mean(rows,'fgAtt')),meanPunts:round(mean(rows,'punts')),homeWinRate:round(mean(rows,'homeWin')),meanHomeFieldRating:round(mean(rows,'homeFieldRating'))});
  const old=summarize(oldRows),v2=summarize(v2Rows),delta={};
- for(const k of ['meanPoints','meanPlays','meanYards','meanTurnovers','homeWinRate'])delta[k]=round(v2[k]-old[k]);
+ for(const k of ['meanPoints','meanPlays','meanYards','meanTurnovers','meanTouchdowns','meanFgMade','meanFgAtt','meanPunts','homeWinRate'])delta[k]=round(v2[k]-old[k]);
  const strengthBuckets={favored:{old:[],v2:[]},even:{old:[],v2:[]},underdog:{old:[],v2:[]}};
- for(let i=0;i<oldRows.length;i++){
-  const gap=oldRows[i].profileGap,b=gap>=7?'favored':gap<=-7?'underdog':'even';strengthBuckets[b].old.push(oldRows[i].homeWin);strengthBuckets[b].v2.push(v2Rows[i].homeWin);
- }
+ for(let i=0;i<oldRows.length;i++){const gap=oldRows[i].profileGap,b=gap>=7?'favored':gap<=-7?'underdog':'even';strengthBuckets[b].old.push(oldRows[i].homeWin);strengthBuckets[b].v2.push(v2Rows[i].homeWin)}
  const sensitivity={};for(const [k,b] of Object.entries(strengthBuckets))sensitivity[k]={games:b.old.length,oldHomeWinRate:round(mean(b.old.map(homeWin=>({homeWin})),'homeWin')),v2HomeWinRate:round(mean(b.v2.map(homeWin=>({homeWin})),'homeWin'))};
  const report={generatedAt:new Date().toISOString(),branch:'codex/v0100-game-engine-2',baselineVersion:e.APP_VERSION,mode:'development-only shadow comparison',matchups:matchups.length,old,v2,delta,strengthSensitivity:sensitivity,notes:['The v0.9 simulator runs only on cloned team objects. Its temporary archive/event writes are removed after each sample.','The v2 result is never installed into the dynasty.','Home-field input is derived from the current homeFieldFor() value and converted to a bounded matchup-rating edge.','These are calibration observations, not release thresholds.']};
  if(!Number.isFinite(v2.meanPoints)||v2.games!==matchups.length)throw new Error('Invalid v2 calibration report.');
