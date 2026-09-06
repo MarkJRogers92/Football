@@ -49,6 +49,7 @@ function loadEngine({ seed, stubRender = true, indexedDB } = {}) {
   const els = installDom();
   if (indexedDB) global.indexedDB = indexedDB;
   global.DynastyStorage = require('../storage.js');
+  global.DynastyRng = require('../rng.js');
   if (seed !== undefined) {
     // Deterministic xorshift so runs are reproducible across measurements.
     let s = seed >>> 0 || 1;
@@ -57,6 +58,16 @@ function loadEngine({ seed, stubRender = true, indexedDB } = {}) {
       s ^= s >> 17;
       s ^= s << 5;  s >>>= 0;
       return s / 4294967296;
+    };
+    let cryptoState = (seed ^ 0x9e3779b9) >>> 0 || 1;
+    global.crypto.getRandomValues = values => {
+      for (let i = 0; i < values.length; i++) {
+        cryptoState ^= cryptoState << 13; cryptoState >>>= 0;
+        cryptoState ^= cryptoState >> 17;
+        cryptoState ^= cryptoState << 5; cryptoState >>>= 0;
+        values[i] = cryptoState;
+      }
+      return values;
     };
   }
   const src = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
@@ -76,6 +87,7 @@ globalThis.__ENGINE__ = {
   get jobOffers(){ return universe.jobOffers },
   get schools(){ return schools },
   loadSchools, initUniverse, buildSchedule, ranked, rankingScore, profiles, gameProfiles,
+  gameplayRandom, syncGameplayRng,
   weeklyPlan, ensureWeeklyDecisions, currentWeeklyDecisions, hasPendingWeeklyDecisions, hasPendingCareerChoice, resolveWeeklyDecision, delegateWeeklyDecisions, playerAgencyDecision, playerInteractionWindow, promisePlayerOpportunity, applyRequestedPositionChange, importantStarters, weeklyPlayerPlan, pipelineStrength, oversignAppetite, scholarshipRoom, scholarshipCapacity, scholarshipSummary, projectedReturning, projectedDepartures, pullOffer, recruitBlocked, enforceScholarshipLimits, canTakeCommit, classCommitCount, pulledOfferHubItems, SCHOLARSHIP_LIMIT,
   setTeamScheme, schemeTransition, schemeFamiliarity, advanceSchemeInstall, schemeFitFor, schemeDefFor, schemeFitPressure, applyCoachScheme, ensureCoachScheme, positionOptions, positionChangeWillingness, positionTransitionFit, applyPositionChangeCost, playerSchemeFit, SCHEME_SIDE,
   gameRecap, recapFacts, recapPicker, weeklyNewsletter, newsWeight, newsGames, newsWeeks,

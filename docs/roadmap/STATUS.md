@@ -1,6 +1,6 @@
 # Roadmap execution status
 
-Last inspected source: `57ccef7` (`0.9.49`)
+Last inspected source: `5e059e0` (`0.9.50 in progress`)
 
 | Packet | Status | Active branch | Blocking decision |
 | --- | --- | --- | --- |
@@ -9,7 +9,7 @@ Last inspected source: `57ccef7` (`0.9.49`)
 | v0.9.47 transfer portal | SHIPPED | `claude/review-improvement-dwjemy` | None |
 | v0.9.48 schedules/rivalries | SHIPPED | `claude/review-improvement-dwjemy` | None |
 | v0.9.49 saves/storage | SHIPPED `bdcf0d2` | `claude/review-improvement-dwjemy` | None |
-| v0.9.50 modules/RNG | READY | — | Preserve standalone build |
+| v0.9.50 modules/RNG | IN PROGRESS | `codex/v0950-continuation` | Preserve standalone build |
 | v0.10 Game Engine 2 | READY FOR SLICING | — | Begin only after v0.9.50 |
 | v0.11 program economy | READY FOR SLICING | — | Creation-budget tuning |
 | v0.12 encyclopedia | READY FOR SLICING | — | Begin after archive contracts stabilize |
@@ -20,10 +20,10 @@ slices, but the whole major version must not be attempted in one branch.
 
 ## Next action
 
-A fast v0.9.49 review found **no definite defect**; see HANDOFF_TO_GPT.md for
-what was inspected and how. Begin `06-v0950-modularization-rng.md`, suggested
-commit 1 only: add the RNG implementation and characterization tests without
-switching any callers. Do not reopen save/storage work.
+Suggested commits 1 and 2 of `06-v0950-modularization-rng.md` are complete at
+`de5a14f` and `5e059e0`: the RNG contract is tested, saved/resumed with the
+universe, and used by the shared random utilities. Next, route direct gameplay
+randomness one domain per commit, beginning with schedule/rivalry.
 
 ## Current validation checkpoint
 
