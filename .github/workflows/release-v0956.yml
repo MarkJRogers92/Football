@@ -1,0 +1,83 @@
+name: Release v0.9.56 My Board
+
+on:
+  push:
+    branches:
+      - codex/v0956-my-board
+    paths:
+      - .github/workflows/release-v0956.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dynasty-release-v0956
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Prepare v0.9.56 release candidate
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          const version='0.9.56';
+          fs.writeFileSync('VERSION.txt',version+'\n');
+          const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
+          pkg.version=version;
+          fs.writeFileSync('package.json',JSON.stringify(pkg,null,2)+'\n');
+          let app=fs.readFileSync('app.js','utf8');
+          if(!/const APP_VERSION='0\.9\.55';/.test(app)) throw new Error('expected APP_VERSION 0.9.55 before release bump');
+          app=app.replace("const APP_VERSION='0.9.55';",`const APP_VERSION='${version}';`);
+          fs.writeFileSync('app.js',app);
+          NODE
+          npm run build
+          rm .github/workflows/release-v0956.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add VERSION.txt package.json app.js index.html .github/workflows/release-v0956.yml
+          git commit -m "release: prepare v0.9.56 production [skip ci]"
+      - name: Verify committed build is current
+        run: |
+          npm run build
+          git diff --exit-code -- index.html
+      - name: Verify releasable source tree
+        run: npm run verify:release
+      - name: Engine and presentation tests
+        run: npm test
+      - name: Locate Chromium
+        id: chromium
+        shell: bash
+        run: |
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$browser" ]; then
+            npx playwright-core install chromium
+            browser="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$browser"
+          echo "path=$browser" >> "$GITHUB_OUTPUT"
+      - name: Browser UI and visual regression tests
+        run: npm run test:browser
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+      - name: Browser IndexedDB regression check
+        run: npm run test:browser-storage
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+      - name: Simulation audit
+        run: npm run audit
+      - name: Push validated v0.9.56 source
+        run: git push origin HEAD:${GITHUB_REF_NAME}
+      - name: Publish production v0.9.56
+        run: node tools/publish.js
