@@ -695,7 +695,13 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 
 .scouting-trail-card{margin:0 0 12px;padding:12px;border:1px solid rgba(255,255,255,.12);border-radius:10px}.scouting-trail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.scouting-trail-head>div{display:grid;gap:2px}.scouting-trail-head>span{font-size:.72rem;opacity:.72;text-align:right}.scouting-trail-list{display:grid;margin-top:9px}.scouting-trail-row{display:grid;grid-template-columns:minmax(105px,.55fr) minmax(0,1.45fr);gap:10px;padding:8px 0;border-top:1px solid rgba(255,255,255,.08)}.scouting-trail-row>div{display:grid;gap:2px}.scouting-trail-row b{font-size:.76rem}.scouting-trail-row small,.scouting-trail-note{font-size:.68rem;opacity:.68}.scouting-trail-note{display:block;margin-top:7px}@media(max-width:700px){.scouting-trail-head,.scouting-trail-row{display:grid;grid-template-columns:1fr}.scouting-trail-head>span{text-align:left}}
 
-.recruiting-filter-strip{display:grid;grid-template-columns:repeat(3,minmax(140px,1fr)) auto auto auto;gap:10px;align-items:end;margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.025)}
+.recruiting-board-view{display:flex;justify-content:space-between;gap:14px;align-items:center;margin:12px 0 8px;padding:12px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,rgba(143,177,255,.08),rgba(255,255,255,.02))}
+.recruiting-board-tabs{display:inline-flex;gap:6px;padding:4px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}
+.recruiting-board-tabs button{border:0;background:transparent;padding:8px 12px;border-radius:7px;color:var(--muted);font-weight:750}
+.recruiting-board-tabs button.active{background:var(--panel);color:var(--text);box-shadow:0 0 0 1px var(--line)}
+.recruiting-board-count{display:inline-flex;min-width:22px;height:20px;padding:0 6px;align-items:center;justify-content:center;margin-left:5px;border-radius:999px;background:rgba(143,177,255,.16);color:var(--accent2);font-size:.75rem;font-variant-numeric:tabular-nums}
+.recruiting-board-note{color:var(--muted);font-size:.8rem;line-height:1.35;max-width:620px}
+.recruiting-filter-strip{display:grid;grid-template-columns:repeat(3,minmax(140px,1fr)) auto auto auto;gap:10px;align-items:end;margin:8px 0 12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.025)}
 .recruiting-filter-strip label{display:grid;gap:5px;font-size:.76rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
 .recruiting-filter-strip select{min-width:0;width:100%}
 .recruiting-filter-toggle{display:flex!important;align-items:center;gap:7px;min-height:38px;text-transform:none!important;letter-spacing:0!important;white-space:nowrap}
@@ -703,8 +709,8 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 .recruiting-filter-count{align-self:center;color:var(--muted);font-size:.78rem;white-space:nowrap}
 .recruiting-filter-count strong{color:var(--text)}
 .recruiting-filter-strip button{white-space:nowrap}
-@media(max-width:900px){.recruiting-filter-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.recruiting-filter-count{white-space:normal}}
-@media(max-width:560px){.recruiting-filter-strip{grid-template-columns:1fr}.recruiting-filter-toggle{min-height:auto}.recruiting-filter-strip button{width:100%}}
+@media(max-width:900px){.recruiting-board-view{align-items:flex-start;flex-direction:column}.recruiting-board-note{max-width:none}.recruiting-filter-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.recruiting-filter-count{white-space:normal}}
+@media(max-width:560px){.recruiting-board-tabs{display:grid;grid-template-columns:1fr 1fr;width:100%}.recruiting-board-tabs button{width:100%}.recruiting-filter-strip{grid-template-columns:1fr}.recruiting-filter-toggle{min-height:auto}.recruiting-filter-strip button{width:100%}}
 
 .recruit-compare-toggle{margin-top:5px;font-size:.72rem;padding:4px 7px}.recruit-compare-toggle.active{font-weight:700}.recruit-compare-tray{margin-top:10px;padding:10px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.recruit-compare-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}.recruit-compare-head>div{display:grid;gap:2px}.recruit-compare-head small{opacity:.68}.recruit-compare-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.recruit-compare-card{padding:9px;border:1px solid rgba(255,255,255,.1);border-radius:8px;display:grid;gap:5px}.recruit-compare-verdict{display:flex;align-items:center;justify-content:space-between;gap:8px}.recruit-compare-verdict b{font-size:1.15rem}@media(max-width:900px){.recruit-compare-grid{grid-template-columns:1fr}}
 .roster-need-strip{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 12px}.roster-need{display:grid;gap:1px;min-width:105px;padding:7px 9px;border:1px solid rgba(255,255,255,.1);border-radius:8px}.roster-need strong{font-size:.82rem}.roster-need span{font-weight:700}.roster-need small{opacity:.65}.roster-need.urgent{border-width:2px}.staff-shortlist-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.staff-shortlist-card{position:relative;display:grid;grid-template-columns:22px 1fr;gap:5px 7px;padding:10px;border:1px solid rgba(255,255,255,.1);border-radius:9px}.staff-shortlist-card.targeted{border-width:2px}.staff-shortlist-rank{grid-row:1/6;font-size:.78rem;opacity:.55}.staff-shortlist-verdict{display:flex;align-items:center;justify-content:space-between;gap:8px}.staff-shortlist-verdict span{font-size:.75rem;opacity:.72}.staff-shortlist-reason,.staff-shortlist-actions,.staff-shortlist-card>.small{grid-column:2}.staff-shortlist-actions{display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap}.staff-shortlist-actions>.scouting-actions{margin-top:0}.staff-shortlist-actions button{font-size:.72rem;padding:4px 7px}@media(max-width:1150px){.staff-shortlist-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.staff-shortlist-grid{grid-template-columns:1fr}.roster-need{flex:1 1 90px}}
@@ -6132,11 +6138,21 @@ if(typeof module==='object'&&module.exports){
  };
  const filterEscape=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function filterOptions(values,current){return values.map(([value,label])=>`<option value="${filterEscape(value)}" ${value===current?'selected':''}>${filterEscape(label)}</option>`).join('')}
+ function recruitingTargetCount(){return Array.isArray(universe?.recruits)?universe.recruits.filter(r=>r.targeted).length:0}
+ function recruitingBoardViewHTML(){
+  const s=recruitingFilterSystem.normalize(recruitBoardFilters),count=recruitingTargetCount();
+  const note=s.targetedOnly?(count?`Your board has ${count} targeted recruit${count===1?'':'s'}. Use the filters below to narrow it further.`:'Your board is empty. Target a recruit from All Recruits and they will appear here automatically.'):'Browse the full recruiting pool, then add prospects to My Board as you identify priorities.';
+  return `<div class="recruiting-board-view" data-recruiting-board-view><div class="recruiting-board-tabs" role="group" aria-label="Recruiting board view"><button type="button" data-recruit-view="all" class="${s.targetedOnly?'':'active'}" aria-pressed="${s.targetedOnly?'false':'true'}">All Recruits</button><button type="button" data-recruit-view="board" class="${s.targetedOnly?'active':''}" aria-pressed="${s.targetedOnly?'true':'false'}">My Board <span class="recruiting-board-count">${count}</span></button></div><div class="recruiting-board-note">${note}</div></div>`;
+ }
  function recruitingFilterHTML(){
   const s=recruitingFilterSystem.normalize(recruitBoardFilters),displayed=Math.min(220,recruitFilterMatchCount),positions=[['ALL','All positions'],...POS.map(p=>[p,p])],stages=[['ALL','All evaluation stages'],['PRELIMINARY','Preliminary'],['QUICK_FILM','Film reviewed'],['FULL_EVALUATION','Full evaluation']],verdicts=[['ALL','All staff verdicts'],...recruitingFilterSystem.verdictLabels.map(v=>[v,v])];
   return `<div class="recruiting-filter-strip" data-recruiting-filters><label>Position<select data-recruit-filter="pos">${filterOptions(positions,s.pos)}</select></label><label>Evaluation<select data-recruit-filter="stage">${filterOptions(stages,s.stage)}</select></label><label>Staff Verdict<select data-recruit-filter="verdict">${filterOptions(verdicts,s.verdict)}</select></label><label class="recruiting-filter-toggle"><input type="checkbox" data-recruit-filter="targetedOnly" ${s.targetedOnly?'checked':''}> Targeted only</label><span class="recruiting-filter-count"><strong>${displayed}</strong> shown · ${recruitFilterMatchCount} matching</span><button type="button" data-recruit-filter-reset ${s.pos==='ALL'&&s.stage==='ALL'&&s.verdict==='ALL'&&!s.targetedOnly?'disabled':''}>Reset</button></div>`;
  }
  function bindRecruitingFilters(){
+  $$('[data-recruit-view]').forEach(el=>el.onclick=()=>{
+   recruitBoardFilters={...recruitBoardFilters,targetedOnly:el.dataset.recruitView==='board'};
+   renderRecruiting();
+  });
   $$('[data-recruit-filter]').forEach(el=>el.onchange=()=>{
    const key=el.dataset.recruitFilter;
    recruitBoardFilters={...recruitBoardFilters,[key]:key==='targetedOnly'?!!el.checked:el.value};
@@ -6146,8 +6162,9 @@ if(typeof module==='object'&&module.exports){
  }
  function renderRecruitingFilters(){
   const root=$('#recruiting'),table=root?.querySelector?.('.table-wrap');if(!root||!table)return;
+  root.querySelector?.('[data-recruiting-board-view]')?.remove();
   root.querySelector?.('[data-recruiting-filters]')?.remove();
-  table.insertAdjacentHTML?.('beforebegin',recruitingFilterHTML());
+  table.insertAdjacentHTML?.('beforebegin',`${recruitingBoardViewHTML()}${recruitingFilterHTML()}`);
   bindRecruitingFilters();
  }
  const renderRecruitingBeforeFilters=renderRecruiting;
@@ -6156,6 +6173,8 @@ if(typeof module==='object'&&module.exports){
  globalThis.DynastyLabRecruitingFilters={
   getState:()=>({...recruitBoardFilters}),
   setState:s=>{recruitBoardFilters=recruitingFilterSystem.normalize({...recruitBoardFilters,...s});renderRecruiting()},
+  showAll:()=>{recruitBoardFilters={...recruitBoardFilters,targetedOnly:false};renderRecruiting()},
+  showBoard:()=>{recruitBoardFilters={...recruitBoardFilters,targetedOnly:true};renderRecruiting()},
   reset:()=>{recruitBoardFilters={pos:'ALL',stage:'ALL',verdict:'ALL',targetedOnly:false};renderRecruiting()}
  };
 }
