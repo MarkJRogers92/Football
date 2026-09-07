@@ -1,4 +1,4 @@
-# Retry with browser console diagnostics and no redundant player click.
+# Retry after guarding the read-only development adapter before dynasty initialization.
 name: V0.10.5 Development Visualization Checkpoint
 
 on:
