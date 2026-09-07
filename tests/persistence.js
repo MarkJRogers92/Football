@@ -70,3 +70,21 @@ const {create} = require('../storage.js');
   e.initUniverse();e.setUserTeam('Chicago Metropolitan');await e.saveBrowser();
   assert.equal((await store.load()).archiveRef.count,0);
  });
+
+// v0.11.4's save-input hardening (validateSaveText) originally walked every string in the
+// whole universe, which is an O(save size) scan on every load and would only ever grow with
+// a dynasty. Team name is the one user-editable string (via applyProgramEdit) that reaches
+// raw innerHTML instead of .textContent; everything else in a save comes from fixed internal
+// word pools and was never typed by a user, so it cannot carry injected markup. This pins
+// that the check is scoped to team names only, not the whole tree.
+test('save-text validation checks team names, not every string in the save',async()=>{
+ const e=loadEngine({seed:5151});await e.loadSchools();e.setUserTeam('Chicago Metropolitan');e.initUniverse();
+ assert.doesNotThrow(()=>e.validateSaveText(e.universe),'a normal universe passes');
+ // A quote character elsewhere in the save (log/recap text, a nickname) must not be flagged —
+ // only user-editable team names are checked.
+ e.universe.movementLog=['Coach "Ace" Miller was hired.'];
+ e.universe.teams[0].nickname='The "Iron" Wolves';
+ assert.doesNotThrow(()=>e.validateSaveText(e.universe),'unsafe-looking text outside team names is not the attack surface and is left alone');
+ e.universe.teams[1].name='<img src=x onerror=alert(1)>';
+ assert.throws(()=>e.validateSaveText(e.universe),/team name contains unsafe markup/,'an actual unsafe team name is still caught');
+});

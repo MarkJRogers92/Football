@@ -3206,18 +3206,16 @@ async function storageOperation(action){
   catch(e){setStatus(e.message||'Save operation failed. Your current dynasty is still open.');return false}
   finally{controls.forEach((el,i)=>el.disabled=disabled[i]);storageBusy=false;if(universe)render()}
 }
-function validateSaveText(value){
-  const pending=[value],seen=new WeakSet();
-  while(pending.length){
-    const current=pending.pop();
-    if(typeof current==='string'){
-      if(/[<>\"]/.test(current))throw new Error('Invalid dynasty save. Text fields contain unsafe markup.');
-      continue;
-    }
-    if(!current||typeof current!=='object'||seen.has(current))continue;
-    seen.add(current);
-    for(const item of Object.values(current))pending.push(item);
-  }
+// Team name is the one user-editable string (via applyProgramEdit) that reaches raw
+// innerHTML across the app (standings, schedules, recruiting) instead of .textContent.
+// Every other name in a save — players, coaches, recruits, recap/log text — comes from
+// fixed internal word pools and was never typed by a user, so it cannot carry injected
+// markup; walking the whole save to re-check it would just be an O(save size) load-time
+// cost with nothing left to catch. Scoped here to what a save can actually make unsafe.
+function validateSaveText(u){
+  for(const t of u.teams||[])
+    if(typeof t?.name==='string'&&/[<>\"]/.test(t.name))
+      throw new Error('Invalid dynasty save. A team name contains unsafe markup.');
 }
 function validateSave(d){
   const u=d?.universe||d;

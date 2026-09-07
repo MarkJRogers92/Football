@@ -90,7 +90,7 @@ function conferenceSurfaces(){
  }
  applyConferenceVars(document)
 }
-function top15(){for(const row of document.querySelectorAll('#top15 .rankrow')){const cell=row.firstElementChild;if(!cell||cell.querySelector('.sports-mark'))continue;const name=[...cell.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();if(!name)continue;cell.querySelector('.rank')?.insertAdjacentHTML('afterend',mark(name,'small'))}}
+function top15(){for(const row of document.querySelectorAll('#top15 .rankrow')){const cell=row.firstElementChild;if(!cell||cell.querySelector('.sports-mark')||cell.querySelector('.team-logo'))continue;const name=[...cell.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();if(!name)continue;cell.querySelector('.rank')?.insertAdjacentHTML('afterend',mark(name,'small'))}}
 function gamecenter(){
  const dlg=document.querySelector('#gameDialog');if(!dlg?.hasAttribute('open'))return;const h=document.querySelector('#gameDialogName'),head=dlg.querySelector('.dialog-head');if(!h||!head)return;const title=(h.textContent||'').trim(),m=title.match(/^(.+?)\s+(\d+)\s+—\s+(\d+)\s+(.+)$/);if(!m){delete dlg.dataset.sportsScoreKey;head.querySelector('.scoreboard')?.remove();return}
  const meta=(document.querySelector('#gameDialogMeta')?.textContent||'').split('·').map(x=>x.trim()).filter(Boolean),pre=document.querySelector('#gamePregame')?.textContent||'',key=title+'|'+meta.join('|')+'|'+pre;if(dlg.dataset.sportsScoreKey===key)return;dlg.dataset.sportsScoreKey=key;dlg.classList.add('sports-game-dialog');

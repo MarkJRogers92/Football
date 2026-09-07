@@ -1,6 +1,9 @@
 # Roadmap execution status
 
-Last inspected source: commit 3 (RNG routing) complete on `claude/review-improvement-dwjemy`; production is `ca1edd6` (v0.9.50, RNG infra only, no routing yet).
+Last inspected source: `77877e9` (`v0.11.4`), published and live on `gh-pages`.
+This file had drifted several releases behind actual `git log` — trust
+`CHANGELOG.md` and `git log --oneline` over this table's history, only the
+current row states are being asserted here.
 
 | Packet | Status | Active branch | Blocking decision |
 | --- | --- | --- | --- |
@@ -9,10 +12,11 @@ Last inspected source: commit 3 (RNG routing) complete on `claude/review-improve
 | v0.9.47 transfer portal | SHIPPED | `claude/review-improvement-dwjemy` | None |
 | v0.9.48 schedules/rivalries | SHIPPED | `claude/review-improvement-dwjemy` | None |
 | v0.9.49 saves/storage | SHIPPED `bdcf0d2` | `claude/review-improvement-dwjemy` | None |
-| v0.9.50 modules/RNG | IN PROGRESS — commits 1-3 done (RNG + all 4 domains routed), not published | `claude/review-improvement-dwjemy` | Full `npm test` not yet run on the routed tree |
-| v0.10 Game Engine 2 | READY FOR SLICING | — | Begin only after v0.9.50 |
-| v0.11 program economy | READY FOR SLICING | — | Creation-budget tuning |
-| v0.12 encyclopedia | READY FOR SLICING | — | Begin after archive contracts stabilize |
+| v0.9.50 modules/RNG | SHIPPED — RNG infra + all 4 gameplay domains routed through `gameplayRandom()` | `claude/review-improvement-dwjemy` | None |
+| v0.9.51-55 season goals/recruiting/development | SHIPPED | `claude/review-improvement-dwjemy` | None |
+| v0.10 Game Engine 2 | SHIPPED | `claude/review-improvement-dwjemy` | None |
+| v0.11 program economy | SHIPPED `77877e9` (`v0.11.4`, current production) | `claude/review-improvement-dwjemy` | None |
+| v0.12 encyclopedia | READY FOR SLICING | — | Not started |
 
 `READY` means the packet can begin as one bounded release. `READY FOR SLICING`
 means the major version has an implementation contract and pre-defined release
@@ -20,12 +24,17 @@ slices, but the whole major version must not be attempted in one branch.
 
 ## Next action
 
-Suggested commits 1 and 2 of `06-v0950-modularization-rng.md` are complete at
-`de5a14f` and `5e059e0`: the RNG contract is tested, saved/resumed with the
-universe, and used by the shared random utilities. Next, route direct gameplay
-randomness one domain per commit, beginning with schedule/rivalry.
+`docs/roadmap/09-v012-encyclopedia.md` is the only unstarted packet with a
+written contract. Read it before beginning; no branch has touched it yet.
 
-## Current validation checkpoint
+## Most recent check (v0.11.4)
+
+Build, `tests/version.js`, and a static sweep (no merge-conflict markers, no
+duplicate `function` declarations, no debug statements) passed on `77877e9`.
+The full `npm test` suite was not run for this check — same open gap noted
+below. Full suite + browser suite are still owed before the next release.
+
+## Current validation checkpoint (historical, pre-v0.10 — kept for provenance only)
 
 - `npm run verify:release`: PASS on clean commit `57ccef7`.
 - Headless simulation smoke: 53 PASS, 0 FAIL.
