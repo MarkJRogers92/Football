@@ -1,4 +1,4 @@
-# Retry after legacy recruiting browser suites explicitly enter Table mode.
+# Diagnose and close the v0.10.4 generated-artifact checkpoint with named browser suites.
 name: V0.10.4 Recruiting Workspace Sync
 
 on:
@@ -47,13 +47,18 @@ jobs:
           fi
           test -n "$browser"
           echo "path=$browser" >> "$GITHUB_OUTPUT"
-      - name: Recruiting browser regressions
+      - name: Recruiting visual regression
         env:
           CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
-        run: |
-          node tests/recruit-visual.js
-          node tests/scouting-trail-browser.js
-          node tests/recruiting-filters-browser.js
+        run: node tests/recruit-visual.js
+      - name: Scouting trail browser regression
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: node tests/scouting-trail-browser.js
+      - name: Recruiting filters browser regression
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: node tests/recruiting-filters-browser.js
       - name: Commit generated artifact and retire helper
         shell: bash
         run: |
