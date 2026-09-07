@@ -14,7 +14,7 @@ concurrency:
   group: v0103-milestone-a-check
   cancel-in-progress: false
 
-# Re-run from the browser-routing-compatible head.
+# Re-run from the mobile-utility-compatible head.
 jobs:
   checkpoint:
     runs-on: ubuntu-latest
