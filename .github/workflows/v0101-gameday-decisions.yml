@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: npm install --no-package-lock
       - name: Parse Game Day foundation
-        run: node --check game-engine-v2-decisions.js && node --check game-engine-v2-gameday.js && node --check game-engine-v2-gameday-record.js && node --check game-engine-v2-gameday-ui.js && node --check tests/game-engine-v2-decisions.js && node --check tests/game-engine-v2-gameday.js && node --check tests/game-engine-v2-gameday-browser.js && node --check tests/game-engine-v2-gameday-record-browser.js
+        run: node --check game-engine-v2-decisions.js && node --check game-engine-v2-gameday.js && node --check game-engine-v2-gameday-prep.js && node --check game-engine-v2-gameday-record.js && node --check game-engine-v2-gameday-ui.js && node --check game-engine-v2-gameday-prep-bridge.js && node --check tests/game-engine-v2-decisions.js && node --check tests/game-engine-v2-gameday.js && node --check tests/game-engine-v2-gameday-browser.js && node --check tests/game-engine-v2-gameday-record-browser.js
       - name: Fourth-down decision contract
         run: npm run test:game-engine-v2-decisions
       - name: Paused calibrated Game Day runner
@@ -32,7 +32,7 @@ jobs:
       - name: Build standalone artifact
         run: npm run build
       - name: Verify Game Day modules are embedded
-        run: grep -q "DynastyGameEngineV2Decisions" index.html && grep -q "DynastyGameEngineV2GameDay" index.html && grep -q "recordInteractiveV2GameDay" index.html && grep -q "v2InteractiveGameDay" index.html
+        run: grep -q "DynastyGameEngineV2Decisions" index.html && grep -q "DynastyGameEngineV2GameDay" index.html && grep -q "v2GameDayPreparedTeams" index.html && grep -q "recordInteractiveV2GameDay" index.html && grep -q "v2InteractiveGameDay" index.html
       - name: Locate Chromium
         id: chromium
         shell: bash
