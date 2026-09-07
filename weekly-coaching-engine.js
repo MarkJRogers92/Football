@@ -4,7 +4,7 @@
   root.DynastyWeeklyCoaching=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
   'use strict';
-  const VERSION=1;
+  const VERSION=2;
   const MAX_POINTS=2;
   const FOCUSES={
     pass_protection:{label:'Pass Protection',side:'offense',description:'More protection reps and pickup work; slightly less route-detail time.',deltas:{ol:2.6,skill:-0.4,offense:0.4}},
@@ -71,5 +71,23 @@
       rows.push({pos:g.pos,starterId:s.id,starterName:s.name,challengerId:c.id,challengerName:c.name,gap,upsideGap,struggleScore:struggle.score,struggleText:struggle.text,recommendation,reason,score})
     }return rows.sort((a,b)=>b.score-a.score||a.pos.localeCompare(b.pos))[0]||null
   }
-  return{VERSION,MAX_POINTS,FOCUSES,normalizeFocuses,buildReport,applyPrepProfile,focusSummary,confidenceLabel,struggleSignal,selectStarterChallenge}
+  function advisorConfidence(coach={},schemeMatch=true){return clamp(Math.round(Number(coach.playCall??65)*.64+Number(coach.adaptability??65)*.36+(schemeMatch?3:-4)),45,96)}
+  function uniqueTwo(primary,candidates){const out=[];for(const id of [primary,...candidates])if(FOCUSES[id]&&!out.includes(id)&&out.length<2)out.push(id);return out}
+  function buildStaffRoom(input={}){
+    const report=input.report||{},e=report.estimatedEdges||{},offPass=Number(input.offPass??.5),defPressure=Number(input.defPressure??50),oc=input.oc||{},dc=input.dc||{};
+    let ocPrimary,ocReason;
+    if(e.teamProtect<=-2){ocPrimary='pass_protection';ocReason='Protection is the offensive problem most likely to wreck the plan before anything else develops.'}
+    else if(e.teamPass>=e.teamRun+2||offPass>=.58){ocPrimary='explosive_pass';ocReason='The matchup and system both justify spending practice time on creating explosive throws.'}
+    else{ocPrimary='run_blocking';ocReason='The cleanest offensive path is to win fits and keep the run game on schedule.'}
+    const ocPlan=uniqueTwo(ocPrimary,ocPrimary==='pass_protection'?(e.teamPass>=0?['explosive_pass','run_blocking']:['run_blocking','explosive_pass']):ocPrimary==='explosive_pass'?['pass_protection','run_blocking']:['pass_protection','explosive_pass']);
+    let dcPrimary,dcReason;
+    if(report.passEstimate>=56||e.oppPass>=e.oppRun+2){dcPrimary='coverage';dcReason='The opponent profile puts the passing game at the center of the defensive week.'}
+    else if(e.oppProtect<=-2||(defPressure>=65&&report.passEstimate>=48)){dcPrimary='pressure';dcReason='Their protection looks attackable enough to justify installing extra pressure answers.'}
+    else{dcPrimary='run_fits';dcReason='The front needs the practice budget more than the coverage menu this week.'}
+    const dcPlan=uniqueTwo(dcPrimary,dcPrimary==='coverage'?(e.oppProtect<=1?['pressure','run_fits']:['run_fits','pressure']):dcPrimary==='pressure'?['coverage','run_fits']:['coverage','pressure']);
+    const ocMatch=input.ocSchemeMatch!==false,dcMatch=input.dcSchemeMatch!==false;
+    const splitPlan=normalizeFocuses([ocPlan[0],dcPlan[0]]);
+    return{version:VERSION,oc:{name:oc.name||'Offensive Coordinator',confidence:advisorConfidence(oc,ocMatch),schemeMatch:ocMatch,plan:ocPlan,reason:ocReason},dc:{name:dc.name||'Defensive Coordinator',confidence:advisorConfidence(dc,dcMatch),schemeMatch:dcMatch,plan:dcPlan,reason:dcReason},split:{plan:splitPlan,reason:'Use one preparation point on each coordinator’s top concern instead of giving either side the entire week.'}}
+  }
+  return{VERSION,MAX_POINTS,FOCUSES,normalizeFocuses,buildReport,applyPrepProfile,focusSummary,confidenceLabel,struggleSignal,selectStarterChallenge,advisorConfidence,buildStaffRoom}
 });
