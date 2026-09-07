@@ -29,22 +29,23 @@ else{
   const battles=(universe.recruits||[]).filter(r=>r.targeted&&!r.committed).map(r=>{const s=recruitingBattleSystem.raceSummary(battleRows(r,5),t.id);return{r,s,window:recruitingBattleSystem.decisionWindow(r,universe,s)}}).filter(x=>x.s.rank&&x.s.rank<=2&&x.s.gap!=null&&x.s.gap>=-7).sort((a,b)=>b.r.interest-a.r.interest);for(const x of battles.slice(0,2)){stories.push({type:'recruiting',tone:x.s.rank===1?'good':'alert',kicker:'RECRUITING BATTLE',title:`${x.r.name} · ${x.s.label}`,summary:`You are #${x.s.rank}, ${x.s.gap===0?'even with':`${Math.abs(x.s.gap)} points behind`} ${x.s.leader||'the leader'} · ${x.window}.`,recruitId:x.r.id,tab:'recruiting'})}
   return{year:universe.year,week:universe.week,teamId:t.id,stories:stories.slice(0,6)};
  }
+ function teamRead(t){const p=profiles(t);return{id:t.id,name:t.name,record:`${t.w}-${t.l}`,rank:rankText(t),conference:t.conference,offense:grade(p.offense),defense:grade(p.defense)}}
  function gameDaySnapshot(){
-  if(!universe?.teams)return null;
-  const u=selected?.(),g=findUserGame?.();if(!u||!g)return null;
+  if(!universe?.teams)return null;const u=selected?.();if(!u)return null;const last=latestShowcase(u),g=findUserGame?.();
+  if(!g){if(!last)return null;const opp=T(last.opponent);if(!opp)return null;const isHome=last.location==='vs',homeTeam=isHome?u:opp;return{postgame:true,week:last.week,location:last.location,isHome,isRival:false,sameConference:u.conference===opp.conference,stakesTone:'postgame',user:teamRead(u),opponent:teamRead(opp),venue:[homeTeam.city,homeTeam.state].filter(Boolean).join(', '),stakes:'Postgame review',homeEdge:'Final result recorded',userOut:0,opponentOut:0,opponentPassMix:Math.round((OFF_SCHEMES[opp.offScheme]?.pass??.5)*100),activePlan:'Final',recommendedPlan:'Review',recommendation:'Review the result and key performers before advancing the week.',lastShowcase:last}}
   const opp=T(g.home===u.name?g.away:g.home);if(!opp)return null;
   const m=gameMatchup(u,opp),P=m.teamProfile||profiles(u),O=m.opponentProfile||profiles(opp),plan=teamGameplanFor(u,opp.name),tier=GAMEPLAN_TIERS[plan?.prep]||GAMEPLAN_TIERS.standard,rec=gameplanRecommendation(u,opp,m),recommended=GAMEPLAN_TIERS[rec?.id]||GAMEPLAN_TIERS.balance||tier;
   const isHome=g.home===u.name,homeTeam=isHome?u:opp,rival=rivalOf(u),isRival=rival?.name===opp.name,sameConference=u.conference===opp.conference;
   const stakes=isRival?`${u.rivalry?.trophy||'Rivalry game'} · ${rivalrySeriesText(u)}`:sameConference?`${u.conference} Conference game`:'Nonconference game';
   const passMix=Math.round((OFF_SCHEMES[opp.offScheme]?.pass??.5)*100);
   return{
-   week:g.week??universe.week+1,location:isHome?'vs':'@',isHome,isRival,sameConference,stakesTone:isRival?'rivalry':sameConference?'conference':'standard',
+   postgame:false,week:g.week??universe.week+1,location:isHome?'vs':'@',isHome,isRival,sameConference,stakesTone:isRival?'rivalry':sameConference?'conference':'standard',
    user:{id:u.id,name:u.name,record:`${u.w}-${u.l}`,rank:rankText(u),conference:u.conference,offense:grade(P.offense),defense:grade(P.defense)},
    opponent:{id:opp.id,name:opp.name,record:`${opp.w}-${opp.l}`,rank:rankText(opp),conference:opp.conference,offense:grade(O.offense),defense:grade(O.defense)},
    venue:[homeTeam.city,homeTeam.state].filter(Boolean).join(', '),stakes,
    homeEdge:isHome?`Home field +${homeFieldFor(u).toFixed(1)} pts`:`Road game · ${opp.name} receives home field`,
    userOut:(u.roster||[]).filter(p=>!gameAvailable(p)).length,opponentOut:(opp.roster||[]).filter(p=>!gameAvailable(p)).length,
-   opponentPassMix:passMix,activePlan:tier?.label||'Standard',recommendedPlan:recommended?.label||tier?.label||'Standard',recommendation:rec?.reason||'Current staff recommendation.',lastShowcase:latestShowcase(u)
+   opponentPassMix:passMix,activePlan:tier?.label||'Standard',recommendedPlan:recommended?.label||tier?.label||'Standard',recommendation:rec?.reason||'Current staff recommendation.',lastShowcase:last
   };
  }
  globalThis.DynastyLabGameDayPresentation={snapshot:gameDaySnapshot,note:'Read-only Game Day presentation derived from the same current matchup, roster availability, staff recommendation, schedule, archived game results and home-field inputs used by the live game.'};
