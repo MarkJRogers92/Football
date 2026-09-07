@@ -1,0 +1,39 @@
+/* v0.11.1 — restrained motion and interaction polish. Presentation only. */
+
+:root{--dl-motion-fast:130ms;--dl-motion-standard:190ms;--dl-motion-slow:260ms;--dl-motion-ease:cubic-bezier(.22,.8,.2,1)}
+
+@keyframes dl-surface-in{from{opacity:.72;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@keyframes dl-detail-in{from{opacity:.62;transform:translateX(5px)}to{opacity:1;transform:translateX(0)}}
+@keyframes dl-value-in{0%{opacity:.5;transform:translateY(3px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes dl-result-in{0%{opacity:.55;transform:scale(.992)}100%{opacity:1;transform:scale(1)}}
+
+@media (prefers-reduced-motion:no-preference){
+  .dl-motion-surface{animation:dl-surface-in var(--dl-motion-standard) var(--dl-motion-ease) both}
+  .dl-motion-detail{animation:dl-detail-in var(--dl-motion-standard) var(--dl-motion-ease) both}
+  .dl-motion-value{animation:dl-value-in var(--dl-motion-fast) var(--dl-motion-ease) both}
+  .dl-motion-result{animation:dl-result-in var(--dl-motion-slow) var(--dl-motion-ease) both}
+
+  .client-nav-item,.client-mobile-item,.client-nav-toggle,.recruit-workspace-card,.rw-filter-stack button,.rw-actions button,.dev-viz-row,.dev-player-picker button,.dev-player-head button,.pi-chip,.event-team,.season-result,.season-next,.legacy-chip,.legacy-season{
+    transition:background-color var(--dl-motion-fast) ease,border-color var(--dl-motion-fast) ease,color var(--dl-motion-fast) ease,opacity var(--dl-motion-fast) ease,transform var(--dl-motion-fast) var(--dl-motion-ease)
+  }
+  .client-nav-item:hover,.client-nav-toggle:hover,.recruit-workspace-card:hover,.rw-filter-stack button:hover,.rw-actions button:hover,.dev-viz-row:hover,.dev-player-picker button:hover,.dev-player-head button:hover,.legacy-season:hover{transform:translateY(-1px)}
+  .recruit-workspace-card:active,.rw-actions button:active,.dev-viz-row:active,.dev-player-picker button:active,.dev-player-head button:active{transform:translateY(0)}
+
+  .rw-confidence>i,.dev-attr-row i>b,.dev-group-row i>b,.season-progress i{transition:width var(--dl-motion-slow) var(--dl-motion-ease),transform var(--dl-motion-slow) var(--dl-motion-ease)}
+  .dev-chart polyline,.dev-chart-point{transition:stroke-dashoffset var(--dl-motion-slow) var(--dl-motion-ease),opacity var(--dl-motion-standard) ease,transform var(--dl-motion-standard) var(--dl-motion-ease)}
+}
+
+.client-nav-item:focus-visible,.client-mobile-item:focus-visible,.client-nav-toggle:focus-visible,.recruit-workspace-card:focus-visible,.rw-filter-stack button:focus-visible,.rw-actions button:focus-visible,.dev-viz-row:focus-visible,.dev-player-picker button:focus-visible,.dev-player-head button:focus-visible{
+  outline:2px solid rgba(var(--team-secondary-rgb,120,170,225),.78);outline-offset:2px
+}
+
+html[data-dl-motion="reduced"] .dl-motion-surface,
+html[data-dl-motion="reduced"] .dl-motion-detail,
+html[data-dl-motion="reduced"] .dl-motion-value,
+html[data-dl-motion="reduced"] .dl-motion-result{animation:none!important;transform:none!important}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important}
+  .dl-motion-surface,.dl-motion-detail,.dl-motion-value,.dl-motion-result{animation:none!important;transform:none!important}
+  .client-nav-item,.client-mobile-item,.client-nav-toggle,.recruit-workspace-card,.rw-filter-stack button,.rw-actions button,.dev-viz-row,.dev-player-picker button,.dev-player-head button,.pi-chip,.event-team,.season-result,.season-next,.legacy-chip,.legacy-season,.rw-confidence>i,.dev-attr-row i>b,.dev-group-row i>b,.season-progress i,.dev-chart polyline,.dev-chart-point{transition:none!important;transform:none!important}
+}
