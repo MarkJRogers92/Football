@@ -45,6 +45,9 @@ const {create} = require('../storage.js');
   await e.importSave('{bad json');assert.equal(e.universe,before);
   await e.importSave(JSON.stringify({universe:{teams:[]}}));assert.equal(e.universe,before);
   await e.importSave(JSON.stringify(stored));assert.equal(e.universe,before);
+  const unsafe=JSON.parse(JSON.stringify(exported));unsafe.universe.teams[0].name='<img src=x onerror=alert(1)>';
+  await e.importSave(JSON.stringify(unsafe));assert.equal(e.universe,before);
+  assert.match(e.$el('#saveStatus').textContent,/unsafe markup/);
   // A structurally plausible but malformed player fails during normalization;
   // it must not replace the active game or poison the player indexes.
   const malformed=JSON.parse(JSON.stringify(exported));malformed.universe.teams[0].roster=[null];

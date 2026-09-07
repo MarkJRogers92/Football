@@ -9,7 +9,10 @@
   'Play the bowl games':'#simBowls',
   'Play the playoff':'#simPlayoff'
  });
- function actionSelector(label){return POSTSEASON_ACTIONS[label]||null}
+ function actionSelector(label){
+  if(/^Play week \d+$/.test(label||''))return '#simWeek';
+  return POSTSEASON_ACTIONS[label]||null;
+ }
  function model({decisionCount=0,items=[]}={}){
   if(decisionCount>0)return{kind:'decision',label:decisionCount===1?'Resolve decision':`Resolve ${decisionCount} decisions`};
   const item=items.find(x=>!x.done);

@@ -1,5 +1,4 @@
 node_modules/
-package-lock.json
 .pages/
 __pycache__/
 *.pyc

@@ -11,10 +11,17 @@ test('first unfinished plan item wins',()=>{
 });
 
 test('postseason calendar gates map to their canonical controls',()=>{
+ assert.equal(api.actionSelector('Play week 7'),'#simWeek');
  assert.equal(api.actionSelector('Play the conference championships'),'#simConf');
  assert.equal(api.actionSelector('Play the bowl games'),'#simBowls');
  assert.equal(api.actionSelector('Play the playoff'),'#simPlayoff');
  assert.equal(api.actionSelector('Build a recruiting board'),null);
+});
+
+test('regular-season labels only map when they identify a numbered week',()=>{
+ assert.equal(api.actionSelector('Play week'),null);
+ assert.equal(api.actionSelector('Play week seven'),null);
+ assert.equal(api.actionSelector('Work your 12 recruiting targets'),null);
 });
 
 test('clear state never invents work',()=>{
