@@ -18,7 +18,7 @@ function v0102StarterChallengeDecision(t,challenge){
 }
 const ensureWeeklyDecisionsBeforePersonnelV0102=ensureWeeklyDecisions;
 ensureWeeklyDecisions=function ensureWeeklyDecisionsWithPersonnel(t=selected()){
-  const current=ensureWeeklyDecisionsBeforePersonnelV0102(t);if(!t||universe.phase!=='regular'||universe.week>=12||current.length>=3||current.some(d=>d.type==='STARTER_CHALLENGE'))return current;
+  const current=ensureWeeklyDecisionsBeforePersonnelV0102(t);if(!t||universe.phase!=='regular'||universe.week>=12||v2InteractiveGameDay||current.length>=3||current.some(d=>d.type==='STARTER_CHALLENGE'))return current;
   const challenge=v0102StarterChallenge(t);if(!challenge)return current;const key=`${challenge.starterId}_${challenge.challengerId}`;
   if(decisionRecent('STARTER_CHALLENGE',key,2)||current.some(d=>[challenge.starterId,challenge.challengerId].includes(d.playerId)))return current;
   const d=v0102StarterChallengeDecision(t,challenge);universe.weeklyDecisions.push(d);return[...current,d]
