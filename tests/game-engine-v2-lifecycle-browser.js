@@ -3,67 +3,27 @@ const path=require('path');
 const {chromium}=require('playwright-core');
 const TAB_GROUP={dashboard:'program',program:'program',history:'program',roster:'team',depth:'team',development:'team',recruiting:'recruiting',gamelab:'games',season:'games',stats:'games',newsletter:'games',staff:'staff',offseason:'staff',records:'staff'};
 const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${TAB_GROUP[id]}"]`);await page.click(`.tabs button[data-tab="${id}"]`)};
-async function startNewDynasty(page){
-  await page.waitForSelector('#titleNew',{timeout:30000});
-  await page.waitForFunction(()=>document.querySelector('#titleTeam')?.options.length>0,{timeout:60000});
-  await page.click('#titleNew');await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});await page.click('#titleStart');
-  await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000});
-}
-async function openGamePlayByPlay(page,id,label){
-  const link=page.locator(`[data-game="${id}"]:visible`).first();
-  assert.ok(await link.count()>0,`${label} should remain reachable from game history/schedule`);
-  await link.click();await page.waitForSelector('#gameDialog[open]',{timeout:10000});
-  await page.locator('#gameTabs button').filter({hasText:/^Play-by-Play$/}).click();
-  assert.ok(await page.locator('#gameDialogBody .playline').count()>10,`${label} should retain durable v2 play-by-play`);
-  await page.evaluate(()=>document.querySelector('#gameDialog')?.close());
-}
+async function startNewDynasty(page){await page.waitForSelector('#titleNew',{timeout:30000});await page.waitForFunction(()=>document.querySelector('#titleTeam')?.options.length>0,{timeout:60000});await page.click('#titleNew');await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});await page.click('#titleStart');await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000})}
+async function openGamePlayByPlay(page,id,label){const link=page.locator(`[data-game="${id}"]:visible`).first();assert.ok(await link.count()>0,`${label} should remain reachable from game history/schedule`);await link.click();await page.waitForSelector('#gameDialog[open]',{timeout:10000});await page.locator('#gameTabs button').filter({hasText:/^Play-by-Play$/}).click();assert.ok(await page.locator('#gameDialogBody .playline').count()>10,`${label} should retain durable v2 play-by-play`);await page.evaluate(()=>document.querySelector('#gameDialog')?.close())}
 async function waitButtonText(page,selector,pattern){await page.waitForFunction(([sel,src,flags])=>{const el=document.querySelector(sel);return !!el&&new RegExp(src,flags).test(el.textContent||'')},[selector,pattern.source,pattern.flags],{timeout:60000})}
 (async()=>{
-  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});
-  const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];
-  page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
+  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
   try{
-    await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);
-    const year1=Number((await page.locator('#weekLine').textContent()).match(/\d{4}/)?.[0]);assert.ok(year1>2000,'starting season year should be visible');
-    const soak=await page.evaluate(()=>window.__DL_TEST__.v2DetailedSeasonSoakProbe());
-    assert.equal(soak.ok,true,`regular-season lifecycle setup failed: ${JSON.stringify(soak)}`);assert.equal(soak.phase,'confReady');assert.equal(soak.ids.length,12);
-    const firstYear1Id=soak.ids[0],lastYear1Id=soak.ids.at(-1);
+    await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);const year1=Number((await page.locator('#weekLine').textContent()).match(/\d{4}/)?.[0]);assert.ok(year1>2000);
+    const soak=await page.evaluate(()=>window.__DL_TEST__.v2InteractiveSeasonSoakProbe());assert.equal(soak.ok,true,`Year 1 Interactive Game Day soak failed: ${JSON.stringify(soak)}`);assert.equal(soak.phase,'confReady');assert.equal(soak.ids.length,12);const firstYear1Id=soak.ids[0],lastYear1Id=soak.ids.at(-1);
 
-    await goTab(page,'season');await page.click('#simConf');
-    await page.waitForFunction(()=>window.DynastyGameEngineV2LabBridge.cutoverDebug().phase==='bowlReady',{timeout:60000});
-    await page.click('#simPlayoff');await page.waitForFunction(()=>window.DynastyGameEngineV2LabBridge.cutoverDebug().phase==='complete',{timeout:120000});
+    await goTab(page,'season');await page.click('#simConf');await page.waitForFunction(()=>window.DynastyGameEngineV2LabBridge.cutoverDebug().phase==='bowlReady',{timeout:60000});await page.click('#simPlayoff');await page.waitForFunction(()=>window.DynastyGameEngineV2LabBridge.cutoverDebug().phase==='complete',{timeout:120000});
 
-    await goTab(page,'offseason');
-    await page.click('#runOffseason');await waitButtonText(page,'#runOffseason',/Process Departures/);
-    await goTab(page,'program');
-    const offers=page.locator('[data-post]');if(await offers.count()){await offers.first().click();await page.waitForTimeout(50)}
-    await goTab(page,'offseason');
-    await page.click('#runOffseason');await waitButtonText(page,'#runOffseason',/Enroll Signing Class/);
-    await page.click('#runOffseason');await waitButtonText(page,'#runOffseason',/Resolve Transfer Portal/);
-    await page.click('#runOffseason');await page.waitForFunction(()=>!document.querySelector('#runSpringCamp')?.disabled,{timeout:60000});
+    await goTab(page,'offseason');await page.click('#runOffseason');await waitButtonText(page,'#runOffseason',/Process Departures/);await goTab(page,'program');const offers=page.locator('[data-post]');if(await offers.count()){await offers.first().click();await page.waitForTimeout(50)}
+    await goTab(page,'offseason');await page.click('#runOffseason');await waitButtonText(page,'#runOffseason',/Enroll Signing Class/);await page.click('#runOffseason');await waitButtonText(page,'#runOffseason',/Resolve Transfer Portal/);await page.click('#runOffseason');await page.waitForFunction(()=>!document.querySelector('#runSpringCamp')?.disabled,{timeout:60000});
+    await goTab(page,'development');await page.click('#runSpringCamp');await page.waitForFunction(()=>!document.querySelector('#runFallCamp')?.disabled,{timeout:60000});assert.ok(await page.locator('#developmentResults tbody tr').count()>0);await page.click('#runFallCamp');await goTab(page,'offseason');await waitButtonText(page,'#runOffseason',/Open New Season/);await page.click('#runOffseason');await page.waitForFunction(y=>{const text=document.querySelector('#weekLine')?.textContent||'';return text.includes(String(y))&&/Week 0/.test(text)},year1+1,{timeout:120000});
+    const year2=Number((await page.locator('#weekLine').textContent()).match(/\d{4}/)?.[0]);assert.equal(year2,year1+1);
 
-    await goTab(page,'development');await page.click('#runSpringCamp');await page.waitForFunction(()=>!document.querySelector('#runFallCamp')?.disabled,{timeout:60000});
-    assert.ok(await page.locator('#developmentResults tbody tr').count()>0,'spring development should produce a visible results receipt');
-    await page.click('#runFallCamp');await goTab(page,'offseason');await waitButtonText(page,'#runOffseason',/Open New Season/);
-    await page.click('#runOffseason');await page.waitForFunction(y=>{const text=document.querySelector('#weekLine')?.textContent||'';return text.includes(String(y))&&/Week 0/.test(text)},year1+1,{timeout:120000});
-    const year2=Number((await page.locator('#weekLine').textContent()).match(/\d{4}/)?.[0]);assert.equal(year2,year1+1,'offseason should roll exactly one season forward');
+    await goTab(page,'history');if(await page.locator('#gameHistoryYear').count()){await page.selectOption('#gameHistoryYear',String(year1));await page.waitForTimeout(50)}await openGamePlayByPlay(page,firstYear1Id,'Year 1 opening Interactive Game Day');await openGamePlayByPlay(page,lastYear1Id,'Year 1 closing Interactive Game Day');
 
-    await goTab(page,'history');
-    if(await page.locator('#gameHistoryYear').count()){await page.selectOption('#gameHistoryYear',String(year1));await page.waitForTimeout(50)}
-    await openGamePlayByPlay(page,firstYear1Id,'Year 1 opening v2 game');
-    await openGamePlayByPlay(page,lastYear1Id,'Year 1 closing v2 game');
-
-    await goTab(page,'gamelab');
-    const prep=await page.evaluate(()=>window.__DL_TEST__.v2PrepareDetailedGame());
-    assert.equal(prep.career,false,`Year 2 Detailed Game should not be blocked by an unresolved career choice: ${JSON.stringify(prep)}`);
-    assert.equal(prep.ready,true,`Year 2 Detailed Game preparation should resolve generated Coach’s Desk blockers: ${JSON.stringify(prep)}`);
-    await page.waitForFunction(()=>!document.querySelector('#simDetailedGame')?.disabled,{timeout:60000});
-    const beforeY2=await page.evaluate(()=>window.DynastyGameEngineV2LabBridge.cutoverDebug().v2UserArchives);
-    await page.click('#simDetailedGame');await page.waitForFunction(n=>window.DynastyGameEngineV2LabBridge.cutoverDebug().v2UserArchives>n,beforeY2,{timeout:120000});
-    const y2=await page.evaluate(()=>window.DynastyGameEngineV2LabBridge.cutoverDebug());assert.equal(y2.year,year2);assert.equal(y2.week,0);assert.equal(y2.lastV2?.week,1,'Year 2 opening scheduled game should be Week 1 while the calendar remains Week 0 until weekly advance');assert.ok(y2.lastV2?.id,'Year 2 Detailed Game should create a permanent v2 archive');assert.ok(y2.lastV2.drives>0);assert.ok(y2.lastV2.playerLines>0);
-    await goTab(page,'season');await openGamePlayByPlay(page,y2.lastV2.id,'Year 2 opening v2 game');
-
-    assert.deepEqual(errors,[],`lifecycle browser regression emitted errors: ${errors.join('\n')}`);
-    console.log(`PASS v0.10 lifecycle soak ${year1}->${year2}; Year 1 archives survived offseason and Year 2 v2 Detailed Game recorded ${y2.lastV2.id}`);
+    await goTab(page,'gamelab');const prep=await page.evaluate(()=>window.__DL_TEST__.v2PrepareDetailedGame());assert.equal(prep.career,false,`Year 2 Game Day blocked by career choice: ${JSON.stringify(prep)}`);assert.equal(prep.ready,true,`Year 2 Game Day blockers not resolved: ${JSON.stringify(prep)}`);await page.waitForSelector('[data-v2-gameday-start]',{timeout:60000});
+    const before=await page.evaluate(()=>window.__DL_TEST__.v2GameDayCommitDebug().archiveLength);await page.click('[data-v2-gameday-start]');await page.click('[data-v2-gameday-delegate]');await page.waitForFunction(()=>window.__DL_TEST__.v2GameDayPreviewState()?.state?.status==='final',{timeout:120000});await page.click('[data-v2-gameday-record]');await page.waitForFunction(n=>window.__DL_TEST__.v2GameDayCommitDebug().archiveLength===n+1,before,{timeout:60000});
+    const y2=await page.evaluate(()=>window.__DL_TEST__.v2GameDayLastArchiveDebug());assert.equal(y2.engine,'v2');assert.equal(y2.gameDayVersion,2);assert.ok(y2.drives>0);assert.ok(y2.playerLines>0);assert.ok(y2.playByPlayLines>10);assert.ok(y2.coachingDecisions>0);
+    await goTab(page,'season');await openGamePlayByPlay(page,y2.id,'Year 2 opening Interactive Game Day');assert.deepEqual(errors,[],`lifecycle browser regression emitted errors: ${errors.join('\n')}`);console.log(`PASS v0.10.1 Interactive Game Day lifecycle ${year1}->${year2}; Year 1 archives survived offseason and Year 2 recorded ${y2.id}`)
   }finally{await browser.close()}
 })().catch(err=>{console.error(err);process.exit(1)});
