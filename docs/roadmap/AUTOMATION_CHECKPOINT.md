@@ -1,0 +1,3 @@
+# v0.10.3 validation checkpoint
+
+Milestone A implementation is complete, but the boundary browser smoke still needs compatibility cleanup before Milestone B begins. The targeted helper run reached the compact-layout tab-group assertion after clearing the legitimate weekly decision gate; on the mobile viewport Playwright attempted a visibility-required click on the Games group button. The gameplay gate and client shell should remain unchanged. Next action: update the smoke test to dispatch the existing group button click without requiring visibility, rerun the targeted browser smoke, then remove the temporary helper workflow and proceed to Milestone B.
