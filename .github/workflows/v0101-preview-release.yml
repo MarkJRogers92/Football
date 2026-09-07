@@ -1,0 +1,119 @@
+name: V0.10.1 Preview Release
+
+on:
+  push:
+    branches:
+      - codex/v0101-gameday-coaching
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v0101-preview-release
+  cancel-in-progress: false
+
+jobs:
+  validate-freeze-preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Prepare v0.10.1 candidate
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          fs.writeFileSync('VERSION.txt','0.10.1\n');
+          const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
+          pkg.version='0.10.1';
+          fs.writeFileSync('package.json',JSON.stringify(pkg,null,2)+'\n');
+          let app=fs.readFileSync('app.js','utf8');
+          const next=app.replace(/const APP_VERSION='[^']+';/,"const APP_VERSION='0.10.1';");
+          if(next===app)throw new Error('APP_VERSION marker was not updated');
+          fs.writeFileSync('app.js',next);
+          NODE
+          npm run build
+      - name: Parse v0.10.1 Game Day modules
+        run: node --check game-engine-v2-decisions.js && node --check game-engine-v2-gameday.js && node --check game-engine-v2-gameday-prep.js && node --check game-engine-v2-gameday-record.js && node --check game-engine-v2-gameday-ui.js && node --check game-engine-v2-gameday-prep-bridge.js && node --check game-engine-v2-gameplan-feedback.js && node --check game-engine-v2-matchup-ui.js && node --check game-engine-v2-gameday-soak.js && node --check tests/game-engine-v2-gameday-mobile-browser.js && node --check tests/game-engine-v2-gameday-storage-browser.js && node --check tests/game-engine-v2-lifecycle-browser.js
+      - name: Game Engine 2 targeted suite
+        run: npm run test:game-engine-v2
+      - name: Frozen calibration gate
+        run: npm run test:game-engine-v2-calibration
+      - name: Archived game-plan feedback
+        run: npm run test:game-engine-v2-gameplan-feedback
+      - name: Locate Chromium
+        id: chromium
+        shell: bash
+        run: |
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$browser" ]; then
+            npx playwright-core install chromium
+            browser="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$browser"
+          echo "path=$browser" >> "$GITHUB_OUTPUT"
+      - name: Interactive Game Day staged browser regression
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: npm run test:game-engine-v2-gameday-browser
+      - name: Interactive Game Day permanent commit regression
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: npm run test:game-engine-v2-gameday-record-browser
+      - name: Matchup intelligence and plan receipt regression
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: npm run test:game-engine-v2-matchup-browser
+      - name: Full Interactive Game Day regular-season soak
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: npm run test:game-engine-v2-gameday-season-browser
+      - name: Postseason regression
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: node tests/game-engine-v2-postseason-browser.js
+      - name: Interactive Game Day two-season lifecycle
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: node tests/game-engine-v2-lifecycle-browser.js
+      - name: Mobile Game Day regression
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: node tests/game-engine-v2-gameday-mobile-browser.js
+      - name: Interactive Game Day IndexedDB persistence
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: node tests/game-engine-v2-gameday-storage-browser.js
+      - name: Standard engine and presentation tests
+        run: npm test
+      - name: Standard browser UI and visual regressions
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: npm run test:browser
+      - name: Generic browser IndexedDB regression
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: npm run test:browser-storage
+      - name: Simulation audit
+        run: npm run audit
+      - name: Freeze exact tested v0.10.1 source
+        shell: bash
+        run: |
+          rm -f .github/workflows/v0101-gameday-decisions.yml .github/workflows/v0101-preview-release.yml
+          git config user.name "MarkJRogers92"
+          git config user.email "136272503+MarkJRogers92@users.noreply.github.com"
+          git add -A
+          git commit -m "release: prepare v0.10.1 preview [skip ci]"
+          git push origin HEAD:${GITHUB_REF_NAME}
+      - name: Verify frozen release source and artifact
+        run: npm run verify:release
+      - name: Publish v0.10.1 preview only
+        run: node tools/publish.js --preview v0101
