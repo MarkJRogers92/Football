@@ -15,11 +15,11 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   const page=await browser.newPage({viewport}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
   await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);
   await page.waitForSelector('#broadcastFeature .broadcast-feature-main');
-  await page.waitForSelector('.topbar-team-logo.coverage-real-logo');
-  await page.waitForSelector('#teamMeta .conference-crest');
+  await page.waitForSelector('#clientStatus [data-client-program]');
   check(`[${label}] dashboard broadcast desk renders`,(await page.locator('#broadcastFeature').innerText()).length>30);
-  check(`[${label}] app header uses real atlas logo instead of initials`,await page.locator('.topbar-team-logo.coverage-real-logo').count()===1);
-  check(`[${label}] program masthead carries its conference crest`,await page.locator('#teamMeta .conference-crest[data-conference="Great Lakes"]').count()===1);
+  const shellProgram=await page.locator('#clientStatus [data-client-program]').innerText();
+  const dashboardProgram=await page.locator('#teamName').innerText();
+  check(`[${label}] premium shell carries selected program identity`,shellProgram.trim()===dashboardProgram.trim(),`${shellProgram} / ${dashboardProgram}`);
   check(`[${label}] Top 15 keeps one real logo per ranked team`,await page.locator('#top15 .team-logo').count()===15&&await page.locator('#top15 .sports-mark').count()===0);
   await goTab(page, 'gamelab');await page.waitForSelector('#nextGameCard .matchup-shell');
   await page.waitForFunction(()=>document.querySelectorAll('#nextGameCard .matchup-team .sports-mark.coverage-real-logo').length===2);
@@ -39,7 +39,16 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   check(`[${label}] player hero uses the real school logo`,await page.locator('#playerDialog .player-hero-team-mark .coverage-real-logo').count()===1);
   if(label==='iphone'){const overflow=await page.$eval('#playerDialog',el=>el.scrollWidth-el.clientWidth);check(`[${label}] scouting profile has no horizontal overflow`,overflow<=1,`${overflow}px`)}
   await page.evaluate(()=>document.querySelector('#playerDialog').close());
-  await goTab(page, 'dashboard');await page.click('#simWeek');await page.waitForFunction(()=>/Week 1/.test(document.querySelector('#weekLine')?.textContent),{timeout:60000});await page.waitForSelector('#broadcastFeature .broadcast-matchup');
+  await goTab(page, 'dashboard');
+  for(let guard=0;guard<6&&await page.$eval('#simWeek',el=>el.disabled);guard++){
+   const resolved=await page.evaluate(()=>{const button=[...document.querySelectorAll('[data-decision][data-choice]')].find(el=>!el.disabled&&el.offsetParent!==null);if(!button)return false;button.click();return true});
+   if(!resolved)break;
+   await page.waitForTimeout(80);
+  }
+  const visualSimReady=await page.$eval('#simWeek',el=>!el.disabled);
+  check(`[${label}] visual weekly decision gate clears before sim`,visualSimReady);
+  if(!visualSimReady)throw new Error(`[${label}] Sim Week remained disabled in visual regression after resolving visible weekly decisions`);
+  await page.click('#simWeek');await page.waitForFunction(()=>/Week 1/.test(document.querySelector('#weekLine')?.textContent),{timeout:60000});await page.waitForSelector('#broadcastFeature .broadcast-matchup');
   await page.waitForFunction(()=>document.querySelectorAll('#broadcastFeature .sports-mark.coverage-real-logo').length>=2);
   check(`[${label}] dashboard promotes next matchup after sim`,/NEXT MATCHUP/.test(await page.locator('#broadcastFeature').innerText()));
   check(`[${label}] dashboard matchup uses real team logos`,await page.locator('#broadcastFeature .sports-mark.coverage-real-logo').count()>=2);
