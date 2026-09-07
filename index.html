@@ -1289,6 +1289,47 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
   .portal-filters label{flex:1 1 140px}
   .portal-filters select{max-width:none;width:100%}
 }
+
+/* Dynasty Lab Premium Client Shell — Milestone A
+   Presentation/navigation layer only. Existing tab buttons and game actions remain canonical. */
+
+:root{--client-rail-w:236px;--client-top-h:70px;--client-mobile-nav-h:62px}
+
+.client-rail{position:fixed;inset:0 auto 0 0;width:var(--client-rail-w);z-index:30;display:flex;flex-direction:column;background:#091019;border-right:1px solid #223146;color:var(--text);padding:16px 12px 12px;box-shadow:10px 0 28px rgba(0,0,0,.18)}
+.client-rail-brand{display:grid;gap:1px;padding:4px 8px 17px;margin-bottom:8px;border-bottom:1px solid #1d2a3a}.client-rail-brand strong{font-size:15px;letter-spacing:.11em;color:#f5f8fc}.client-rail-brand span{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:#72859c}
+.client-rail-nav{display:grid;gap:14px;overflow:auto;padding:2px 0 10px;scrollbar-width:thin}.client-nav-group{display:grid;gap:3px}.client-nav-label{padding:0 9px 4px;font-size:9px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:#64768d}.client-nav-item{width:100%;border:0;border-radius:8px;background:transparent;padding:8px 9px;text-align:left;color:#aebdce;font-size:12.5px;font-weight:620}.client-nav-item:hover,.client-nav-item:focus-visible{background:#111c29;border:0;color:#f4f7fb;outline:1px solid #2a4059}.client-nav-item.active{background:linear-gradient(90deg,rgba(var(--team-rgb),.19),rgba(20,33,47,.72));color:#fff;box-shadow:inset 3px 0 var(--team-secondary)}
+.client-rail-footer{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:12px 4px 0;border-top:1px solid #1d2a3a}.client-rail-footer button{padding:7px 8px;border-radius:7px;background:#101925;font-size:10.5px}.client-rail-footer span{grid-column:1/-1;padding-top:3px;text-align:center;font-size:9px;color:#64768d;letter-spacing:.05em}
+
+.client-shell-ready{padding-left:var(--client-rail-w);min-height:100vh}.client-shell-ready .topbar{min-height:var(--client-top-h);padding:11px 18px;gap:14px;background:#0a111a;border-bottom-color:#223146;box-shadow:none}.client-shell-ready .topbar>div:first-of-type{display:none}.client-status{display:flex;align-items:center;gap:20px;min-width:0;flex:1}.client-status-program{display:grid;min-width:180px}.client-status-program strong{font-size:16px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.client-status-program span{margin-top:2px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#73869d}.client-status-facts{display:flex;align-items:center;gap:0;color:#b9c6d5;min-width:0}.client-status-facts span{padding:0 12px;border-left:1px solid #2a394d;font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}.client-status-facts span:first-child{font-size:16px;font-weight:800;color:#f4f7fa;border-left:0;padding-left:0}.client-shell-ready .header-actions{justify-content:flex-end;align-items:center;gap:6px;flex-wrap:nowrap}.client-shell-ready .header-actions select,.client-shell-ready .header-actions button{padding:7px 9px;border-radius:7px;font-size:10.5px;background:#101925}.client-shell-ready #userTeam{max-width:190px}.client-shell-ready #saveSlot{max-width:150px}.client-nav-toggle{display:none;align-items:center;gap:7px;padding:7px 9px;font-size:11px}
+
+.client-shell-ready .tabs-shell{position:sticky;top:var(--client-top-h);z-index:20;background:#0c141e;border-bottom:1px solid #223146;box-shadow:none}.client-shell-ready .tab-groups{display:none!important}.client-shell-ready .tabs{min-height:43px;padding:6px 18px;gap:3px;background:transparent;border:0;overflow:auto}.client-shell-ready .tabs button{padding:7px 10px;border:0;border-radius:7px;color:#8294aa;font-size:11.5px;background:transparent}.client-shell-ready .tabs button::before,.client-shell-ready .tabs button::after{display:none!important}.client-shell-ready .tabs button.active{background:#172331;color:#fff;border:0}.client-shell-ready .tabs button[hidden]{display:none!important}.client-shell-ready main{width:100%;max-width:1540px;margin:0 auto;padding:22px 24px 40px}
+.client-shell-ready .save-status,.client-shell-ready .control-mode-banner{padding-left:18px}
+
+.client-mobile-nav{display:none}
+
+@media(max-width:1120px) and (min-width:861px){
+  :root{--client-rail-w:210px}.client-shell-ready .header-actions #exportSave,.client-shell-ready .header-actions #importSave{display:none}.client-status-program{min-width:145px}.client-status-facts span{padding:0 8px}.client-shell-ready #saveSlot{display:none}
+}
+
+@media(max-width:860px){
+  :root{--client-top-h:58px}
+  .client-shell-ready{padding-left:0;padding-bottom:var(--client-mobile-nav-h)}
+  .client-rail{width:min(84vw,300px);transform:translateX(-103%);transition:transform .18s ease;box-shadow:20px 0 40px rgba(0,0,0,.42)}.client-shell-ready.client-rail-open .client-rail{transform:translateX(0)}
+  .client-shell-ready.client-rail-open::after{content:"";position:fixed;inset:0;z-index:25;background:rgba(2,6,10,.64)}
+  .client-shell-ready .topbar{min-height:var(--client-top-h);padding:8px 10px;gap:9px;position:sticky;top:0;z-index:24;flex-direction:row;align-items:center}
+  .client-nav-toggle{display:inline-flex;flex:0 0 auto}.client-nav-toggle span:last-child{display:none}
+  .client-status{gap:8px}.client-status-program{min-width:0;flex:1}.client-status-program strong{font-size:13px}.client-status-program span{display:none}.client-status-facts{gap:7px}.client-status-facts span{display:none;border:0;padding:0}.client-status-facts span:first-child,.client-status-facts span:last-child{display:block;font-size:11px}.client-status-facts span:first-child{font-size:13px}
+  .client-shell-ready .header-actions{display:none}
+  .client-shell-ready .tabs-shell{top:var(--client-top-h);z-index:19}.client-shell-ready .tabs{padding:5px 10px;min-height:40px}.client-shell-ready .tabs button{font-size:10.5px;padding:6px 8px}
+  .client-shell-ready main{padding:12px 10px 28px}
+  .client-mobile-nav{position:fixed;z-index:24;left:0;right:0;bottom:0;height:var(--client-mobile-nav-h);display:grid;grid-template-columns:repeat(5,1fr);padding:5px max(5px,env(safe-area-inset-left)) max(5px,env(safe-area-inset-bottom));border-top:1px solid #26374b;background:rgba(8,14,21,.98);box-shadow:0 -12px 30px rgba(0,0,0,.28)}
+  .client-mobile-nav .client-mobile-item{display:grid;place-items:center;border:0;background:transparent;padding:5px 2px;border-radius:7px;color:#7f91a7;font-size:9.5px;font-weight:700;white-space:nowrap}.client-mobile-nav .client-mobile-item.active{background:rgba(var(--team-rgb),.17);color:#fff;box-shadow:none}.client-mobile-nav .client-mobile-item:hover{border:0;background:#142030}
+  .client-shell-ready .save-status,.client-shell-ready .control-mode-banner{padding-left:10px;padding-right:10px}
+}
+
+@media(max-width:430px){.client-status-program strong{max-width:150px}.client-status-facts span:last-child{max-width:88px;overflow:hidden;text-overflow:ellipsis}.client-shell-ready .tabs{scrollbar-width:none}.client-shell-ready .tabs::-webkit-scrollbar{display:none}}
+
+@media(prefers-reduced-motion:reduce){.client-rail{transition:none}}
 </style></head><body>
 <section id="titleScreen" class="title-screen" aria-labelledby="titleGameName">
   <div class="title-screen-art" aria-hidden="true"></div>
@@ -9794,5 +9835,111 @@ document.querySelector('#userTeam')?.addEventListener('change',()=>setTimeout(qu
 document.addEventListener('click',()=>setTimeout(queue,0));
 if(window.MutationObserver&&document.body)new MutationObserver(queue).observe(document.body,{childList:true,subtree:true,characterData:true});
 queue();
+})();
+
+(function(){
+  'use strict';
+
+  const TAB_GROUP={dashboard:'program',program:'program',history:'program',roster:'team',depth:'team',development:'team',recruiting:'recruiting',gamelab:'games',season:'games',stats:'games',newsletter:'games',staff:'staff',offseason:'staff',records:'staff'};
+  const NAV=[
+    {label:'Home',items:[['dashboard','Command Center'],['newsletter','News / Inbox']]},
+    {label:'Program',items:[['program','Program Overview'],['roster','Roster'],['depth','Roles & Depth'],['development','Development'],['staff','Staff'],['offseason','Offseason']]},
+    {label:'Recruiting',items:[['recruiting','Recruiting Board']]},
+    {label:'Season',items:[['gamelab','Game Center'],['season','Schedule'],['stats','Stats & Rankings']]},
+    {label:'World',items:[['history','History'],['records','Awards & Records']]}
+  ];
+
+  const app=document.querySelector('#app');
+  const topbar=app?.querySelector('.topbar');
+  const tabsShell=app?.querySelector('.tabs-shell');
+  if(!app||!topbar||!tabsShell||document.querySelector('#clientRail'))return;
+
+  function navButton(tab,label,extra=''){
+    return `<button type="button" class="client-nav-item ${extra}" data-client-tab="${tab}"><span>${label}</span></button>`;
+  }
+
+  const rail=document.createElement('aside');
+  rail.id='clientRail';
+  rail.className='client-rail';
+  rail.setAttribute('aria-label','Dynasty Lab navigation');
+  rail.innerHTML=`
+    <div class="client-rail-brand"><strong>DYNASTY LAB</strong><span>Front Office</span></div>
+    <nav class="client-rail-nav">${NAV.map(group=>`<section class="client-nav-group"><div class="client-nav-label">${group.label}</div>${group.items.map(([tab,label])=>navButton(tab,label)).join('')}</section>`).join('')}</nav>
+    <div class="client-rail-footer">
+      <button type="button" data-client-action="saveBrowser">Save Dynasty</button>
+      <button type="button" data-client-action="newUniverse">Title Screen</button>
+      <span data-client-version>Dynasty Lab</span>
+    </div>`;
+  topbar.insertAdjacentElement('beforebegin',rail);
+
+  const navToggle=document.createElement('button');
+  navToggle.type='button';
+  navToggle.className='client-nav-toggle';
+  navToggle.setAttribute('aria-label','Open navigation');
+  navToggle.setAttribute('aria-expanded','false');
+  navToggle.innerHTML='<span aria-hidden="true">☰</span><span>Menu</span>';
+  topbar.insertAdjacentElement('afterbegin',navToggle);
+
+  const status=document.createElement('div');
+  status.id='clientStatus';
+  status.className='client-status';
+  status.innerHTML=`<div class="client-status-program"><strong data-client-program>Program</strong><span data-client-context>Dynasty</span></div><div class="client-status-facts"><span data-client-record>0–0</span><span data-client-rank>Preseason</span><span data-client-week>Week 0</span></div>`;
+  const actions=topbar.querySelector('.header-actions');
+  if(actions)topbar.insertBefore(status,actions);else topbar.append(status);
+
+  const mobile=document.createElement('nav');
+  mobile.className='client-mobile-nav';
+  mobile.setAttribute('aria-label','Quick navigation');
+  mobile.innerHTML=`${navButton('dashboard','Home','client-mobile-item')}${navButton('roster','Program','client-mobile-item')}${navButton('recruiting','Recruit','client-mobile-item')}${navButton('gamelab','Season','client-mobile-item')}<button type="button" class="client-mobile-item" data-client-more>More</button>`;
+  app.appendChild(mobile);
+
+  function currentTab(){return app.querySelector('.tabs button.active[data-tab]')?.dataset.tab||'dashboard'}
+
+  function go(tab){
+    const groupId=TAB_GROUP[tab];
+    const group=groupId&&app.querySelector(`.tab-groups button[data-group="${groupId}"]`);
+    if(group&&!group.classList.contains('active'))group.click();
+    const target=app.querySelector(`.tabs button[data-tab="${tab}"]`);
+    if(target)target.click();
+    closeRail();
+    setTimeout(sync,0);
+  }
+
+  function clean(text,fallback){const v=String(text||'').replace(/\s+/g,' ').trim();return v&&v!=='—'?v:fallback}
+  function syncStatus(){
+    const program=clean(document.querySelector('#teamName')?.textContent,document.querySelector('#userTeam')?.selectedOptions?.[0]?.textContent||'Program');
+    const record=clean(document.querySelector('#recordBig')?.textContent,'0–0');
+    const rank=clean(document.querySelector('#rankLine')?.textContent,'Preseason');
+    const week=clean(document.querySelector('#weekLine')?.textContent,'Week 0');
+    const programEl=status.querySelector('[data-client-program]'),recordEl=status.querySelector('[data-client-record]'),rankEl=status.querySelector('[data-client-rank]'),weekEl=status.querySelector('[data-client-week]');
+    if(programEl)programEl.textContent=program;if(recordEl)recordEl.textContent=record;if(rankEl)rankEl.textContent=rank;if(weekEl)weekEl.textContent=week;
+    const version=document.querySelector('[data-app-version]')?.textContent?.trim();const versionEl=rail.querySelector('[data-client-version]');if(versionEl&&version)versionEl.textContent=`Dynasty Lab ${version}`;
+  }
+
+  function sync(){
+    const tab=currentTab();
+    app.querySelectorAll('[data-client-tab]').forEach(button=>{const active=button.dataset.clientTab===tab;button.classList.toggle('active',active);button.setAttribute('aria-current',active?'page':'false')});
+    syncStatus();
+  }
+
+  function openRail(){app.classList.add('client-rail-open');navToggle.setAttribute('aria-expanded','true')}
+  function closeRail(){app.classList.remove('client-rail-open');navToggle.setAttribute('aria-expanded','false')}
+
+  app.addEventListener('click',event=>{
+    const nav=event.target.closest('[data-client-tab]');if(nav){event.preventDefault();go(nav.dataset.clientTab);return}
+    const more=event.target.closest('[data-client-more]');if(more){event.preventDefault();app.classList.contains('client-rail-open')?closeRail():openRail();return}
+    const action=event.target.closest('[data-client-action]');if(action){document.getElementById(action.dataset.clientAction)?.click();closeRail();return}
+    if(event.target.closest('.tabs button,.tab-groups button'))setTimeout(sync,0);
+  });
+  navToggle.addEventListener('click',()=>app.classList.contains('client-rail-open')?closeRail():openRail());
+  document.addEventListener('keydown',event=>{if(event.key==='Escape')closeRail()});
+  document.querySelector('#userTeam')?.addEventListener('change',()=>setTimeout(syncStatus,0));
+
+  const watched=['teamName','recordBig','rankLine','weekLine'];
+  for(const id of watched){const node=document.getElementById(id);if(node)new MutationObserver(syncStatus).observe(node,{childList:true,subtree:true,characterData:true})}
+  const tabObserver=new MutationObserver(sync);app.querySelectorAll('.tabs button[data-tab]').forEach(button=>tabObserver.observe(button,{attributes:true,attributeFilter:['class','hidden']}));
+
+  app.classList.add('client-shell-ready');
+  sync();
 })();
 </script></body></html>
