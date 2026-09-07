@@ -1,0 +1,86 @@
+name: V0.11.2 Showcase Stories Interactions
+on:
+  push:
+    branches: [codex/v0112-gameday-stories-interactions]
+    paths:
+      - 'season-presentation-adapter.js'
+      - 'gameday-season-presentation.js'
+      - 'gameday-season-presentation.css'
+      - 'recruiting-workspace.js'
+      - 'recruiting-workspace.css'
+      - 'roster-depth-experience.js'
+      - 'roster-depth-experience.css'
+      - 'interaction-polish.js'
+      - 'tests/v0112-presentation-browser.js'
+      - '.github/workflows/v0112-presentation-checkpoint.yml'
+permissions:
+  contents: write
+jobs:
+  verify-and-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v0112-gameday-stories-interactions
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Parse presentation sources
+        run: |
+          node --check season-presentation-adapter.js
+          node --check gameday-season-presentation.js
+          node --check recruiting-workspace.js
+          node --check roster-depth-experience.js
+          node --check interaction-polish.js
+          node --check tests/v0112-presentation-browser.js
+      - name: Build standalone artifact
+        run: npm run build
+      - name: Targeted presentation models
+        run: |
+          node tests/season-presentation-model.js
+          node tests/roster-depth-presentation-model.js
+      - name: Locate Chromium
+        id: chromium
+        shell: bash
+        run: |
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$browser" ]; then
+            npx playwright-core install chromium
+            browser="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$browser"
+          echo "path=$browser" >> "$GITHUB_OUTPUT"
+      - name: V0.11.2 integrated presentation regression
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: node tests/v0112-presentation-browser.js
+      - name: Existing presentation regressions
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: |
+          node tests/gameday-season-presentation-browser.js
+          node tests/recruiting-workspace-browser.js
+          node tests/roster-depth-experience-browser.js
+          node tests/interaction-polish-browser.js
+      - name: Commit synchronized artifact and retire helper
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git rm .github/workflows/v0112-presentation-checkpoint.yml
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit"
+          else
+            git commit -m "build: checkpoint showcase stories and interactions"
+          fi
+      - name: Verify clean reproducible release source
+        run: |
+          npm run build
+          git diff --exit-code -- index.html
+          npm run verify:release
+      - name: Push verified checkpoint
+        run: git push origin HEAD:codex/v0112-gameday-stories-interactions
