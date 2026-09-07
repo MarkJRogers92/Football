@@ -21,4 +21,8 @@ assert.ok(defense.prepPressure>base.prepPressure,'pressure package should increa
 assert.ok(defense.defense>base.defense,'defensive preparation should raise prepared defensive profile');
 const low=weekly.buildReport({...input,confidence:50}),high=weekly.buildReport({...input,confidence:92});
 assert.equal(low.confidenceLabel,'Low');assert.equal(high.confidenceLabel,'High');
-console.log('PASS v0.10.2 weekly coaching engine: deterministic imperfect scouting + two-point preparation profile');
+const challenge=weekly.selectStarterChallenge([{pos:'QB',starter:{id:'S',name:'Starter QB',grade:74,upside:78,year:'JR',stats:{passAtt:100,passComp:49,int:7}},challenger:{id:'C',name:'Young QB',grade:76,upside:88,year:'SO',stats:{}}}]);
+assert.equal(challenge.challengerId,'C');assert.equal(challenge.recommendation,'promote');assert.ok(challenge.struggleScore>=1);
+const noChallenge=weekly.selectStarterChallenge([{pos:'RB',starter:{id:'S',name:'Starter RB',grade:82,upside:84,year:'JR',stats:{rushAtt:80,rushYds:410}},challenger:{id:'C',name:'Backup RB',grade:74,upside:78,year:'SO',stats:{}}}]);
+assert.equal(noChallenge,null,'healthy separation and solid production should not manufacture a personnel decision');
+console.log('PASS v0.10.2 weekly coaching engine: deterministic imperfect scouting, two-point prep and selective starter pressure');
