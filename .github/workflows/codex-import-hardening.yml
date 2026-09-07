@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   patch-and-test:
-    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -81,8 +80,7 @@ function validateImportedSaveText(value){
 '''
           if old_import not in src:
               raise SystemExit('importSave anchor not found')
-          src = src.replace(old_import, new_import, 1)
-          app.write_text(src)
+          app.write_text(src.replace(old_import, new_import, 1))
 
           test = Path('tests/persistence.js')
           t = test.read_text()
