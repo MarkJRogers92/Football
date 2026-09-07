@@ -33,6 +33,6 @@ jobs:
           rm .github/workflows/codex-import-hardening.yml tools/codex_patch_import.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app.js tests/persistence.js dynasty-lab-standalone.html .github/workflows/codex-import-hardening.yml tools/codex_patch_import.py
+          git add app.js tests/persistence.js index.html .github/workflows/codex-import-hardening.yml tools/codex_patch_import.py
           git commit -m "fix: harden untrusted save imports without slowing browser loads"
           git push origin HEAD:codex/v0115-import-save-hardening
