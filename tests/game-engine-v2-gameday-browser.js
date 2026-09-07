@@ -27,9 +27,9 @@ async function startNewDynasty(page){
     assert.equal(await page.evaluate(()=>window.__DL_TEST__.v2GameDayPreviewDigest()),before,'resolving a coaching decision must not mutate the live dynasty');
     await page.click('[data-v2-gameday-delegate]');await page.waitForFunction(()=>window.__DL_TEST__.v2GameDayPreviewState()?.state?.status==='final',{timeout:60000});
     state=await page.evaluate(()=>window.__DL_TEST__.v2GameDayPreviewState());assert.equal(state.status,'final');assert.ok(state.state.events.some(e=>e.type==='coaching_decision'));assert.ok(state.state.events.length>50);
-    assert.equal(await page.evaluate(()=>window.__DL_TEST__.v2GameDayPreviewDigest()),before,'finishing the preview must leave schedule, records, stats and archive untouched');
-    assert.match(await page.locator('#v2InteractiveGameDay').textContent(),/FINAL · Preview complete/);
+    assert.equal(await page.evaluate(()=>window.__DL_TEST__.v2GameDayPreviewDigest()),before,'a staged final must leave schedule, records, stats and archive untouched');
+    assert.match(await page.locator('#v2InteractiveGameDay').textContent(),/Final is staged until you make it official/);assert.equal(await page.locator('[data-v2-gameday-record]').count(),1,'staged final should expose the official-record button');
     assert.deepEqual(errors,[],`interactive Game Day preview emitted browser errors: ${errors.join('\n')}`);
-    console.log('PASS v0.10.1 interactive Game Day preview: live scoreboard, fourth-down decision UI, deterministic completion, zero dynasty mutation');
+    console.log('PASS v0.10.1 interactive Game Day: live scoreboard, fourth-down decision UI, deterministic staged final, zero mutation before official record');
   }finally{await browser.close()}
 })().catch(err=>{console.error(err);process.exit(1)});
