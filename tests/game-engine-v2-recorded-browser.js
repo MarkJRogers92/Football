@@ -9,16 +9,40 @@ async function startNewDynasty(page){
   await page.click('#titleNew');await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});await page.click('#titleStart');
   await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000});
 }
+async function resolveWeeklyDecisions(page){
+  await goTab(page,'dashboard');
+  for(let guard=0;guard<6;guard++){
+    const blocked=await page.evaluate(()=>{
+      const sim=document.querySelector('#simWeek');
+      return !!sim?.disabled;
+    });
+    if(!blocked)return true;
+    const resolved=await page.evaluate(()=>{
+      const button=[...document.querySelectorAll('[data-decision][data-choice]')]
+        .find(el=>!el.disabled&&el.offsetParent!==null);
+      if(!button)return false;
+      button.click();
+      return true;
+    });
+    if(!resolved)break;
+    await page.waitForTimeout(80);
+  }
+  return page.evaluate(()=>!document.querySelector('#simWeek')?.disabled);
+}
 (async()=>{
   const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});
   const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];
   page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
   try{
-    await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);await goTab(page,'gamelab');
+    await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);
+    assert.equal(await resolveWeeklyDecisions(page),true,'weekly Coach’s Desk decisions should clear through their canonical UI before recording');
+    await goTab(page,'gamelab');
     assert.equal(await page.locator('#v2RecordGate').count(),0,'temporary development record button should be absent after Detailed Game cutover');
     assert.equal(await page.locator('[data-v2-shadow-run]').count(),0,'release UI should not expose the retired shadow-preview control');
     const rollback=await page.evaluate(()=>window.__DL_TEST__.v2RollbackProbe('afterArchive'));
     assert.equal(rollback.ok,true,`rollback probe failed: ${rollback.message}\n${JSON.stringify({before:rollback.before,after:rollback.after})}`);
+    assert.equal(await resolveWeeklyDecisions(page),true,'rollback probe should not leave a weekly decision gate unresolved');
+    await goTab(page,'gamelab');
     const before=await page.evaluate(()=>window.DynastyGameEngineV2LabBridge.debug());
     await page.evaluate(()=>window.DynastyGameEngineV2LabBridge.recordCurrent());
     await page.waitForFunction(()=>window.DynastyGameEngineV2LabBridge.debug().lastArchive?.engine==='v2',{timeout:30000});
