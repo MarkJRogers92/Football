@@ -1341,6 +1341,46 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
 @media(max-width:430px){.client-status-program strong{max-width:150px}.client-status-facts span:last-child{max-width:88px;overflow:hidden;text-overflow:ellipsis}.client-shell-ready .tabs{scrollbar-width:none}.client-shell-ready .tabs::-webkit-scrollbar{display:none}}
 
 @media(prefers-reduced-motion:reduce){.client-rail{transition:none}}
+
+/* v0.11.1 — restrained motion and interaction polish. Presentation only. */
+
+:root{--dl-motion-fast:130ms;--dl-motion-standard:190ms;--dl-motion-slow:260ms;--dl-motion-ease:cubic-bezier(.22,.8,.2,1)}
+
+@keyframes dl-surface-in{from{opacity:.72;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@keyframes dl-detail-in{from{opacity:.62;transform:translateX(5px)}to{opacity:1;transform:translateX(0)}}
+@keyframes dl-value-in{0%{opacity:.5;transform:translateY(3px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes dl-result-in{0%{opacity:.55;transform:scale(.992)}100%{opacity:1;transform:scale(1)}}
+
+@media (prefers-reduced-motion:no-preference){
+  .dl-motion-surface{animation:dl-surface-in var(--dl-motion-standard) var(--dl-motion-ease) both}
+  .dl-motion-detail{animation:dl-detail-in var(--dl-motion-standard) var(--dl-motion-ease) both}
+  .dl-motion-value{animation:dl-value-in var(--dl-motion-fast) var(--dl-motion-ease) both}
+  .dl-motion-result{animation:dl-result-in var(--dl-motion-slow) var(--dl-motion-ease) both}
+
+  .client-nav-item,.client-mobile-item,.client-nav-toggle,.recruit-workspace-card,.rw-filter-stack button,.rw-actions button,.dev-viz-row,.dev-player-picker button,.dev-player-head button,.pi-chip,.event-team,.season-result,.season-next,.legacy-chip,.legacy-season{
+    transition:background-color var(--dl-motion-fast) ease,border-color var(--dl-motion-fast) ease,color var(--dl-motion-fast) ease,opacity var(--dl-motion-fast) ease,transform var(--dl-motion-fast) var(--dl-motion-ease)
+  }
+  .client-nav-item:hover,.client-nav-toggle:hover,.recruit-workspace-card:hover,.rw-filter-stack button:hover,.rw-actions button:hover,.dev-viz-row:hover,.dev-player-picker button:hover,.dev-player-head button:hover,.legacy-season:hover{transform:translateY(-1px)}
+  .recruit-workspace-card:active,.rw-actions button:active,.dev-viz-row:active,.dev-player-picker button:active,.dev-player-head button:active{transform:translateY(0)}
+
+  .rw-confidence>i,.dev-attr-row i>b,.dev-group-row i>b,.season-progress i{transition:width var(--dl-motion-slow) var(--dl-motion-ease),transform var(--dl-motion-slow) var(--dl-motion-ease)}
+  .dev-chart polyline,.dev-chart-point{transition:stroke-dashoffset var(--dl-motion-slow) var(--dl-motion-ease),opacity var(--dl-motion-standard) ease,transform var(--dl-motion-standard) var(--dl-motion-ease)}
+}
+
+.client-nav-item:focus-visible,.client-mobile-item:focus-visible,.client-nav-toggle:focus-visible,.recruit-workspace-card:focus-visible,.rw-filter-stack button:focus-visible,.rw-actions button:focus-visible,.dev-viz-row:focus-visible,.dev-player-picker button:focus-visible,.dev-player-head button:focus-visible{
+  outline:2px solid rgba(var(--team-secondary-rgb,120,170,225),.78);outline-offset:2px
+}
+
+html[data-dl-motion="reduced"] .dl-motion-surface,
+html[data-dl-motion="reduced"] .dl-motion-detail,
+html[data-dl-motion="reduced"] .dl-motion-value,
+html[data-dl-motion="reduced"] .dl-motion-result{animation:none!important;transform:none!important}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important}
+  .dl-motion-surface,.dl-motion-detail,.dl-motion-value,.dl-motion-result{animation:none!important;transform:none!important}
+  .client-nav-item,.client-mobile-item,.client-nav-toggle,.recruit-workspace-card,.rw-filter-stack button,.rw-actions button,.dev-viz-row,.dev-player-picker button,.dev-player-head button,.pi-chip,.event-team,.season-result,.season-next,.legacy-chip,.legacy-season,.rw-confidence>i,.dev-attr-row i>b,.dev-group-row i>b,.season-progress i,.dev-chart polyline,.dev-chart-point{transition:none!important;transform:none!important}
+}
 </style></head><body>
 <section id="titleScreen" class="title-screen" aria-labelledby="titleGameName">
   <div class="title-screen-art" aria-hidden="true"></div>
@@ -10396,5 +10436,46 @@ queue();
 
   app.classList.add('client-shell-ready');
   sync();
+})();
+
+(() => {
+'use strict';
+const motion=window.matchMedia?.('(prefers-reduced-motion: reduce)');
+const observed=new WeakSet(),timers=new WeakMap();
+function reduced(){return !!motion?.matches}
+function markMode(){document.documentElement.dataset.dlMotion=reduced()?'reduced':'full'}
+function visible(el){if(!el)return false;const s=getComputedStyle(el);return s.display!=='none'&&s.visibility!=='hidden'&&!el.hidden}
+function replay(el,kind='surface'){
+ if(!el||reduced()||!visible(el))return;
+ const cls=`dl-motion-${kind}`;el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);
+ clearTimeout(timers.get(el));timers.set(el,setTimeout(()=>el.classList.remove(cls),360));
+}
+function values(root){if(!root||reduced())return;for(const el of root.querySelectorAll('strong,b')){if(el.closest('button')||!visible(el))continue;el.classList.remove('dl-motion-value');void el.offsetWidth;el.classList.add('dl-motion-value');setTimeout(()=>el.classList.remove('dl-motion-value'),300)}}
+function watch(selector,childSelector,kind='surface',valueMotion=false){
+ const host=document.querySelector(selector);if(!host||observed.has(host))return;observed.add(host);
+ let queued=false;const run=()=>{queued=false;const target=childSelector?host.querySelector(childSelector):host;if(!target)return;replay(target,kind);if(valueMotion)values(target)};
+ new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(run)}).observe(host,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['hidden','class']});
+ if(visible(host))requestAnimationFrame(run);
+}
+function attach(){
+ watch('#recruitWorkspace','.recruit-workspace-dossier','detail',true);
+ watch('#developmentVisualLab','.dev-player-detail','detail',true);
+ watch('#playerIdentityHero',null,'detail',true);
+ watch('#gamedayEventHero',null,'result',true);
+ watch('#seasonPulse',null,'result',true);
+ watch('#dynastyMuseum',null,'surface',true);
+}
+function routeReveal(){
+ const active=[...document.querySelectorAll('.tab.active')].find(visible);if(!active)return;
+ const first=active.querySelector(':scope > .section-head + *')||active.querySelector(':scope > .section-head')||active.firstElementChild;
+ replay(first||active,'surface');
+}
+markMode();motion?.addEventListener?.('change',()=>{markMode();document.querySelectorAll('.dl-motion-surface,.dl-motion-detail,.dl-motion-value,.dl-motion-result').forEach(el=>el.classList.remove('dl-motion-surface','dl-motion-detail','dl-motion-value','dl-motion-result'))});
+document.addEventListener('click',e=>{
+ const route=e.target.closest?.('[data-client-tab],.tabs button[data-tab]');if(route)setTimeout(()=>{attach();routeReveal()},0);
+ if(e.target.closest?.('[data-rwid],[data-rwf],[data-rwa],[data-scout-action],[data-dev-player],[data-player]'))setTimeout(attach,0);
+},true);
+const bodyObserver=new MutationObserver(()=>attach());if(document.body)bodyObserver.observe(document.body,{childList:true,subtree:true});
+attach();setTimeout(attach,0);setTimeout(attach,150);
 })();
 </script></body></html>
