@@ -12,6 +12,7 @@ if(!engine||!adapter||!decisions)throw new Error('Game Day runner requires Game 
 const VERSION=2;
 const POLICY_ID='adapter-v1';
 const TEMPO_POLICY_ID='tempo-v1';
+const HALFTIME_POLICY_ID='halftime-v1';
 const clone=value=>JSON.parse(JSON.stringify(value));
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
 const finite=(value,fallback=0)=>Number.isFinite(Number(value))?Number(value):fallback;
@@ -29,7 +30,10 @@ function validateSession(session){
   if(!session.state||session.state.engine!=='v2')throw new Error('Game Day session is missing v2 state.');
   if(!session.inputs?.home||!session.inputs?.away)throw new Error('Game Day session is missing calibrated team inputs.');
   if(session.controlledSide!==null&&session.controlledSide!=='home'&&session.controlledSide!=='away')throw new Error('Invalid Game Day controlled side.');
-  for(const side of ['home','away'])if(!['normal','hurry','drain'].includes(session.tempo?.[side]))throw new Error(`Invalid ${side} tempo strategy.`);
+  for(const side of ['home','away']){
+    if(!['normal','hurry','drain'].includes(session.tempo?.[side]))throw new Error(`Invalid ${side} tempo strategy.`);
+    if(!['balanced','aggressive','ball_control'].includes(session.halftimeApproach?.[side]))throw new Error(`Invalid ${side} halftime approach.`);
+  }
   engine.validateState(session.state);return true
 }
 function createSession(options={}){
@@ -37,12 +41,24 @@ function createSession(options={}){
   const session={
     version:VERSION,status:'pregame',gameId:String(options.gameId??made.state.gameId),seed:String(options.seed??made.state.seed),
     state:made.state,inputs:{home:made.homeInput,away:made.awayInput},homeFieldRating,controlledSide,
-    tempo:{home:'normal',away:'normal'},tempoDecisionMade:{home:false,away:false},pendingStrategyDecision:null,
+    tempo:{home:'normal',away:'normal'},tempoDecisionMade:{home:false,away:false},
+    halftimeApproach:{home:'balanced',away:'balanced'},halftimeDecisionMade:false,pendingStrategyDecision:null,
     names:{home:String(options.home?.name??made.homeInput.name??'Home'),away:String(options.away?.name??made.awayInput.name??'Away')}
   };
   validateSession(session);return session
 }
 function isControlled(session,side){return !session.controlledSide||session.controlledSide===side}
+function halftimeAdjustedOutcome(session,state,outcome){
+  if(state.period<3)return outcome;const approach=session.halftimeApproach?.[state.possession]||'balanced';
+  if(approach==='aggressive'){
+    if(!outcome.turnover){if(outcome.kind==='pass'&&outcome.completed)outcome.yards=clamp((Number(outcome.yards)||0)+2,-14,55);else if(outcome.kind==='rush')outcome.yards=clamp((Number(outcome.yards)||0)+1,-14,55)}
+    outcome.clock=clamp(Math.round((Number(outcome.clock)||1)*.90),1,45)
+  }else if(approach==='ball_control'){
+    if(!outcome.turnover&&(Number(outcome.yards)||0)>0)outcome.yards=Math.max(0,(Number(outcome.yards)||0)-1);
+    outcome.clock=clamp(Math.round((Number(outcome.clock)||1)*1.10+1),1,45)
+  }
+  return outcome
+}
 function tempoAdjustedClock(session,state,clock){
   const tempo=session.tempo?.[state.possession]||'normal',n=Number(clock)||1;
   if(state.period!==4)return n;
@@ -52,7 +68,7 @@ function tempoAdjustedClock(session,state,clock){
 }
 function playOutcome(session,state){
   const outcome=adapter.profileOutcome(state,session.inputs.home,session.inputs.away,session.homeFieldRating),start=state.events.length;
-  outcome.clock=tempoAdjustedClock(session,state,outcome.clock);
+  halftimeAdjustedOutcome(session,state,outcome);outcome.clock=tempoAdjustedClock(session,state,outcome.clock);
   engine.applyScrimmage(state,outcome);adapter.annotateOutcomeEvent(state,start,outcome);return outcome
 }
 function executeAction(session,action,state){
@@ -85,19 +101,35 @@ function eventState(state){return{
   timeouts:{home:state.timeouts.home,away:state.timeouts.away},status:state.status,
   ot:state.ot?{period:state.ot.period,possession:state.ot.possession,possessions:state.ot.possessions}:null
 }}
+function nextDecisionId(state){if(!Number.isInteger(state.coachingDecisionCounter)||state.coachingDecisionCounter<0)state.coachingDecisionCounter=0;return`GD-${state.gameId}-${++state.coachingDecisionCounter}`}
+function halftimeWindow(session){
+  const state=session.state;if(session.halftimeDecisionMade||state.status!=='live'||state.period!==3||state.clock!==900)return false;
+  if(!(state.events||[]).slice(-5).some(e=>e.type==='halftime'))return false;
+  const side=session.controlledSide||state.possession;return !!side&&isControlled(session,side)
+}
+function createHalftimeDecision(session){
+  if(!halftimeWindow(session))return null;if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);
+  const state=session.state,side=session.controlledSide||state.possession,team=state[side]?.name||session.names[side],mine=state.score[side]||0,theirs=state.score[side==='home'?'away':'home']||0;
+  const situation=`HALFTIME · ${team} ${mine===theirs?'tied':mine>theirs?`leads ${mine}–${theirs}`:`trails ${mine}–${theirs}`}`;
+  const decision={
+    id:nextDecisionId(state),type:'halftime_adjustment',policyId:HALFTIME_POLICY_ID,team:side,teamId:state[side]?.id??null,
+    contextKey:`halftime:${side}:${state.score.home}:${state.score.away}`,situation,
+    context:{period:state.period,clock:state.clock,possession:state.possession,fieldPosition:state.fieldPosition,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},
+    options:[{id:'aggressive',label:'Open it up'},{id:'balanced',label:'Stay balanced'},{id:'ball_control',label:'Lean ball control'},{id:'delegate',label:'Delegate to staff'}],
+    staffRecommendation:'balanced',defaultOption:'balanced',createdAfterEventSeq:state.events?.length||0
+  };session.pendingStrategyDecision=decision;return clone(decision)
+}
 function tempoWindow(session){
   const state=session.state,side=state.possession;if(state.status!=='live'||state.period!==4||state.clock<=0||state.clock>300||state.down!==1||!side)return false;
   if(!isControlled(session,side)||session.tempoDecisionMade?.[side])return false;
   const margin=Math.abs((state.score?.home||0)-(state.score?.away||0));return margin<=16
 }
 function createTempoDecision(session){
-  if(!tempoWindow(session))return null;
-  if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);
-  const state=session.state,side=state.possession;if(!Number.isInteger(state.coachingDecisionCounter)||state.coachingDecisionCounter<0)state.coachingDecisionCounter=0;
-  const min=Math.floor(state.clock/60),sec=String(state.clock%60).padStart(2,'0'),team=state[side]?.name||session.names[side],margin=(state.score[side]||0)-(state.score[side==='home'?'away':'home']||0);
+  if(!tempoWindow(session))return null;if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);
+  const state=session.state,side=state.possession,min=Math.floor(state.clock/60),sec=String(state.clock%60).padStart(2,'0'),team=state[side]?.name||session.names[side],margin=(state.score[side]||0)-(state.score[side==='home'?'away':'home']||0);
   const situation=`Q4 ${min}:${sec} · ${team} ball · ${margin===0?'tie game':margin>0?`leading by ${margin}`:`trailing by ${Math.abs(margin)}`}`;
   const decision={
-    id:`GD-${state.gameId}-${++state.coachingDecisionCounter}`,type:'late_game_tempo',policyId:TEMPO_POLICY_ID,team:side,teamId:state[side]?.id??null,
+    id:nextDecisionId(state),type:'late_game_tempo',policyId:TEMPO_POLICY_ID,team:side,teamId:state[side]?.id??null,
     contextKey:`tempo:${state.period}:${state.clock}:${side}:${state.fieldPosition}:${state.score.home}:${state.score.away}`,
     situation,context:{period:state.period,clock:state.clock,possession:side,fieldPosition:state.fieldPosition,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},
     options:[{id:'hurry',label:'Hurry-up'},{id:'normal',label:'Normal tempo'},{id:'drain',label:'Drain clock'},{id:'delegate',label:'Delegate to staff'}],
@@ -116,14 +148,20 @@ function currentDecision(session){
   const state=session.state,existing=decisions.pendingDecision(state);
   if(existing){if(isControlled(session,existing.team))return clone(existing);state.pendingCoachingDecision=null}
   if(state.status==='live'&&state.period<=4&&state.down===4&&state.possession&&isControlled(session,state.possession))return decisions.ensureDecision(state,hooks(session));
-  return createTempoDecision(session)
+  return createHalftimeDecision(session)||createTempoDecision(session)
 }
-function resolveTempo(session,optionId){
-  const decision=session.pendingStrategyDecision;if(!decision)throw new Error('No tempo decision is pending.');
-  const selected=String(optionId||'delegate');if(!decision.options.some(o=>o.id===selected))throw new Error(`Illegal tempo decision option: ${selected}`);
-  const action=selected==='delegate'?decision.defaultOption:selected;if(!['normal','hurry','drain'].includes(action))throw new Error(`Unknown tempo action: ${action}`);
-  session.pendingStrategyDecision=null;session.tempo[decision.team]=action;session.tempoDecisionMade[decision.team]=true;
-  appendStrategyReceipt(session,decision,selected,action);engine.validateState(session.state);
+function resolveStrategy(session,optionId){
+  const decision=session.pendingStrategyDecision;if(!decision)throw new Error('No strategy decision is pending.');
+  const selected=String(optionId||'delegate');if(!decision.options.some(o=>o.id===selected))throw new Error(`Illegal ${decision.type} option: ${selected}`);
+  const action=selected==='delegate'?decision.defaultOption:selected;
+  if(decision.type==='late_game_tempo'){
+    if(!['normal','hurry','drain'].includes(action))throw new Error(`Unknown tempo action: ${action}`);
+    session.tempo[decision.team]=action;session.tempoDecisionMade[decision.team]=true
+  }else if(decision.type==='halftime_adjustment'){
+    if(!['balanced','aggressive','ball_control'].includes(action))throw new Error(`Unknown halftime action: ${action}`);
+    session.halftimeApproach[decision.team]=action;session.halftimeDecisionMade=true
+  }else throw new Error(`Unknown strategy decision type: ${decision.type}`);
+  session.pendingStrategyDecision=null;appendStrategyReceipt(session,decision,selected,action);engine.validateState(session.state);
   return{decision:clone(decision),selectedOption:selected,resolvedAction:action,state:session.state,session}
 }
 function advanceOne(session){
@@ -145,7 +183,7 @@ function advance(session,maxSteps=500){
 }
 function resolve(session,optionId='delegate'){
   validateSession(session);let result;
-  if(session.pendingStrategyDecision)result=resolveTempo(session,optionId);
+  if(session.pendingStrategyDecision)result=resolveStrategy(session,optionId);
   else result=decisions.resolveDecision(session.state,optionId,hooks(session));
   session.status=session.state.status==='final'?'final':'live';if(session.status==='final')session.summary=adapter.eventSummary(session.state);
   return{...result,session}
@@ -163,5 +201,5 @@ function snapshot(session){validateSession(session);return clone(session)}
 function restore(value){const session=clone(value);validateSession(session);const pending=session.pendingStrategyDecision||decisions.pendingDecision(session.state);session.status=session.state.status==='final'?'final':(pending?'decision':session.state.status);return session}
 function pendingDecision(session){validateSession(session);return session.pendingStrategyDecision?clone(session.pendingStrategyDecision):decisions.pendingDecision(session.state)}
 
-return{VERSION,POLICY_ID,TEMPO_POLICY_ID,createSession,advanceOne,advance,resolve,simulate,snapshot,restore,pendingDecision,validateSession};
+return{VERSION,POLICY_ID,TEMPO_POLICY_ID,HALFTIME_POLICY_ID,createSession,advanceOne,advance,resolve,simulate,snapshot,restore,pendingDecision,validateSession};
 });
