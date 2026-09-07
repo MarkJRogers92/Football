@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.10.0</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.10.1</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -732,6 +732,24 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 
 .v2-release-host{overflow:hidden;padding:0}.v2-release-recap{display:grid;gap:0}.v2-release-kicker{display:flex;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line,#2b3440);font-size:.76rem;letter-spacing:.08em}.v2-release-kicker span{font-weight:800}.v2-release-kicker strong{font-weight:600;color:var(--muted,#9ca8b8);letter-spacing:0}.v2-release-score{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;padding:22px 18px}.v2-release-team{display:flex;align-items:center;gap:10px;font-size:1.05rem;font-weight:750}.v2-release-team.home{justify-content:flex-end;text-align:right}.v2-release-team b{font-size:2.3rem;line-height:1}.v2-release-final{font-size:.78rem;font-weight:850;letter-spacing:.12em;padding:7px 10px;border:1px solid var(--line,#2b3440);border-radius:999px}.v2-release-metrics{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line,#2b3440);border-bottom:1px solid var(--line,#2b3440)}.v2-release-metrics>div{display:grid;gap:3px;padding:12px 14px;text-align:center;border-right:1px solid var(--line,#2b3440)}.v2-release-metrics>div:last-child{border-right:0}.v2-release-metrics span,.v2-release-section-head span{font-size:.72rem;color:var(--muted,#9ca8b8);text-transform:uppercase;letter-spacing:.06em}.v2-release-metrics strong{font-size:1rem}.v2-release-section{padding:15px 16px;border-bottom:1px solid var(--line,#2b3440)}.v2-release-section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}.v2-release-drive-strip{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px}.v2-release-drive{min-width:76px;padding:7px 8px;border:1px solid var(--line,#2b3440);border-radius:8px;display:grid;gap:2px;font-size:.75rem}.v2-release-drive b{font-size:.66rem;color:var(--muted,#9ca8b8)}.v2-release-drive small{font-size:.63rem;color:var(--muted,#9ca8b8);white-space:nowrap}.v2-release-drive.score{border-color:color-mix(in srgb,currentColor 35%,transparent)}.v2-release-drive.turnover{box-shadow:inset 3px 0 0 currentColor}.v2-release-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}.v2-release-grid>section{padding:16px}.v2-release-grid>section+section{border-left:1px solid var(--line,#2b3440)}.v2-release-scoring-row{display:grid;grid-template-columns:42px 1fr auto;gap:9px;align-items:center;padding:7px 0;border-bottom:1px solid color-mix(in srgb,currentColor 10%,transparent);font-size:.78rem}.v2-release-scoring-row span{color:var(--muted,#9ca8b8);font-weight:750}.v2-release-scoring-row b{font-variant-numeric:tabular-nums}.v2-release-leader-team+h4{margin-top:12px}.v2-release-leader-team h4{margin:9px 0 5px}.v2-release-leader{display:grid;grid-template-columns:42px 1fr;gap:8px;padding:5px 0;font-size:.75rem}.v2-release-leader span{color:var(--muted,#9ca8b8);font-weight:800}.v2-release-leader strong{font-weight:650}@media(max-width:760px){.v2-release-score{grid-template-columns:1fr;gap:10px;text-align:center}.v2-release-team,.v2-release-team.home{justify-content:center}.v2-release-team.home{flex-direction:row-reverse}.v2-release-final{justify-self:center}.v2-release-metrics{grid-template-columns:repeat(2,1fr)}.v2-release-metrics>div:nth-child(2){border-right:0}.v2-release-metrics>div:nth-child(-n+2){border-bottom:1px solid var(--line,#2b3440)}.v2-release-grid{grid-template-columns:1fr}.v2-release-grid>section+section{border-left:0;border-top:1px solid var(--line,#2b3440)}.v2-release-kicker{display:grid}}
 
+.v2-gameday-host{border-color:#42516a;background:linear-gradient(180deg,#151c27,#131922)}
+.v2-gameday-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:14px}
+.v2-gameday-scoreboard{display:grid;grid-template-columns:minmax(0,1fr) minmax(190px,.7fr) minmax(0,1fr);align-items:center;gap:12px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--panel2)}
+.v2-gameday-team{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:9px;min-width:0}.v2-gameday-team.home{grid-template-columns:auto minmax(0,1fr) auto}.v2-gameday-team span{font-weight:750;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.v2-gameday-team b{font-size:32px;font-variant-numeric:tabular-nums}.v2-gameday-center{text-align:center;display:grid;gap:3px}.v2-gameday-center strong{font-size:15px}.v2-gameday-center small{color:var(--muted)}
+.v2-gameday-decision{margin-top:12px;padding:14px;border:1px solid var(--warn);border-radius:12px;background:rgba(243,202,120,.06)}.v2-gameday-decision h3{margin:2px 0 6px}.v2-gameday-decision .button-row{margin-top:12px}.v2-gameday-decision button.recommended{border-color:var(--good)}
+.v2-gameday-controls{align-items:center;margin:12px 0}.v2-gameday-feed{margin-top:10px;border:1px solid var(--line);border-radius:12px;overflow:hidden}.v2-gameday-feed-head{display:flex;justify-content:space-between;gap:10px;padding:9px 11px;background:var(--panel2);border-bottom:1px solid var(--line)}.v2-gameday-feed-row{display:grid;grid-template-columns:90px minmax(0,1fr) auto;gap:10px;padding:8px 11px;border-bottom:1px solid var(--line);align-items:start}.v2-gameday-feed-row:last-child{border-bottom:0}.v2-gameday-feed-row span{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}.v2-gameday-feed-row strong{font-size:13px}.v2-gameday-feed-row b{font-variant-numeric:tabular-nums}
+@media(max-width:720px){.v2-gameday-head{flex-direction:column}.v2-gameday-scoreboard{grid-template-columns:1fr}.v2-gameday-team,.v2-gameday-team.home{grid-template-columns:auto minmax(0,1fr) auto}.v2-gameday-center{order:-1}.v2-gameday-feed-row{grid-template-columns:72px minmax(0,1fr) auto}.v2-gameday-team b{font-size:28px}}
+
+.v2-matchup-host{border-color:#3b4e69;background:linear-gradient(180deg,#171e29,#141a22)}
+.v2-matchup-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:16px}.v2-matchup-head h2{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.v2-matchup-ratings{display:grid;gap:6px;text-align:right;min-width:190px}.v2-matchup-ratings span{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}.v2-matchup-ratings b{color:var(--text);font-size:12px;letter-spacing:0}
+.v2-matchup-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:12px;margin-top:12px}.v2-matchup-grid>section{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px}.v2-matchup-section-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:7px}.v2-matchup-section-head span{font-size:11px;color:var(--muted)}.v2-matchup-section-head.minor{margin-top:14px}
+.v2-matchup-edge{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}.v2-matchup-edge:last-child{border-bottom:0}.v2-matchup-edge strong{display:flex;gap:7px;align-items:center;text-align:right}.v2-matchup-edge small{font-variant-numeric:tabular-nums;color:var(--muted)}
+.v2-matchup-tendency{display:flex;justify-content:space-between;gap:12px;background:var(--panel);border-radius:8px;padding:10px}.v2-matchup-tendency span{font-size:12px;color:var(--muted)}.v2-matchup-availability{display:grid;grid-template-columns:52px 1fr;gap:8px;padding:5px 0;font-size:12px}.v2-matchup-availability>span:first-child{color:var(--muted);font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.06em}
+.v2-matchup-grid.players{grid-template-columns:1fr 1fr}.v2-matchup-player{display:grid;grid-template-columns:75px minmax(0,1fr);gap:2px 9px;padding:7px 0;border-bottom:1px solid var(--line)}.v2-matchup-player:last-child{border-bottom:0}.v2-matchup-player>span{grid-row:1/3;color:var(--muted);font-size:11px}.v2-matchup-player strong{font-size:13px}.v2-matchup-player small{color:var(--muted)}
+.v2-matchup-plan{display:grid;grid-template-columns:.8fr 1.7fr auto;gap:12px;align-items:center;margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}.v2-matchup-plan>div{display:grid;gap:2px}.v2-matchup-plan span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}.v2-matchup-plan strong{font-size:13px}.v2-matchup-plan small{color:var(--muted);font-size:11px}.v2-matchup-plan-action{justify-items:end}.v2-matchup-note{margin-top:8px}
+.v2-plan-receipt{margin-top:0;border-left:3px solid var(--accent2)}.v2-plan-receipt>.muted{margin:5px 0}
+@media(max-width:760px){.v2-matchup-head{display:grid}.v2-matchup-ratings{text-align:left;min-width:0}.v2-matchup-grid,.v2-matchup-grid.players{grid-template-columns:1fr}.v2-matchup-plan{grid-template-columns:1fr}.v2-matchup-plan-action{justify-items:start}.v2-matchup-edge{font-size:12px}}
+
 /* Dynasty Lab commercial polish layer (v0.9.14 pass).
    Loaded last. Presentation only: no simulation, storage or save-format code depends on it.
    Section 1 — flagship Dashboard. Later sections add shared primitives. */
@@ -1321,7 +1339,7 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.10.0</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.10.1</b></span></footer>
   </div>
 </section>
 
@@ -1329,7 +1347,7 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.10.0</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.10.1</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -2739,6 +2757,135 @@ return{ENGINE_VERSION,QUARTER_SECONDS,createGame,startGame,step,simulate,applySc
 });
 (function(root,factory){
   const engine=(typeof module==='object'&&module.exports)?require('./game-engine-v2.js'):root.DynastyGameEngineV2;
+  const api=factory(engine);
+  if(typeof module==='object'&&module.exports)module.exports=api;
+  else root.DynastyGameEngineV2Decisions=api;
+})(typeof window==='object'?window:globalThis,function(engine){
+'use strict';
+if(!engine)throw new Error('Game Day decisions require Game Engine 2.');
+
+const VERSION=1;
+const clone=value=>JSON.parse(JSON.stringify(value));
+const scoreCopy=state=>({home:Number(state.score?.home)||0,away:Number(state.score?.away)||0});
+const timeoutsCopy=state=>({home:Number(state.timeouts?.home)||0,away:Number(state.timeouts?.away)||0});
+
+function ensureMeta(state){
+  if(!state||state.engine!=='v2')throw new Error('Game Day decisions require a Game Engine 2 state.');
+  if(!Number.isInteger(state.coachingDecisionCounter)||state.coachingDecisionCounter<0)state.coachingDecisionCounter=0;
+  if(!Object.prototype.hasOwnProperty.call(state,'pendingCoachingDecision'))state.pendingCoachingDecision=null;
+  state.coachingDecisionVersion=VERSION;
+  return state;
+}
+function fieldGoalDistance(state){return Math.round(100-state.fieldPosition+17)}
+function normalizeAction(value){const action=String(value||'').toLowerCase();return action==='play'?'go':action}
+function oldFourthDownPolicy(state){
+  if(state.down!==4)return null;
+  if(state.fieldPosition>=58&&state.distance>2)return 'field_goal';
+  if(state.fieldPosition<60&&state.distance>1)return 'punt';
+  return 'go';
+}
+function policyAction(state,hooks={}){
+  const raw=typeof hooks.defaultAction==='function'?hooks.defaultAction(state):oldFourthDownPolicy(state);
+  const action=normalizeAction(raw);if(!['go','punt','field_goal'].includes(action))throw new Error(`Invalid fourth-down default action: ${raw}`);return action
+}
+function contextKey(state){return[
+  state.period,state.clock,state.possession,state.fieldPosition,state.down,state.distance,
+  state.score?.home??0,state.score?.away??0,state.timeouts?.home??0,state.timeouts?.away??0
+].join(':')}
+function decisionSituation(state){
+  const offense=state[state.possession]?.name||state.possession;
+  const spot=state.fieldPosition>=50?`OPP ${100-state.fieldPosition}`:`OWN ${state.fieldPosition}`;
+  const q=state.period<=4?`Q${state.period}`:'OT';
+  const min=Math.floor((state.clock||0)/60),sec=String((state.clock||0)%60).padStart(2,'0');
+  return`${q} ${min}:${sec} · ${offense} · 4th & ${state.distance} · ${spot}`
+}
+function optionList(state){
+  const fg=fieldGoalDistance(state),options=[
+    {id:'go',label:'Go for it'},
+    {id:'punt',label:'Punt'}
+  ];
+  if(fg<=67)options.push({id:'field_goal',label:`Try ${fg}-yard field goal`});
+  options.push({id:'delegate',label:'Delegate to staff'});
+  return options
+}
+function isFourthDownWindow(state){return state.status==='live'&&state.period<=4&&state.down===4&&!!state.possession}
+function ensureDecision(state,hooks={}){
+  ensureMeta(state);engine.validateState(state);
+  if(!isFourthDownWindow(state)){state.pendingCoachingDecision=null;return null}
+  const key=contextKey(state),policyId=String(hooks.policyId||'core-v1'),existing=state.pendingCoachingDecision;
+  if(existing?.type==='fourth_down'&&existing.contextKey===key&&existing.policyId===policyId)return clone(existing);
+  const recommendation=policyAction(state,hooks),options=optionList(state);
+  if(!options.some(o=>o.id===recommendation))throw new Error(`Default fourth-down action is not legal in this window: ${recommendation}`);
+  const id=`GD-${state.gameId}-${++state.coachingDecisionCounter}`;
+  const decision={
+    id,type:'fourth_down',policyId,team:state.possession,teamId:state[state.possession]?.id??null,
+    contextKey:key,situation:decisionSituation(state),
+    context:{period:state.period,clock:state.clock,possession:state.possession,fieldPosition:state.fieldPosition,down:state.down,distance:state.distance,score:scoreCopy(state),timeouts:timeoutsCopy(state)},
+    fieldGoalDistance:fieldGoalDistance(state),options,staffRecommendation:recommendation,defaultOption:recommendation,
+    createdAfterEventSeq:state.events?.length||0
+  };
+  state.pendingCoachingDecision=decision;return clone(decision)
+}
+function eventState(state){return{
+  period:state.period,clock:state.clock,elapsed:state.elapsed,possession:state.possession,
+  fieldPosition:state.fieldPosition,down:state.down,distance:state.distance,
+  score:scoreCopy(state),timeouts:timeoutsCopy(state),status:state.status,
+  ot:state.ot?{period:state.ot.period,possession:state.ot.possession,possessions:state.ot.possessions}:null
+}}
+function appendDecisionEvent(state,decision,selectedOption,resolvedAction){
+  const event={
+    seq:(state.events?.length||0)+1,type:'coaching_decision',decisionId:decision.id,decisionType:decision.type,
+    policyId:decision.policyId,team:decision.team,selectedOption,resolvedAction,staffRecommendation:decision.staffRecommendation,
+    situation:decision.situation,state:eventState(state)
+  };
+  state.events.push(event);return event
+}
+function executeDefaultAction(state,action){
+  if(action==='field_goal')engine.attemptFieldGoal(state);
+  else if(action==='punt')engine.punt(state);
+  else if(action==='go')engine.applyScrimmage(state,engine.generateOutcome(state));
+  else throw new Error(`Unknown coaching decision action: ${action}`)
+}
+function resolveDecision(state,optionId='delegate',hooks={}){
+  const decision=ensureDecision(state,hooks);if(!decision)throw new Error('No coaching decision is pending.');
+  const selected=String(optionId||'delegate');
+  if(!decision.options.some(o=>o.id===selected))throw new Error(`Illegal coaching decision option: ${selected}`);
+  const action=selected==='delegate'?decision.defaultOption:selected;
+  state.pendingCoachingDecision=null;
+  appendDecisionEvent(state,decision,selected,action);
+  if(typeof hooks.executeAction==='function')hooks.executeAction(action,state,decision);
+  else executeDefaultAction(state,action);
+  engine.validateState(state);
+  return{decision,selectedOption:selected,resolvedAction:action,state}
+}
+function advanceUntilDecision(state,maxSteps=500,hooks={}){
+  ensureMeta(state);
+  if(state.status==='pregame')engine.startGame(state);
+  let steps=0;
+  while(state.status!=='final'){
+    if(++steps>maxSteps)throw new Error('Game Day decision runner step limit exceeded.');
+    const decision=ensureDecision(state,hooks);if(decision)return{status:'decision',decision,steps:steps-1,state};
+    if(typeof hooks.step==='function')hooks.step(state);else engine.step(state);
+  }
+  state.pendingCoachingDecision=null;engine.validateGame(state);return{status:'final',decision:null,steps,state}
+}
+function simulateWithDecisions(state,chooser=()=> 'delegate',maxWindows=200,hooks={}){
+  let windows=0;
+  while(state.status!=='final'){
+    const out=advanceUntilDecision(state,500,hooks);
+    if(out.status==='final')break;
+    if(++windows>maxWindows)throw new Error('Game Day decision window safety limit exceeded.');
+    resolveDecision(state,chooser(clone(out.decision),state),hooks);
+  }
+  engine.validateGame(state);return state
+}
+function pendingDecision(state){ensureMeta(state);return state.pendingCoachingDecision?clone(state.pendingCoachingDecision):null}
+
+return{VERSION,ensureDecision,pendingDecision,resolveDecision,advanceUntilDecision,simulateWithDecisions,oldFourthDownPolicy};
+});
+
+(function(root,factory){
+  const engine=(typeof module==='object'&&module.exports)?require('./game-engine-v2.js'):root.DynastyGameEngineV2;
   const rngApi=(typeof module==='object'&&module.exports)?require('./rng.js'):root.DynastyRng;
   const api=factory(engine,rngApi);
   if(typeof module==='object'&&module.exports)module.exports=api;
@@ -2850,6 +2997,201 @@ function aggregate(samples){
   return result;
 }
 return{profileTeam,eventSummary,createShadowGame,profileOutcome,annotateOutcomeEvent,shadowDecision,simulateShadow,aggregate};
+});
+
+(function(root,factory){
+  const engine=(typeof module==='object'&&module.exports)?require('./game-engine-v2.js'):root.DynastyGameEngineV2;
+  const adapter=(typeof module==='object'&&module.exports)?require('./game-engine-v2-adapter.js'):root.DynastyGameEngineV2Adapter;
+  const decisions=(typeof module==='object'&&module.exports)?require('./game-engine-v2-decisions.js'):root.DynastyGameEngineV2Decisions;
+  const rngApi=(typeof module==='object'&&module.exports)?require('./rng.js'):root.DynastyRng;
+  const api=factory(engine,adapter,decisions,rngApi);
+  if(typeof module==='object'&&module.exports)module.exports=api;
+  else root.DynastyGameEngineV2GameDay=api;
+})(typeof window==='object'?window:globalThis,function(engine,adapter,decisions,DynastyRng){
+'use strict';
+if(!engine||!adapter||!decisions||!DynastyRng)throw new Error('Game Day runner requires Game Engine 2, adapter, decision controller, and RNG.');
+
+const VERSION=2;
+const POLICY_ID='adapter-v1';
+const TEMPO_POLICY_ID='tempo-v1';
+const HALFTIME_POLICY_ID='halftime-v1';
+const CONVERSION_POLICY_ID='conversion-v1';
+const clone=value=>JSON.parse(JSON.stringify(value));
+const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+const finite=(value,fallback=0)=>Number.isFinite(Number(value))?Number(value):fallback;
+const other=side=>side==='home'?'away':'home';
+const normalizeFourth=value=>String(value||'').toLowerCase()==='play'?'go':String(value||'').toLowerCase();
+
+function controlledSideFor(options,made){
+  if(options.controlledSide==='home'||options.controlledSide==='away')return options.controlledSide;
+  if(options.controlledTeamId==null)return null;
+  const id=String(options.controlledTeamId);
+  if(String(made.homeInput.id)===id)return'home';if(String(made.awayInput.id)===id)return'away';
+  throw new Error('Controlled team is not part of this Game Day matchup.');
+}
+function validateSession(session){
+  if(!session||session.version!==VERSION)throw new Error('Invalid Game Day session version.');
+  if(!session.state||session.state.engine!=='v2')throw new Error('Game Day session is missing v2 state.');
+  if(!session.inputs?.home||!session.inputs?.away)throw new Error('Game Day session is missing calibrated team inputs.');
+  if(session.controlledSide!==null&&session.controlledSide!=='home'&&session.controlledSide!=='away')throw new Error('Invalid Game Day controlled side.');
+  for(const side of ['home','away']){
+    if(!['normal','hurry','drain'].includes(session.tempo?.[side]))throw new Error(`Invalid ${side} tempo strategy.`);
+    if(!['balanced','aggressive','ball_control'].includes(session.halftimeApproach?.[side]))throw new Error(`Invalid ${side} halftime approach.`);
+  }
+  if(session.pendingConversion&& !['home','away'].includes(session.pendingConversion.side))throw new Error('Invalid pending touchdown conversion.');
+  engine.validateState(session.state);return true
+}
+function createSession(options={}){
+  const made=adapter.createShadowGame(options),homeFieldRating=clamp(finite(options.homeFieldRating,0),0,12),controlledSide=controlledSideFor(options,made);
+  const session={
+    version:VERSION,status:'pregame',gameId:String(options.gameId??made.state.gameId),seed:String(options.seed??made.state.seed),
+    state:made.state,inputs:{home:made.homeInput,away:made.awayInput},homeFieldRating,controlledSide,
+    tempo:{home:'normal',away:'normal'},tempoDecisionMade:{home:false,away:false},
+    halftimeApproach:{home:'balanced',away:'balanced'},halftimeDecisionMade:false,pendingConversion:null,pendingStrategyDecision:null,
+    names:{home:String(options.home?.name??made.homeInput.name??'Home'),away:String(options.away?.name??made.awayInput.name??'Away')}
+  };
+  validateSession(session);return session
+}
+function isControlled(session,side){return !session.controlledSide||session.controlledSide===side}
+function eventState(state){return{
+  period:state.period,clock:state.clock,elapsed:state.elapsed,possession:state.possession,fieldPosition:state.fieldPosition,
+  down:state.down,distance:state.distance,score:{home:state.score.home,away:state.score.away},
+  timeouts:{home:state.timeouts.home,away:state.timeouts.away},status:state.status,
+  ot:state.ot?{period:state.ot.period,possession:state.ot.possession,possessions:state.ot.possessions}:null
+}}
+function pushGameEvent(state,type,data={}){const e={seq:(state.events?.length||0)+1,type,...data,state:eventState(state)};state.events.push(e);return e}
+function addGamePoints(state,side,points,type,data={}){state.score[side]+=points;return pushGameEvent(state,type,{team:side,points,...data})}
+function kickoffGame(state,receiver,reason){state.pendingKickoff=null;state.possession=receiver;state.fieldPosition=25;state.down=1;state.distance=10;state.drive++;pushGameEvent(state,'kickoff',{receiver,reason,touchback:true})}
+function finishRegulationGame(state){state.status='final';state.possession=null;state.fieldPosition=null;state.down=null;state.distance=null;pushGameEvent(state,'game_end',{reason:'regulation',winner:state.score.home>state.score.away?'home':'away'})}
+function startRegulationOvertime(state){
+  state.period=5;state.clock=0;state.ot={period:1,first:state.openingReceiver,possessions:0,possession:state.openingReceiver,startScore:{...state.score},pendingResult:null};
+  state.possession=state.ot.first;state.fieldPosition=75;state.down=1;state.distance=10;pushGameEvent(state,'overtime_start',{overtime:1,first:state.ot.first})
+}
+function endRegulationAfterConversion(state){
+  if(state.status!=='live'||state.period>4||state.clock>0)return false;pushGameEvent(state,'period_end',{period:state.period});
+  if(state.period===4){if(state.score.home===state.score.away)startRegulationOvertime(state);else finishRegulationGame(state);return true}
+  if(state.period===2){state.period=3;state.clock=900;state.timeouts={home:3,away:3};state.pendingKickoff=null;pushGameEvent(state,'halftime',{});kickoffGame(state,state.secondHalfReceiver,'second_half_kickoff');return true}
+  const pending=state.pendingKickoff;state.period++;state.clock=900;pushGameEvent(state,'period_start',{period:state.period});if(pending)kickoffGame(state,pending.receiver,pending.reason);return true
+}
+function resolvePendingConversion(session,choice='extra_point'){
+  const state=session.state,pending=session.pendingConversion;if(!pending)throw new Error('No touchdown conversion is pending.');const side=pending.side;
+  const rng=DynastyRng.create(state.rng),roll=rng.next();state.rng=rng.snapshot();
+  if(choice==='extra_point'){
+    const made=roll<.965;if(made)addGamePoints(state,side,1,'extra_point',{made:true});else pushGameEvent(state,'extra_point',{team:side,points:0,made:false})
+  }else if(choice==='two_point'){
+    const made=roll<.47;if(made)addGamePoints(state,side,2,'two_point',{made:true});else pushGameEvent(state,'two_point',{team:side,points:0,made:false})
+  }else throw new Error(`Unknown conversion choice: ${choice}`);
+  session.pendingConversion=null;
+  if(state.period<=4&&state.clock===0)state.pendingKickoff={receiver:other(side),reason:'post_touchdown'};else kickoffGame(state,other(side),'post_touchdown');
+  endRegulationAfterConversion(state);engine.validateState(state);return state
+}
+function halftimeAdjustedOutcome(session,state,outcome){
+  if(state.period<3)return outcome;const approach=session.halftimeApproach?.[state.possession]||'balanced';
+  if(approach==='aggressive'){
+    if(!outcome.turnover){if(outcome.kind==='pass'&&outcome.completed)outcome.yards=clamp((Number(outcome.yards)||0)+2,-14,55);else if(outcome.kind==='rush')outcome.yards=clamp((Number(outcome.yards)||0)+1,-14,55)}
+    outcome.clock=clamp(Math.round((Number(outcome.clock)||1)*.90),1,45)
+  }else if(approach==='ball_control'){
+    if(!outcome.turnover&&(Number(outcome.yards)||0)>0)outcome.yards=Math.max(0,(Number(outcome.yards)||0)-1);
+    outcome.clock=clamp(Math.round((Number(outcome.clock)||1)*1.10+1),1,45)
+  }
+  return outcome
+}
+function tempoAdjustedClock(session,state,clock){
+  const tempo=session.tempo?.[state.possession]||'normal',n=Number(clock)||1;
+  if(state.period!==4)return n;if(tempo==='hurry')return clamp(Math.round(n*.55),4,45);if(tempo==='drain')return clamp(Math.round(n*1.35+3),1,45);return n
+}
+function deferredTouchdown(session,state,outcome){
+  const offense=state.possession,beforeField=state.fieldPosition,beforeDown=state.down,beforeDistance=state.distance,clock=clamp(Math.round(outcome.clock??30),1,45),used=clamp(clock,0,state.clock);
+  state.clock-=used;state.elapsed+=used;state.play++;state.fieldPosition=100;
+  pushGameEvent(state,'scrimmage',{team:offense,yards:100-beforeField,from:{fieldPosition:beforeField,down:beforeDown,distance:beforeDistance}});addGamePoints(state,offense,6,'touchdown',{});
+  session.pendingConversion={side:offense,createdAfterEventSeq:state.events.length,period:state.period,clock:state.clock};engine.validateState(state);return state
+}
+function playOutcome(session,state){
+  const outcome=adapter.profileOutcome(state,session.inputs.home,session.inputs.away,session.homeFieldRating),start=state.events.length,beforeField=state.fieldPosition;
+  halftimeAdjustedOutcome(session,state,outcome);outcome.clock=tempoAdjustedClock(session,state,outcome.clock);
+  const yards=clamp(Math.round(outcome.yards??0),-99,99),touchdown=state.period<=4&&!outcome.turnover&&beforeField+yards>=100;
+  if(touchdown)deferredTouchdown(session,state,outcome);else engine.applyScrimmage(state,outcome);
+  adapter.annotateOutcomeEvent(state,start,outcome);return outcome
+}
+function executeAction(session,action,state){
+  const normalized=normalizeFourth(action);if(normalized==='field_goal')engine.attemptFieldGoal(state);else if(normalized==='punt')engine.punt(state);else if(normalized==='go')playOutcome(session,state);else throw new Error(`Unknown Game Day action: ${action}`)
+}
+function stepSession(session,state){
+  if(session.pendingConversion){resolvePendingConversion(session,'extra_point');return}
+  if(state.period>4){if(state.ot?.period>=3||(state.down===4&&state.fieldPosition>=55)){engine.step(state);return}playOutcome(session,state);return}
+  if(state.down===4){if(isControlled(session,state.possession))throw new Error('Game Day runner attempted to step through an unresolved fourth-down decision.');executeAction(session,adapter.shadowDecision(state),state);return}
+  playOutcome(session,state)
+}
+function hooks(session){return{policyId:POLICY_ID,defaultAction:state=>adapter.shadowDecision(state),executeAction:(action,state)=>executeAction(session,action,state),step:state=>stepSession(session,state)}}
+function nextDecisionId(state){if(!Number.isInteger(state.coachingDecisionCounter)||state.coachingDecisionCounter<0)state.coachingDecisionCounter=0;return`GD-${state.gameId}-${++state.coachingDecisionCounter}`}
+function conversionWindow(session){
+  const state=session.state,p=session.pendingConversion;if(!p||state.status!=='live'||state.period!==4||state.clock>600||!isControlled(session,p.side))return false;
+  const margin=(state.score[p.side]||0)-(state.score[other(p.side)]||0);return Math.abs(margin)<=8
+}
+function createConversionDecision(session){
+  if(!conversionWindow(session))return null;if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);
+  const state=session.state,side=session.pendingConversion.side,team=state[side]?.name||session.names[side],mine=state.score[side],theirs=state.score[other(side)],min=Math.floor(state.clock/60),sec=String(state.clock%60).padStart(2,'0');
+  const decision={id:nextDecisionId(state),type:'two_point_decision',policyId:CONVERSION_POLICY_ID,team:side,teamId:state[side]?.id??null,contextKey:`conversion:${state.period}:${state.clock}:${side}:${mine}:${theirs}`,situation:`Q4 ${min}:${sec} · TOUCHDOWN ${team} · ${mine}–${theirs}`,context:{period:state.period,clock:state.clock,possession:side,fieldPosition:100,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},options:[{id:'extra_point',label:'Kick PAT'},{id:'two_point',label:'Go for two'},{id:'delegate',label:'Delegate to staff'}],staffRecommendation:'extra_point',defaultOption:'extra_point',createdAfterEventSeq:state.events?.length||0};
+  session.pendingStrategyDecision=decision;return clone(decision)
+}
+function halftimeWindow(session){
+  const state=session.state;if(session.halftimeDecisionMade||state.status!=='live'||state.period!==3||state.clock!==900)return false;if(!(state.events||[]).slice(-5).some(e=>e.type==='halftime'))return false;const side=session.controlledSide||state.possession;return !!side&&isControlled(session,side)
+}
+function createHalftimeDecision(session){
+  if(!halftimeWindow(session))return null;if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);
+  const state=session.state,side=session.controlledSide||state.possession,team=state[side]?.name||session.names[side],mine=state.score[side]||0,theirs=state.score[other(side)]||0;
+  const decision={id:nextDecisionId(state),type:'halftime_adjustment',policyId:HALFTIME_POLICY_ID,team:side,teamId:state[side]?.id??null,contextKey:`halftime:${side}:${state.score.home}:${state.score.away}`,situation:`HALFTIME · ${team} ${mine===theirs?'tied':mine>theirs?`leads ${mine}–${theirs}`:`trails ${mine}–${theirs}`}`,context:{period:state.period,clock:state.clock,possession:state.possession,fieldPosition:state.fieldPosition,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},options:[{id:'aggressive',label:'Open it up'},{id:'balanced',label:'Stay balanced'},{id:'ball_control',label:'Lean ball control'},{id:'delegate',label:'Delegate to staff'}],staffRecommendation:'balanced',defaultOption:'balanced',createdAfterEventSeq:state.events?.length||0};
+  session.pendingStrategyDecision=decision;return clone(decision)
+}
+function tempoWindow(session){
+  const state=session.state,side=state.possession;if(state.status!=='live'||state.period!==4||state.clock<=0||state.clock>300||state.down!==1||!side)return false;if(!isControlled(session,side)||session.tempoDecisionMade?.[side])return false;return Math.abs((state.score?.home||0)-(state.score?.away||0))<=16
+}
+function createTempoDecision(session){
+  if(!tempoWindow(session))return null;if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);
+  const state=session.state,side=state.possession,min=Math.floor(state.clock/60),sec=String(state.clock%60).padStart(2,'0'),team=state[side]?.name||session.names[side],margin=(state.score[side]||0)-(state.score[other(side)]||0);
+  const decision={id:nextDecisionId(state),type:'late_game_tempo',policyId:TEMPO_POLICY_ID,team:side,teamId:state[side]?.id??null,contextKey:`tempo:${state.period}:${state.clock}:${side}:${state.fieldPosition}:${state.score.home}:${state.score.away}`,situation:`Q4 ${min}:${sec} · ${team} ball · ${margin===0?'tie game':margin>0?`leading by ${margin}`:`trailing by ${Math.abs(margin)}`}`,context:{period:state.period,clock:state.clock,possession:side,fieldPosition:state.fieldPosition,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},options:[{id:'hurry',label:'Hurry-up'},{id:'normal',label:'Normal tempo'},{id:'drain',label:'Drain clock'},{id:'delegate',label:'Delegate to staff'}],staffRecommendation:'normal',defaultOption:'normal',createdAfterEventSeq:state.events?.length||0};
+  session.pendingStrategyDecision=decision;return clone(decision)
+}
+function appendStrategyReceipt(session,decision,selectedOption,resolvedAction){const state=session.state,event={seq:(state.events?.length||0)+1,type:'coaching_decision',decisionId:decision.id,decisionType:decision.type,policyId:decision.policyId,team:decision.team,selectedOption,resolvedAction,staffRecommendation:decision.staffRecommendation,situation:decision.situation,state:eventState(state)};state.events.push(event);return event}
+function currentDecision(session){
+  if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);const state=session.state;
+  if(session.pendingConversion){const conversion=createConversionDecision(session);if(conversion)return conversion;resolvePendingConversion(session,'extra_point');if(state.status==='final')return null}
+  const existing=decisions.pendingDecision(state);if(existing){if(isControlled(session,existing.team))return clone(existing);state.pendingCoachingDecision=null}
+  if(state.status==='live'&&state.period<=4&&state.down===4&&state.possession&&isControlled(session,state.possession))return decisions.ensureDecision(state,hooks(session));
+  return createHalftimeDecision(session)||createTempoDecision(session)
+}
+function resolveStrategy(session,optionId){
+  const decision=session.pendingStrategyDecision;if(!decision)throw new Error('No strategy decision is pending.');const selected=String(optionId||'delegate');if(!decision.options.some(o=>o.id===selected))throw new Error(`Illegal ${decision.type} option: ${selected}`);const action=selected==='delegate'?decision.defaultOption:selected;session.pendingStrategyDecision=null;
+  if(decision.type==='two_point_decision'){
+    if(!['extra_point','two_point'].includes(action))throw new Error(`Unknown conversion action: ${action}`);appendStrategyReceipt(session,decision,selected,action);resolvePendingConversion(session,action)
+  }else if(decision.type==='late_game_tempo'){
+    if(!['normal','hurry','drain'].includes(action))throw new Error(`Unknown tempo action: ${action}`);session.tempo[decision.team]=action;session.tempoDecisionMade[decision.team]=true;appendStrategyReceipt(session,decision,selected,action)
+  }else if(decision.type==='halftime_adjustment'){
+    if(!['balanced','aggressive','ball_control'].includes(action))throw new Error(`Unknown halftime action: ${action}`);session.halftimeApproach[decision.team]=action;session.halftimeDecisionMade=true;appendStrategyReceipt(session,decision,selected,action)
+  }else throw new Error(`Unknown strategy decision type: ${decision.type}`);
+  engine.validateState(session.state);return{decision:clone(decision),selectedOption:selected,resolvedAction:action,state:session.state,session}
+}
+function finalResult(session){session.status='final';session.summary=adapter.eventSummary(session.state);return{status:'final',decision:null,session}}
+function advanceOne(session){
+  validateSession(session);const state=session.state;if(state.status==='pregame')engine.startGame(state);if(state.status==='final')return finalResult(session);
+  const before=currentDecision(session);if(state.status==='final')return finalResult(session);if(before){session.status='decision';return{status:'decision',decision:clone(before),session}}
+  stepSession(session,state);if(state.status==='final')return finalResult(session);
+  const after=currentDecision(session);if(state.status==='final')return finalResult(session);session.status=after?'decision':'live';return{status:session.status,decision:after?clone(after):null,session}
+}
+function advance(session,maxSteps=500){
+  validateSession(session);let steps=0;while(session.state.status!=='final'){const out=advanceOne(session);if(out.status==='decision'||out.status==='final')return{...out,steps};if(++steps>maxSteps)throw new Error('Game Day runner step limit exceeded.')}return finalResult(session)
+}
+function resolve(session,optionId='delegate'){
+  validateSession(session);let result;if(session.pendingStrategyDecision)result=resolveStrategy(session,optionId);else result=decisions.resolveDecision(session.state,optionId,hooks(session));session.status=session.state.status==='final'?'final':'live';if(session.status==='final')session.summary=adapter.eventSummary(session.state);return{...result,session}
+}
+function simulate(session,chooser=()=> 'delegate',maxWindows=200){
+  let windows=0;while(session.state.status!=='final'){const out=advance(session);if(out.status==='final')break;if(++windows>maxWindows)throw new Error('Game Day session decision safety limit exceeded.');resolve(session,chooser(clone(out.decision),session))}engine.validateGame(session.state);session.status='final';session.summary=adapter.eventSummary(session.state);return session
+}
+function snapshot(session){validateSession(session);return clone(session)}
+function restore(value){const session=clone(value);validateSession(session);const pending=session.pendingStrategyDecision||decisions.pendingDecision(session.state);session.status=session.state.status==='final'?'final':(pending?'decision':session.state.status);return session}
+function pendingDecision(session){validateSession(session);return session.pendingStrategyDecision?clone(session.pendingStrategyDecision):decisions.pendingDecision(session.state)}
+
+return{VERSION,POLICY_ID,TEMPO_POLICY_ID,HALFTIME_POLICY_ID,CONVERSION_POLICY_ID,createSession,advanceOne,advance,resolve,simulate,snapshot,restore,pendingDecision,validateSession};
 });
 
 (function(root,factory){
@@ -3422,7 +3764,7 @@ return {VERSION,STAT_KEYS:[...STAT_KEYS],BOX_KEYS:[...BOX_KEYS],normalizeBox,bui
 })(typeof window==='object'?window:globalThis,function(Adapter){
 'use strict';
 if(!Adapter)throw new Error('Game Engine 2 Lab requires the v2 adapter.');
-const escapeHTML=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const escapeHTML=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
 const ordinal=n=>n===1?'1st':n===2?'2nd':n===3?'3rd':n===4?'4th':String(n??'—');
 function clockLabel(state={}){
   if((state.period||0)>4){const ot=state.ot?.period||Math.max(1,(state.period||5)-4);return `OT${ot}`}
@@ -3441,6 +3783,7 @@ function downLabel(state={}){
 }
 function teamName(side,names={}){return names[side]||side||'Team'}
 function signedYards(y){const n=Number(y)||0;return n===0?'no gain':n>0?`gains ${n}`:`loses ${Math.abs(n)}`}
+function decisionActionLabel(value){return String(value||'decision').replaceAll('_',' ')}
 function eventText(event={},names={}){
   const state=event.state||{},team=teamName(event.team,names),receiver=teamName(event.receiver,names);
   if(event.type==='game_start')return'Game begins.';
@@ -3455,6 +3798,10 @@ function eventText(event={},names={}){
   if(event.type==='field_goal')return`${team} ${event.distance||''}-yard field goal ${event.made?'good':'missed'}.`.replace('  -',' ');
   if(event.type==='punt')return`${team} punts${event.touchback?' for a touchback':''}.`;
   if(event.type==='safety')return`SAFETY for ${team}.`;
+  if(event.type==='coaching_decision'){
+    const choice=event.selectedOption==='delegate'?`delegates — staff chooses ${decisionActionLabel(event.resolvedAction)}`:`chooses ${decisionActionLabel(event.selectedOption)}`;
+    return`${team} coach ${choice}.`;
+  }
   if(event.type==='period_end')return`End of ${event.period===1?'1st quarter':event.period===2?'1st half':event.period===3?'3rd quarter':'regulation'}.`;
   if(event.type==='period_start')return`Start of quarter ${event.period}.`;
   if(event.type==='halftime')return'Halftime.';
@@ -3483,6 +3830,65 @@ function eventsHTML(preview,limit=160){
 }
 return{clockLabel,fieldLabel,downLabel,eventText,eventRowHTML,simulate,summaryHTML,eventsHTML};
 });
+(function(root,factory){
+  const api=factory();
+  if(typeof module==='object'&&module.exports)module.exports=api;
+  else root.DynastyGameplanFeedback=api;
+})(typeof window==='object'?window:globalThis,function(){
+'use strict';
+
+const VERSION=1;
+const finite=(v,fallback=0)=>Number.isFinite(Number(v))?Number(v):fallback;
+const safeDiv=(a,b)=>b>0?a/b:0;
+const opposite=side=>side==='home'?'away':'home';
+const PLAN_LABELS={
+  scout:'Full scout',balance:'Balanced prep',standard:'Standard week',stop_run:'Stop the run',
+  protect_pass:'Protect against the pass',pressure:'Pressure the QB'
+};
+function normalizePlan(record,side){
+  const raw=record?.[side]?.gameplan||{},prep=String(raw.prep||'standard');
+  return{prep,label:String(raw.label||PLAN_LABELS[prep]||prep)}
+}
+function metrics(record,side){
+  const opp=opposite(side),mine=record?.teamStats?.[side]||{},theirs=record?.teamStats?.[opp]||{};
+  const rushAtt=finite(theirs.rushAtt),passAtt=finite(theirs.passAtt),plays=finite(theirs.plays),rushYds=finite(theirs.rushYds),passYds=finite(theirs.passYds);
+  return{
+    pointsAllowed:finite(record?.score?.[opp]),pointsFor:finite(record?.score?.[side]),
+    rushAtt,rushYds,rushYpc:safeDiv(rushYds,rushAtt),passAtt,passYds,passYpa:safeDiv(passYds,passAtt),
+    sacks:finite(theirs.sacksTaken),takeaways:finite(theirs.turnovers),totalYards:rushYds+passYds,yardsPerPlay:safeDiv(rushYds+passYds,plays),
+    ownTurnovers:finite(mine.turnovers),ownYards:finite(mine.rushYds)+finite(mine.passYds)
+  }
+}
+function verdict(rank){return rank>=2?'Worked':rank<=-2?'Missed':'Mixed'}
+function evaluate(record,side){
+  if(side!=='home'&&side!=='away')throw new Error('Gameplan feedback side must be home or away.');
+  const plan=normalizePlan(record,side),m=metrics(record,side);let rank=0,headline='',detail='';
+  if(plan.prep==='stop_run'){
+    if(m.rushAtt<8){rank=0;headline='Opponent rarely tested the run front.'}
+    else{rank=m.rushYpc<=3.7?2:m.rushYpc>=5.0?-2:0;headline=`Run defense allowed ${m.rushYpc.toFixed(1)} yards per carry.`}
+    detail=`${m.rushYds} rushing yards on ${m.rushAtt} carries; ${m.passYds} passing yards allowed.`
+  }else if(plan.prep==='protect_pass'){
+    rank=m.passAtt<12?0:m.passYpa<=6.4?2:m.passYpa>=8.5?-2:0;headline=`Pass defense allowed ${m.passYpa.toFixed(1)} yards per attempt.`;
+    detail=`${m.passYds} passing yards on ${m.passAtt} attempts with ${m.takeaways} total takeaway${m.takeaways===1?'':'s'}.`
+  }else if(plan.prep==='pressure'){
+    rank=m.sacks>=4&&m.passYpa<8.5?2:m.sacks<=1&&m.passYpa>=8.0?-2:m.sacks>=3?1:0;headline=`Pressure produced ${m.sacks} sack${m.sacks===1?'':'s'}.`;
+    detail=`Opponent averaged ${m.passYpa.toFixed(1)} yards per pass attempt and finished with ${m.passYds} passing yards.`
+  }else if(plan.prep==='scout'||plan.prep==='balance'){
+    rank=m.yardsPerPlay<=5.2?2:m.yardsPerPlay>=7.0?-2:0;headline=`Defense allowed ${m.yardsPerPlay.toFixed(1)} yards per play.`;
+    detail=`${m.totalYards} total yards allowed, ${m.takeaways} takeaway${m.takeaways===1?'':'s'}, ${m.pointsAllowed} points allowed.`
+  }else{
+    rank=0;headline=`Standard preparation produced a ${m.pointsFor}–${m.pointsAllowed} result.`;
+    detail=`${m.ownYards} yards gained, ${m.totalYards} allowed, turnover margin ${m.takeaways-m.ownTurnovers>=0?'+':''}${m.takeaways-m.ownTurnovers}.`
+  }
+  return{version:VERSION,side,plan,verdict:plan.prep==='standard'?'Baseline':verdict(rank),rank,headline,detail,metrics:m}
+}
+function forTeam(record,teamId){
+  const id=String(teamId);let side=null;if(String(record?.home?.id)===id)side='home';else if(String(record?.away?.id)===id)side='away';
+  if(!side)throw new Error('Team is not part of the supplied game archive record.');return evaluate(record,side)
+}
+return{VERSION,PLAN_LABELS,metrics,evaluate,forTeam};
+});
+
 // Shared HTML escaping helper. Keep this tiny and load it before app.js so
 // presentation helpers inside the app IIFE can safely use `esc(...)`.
 (function(root,factory){
@@ -3498,7 +3904,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=[{"id":1,"name":"Chicago Metropolitan","conference":"Great Lakes","prestige":92,"resources":93,"development":81,"nil":86,"academics":81,"fan_support":92,"facilities":94,"admin_patience":25,"program_ceiling":100,"city":"Chicago","state":"IL","lat":41.8781,"lon":-87.6298},{"id":2,"name":"Great Lakes University","conference":"Great Lakes","prestige":60,"resources":62,"development":58,"nil":59,"academics":63,"fan_support":68,"facilities":60,"admin_patience":78,"program_ceiling":67,"city":"Evanston","state":"IL","lat":42.0451,"lon":-87.6877},{"id":3,"name":"Wisconsin Commonwealth","conference":"Great Lakes","prestige":89,"resources":88,"development":84,"nil":98,"academics":61,"fan_support":83,"facilities":85,"admin_patience":61,"program_ceiling":100,"city":"Madison","state":"WI","lat":43.0731,"lon":-89.4012},{"id":4,"name":"Milwaukee State","conference":"Great Lakes","prestige":59,"resources":70,"development":55,"nil":70,"academics":60,"fan_support":67,"facilities":62,"admin_patience":66,"program_ceiling":74,"city":"Milwaukee","state":"WI","lat":43.0389,"lon":-87.9065},{"id":5,"name":"Michigan Commonwealth","conference":"Great Lakes","prestige":94,"resources":97,"development":82,"nil":94,"academics":66,"fan_support":75,"facilities":99,"admin_patience":50,"program_ceiling":100,"city":"Lansing","state":"MI","lat":42.7325,"lon":-84.5555},{"id":6,"name":"Detroit Metropolitan","conference":"Great Lakes","prestige":75,"resources":93,"development":47,"nil":90,"academics":37,"fan_support":76,"facilities":85,"admin_patience":42,"program_ceiling":90,"city":"Detroit","state":"MI","lat":42.3314,"lon":-83.0458},{"id":7,"name":"Lake Erie University","conference":"Great Lakes","prestige":62,"resources":63,"development":67,"nil":66,"academics":70,"fan_support":63,"facilities":62,"admin_patience":87,"program_ceiling":71,"city":"Cleveland","state":"OH","lat":41.4993,"lon":-81.6944},{"id":8,"name":"Ohio Western","conference":"Great Lakes","prestige":49,"resources":62,"development":40,"nil":62,"academics":58,"fan_support":82,"facilities":54,"admin_patience":63,"program_ceiling":54,"city":"Toledo","state":"OH","lat":41.6528,"lon":-83.5379},{"id":9,"name":"Indiana Commonwealth","conference":"Great Lakes","prestige":65,"resources":57,"development":53,"nil":50,"academics":78,"fan_support":67,"facilities":57,"admin_patience":58,"program_ceiling":70,"city":"Indianapolis","state":"IN","lat":39.7684,"lon":-86.1581},{"id":10,"name":"Fort Wayne State","conference":"Great Lakes","prestige":59,"resources":40,"development":62,"nil":47,"academics":66,"fan_support":47,"facilities":47,"admin_patience":65,"program_ceiling":66,"city":"Fort Wayne","state":"IN","lat":41.0793,"lon":-85.1394},{"id":11,"name":"Twin Cities University","conference":"Great Lakes","prestige":84,"resources":84,"development":65,"nil":79,"academics":76,"fan_support":73,"facilities":79,"admin_patience":63,"program_ceiling":97,"city":"Minneapolis","state":"MN","lat":44.9778,"lon":-93.265},{"id":12,"name":"Iowa Lakes University","conference":"Great Lakes","prestige":41,"resources":38,"development":58,"nil":29,"academics":72,"fan_support":39,"facilities":35,"admin_patience":81,"program_ceiling":51,"city":"Cedar Rapids","state":"IA","lat":41.9779,"lon":-91.6656},{"id":13,"name":"New England Commonwealth","conference":"Northeast","prestige":82,"resources":85,"development":57,"nil":99,"academics":42,"fan_support":72,"facilities":77,"admin_patience":46,"program_ceiling":91,"city":"Boston","state":"MA","lat":42.3601,"lon":-71.0589},{"id":14,"name":"Massachusetts Bay University","conference":"Northeast","prestige":58,"resources":58,"development":49,"nil":63,"academics":79,"fan_support":48,"facilities":46,"admin_patience":68,"program_ceiling":66,"city":"Worcester","state":"MA","lat":42.2626,"lon":-71.8023},{"id":15,"name":"Hudson University","conference":"Northeast","prestige":47,"resources":45,"development":43,"nil":38,"academics":60,"fan_support":38,"facilities":44,"admin_patience":65,"program_ceiling":59,"city":"Albany","state":"NY","lat":42.6526,"lon":-73.7562},{"id":16,"name":"New York Metropolitan","conference":"Northeast","prestige":80,"resources":75,"development":72,"nil":76,"academics":81,"fan_support":78,"facilities":76,"admin_patience":66,"program_ceiling":90,"city":"New York","state":"NY","lat":40.7128,"lon":-74.006},{"id":17,"name":"Long Island State","conference":"Northeast","prestige":58,"resources":53,"development":59,"nil":40,"academics":64,"fan_support":72,"facilities":61,"admin_patience":48,"program_ceiling":74,"city":"Hempstead","state":"NY","lat":40.7062,"lon":-73.6187},{"id":18,"name":"Connecticut Commonwealth","conference":"Northeast","prestige":47,"resources":48,"development":37,"nil":48,"academics":77,"fan_support":44,"facilities":49,"admin_patience":43,"program_ceiling":56,"city":"Hartford","state":"CT","lat":41.7658,"lon":-72.6734},{"id":19,"name":"Rhode Island Maritime","conference":"Northeast","prestige":57,"resources":55,"development":62,"nil":51,"academics":97,"fan_support":61,"facilities":58,"admin_patience":44,"program_ceiling":74,"city":"Providence","state":"RI","lat":41.824,"lon":-71.4128},{"id":20,"name":"Vermont State","conference":"Northeast","prestige":28,"resources":27,"development":57,"nil":29,"academics":77,"fan_support":36,"facilities":35,"admin_patience":70,"program_ceiling":38,"city":"Burlington","state":"VT","lat":44.4759,"lon":-73.2121},{"id":21,"name":"New Hampshire Tech","conference":"Northeast","prestige":60,"resources":58,"development":48,"nil":30,"academics":73,"fan_support":64,"facilities":63,"admin_patience":43,"program_ceiling":69,"city":"Manchester","state":"NH","lat":42.9956,"lon":-71.4548},{"id":22,"name":"Maine Commonwealth","conference":"Northeast","prestige":47,"resources":40,"development":52,"nil":29,"academics":72,"fan_support":50,"facilities":39,"admin_patience":74,"program_ceiling":55,"city":"Portland","state":"ME","lat":43.6591,"lon":-70.2568},{"id":23,"name":"Delaware Valley University","conference":"Northeast","prestige":41,"resources":33,"development":44,"nil":35,"academics":56,"fan_support":53,"facilities":28,"admin_patience":75,"program_ceiling":54,"city":"Wilmington","state":"DE","lat":39.7391,"lon":-75.5398},{"id":24,"name":"Jersey Coastal University","conference":"Northeast","prestige":32,"resources":36,"development":65,"nil":29,"academics":57,"fan_support":28,"facilities":34,"admin_patience":68,"program_ceiling":79,"city":"Newark","state":"NJ","lat":40.7357,"lon":-74.1724},{"id":25,"name":"Chesapeake University","conference":"Atlantic","prestige":82,"resources":96,"development":53,"nil":89,"academics":69,"fan_support":99,"facilities":84,"admin_patience":50,"program_ceiling":90,"city":"Baltimore","state":"MD","lat":39.2904,"lon":-76.6122},{"id":26,"name":"Potomac Commonwealth","conference":"Atlantic","prestige":53,"resources":46,"development":46,"nil":67,"academics":78,"fan_support":50,"facilities":47,"admin_patience":67,"program_ceiling":63,"city":"Washington","state":"DC","lat":38.9072,"lon":-77.0369},{"id":27,"name":"Virginia Commonwealth Tech","conference":"Atlantic","prestige":84,"resources":93,"development":72,"nil":99,"academics":59,"fan_support":75,"facilities":85,"admin_patience":53,"program_ceiling":100,"city":"Richmond","state":"VA","lat":37.5407,"lon":-77.436},{"id":28,"name":"Tidewater State","conference":"Atlantic","prestige":62,"resources":72,"development":57,"nil":62,"academics":85,"fan_support":58,"facilities":71,"admin_patience":61,"program_ceiling":75,"city":"Norfolk","state":"VA","lat":36.8508,"lon":-76.2859},{"id":29,"name":"Blue Ridge University","conference":"Atlantic","prestige":49,"resources":55,"development":83,"nil":50,"academics":62,"fan_support":62,"facilities":56,"admin_patience":56,"program_ceiling":63,"city":"Roanoke","state":"VA","lat":37.2709,"lon":-79.9414},{"id":30,"name":"Carolina Commonwealth","conference":"Atlantic","prestige":88,"resources":88,"development":64,"nil":99,"academics":69,"fan_support":98,"facilities":93,"admin_patience":57,"program_ceiling":100,"city":"Charlotte","state":"NC","lat":35.2271,"lon":-80.8431},{"id":31,"name":"Piedmont University","conference":"Atlantic","prestige":69,"resources":67,"development":55,"nil":64,"academics":95,"fan_support":73,"facilities":72,"admin_patience":56,"program_ceiling":81,"city":"Raleigh","state":"NC","lat":35.7796,"lon":-78.6382},{"id":32,"name":"Cape Fear State","conference":"Atlantic","prestige":67,"resources":53,"development":68,"nil":47,"academics":66,"fan_support":69,"facilities":56,"admin_patience":78,"program_ceiling":76,"city":"Wilmington","state":"NC","lat":34.2257,"lon":-77.9447},{"id":33,"name":"Palmetto University","conference":"Atlantic","prestige":70,"resources":67,"development":68,"nil":65,"academics":81,"fan_support":62,"facilities":65,"admin_patience":52,"program_ceiling":86,"city":"Columbia","state":"SC","lat":34.0007,"lon":-81.0348},{"id":34,"name":"Charleston Maritime","conference":"Atlantic","prestige":60,"resources":68,"development":73,"nil":56,"academics":70,"fan_support":49,"facilities":60,"admin_patience":52,"program_ceiling":77,"city":"Charleston","state":"SC","lat":32.7765,"lon":-79.9311},{"id":35,"name":"Appalachian Commonwealth","conference":"Atlantic","prestige":48,"resources":49,"development":63,"nil":45,"academics":58,"fan_support":44,"facilities":47,"admin_patience":78,"program_ceiling":54,"city":"Asheville","state":"NC","lat":35.5951,"lon":-82.5515},{"id":36,"name":"Shenandoah University","conference":"Atlantic","prestige":71,"resources":72,"development":53,"nil":75,"academics":67,"fan_support":81,"facilities":62,"admin_patience":85,"program_ceiling":78,"city":"Charlottesville","state":"VA","lat":38.0293,"lon":-78.4767},{"id":37,"name":"Georgia Commonwealth","conference":"Southeastern","prestige":96,"resources":99,"development":73,"nil":99,"academics":83,"fan_support":99,"facilities":98,"admin_patience":51,"program_ceiling":100,"city":"Atlanta","state":"GA","lat":33.749,"lon":-84.388},{"id":38,"name":"Georgia Coastal","conference":"Southeastern","prestige":84,"resources":85,"development":63,"nil":84,"academics":74,"fan_support":95,"facilities":86,"admin_patience":38,"program_ceiling":95,"city":"Savannah","state":"GA","lat":32.0809,"lon":-81.0912},{"id":39,"name":"Florida Commonwealth","conference":"Southeastern","prestige":92,"resources":94,"development":90,"nil":84,"academics":72,"fan_support":91,"facilities":92,"admin_patience":54,"program_ceiling":97,"city":"Orlando","state":"FL","lat":28.5383,"lon":-81.3792},{"id":40,"name":"South Florida Metropolitan","conference":"Southeastern","prestige":52,"resources":51,"development":48,"nil":48,"academics":59,"fan_support":40,"facilities":55,"admin_patience":71,"program_ceiling":90,"city":"Miami","state":"FL","lat":25.7617,"lon":-80.1918},{"id":41,"name":"Florida Gulf University","conference":"Southeastern","prestige":69,"resources":73,"development":59,"nil":91,"academics":44,"fan_support":71,"facilities":75,"admin_patience":53,"program_ceiling":78,"city":"Tampa","state":"FL","lat":27.9506,"lon":-82.4572},{"id":42,"name":"Alabama Commonwealth","conference":"Southeastern","prestige":97,"resources":91,"development":86,"nil":88,"academics":61,"fan_support":85,"facilities":99,"admin_patience":16,"program_ceiling":100,"city":"Birmingham","state":"AL","lat":33.5186,"lon":-86.8104},{"id":43,"name":"Mobile State","conference":"Southeastern","prestige":40,"resources":35,"development":42,"nil":33,"academics":62,"fan_support":34,"facilities":29,"admin_patience":68,"program_ceiling":56,"city":"Mobile","state":"AL","lat":30.6954,"lon":-88.0399},{"id":44,"name":"Tennessee Commonwealth","conference":"Southeastern","prestige":85,"resources":78,"development":74,"nil":84,"academics":75,"fan_support":66,"facilities":88,"admin_patience":30,"program_ceiling":100,"city":"Nashville","state":"TN","lat":36.1627,"lon":-86.7816},{"id":45,"name":"Knoxville Tech","conference":"Southeastern","prestige":48,"resources":45,"development":54,"nil":50,"academics":72,"fan_support":53,"facilities":44,"admin_patience":65,"program_ceiling":65,"city":"Knoxville","state":"TN","lat":35.9606,"lon":-83.9207},{"id":46,"name":"Mississippi Commonwealth","conference":"Southeastern","prestige":54,"resources":53,"development":64,"nil":63,"academics":77,"fan_support":59,"facilities":65,"admin_patience":41,"program_ceiling":66,"city":"Jackson","state":"MS","lat":32.2988,"lon":-90.1848},{"id":47,"name":"Magnolia State","conference":"Southeastern","prestige":52,"resources":54,"development":71,"nil":34,"academics":82,"fan_support":63,"facilities":53,"admin_patience":67,"program_ceiling":60,"city":"Hattiesburg","state":"MS","lat":31.3271,"lon":-89.2903},{"id":48,"name":"Kentucky Commonwealth","conference":"Southeastern","prestige":65,"resources":76,"development":65,"nil":75,"academics":79,"fan_support":43,"facilities":73,"admin_patience":50,"program_ceiling":80,"city":"Lexington","state":"KY","lat":38.0406,"lon":-84.5037},{"id":49,"name":"Louisiana Commonwealth","conference":"Gulf","prestige":91,"resources":99,"development":66,"nil":96,"academics":79,"fan_support":96,"facilities":92,"admin_patience":61,"program_ceiling":100,"city":"Baton Rouge","state":"LA","lat":30.4515,"lon":-91.1871},{"id":50,"name":"New Orleans University","conference":"Gulf","prestige":83,"resources":64,"development":57,"nil":66,"academics":67,"fan_support":80,"facilities":73,"admin_patience":40,"program_ceiling":93,"city":"New Orleans","state":"LA","lat":29.9511,"lon":-90.0715},{"id":51,"name":"Acadiana State","conference":"Gulf","prestige":66,"resources":57,"development":44,"nil":50,"academics":72,"fan_support":81,"facilities":68,"admin_patience":78,"program_ceiling":72,"city":"Lafayette","state":"LA","lat":30.2241,"lon":-92.0198},{"id":52,"name":"Gulf Coast Tech","conference":"Gulf","prestige":67,"resources":78,"development":83,"nil":77,"academics":57,"fan_support":77,"facilities":67,"admin_patience":31,"program_ceiling":79,"city":"Biloxi","state":"MS","lat":30.396,"lon":-88.8853},{"id":53,"name":"Houston Metropolitan","conference":"Gulf","prestige":84,"resources":94,"development":59,"nil":84,"academics":77,"fan_support":86,"facilities":99,"admin_patience":53,"program_ceiling":99,"city":"Houston","state":"TX","lat":29.7604,"lon":-95.3698},{"id":54,"name":"East Texas University","conference":"Gulf","prestige":67,"resources":54,"development":57,"nil":53,"academics":64,"fan_support":56,"facilities":68,"admin_patience":51,"program_ceiling":84,"city":"Beaumont","state":"TX","lat":30.0802,"lon":-94.1266},{"id":55,"name":"Arkansas Delta","conference":"Gulf","prestige":68,"resources":62,"development":50,"nil":63,"academics":57,"fan_support":56,"facilities":72,"admin_patience":66,"program_ceiling":85,"city":"Little Rock","state":"AR","lat":34.7465,"lon":-92.2896},{"id":56,"name":"Ozark Commonwealth","conference":"Gulf","prestige":67,"resources":79,"development":71,"nil":88,"academics":57,"fan_support":53,"facilities":70,"admin_patience":57,"program_ceiling":75,"city":"Fayetteville","state":"AR","lat":36.0822,"lon":-94.1719},{"id":57,"name":"Memphis Metropolitan","conference":"Gulf","prestige":64,"resources":65,"development":67,"nil":75,"academics":68,"fan_support":60,"facilities":55,"admin_patience":58,"program_ceiling":77,"city":"Memphis","state":"TN","lat":35.1495,"lon":-90.049},{"id":58,"name":"Red River University","conference":"Gulf","prestige":77,"resources":75,"development":60,"nil":76,"academics":78,"fan_support":81,"facilities":88,"admin_patience":52,"program_ceiling":90,"city":"Shreveport","state":"LA","lat":32.5252,"lon":-93.7502},{"id":59,"name":"Coastal Bend State","conference":"Gulf","prestige":63,"resources":70,"development":57,"nil":74,"academics":47,"fan_support":59,"facilities":69,"admin_patience":42,"program_ceiling":72,"city":"Corpus Christi","state":"TX","lat":27.8006,"lon":-97.3964},{"id":60,"name":"Gulf Plains University","conference":"Gulf","prestige":31,"resources":28,"development":60,"nil":22,"academics":73,"fan_support":29,"facilities":25,"admin_patience":60,"program_ceiling":44,"city":"Lake Charles","state":"LA","lat":30.2266,"lon":-93.2174},{"id":61,"name":"Missouri Commonwealth","conference":"Heartland","prestige":82,"resources":83,"development":85,"nil":65,"academics":69,"fan_support":99,"facilities":85,"admin_patience":59,"program_ceiling":98,"city":"Columbia","state":"MO","lat":38.9517,"lon":-92.3341},{"id":62,"name":"St. Louis Metropolitan","conference":"Heartland","prestige":65,"resources":74,"development":50,"nil":67,"academics":69,"fan_support":54,"facilities":72,"admin_patience":67,"program_ceiling":76,"city":"St. Louis","state":"MO","lat":38.627,"lon":-90.1994},{"id":63,"name":"Kansas Commonwealth","conference":"Heartland","prestige":81,"resources":91,"development":74,"nil":91,"academics":75,"fan_support":84,"facilities":82,"admin_patience":81,"program_ceiling":86,"city":"Wichita","state":"KS","lat":37.6872,"lon":-97.3301},{"id":64,"name":"Prairie Tech","conference":"Heartland","prestige":65,"resources":65,"development":64,"nil":77,"academics":72,"fan_support":73,"facilities":64,"admin_patience":48,"program_ceiling":82,"city":"Manhattan","state":"KS","lat":39.1836,"lon":-96.5717},{"id":65,"name":"Nebraska Commonwealth","conference":"Heartland","prestige":87,"resources":94,"development":65,"nil":83,"academics":95,"fan_support":61,"facilities":87,"admin_patience":54,"program_ceiling":97,"city":"Lincoln","state":"NE","lat":40.8136,"lon":-96.7026},{"id":66,"name":"Omaha State","conference":"Heartland","prestige":73,"resources":75,"development":64,"nil":76,"academics":74,"fan_support":63,"facilities":70,"admin_patience":58,"program_ceiling":84,"city":"Omaha","state":"NE","lat":41.2565,"lon":-95.9345},{"id":67,"name":"Iowa Commonwealth","conference":"Heartland","prestige":69,"resources":75,"development":51,"nil":73,"academics":64,"fan_support":70,"facilities":73,"admin_patience":57,"program_ceiling":77,"city":"Des Moines","state":"IA","lat":41.5868,"lon":-93.625},{"id":68,"name":"Dakota University","conference":"Heartland","prestige":79,"resources":89,"development":68,"nil":82,"academics":70,"fan_support":82,"facilities":80,"admin_patience":58,"program_ceiling":94,"city":"Sioux Falls","state":"SD","lat":43.5446,"lon":-96.7311},{"id":69,"name":"North Dakota Commonwealth","conference":"Heartland","prestige":66,"resources":73,"development":63,"nil":73,"academics":82,"fan_support":73,"facilities":68,"admin_patience":62,"program_ceiling":77,"city":"Fargo","state":"ND","lat":46.8772,"lon":-96.7898},{"id":70,"name":"Oklahoma Northern","conference":"Heartland","prestige":60,"resources":47,"development":74,"nil":59,"academics":75,"fan_support":59,"facilities":47,"admin_patience":55,"program_ceiling":77,"city":"Tulsa","state":"OK","lat":36.154,"lon":-95.9928},{"id":71,"name":"Springfield State","conference":"Heartland","prestige":51,"resources":64,"development":51,"nil":64,"academics":58,"fan_support":35,"facilities":57,"admin_patience":78,"program_ceiling":68,"city":"Springfield","state":"MO","lat":37.209,"lon":-93.2923},{"id":72,"name":"Central Plains University","conference":"Heartland","prestige":71,"resources":70,"development":73,"nil":65,"academics":85,"fan_support":61,"facilities":67,"admin_patience":65,"program_ceiling":78,"city":"Topeka","state":"KS","lat":39.0473,"lon":-95.6752},{"id":73,"name":"Texas Republic University","conference":"Southwest","prestige":98,"resources":99,"development":73,"nil":99,"academics":71,"fan_support":78,"facilities":83,"admin_patience":46,"program_ceiling":100,"city":"Austin","state":"TX","lat":30.2672,"lon":-97.7431},{"id":74,"name":"Lone Star Tech","conference":"Southwest","prestige":90,"resources":79,"development":65,"nil":73,"academics":73,"fan_support":83,"facilities":83,"admin_patience":58,"program_ceiling":100,"city":"Dallas","state":"TX","lat":32.7767,"lon":-96.797},{"id":75,"name":"Fort Worth State","conference":"Southwest","prestige":70,"resources":62,"development":75,"nil":60,"academics":84,"fan_support":71,"facilities":64,"admin_patience":79,"program_ceiling":83,"city":"Fort Worth","state":"TX","lat":32.7555,"lon":-97.3308},{"id":76,"name":"San Antonio Commonwealth","conference":"Southwest","prestige":69,"resources":91,"development":74,"nil":92,"academics":66,"fan_support":52,"facilities":82,"admin_patience":62,"program_ceiling":81,"city":"San Antonio","state":"TX","lat":29.4241,"lon":-98.4936},{"id":77,"name":"West Texas University","conference":"Southwest","prestige":56,"resources":40,"development":60,"nil":50,"academics":75,"fan_support":68,"facilities":41,"admin_patience":50,"program_ceiling":61,"city":"Lubbock","state":"TX","lat":33.5779,"lon":-101.8552},{"id":78,"name":"Rio Grande State","conference":"Southwest","prestige":68,"resources":67,"development":74,"nil":70,"academics":88,"fan_support":74,"facilities":61,"admin_patience":45,"program_ceiling":74,"city":"El Paso","state":"TX","lat":31.7619,"lon":-106.485},{"id":79,"name":"Oklahoma Commonwealth","conference":"Southwest","prestige":87,"resources":87,"development":69,"nil":85,"academics":60,"fan_support":88,"facilities":84,"admin_patience":52,"program_ceiling":94,"city":"Oklahoma City","state":"OK","lat":35.4676,"lon":-97.5164},{"id":80,"name":"Red Dirt University","conference":"Southwest","prestige":65,"resources":60,"development":76,"nil":71,"academics":73,"fan_support":73,"facilities":59,"admin_patience":44,"program_ceiling":73,"city":"Norman","state":"OK","lat":35.2226,"lon":-97.4395},{"id":81,"name":"New Mexico Commonwealth","conference":"Southwest","prestige":60,"resources":51,"development":50,"nil":63,"academics":76,"fan_support":64,"facilities":64,"admin_patience":65,"program_ceiling":72,"city":"Albuquerque","state":"NM","lat":35.0844,"lon":-106.6504},{"id":82,"name":"Santa Fe Tech","conference":"Southwest","prestige":53,"resources":51,"development":73,"nil":54,"academics":57,"fan_support":61,"facilities":53,"admin_patience":70,"program_ceiling":60,"city":"Santa Fe","state":"NM","lat":35.687,"lon":-105.9378},{"id":83,"name":"Arizona Commonwealth","conference":"Southwest","prestige":82,"resources":91,"development":65,"nil":81,"academics":72,"fan_support":99,"facilities":85,"admin_patience":64,"program_ceiling":90,"city":"Phoenix","state":"AZ","lat":33.4484,"lon":-112.074},{"id":84,"name":"Desert State University","conference":"Southwest","prestige":56,"resources":68,"development":36,"nil":54,"academics":46,"fan_support":46,"facilities":62,"admin_patience":68,"program_ceiling":67,"city":"Tucson","state":"AZ","lat":32.2226,"lon":-110.9747},{"id":85,"name":"Colorado Commonwealth","conference":"Mountain","prestige":82,"resources":86,"development":67,"nil":81,"academics":57,"fan_support":73,"facilities":85,"admin_patience":40,"program_ceiling":100,"city":"Denver","state":"CO","lat":39.7392,"lon":-104.9903},{"id":86,"name":"Front Range University","conference":"Mountain","prestige":56,"resources":59,"development":56,"nil":69,"academics":65,"fan_support":71,"facilities":55,"admin_patience":66,"program_ceiling":60,"city":"Colorado Springs","state":"CO","lat":38.8339,"lon":-104.8214},{"id":87,"name":"Utah Commonwealth","conference":"Mountain","prestige":84,"resources":88,"development":71,"nil":89,"academics":65,"fan_support":89,"facilities":89,"admin_patience":48,"program_ceiling":92,"city":"Salt Lake City","state":"UT","lat":40.7608,"lon":-111.891},{"id":88,"name":"Wasatch Tech","conference":"Mountain","prestige":82,"resources":74,"development":60,"nil":79,"academics":74,"fan_support":82,"facilities":88,"admin_patience":57,"program_ceiling":91,"city":"Provo","state":"UT","lat":40.2338,"lon":-111.6585},{"id":89,"name":"Boise Commonwealth","conference":"Mountain","prestige":81,"resources":87,"development":80,"nil":93,"academics":65,"fan_support":79,"facilities":84,"admin_patience":63,"program_ceiling":95,"city":"Boise","state":"ID","lat":43.615,"lon":-116.2023},{"id":90,"name":"Montana Commonwealth","conference":"Mountain","prestige":55,"resources":62,"development":45,"nil":54,"academics":55,"fan_support":59,"facilities":68,"admin_patience":68,"program_ceiling":68,"city":"Missoula","state":"MT","lat":46.8721,"lon":-113.994},{"id":91,"name":"Big Sky State","conference":"Mountain","prestige":76,"resources":67,"development":67,"nil":44,"academics":79,"fan_support":98,"facilities":74,"admin_patience":53,"program_ceiling":88,"city":"Bozeman","state":"MT","lat":45.677,"lon":-111.0429},{"id":92,"name":"Wyoming State","conference":"Mountain","prestige":35,"resources":45,"development":39,"nil":36,"academics":51,"fan_support":43,"facilities":36,"admin_patience":76,"program_ceiling":46,"city":"Cheyenne","state":"WY","lat":41.14,"lon":-104.8202},{"id":93,"name":"Nevada Commonwealth","conference":"Mountain","prestige":38,"resources":44,"development":58,"nil":48,"academics":53,"fan_support":26,"facilities":50,"admin_patience":57,"program_ceiling":42,"city":"Reno","state":"NV","lat":39.5296,"lon":-119.8138},{"id":94,"name":"Las Vegas Metropolitan","conference":"Mountain","prestige":78,"resources":69,"development":78,"nil":74,"academics":76,"fan_support":76,"facilities":74,"admin_patience":79,"program_ceiling":90,"city":"Las Vegas","state":"NV","lat":36.1699,"lon":-115.1398},{"id":95,"name":"Idaho Northern","conference":"Mountain","prestige":61,"resources":56,"development":63,"nil":53,"academics":66,"fan_support":60,"facilities":59,"admin_patience":59,"program_ceiling":69,"city":"Coeur d'Alene","state":"ID","lat":47.6777,"lon":-116.7805},{"id":96,"name":"Rocky Mountain University","conference":"Mountain","prestige":49,"resources":49,"development":47,"nil":39,"academics":84,"fan_support":52,"facilities":51,"admin_patience":48,"program_ceiling":65,"city":"Grand Junction","state":"CO","lat":39.0639,"lon":-108.5506},{"id":97,"name":"Southern California Commonwealth","conference":"Pacific","prestige":95,"resources":99,"development":70,"nil":92,"academics":64,"fan_support":95,"facilities":99,"admin_patience":38,"program_ceiling":100,"city":"Los Angeles","state":"CA","lat":34.0522,"lon":-118.2437},{"id":98,"name":"Los Angeles Metropolitan","conference":"Pacific","prestige":54,"resources":67,"development":56,"nil":55,"academics":45,"fan_support":54,"facilities":68,"admin_patience":52,"program_ceiling":69,"city":"Los Angeles","state":"CA","lat":34.0522,"lon":-118.2437},{"id":99,"name":"California Pacific","conference":"Pacific","prestige":75,"resources":79,"development":72,"nil":70,"academics":79,"fan_support":57,"facilities":81,"admin_patience":74,"program_ceiling":83,"city":"San Diego","state":"CA","lat":32.7157,"lon":-117.1611},{"id":100,"name":"Bay Area University","conference":"Pacific","prestige":84,"resources":79,"development":68,"nil":71,"academics":72,"fan_support":78,"facilities":76,"admin_patience":35,"program_ceiling":91,"city":"San Francisco","state":"CA","lat":37.7749,"lon":-122.4194},{"id":101,"name":"Sacramento State College","conference":"Pacific","prestige":74,"resources":82,"development":73,"nil":88,"academics":83,"fan_support":74,"facilities":85,"admin_patience":73,"program_ceiling":80,"city":"Sacramento","state":"CA","lat":38.5816,"lon":-121.4944},{"id":102,"name":"Central California Tech","conference":"Pacific","prestige":48,"resources":46,"development":65,"nil":34,"academics":62,"fan_support":35,"facilities":45,"admin_patience":63,"program_ceiling":64,"city":"Fresno","state":"CA","lat":36.7378,"lon":-119.7871},{"id":103,"name":"Oregon Commonwealth","conference":"Pacific","prestige":87,"resources":92,"development":81,"nil":98,"academics":82,"fan_support":89,"facilities":85,"admin_patience":68,"program_ceiling":96,"city":"Portland","state":"OR","lat":45.5152,"lon":-122.6784},{"id":104,"name":"Cascade University","conference":"Pacific","prestige":48,"resources":58,"development":54,"nil":58,"academics":55,"fan_support":37,"facilities":46,"admin_patience":52,"program_ceiling":58,"city":"Eugene","state":"OR","lat":44.0521,"lon":-123.0868},{"id":105,"name":"Washington Commonwealth","conference":"Pacific","prestige":90,"resources":88,"development":82,"nil":93,"academics":81,"fan_support":68,"facilities":81,"admin_patience":46,"program_ceiling":100,"city":"Seattle","state":"WA","lat":47.6062,"lon":-122.3321},{"id":106,"name":"Puget Sound State","conference":"Pacific","prestige":62,"resources":60,"development":56,"nil":57,"academics":59,"fan_support":63,"facilities":64,"admin_patience":72,"program_ceiling":75,"city":"Tacoma","state":"WA","lat":47.2529,"lon":-122.4443},{"id":107,"name":"Hawaii Commonwealth","conference":"Pacific","prestige":53,"resources":56,"development":55,"nil":63,"academics":61,"fan_support":47,"facilities":54,"admin_patience":60,"program_ceiling":65,"city":"Honolulu","state":"HI","lat":21.3069,"lon":-157.8583},{"id":108,"name":"Alaska Pacific","conference":"Pacific","prestige":22,"resources":21,"development":49,"nil":39,"academics":90,"fan_support":25,"facilities":25,"admin_patience":50,"program_ceiling":36,"city":"Anchorage","state":"AK","lat":61.2181,"lon":-149.9003},{"id":109,"name":"Philadelphia Metropolitan","conference":"Metro","prestige":80,"resources":93,"development":68,"nil":99,"academics":63,"fan_support":92,"facilities":92,"admin_patience":48,"program_ceiling":94,"city":"Philadelphia","state":"PA","lat":39.9526,"lon":-75.1652},{"id":110,"name":"Pittsburgh Commonwealth","conference":"Metro","prestige":82,"resources":71,"development":81,"nil":52,"academics":60,"fan_support":73,"facilities":85,"admin_patience":49,"program_ceiling":89,"city":"Pittsburgh","state":"PA","lat":40.4406,"lon":-79.9959},{"id":111,"name":"Baltimore Metropolitan","conference":"Metro","prestige":43,"resources":39,"development":62,"nil":41,"academics":75,"fan_support":39,"facilities":36,"admin_patience":67,"program_ceiling":60,"city":"Baltimore","state":"MD","lat":39.2904,"lon":-76.6122},{"id":112,"name":"Cincinnati Commonwealth","conference":"Metro","prestige":79,"resources":60,"development":66,"nil":61,"academics":54,"fan_support":72,"facilities":63,"admin_patience":77,"program_ceiling":87,"city":"Cincinnati","state":"OH","lat":39.1031,"lon":-84.512},{"id":113,"name":"Louisville Metropolitan","conference":"Metro","prestige":77,"resources":68,"development":73,"nil":87,"academics":76,"fan_support":84,"facilities":82,"admin_patience":66,"program_ceiling":82,"city":"Louisville","state":"KY","lat":38.2527,"lon":-85.7585},{"id":114,"name":"Nashville Tech","conference":"Metro","prestige":51,"resources":41,"development":52,"nil":24,"academics":63,"fan_support":48,"facilities":41,"admin_patience":62,"program_ceiling":69,"city":"Nashville","state":"TN","lat":36.1627,"lon":-86.7816},{"id":115,"name":"Indianapolis Metropolitan","conference":"Metro","prestige":60,"resources":63,"development":49,"nil":58,"academics":54,"fan_support":56,"facilities":74,"admin_patience":64,"program_ceiling":75,"city":"Indianapolis","state":"IN","lat":39.7684,"lon":-86.1581},{"id":116,"name":"Columbus Metropolitan","conference":"Metro","prestige":78,"resources":67,"development":62,"nil":68,"academics":77,"fan_support":60,"facilities":76,"admin_patience":44,"program_ceiling":91,"city":"Columbus","state":"OH","lat":39.9612,"lon":-82.9988},{"id":117,"name":"Buffalo State University","conference":"Metro","prestige":46,"resources":47,"development":71,"nil":41,"academics":77,"fan_support":30,"facilities":47,"admin_patience":65,"program_ceiling":55,"city":"Buffalo","state":"NY","lat":42.8864,"lon":-78.8784},{"id":118,"name":"Pittsburgh Tech","conference":"Metro","prestige":42,"resources":28,"development":54,"nil":27,"academics":49,"fan_support":33,"facilities":29,"admin_patience":56,"program_ceiling":59,"city":"Pittsburgh","state":"PA","lat":40.4406,"lon":-79.9959},{"id":119,"name":"Richmond Metropolitan","conference":"Metro","prestige":69,"resources":62,"development":61,"nil":51,"academics":62,"fan_support":70,"facilities":68,"admin_patience":65,"program_ceiling":85,"city":"Richmond","state":"VA","lat":37.5407,"lon":-77.436},{"id":120,"name":"Toronto International University","conference":"Metro","prestige":62,"resources":49,"development":49,"nil":56,"academics":53,"fan_support":67,"facilities":39,"admin_patience":67,"program_ceiling":72,"city":"Toronto","state":"ON","lat":43.6532,"lon":-79.3832}];
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.10.0';
+const APP_VERSION='0.10.1';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -7809,6 +8215,7 @@ function v2RecordDriveArchive(preview){
     if(e.type==='possession_change'&&valid(e.to)){if(drive&&drive.side!==e.to)finish();if(!drive)start(e.to);continue}
     const side=valid(e.team)?e.team:null;if(side&&(!drive||drive.side!==side)){finish();start(side,(e.state?.period||0)>4)}if(!drive)continue;
     if(['scrimmage','interception','fumble'].includes(e.type)){drive.plays++;drive.playByPlay.push(v2RecordArchiveText(e,names));if(e.type==='interception')drive.result='INT';if(e.type==='fumble')drive.result='FUMBLE'}
+    else if(e.type==='coaching_decision'){drive.playByPlay.push(v2RecordArchiveText(e,names))}
     else if(e.type==='touchdown'){drive.points+=6;drive.result='TD';drive.playByPlay.push(v2RecordArchiveText(e,names))}
     else if(e.type==='extra_point'){if(e.made!==false)drive.points++;drive.playByPlay.push(v2RecordArchiveText(e,names))}
     else if(e.type==='two_point'){if(e.made)drive.points+=2;drive.playByPlay.push(v2RecordArchiveText(e,names))}
@@ -8107,6 +8514,252 @@ renderV2RecordGate=function renderV2RecordGateRelease(){document.querySelector('
 const renderGameLabBeforeV2Release=TAB_RENDERERS.gamelab;TAB_RENDERERS.gamelab=()=>{renderGameLabBeforeV2Release();renderV2ReleaseGameLab()};
 globalThis.DynastyGameEngineV2LabBridge.releaseRecord=v2ReleaseRecord;
 globalThis.DynastyGameEngineV2LabBridge.renderRelease=renderV2ReleaseGameLab;
+
+// v0.10.1 pure pregame preparation for Interactive Game Day.
+// Mirrors recoverWeek() on cloned matchup rosters by replaying the live gameplay RNG stream
+// across every roster in universe order, then charges gameplan wear on the two clones.
+function v2GameDayPreparedTeams(home,away){
+  const hc=v2LabClone(home),ac=v2LabClone(away),targets=new Map([[String(home.id),hc],[String(away.id),ac]]);
+  if(universe.recoveredWeek!==universe.week){
+    const shadowRng=globalThis.DynastyRng.create(ensureGameplayRng().snapshot()),giShadow=(a,b)=>Math.floor(shadowRng.next()*(b-a+1)+a);
+    for(const team of universe.teams){
+      const target=targets.get(String(team.id)),players=target?new Map((target.roster||[]).map(p=>[String(p.id),p])):null;
+      for(const source of team.roster||[]){
+        const healing=(source.injuryWeeks||0)>0?giShadow(7,14):giShadow(2,6),wearRecovery=giShadow(3,7);
+        if(!players)continue;const p=players.get(String(source.id));if(!p)continue;
+        if((source.injuryWeeks||0)>0){p.injuryWeeks=Math.max(0,(source.injuryWeeks||0)-1);p.health=clamp((source.health??70)+healing,35,100);if(p.injuryWeeks===0)p.injury=null}
+        else p.health=clamp((source.health??100)+healing,40,100);
+        p.wear=clamp((source.wear||0)-wearRecovery,0,100)
+      }
+    }
+  }
+  applyGameplanWear(hc,ac.name);applyGameplanWear(ac,hc.name);
+  return{home:hc,away:ac}
+}
+
+// v0.10.1 permanent commit bridge for a completed Interactive Game Day session.
+function v2GameDayInputMatches(session,home,away,homeProfile,awayProfile){
+  const adapter=globalThis.DynastyGameEngineV2Adapter;if(!adapter)return false;
+  const expected={home:adapter.profileTeam(home,homeProfile),away:adapter.profileTeam(away,awayProfile)};
+  return['home','away'].every(side=>['rating','offense','defense'].every(key=>Number(expected[side][key])===Number(session.inputs?.[side]?.[key])))
+}
+function v2GameDayDecisionReceipts(state){
+  return(state?.events||[]).filter(e=>e.type==='coaching_decision').map(e=>({
+    id:e.decisionId,type:e.decisionType||'fourth_down',team:e.team,selectedOption:e.selectedOption,resolvedAction:e.resolvedAction,
+    staffRecommendation:e.staffRecommendation,situation:e.situation,period:e.state?.period??null,clock:e.state?.clock??null
+  }))
+}
+function recordInteractiveV2GameDay(session,options={}){
+  const gameday=globalThis.DynastyGameEngineV2GameDay,engine=globalThis.DynastyGameEngineV2,adapter=globalThis.DynastyGameEngineV2Adapter,actors=globalThis.DynastyGameEngineV2Attribution,tx=globalThis.DynastyGameEngineV2Transaction;
+  if(!gameday||!engine||!adapter||!actors||!tx)throw new Error('Interactive Game Day transaction modules are unavailable.');
+  gameday.validateSession(session);engine.validateGame(session.state);
+  if(session.state.status!=='final')throw new Error('Interactive Game Day must be final before it can be recorded.');
+  if(gameday.pendingDecision(session))throw new Error('Resolve the pending coaching decision before recording the game.');
+  const g=findUserGame();if(!g)throw new Error('No unsimulated user game is available for Interactive Game Day.');
+  if(universe.phase!=='regular')throw new Error('Interactive Game Day recording is currently limited to regular-season scheduled games.');
+  if(g.played)throw new Error('This scheduled game is already complete.');
+  if(hasPendingCareerChoice())throw new Error('Choose your next job before recording this game.');
+  if(hasPendingWeeklyDecisions())throw new Error('Resolve the Coach’s Desk decisions before recording this game.');
+  const key=v2GameLabKey(g),expectedId=`v0101-gameday-${key}`;if(session.gameId!==expectedId)throw new Error('Interactive Game Day session does not match the current scheduled game.');
+  const home=T(g.home),away=T(g.away);if(!home||!away)throw new Error('Scheduled teams could not be resolved.');
+  if(options.expectedIntegrity&&v2LabIntegrity(g,home,away)!==options.expectedIntegrity)throw new Error('The live dynasty changed after this Interactive Game Day preview began. Reset the preview before recording.');
+  recoverWeek();const rollback=v2RecordCapture(g,home,away);
+  try{
+    const before=beginGame(home,away,false,{week:g.week,label:'Regular season'}),homeProfile=gameProfiles(home,away.name),awayProfile=gameProfiles(away,home.name);
+    if(!v2GameDayInputMatches(session,home,away,homeProfile,awayProfile))throw new Error('Matchup inputs changed after the Interactive Game Day session began. Reset the preview before recording.');
+    const summary=adapter.eventSummary(session.state),attribution=actors.attributeGame(session.state,{home:v2AttributionContext(home),away:v2AttributionContext(away)});actors.attachEventSummary(attribution,summary);
+    const candidate=tx.buildCandidate({state:session.state,attribution,homeTeam:home,awayTeam:away,starterIds:{home:v2StarterIds(home),away:v2StarterIds(away)},meta:{season:universe.year,week:g.week??universe.week+1,phase:universe.phase,label:'Regular season',venue:`${home.name} · ${home.city||''}`},conference:g.conf??home.conference===away.conference,homeOpponentOverall:awayProfile.overall,awayOpponentOverall:homeProfile.overall});
+    const transactionProof=tx.dryRunTransaction({candidate,homeTeam:home,awayTeam:away,homeGameplan:gameplanSnapshot(home,away.name),awayGameplan:gameplanSnapshot(away,home.name)});
+    if(options.testFault==='afterDryRun')throw new Error('Injected Interactive Game Day rollback fault after dry run.');
+    v2RecordApplyPlayerStats(home,candidate.playerStats.home);v2RecordApplyPlayerStats(away,candidate.playerStats.away);const win=recordGame(home,away,candidate.hp,candidate.ap,candidate.conference,homeProfile,awayProfile);
+    if(options.testFault==='afterStats')throw new Error('Injected Interactive Game Day rollback fault after stat application.');
+    postGameCondition(home);postGameCondition(away);
+    const preview={state:session.state,names:session.names},drives=v2RecordDriveArchive(preview),log=(session.state.events||[]).slice(-160).map(e=>globalThis.DynastyGameEngineV2Lab.eventText(e,session.names));
+    const result=finishGame(before,home,away,{home:home.name,away:away.name,hp:candidate.hp,ap:candidate.ap,winner:win.name,box:candidate.box,detailed:true,drives,log,engine:'v2',transactionVersion:tx.VERSION});
+    const record=(universe.gameArchive||[]).find(x=>x.id===result.gameId);if(!record)throw new Error('Interactive Game Day archive record was not created.');
+    record.engine='v2';record.transactionVersion=tx.VERSION;record.eventCount=candidate.eventCount;record.seed=candidate.seed;record.gameDayVersion=gameday.VERSION;record.coachingDecisionVersion=globalThis.DynastyGameEngineV2Decisions?.VERSION||1;record.coachingDecisions=v2GameDayDecisionReceipts(session.state);
+    for(const side of ['home','away']){const drivePoints=drives.filter(d=>d.side===side).reduce((n,d)=>n+(Number(d.points)||0),0);record.scoreAdjustment[side]=record.score[side]-drivePoints}
+    if(options.testFault==='afterArchive')throw new Error('Injected Interactive Game Day rollback fault after archive write.');
+    completeScheduledGame(g,result,true);if(options.testFault==='afterSchedule')throw new Error('Injected Interactive Game Day rollback fault after schedule settlement.');
+    universe.lastDetailedGame={...result,season:universe.year,week:g.week,engine:'v2',transactionVersion:tx.VERSION,gameDayVersion:gameday.VERSION};universe.latest=[result];
+    const validation=v2RecordValidate(candidate,record,home,away,rollback,g);if(!validation.ok)throw new Error(`Interactive Game Day failed post-commit validation: ${validation.errors.join('; ')}`);
+    ranked();if(options.testFault==='afterRank')throw new Error('Injected Interactive Game Day rollback fault after rankings.');syncGameplayRng();
+    return{ok:true,result,record,candidate,validation,transactionProof,coachingDecisions:record.coachingDecisions}
+  }catch(err){v2RecordRestore(rollback,g,home,away);throw err}
+}
+function v2GameDayCommitDebug(){
+  const me=selected(),g=findUserGame();return{year:universe.year,week:universe.week,phase:universe.phase,userRecord:me?me.w+me.l:0,archiveLength:(universe.gameArchive||[]).length,game:g?{week:g.week,played:!!g.played,gameId:g.gameId||null}:null,last:universe.lastDetailedGame?{gameId:universe.lastDetailedGame.gameId,engine:universe.lastDetailedGame.engine,gameDayVersion:universe.lastDetailedGame.gameDayVersion}:null}
+}
+function v2GameDayLastArchiveDebug(){
+  const record=(universe.gameArchive||[]).at(-1);if(!record)return null;const playByPlay=(record.drives||[]).flatMap(d=>d.playByPlay||[]);
+  return{id:record.id,engine:record.engine,transactionVersion:record.transactionVersion,gameDayVersion:record.gameDayVersion,coachingDecisionVersion:record.coachingDecisionVersion,coachingDecisions:v2RecordClone(record.coachingDecisions||[]),drives:record.drives?.length||0,playerLines:(record.playerStats?.home?.length||0)+(record.playerStats?.away?.length||0),playByPlayLines:playByPlay.length,playByPlayHasCoachDecision:playByPlay.some(line=>/coach|decision/i.test(String(line)))}
+}
+globalThis.DynastyGameEngineV2LabBridge.recordInteractive=recordInteractiveV2GameDay;
+if(globalThis.__DL_TEST__){globalThis.__DL_TEST__.v2GameDayCommitDebug=v2GameDayCommitDebug;globalThis.__DL_TEST__.v2GameDayLastArchiveDebug=v2GameDayLastArchiveDebug}
+
+// v0.10.1 interactive Game Day surface. Live play is isolated until the player makes the final result official.
+let v2InteractiveGameDay=null;
+function v2GameDayUIKey(g){return v2GameLabKey(g)}
+function v2GameDayUILiveContext(){
+  const g=findUserGame();if(!g)return null;const home=T(g.home),away=T(g.away);if(!home||!away)return null;
+  return{g,home,away,key:v2GameDayUIKey(g)}
+}
+function v2GameDayUIDigest(ctx=v2GameDayUILiveContext()){return ctx?v2LabIntegrity(ctx.g,ctx.home,ctx.away):null}
+function v2GameDayUIAssertUnchanged(before,ctx){const after=v2GameDayUIDigest(ctx);if(before!==after)throw new Error('Interactive Game Day preview mutated live dynasty state.')}
+function v2GameDayUIPrepare(){
+  const ctx=v2GameDayUILiveContext(),api=globalThis.DynastyGameEngineV2GameDay;if(!ctx||!api)throw new Error('No upcoming game is available for Interactive Game Day.');
+  const before=v2GameDayUIDigest(ctx),hc=v2LabClone(ctx.home),ac=v2LabClone(ctx.away);
+  applyGameplanWear(hc,ac.name);applyGameplanWear(ac,hc.name);
+  const homeProfile=gameProfiles(hc,ac.name),awayProfile=gameProfiles(ac,hc.name);
+  const session=api.createSession({gameId:`v0101-gameday-${ctx.key}`,seed:`v0101-gameday-${ctx.key}`,home:ctx.home,away:ctx.away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(ctx.home)});
+  api.advanceOne(session);v2GameDayUIAssertUnchanged(before,ctx);
+  v2InteractiveGameDay={key:ctx.key,session,integrity:before};renderV2InteractiveGameDay();return session
+}
+function v2GameDayUIRun(action){
+  const ctx=v2GameDayUILiveContext(),api=globalThis.DynastyGameEngineV2GameDay;if(!ctx||!api||!v2InteractiveGameDay)throw new Error('Interactive Game Day session is unavailable.');
+  const before=v2GameDayUIDigest(ctx);action(api,v2InteractiveGameDay.session);v2GameDayUIAssertUnchanged(before,ctx);renderV2InteractiveGameDay()
+}
+function v2GameDayUIRecord(options={}){
+  if(!v2InteractiveGameDay)throw new Error('No Interactive Game Day session is available to record.');
+  const out=recordInteractiveV2GameDay(v2InteractiveGameDay.session,{...options,expectedIntegrity:v2InteractiveGameDay.integrity});
+  v2InteractiveGameDay=null;setStatus(`Game Day recorded: ${out.result.away} ${out.result.ap} – ${out.result.hp} ${out.result.home}.`);render();return out
+}
+function v2GameDayUIEventText(event,names){
+  if(event?.type==='coaching_decision'){
+    const chosen=event.selectedOption==='delegate'?`delegated (${event.resolvedAction.replaceAll('_',' ')})`:event.selectedOption.replaceAll('_',' ');
+    return`COACH DECISION · ${chosen}`
+  }
+  return globalThis.DynastyGameEngineV2Lab?.eventText(event,names)||String(event?.type||'event').replaceAll('_',' ')
+}
+function v2GameDayUIScoreboard(session){
+  const s=session.state,lab=globalThis.DynastyGameEngineV2Lab,context=s.status==='final'?'Final':`${lab?.clockLabel(s)||''}${lab?.downLabel(s)?` · ${lab.downLabel(s)}`:''}`;
+  return`<div class="v2-gameday-scoreboard"><div class="v2-gameday-team away">${teamLogoHTML(s.away?.id,42,'team-logo--inline')}<span>${gameEscape(session.names.away)}</span><b>${s.score.away}</b></div><div class="v2-gameday-center"><strong>${gameEscape(context)}</strong><small>${s.possession?`${gameEscape(session.names[s.possession])} ball · ${s.timeouts.away} TO / ${s.timeouts.home} TO`:''}</small></div><div class="v2-gameday-team home"><b>${s.score.home}</b><span>${gameEscape(session.names.home)}</span>${teamLogoHTML(s.home?.id,42,'team-logo--inline')}</div></div>`
+}
+function v2GameDayUIDecision(session){
+  const d=globalThis.DynastyGameEngineV2GameDay?.pendingDecision(session);if(!d)return'';
+  return`<div class="v2-gameday-decision"><div class="eyebrow">HEAD COACH DECISION</div><h3>${gameEscape(d.situation)}</h3><div class="muted">Staff recommendation: <strong>${gameEscape(d.staffRecommendation.replaceAll('_',' '))}</strong></div><div class="button-row">${d.options.map(o=>`<button type="button" data-v2-gameday-choice="${gameEscape(o.id)}" ${o.id===d.staffRecommendation?'class="recommended"':''}>${gameEscape(o.label)}</button>`).join('')}</div></div>`
+}
+function v2GameDayUIFeed(session){
+  const rows=(session.state.events||[]).slice(-18).reverse();if(!rows.length)return'<div class="muted">Kickoff is next.</div>';
+  return rows.map(e=>`<div class="v2-gameday-feed-row"><span>${gameEscape(globalThis.DynastyGameEngineV2Lab?.clockLabel(e.state)||'')}</span><strong>${gameEscape(v2GameDayUIEventText(e,session.names))}</strong><b>${e.state?.score?.away??0}–${e.state?.score?.home??0}</b></div>`).join('')
+}
+function ensureV2InteractiveGameDayHost(){
+  let host=document.querySelector('#v2InteractiveGameDay');if(host)return host;const next=document.querySelector('#nextGameCard');if(!next)return null;
+  host=document.createElement('div');host.id='v2InteractiveGameDay';host.className='card v2-gameday-host';next.insertAdjacentElement('afterend',host);return host
+}
+function renderV2InteractiveGameDay(){
+  const host=ensureV2InteractiveGameDayHost();if(!host)return;const ctx=v2GameDayUILiveContext(),api=globalThis.DynastyGameEngineV2GameDay;
+  if(v2InteractiveGameDay&&v2InteractiveGameDay.key!==ctx?.key)v2InteractiveGameDay=null;
+  if(!ctx||!api){host.innerHTML='<div class="muted">Interactive Game Day becomes available when your program has an unsimulated game.</div>';return}
+  if(!v2InteractiveGameDay){
+    host.innerHTML=`<div class="section-head"><div><div class="eyebrow">V0.10.1 INTERACTIVE GAME DAY</div><h3>Coach the next game</h3><div class="muted">Play the matchup through Game Engine 2, make fourth-down decisions, then make the final result official. Nothing changes in the dynasty until you record the completed game.</div></div><button type="button" data-v2-gameday-start>Start Game Day</button></div>`;
+    host.querySelector('[data-v2-gameday-start]').onclick=()=>{try{v2GameDayUIPrepare()}catch(err){console.error(err);setStatus(`Interactive Game Day stopped: ${err.message||err}`)}};return
+  }
+  const session=v2InteractiveGameDay.session,d=api.pendingDecision(session),final=session.state.status==='final';
+  host.innerHTML=`<div class="v2-gameday-head"><div><div class="eyebrow">INTERACTIVE GAME DAY${final?' · FINAL':''}</div><h3>${gameEscape(session.names.away)} at ${gameEscape(session.names.home)}</h3></div><button type="button" data-v2-gameday-reset>Reset Game</button></div>${v2GameDayUIScoreboard(session)}${v2GameDayUIDecision(session)}<div class="v2-gameday-controls button-row">${!final&&!d?'<button type="button" data-v2-gameday-next>Next Play</button><button type="button" data-v2-gameday-decision>Advance to Next Decision</button>':''}${!final?'<button type="button" data-v2-gameday-delegate>Delegate Rest</button>':''}${final?'<button type="button" data-v2-gameday-record class="recommended">Make Result Official</button><strong>Final is staged until you make it official.</strong>':''}</div><div class="v2-gameday-feed"><div class="v2-gameday-feed-head"><strong>Game feed</strong><span class="muted">Newest first</span></div>${v2GameDayUIFeed(session)}</div><div class="v2-shadow-safety"><strong>${final?'Final staged':'Game in progress'}.</strong> Live dynasty records, player stats, schedule and archive remain unchanged until “Make Result Official.”</div>`;
+  host.querySelector('[data-v2-gameday-reset]')?.addEventListener('click',()=>{v2InteractiveGameDay=null;renderV2InteractiveGameDay()});
+  host.querySelector('[data-v2-gameday-next]')?.addEventListener('click',()=>{try{v2GameDayUIRun((x,s)=>x.advanceOne(s))}catch(err){console.error(err);setStatus(`Interactive Game Day stopped: ${err.message||err}`)}});
+  host.querySelector('[data-v2-gameday-decision]')?.addEventListener('click',()=>{try{v2GameDayUIRun((x,s)=>x.advance(s))}catch(err){console.error(err);setStatus(`Interactive Game Day stopped: ${err.message||err}`)}});
+  host.querySelector('[data-v2-gameday-delegate]')?.addEventListener('click',()=>{try{v2GameDayUIRun((x,s)=>x.simulate(s,()=> 'delegate'))}catch(err){console.error(err);setStatus(`Interactive Game Day stopped: ${err.message||err}`)}});
+  host.querySelector('[data-v2-gameday-record]')?.addEventListener('click',()=>{try{v2GameDayUIRecord()}catch(err){console.error(err);setStatus(`Interactive Game Day rolled back: ${err.message||err}`)}});
+  host.querySelectorAll('[data-v2-gameday-choice]').forEach(button=>button.addEventListener('click',()=>{try{v2GameDayUIRun((x,s)=>x.resolve(s,button.dataset.v2GamedayChoice))}catch(err){console.error(err);setStatus(`Interactive Game Day stopped: ${err.message||err}`)}}))
+}
+const renderGameLabBeforeInteractiveV2=TAB_RENDERERS.gamelab;
+TAB_RENDERERS.gamelab=()=>{renderGameLabBeforeInteractiveV2();renderV2InteractiveGameDay()};
+globalThis.DynastyGameEngineV2LabBridge.interactive={start:v2GameDayUIPrepare,render:renderV2InteractiveGameDay,getSession:()=>v2InteractiveGameDay?.session||null,record:v2GameDayUIRecord,reset:()=>{v2InteractiveGameDay=null;renderV2InteractiveGameDay()}};
+if(globalThis.__DL_TEST__){
+  globalThis.__DL_TEST__.v2GameDayPreviewDigest=()=>v2GameDayUIDigest();
+  globalThis.__DL_TEST__.v2GameDayPreviewState=()=>v2InteractiveGameDay?v2LabClone(v2InteractiveGameDay.session):null;
+  globalThis.__DL_TEST__.v2GameDayCommitCurrent=(fault=null)=>v2GameDayUIRecord(fault?{testFault:fault}:{});
+}
+
+// v0.10.1 Interactive Game Day pregame bridge.
+// Replaces only the staged preparation step so preview kickoff profiles mirror the
+// permanent record path: recoverWeek() on cloned rosters, then beginGame() preparation wear.
+v2GameDayUIPrepare=function v2GameDayUIPrepareWithRecovery(){
+  const ctx=v2GameDayUILiveContext(),api=globalThis.DynastyGameEngineV2GameDay;if(!ctx||!api)throw new Error('No upcoming game is available for Interactive Game Day.');
+  const before=v2GameDayUIDigest(ctx),prepared=v2GameDayPreparedTeams(ctx.home,ctx.away),hc=prepared.home,ac=prepared.away;
+  const homeProfile=gameProfiles(hc,ac.name),awayProfile=gameProfiles(ac,hc.name),me=selected();
+  const session=api.createSession({gameId:`v0101-gameday-${ctx.key}`,seed:`v0101-gameday-${ctx.key}`,home:ctx.home,away:ctx.away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(ctx.home),controlledTeamId:me?.id??null});
+  api.advanceOne(session);v2GameDayUIAssertUnchanged(before,ctx);
+  v2InteractiveGameDay={key:ctx.key,session,integrity:before};renderV2InteractiveGameDay();return session
+};
+if(globalThis.DynastyGameEngineV2LabBridge?.interactive)globalThis.DynastyGameEngineV2LabBridge.interactive.start=v2GameDayUIPrepare;
+
+// v0.10.1 release-facing matchup intelligence and postgame gameplan receipt.
+function v2MatchupEdgeTone(v){return v>=3?'good':v<=-3?'bad':''}
+function v2MatchupEdgeRow(label,v){return`<div class="v2-matchup-edge"><span>${gameEscape(label)}</span><strong class="${v2MatchupEdgeTone(v)}">${gameEscape(matchupEdgeLabel(v))}<small>${v>=0?'+':''}${v}</small></strong></div>`}
+function v2MatchupPlayer(team,role,label){const p=roleStarter(team,role);return p?{p,label}:null}
+function v2MatchupKeyPlayers(team){
+  const candidates=[v2MatchupPlayer(team,'QB1','QB'),v2MatchupPlayer(team,'RB1','Backfield'),v2MatchupPlayer(team,'X','Top target'),v2MatchupPlayer(team,'RUSH','Pass rush'),v2MatchupPlayer(team,'MIKE','Front seven'),v2MatchupPlayer(team,'FCB','Coverage')].filter(Boolean);
+  const seen=new Set(),out=[];for(const row of candidates){if(seen.has(String(row.p.id)))continue;seen.add(String(row.p.id));out.push(row);if(out.length===3)break}return out
+}
+function v2MatchupPlayerHTML(team){
+  const rows=v2MatchupKeyPlayers(team);if(!rows.length)return'<div class="muted">No projected key players available.</div>';
+  return rows.map(({p,label})=>`<div class="v2-matchup-player"><span>${gameEscape(label)}</span><strong>${gameEscape(p.name)} · ${gameEscape(p.pos||'')}</strong><small>${p.injury?`${gameEscape(p.injury)} · ${p.injuryWeeks||0} wk`:gameAvailable(p)?`Health ${Math.round(p.health??100)}`:'Unavailable'}</small></div>`).join('')
+}
+function v2MatchupAvailability(team){
+  const injuries=(team.roster||[]).filter(p=>p.injury||(p.injuryWeeks||0)>0).sort((a,b)=>(b.injuryWeeks||0)-(a.injuryWeeks||0));
+  if(!injuries.length)return'<span class="good">No active injuries</span>';
+  const shown=injuries.slice(0,4).map(p=>`${gameEscape(p.name)} (${gameEscape(p.pos||'')}, ${gameEscape(p.injury||'limited')}, ${p.injuryWeeks||0} wk)`).join(' · ');
+  return`<span class="warn">${shown}${injuries.length>4?` · +${injuries.length-4} more`:''}</span>`
+}
+function v2MatchupPlanHTML(team,opp,matchup){
+  const plan=teamGameplanFor(team,opp.name),tier=GAMEPLAN_TIERS[plan?.prep]||GAMEPLAN_TIERS.standard,rec=gameplanRecommendation(team,opp,matchup),recommended=GAMEPLAN_TIERS[rec.id]||GAMEPLAN_TIERS.balance;
+  return`<div class="v2-matchup-plan"><div><span>Active plan</span><strong>${gameEscape(tier.label)}</strong></div><div><span>Staff recommendation</span><strong>${gameEscape(recommended.label)}</strong><small>${gameEscape(rec.reason)}</small></div><div class="v2-matchup-plan-action">${plan?'<span class="pill good">Plan locked for kickoff</span>':'<button type="button" data-v2-open-coachs-desk>Set plan in Coach’s Desk</button>'}</div></div>`
+}
+function v2MatchupStakes(team,opp){
+  const rival=rivalOf(team),isRival=rival?.name===opp.name,sameConference=team.conference===opp.conference;
+  if(isRival)return`${team.rivalry?.trophy||'Rivalry game'} · ${rivalrySeriesText(team)}`;if(sameConference)return`${team.conference} Conference game`;return'Nonconference game'
+}
+function ensureV2MatchupHost(){
+  let host=document.querySelector('#v2MatchupIntelligence');if(host)return host;const next=document.querySelector('#nextGameCard');if(!next)return null;
+  host=document.createElement('div');host.id='v2MatchupIntelligence';host.className='card v2-matchup-host';next.insertAdjacentElement('afterend',host);return host
+}
+function ensureV2PlanReceiptHost(host){let receipt=document.querySelector('#v2PlanReceipt');if(!receipt&&host){receipt=document.createElement('div');receipt.id='v2PlanReceipt';host.insertAdjacentElement('afterend',receipt)}return receipt}
+function v2MatchupReceiptHTML(){
+  const record=typeof v2ReleaseRecord==='function'?v2ReleaseRecord():null,me=selected(),api=globalThis.DynastyGameplanFeedback;if(!record||!me||!api)return'';
+  let receipt;try{receipt=api.forTeam(record,me.id)}catch{return''}
+  const tone=receipt.verdict==='Worked'?'good':receipt.verdict==='Missed'?'bad':receipt.verdict==='Baseline'?'':'warn';
+  return`<div class="card v2-plan-receipt"><div class="section-head"><div><div class="eyebrow">POSTGAME PLAN RECEIPT</div><h3>${gameEscape(receipt.plan.label)}</h3></div><span class="pill ${tone}">${gameEscape(receipt.verdict)}</span></div><strong>${gameEscape(receipt.headline)}</strong><div class="muted">${gameEscape(receipt.detail)}</div><div class="small muted">This grades the archived result against the plan’s intended matchup target. It does not claim the plan alone caused the outcome.</div></div>`
+}
+function renderV2MatchupIntelligence(){
+  const host=ensureV2MatchupHost();if(!host)return;const receipt=ensureV2PlanReceiptHost(host),team=selected(),g=findUserGame();if(receipt)receipt.innerHTML=v2MatchupReceiptHTML();
+  if(!team||!g){host.hidden=true;return}
+  const opp=T(g.home===team.name?g.away:g.home);if(!opp){host.hidden=true;return}host.hidden=false;
+  const m=gameMatchup(team,opp),P=m.teamProfile,O=m.opponentProfile,e=m.teamEdges,oe=m.opponentEdges,isHome=g.home===team.name,passMix=Math.round((OFF_SCHEMES[opp.offScheme]?.pass??.5)*100),homeText=isHome?`Home field +${homeFieldFor(team).toFixed(1)} pts`:`Road game · ${opp.name} receives home field`;
+  host.innerHTML=`<div class="v2-matchup-head"><div><div class="eyebrow">GAME DAY INTELLIGENCE</div><h2>${teamLogoHTML(team.id,34,'team-logo--inline')} ${gameEscape(team.name)} ${isHome?'vs':'at'} ${teamLogoHTML(opp.id,34,'team-logo--inline')} ${gameEscape(opp.name)}</h2><div class="muted">Week ${g.week??universe.week+1} · ${gameEscape(v2MatchupStakes(team,opp))} · ${gameEscape(homeText)}</div></div><div class="v2-matchup-ratings"><span>YOU <b>O ${grade(P.offense)} · D ${grade(P.defense)}</b></span><span>THEM <b>O ${grade(O.offense)} · D ${grade(O.defense)}</b></span></div></div><div class="v2-matchup-grid"><section><div class="v2-matchup-section-head"><strong>Where the game tilts</strong><span>Current kickoff profiles</span></div>${v2MatchupEdgeRow('Your passing game vs coverage',e.passGame)}${v2MatchupEdgeRow('Your run game vs front',e.runGame)}${v2MatchupEdgeRow('Your protection vs rush',e.passProtection)}${v2MatchupEdgeRow('Their passing game vs coverage',oe.passGame)}${v2MatchupEdgeRow('Their run game vs front',oe.runGame)}${v2MatchupEdgeRow('Their protection vs rush',oe.passProtection)}</section><section><div class="v2-matchup-section-head"><strong>Opponent identity</strong><span>${passMix}% pass tendency</span></div><div class="v2-matchup-tendency"><b>${passMix>=55?'Pass leaning':passMix<=45?'Run leaning':'Balanced'}</b><span>${passMix}% pass · ${100-passMix}% run</span></div><div class="v2-matchup-section-head minor"><strong>Availability</strong></div><div class="v2-matchup-availability"><span>You</span>${v2MatchupAvailability(team)}</div><div class="v2-matchup-availability"><span>Them</span>${v2MatchupAvailability(opp)}</div></section></div><div class="v2-matchup-grid players"><section><div class="v2-matchup-section-head"><strong>Your key players</strong></div>${v2MatchupPlayerHTML(team)}</section><section><div class="v2-matchup-section-head"><strong>Players to know</strong></div>${v2MatchupPlayerHTML(opp)}</section></div>${v2MatchupPlanHTML(team,opp,m)}<div class="small muted v2-matchup-note">Matchup edges use the same health, wear, scheme, staff and active game-plan profile inputs consumed at kickoff.</div>`;
+  host.querySelector('[data-v2-open-coachs-desk]')?.addEventListener('click',()=>{document.querySelector('.tab-groups button[data-group="program"]')?.click();document.querySelector('.tabs button[data-tab="dashboard"]')?.click();document.querySelector('#weeklyDecisions')?.scrollIntoView({behavior:'smooth',block:'center'})})
+}
+const renderGameLabBeforeMatchupV2=TAB_RENDERERS.gamelab;TAB_RENDERERS.gamelab=()=>{renderGameLabBeforeMatchupV2();renderV2MatchupIntelligence()};
+if(globalThis.__DL_TEST__)globalThis.__DL_TEST__.v2MatchupSummary=()=>{const h=document.querySelector('#v2MatchupIntelligence'),r=document.querySelector('#v2PlanReceipt');return{matchup:h?{visible:!h.hidden,text:h.textContent}:null,receipt:r?.textContent||''}};
+
+// Test-only hardening probe for a full regular season of permanent Interactive Game Day results.
+function v2GameDaySoakSession(g,me){
+  const api=globalThis.DynastyGameEngineV2GameDay,home=T(g.home),away=T(g.away);if(!api||!home||!away)throw new Error('Interactive Game Day soak could not resolve matchup modules.');
+  const integrity=v2LabIntegrity(g,home,away),prepared=v2GameDayPreparedTeams(home,away),homeProfile=gameProfiles(prepared.home,prepared.away.name),awayProfile=gameProfiles(prepared.away,prepared.home.name),key=v2GameLabKey(g);
+  const session=api.createSession({gameId:`v0101-gameday-${key}`,seed:`v0101-gameday-${key}`,home,away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(home),controlledTeamId:me.id});
+  api.simulate(session,()=> 'delegate');return{session,integrity,home,away}
+}
+function v2InteractiveSeasonSoakProbe(){
+  const me=selected();if(!me)throw new Error('No controlled program for Interactive Game Day season soak.');
+  const start={week:universe.week,record:me.w+me.l,archives:(universe.gameArchive||[]).filter(r=>r.gameDayVersion===2&&(r.home?.id===me.id||r.away?.id===me.id)).length},ids=[],driveCounts=[],decisionCounts=[];
+  while(universe.phase==='regular'&&universe.week<12){
+    if(hasPendingCareerChoice())throw new Error(`Career choice blocked Interactive Game Day soak before week ${universe.week+1}.`);
+    if(hasPendingWeeklyDecisions())delegateWeeklyDecisions();
+    const g=findUserGame();if(!g)throw new Error(`No scheduled user game for Interactive Game Day soak week ${universe.week+1}.`);
+    const beforeWeek=universe.week,staged=v2GameDaySoakSession(g,me),out=recordInteractiveV2GameDay(staged.session,{expectedIntegrity:staged.integrity}),record=out.record;
+    if(!out.ok||record.engine!=='v2'||record.gameDayVersion!==2||record.transactionVersion!==1||!g.played||g.gameId!==record.id)throw new Error(`Interactive Game Day did not settle week ${g.week}.`);
+    if((record.playerStats?.home?.length||0)+(record.playerStats?.away?.length||0)<=0)throw new Error(`Interactive Game Day lost player stats in week ${g.week}.`);
+    if(!(record.drives||[]).some(d=>(d.playByPlay?.length||0)>0))throw new Error(`Interactive Game Day lost durable play-by-play in week ${g.week}.`);
+    if(!(record.coachingDecisions||[]).length)throw new Error(`Interactive Game Day lost coaching receipts in week ${g.week}.`);
+    ids.push(record.id);driveCounts.push(record.drives?.length||0);decisionCounts.push(record.coachingDecisions.length);
+    simWeek(true);if(universe.week!==beforeWeek+1)throw new Error(`Interactive Game Day soak failed weekly advance after week ${g.week}.`)
+  }
+  const records=(universe.gameArchive||[]).filter(r=>r.gameDayVersion===2&&(r.home?.id===me.id||r.away?.id===me.id)),delta=records.length-start.archives,uniqueDriveCounts=new Set(driveCounts).size;
+  return{ok:ids.length===12-start.week&&new Set(ids).size===ids.length&&(me.w+me.l)-start.record===ids.length&&delta===ids.length&&universe.phase==='confReady'&&driveCounts.every(n=>n>0)&&decisionCounts.every(n=>n>0),weeks:ids.length,startWeek:start.week,endWeek:universe.week,recordDelta:(me.w+me.l)-start.record,archiveDelta:delta,ids,driveCounts,uniqueDriveCounts,decisionCounts,phase:universe.phase}
+}
+if(globalThis.__DL_TEST__)globalThis.__DL_TEST__.v2InteractiveSeasonSoakProbe=v2InteractiveSeasonSoakProbe;
 
 loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});[...new Set(schools.map(t=>t.conference))].forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();applyTitlePreferences();showTitleScreen();refreshTitleSave();}).catch(e=>{$('#titleStatus').textContent='Could not initialize Dynasty Lab. '+e.message});
 })();
