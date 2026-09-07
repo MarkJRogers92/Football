@@ -6,7 +6,7 @@
 })(typeof window==='object'?window:globalThis,function(Adapter){
 'use strict';
 if(!Adapter)throw new Error('Game Engine 2 Lab requires the v2 adapter.');
-const escapeHTML=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const escapeHTML=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
 const ordinal=n=>n===1?'1st':n===2?'2nd':n===3?'3rd':n===4?'4th':String(n??'—');
 function clockLabel(state={}){
   if((state.period||0)>4){const ot=state.ot?.period||Math.max(1,(state.period||5)-4);return `OT${ot}`}
@@ -25,6 +25,7 @@ function downLabel(state={}){
 }
 function teamName(side,names={}){return names[side]||side||'Team'}
 function signedYards(y){const n=Number(y)||0;return n===0?'no gain':n>0?`gains ${n}`:`loses ${Math.abs(n)}`}
+function decisionActionLabel(value){return String(value||'decision').replaceAll('_',' ')}
 function eventText(event={},names={}){
   const state=event.state||{},team=teamName(event.team,names),receiver=teamName(event.receiver,names);
   if(event.type==='game_start')return'Game begins.';
@@ -39,6 +40,10 @@ function eventText(event={},names={}){
   if(event.type==='field_goal')return`${team} ${event.distance||''}-yard field goal ${event.made?'good':'missed'}.`.replace('  -',' ');
   if(event.type==='punt')return`${team} punts${event.touchback?' for a touchback':''}.`;
   if(event.type==='safety')return`SAFETY for ${team}.`;
+  if(event.type==='coaching_decision'){
+    const choice=event.selectedOption==='delegate'?`delegates — staff chooses ${decisionActionLabel(event.resolvedAction)}`:`chooses ${decisionActionLabel(event.selectedOption)}`;
+    return`${team} coach ${choice}.`;
+  }
   if(event.type==='period_end')return`End of ${event.period===1?'1st quarter':event.period===2?'1st half':event.period===3?'3rd quarter':'regulation'}.`;
   if(event.type==='period_start')return`Start of quarter ${event.period}.`;
   if(event.type==='halftime')return'Halftime.';
