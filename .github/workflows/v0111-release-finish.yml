@@ -1,0 +1,113 @@
+name: Finish v0.11.1 Release
+
+on:
+  push:
+    branches:
+      - codex/v0111-motion-final-polish
+    paths:
+      - .github/workflows/v0111-release-finish.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v0111-release-finish
+  cancel-in-progress: false
+
+jobs:
+  validate-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v0111-motion-final-polish
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Apply test compatibility fix and release version
+        shell: python
+        run: |
+          from pathlib import Path
+          import json
+
+          p=Path('tests/browser.js')
+          text=p.read_text()
+          old="""    // Simulate a week and confirm the UI advances.\n    await goTab(page, 'dashboard');\n    const t0 = Date.now();\n    await page.click('#simWeek');\n"""
+          new="""    // Simulate a week and confirm the UI advances. Weekly coaching can\n    // legitimately gate advancement behind unresolved decisions, so clear those\n    // decisions through their real UI before testing the Sim Week action.\n    await goTab(page, 'dashboard');\n    for (let guard = 0; guard < 6 && await page.$eval('#simWeek', el => el.disabled); guard++) {\n      const resolved = await page.evaluate(() => {\n        const button = [...document.querySelectorAll('[data-decision][data-choice]')]\n          .find(el => !el.disabled && el.offsetParent !== null);\n        if (!button) return false;\n        button.click();\n        return true;\n      });\n      if (!resolved) break;\n      await page.waitForTimeout(80);\n    }\n    const simReady = await page.$eval('#simWeek', el => !el.disabled);\n    check(`[${label}] weekly decision gate clears before sim`, simReady);\n    if (!simReady) throw new Error(`[${label}] Sim Week remained disabled after resolving visible weekly decisions`);\n    const t0 = Date.now();\n    await page.click('#simWeek');\n"""
+          if old in text:
+              p.write_text(text.replace(old,new,1))
+          elif 'weekly decision gate clears before sim' not in text:
+              raise SystemExit('browser compatibility patch target not found')
+
+          Path('VERSION.txt').write_text('0.11.1\n')
+          pkg=json.loads(Path('package.json').read_text())
+          pkg['version']='0.11.1'
+          Path('package.json').write_text(json.dumps(pkg,indent=2)+'\n')
+
+          app=Path('app.js').read_text()
+          oldv="const APP_VERSION='0.10.1';"
+          newv="const APP_VERSION='0.11.1';"
+          if oldv in app:
+              Path('app.js').write_text(app.replace(oldv,newv,1))
+          elif newv not in app:
+              raise SystemExit('APP_VERSION marker not found')
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Build v0.11.1 standalone artifact
+        run: npm run build
+      - name: Verify releasable source tree
+        run: npm run verify:release
+      - name: Locate Chromium
+        id: chromium
+        shell: bash
+        run: |
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$browser" ]; then
+            npx playwright-core install chromium
+            browser="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$browser"
+          echo "path=$browser" >> "$GITHUB_OUTPUT"
+      - name: Browser UI and visual regression tests
+        run: npm run test:browser
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+      - name: Browser IndexedDB regression check
+        run: npm run test:browser-storage
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+      - name: Simulation audit
+        run: npm run audit
+      - name: Commit verified v0.11.1 release source
+        shell: bash
+        run: |
+          rm .github/workflows/v0111-release-finish.yml
+          cat > docs/v0111-PRODUCTION-RELEASE.md <<'EOF'
+          # Dynasty Lab v0.11.1 Production Release
+
+          Status: VALIDATED FOR PRODUCTION
+
+          This release contains the completed non-Blender premium presentation overhaul through motion/final polish. The premium asset/Blender helmet and trophy pass remains intentionally deferred.
+
+          Release validation reused the completed 358/358 full engine and presentation suite from the immediately preceding milestone-boundary commit because the only follow-up source change was a browser-test compatibility fix plus version metadata. The release finish gate then passed the complete browser UI/visual suite, browser IndexedDB regression, simulation audit, clean reproducible build verification, and production artifact verification.
+          EOF
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/browser.js VERSION.txt package.json app.js index.html docs/v0111-PRODUCTION-RELEASE.md .github/workflows/v0111-release-finish.yml
+          git commit -m "release: prepare Dynasty Lab v0.11.1 production"
+          git push origin HEAD:codex/v0111-motion-final-polish
+      - name: Reverify committed release artifact
+        run: |
+          npm run build
+          git diff --exit-code -- index.html
+          npm run verify:release
+      - name: Publish production
+        run: node tools/publish.js
+      - name: Verify gh-pages production commit
+        shell: bash
+        run: |
+          git fetch origin gh-pages
+          git log -1 --format='%H %s' origin/gh-pages
+          git log -1 --format='%s' origin/gh-pages | grep -F 'Publish production: 0.11.1'
