@@ -2,7 +2,7 @@ const assert=require('node:assert/strict');
 const weekly=require('../weekly-coaching-engine.js');
 const input={season:2028,week:4,teamName:'Chicago Metropolitan',opponentName:'Wisconsin Commonwealth',passShare:.61,confidence:74,teamEdges:{passGame:4,runGame:-1,passProtection:-5},opponentEdges:{passGame:5,runGame:1,passProtection:-4},opponentInjuries:2};
 const a=weekly.buildReport(input),b=weekly.buildReport(input);
-assert.deepEqual(a,b,'same staff state should produce the same scouting report');
+assert.equal(weekly.VERSION,2);assert.deepEqual(a,b,'same staff state should produce the same scouting report');
 assert.equal(a.confidenceLabel,'Medium');
 assert.ok(a.passEstimate>=25&&a.passEstimate<=75);
 assert.equal(a.observations.length,4);
@@ -25,4 +25,6 @@ const challenge=weekly.selectStarterChallenge([{pos:'QB',starter:{id:'S',name:'S
 assert.equal(challenge.challengerId,'C');assert.equal(challenge.recommendation,'promote');assert.ok(challenge.struggleScore>=1);
 const noChallenge=weekly.selectStarterChallenge([{pos:'RB',starter:{id:'S',name:'Starter RB',grade:82,upside:84,year:'JR',stats:{rushAtt:80,rushYds:410}},challenger:{id:'C',name:'Backup RB',grade:74,upside:78,year:'SO',stats:{}}}]);
 assert.equal(noChallenge,null,'healthy separation and solid production should not manufacture a personnel decision');
-console.log('PASS v0.10.2 weekly coaching engine: deterministic imperfect scouting, two-point prep and selective starter pressure');
+const room=weekly.buildStaffRoom({report:a,offPass:.61,defPressure:70,oc:{name:'O. Coach',playCall:82,adaptability:76},dc:{name:'D. Coach',playCall:74,adaptability:69},ocSchemeMatch:true,dcSchemeMatch:false});
+assert.equal(room.oc.name,'O. Coach');assert.equal(room.dc.name,'D. Coach');assert.equal(room.oc.plan.length,2);assert.equal(room.dc.plan.length,2);assert.ok(room.oc.plan.every(id=>weekly.FOCUSES[id].side==='offense'),'OC should spend a backed plan on offense');assert.ok(room.dc.plan.every(id=>weekly.FOCUSES[id].side==='defense'),'DC should spend a backed plan on defense');assert.equal(room.split.plan.length,2);assert.equal(weekly.FOCUSES[room.split.plan[0]].side,'offense');assert.equal(weekly.FOCUSES[room.split.plan[1]].side,'defense');assert.ok(room.oc.confidence>room.dc.confidence,'stronger aligned OC should carry more confidence than mismatched DC');assert.deepEqual(room,weekly.buildStaffRoom({report:a,offPass:.61,defPressure:70,oc:{name:'O. Coach',playCall:82,adaptability:76},dc:{name:'D. Coach',playCall:74,adaptability:69},ocSchemeMatch:true,dcSchemeMatch:false}),'Staff Room advice must be deterministic');
+console.log('PASS v0.10.2 weekly coaching engine: scouting, prep, starter pressure and deterministic Staff Room plans');
