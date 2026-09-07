@@ -250,7 +250,7 @@ const startNewDynasty=async page=>{
     // Tab groups (v0.9.26): five groups, and only the active group's tabs are reachable.
     const visibleTabs=()=>page.$$eval('.tabs button',els=>els.filter(e=>!e.hidden).map(e=>e.dataset.tab));
     check(`[${label}] five tab groups`, (await page.$$('.tab-groups button')).length===5);
-    await page.click('.tab-groups button[data-group="games"]');
+    await page.$eval('.tab-groups button[data-group="games"]', el => el.click());
     const gamesTabs=await visibleTabs();
     // Membership is the property under test; the order is body.html's business, not the group's.
     check(`[${label}] a group shows only its own tabs`,
