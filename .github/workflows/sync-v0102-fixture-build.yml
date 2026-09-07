@@ -1,0 +1,55 @@
+name: Sync v0.10.2 fixture build
+
+on:
+  push:
+    branches:
+      - codex/v0102-weekly-coaching-loop
+    paths:
+      - .github/workflows/sync-v0102-fixture-build.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sync-and-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Build standalone artifact
+        run: npm run build
+      - name: Locate Chromium
+        id: chromium
+        shell: bash
+        run: |
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$browser" ]; then
+            npx playwright-core install chromium
+            browser="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$browser"
+          echo "path=$browser" >> "$GITHUB_OUTPUT"
+      - name: Starter-pressure fixture regression
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: node tests/weekly-personnel-browser.js
+      - name: Commit synchronized artifact and remove helper
+        shell: bash
+        run: |
+          git rm --ignore-unmatch .github/workflows/sync-v0102-fixture-build.yml
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No synchronized changes required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "build: sync deterministic v0.10.2 personnel fixture"
+          git push
