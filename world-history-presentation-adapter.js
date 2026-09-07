@@ -29,5 +29,5 @@ function makeWorldHistoryPresentationModel(){
 if(typeof module==='object'&&module.exports){module.exports={makeWorldHistoryPresentationModel};}
 else{
  const worldHistoryPresentationModel=makeWorldHistoryPresentationModel();
- globalThis.DynastyLabWorldHistoryPresentation={snapshot:()=>{const t=selected?.();if(!t||!universe)return null;return worldHistoryPresentationModel.snapshot({teamId:t.id,teamName:t.name,conference:t.conference,tracked:t.allTimeRecord||{},history:universe.history||[]})},note:'World/history presentation uses only archived season records, awards, championships and the existing tracked all-time record.'};
+ globalThis.DynastyLabWorldHistoryPresentation={snapshot:()=>{if(!universe?.teams)return null;const t=selected?.();if(!t)return null;return worldHistoryPresentationModel.snapshot({teamId:t.id,teamName:t.name,conference:t.conference,tracked:t.allTimeRecord||{},history:universe.history||[]})},note:'World/history presentation uses only archived season records, awards, championships and the existing tracked all-time record.'};
 }
