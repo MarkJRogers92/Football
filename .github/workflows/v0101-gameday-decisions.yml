@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: npm install --no-package-lock
       - name: Parse Game Day foundation
-        run: node --check game-engine-v2-decisions.js && node --check game-engine-v2-gameday.js && node --check game-engine-v2-gameday-ui.js && node --check tests/game-engine-v2-decisions.js && node --check tests/game-engine-v2-gameday.js && node --check tests/game-engine-v2-gameday-browser.js
+        run: node --check game-engine-v2-decisions.js && node --check game-engine-v2-gameday.js && node --check game-engine-v2-gameday-record.js && node --check game-engine-v2-gameday-ui.js && node --check tests/game-engine-v2-decisions.js && node --check tests/game-engine-v2-gameday.js && node --check tests/game-engine-v2-gameday-browser.js && node --check tests/game-engine-v2-gameday-record-browser.js
       - name: Fourth-down decision contract
         run: npm run test:game-engine-v2-decisions
       - name: Paused calibrated Game Day runner
@@ -32,7 +32,7 @@ jobs:
       - name: Build standalone artifact
         run: npm run build
       - name: Verify Game Day modules are embedded
-        run: grep -q "DynastyGameEngineV2Decisions" index.html && grep -q "DynastyGameEngineV2GameDay" index.html && grep -q "v2InteractiveGameDay" index.html
+        run: grep -q "DynastyGameEngineV2Decisions" index.html && grep -q "DynastyGameEngineV2GameDay" index.html && grep -q "recordInteractiveV2GameDay" index.html && grep -q "v2InteractiveGameDay" index.html
       - name: Locate Chromium
         id: chromium
         shell: bash
@@ -44,7 +44,11 @@ jobs:
           fi
           test -n "$browser"
           echo "path=$browser" >> "$GITHUB_OUTPUT"
-      - name: Interactive Game Day browser regression
+      - name: Interactive Game Day staged browser regression
         env:
           CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
         run: npm run test:game-engine-v2-gameday-browser
+      - name: Interactive Game Day permanent commit regression
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: npm run test:game-engine-v2-gameday-record-browser
