@@ -69,3 +69,25 @@ test('late-game tempo is a serializable user decision and changes clock behavior
   assert.deepEqual(hurry.state.rng,drain.state.rng,'tempo changes clock management without drawing extra random numbers');
   assert.ok(hurry.state.events.some(e=>e.type==='coaching_decision'&&e.decisionType==='late_game_tempo'&&e.resolvedAction==='hurry'));
 });
+
+test('halftime adjustment pauses at the real halftime transition and branches second-half clock behavior deterministically',()=>{
+  const base=gameday.createSession({...options,gameId:'GD-HALF',seed:'gameday-half',controlledTeamId:home.id});let out;
+  for(let i=0;i<200;i++){
+    out=gameday.advance(base);
+    if(out.status==='final')assert.fail('game ended before halftime decision');
+    if(out.status==='decision'&&out.decision.type==='halftime_adjustment')break;
+    if(out.status==='decision')gameday.resolve(base,'delegate');
+  }
+  assert.equal(out.status,'decision');assert.equal(out.decision.type,'halftime_adjustment');assert.equal(out.decision.team,'home');assert.equal(out.decision.staffRecommendation,'balanced');
+  assert.deepEqual(out.decision.options.map(o=>o.id),['aggressive','balanced','ball_control','delegate']);
+  const saved=JSON.parse(JSON.stringify(gameday.snapshot(base))),aggressive=gameday.restore(saved),control=gameday.restore(saved);
+  gameday.resolve(aggressive,'aggressive');gameday.resolve(control,'ball_control');
+  assert.equal(aggressive.halftimeApproach.home,'aggressive');assert.equal(control.halftimeApproach.home,'ball_control');
+  Object.assign(aggressive.state,{period:3,clock:850,possession:'home',fieldPosition:35,down:1,distance:10});
+  Object.assign(control.state,{period:3,clock:850,possession:'home',fieldPosition:35,down:1,distance:10});
+  const rngBefore=JSON.parse(JSON.stringify(aggressive.state.rng));assert.deepEqual(control.state.rng,rngBefore);
+  gameday.advanceOne(aggressive);gameday.advanceOne(control);
+  assert.ok(aggressive.state.clock>control.state.clock,'aggressive halftime approach should use less clock than ball control on the same deterministic snap');
+  assert.deepEqual(aggressive.state.rng,control.state.rng,'halftime approach changes the deterministic outcome transform without extra RNG draws');
+  assert.ok(aggressive.state.events.some(e=>e.type==='coaching_decision'&&e.decisionType==='halftime_adjustment'&&e.resolvedAction==='aggressive'));
+});
