@@ -1,3 +1,4 @@
+# Retry with browser console diagnostics and no redundant player click.
 name: V0.10.5 Development Visualization Checkpoint
 
 on:
