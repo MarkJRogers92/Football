@@ -25,9 +25,11 @@ jobs:
       - name: Install dependencies
         run: npm install --no-package-lock
       - name: Parse weekly coaching modules
-        run: node --check weekly-coaching-engine.js && node --check weekly-coaching-loop.js && node --check weekly-personnel-decisions.js && node --check tests/weekly-coaching-loop.js && node --check tests/weekly-coaching-loop-browser.js && node --check tests/weekly-personnel-browser.js
-      - name: Weekly scouting, preparation and personnel contract
+        run: node --check weekly-coaching-engine.js && node --check weekly-coaching-loop.js && node --check weekly-personnel-decisions.js && node --check weekly-player-stories-engine.js && node --check weekly-player-stories.js && node --check tests/weekly-coaching-loop.js && node --check tests/weekly-coaching-loop-browser.js && node --check tests/weekly-personnel-browser.js && node --check tests/weekly-player-stories.js && node --check tests/weekly-player-stories-browser.js
+      - name: Weekly scouting, preparation, Staff Room and personnel contract
         run: node tests/weekly-coaching-loop.js
+      - name: Player Story selection contract
+        run: node tests/weekly-player-stories.js
       - name: Game Engine 2 targeted suite
         run: npm run test:game-engine-v2
       - name: Frozen v0.10 calibration guardrail
@@ -38,9 +40,12 @@ jobs:
         shell: bash
         run: |
           grep -q 'V0.10.2 WEEKLY COACHING' index.html
+          grep -q 'Staff Room' index.html
           grep -q 'DynastyWeeklyCoaching' index.html
           grep -q 'weeklyPrepVersion' index.html
           grep -q 'STARTER_CHALLENGE' index.html
+          grep -q 'PLAYERS TO WATCH' index.html
+          grep -q 'DynastyPlayerStories' index.html
       - name: Locate Chromium
         id: chromium
         shell: bash
@@ -64,3 +69,7 @@ jobs:
         env:
           CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
         run: node tests/weekly-personnel-browser.js
+      - name: Player Story dashboard regression
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: node tests/weekly-player-stories-browser.js
