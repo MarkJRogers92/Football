@@ -7,18 +7,14 @@ function txt(r,l){return(cell(r,l)?.innerText||'').replace(/\s+/g,' ').trim()}
 function data(){return $$('#recruitBody tr').map(row=>{const a=row.querySelector('[data-recruit]');if(!a)return null;const interest=txt(row,'Interest');return{row,id:String(a.dataset.recruit||''),name:a.textContent.trim(),pos:txt(row,'Pos'),rank:txt(row,'Rank').split(/\s+/)[0],stars:txt(row,'Stars'),home:txt(row,'Hometown / HS'),priority:txt(row,'Priority'),scout:txt(row,'Scout'),interest,trend:txt(row,'Trend'),leader:txt(row,'Leader'),target:row.classList.contains('target'),commit:/COMMITTED|WAVERING/i.test(interest)}}).filter(Boolean)}
 function filtered(){const q=($('#rwSearch')?.value||'').toLowerCase();return data().filter(x=>(filter==='all'||filter==='board'&&x.target||filter==='commits'&&x.commit)&&(!q||[x.name,x.pos,x.home,x.priority,x.leader].join(' ').toLowerCase().includes(q)))}
 function delegate(x,s){const b=x?.row.querySelector(s);if(b&&!b.disabled)b.click()}
-function recruitFor(x){if(!x||typeof universe!=='object')return null;return(universe.recruits||[]).find(r=>String(r.id)===String(x.id))||null}
-function staffRead(r,x){
- const sc=cell(x?.row,'Scout'),fallbackLabel=sc?.querySelector('.staff-verdict-compact strong')?.textContent?.trim()||'Preliminary',fallbackDetail=sc?.querySelector('.staff-verdict-compact span')?.textContent?.trim()||'Evaluation in progress';
- try{const t=typeof selected==='function'?selected():null,v=r&&t&&typeof recruitStaffVerdict==='function'?recruitStaffVerdict(r,t):null;if(v)return{label:v.label||fallbackLabel,detail:`${v.conviction||'Preliminary'} conviction · ${Math.round(v.confidence||0)}% report confidence`,confidence:Number.isFinite(v.confidence)?Math.round(v.confidence):null,risk:v.risk||null,summary:v.summary||''}}catch{}
- return{label:fallbackLabel,detail:fallbackDetail,confidence:null,risk:null,summary:''}
+function intelFor(x){try{return x?globalThis.DynastyRecruitingWorkspaceIntel?.forId?.(x.id)||null:null}catch{return null}}
+function staffRead(intel,x){
+ const sc=cell(x?.row,'Scout'),fallbackLabel=sc?.querySelector('.staff-verdict-compact strong')?.textContent?.trim()||'Preliminary',fallbackDetail=sc?.querySelector('.staff-verdict-compact span')?.textContent?.trim()||'Evaluation in progress',v=intel?.staff;
+ return v?{label:v.label||fallbackLabel,detail:`${v.conviction||'Preliminary'} conviction · ${Number.isFinite(v.confidence)?Math.round(v.confidence):'—'}% report confidence`,confidence:Number.isFinite(v.confidence)?Math.round(v.confidence):null,risk:v.risk||null,summary:v.summary||''}:{label:fallbackLabel,detail:fallbackDetail,confidence:null,risk:null,summary:''}
 }
-function scoutStage(r){try{const t=typeof selected==='function'?selected():null,rec=r&&t&&typeof recruitScoutingRecord==='function'?recruitScoutingRecord(r,t,false):null;return rec?.full?'Full evaluation':rec?.quick?'Film reviewed':'Preliminary'}catch{return'Preliminary'}}
-function momentum(r,x){const n=Math.round(Number(r?.trend));if(!Number.isFinite(n))return x?.trend||'Steady';return n>=6?`Heating up +${n}`:n>=2?`Gaining +${n}`:n<=-6?`Sliding ${n}`:n<=-2?`Cooling ${n}`:'Steady'}
-function battleRead(r,x){
- try{const s=r&&globalThis.DynastyLabRecruitingBattles?.summary?.(r);if(s)return{label:s.label||'No race',rank:s.rank?`#${s.rank}`:'Outside top group',gap:s.gap==null?'—':s.gap===0?'Even':`${s.gap>0?'+':''}${s.gap}`,leader:s.leader||x?.leader||'—'}}catch{}
- return{label:'Race developing',rank:'—',gap:'—',leader:x?.leader||'—'}
-}
+function scoutStage(intel){return intel?.stage||'Preliminary'}
+function momentum(intel,x){return intel?.momentum||x?.trend||'Steady'}
+function battleRead(intel,x){const s=intel?.battle;return s?{label:s.label||'No race',rank:s.rank?`#${s.rank}`:'Outside top group',gap:s.gap==null?'—':s.gap===0?'Even':`${s.gap>0?'+':''}${s.gap}`,leader:s.leader||x?.leader||'—'}:{label:'Race developing',rank:'—',gap:'—',leader:x?.leader||'—'}}
 function ensure(){
  const tab=$('#recruiting'),head=tab?.querySelector(':scope > .section-head');if(!tab||!head)return null;
  if(!$('#rwSwitch')){const n=document.createElement('div');n.id='rwSwitch';n.className='recruit-workspace-switcher';n.innerHTML='<div><span class="eyebrow">RECRUITING MODE</span><strong>Scout and act without losing board context.</strong></div><div class="recruit-mode-buttons"><button data-rwm="workspace" class="active">Workspace</button><button data-rwm="table">Table</button></div>';head.after(n);n.querySelectorAll('[data-rwm]').forEach(b=>b.onclick=()=>{mode=b.dataset.rwm;render()})}
@@ -28,7 +24,7 @@ function ensure(){
 function card(x){return '<button class="recruit-workspace-card'+(x.id===sel?' active':'')+'" data-rwid="'+esc(x.id)+'"><span class="rw-rank">'+esc(x.rank)+'</span><span class="rw-main"><strong>'+esc(x.name)+'</strong><small>'+esc(x.pos)+' · '+esc(x.stars)+' · '+esc(x.home)+'</small><small>'+esc(x.scout)+'</small></span><span class="rw-state">'+esc(x.interest)+'</span></button>'}
 function dossier(x){
  if(!x)return'<div class="recruit-dossier-empty"><span class="eyebrow">SCOUTING DOSSIER</span><strong>Select a prospect</strong></div>';
- const r=recruitFor(x),staff=staffRead(r,x),battle=battleRead(r,x),stage=scoutStage(r),mom=momentum(r,x),sc=cell(x.row,'Scout'),q=sc?.querySelector('[data-scout-action="quick"]'),f=sc?.querySelector('[data-scout-action="full"]'),t=x.row.querySelector('[data-target]'),confidence=Number.isFinite(staff.confidence)?Math.max(0,Math.min(100,staff.confidence)):null;
+ const intel=intelFor(x),staff=staffRead(intel,x),battle=battleRead(intel,x),stage=scoutStage(intel),mom=momentum(intel,x),sc=cell(x.row,'Scout'),q=sc?.querySelector('[data-scout-action="quick"]'),f=sc?.querySelector('[data-scout-action="full"]'),t=x.row.querySelector('[data-target]'),confidence=Number.isFinite(staff.confidence)?Math.max(0,Math.min(100,staff.confidence)):null;
  return '<div class="recruit-dossier-head"><span class="eyebrow">SCOUTING DOSSIER</span><strong>'+esc(x.name)+'</strong><small>'+esc(x.pos)+' · '+esc(x.stars)+' · '+esc(x.rank)+' · '+esc(x.home)+'</small></div>'+
  '<div class="rw-verdict"><span>STAFF READ</span><strong>'+esc(staff.label)+'</strong><small>'+esc(staff.detail)+'</small>'+(confidence!=null?'<div class="rw-confidence" role="meter" aria-label="Report confidence" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+confidence+'"><i style="width:'+confidence+'%"></i></div>':'')+(staff.risk?'<small>Biggest uncertainty: '+esc(staff.risk)+'.</small>':'')+'</div>'+
  '<div class="rw-battle"><div><span class="eyebrow">RECRUITING BATTLE</span><strong>'+esc(battle.label)+'</strong></div><div class="rw-battle-grid"><div><span>Your position</span><strong>'+esc(battle.rank)+'</strong></div><div><span>Gap to leader</span><strong>'+esc(battle.gap)+'</strong></div><div><span>Leader</span><strong>'+esc(battle.leader)+'</strong></div><div><span>Momentum</span><strong>'+esc(mom)+'</strong></div></div></div>'+
