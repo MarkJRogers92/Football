@@ -1,0 +1,38 @@
+name: V0.10.1 Production Publish
+
+on:
+  push:
+    branches:
+      - codex/v0101-production-publish
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dynasty-publish
+  cancel-in-progress: false
+
+jobs:
+  publish-production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 34e966be92b6da7520fbb921d196880878586c55
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify exact frozen v0.10.1 release
+        shell: bash
+        run: |
+          test "$(cat VERSION.txt)" = "0.10.1"
+          grep -q "const APP_VERSION='0.10.1';" app.js
+          grep -q "Dynasty Lab v0.10.1" index.html
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Verify frozen release source and artifact
+        run: npm run verify:release
+      - name: Publish v0.10.1 production
+        run: node tools/publish.js
