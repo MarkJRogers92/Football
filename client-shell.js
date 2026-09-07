@@ -27,8 +27,10 @@
     <div class="client-rail-brand"><strong>DYNASTY LAB</strong><span>Front Office</span></div>
     <nav class="client-rail-nav">${NAV.map(group=>`<section class="client-nav-group"><div class="client-nav-label">${group.label}</div>${group.items.map(([tab,label])=>navButton(tab,label)).join('')}</section>`).join('')}</nav>
     <div class="client-rail-footer">
-      <button type="button" data-client-action="saveBrowser">Save Dynasty</button>
-      <button type="button" data-client-action="newUniverse">Title Screen</button>
+      <details class="client-utilities">
+        <summary>Dynasty &amp; Saves</summary>
+        <div class="client-utility-host"></div>
+      </details>
       <span data-client-version>Dynasty Lab</span>
     </div>`;
   topbar.insertAdjacentElement('beforebegin',rail);
@@ -41,12 +43,17 @@
   navToggle.innerHTML='<span aria-hidden="true">☰</span><span>Menu</span>';
   topbar.insertAdjacentElement('afterbegin',navToggle);
 
+  const actions=topbar.querySelector('.header-actions');
+  if(actions){
+    actions.classList.add('client-utility-actions');
+    rail.querySelector('.client-utility-host')?.appendChild(actions);
+  }
+
   const status=document.createElement('div');
   status.id='clientStatus';
   status.className='client-status';
   status.innerHTML=`<div class="client-status-program"><strong data-client-program>Program</strong><span data-client-context>Dynasty</span></div><div class="client-status-facts"><span data-client-record>0–0</span><span data-client-rank>Preseason</span><span data-client-week>Week 0</span></div>`;
-  const actions=topbar.querySelector('.header-actions');
-  if(actions)topbar.insertBefore(status,actions);else topbar.append(status);
+  topbar.append(status);
 
   const mobile=document.createElement('nav');
   mobile.className='client-mobile-nav';
@@ -89,7 +96,6 @@
   app.addEventListener('click',event=>{
     const nav=event.target.closest('[data-client-tab]');if(nav){event.preventDefault();go(nav.dataset.clientTab);return}
     const more=event.target.closest('[data-client-more]');if(more){event.preventDefault();app.classList.contains('client-rail-open')?closeRail():openRail();return}
-    const action=event.target.closest('[data-client-action]');if(action){document.getElementById(action.dataset.clientAction)?.click();closeRail();return}
     if(event.target.closest('.tabs button,.tab-groups button'))setTimeout(sync,0);
   });
   navToggle.addEventListener('click',()=>app.classList.contains('client-rail-open')?closeRail():openRail());
