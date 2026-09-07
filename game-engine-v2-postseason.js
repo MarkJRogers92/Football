@@ -86,14 +86,14 @@ function v2PostseasonTestPrepare(stage){
   const others=universe.teams.filter(t=>t.id!==me.id);
   if(stage==='conference'){
     universe.phase='confReady';for(const t of universe.teams){t.champ=false;if(t.conference===me.conference){t.w=2;t.l=10;t.cw=1;t.cl=8}}
-    me.w=12;me.l=0;me.cw=9;me.cl=0;const rival=others.find(t=>t.conference===me.conference);if(rival){rival.w=11;rival.l=1;rival.cw=8;rival.cl=1}ranked();return{stage,conference:me.conference}
+    me.w=12;me.l=0;me.cw=9;me.cl=0;const rival=others.find(t=>t.conference===me.conference);if(rival){rival.w=11;rival.l=1;rival.cw=8;rival.cl=1}ranked();render();return{stage,conference:me.conference}
   }
   if(stage==='bowl'){
     universe.phase='bowlReady';for(const t of universe.teams){t.champ=false;t.w=Math.max(6,t.w||0);t.l=Math.max(0,12-t.w)}
-    me.w=6;me.l=6;const elite=others.slice(0,20);for(const t of elite){t.w=12;t.l=0}universe.confChamps=elite.slice(0,10);ranked();const field=bowlField().map(t=>t.id);if(!field.includes(me.id))throw new Error('Bowl test fixture did not place the controlled program in a bowl.');return{stage,field,userId:me.id}
+    me.w=6;me.l=6;const elite=others.slice(0,20);for(const t of elite){t.w=12;t.l=0}universe.confChamps=elite.slice(0,10);ranked();const field=bowlField().map(t=>t.id);if(!field.includes(me.id))throw new Error('Bowl test fixture did not place the controlled program in a bowl.');render();return{stage,field,userId:me.id}
   }
   if(stage==='playoff'){
-    universe.phase='playoffReady';for(const t of universe.teams){t.champ=false}me.w=12;me.l=0;const champs=[me,...others.slice(0,9)];for(const t of champs){t.w=Math.max(10,t.w||0);t.l=Math.min(2,t.l||0)}universe.confChamps=champs;ranked();const field=seedField().map(t=>t.id);if(!field.includes(me.id))throw new Error('Playoff test fixture did not place the controlled program in the field.');return{stage,field,userId:me.id}
+    universe.phase='playoffReady';for(const t of universe.teams){t.champ=false}me.w=12;me.l=0;const champs=[me,...others.slice(0,9)];for(const t of champs){t.w=Math.max(10,t.w||0);t.l=Math.min(2,t.l||0)}universe.confChamps=champs;ranked();const field=seedField().map(t=>t.id);if(!field.includes(me.id))throw new Error('Playoff test fixture did not place the controlled program in the field.');render();return{stage,field,userId:me.id}
   }
   throw new Error(`Unknown postseason test stage: ${stage}`)
 }
