@@ -18,6 +18,10 @@ async function startNewDynasty(page){
     assert.equal(await page.locator('#v2RecordGate').count(),0,'obsolete development record gate should be removed after cutover');
     const rollback=await page.evaluate(()=>window.__DL_TEST__.v2RollbackProbe('afterArchive'));
     assert.equal(rollback.ok,true,`rollback protection regressed: ${rollback.message}`);
+    const prep=await page.evaluate(()=>window.__DL_TEST__.v2PrepareDetailedGame());
+    assert.equal(prep.career,false,'fresh cutover browser fixture should not have a career choice blocking Detailed Game');
+    assert.equal(prep.ready,true,'cutover browser should resolve legitimate weekly decisions before Detailed Game');
+    await goTab(page,'gamelab');
     const before=await page.evaluate(()=>({record:window.DynastyGameEngineV2LabBridge.debug(),cutover:window.DynastyGameEngineV2LabBridge.cutoverDebug()}));
     await page.click('#simDetailedGame');
     await page.waitForFunction(()=>window.DynastyGameEngineV2LabBridge.debug().lastArchive?.engine==='v2',{timeout:30000});
