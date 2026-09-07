@@ -1,4 +1,4 @@
-# Retry after validating Table fallback against any visible dense-board row.
+# Retry after fixing Workspace visibility in Table mode.
 name: V0.10.4 Recruiting Workspace Checkpoint
 
 on:
