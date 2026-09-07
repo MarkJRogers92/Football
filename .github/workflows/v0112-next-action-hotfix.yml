@@ -121,12 +121,13 @@ jobs:
         run: node tests/browser.js
         env:
           CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
-      - name: Verify reproducible release artifact
-        run: npm run verify:release
       - name: Commit validated hotfix and retire helper
         shell: bash
         run: |
           rm .github/workflows/v0112-next-action-hotfix.yml
           git add next-action.js tests/next-action.js body.html app.js index.html tests/postseason-next-action-browser.js .github/workflows/v0112-next-action-hotfix.yml
           git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'fix: make postseason next action unambiguous'
-          git push origin HEAD:codex/v0112-next-action-hotfix
+      - name: Verify reproducible release artifact
+        run: npm run verify:release
+      - name: Push validated hotfix
+        run: git push origin HEAD:codex/v0112-next-action-hotfix
