@@ -9,7 +9,6 @@ const goDevelopment=page=>page.evaluate(()=>{const g=document.querySelector('.ta
   await page.goto('file://'+path.join(__dirname,'..','index.html'));await page.click('#titleNew');await page.click('#titleStart');await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000});
   await page.evaluate(()=>window.__DL_TEST__.prepareDevelopmentResults());await goDevelopment(page);await page.waitForSelector('.development-results-hero');await page.waitForSelector('#developmentVisualLab');
   const lab=page.locator('#developmentVisualLab'),guardrail=(await lab.locator('.dev-viz-guardrail').innerText()).toLowerCase(),picker=lab.locator('.dev-player-picker [data-dev-player]');
-  if(await picker.count()){await picker.first().click();await page.waitForTimeout(30)}
   const checks=[
    ['results summary hero',await page.locator('.development-results-hero').count()===1],
    ['results player rows',await page.locator('[data-development-result]').count()>20],
@@ -22,9 +21,9 @@ const goDevelopment=page=>page.evaluate(()=>{const g=document.querySelector('.ta
    ['position-group movement is visualized',await lab.locator('.dev-group-row').count()>5],
    ['hidden-growth guardrail is explicit',guardrail.includes('hidden growth curves')&&guardrail.includes('true talent')],
    ['no page overflow',await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth)<=1],
-   ['no console errors',errors.length===0]
+   ['no console errors',errors.length===0,errors.slice(0,4).join(' | ')]
   ];
-  for(const [name,ok] of checks){console.log(`${ok?'PASS':'FAIL'} [${label}] ${name}`);if(!ok)failures++}await page.close();
+  for(const [name,ok,detail] of checks){console.log(`${ok?'PASS':'FAIL'} [${label}] ${name}${detail?` — ${detail}`:''}`);if(!ok)failures++}await page.close();
  }
  await browser.close();process.exit(failures?1:0);
 })().catch(e=>{console.error(e);process.exit(1)});
