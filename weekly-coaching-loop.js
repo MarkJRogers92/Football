@@ -52,6 +52,9 @@ function renderV0102WeeklyCoaching(){
   host.querySelector('[data-v0102-prep-clear]')?.addEventListener('click',()=>v0102SetWeeklyPrep(t,opp,[]))
 }
 const renderGameLabBeforeWeeklyCoachingV0102=TAB_RENDERERS.gamelab;TAB_RENDERERS.gamelab=()=>{renderGameLabBeforeWeeklyCoachingV0102();renderV0102WeeklyCoaching()};
+const renderV2InteractiveGameDayBeforeWeeklyLockV0102=renderV2InteractiveGameDay;
+renderV2InteractiveGameDay=function renderV2InteractiveGameDayWithWeeklyLock(){const out=renderV2InteractiveGameDayBeforeWeeklyLockV0102();renderV0102WeeklyCoaching();return out};
+if(globalThis.DynastyGameEngineV2LabBridge?.interactive)globalThis.DynastyGameEngineV2LabBridge.interactive.render=renderV2InteractiveGameDay;
 const recordInteractiveBeforeWeeklyPrepV0102=recordInteractiveV2GameDay;
 recordInteractiveV2GameDay=function recordInteractiveV2GameDayWithWeeklyPrep(session,options={}){
   const g=findUserGame(),home=g?T(g.home):null,away=g?T(g.away):null,weeklyPrep={home:home&&away?v0102WeeklyPrepSnapshot(home,away.name):null,away:home&&away?v0102WeeklyPrepSnapshot(away,home.name):null};
