@@ -1,3 +1,4 @@
+# Retry after adding the read-only in-closure recruiting intelligence adapter.
 name: V0.10.4 Recruiting Workspace Checkpoint
 
 on:
@@ -32,6 +33,7 @@ jobs:
       - name: Parse workspace sources and test
         run: |
           node --check recruiting-workspace.js
+          node --check recruiting-workspace-adapter.js
           node --check tests/recruiting-workspace-browser.js
       - name: Build standalone artifact
         run: npm run build
