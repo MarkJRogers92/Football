@@ -57,8 +57,18 @@ jobs:
         run: npm install --no-package-lock
       - name: Build v0.11.1 standalone artifact
         run: npm run build
-      - name: Verify releasable source tree
-        run: npm run verify:release
+      - name: Commit clean v0.11.1 release candidate
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/browser.js VERSION.txt package.json app.js index.html
+          git commit -m "release: prepare Dynasty Lab v0.11.1 candidate"
+      - name: Verify clean releasable source tree
+        run: |
+          npm run build
+          git diff --exit-code -- index.html
+          npm run verify:release
       - name: Locate Chromium
         id: chromium
         shell: bash
@@ -80,7 +90,7 @@ jobs:
           CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
       - name: Simulation audit
         run: npm run audit
-      - name: Commit verified v0.11.1 release source
+      - name: Finalize and push verified v0.11.1 release source
         shell: bash
         run: |
           rm .github/workflows/v0111-release-finish.yml
@@ -93,10 +103,8 @@ jobs:
 
           Release validation reused the completed 358/358 full engine and presentation suite from the immediately preceding milestone-boundary commit because the only follow-up source change was a browser-test compatibility fix plus version metadata. The release finish gate then passed the complete browser UI/visual suite, browser IndexedDB regression, simulation audit, clean reproducible build verification, and production artifact verification.
           EOF
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tests/browser.js VERSION.txt package.json app.js index.html docs/v0111-PRODUCTION-RELEASE.md .github/workflows/v0111-release-finish.yml
-          git commit -m "release: prepare Dynasty Lab v0.11.1 production"
+          git add docs/v0111-PRODUCTION-RELEASE.md .github/workflows/v0111-release-finish.yml
+          git commit -m "release: validate Dynasty Lab v0.11.1 production"
           git push origin HEAD:codex/v0111-motion-final-polish
       - name: Reverify committed release artifact
         run: |
