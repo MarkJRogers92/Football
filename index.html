@@ -750,6 +750,10 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 .v2-plan-receipt{margin-top:0;border-left:3px solid var(--accent2)}.v2-plan-receipt>.muted{margin:5px 0}
 @media(max-width:760px){.v2-matchup-head{display:grid}.v2-matchup-ratings{text-align:left;min-width:0}.v2-matchup-grid,.v2-matchup-grid.players{grid-template-columns:1fr}.v2-matchup-plan{grid-template-columns:1fr}.v2-matchup-plan-action{justify-items:start}.v2-matchup-edge{font-size:12px}}
 
+.v0102-weekly-coaching{margin-top:16px}.v0102-weekly-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:16px}.v0102-weekly-grid section{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:13px}.v0102-weekly-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}.v0102-weekly-head span{font-size:11px;color:var(--muted)}.v0102-scout-note{padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}.v0102-scout-note:last-of-type{border-bottom:0}.v0102-prep-focuses{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.v0102-prep-focus{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:4px;min-height:78px}.v0102-prep-focus strong{font-size:13px}.v0102-prep-focus small{color:var(--muted);line-height:1.3}.v0102-prep-focus.active{border-color:var(--accent2);background:rgba(143,177,255,.12)}.v0102-prep-actions{margin-top:10px}.v0102-prep-actions+div{margin-top:8px}.v0102-staff-room{grid-column:1/-1}.v0102-staff-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.v0102-staff-card{display:flex;flex-direction:column;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;min-width:0}.v0102-staff-card--split{border-color:#4d6080}.v0102-staff-title{display:flex;justify-content:space-between;gap:8px;align-items:center}.v0102-staff-plan{display:flex;gap:4px;flex-wrap:wrap}.v0102-staff-card .compact{flex:1}.v0102-staff-card button{align-self:flex-start}@media(max-width:900px){.v0102-staff-grid{grid-template-columns:1fr}}@media(max-width:720px){.v0102-weekly-grid{grid-template-columns:1fr}.v0102-prep-focuses{grid-template-columns:1fr}.v0102-weekly-head,.v0102-staff-title{align-items:flex-start;flex-direction:column}.v0102-prep-focus{min-height:0;width:100%}.v0102-staff-card button{width:100%}}
+
+.v0102-player-stories{margin-top:16px}.v0102-story-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.v0102-story-card{min-width:0;background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:12px}.v0102-story-kicker{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:5px}.v0102-story-name{padding:0;border:0;background:transparent;font-weight:750;text-align:left}.v0102-story-card .compact{margin-top:8px}.v0102-story-bad{border-left:3px solid var(--bad)}.v0102-story-warn{border-left:3px solid var(--warn)}.v0102-story-good{border-left:3px solid var(--good)}@media(max-width:1050px){.v0102-story-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:720px){.v0102-story-grid{grid-template-columns:1fr}.v0102-story-card{padding:11px}}
+
 /* Dynasty Lab commercial polish layer (v0.9.14 pass).
    Loaded last. Presentation only: no simulation, storage or save-format code depends on it.
    Section 1 — flagship Dashboard. Later sections add shared primitives. */
@@ -3887,6 +3891,138 @@ function forTeam(record,teamId){
   if(!side)throw new Error('Team is not part of the supplied game archive record.');return evaluate(record,side)
 }
 return{VERSION,PLAN_LABELS,metrics,evaluate,forTeam};
+});
+
+(function(root,factory){
+  const api=factory();
+  if(typeof module==='object'&&module.exports)module.exports=api;
+  root.DynastyWeeklyCoaching=api;
+})(typeof globalThis!=='undefined'?globalThis:this,function(){
+  'use strict';
+  const VERSION=2;
+  const MAX_POINTS=2;
+  const FOCUSES={
+    pass_protection:{label:'Pass Protection',side:'offense',description:'More protection reps and pickup work; slightly less route-detail time.',deltas:{ol:2.6,skill:-0.4,offense:0.4}},
+    run_blocking:{label:'Run Blocking',side:'offense',description:'More fit and combination-block work; slightly less QB timing work.',deltas:{ol:1.8,skill:0.9,qb:-0.4,offense:0.5}},
+    explosive_pass:{label:'Explosive Passing',side:'offense',description:'Push vertical timing and separation; protection gets fewer dedicated reps.',deltas:{qb:1.4,skill:1.8,ol:-0.8,offense:0.7}},
+    run_fits:{label:'Run Fits',side:'defense',description:'Tighter front mechanics and fits; fewer coverage-detail reps.',deltas:{front:2.5,coverage:-0.7,defense:0.6}},
+    coverage:{label:'Coverage',side:'defense',description:'Extra leverage and pattern-match work; slightly fewer front reps.',deltas:{coverage:2.5,front:-0.7,defense:0.6}},
+    pressure:{label:'Pressure Package',side:'defense',description:'Install pressure answers and rush games; coverage is more exposed if pressure misses.',deltas:{front:1.3,coverage:-1.1,prepPressure:0.012,defense:0.5}}
+  };
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  function normalizeFocuses(list){const out=[];for(const id of Array.isArray(list)?list:[]){if(FOCUSES[id]&&!out.includes(id))out.push(id);if(out.length===MAX_POINTS)break}return out}
+  function hashUnit(text){let h=2166136261>>>0;for(const ch of String(text)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)>>>0}return (h/4294967295)*2-1}
+  function confidenceLabel(v){return v>=82?'High':v>=64?'Medium':'Low'}
+  function noisy(value,confidence,key){const spread=clamp((100-confidence)/9,1,6);return Math.round(Number(value||0)+hashUnit(key)*spread)}
+  function edgeLabel(v){return v>=5?'clear edge':v>=2?'slight edge':v<=-5?'clear concern':v<=-2?'slight concern':'close to even'}
+  function buildReport(input={}){
+    const confidence=clamp(Math.round(input.confidence??70),45,94),seed=`${input.season||0}|${input.week||0}|${input.teamName||''}|${input.opponentName||''}`;
+    const passShare=clamp(Number(input.passShare??.5),.2,.8),passEstimate=clamp(Math.round(passShare*100+hashUnit(seed+'|pass')*Math.max(2,(100-confidence)/7)),25,75);
+    const te=input.teamEdges||{},oe=input.opponentEdges||{};
+    const est={
+      teamPass:noisy(te.passGame,confidence,seed+'|tp'),teamRun:noisy(te.runGame,confidence,seed+'|tr'),teamProtect:noisy(te.passProtection,confidence,seed+'|tprot'),
+      oppPass:noisy(oe.passGame,confidence,seed+'|op'),oppRun:noisy(oe.runGame,confidence,seed+'|or'),oppProtect:noisy(oe.passProtection,confidence,seed+'|oprot')
+    };
+    const observations=[];
+    observations.push(passEstimate>=56?`Staff expects a pass-leaning opponent, roughly ${passEstimate}% through the air.`:passEstimate<=44?`Staff expects a run-leaning opponent, roughly ${100-passEstimate}% on the ground.`:`Staff sees a balanced offense, roughly ${passEstimate}% pass.`);
+    if(est.oppPass>=3)observations.push(`Their passing matchup looks like a ${edgeLabel(est.oppPass)} for them; coverage detail matters.`);
+    else if(est.oppRun>=3)observations.push(`Their run game looks like a ${edgeLabel(est.oppRun)} for them; the front needs a clean week.`);
+    else if(est.oppProtect<=-3)observations.push('Staff believes their protection can be stressed with pressure and rush games.');
+    else observations.push('Staff does not see one obvious opponent matchup to sell out against.');
+    if(est.teamProtect<=-3)observations.push('Your protection matchup is a concern; extra pickup and protection work could stabilize the offense.');
+    else if(est.teamPass>=3)observations.push('Your passing matchup looks favorable enough to justify an explosive-pass emphasis.');
+    else if(est.teamRun>=3)observations.push('Your run-game matchup looks favorable enough to lean into blocking detail.');
+    else observations.push('Your offense projects relatively even; preparation can be used to shape identity rather than patch a clear weakness.');
+    const oppInjuries=Number(input.opponentInjuries||0);if(oppInjuries>0)observations.push(`${oppInjuries} opponent availability issue${oppInjuries===1?' is':'s are'} on the staff report.`);
+    const candidates=[];const add=id=>{if(FOCUSES[id]&&!candidates.includes(id))candidates.push(id)};
+    if(est.teamProtect<=-2)add('pass_protection');
+    if(est.oppPass>=2||passEstimate>=56)add('coverage');
+    if(est.oppProtect<=-2)add('pressure');
+    if(est.oppRun>=2||passEstimate<=44)add('run_fits');
+    if(est.teamPass>=2)add('explosive_pass');
+    if(est.teamRun>=2)add('run_blocking');
+    add('pass_protection');add('coverage');
+    return{version:VERSION,confidence,confidenceLabel:confidenceLabel(confidence),passEstimate,estimatedEdges:est,observations:observations.slice(0,4),recommendedFocuses:candidates.slice(0,MAX_POINTS)}
+  }
+  function applyPrepProfile(profile,focuses){
+    const ids=normalizeFocuses(focuses);if(!profile||!ids.length)return profile&&JSON.parse(JSON.stringify(profile));
+    const out={...profile};
+    for(const id of ids){const deltas=FOCUSES[id].deltas;for(const [key,delta] of Object.entries(deltas)){const base=Number(out[key]||0);out[key]=key==='prepPressure'?clamp(base+delta,-.1,.2):clamp(base+delta,20,99)}}
+    if(Number.isFinite(out.offense)&&Number.isFinite(out.defense))out.overall=(out.offense+out.defense)/2;
+    return out
+  }
+  function focusSummary(focuses){return normalizeFocuses(focuses).map(id=>({id,label:FOCUSES[id].label,side:FOCUSES[id].side,description:FOCUSES[id].description}))}
+  function struggleSignal(pos,stats={}){
+    if(pos==='QB'&&(stats.passAtt||0)>=25){const comp=(stats.passComp||0)/stats.passAtt,intRate=(stats.int||0)/stats.passAtt;return{score:(comp<.55?1:0)+(intRate>.05?1:0),text:comp<.55||intRate>.05?'passing efficiency has slipped':'passing production is stable'}}
+    if(pos==='RB'&&(stats.rushAtt||0)>=25){const ypc=(stats.rushYds||0)/stats.rushAtt;return{score:ypc<3.5?2:ypc<4?1:0,text:ypc<3.5?'rushing efficiency has been poor':ypc<4?'rushing efficiency is under pressure':'rushing production is stable'}}
+    if(['WR','TE'].includes(pos)&&(stats.targets||0)>=15){const rate=(stats.receptions||0)/stats.targets;return{score:rate<.5?2:rate<.58?1:0,text:rate<.5?'target conversion has been poor':rate<.58?'target conversion has dipped':'receiving production is stable'}}
+    return{score:0,text:'season production is not a major warning'}
+  }
+  function selectStarterChallenge(groups=[]){
+    const rows=[];for(const g of groups){const s=g?.starter,c=g?.challenger;if(!s||!c)continue;const gap=Number(c.grade||0)-Number(s.grade||0),upsideGap=Number(c.upside||0)-Number(s.upside||0),struggle=struggleSignal(g.pos,s.stats||{}),youthPush=(c.year==='FR'||c.year==='SO')&&upsideGap>=6;
+      if(!(gap>=1||(gap>=-3&&struggle.score>0)||(gap>=-2&&youthPush)))continue;
+      const score=gap*4+struggle.score*6+Math.max(0,upsideGap)*.3+(youthPush?2:0),recommendation=(gap>=2||(struggle.score>=2&&gap>=-1))?'promote':(gap>=-2?'split':'stay');
+      const reason=gap>=2?`${c.name} is grading ahead of ${s.name}.`:struggle.score?`${s.name} is under performance pressure and ${c.name} is close enough to force a decision.`:`${c.name}'s development has closed the gap on ${s.name}.`;
+      rows.push({pos:g.pos,starterId:s.id,starterName:s.name,challengerId:c.id,challengerName:c.name,gap,upsideGap,struggleScore:struggle.score,struggleText:struggle.text,recommendation,reason,score})
+    }return rows.sort((a,b)=>b.score-a.score||a.pos.localeCompare(b.pos))[0]||null
+  }
+  function advisorConfidence(coach={},schemeMatch=true){return clamp(Math.round(Number(coach.playCall??65)*.64+Number(coach.adaptability??65)*.36+(schemeMatch?3:-4)),45,96)}
+  function uniqueTwo(primary,candidates){const out=[];for(const id of [primary,...candidates])if(FOCUSES[id]&&!out.includes(id)&&out.length<2)out.push(id);return out}
+  function buildStaffRoom(input={}){
+    const report=input.report||{},e=report.estimatedEdges||{},offPass=Number(input.offPass??.5),defPressure=Number(input.defPressure??50),oc=input.oc||{},dc=input.dc||{};
+    let ocPrimary,ocReason;
+    if(e.teamProtect<=-2){ocPrimary='pass_protection';ocReason='Protection is the offensive problem most likely to wreck the plan before anything else develops.'}
+    else if(e.teamPass>=e.teamRun+2||offPass>=.58){ocPrimary='explosive_pass';ocReason='The matchup and system both justify spending practice time on creating explosive throws.'}
+    else{ocPrimary='run_blocking';ocReason='The cleanest offensive path is to win fits and keep the run game on schedule.'}
+    const ocPlan=uniqueTwo(ocPrimary,ocPrimary==='pass_protection'?(e.teamPass>=0?['explosive_pass','run_blocking']:['run_blocking','explosive_pass']):ocPrimary==='explosive_pass'?['pass_protection','run_blocking']:['pass_protection','explosive_pass']);
+    let dcPrimary,dcReason;
+    if(report.passEstimate>=56||e.oppPass>=e.oppRun+2){dcPrimary='coverage';dcReason='The opponent profile puts the passing game at the center of the defensive week.'}
+    else if(e.oppProtect<=-2||(defPressure>=65&&report.passEstimate>=48)){dcPrimary='pressure';dcReason='Their protection looks attackable enough to justify installing extra pressure answers.'}
+    else{dcPrimary='run_fits';dcReason='The front needs the practice budget more than the coverage menu this week.'}
+    const dcPlan=uniqueTwo(dcPrimary,dcPrimary==='coverage'?(e.oppProtect<=1?['pressure','run_fits']:['run_fits','pressure']):dcPrimary==='pressure'?['coverage','run_fits']:['coverage','pressure']);
+    const ocMatch=input.ocSchemeMatch!==false,dcMatch=input.dcSchemeMatch!==false;
+    const splitPlan=normalizeFocuses([ocPlan[0],dcPlan[0]]);
+    return{version:VERSION,oc:{name:oc.name||'Offensive Coordinator',confidence:advisorConfidence(oc,ocMatch),schemeMatch:ocMatch,plan:ocPlan,reason:ocReason},dc:{name:dc.name||'Defensive Coordinator',confidence:advisorConfidence(dc,dcMatch),schemeMatch:dcMatch,plan:dcPlan,reason:dcReason},split:{plan:splitPlan,reason:'Use one preparation point on each coordinator’s top concern instead of giving either side the entire week.'}}
+  }
+  return{VERSION,MAX_POINTS,FOCUSES,normalizeFocuses,buildReport,applyPrepProfile,focusSummary,confidenceLabel,struggleSignal,selectStarterChallenge,advisorConfidence,buildStaffRoom}
+});
+
+(function(root,factory){
+  const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;root.DynastyPlayerStories=api;
+})(typeof globalThis!=='undefined'?globalThis:this,function(){
+  'use strict';
+  const VERSION=1;
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  function productionScore(p={}){const s=p.stats||{},pos=p.pos;
+    if(pos==='QB')return (s.passYds||0)/150+(s.passTD||0)*1.8+(s.rushYds||0)/120+(s.rushTD||0)*1.4-(s.int||0)*.45;
+    if(pos==='RB')return (s.rushYds||0)/70+(s.recYds||0)/100+((s.rushTD||0)+(s.recTD||0))*1.8;
+    if(['WR','TE'].includes(pos))return (s.recYds||0)/75+(s.recTD||0)*1.8+(s.receptions||0)/18;
+    if(['EDGE','DT','LB','CB','S'].includes(pos))return (s.tackles||0)/10+(s.tfl||0)*.45+(s.sacks||0)*2+(s.intDef||0)*3+(s.forcedFumbles||0)*2;
+    if(['OT','OG','C'].includes(pos))return (s.starts||0)*.6+Math.max(0,(s.snaps||0)/120-(s.sacksAllowed||0)*.8);
+    return (s.games||0)*.2
+  }
+  function statLine(p={}){const s=p.stats||{};
+    if(p.pos==='QB')return`${s.passYds||0} pass yd · ${s.passTD||0} TD · ${s.int||0} INT`;
+    if(p.pos==='RB')return`${s.rushYds||0} rush yd · ${s.rushTD||0} rush TD`;
+    if(['WR','TE'].includes(p.pos))return`${s.receptions||0} rec · ${s.recYds||0} yd · ${s.recTD||0} TD`;
+    if(['EDGE','DT','LB','CB','S'].includes(p.pos))return`${s.tackles||0} tackles · ${s.sacks||0} sacks · ${s.intDef||0} INT`;
+    return`${s.starts||0} starts · ${s.games||0} games`
+  }
+  function buildPlayerStories(players=[],context={}){
+    const limit=clamp(Number(context.limit)||5,1,6),byId=new Map(players.map(p=>[String(p.id),p])),rows=[],used=new Set();
+    const add=(p,type,priority,title,summary,tone='')=>{if(!p||used.has(String(p.id)))return;used.add(String(p.id));rows.push({playerId:p.id,name:p.name,pos:p.pos,type,priority,title,summary,tone})};
+    for(const p of [...players].sort((a,b)=>(b.injuryWeeks||0)-(a.injuryWeeks||0)||(a.health??100)-(b.health??100)))if((p.injuryWeeks||0)>0)add(p,'injury',100,`${p.name} — availability watch`,`${p.injuryWeeks} week${p.injuryWeeks===1?'':'s'} listed out · ${p.health??100}% health.`,'bad');
+    for(const p of [...players].sort((a,b)=>(b.transferRisk||0)-(a.transferRisk||0)||(a.morale??70)-(b.morale??70)))if((p.transferRisk||0)>=55||(p.morale??70)<=48)add(p,'locker_room',92,`${p.name} — locker room watch`,`Morale ${p.morale??70} · transfer risk ${Math.round(p.transferRisk||0)}. The role relationship needs attention.`,'warn');
+    const c=context.challenge;if(c){const p=byId.get(String(c.challengerId));add(p,'role_battle',86,`${c.pos} room — pressure building`,`${c.challengerName} is pushing ${c.starterName}. Staff leans ${c.recommendation==='promote'?'toward a change':c.recommendation==='split'?'toward a larger rotation':'toward holding the order'}.`,'warn')}
+    for(const p of players)if(p.promiseLabel)add(p,'promise',80,`${p.name} — promise watch`,`${p.promiseLabel} is still active. Current role: ${p.role||'Development'}.`,'');
+    const breakouts=players.filter(p=>['FR','SO'].includes(p.year)&&(p.stats?.games||0)>=2).map(p=>({p,score:productionScore(p)})).filter(x=>x.score>=4).sort((a,b)=>b.score-a.score);
+    for(const x of breakouts)add(x.p,'breakout',72,`${x.p.name} — young production`,`${statLine(x.p)}. The early-career production is becoming meaningful.`,'good');
+    const risers=players.filter(p=>['FR','SO'].includes(p.year)&&Number(p.upside||0)>=Number(p.grade||0)+6).sort((a,b)=>(b.upside-b.grade)-(a.upside-a.grade)||b.grade-a.grade);
+    for(const p of risers)add(p,'emerging',58,`${p.name} — development watch`,`${p.year} ${p.pos} · current staff grade ${Math.round(p.grade||0)} · upside estimate ${Math.round(p.upside||0)}.`,'');
+    const cornerstones=[...players].filter(p=>!p.redshirtActive).sort((a,b)=>(b.grade||0)-(a.grade||0));for(const p of cornerstones)add(p,'cornerstone',30,`${p.name} — program cornerstone`,`${p.pos} · ${p.year} · staff grade ${Math.round(p.grade||0)} · ${p.role||'rotation role'}.`,'');
+    return rows.sort((a,b)=>b.priority-a.priority||String(a.name).localeCompare(String(b.name))).slice(0,limit)
+  }
+  return{VERSION,productionScore,statLine,buildPlayerStories}
 });
 
 // Shared HTML escaping helper. Keep this tiny and load it before app.js so
@@ -8760,6 +8896,145 @@ function v2InteractiveSeasonSoakProbe(){
   return{ok:ids.length===12-start.week&&new Set(ids).size===ids.length&&(me.w+me.l)-start.record===ids.length&&delta===ids.length&&universe.phase==='confReady'&&driveCounts.every(n=>n>0)&&decisionCounts.every(n=>n>0),weeks:ids.length,startWeek:start.week,endWeek:universe.week,recordDelta:(me.w+me.l)-start.record,archiveDelta:delta,ids,driveCounts,uniqueDriveCounts,decisionCounts,phase:universe.phase}
 }
 if(globalThis.__DL_TEST__)globalThis.__DL_TEST__.v2InteractiveSeasonSoakProbe=v2InteractiveSeasonSoakProbe;
+
+// v0.10.2 — opponent scouting, weekly preparation and Staff Room bridge.
+const v0102WeeklyApi=globalThis.DynastyWeeklyCoaching;
+const gameProfilesBeforeWeeklyPrep=gameProfiles;
+function v0102WeeklyStaffConfidence(t){
+  const vals=[t?.staff?.OC?.playCall,t?.staff?.DC?.playCall,t?.staff?.HC?.development].filter(Number.isFinite);
+  return clamp(Math.round(vals.length?avg(vals):70),45,94)
+}
+function v0102WeeklyPrepFor(t,opponentName){
+  const p=t?.weeklyPrep;if(!p)return null;
+  return p.year===universe.year&&p.week===universe.week&&p.opponent===opponentName?p:null
+}
+function v0102WeeklyPrepSnapshot(t,opponentName){
+  const p=v0102WeeklyPrepFor(t,opponentName);if(!p)return null;
+  return{version:p.version||1,year:p.year,week:p.week,opponent:p.opponent,focuses:[...(p.focuses||[])],delegated:!!p.delegated,source:p.source||'manual',staffRecommended:[...(p.staffRecommended||[])]}
+}
+function v0102WeeklyBaselineMatchup(t,opp){
+  const P=gameProfilesBeforeWeeklyPrep(t,opp.name),O=gameProfilesBeforeWeeklyPrep(opp,t.name);
+  return{teamProfile:P,opponentProfile:O,teamEdges:matchupEdges(t,opp,P,O),opponentEdges:matchupEdges(opp,t,O,P)}
+}
+function v0102WeeklyOpponentReport(t,opp){
+  if(!v0102WeeklyApi||!t||!opp)return null;
+  const m=v0102WeeklyBaselineMatchup(t,opp),passShare=OFF_SCHEMES[opp.offScheme]?.pass??.5;
+  return v0102WeeklyApi.buildReport({season:universe.year,week:universe.week,teamName:t.name,opponentName:opp.name,passShare,confidence:v0102WeeklyStaffConfidence(t),teamEdges:m.teamEdges,opponentEdges:m.opponentEdges,opponentInjuries:(opp.roster||[]).filter(p=>p.injury||(p.injuryWeeks||0)>0).length})
+}
+function v0102WeeklyStaffRoom(t,opp,report=v0102WeeklyOpponentReport(t,opp)){
+  if(!v0102WeeklyApi||!t||!opp||!report)return null;const oc=t.staff?.OC||{},dc=t.staff?.DC||{};
+  return v0102WeeklyApi.buildStaffRoom({report,offPass:OFF_SCHEMES[t.offScheme]?.pass??.5,defPressure:DEF_SCHEMES[t.defScheme]?.pressure??50,oc,dc,ocSchemeMatch:!oc.preferredScheme||oc.preferredScheme===t.offScheme,dcSchemeMatch:!dc.preferredScheme||dc.preferredScheme===t.defScheme})
+}
+function v0102SetWeeklyPrep(t,opp,focuses,{delegated=false,source='manual'}={}){
+  if(!v0102WeeklyApi||!t||!opp||v2InteractiveGameDay)return false;
+  const normalized=v0102WeeklyApi.normalizeFocuses(focuses),report=v0102WeeklyOpponentReport(t,opp);
+  t.weeklyPrep={version:v0102WeeklyApi.VERSION,year:universe.year,week:universe.week,opponent:opp.name,focuses:normalized,delegated:!!delegated,source,staffRecommended:[...(report?.recommendedFocuses||[])]};
+  setStatus(normalized.length?`Weekly prep set: ${v0102WeeklyApi.focusSummary(normalized).map(x=>x.label).join(' + ')}.`:'Weekly prep cleared; kickoff returns to the standard profile.');
+  render();return true
+}
+function v0102DelegateWeeklyPrep(t,opp){const report=v0102WeeklyOpponentReport(t,opp);return v0102SetWeeklyPrep(t,opp,report?.recommendedFocuses||[],{delegated:true,source:'staff'})}
+function v0102UseStaffRoomPlan(t,opp,key){const room=v0102WeeklyStaffRoom(t,opp),plan=key==='oc'?room?.oc?.plan:key==='dc'?room?.dc?.plan:key==='split'?room?.split?.plan:null;return plan?v0102SetWeeklyPrep(t,opp,plan,{source:key}):false}
+gameProfiles=function gameProfilesWithWeeklyPrep(t,opponentName){
+  const base=gameProfilesBeforeWeeklyPrep(t,opponentName),prep=v0102WeeklyPrepFor(t,opponentName);
+  return prep&&v0102WeeklyApi?v0102WeeklyApi.applyPrepProfile(base,prep.focuses):base
+};
+function v0102WeeklyFocusButton(id,selected,recommended,disabled){
+  const f=v0102WeeklyApi.FOCUSES[id],on=selected.includes(id),rec=recommended.includes(id);
+  return`<button type="button" class="v0102-prep-focus${on?' active':''}" data-v0102-prep-focus="${gameEscape(id)}" ${disabled&&!on?'disabled':''}><strong>${gameEscape(f.label)}${rec?' · Staff pick':''}</strong><small>${gameEscape(f.description)}</small></button>`
+}
+function v0102PlanLabels(plan){return v0102WeeklyApi.focusSummary(plan).map(x=>`<span class="scheme-badge">${gameEscape(x.label)}</span>`).join('')}
+function v0102StaffCard(kind,label,advice,started){return`<div class="v0102-staff-card"><div class="v0102-staff-title"><strong>${gameEscape(label)}</strong><span class="pill ${advice.confidence>=82?'good':advice.confidence<64?'warn':''}">${advice.confidence}% confidence</span></div><div class="small muted">${gameEscape(advice.name)}${advice.schemeMatch?'':' · scheme tension'}</div><div class="v0102-staff-plan">${v0102PlanLabels(advice.plan)}</div><div class="compact">${gameEscape(advice.reason)}</div><button type="button" data-v0102-staff-plan="${kind}" ${started?'disabled':''}>Back ${kind==='oc'?'the OC':'the DC'}</button></div>`}
+function ensureV0102WeeklyCoachingHost(){
+  let host=document.querySelector('#v0102WeeklyCoaching');if(host)return host;const matchup=document.querySelector('#v2MatchupIntelligence');if(!matchup)return null;
+  host=document.createElement('div');host.id='v0102WeeklyCoaching';host.className='card v0102-weekly-coaching';matchup.insertAdjacentElement('afterend',host);return host
+}
+function renderV0102WeeklyCoaching(){
+  const host=ensureV0102WeeklyCoachingHost();if(!host)return;const t=selected(),g=findUserGame();if(!t||!g){host.hidden=true;return}const opp=T(g.home===t.name?g.away:g.home);if(!opp||!v0102WeeklyApi){host.hidden=true;return}host.hidden=false;
+  const report=v0102WeeklyOpponentReport(t,opp),room=v0102WeeklyStaffRoom(t,opp,report),prep=v0102WeeklyPrepFor(t,opp.name),selectedFocuses=[...(prep?.focuses||[])],recommended=report?.recommendedFocuses||[],started=!!v2InteractiveGameDay,full=selectedFocuses.length>=v0102WeeklyApi.MAX_POINTS;
+  const focusRows=Object.keys(v0102WeeklyApi.FOCUSES).map(id=>v0102WeeklyFocusButton(id,selectedFocuses,recommended,started||full)).join('');
+  const split=`<div class="v0102-staff-card v0102-staff-card--split"><div class="v0102-staff-title"><strong>Head coach split</strong><span class="pill">1 + 1</span></div><div class="small muted">One point to each coordinator’s top priority</div><div class="v0102-staff-plan">${v0102PlanLabels(room.split.plan)}</div><div class="compact">${gameEscape(room.split.reason)}</div><button type="button" data-v0102-staff-plan="split" ${started?'disabled':''}>Split the Room</button></div>`;
+  host.innerHTML=`<div class="section-head"><div><div class="eyebrow">V0.10.2 WEEKLY COACHING</div><h3>Opponent scout + preparation</h3><div class="muted">Staff estimate for ${gameEscape(opp.name)} · ${gameEscape(report.confidenceLabel)} confidence (${report.confidence}%)</div></div><span class="pill ${report.confidence>=82?'good':report.confidence<64?'warn':''}">${selectedFocuses.length}/${v0102WeeklyApi.MAX_POINTS} prep points used</span></div><div class="v0102-weekly-grid"><section><div class="v0102-weekly-head"><strong>Opponent scout</strong><span>Estimated ${report.passEstimate}% pass</span></div>${report.observations.map(x=>`<div class="v0102-scout-note">${gameEscape(x)}</div>`).join('')}<div class="small muted">This is a deterministic staff estimate with uncertainty. It does not reveal hidden exact ratings.</div></section><section><div class="v0102-weekly-head"><strong>Preparation board</strong><span>Choose up to ${v0102WeeklyApi.MAX_POINTS}</span></div><div class="v0102-prep-focuses">${focusRows}</div><div class="button-row v0102-prep-actions"><button type="button" data-v0102-prep-delegate ${started?'disabled':''}>Delegate to Staff</button><button type="button" data-v0102-prep-clear ${started||!selectedFocuses.length?'disabled':''}>Clear Prep</button></div>${started?'<div class="small warn">Game Day has started. Reset the staged game before changing preparation.</div>':prep?.delegated?'<div class="small muted">Staff selected the active emphases.</div>':prep?.source&&prep.source!=='manual'?`<div class="small muted">Active plan source: ${gameEscape(prep.source==='split'?'Head coach split':prep.source.toUpperCase())}.</div>`:'<div class="small muted">Prep is editable until Game Day begins. Unused points leave the v0.10.1 kickoff profile unchanged.</div>'}</section><section class="v0102-staff-room"><div class="v0102-weekly-head"><strong>Staff Room</strong><span>Same 2-point budget · competing priorities</span></div><div class="v0102-staff-grid">${v0102StaffCard('oc','Offensive coordinator',room.oc,started)}${v0102StaffCard('dc','Defensive coordinator',room.dc,started)}${split}</div></section></div>`;
+  host.querySelectorAll('[data-v0102-prep-focus]').forEach(button=>button.addEventListener('click',()=>{const id=button.dataset.v0102PrepFocus,current=[...selectedFocuses],i=current.indexOf(id);if(i>=0)current.splice(i,1);else if(current.length<v0102WeeklyApi.MAX_POINTS)current.push(id);v0102SetWeeklyPrep(t,opp,current,{source:'manual'})}));
+  host.querySelector('[data-v0102-prep-delegate]')?.addEventListener('click',()=>v0102DelegateWeeklyPrep(t,opp));
+  host.querySelector('[data-v0102-prep-clear]')?.addEventListener('click',()=>v0102SetWeeklyPrep(t,opp,[],{source:'manual'}));
+  host.querySelectorAll('[data-v0102-staff-plan]').forEach(button=>button.addEventListener('click',()=>v0102UseStaffRoomPlan(t,opp,button.dataset.v0102StaffPlan)))
+}
+const renderGameLabBeforeWeeklyCoachingV0102=TAB_RENDERERS.gamelab;TAB_RENDERERS.gamelab=()=>{renderGameLabBeforeWeeklyCoachingV0102();renderV0102WeeklyCoaching()};
+const renderV2InteractiveGameDayBeforeWeeklyLockV0102=renderV2InteractiveGameDay;
+renderV2InteractiveGameDay=function renderV2InteractiveGameDayWithWeeklyLock(){const out=renderV2InteractiveGameDayBeforeWeeklyLockV0102();renderV0102WeeklyCoaching();return out};
+if(globalThis.DynastyGameEngineV2LabBridge?.interactive)globalThis.DynastyGameEngineV2LabBridge.interactive.render=renderV2InteractiveGameDay;
+const recordInteractiveBeforeWeeklyPrepV0102=recordInteractiveV2GameDay;
+recordInteractiveV2GameDay=function recordInteractiveV2GameDayWithWeeklyPrep(session,options={}){
+  const g=findUserGame(),home=g?T(g.home):null,away=g?T(g.away):null,weeklyPrep={home:home&&away?v0102WeeklyPrepSnapshot(home,away.name):null,away:home&&away?v0102WeeklyPrepSnapshot(away,home.name):null};
+  const out=recordInteractiveBeforeWeeklyPrepV0102(session,options);if(out?.record){out.record.weeklyPrepVersion=v0102WeeklyApi?.VERSION||1;out.record.weeklyPrep=weeklyPrep}return out
+};
+if(globalThis.DynastyGameEngineV2LabBridge)globalThis.DynastyGameEngineV2LabBridge.recordInteractive=recordInteractiveV2GameDay;
+if(globalThis.__DL_TEST__){
+  globalThis.__DL_TEST__.weeklyCoachingDebug=()=>{const t=selected(),g=findUserGame(),opp=t&&g?T(g.home===t.name?g.away:g.home):null;if(!t||!opp)return null;const report=v0102WeeklyOpponentReport(t,opp),prep=v0102WeeklyPrepSnapshot(t,opp.name),base=gameProfilesBeforeWeeklyPrep(t,opp.name),active=gameProfiles(t,opp.name),staffRoom=v0102WeeklyStaffRoom(t,opp,report);return{opponent:opp.name,report,staffRoom,prep,profile:{base,active}}};
+  globalThis.__DL_TEST__.weeklyCoachingSet=(focuses=[])=>{const t=selected(),g=findUserGame(),opp=t&&g?T(g.home===t.name?g.away:g.home):null;return!!(t&&opp&&v0102SetWeeklyPrep(t,opp,focuses,{source:'manual'}))};
+  globalThis.__DL_TEST__.weeklyCoachingDelegate=()=>{const t=selected(),g=findUserGame(),opp=t&&g?T(g.home===t.name?g.away:g.home):null;return!!(t&&opp&&v0102DelegateWeeklyPrep(t,opp))};
+  globalThis.__DL_TEST__.weeklyCoachingUseStaffPlan=(key='split')=>{const t=selected(),g=findUserGame(),opp=t&&g?T(g.home===t.name?g.away:g.home):null;return!!(t&&opp&&v0102UseStaffRoomPlan(t,opp,key))};
+  globalThis.__DL_TEST__.weeklyCoachingLastArchive=()=>{const r=(universe.gameArchive||[]).at(-1);return r?{id:r.id,weeklyPrepVersion:r.weeklyPrepVersion||null,weeklyPrep:v2RecordClone(r.weeklyPrep||null)}:null};
+}
+
+// v0.10.2 Slice 2 — selective starter-pressure / rotation decisions.
+function v0102PersonnelGroups(t){
+  ensureDepth(t);const positions=['QB','RB','WR','TE','EDGE','DT','LB','CB','S'],rows=[];
+  for(const pos of positions){const ids=t.depthChart?.[pos]||[],starter=t.roster.find(p=>p.id===ids[0]),challenger=t.roster.find(p=>p.id===ids[1]);if(!starter||!challenger||starter.redshirtActive||challenger.redshirtActive||(starter.injuryWeeks||0)>0||(challenger.injuryWeeks||0)>0)continue;
+    rows.push({pos,starter:{id:starter.id,name:starter.name,grade:starter.perceived??starter.trueNow??60,upside:starter.perceivedUpside??starter.upside??60,year:starter.year,stats:starter.stats||{}},challenger:{id:challenger.id,name:challenger.name,grade:challenger.perceived??challenger.trueNow??60,upside:challenger.perceivedUpside??challenger.upside??60,year:challenger.year,stats:challenger.stats||{}}})
+  }return rows
+}
+function v0102StarterChallenge(t){return globalThis.DynastyWeeklyCoaching?.selectStarterChallenge(v0102PersonnelGroups(t))||null}
+function v0102BumpRolePackage(t,p){
+  ensureRoleDepth(t);for(const role of ROLE_DEFS){if(!role.eligible.includes(p.pos))continue;const arr=t.roleDepth?.[role.id]||[],i=arr.indexOf(p.id);if(i>0)[arr[i-1],arr[i]]=[arr[i],arr[i-1]]}
+}
+function v0102StarterChallengeDecision(t,challenge){
+  const rec=challenge.recommendation,key=`${challenge.starterId}_${challenge.challengerId}`;
+  return decisionRecord('STARTER_CHALLENGE',t,challenge.challengerId,`${challenge.pos} room — starter pressure`,`${challenge.reason} Staff recommends ${rec==='promote'?'a change at the top':rec==='split'?'a larger rotation':'holding the current order'}.`,[
+    decisionOption('stay',`Keep ${challenge.starterName} on top`,'Keep the current depth order and make the challenger earn another week.',rec==='stay'),
+    decisionOption('split','Expand the rotation',`Give ${challenge.challengerName} a larger package without fully changing the starter.`,rec==='split'),
+    decisionOption('promote',`Promote ${challenge.challengerName}`,`Move ${challenge.challengerName} ahead of ${challenge.starterName} in the current depth order.`,rec==='promote')],{playerId:challenge.challengerId,starterId:challenge.starterId,pos:challenge.pos,recommendedOption:rec,challengeKey:key},84)
+}
+const ensureWeeklyDecisionsBeforePersonnelV0102=ensureWeeklyDecisions;
+ensureWeeklyDecisions=function ensureWeeklyDecisionsWithPersonnel(t=selected()){
+  const current=ensureWeeklyDecisionsBeforePersonnelV0102(t);if(!t||universe.phase!=='regular'||universe.week>=12||v2InteractiveGameDay||current.length>=3||current.some(d=>d.type==='STARTER_CHALLENGE'))return current;
+  const challenge=v0102StarterChallenge(t);if(!challenge)return current;const key=`${challenge.starterId}_${challenge.challengerId}`;
+  if(decisionRecent('STARTER_CHALLENGE',key,2)||current.some(d=>[challenge.starterId,challenge.challengerId].includes(d.playerId)))return current;
+  const d=v0102StarterChallengeDecision(t,challenge);universe.weeklyDecisions.push(d);return[...current,d]
+};
+const resolveWeeklyDecisionBeforePersonnelV0102=resolveWeeklyDecision;
+resolveWeeklyDecision=function resolveWeeklyDecisionWithPersonnel(id,optionId){
+  const d=(universe.weeklyDecisions||[]).find(x=>x.id===id);if(d?.type!=='STARTER_CHALLENGE')return resolveWeeklyDecisionBeforePersonnelV0102(id,optionId);
+  const t=universe.teams.find(x=>x.id===d.teamId),option=d.options?.find(x=>x.id===optionId),challenger=t?.roster.find(x=>x.id===d.playerId),starter=t?.roster.find(x=>x.id===d.starterId);if(!t||!option||!challenger||!starter||d.resolved)return false;
+  if(option.id==='stay'){starter.staffTrust=clamp((starter.staffTrust??70)+1,0,100);challenger.morale=clamp((challenger.morale??70)-1,15,99)}
+  else if(option.id==='split'){challenger.role='Rotation';challenger.morale=clamp((challenger.morale??70)+3,15,99);challenger.staffTrust=clamp((challenger.staffTrust??70)+2,0,100);v0102BumpRolePackage(t,challenger)}
+  else if(option.id==='promote'){starter.role='Rotation';challenger.role='Starter';promoteRotationPlayer(t,challenger);challenger.morale=clamp((challenger.morale??70)+5,15,99);challenger.staffTrust=clamp((challenger.staffTrust??70)+3,0,100);starter.morale=clamp((starter.morale??70)-3,15,99)}
+  d.resolved=true;d.resolvedOptionId=option.id;d.resolvedSeason=universe.year;d.resolvedWeek=universe.week;addWeeklyDecisionEvent(d,option,t);setStatus(`Personnel decision recorded: ${option.label}.`);render();return true
+};
+if(globalThis.__DL_TEST__){
+  globalThis.__DL_TEST__.weeklyPersonnelDebug=()=>{const t=selected(),c=t?v0102StarterChallenge(t):null;return{candidate:c,decision:(universe.weeklyDecisions||[]).find(d=>d.season===universe.year&&d.week===universe.week&&d.teamId===t?.id&&d.type==='STARTER_CHALLENGE')||null}};
+  globalThis.__DL_TEST__.weeklyPersonnelForceFixture=()=>{const t=selected();if(!t)return null;ensureDepth(t);const ids=t.depthChart?.QB||[],starter=t.roster.find(p=>p.id===ids[0]),challenger=t.roster.find(p=>p.id===ids[1]);if(!starter||!challenger)return null;starter.redshirtActive=false;challenger.redshirtActive=false;starter.injuryWeeks=0;challenger.injuryWeeks=0;starter.stats={...(starter.stats||{}),passAtt:100,passComp:48,int:7};challenger.perceived=clamp((starter.perceived??starter.trueNow??70)+3,30,99);challenger.perceivedUpside=clamp(Math.max(challenger.perceived+4,(starter.perceivedUpside??starter.upside??75)+5),challenger.perceived,99);universe.weeklyDecisions=(universe.weeklyDecisions||[]).filter(d=>!(d.season===universe.year&&d.week===universe.week&&d.teamId===t.id));const challenge=v0102StarterChallenge(t);if(!challenge)return null;const decision=v0102StarterChallengeDecision(t,challenge);universe.weeklyDecisions.push(decision);render();return{id:decision.id,starterId:decision.starterId,challengerId:decision.playerId,pos:decision.pos,recommendedOption:decision.recommendedOption}};
+  globalThis.__DL_TEST__.weeklyPersonnelDepth=(pos='QB')=>{const t=selected();ensureDepth(t);return[...(t?.depthChart?.[pos]||[])]};
+}
+
+// v0.10.2 Slice 4 — factual Player Story Cards on the weekly dashboard.
+const v0102StoryApi=globalThis.DynastyPlayerStories;
+function v0102StoryPlayerInput(t,p){
+  const promise=(p.promises||[]).find(q=>q.status==='ACTIVE');return{id:p.id,name:p.name,pos:p.pos,year:p.year,grade:p.perceived??p.trueNow??60,upside:p.perceivedUpside??p.upside??60,role:p.role||'Development',morale:p.morale??70,transferRisk:transferRisk(p),health:p.health??100,injuryWeeks:p.injuryWeeks||0,redshirtActive:!!p.redshirtActive,promiseLabel:promise?.type?String(promise.type).replaceAll('_',' '):(p.promise&&p.promise!=='None'?p.promise:null),stats:{...(p.stats||{})}}
+}
+function v0102PlayerStories(t=selected()){
+  if(!t||!v0102StoryApi)return[];const players=(t.roster||[]).map(p=>v0102StoryPlayerInput(t,p)),challenge=v0102StarterChallenge(t);return v0102StoryApi.buildPlayerStories(players,{challenge,limit:5})
+}
+function ensureV0102PlayerStoriesHost(){let host=document.querySelector('#v0102PlayerStories');if(host)return host;const command=document.querySelector('#dashboard .command-center');if(!command)return null;host=document.createElement('div');host.id='v0102PlayerStories';host.className='card v0102-player-stories';command.insertAdjacentElement('afterend',host);return host}
+function renderV0102PlayerStories(){
+  const host=ensureV0102PlayerStoriesHost();if(!host)return;const t=selected(),stories=v0102PlayerStories(t);if(!t||!stories.length){host.hidden=true;return}host.hidden=false;
+  host.innerHTML=`<div class="section-head"><div><div class="eyebrow">PLAYERS TO WATCH</div><h3>This week’s player stories</h3><div class="muted">Selected from real roster status, promises, role pressure and accumulated production.</div></div><span class="pill">${stories.length} active</span></div><div class="v0102-story-grid">${stories.map(s=>`<article class="v0102-story-card ${s.tone?`v0102-story-${gameEscape(s.tone)}`:''}" data-v0102-story="${gameEscape(s.type)}"><div class="v0102-story-kicker">${gameEscape(String(s.type).replaceAll('_',' '))}</div><button class="player-button v0102-story-name" data-player="${gameEscape(s.playerId)}">${gameEscape(s.name)}</button><div class="small muted">${gameEscape(s.pos)}</div><div class="compact">${gameEscape(s.summary)}</div></article>`).join('')}</div>`;attachPlayerLinks()
+}
+const renderDashboardBeforePlayerStoriesV0102=TAB_RENDERERS.dashboard;TAB_RENDERERS.dashboard=()=>{renderDashboardBeforePlayerStoriesV0102();renderV0102PlayerStories()};
+if(globalThis.__DL_TEST__){
+  globalThis.__DL_TEST__.weeklyPlayerStoriesDebug=()=>v0102PlayerStories().map(x=>({...x}));
+  globalThis.__DL_TEST__.weeklyPlayerStoriesForceFixture=()=>{const t=selected();if(!t||!t.roster?.length)return null;const p=t.roster[0];p.injuryWeeks=2;p.health=63;p.morale=42;renderV0102PlayerStories();return{id:p.id,name:p.name}}
+}
 
 loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});[...new Set(schools.map(t=>t.conference))].forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();applyTitlePreferences();showTitleScreen();refreshTitleSave();}).catch(e=>{$('#titleStatus').textContent='Could not initialize Dynasty Lab. '+e.message});
 })();
