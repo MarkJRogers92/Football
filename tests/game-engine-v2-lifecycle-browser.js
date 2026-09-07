@@ -10,7 +10,7 @@ async function startNewDynasty(page){
   await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000});
 }
 async function openGamePlayByPlay(page,id,label){
-  const link=page.locator(`[data-game="${id}"]`).first();
+  const link=page.locator(`[data-game="${id}"]:visible`).first();
   assert.ok(await link.count()>0,`${label} should remain reachable from game history/schedule`);
   await link.click();await page.waitForSelector('#gameDialog[open]',{timeout:10000});
   await page.locator('#gameTabs button').filter({hasText:/^Play-by-Play$/}).click();
