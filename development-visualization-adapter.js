@@ -31,10 +31,11 @@ function makeDevelopmentVisualizationModel(){
 if(typeof module==='object'&&module.exports){module.exports={makeDevelopmentVisualizationModel};}
 else{
  const developmentVisualizationModel=makeDevelopmentVisualizationModel();
+ function developmentVisualizationReady(){return !!universe&&Array.isArray(universe.teams)}
  function developmentVisualizationPlayer(p){const tendency=(typeof developmentTendencySystem==='object'&&developmentTendencySystem?.clue)?developmentTendencySystem.clue(p):null;return developmentVisualizationModel.player(p,tendency)}
  globalThis.DynastyLabDevelopmentView={
-  snapshot:()=>{const t=selected?.();if(!t)return null;const players=(t.roster||[]).map(p=>{const x=developmentVisualizationPlayer(p);return{id:x.id,name:x.name,pos:x.pos,currentRead:x.currentRead,confidence:x.confidence,historyCount:x.history.length,totalDelta:x.totalDelta,tendency:x.tendency}});return{team:{id:t.id,name:t.name,development:t.development},year:universe?.year,phase:universe?.phase,summary:developmentVisualizationModel.team(t.roster||[]),players};},
-  player:id=>{const t=selected?.(),p=t?.roster?.find(x=>String(x.id)===String(id));return developmentVisualizationPlayer(p)},
+  snapshot:()=>{if(!developmentVisualizationReady())return null;const t=selected?.();if(!t)return null;const players=(t.roster||[]).map(p=>{const x=developmentVisualizationPlayer(p);return{id:x.id,name:x.name,pos:x.pos,currentRead:x.currentRead,confidence:x.confidence,historyCount:x.history.length,totalDelta:x.totalDelta,tendency:x.tendency}});return{team:{id:t.id,name:t.name,development:t.development},year:universe.year,phase:universe.phase,summary:developmentVisualizationModel.team(t.roster||[]),players};},
+  player:id=>{if(!developmentVisualizationReady())return null;const t=selected?.(),p=t?.roster?.find(x=>String(x.id)===String(id));return developmentVisualizationPlayer(p)},
   note:'Read-only observed development presentation. Hidden development curves, true talent and private growth state are not exposed.'
  };
 }
