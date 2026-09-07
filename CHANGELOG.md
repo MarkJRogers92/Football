@@ -1,3 +1,9 @@
+## v0.11.4 — Weekly advance and save-safety hotfix
+
+- Restores the Command Center's regular-season Next Action button so it advances the scheduled week instead of reopening the current tab.
+- Rejects unsafe markup in edited program names and imported save text before it can reach HTML-rendered game surfaces.
+- Adds a committed dependency lockfile so clean validation and release installs are reproducible with `npm ci`.
+
 ## v0.9.55 — Staff, Recruiting Battles and Development Plans
 
 - Gives coaching staffs durable scouting identities with deterministic evaluation specialties tied to coach identity.
