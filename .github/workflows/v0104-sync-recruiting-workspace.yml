@@ -1,0 +1,70 @@
+name: V0.10.4 Recruiting Workspace Sync
+
+on:
+  push:
+    branches:
+      - codex/v0104-recruiting-workspace-integrated
+    paths:
+      - .github/workflows/v0104-sync-recruiting-workspace.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v0104-recruiting-workspace-sync
+  cancel-in-progress: false
+
+jobs:
+  sync-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v0104-recruiting-workspace-integrated
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Parse workspace sources
+        run: node --check recruiting-workspace.js
+      - name: Build standalone artifact
+        run: npm run build
+      - name: Targeted recruiting and scouting regression
+        run: node --test tests/scouting.js tests/scouting-actions.js tests/scouting-trail.js tests/recruiting-filters.js tests/scouting-receipts.js tests/recruiting-history.js tests/recruit-compare.js tests/recruiting-shortlist.js tests/staff-scouting-v0955.js tests/recruiting-battles-v0955.js
+      - name: Verify release source
+        run: npm run verify:release
+      - name: Locate Chromium
+        id: chromium
+        shell: bash
+        run: |
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$browser" ]; then
+            npx playwright-core install chromium
+            browser="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$browser"
+          echo "path=$browser" >> "$GITHUB_OUTPUT"
+      - name: Recruiting browser regressions
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: |
+          node tests/recruit-visual.js
+          node tests/scouting-trail-browser.js
+          node tests/recruiting-filters-browser.js
+      - name: Commit generated artifact and retire helper
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git rm .github/workflows/v0104-sync-recruiting-workspace.yml
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit"
+            exit 0
+          fi
+          git commit -m "build: sync v0.10.4 recruiting workspace artifact"
+          git push origin HEAD:codex/v0104-recruiting-workspace-integrated
