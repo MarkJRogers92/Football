@@ -9,16 +9,19 @@ function v0102StarterChallenge(t){return globalThis.DynastyWeeklyCoaching?.selec
 function v0102BumpRolePackage(t,p){
   ensureRoleDepth(t);for(const role of ROLE_DEFS){if(!role.eligible.includes(p.pos))continue;const arr=t.roleDepth?.[role.id]||[],i=arr.indexOf(p.id);if(i>0)[arr[i-1],arr[i]]=[arr[i],arr[i-1]]}
 }
+function v0102StarterChallengeDecision(t,challenge){
+  const rec=challenge.recommendation,key=`${challenge.starterId}_${challenge.challengerId}`;
+  return decisionRecord('STARTER_CHALLENGE',t,challenge.challengerId,`${challenge.pos} room — starter pressure`,`${challenge.reason} Staff recommends ${rec==='promote'?'a change at the top':rec==='split'?'a larger rotation':'holding the current order'}.`,[
+    decisionOption('stay',`Keep ${challenge.starterName} on top`,'Keep the current depth order and make the challenger earn another week.',rec==='stay'),
+    decisionOption('split','Expand the rotation',`Give ${challenge.challengerName} a larger package without fully changing the starter.`,rec==='split'),
+    decisionOption('promote',`Promote ${challenge.challengerName}`,`Move ${challenge.challengerName} ahead of ${challenge.starterName} in the current depth order.`,rec==='promote')],{playerId:challenge.challengerId,starterId:challenge.starterId,pos:challenge.pos,recommendedOption:rec,challengeKey:key},84)
+}
 const ensureWeeklyDecisionsBeforePersonnelV0102=ensureWeeklyDecisions;
 ensureWeeklyDecisions=function ensureWeeklyDecisionsWithPersonnel(t=selected()){
   const current=ensureWeeklyDecisionsBeforePersonnelV0102(t);if(!t||universe.phase!=='regular'||universe.week>=12||current.length>=3||current.some(d=>d.type==='STARTER_CHALLENGE'))return current;
   const challenge=v0102StarterChallenge(t);if(!challenge)return current;const key=`${challenge.starterId}_${challenge.challengerId}`;
   if(decisionRecent('STARTER_CHALLENGE',key,2)||current.some(d=>[challenge.starterId,challenge.challengerId].includes(d.playerId)))return current;
-  const rec=challenge.recommendation,d=decisionRecord('STARTER_CHALLENGE',t,challenge.challengerId,`${challenge.pos} room — starter pressure`,`${challenge.reason} Staff recommends ${rec==='promote'?'a change at the top':rec==='split'?'a larger rotation':'holding the current order'}.`,[
-    decisionOption('stay',`Keep ${challenge.starterName} on top`,'Keep the current depth order and make the challenger earn another week.',rec==='stay'),
-    decisionOption('split','Expand the rotation',`Give ${challenge.challengerName} a larger package without fully changing the starter.`,rec==='split'),
-    decisionOption('promote',`Promote ${challenge.challengerName}`,`Move ${challenge.challengerName} ahead of ${challenge.starterName} in the current depth order.`,rec==='promote')],{playerId:challenge.challengerId,starterId:challenge.starterId,pos:challenge.pos,recommendedOption:rec,challengeKey:key},84);
-  universe.weeklyDecisions.push(d);return[...current,d]
+  const d=v0102StarterChallengeDecision(t,challenge);universe.weeklyDecisions.push(d);return[...current,d]
 };
 const resolveWeeklyDecisionBeforePersonnelV0102=resolveWeeklyDecision;
 resolveWeeklyDecision=function resolveWeeklyDecisionWithPersonnel(id,optionId){
@@ -31,6 +34,6 @@ resolveWeeklyDecision=function resolveWeeklyDecisionWithPersonnel(id,optionId){
 };
 if(globalThis.__DL_TEST__){
   globalThis.__DL_TEST__.weeklyPersonnelDebug=()=>{const t=selected(),c=t?v0102StarterChallenge(t):null;return{candidate:c,decision:(universe.weeklyDecisions||[]).find(d=>d.season===universe.year&&d.week===universe.week&&d.teamId===t?.id&&d.type==='STARTER_CHALLENGE')||null}};
-  globalThis.__DL_TEST__.weeklyPersonnelForceFixture=()=>{const t=selected();if(!t)return null;ensureDepth(t);const ids=t.depthChart?.QB||[],starter=t.roster.find(p=>p.id===ids[0]),challenger=t.roster.find(p=>p.id===ids[1]);if(!starter||!challenger)return null;starter.redshirtActive=false;challenger.redshirtActive=false;starter.injuryWeeks=0;challenger.injuryWeeks=0;starter.stats={...(starter.stats||{}),passAtt:100,passComp:48,int:7};challenger.perceived=clamp((starter.perceived??starter.trueNow??70)+3,30,99);challenger.perceivedUpside=clamp(Math.max(challenger.perceived+4,(starter.perceivedUpside??starter.upside??75)+5),challenger.perceived,99);universe.weeklyDecisions=(universe.weeklyDecisions||[]).filter(d=>!(d.season===universe.year&&d.week===universe.week&&d.teamId===t.id));const rows=ensureWeeklyDecisions(t),decision=rows.find(d=>d.type==='STARTER_CHALLENGE');return decision?{id:decision.id,starterId:decision.starterId,challengerId:decision.playerId,pos:decision.pos,recommendedOption:decision.recommendedOption}:null};
+  globalThis.__DL_TEST__.weeklyPersonnelForceFixture=()=>{const t=selected();if(!t)return null;ensureDepth(t);const ids=t.depthChart?.QB||[],starter=t.roster.find(p=>p.id===ids[0]),challenger=t.roster.find(p=>p.id===ids[1]);if(!starter||!challenger)return null;starter.redshirtActive=false;challenger.redshirtActive=false;starter.injuryWeeks=0;challenger.injuryWeeks=0;starter.stats={...(starter.stats||{}),passAtt:100,passComp:48,int:7};challenger.perceived=clamp((starter.perceived??starter.trueNow??70)+3,30,99);challenger.perceivedUpside=clamp(Math.max(challenger.perceived+4,(starter.perceivedUpside??starter.upside??75)+5),challenger.perceived,99);universe.weeklyDecisions=(universe.weeklyDecisions||[]).filter(d=>!(d.season===universe.year&&d.week===universe.week&&d.teamId===t.id));const challenge=v0102StarterChallenge(t);if(!challenge)return null;const decision=v0102StarterChallengeDecision(t,challenge);universe.weeklyDecisions.push(decision);render();return{id:decision.id,starterId:decision.starterId,challengerId:decision.playerId,pos:decision.pos,recommendedOption:decision.recommendedOption}};
   globalThis.__DL_TEST__.weeklyPersonnelDepth=(pos='QB')=>{const t=selected();ensureDepth(t);return[...(t?.depthChart?.[pos]||[])]};
 }
