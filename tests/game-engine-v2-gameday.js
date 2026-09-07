@@ -46,3 +46,26 @@ test('different Game Day fourth-down choices branch the calibrated future',()=>{
   const goReceipt=go.state.events.find(e=>e.type==='coaching_decision'&&e.selectedOption==='go');const puntReceipt=punt.state.events.find(e=>e.type==='coaching_decision'&&e.selectedOption==='punt');
   assert.ok(goReceipt);assert.ok(puntReceipt);
 });
+
+test('controlled Game Day never asks the user to make the opponent fourth-down decision',()=>{
+  const session=gameday.createSession({...options,gameId:'GD-OWNERSHIP',seed:'gameday-ownership',controlledTeamId:home.id});engine.startGame(session.state);
+  Object.assign(session.state,{period:2,clock:500,possession:'away',fieldPosition:42,down:4,distance:6});
+  const auto=gameday.advanceOne(session);assert.notEqual(auto.status,'decision');
+  assert.equal(session.state.events.filter(e=>e.type==='coaching_decision'&&e.team==='away').length,0);
+  Object.assign(session.state,{period:2,clock:430,possession:'home',fieldPosition:45,down:4,distance:2});
+  const mine=gameday.advanceOne(session);assert.equal(mine.status,'decision');assert.equal(mine.decision.type,'fourth_down');assert.equal(mine.decision.team,'home');
+});
+
+test('late-game tempo is a serializable user decision and changes clock behavior without extra RNG',()=>{
+  const base=gameday.createSession({...options,gameId:'GD-TEMPO',seed:'gameday-tempo',controlledTeamId:home.id});engine.startGame(base.state);
+  Object.assign(base.state,{period:4,clock:240,possession:'home',fieldPosition:35,down:1,distance:10,score:{home:20,away:24}});
+  const pending=gameday.advanceOne(base);assert.equal(pending.status,'decision');assert.equal(pending.decision.type,'late_game_tempo');assert.equal(pending.decision.staffRecommendation,'normal');
+  assert.deepEqual(pending.decision.options.map(o=>o.id),['hurry','normal','drain','delegate']);
+  const saved=JSON.parse(JSON.stringify(gameday.snapshot(base))),hurry=gameday.restore(saved),drain=gameday.restore(saved);
+  gameday.resolve(hurry,'hurry');gameday.resolve(drain,'drain');assert.equal(hurry.tempo.home,'hurry');assert.equal(drain.tempo.home,'drain');
+  const rngBefore=JSON.parse(JSON.stringify(hurry.state.rng));assert.deepEqual(drain.state.rng,rngBefore);
+  gameday.advanceOne(hurry);gameday.advanceOne(drain);
+  assert.ok(hurry.state.clock>drain.state.clock,'hurry-up should consume less clock than drain-clock on the same deterministic snap');
+  assert.deepEqual(hurry.state.rng,drain.state.rng,'tempo changes clock management without drawing extra random numbers');
+  assert.ok(hurry.state.events.some(e=>e.type==='coaching_decision'&&e.decisionType==='late_game_tempo'&&e.resolvedAction==='hurry'));
+});
