@@ -54,6 +54,17 @@ function hooks(session){return{
   executeAction:(action,state)=>executeAction(session,action,state),
   step:state=>stepSession(session,state)
 }}
+function advanceOne(session){
+  validateSession(session);const state=session.state;
+  if(state.status==='pregame')engine.startGame(state);
+  if(state.status==='final'){session.status='final';session.summary=adapter.eventSummary(state);return{status:'final',decision:null,session}}
+  const before=decisions.ensureDecision(state,hooks(session));
+  if(before){session.status='decision';return{status:'decision',decision:clone(before),session}}
+  stepSession(session,state);
+  if(state.status==='final'){session.status='final';session.summary=adapter.eventSummary(state);return{status:'final',decision:null,session}}
+  const after=decisions.ensureDecision(state,hooks(session));
+  session.status=after?'decision':'live';return{status:session.status,decision:after?clone(after):null,session}
+}
 function advance(session,maxSteps=500){
   validateSession(session);
   const out=decisions.advanceUntilDecision(session.state,maxSteps,hooks(session));
@@ -82,5 +93,5 @@ function snapshot(session){validateSession(session);return clone(session)}
 function restore(value){const session=clone(value);validateSession(session);session.status=session.state.status==='final'?'final':(decisions.pendingDecision(session.state)?'decision':session.state.status);return session}
 function pendingDecision(session){validateSession(session);return decisions.pendingDecision(session.state)}
 
-return{VERSION,POLICY_ID,createSession,advance,resolve,simulate,snapshot,restore,pendingDecision,validateSession};
+return{VERSION,POLICY_ID,createSession,advanceOne,advance,resolve,simulate,snapshot,restore,pendingDecision,validateSession};
 });
