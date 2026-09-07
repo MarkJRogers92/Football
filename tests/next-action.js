@@ -10,6 +10,13 @@ test('first unfinished plan item wins',()=>{
  assert.deepEqual(api.model({items:[{done:true,label:'Review'},{done:false,label:'Run spring development',tab:'development',index:1},{done:false,label:'Fall camp',tab:'development',index:2}]}),{kind:'plan',label:'Run spring development',tab:'development',index:1});
 });
 
+test('postseason calendar gates map to their canonical controls',()=>{
+ assert.equal(api.actionSelector('Play the conference championships'),'#simConf');
+ assert.equal(api.actionSelector('Play the bowl games'),'#simBowls');
+ assert.equal(api.actionSelector('Play the playoff'),'#simPlayoff');
+ assert.equal(api.actionSelector('Build a recruiting board'),null);
+});
+
 test('clear state never invents work',()=>{
  assert.deepEqual(api.model({items:[{done:true,label:'Review'}]}),{kind:'clear',label:'All caught up'});
 });
