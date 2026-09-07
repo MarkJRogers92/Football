@@ -51,5 +51,9 @@ function recordInteractiveV2GameDay(session,options={}){
 function v2GameDayCommitDebug(){
   const me=selected(),g=findUserGame();return{year:universe.year,week:universe.week,phase:universe.phase,userRecord:me?me.w+me.l:0,archiveLength:(universe.gameArchive||[]).length,game:g?{week:g.week,played:!!g.played,gameId:g.gameId||null}:null,last:universe.lastDetailedGame?{gameId:universe.lastDetailedGame.gameId,engine:universe.lastDetailedGame.engine,gameDayVersion:universe.lastDetailedGame.gameDayVersion}:null}
 }
+function v2GameDayLastArchiveDebug(){
+  const record=(universe.gameArchive||[]).at(-1);if(!record)return null;const playByPlay=(record.drives||[]).flatMap(d=>d.playByPlay||[]);
+  return{id:record.id,engine:record.engine,transactionVersion:record.transactionVersion,gameDayVersion:record.gameDayVersion,coachingDecisionVersion:record.coachingDecisionVersion,coachingDecisions:v2RecordClone(record.coachingDecisions||[]),drives:record.drives?.length||0,playerLines:(record.playerStats?.home?.length||0)+(record.playerStats?.away?.length||0),playByPlayLines:playByPlay.length,playByPlayHasCoachDecision:playByPlay.some(line=>/coach|decision/i.test(String(line)))}
+}
 globalThis.DynastyGameEngineV2LabBridge.recordInteractive=recordInteractiveV2GameDay;
-if(globalThis.__DL_TEST__)globalThis.__DL_TEST__.v2GameDayCommitDebug=v2GameDayCommitDebug;
+if(globalThis.__DL_TEST__){globalThis.__DL_TEST__.v2GameDayCommitDebug=v2GameDayCommitDebug;globalThis.__DL_TEST__.v2GameDayLastArchiveDebug=v2GameDayLastArchiveDebug}
