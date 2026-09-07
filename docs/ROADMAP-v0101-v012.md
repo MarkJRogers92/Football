@@ -1,171 +1,219 @@
 # Dynasty Lab — Post-v0.10 Gameplay Roadmap
 
 Status: **ACTIVE**  
-Production baseline: **v0.10.0**  
-Source baseline: `859cd99844f6f6304d833fc385dadd2c43239587`  
-Active implementation branch: `codex/v0101-gameday-coaching`
+Production baseline: **v0.10.1**  
+Source baseline: `34e966be92b6da7520fbb921d196880878586c55`  
+Active implementation branch: `codex/v0102-weekly-coaching-loop`
 
 ## Product direction
 
-Dynasty Lab has enough simulation depth. The next releases should convert that depth into a game the player can actively coach, understand, and remember.
+Dynasty Lab now has a real user-facing Game Day. The next releases should make the rest of the week feel like coaching a program rather than operating separate systems.
 
 The core loop is:
 
-**Scout → Recruit → Prepare → Coach → Watch consequences → Develop → Build history**
+**Review opponent → Handle Coach’s Desk → Scout / recruit → Prepare → Coach → Review consequences → Develop → Build history**
 
-The roadmap prioritizes player agency, visible cause/effect, delegation, and a living fictional college-football world. It deliberately does **not** turn Dynasty Lab into an every-play Madden-style play-calling game.
+The roadmap prioritizes player agency, visible cause/effect, delegation, memorable players, and a living fictional college-football world. It deliberately does **not** turn Dynasty Lab into an every-play Madden-style play-calling game.
 
 ## Design rules
 
 1. **Head-coach decisions, not every-play micromanagement.** Prompt only when a choice is consequential.
 2. **Delegate everything optional.** The player can be deeply involved without being forced through dozens of menus.
-3. **Show cause and effect.** Game plans, staff advice, player development, and coaching decisions must generate understandable feedback.
-4. **Keep the universe fast.** Full detail is for user-facing games; AI games use compact storage and simulation where possible.
-5. **Protect long dynasties.** Save growth, archive size, deterministic RNG, and season-to-season durability are release gates.
-6. **Mobile remains first-class.** Decision windows and Game Day must work comfortably on phone screens.
-7. **No hidden production experiments.** Development hooks may remain for tests, but release UI must be intentional and player-facing.
+3. **Show cause and effect.** Preparation, staff advice, development, and coaching decisions must generate understandable feedback.
+4. **Scouting should be useful but imperfect.** Staff quality and uncertainty should matter; avoid exposing hidden exact ratings as truth.
+5. **Keep the universe fast.** Full detail is for user-facing games; AI games use compact storage and simulation where possible.
+6. **Protect long dynasties.** Save growth, archive size, deterministic RNG, and season-to-season durability are release gates.
+7. **Mobile remains first-class.** Weekly decisions and Game Day must work comfortably on phone screens.
+8. **No hidden production experiments.** Development hooks may remain for tests, but release UI must be intentional and player-facing.
 
 ---
 
-# v0.10.1 — Game Day + Coaching Decisions
+# v0.10.1 — Game Day + Coaching Decisions — COMPLETE
+
+Production includes:
+
+- deterministic fourth-down decisions
+- late-game tempo decisions
+- halftime adjustments
+- meaningful PAT / two-point decisions
+- paused/resumable Interactive Game Day
+- permanent transaction + rollback protection
+- live scoreboard / clock / down-distance / field position / feed
+- matchup intelligence and staff recommendation
+- postgame game-plan receipt
+- mobile Game Day regression
+- Game Day IndexedDB persistence
+- 12-game regular-season soak
+- postseason and two-season lifecycle soak
+
+Release source: `34e966be92b6da7520fbb921d196880878586c55`
+
+---
+
+# v0.10.2 — Weekly Coaching Loop
 
 ## Goal
 
-Make a user-controlled game enjoyable to watch and meaningfully influence without requiring every-play play calling.
+Make Tuesday through Friday as interesting as Saturday. The player should understand the opponent, choose what to emphasize, handle a small number of meaningful people decisions, and then see those choices reflected on Game Day.
 
-## 1. Decision engine foundation
+## Slice 1 — Opponent scouting + weekly preparation
 
-Introduce a deterministic decision-window layer above Game Engine 2.
+### Opponent scouting report
 
-Initial decision types:
+Add a staff-generated report before kickoff containing:
 
-- fourth down: go for it / punt / field goal / delegate
-- late-game tempo: hurry / normal / drain clock / delegate
-- two-point decision where game state makes it meaningful
-- halftime adjustment
-- injury/substitution decision when an important player is compromised
+- offensive tendency estimate
+- likely strengths / weaknesses
+- protection / coverage / run-front concerns
+- key injuries and availability
+- 2–4 staff observations
+- confidence level / uncertainty
+- recommended preparation emphases
 
-Each decision must contain:
+Important: this is a **staff estimate**, not a reveal of hidden exact ratings. Low-confidence staffs should have wider or occasionally imperfect reads. Report generation must be deterministic and must not consume gameplay RNG.
 
-- stable decision ID
-- game state snapshot
-- reason / stakes
-- legal options
-- staff recommendation
-- default/delegated option
-- selected option
-- resolution event for archive/debugging
+### Weekly preparation budget
 
-### Release boundary for Slice 1
+Give the head coach **2 preparation emphasis points** per opponent.
 
-Start with **fourth-down decisions only**. Do not add the other decision types until the API and deterministic-resume contract are proven.
+Initial emphasis menu:
 
-### Acceptance criteria
+- Pass Protection
+- Run Blocking
+- Explosive Passing
+- Run Fits
+- Coverage
+- Pressure Package
 
-- Same seed + same choices = identical result.
-- Same seed + different meaningful fourth-down choices can produce different event streams/results.
-- No decision can leave the game in an invalid or unresumable state.
-- Decision choices survive serialization/resume.
-- Delegation reproduces the existing v2 fourth-down policy unless intentionally recalibrated.
-- Existing v2 calibration remains inside frozen guardrails when all decisions are delegated.
+Each emphasis modifies the same kickoff profile path consumed by Game Engine 2 and has an opportunity-cost or tradeoff. The player cannot maximize everything.
 
-## 2. Interactive Game Day presentation
+Requirements:
 
-Turn Game Lab / Watch Game into the primary game presentation.
+- up to 2 emphases
+- staff recommendation visible
+- Delegate to Staff option
+- editable before kickoff
+- saved on the team / week / opponent
+- survives save/load
+- archived with the permanent game result
+- preview and permanent transaction use identical inputs
+- no gameplay-RNG consumption from report generation or UI
 
-Persistent header:
+### Slice 1 acceptance criteria
 
-- score
-- quarter / clock
-- possession
-- field position
-- down and distance
-- timeouts
+- no preparation selected = v0.10.1 kickoff profile is unchanged
+- same dynasty state + same prep = same report and game inputs
+- different prep choices can change matchup/game outcomes
+- preview and permanent commit inputs match exactly
+- weekly prep persists through IndexedDB save/load
+- archived game records which emphases were used
+- mobile UI remains usable
+- existing v0.10.1 calibration stays green when no prep is selected
 
-Live surfaces:
+## Slice 2 — Depth chart / personnel decisions
 
-- current drive
-- play-by-play
-- scoring timeline
-- live player leaders
-- drive chart
-- meaningful event emphasis: touchdowns, turnovers, sacks, explosive plays, injuries
+Add selective situations rather than constant micromanagement:
 
-Decision window:
+- struggling starter vs backup
+- injured starter risk decision
+- freshman pushing a veteran
+- RB workload split
+- third-down / nickel specialist
+- redshirt decision
+- temporary benching / role adjustment
 
-- clear game situation
-- staff recommendation
-- choice buttons
-- Delegate option
-- no modal spam for ordinary plays
+Surface only a few meaningful situations each week. Existing depth-chart and player-agency systems remain authoritative.
 
-## 3. Game plan feedback
+## Slice 3 — Staff Room
 
-Connect pregame plan choices to visible v2 outcomes.
+Create a staff advice layer where OC / DC / other staff can disagree.
+
+Features:
+
+- coordinator recommendation cards
+- confidence / trust context
+- conflicting recommendations
+- Delegate by responsibility
+- staff personality / ability influences usefulness
+- postgame receipt comparing recommendation vs result
+
+## Slice 4 — Player Story Cards
+
+Surface 3–6 relevant players each week rather than forcing roster-table inspection.
 
 Examples:
 
-- pressure package → pressure/sacks vs explosive-pass tradeoff
-- run emphasis → rush share, efficiency, clock effect
-- aggressive offense → explosive plays vs turnovers
-- ball control → pace / possession / lower variance
+- breakout freshman
+- unhappy backup
+- injured star
+- player nearing a record
+- former recruit / transfer facing you
+- player on a hot or cold stretch
+- player affected by a recent promise
 
-Postgame receipt must explain whether the plan appeared to work and the cost paid for it.
+Stories must come from real universe state and remain traceable to player/history data.
 
-## 4. Matchup screen
+## Slice 5 — Postgame consequences
 
-Before Game Day, show:
+After Game Day, produce a short consequence layer:
 
-- team comparison
-- injuries
-- key players
-- opponent tendencies
-- matchup edges
-- staff recommendations
-- rivalry/history/stakes
-- game-plan controls
+- breakout / disappointment
+- injury fallout
+- coordinator praise / criticism
+- recruiting momentum
+- rivalry / upset significance
+- fan / admin reaction
+- relevant player morale / role consequences
 
-### v0.10.1 release gate
+Avoid random flavor disconnected from the simulation.
 
-- targeted decision-engine tests
-- deterministic resume tests at a pending decision
-- existing Game Engine 2 suite
-- frozen calibration with delegated decisions
-- user 12-game soak
-- postseason soak
-- two-season lifecycle soak
-- browser/mobile Game Day regression
+### v0.10.2 release gate
+
+- pure weekly-scouting determinism tests
+- prep-profile integration tests
+- Interactive Game Day preview/commit parity
+- permanent archive receipt
+- 12-game weekly-loop soak
+- postseason + two-season lifecycle
+- mobile weekly-prep regression
 - IndexedDB persistence
+- standard browser / engine suites
 - simulation audit
 
 ---
 
-# v0.10.2 — Compact League-Wide Game Engine 2
+# v0.10.3 — Player Stories + Staff Room Expansion
+
+## Goal
+
+Make coaches and players memorable and make advice feel like it comes from people rather than generic UI.
+
+Features:
+
+- richer staff personalities and disagreement
+- coordinator autonomy / trust
+- player story history
+- staff recommendation track record
+- player role conversations
+- promises / playing-time management
+- richer Coach’s Desk events
+- media / booster / administrator reactions where grounded in universe state
+
+---
+
+# v0.10.4 — Compact League-Wide Game Engine 2
 
 ## Goal
 
 Move the entire fictional universe onto one football model without making saves or season simulation unreasonably large.
 
-## Simulation modes
-
 ### Full v2
 
-Used for user Detailed / Watch games.
-
-Retains:
-
-- full game state
-- real-player attribution
-- drives
-- useful play-by-play
-- decision receipts
-- Game Day recap
+Used for user Detailed / Watch games. Retains full useful Game Day detail.
 
 ### Compact v2
 
-Used for AI-vs-AI and bulk simulation.
-
-Retains:
+Used for AI-vs-AI and bulk simulation. Retains:
 
 - final score
 - team box score
@@ -176,71 +224,45 @@ Retains:
 
 Does **not** retain every ordinary snap.
 
-## Acceptance criteria
+Acceptance criteria:
 
-- AI and user games share the same core football model.
-- Full-season performance remains acceptable.
-- Save growth is measured across 1, 5, 10, and 25 seasons.
-- League statistical distributions remain within calibrated ranges.
-- Legacy quick simulation remains available as rollback/reference until compact v2 passes release gates.
-
----
-
-# v0.10.3 — Matchup + Gameplan Intelligence
-
-## Goal
-
-Make preparation matter before kickoff and make its consequences understandable afterward.
-
-Features:
-
-- opponent scouting tendencies
-- strengths / weaknesses
-- personnel mismatch detection
-- staff game-plan recommendations
-- uncertainty where scouting quality is weak
-- pregame keys to victory
-- postgame plan report
-- opponent-adjusted performance context
-
-The player should be able to answer:
-
-> What did I think would work, what did I choose, what actually happened, and why?
+- AI and user games share the same core football model
+- full-season performance remains acceptable
+- save growth measured across long dynasties
+- league statistical distributions remain within calibrated ranges
+- legacy quick simulation remains available as rollback/reference until compact v2 passes release gates
 
 ---
 
-# v0.11 — The Head Coach Experience
+# v0.11 — Full Head Coach Experience
 
 ## Goal
 
-Make the weekly experience feel like running a program rather than operating a spreadsheet.
+Make the weekly experience feel like running a program.
 
 Major systems:
 
 - coordinator autonomy and trust
 - delegation profiles by responsibility
-- weekly practice allocation
+- weekly practice allocation expansion
 - player role conversations
 - promises and playing-time management
-- redshirt decisions
-- injury/risk decisions
+- injury / risk decisions
 - morale and locker-room consequences
 - discipline / culture events
-- staff responsibilities
 - coordinator philosophy clashes
 - administrator / booster pressure
 - hot-seat and contract expectations
 - richer coaching market and career decisions
+- emergent Program Identity traits such as QB Factory, Defensive Factory, Development Program, Giant Killer, Home Fortress, Portal Mercenaries, etc.
 
 ## Weekly command flow
-
-Dashboard should make the next action obvious:
 
 1. Review opponent
 2. Handle Coach’s Desk
 3. Scout / recruit
-4. Adjust board
-5. Set game plan
+4. Adjust recruiting board
+5. Set weekly preparation
 6. Play / watch / sim
 7. Review consequences
 8. Advance
@@ -268,7 +290,6 @@ Features:
 - postseason history
 - records by school / conference / nation
 - recruiting class retrospectives
-- draft/pro career summaries where appropriate
 - historical rankings and season summaries
 - storylines generated from real universe state
 
@@ -278,33 +299,16 @@ The target is an alternate college-football universe with enough continuity that
 
 # First-time player experience
 
-This is a cross-cutting requirement rather than a separate late feature.
-
-As depth grows, the Dashboard should provide a quiet guided path rather than a mandatory tutorial.
+This remains a cross-cutting requirement.
 
 Principles:
 
 - always show the single most important next action
 - explain blocked actions in plain language
 - surface optional depth without requiring it
-- distinguish "must do" from "can delegate"
+- distinguish **must do** from **can delegate**
 - provide short contextual help near unfamiliar systems
-
----
-
-# Implementation order
-
-1. **v0.10.1 Slice 1 — deterministic fourth-down decision API**
-2. v0.10.1 Slice 2 — paused/resumable user Game Day runner
-3. v0.10.1 Slice 3 — Game Day scoreboard + decision UI
-4. v0.10.1 Slice 4 — halftime / tempo / two-point decision windows
-5. v0.10.1 Slice 5 — game-plan feedback + matchup screen
-6. v0.10.1 release soak / preview / production
-7. v0.10.2 compact league-wide v2
-8. v0.10.3 matchup intelligence expansion
-9. v0.11 Head Coach Experience
-10. v0.12 Living World / encyclopedia
 
 # Current implementation checkpoint
 
-**Next code task:** implement Slice 1 as a small, testable Game Engine 2 API change. The existing automatic fourth-down behavior becomes the delegated/default policy. Interactive UI comes only after deterministic pause/resume and archive semantics are proven.
+**Next code task:** v0.10.2 Slice 1 — deterministic opponent scouting report + two-point weekly preparation budget integrated into the existing Game Engine 2 kickoff profile path. No new Game Day decision types until this weekly preparation contract is proven.
