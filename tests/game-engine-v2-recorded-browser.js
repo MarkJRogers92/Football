@@ -16,10 +16,9 @@ async function startNewDynasty(page){
   try{
     await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);await goTab(page,'gamelab');
     assert.equal(await page.locator('#v2RecordGate').count(),0,'temporary development record button should be absent after Detailed Game cutover');
+    assert.equal(await page.locator('[data-v2-shadow-run]').count(),0,'release UI should not expose the retired shadow-preview control');
     const rollback=await page.evaluate(()=>window.__DL_TEST__.v2RollbackProbe('afterArchive'));
     assert.equal(rollback.ok,true,`rollback probe failed: ${rollback.message}\n${JSON.stringify({before:rollback.before,after:rollback.after})}`);
-    await page.click('[data-v2-shadow-run]');
-    await page.waitForFunction(()=>/Archive transaction dry run: PASS/.test(document.querySelector('#v2ShadowLab')?.textContent||''),{timeout:20000});
     const before=await page.evaluate(()=>window.DynastyGameEngineV2LabBridge.debug());
     await page.evaluate(()=>window.DynastyGameEngineV2LabBridge.recordCurrent());
     await page.waitForFunction(()=>window.DynastyGameEngineV2LabBridge.debug().lastArchive?.engine==='v2',{timeout:30000});
