@@ -41,7 +41,18 @@ const {create} = require('../storage.js');
     await e.importSave(JSON.stringify(legacy));assert.match(e.$el('#saveStatus').textContent,/Imported/);
     assert.equal(e.universe.version,e.APP_VERSION);assert.deepEqual(e.packUniverse(e.universe).playerArchive,expectedArchive);
   }
+  // Portable imports are untrusted even when their shape matches a real export. Quotes in
+  // ordinary generated prose remain valid, but markup and attribute-breakout payloads must
+  // be rejected before installSave() can render any save-backed string.
+  const quoted=JSON.parse(JSON.stringify(exported));quoted.universe.movementLog=['Coach "Ace" Miller was hired.'];
+  await e.importSave(JSON.stringify(quoted));assert.match(e.$el('#saveStatus').textContent,/Imported/);
   const before=e.universe;
+  const unsafeLog=JSON.parse(JSON.stringify(exported));unsafeLog.universe.movementLog=['<img src=x onerror=alert(1)>'];
+  await e.importSave(JSON.stringify(unsafeLog));assert.equal(e.universe,before);
+  assert.match(e.$el('#saveStatus').textContent,/unsafe markup/);
+  const unsafeId=JSON.parse(JSON.stringify(exported));unsafeId.universe.teams[0].roster[0].id='p1" onmouseover=alert(1) data-x="';
+  await e.importSave(JSON.stringify(unsafeId));assert.equal(e.universe,before);
+  assert.match(e.$el('#saveStatus').textContent,/unsafe markup/);
   await e.importSave('{bad json');assert.equal(e.universe,before);
   await e.importSave(JSON.stringify({universe:{teams:[]}}));assert.equal(e.universe,before);
   await e.importSave(JSON.stringify(stored));assert.equal(e.universe,before);
