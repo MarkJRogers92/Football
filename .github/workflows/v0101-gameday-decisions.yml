@@ -19,15 +19,17 @@ jobs:
           node-version: 24
       - name: Install dependencies
         run: npm install --no-package-lock
-      - name: Parse decision controller
-        run: node --check game-engine-v2-decisions.js && node --check tests/game-engine-v2-decisions.js
+      - name: Parse Game Day foundation
+        run: node --check game-engine-v2-decisions.js && node --check game-engine-v2-gameday.js && node --check tests/game-engine-v2-decisions.js && node --check tests/game-engine-v2-gameday.js
       - name: Fourth-down decision contract
         run: npm run test:game-engine-v2-decisions
+      - name: Paused calibrated Game Day runner
+        run: npm run test:game-engine-v2-gameday
       - name: Game Engine 2 targeted suite
         run: npm run test:game-engine-v2
       - name: Frozen calibration guardrail
         run: npm run test:game-engine-v2-calibration
       - name: Build standalone artifact
         run: npm run build
-      - name: Verify decision controller is embedded
-        run: grep -q "DynastyGameEngineV2Decisions" index.html
+      - name: Verify Game Day modules are embedded
+        run: grep -q "DynastyGameEngineV2Decisions" index.html && grep -q "DynastyGameEngineV2GameDay" index.html
