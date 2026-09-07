@@ -21,6 +21,11 @@ function v2DetailedSeasonSoakProbe(){
   const end=v2DetailedCutoverDebug(),uniqueDriveCounts=new Set(driveCounts).size;
   return{ok:ids.length===12-start.week&&new Set(ids).size===ids.length&&end.userRecord-start.record===ids.length&&end.v2UserArchives-start.v2===ids.length&&universe.phase==='confReady'&&uniqueDriveCounts>1,weeks:ids.length,startWeek:start.week,endWeek:universe.week,recordDelta:end.userRecord-start.record,v2Delta:end.v2UserArchives-start.v2,ids,driveCounts,uniqueDriveCounts,phase:universe.phase};
 }
+function v2PrepareDetailedGameForTest(){
+  const career=hasPendingCareerChoice(),weekly=hasPendingWeeklyDecisions();
+  if(!career&&weekly)delegateWeeklyDecisions();
+  return{career,weeklyDelegated:!career&&weekly,ready:!hasPendingCareerChoice()&&!hasPendingWeeklyDecisions()};
+}
 simulateUserDetailed=function simulateUserDetailedV2Cutover(){
   const g=findUserGame();if(!g)return;
   if(hasPendingCareerChoice()){setStatus('Choose your next job before advancing the week.');return}
@@ -30,4 +35,4 @@ simulateUserDetailed=function simulateUserDetailedV2Cutover(){
 // The development-only record button is obsolete after the normal Detailed Game cutover.
 renderV2RecordGate=function renderV2RecordGateAfterCutover(){const host=document.querySelector('#v2RecordGate');if(host)host.remove()};
 globalThis.DynastyGameEngineV2LabBridge.cutoverDebug=v2DetailedCutoverDebug;
-if(globalThis.__DL_TEST__)globalThis.__DL_TEST__.v2DetailedSeasonSoakProbe=v2DetailedSeasonSoakProbe;
+if(globalThis.__DL_TEST__){globalThis.__DL_TEST__.v2DetailedSeasonSoakProbe=v2DetailedSeasonSoakProbe;globalThis.__DL_TEST__.v2PrepareDetailedGame=v2PrepareDetailedGameForTest}
