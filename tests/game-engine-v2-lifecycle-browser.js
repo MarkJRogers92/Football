@@ -54,8 +54,9 @@ async function waitButtonText(page,selector,pattern){await page.waitForFunction(
     await openGamePlayByPlay(page,lastYear1Id,'Year 1 closing v2 game');
 
     await goTab(page,'gamelab');await page.waitForFunction(()=>!document.querySelector('#simDetailedGame')?.disabled,{timeout:60000});
-    await page.click('#simDetailedGame');await page.waitForFunction(()=>window.DynastyGameEngineV2LabBridge.cutoverDebug().lastV2?.week===0,{timeout:60000});
-    const y2=await page.evaluate(()=>window.DynastyGameEngineV2LabBridge.cutoverDebug());assert.equal(y2.year,year2);assert.equal(y2.week,0);assert.ok(y2.lastV2?.id,'Year 2 Detailed Game should create a permanent v2 archive');assert.ok(y2.lastV2.drives>0);assert.ok(y2.lastV2.playerLines>0);
+    const beforeY2=await page.evaluate(()=>window.DynastyGameEngineV2LabBridge.cutoverDebug().v2UserArchives);
+    await page.click('#simDetailedGame');await page.waitForFunction(n=>window.DynastyGameEngineV2LabBridge.cutoverDebug().v2UserArchives>n,beforeY2,{timeout:60000});
+    const y2=await page.evaluate(()=>window.DynastyGameEngineV2LabBridge.cutoverDebug());assert.equal(y2.year,year2);assert.equal(y2.week,0);assert.equal(y2.lastV2?.week,1,'Year 2 opening scheduled game should be Week 1 while the calendar remains Week 0 until weekly advance');assert.ok(y2.lastV2?.id,'Year 2 Detailed Game should create a permanent v2 archive');assert.ok(y2.lastV2.drives>0);assert.ok(y2.lastV2.playerLines>0);
     await goTab(page,'season');await openGamePlayByPlay(page,y2.lastV2.id,'Year 2 opening v2 game');
 
     assert.deepEqual(errors,[],`lifecycle browser regression emitted errors: ${errors.join('\n')}`);
