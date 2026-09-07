@@ -96,6 +96,7 @@
   app.addEventListener('click',event=>{
     const nav=event.target.closest('[data-client-tab]');if(nav){event.preventDefault();go(nav.dataset.clientTab);return}
     const more=event.target.closest('[data-client-more]');if(more){event.preventDefault();app.classList.contains('client-rail-open')?closeRail():openRail();return}
+    const utilityButton=event.target.closest('.client-utility-actions button');if(utilityButton){setTimeout(closeRail,0);return}
     if(event.target.closest('.tabs button,.tab-groups button'))setTimeout(sync,0);
   });
   navToggle.addEventListener('click',()=>app.classList.contains('client-rail-open')?closeRail():openRail());
