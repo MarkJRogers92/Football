@@ -4,6 +4,12 @@
  else{root.DynastyNextAction=api;api.install(root.document)}
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
  'use strict';
+ const POSTSEASON_ACTIONS=Object.freeze({
+  'Play the conference championships':'#simConf',
+  'Play the bowl games':'#simBowls',
+  'Play the playoff':'#simPlayoff'
+ });
+ function actionSelector(label){return POSTSEASON_ACTIONS[label]||null}
  function model({decisionCount=0,items=[]}={}){
   if(decisionCount>0)return{kind:'decision',label:decisionCount===1?'Resolve decision':`Resolve ${decisionCount} decisions`};
   const item=items.find(x=>!x.done);
@@ -21,10 +27,11 @@
   if(!button||!plan)return false;
   button.dataset.nextActionController='1';
   const refresh=()=>{
-   const state=readState(doc),next=state.next;
+   const state=readState(doc),next=state.next,action=next.kind==='plan'?actionSelector(next.label):null;
    button.textContent=next.kind==='clear'?'All caught up':`Next: ${next.label}`;
    button.disabled=next.kind==='clear';
-   button.title=next.kind==='decision'?'Resolve the Coach’s Desk item before advancing.':'Open the next unfinished item from the weekly plan.';
+   button.title=next.kind==='decision'?'Resolve the Coach’s Desk item before advancing.'
+    :action?'Advance this postseason round now.':'Open the next unfinished item from the weekly plan.';
    return state;
   };
   button.addEventListener('click',e=>{
@@ -35,6 +42,8 @@
     target?.scrollIntoView?.({block:'center'});target?.focus?.();return;
    }
    if(state.next.kind==='plan'){
+    const selector=actionSelector(state.next.label),action=selector?doc.querySelector(selector):null;
+    if(action&&!action.disabled){action.click();return}
     const item=state.items.find(x=>!x.done)?.node;
     item?.click?.();item?.focus?.();
    }
@@ -44,5 +53,5 @@
   refresh();
   return true;
  }
- return{model,readState,install};
+ return{model,readState,install,actionSelector};
 });
