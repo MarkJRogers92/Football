@@ -1,0 +1,61 @@
+name: V0.10.4 V2 Presentation Gate
+
+on:
+  push:
+    branches:
+      - codex/v0104-v2-presentation-preview
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v0104-presentation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  presentation:
+    if: ${{ !contains(github.event.head_commit.message, '[v0104-presentation-sync]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm install --no-package-lock
+      - name: Parse presentation modules
+        run: node --check game-engine-v2-presentation.js && node --check tests/game-engine-v2-presentation-browser.js && node --check tests/game-engine-v2-lifecycle-browser.js
+      - name: Game Engine 2 targeted suite
+        run: npm run test:game-engine-v2
+      - name: Frozen calibration gate
+        run: npm run test:game-engine-v2-calibration
+      - name: Build standalone artifact
+        run: npm run build
+      - name: Locate Chromium
+        id: chromium
+        shell: bash
+        run: |
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$browser" ]; then
+            npx playwright-core install chromium
+            browser="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$browser"
+          echo "path=$browser" >> "$GITHUB_OUTPUT"
+      - name: Release presentation regression
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: node tests/game-engine-v2-presentation-browser.js
+      - name: Full lifecycle regression with release UI
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: node tests/game-engine-v2-lifecycle-browser.js
+      - name: Sync exact tested standalone build
+        shell: bash
+        run: |
+          if git diff --quiet -- index.html; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "build: sync v0.10 presentation [v0104-presentation-sync]"
+          git push origin HEAD:${GITHUB_REF_NAME}
