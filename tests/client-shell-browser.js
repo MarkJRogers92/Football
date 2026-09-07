@@ -22,23 +22,33 @@ const startNewDynasty=async page=>{
     await page.waitForSelector('#clientRail');await page.waitForSelector('#clientStatus');
     check(`[${label}] premium shell mounts`,await page.locator('#clientRail').count()===1&&await page.locator('#clientStatus').count()===1);
     check(`[${label}] legacy group nav is visually retired`,await page.$eval('.tab-groups',el=>getComputedStyle(el).display)==='none');
-    await page.click('#clientRail [data-client-tab="recruiting"]');
-    await page.waitForFunction(()=>document.querySelector('#recruiting')?.classList.contains('active'));
-    check(`[${label}] rail routes to Recruiting`,await page.locator('#recruiting.active').count()===1);
-    check(`[${label}] rail active state follows route`,await page.locator('#clientRail [data-client-tab="recruiting"].active').count()===1);
-    await page.click('#clientRail [data-client-tab="development"]');
-    await page.waitForFunction(()=>document.querySelector('#development')?.classList.contains('active'));
-    check(`[${label}] cross-group route reaches Development`,await page.locator('#development.active').count()===1);
+
     if(label==='desktop'){
+      await page.click('#clientRail [data-client-tab="recruiting"]');
+      await page.waitForFunction(()=>document.querySelector('#recruiting')?.classList.contains('active'));
+      check('[desktop] rail routes to Recruiting',await page.locator('#recruiting.active').count()===1);
+      check('[desktop] rail active state follows route',await page.locator('#clientRail [data-client-tab="recruiting"].active').count()===1);
+      await page.click('#clientRail [data-client-tab="development"]');
+      await page.waitForFunction(()=>document.querySelector('#development')?.classList.contains('active'));
+      check('[desktop] cross-group route reaches Development',await page.locator('#development.active').count()===1);
       check('[desktop] rail is persistent',await page.$eval('#clientRail',el=>getComputedStyle(el).position)==='fixed');
       check('[desktop] mobile quick nav is hidden',await page.$eval('.client-mobile-nav',el=>getComputedStyle(el).display)==='none');
     }else{
       check('[mobile] quick nav is visible',await page.$eval('.client-mobile-nav',el=>getComputedStyle(el).display)!=='none');
+      await page.click('.client-mobile-nav [data-client-tab="recruiting"]');
+      await page.waitForFunction(()=>document.querySelector('#recruiting')?.classList.contains('active'));
+      check('[mobile] quick nav routes to Recruiting',await page.locator('#recruiting.active').count()===1);
+      check('[mobile] active state follows quick route',await page.locator('.client-mobile-nav [data-client-tab="recruiting"].active').count()===1);
       await page.click('[data-client-more]');
       check('[mobile] More opens navigation drawer',await page.$eval('#app',el=>el.classList.contains('client-rail-open')));
+      await page.click('#clientRail [data-client-tab="development"]');
+      await page.waitForFunction(()=>document.querySelector('#development')?.classList.contains('active'));
+      check('[mobile] drawer reaches deeper Program route',await page.locator('#development.active').count()===1);
+      check('[mobile] drawer closes after route',!(await page.$eval('#app',el=>el.classList.contains('client-rail-open'))));
+      await page.click('[data-client-more]');
       await page.click('#clientRail [data-client-tab="dashboard"]');
       await page.waitForFunction(()=>document.querySelector('#dashboard')?.classList.contains('active'));
-      check('[mobile] drawer navigation closes after route',!(await page.$eval('#app',el=>el.classList.contains('client-rail-open'))));
+      check('[mobile] drawer can return to Command Center',await page.locator('#dashboard.active').count()===1);
     }
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
     check(`[${label}] shell has no page-level horizontal overflow`,overflow<=1,`${overflow}px`);
