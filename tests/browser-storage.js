@@ -10,9 +10,13 @@ const goTab=async(page,id)=>page.evaluate(({id,group})=>{const g=document.queryS
 // it (New Dynasty -> Start Dynasty, which defaults to Chicago Metropolitan) before #userTeam exists.
 const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeout:30000});await page.waitForFunction(()=>document.querySelector('#titleTeam')?.options.length>0,{timeout:60000});await page.click('#titleNew');await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});await page.click('#titleStart');await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000})};
 const clickShellUtility=async(page,selector)=>{
- const target=page.locator(selector);if(await target.isVisible()){await target.click();return}
- const quick=page.locator('.client-mobile-nav');if(await quick.count()&&await quick.isVisible()&&!await page.$eval('#app',el=>el.classList.contains('client-rail-open')))await page.click('[data-client-more]');
- const details=page.locator('.client-utilities');if(await details.count()&&!await details.evaluate(el=>el.open))await details.locator('summary').click();
+ const shell=page.locator('#clientRail');
+ if(await shell.count()){
+  const quick=page.locator('.client-mobile-nav');
+  if(await quick.count()&&await quick.isVisible()&&!await page.$eval('#app',el=>el.classList.contains('client-rail-open')))await page.click('[data-client-more]');
+  const details=page.locator('.client-utilities');
+  if(await details.count()&&!await details.evaluate(el=>el.open))await details.locator('summary').click();
+ }
  await page.locator(selector).click();
 };
 
