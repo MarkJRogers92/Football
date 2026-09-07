@@ -91,3 +91,14 @@ test('halftime adjustment pauses at the real halftime transition and branches se
   assert.deepEqual(aggressive.state.rng,control.state.rng,'halftime approach changes the deterministic outcome transform without extra RNG draws');
   assert.ok(aggressive.state.events.some(e=>e.type==='coaching_decision'&&e.decisionType==='halftime_adjustment'&&e.resolvedAction==='aggressive'));
 });
+
+test('meaningful late-game touchdown pauses before conversion and PAT/two-point choices consume the same single RNG draw',()=>{
+  const base=gameday.createSession({...options,gameId:'GD-2PT',seed:'gameday-two-point',controlledTeamId:home.id});engine.startGame(base.state);
+  Object.assign(base.state,{period:4,clock:120,possession:'home',fieldPosition:100,down:1,distance:1,score:{home:26,away:28}});base.pendingConversion={side:'home',createdAfterEventSeq:base.state.events.length,period:4,clock:120};base.tempoDecisionMade.home=true;base.halftimeDecisionMade=true;
+  const pending=gameday.advanceOne(base);assert.equal(pending.status,'decision');assert.equal(pending.decision.type,'two_point_decision');assert.equal(pending.decision.staffRecommendation,'extra_point');assert.deepEqual(pending.decision.options.map(o=>o.id),['extra_point','two_point','delegate']);
+  const saved=JSON.parse(JSON.stringify(gameday.snapshot(base))),pat=gameday.restore(saved),two=gameday.restore(saved),rngBefore=JSON.parse(JSON.stringify(base.state.rng));
+  gameday.resolve(pat,'extra_point');gameday.resolve(two,'two_point');
+  assert.equal(pat.pendingConversion,null);assert.equal(two.pendingConversion,null);assert.deepEqual(pat.state.rng,two.state.rng);assert.notDeepEqual(pat.state.rng,rngBefore,'conversion should consume exactly one deterministic RNG draw');
+  assert.ok(pat.state.events.some(e=>e.type==='extra_point'));assert.ok(two.state.events.some(e=>e.type==='two_point'));assert.ok(two.state.events.some(e=>e.type==='coaching_decision'&&e.decisionType==='two_point_decision'&&e.resolvedAction==='two_point'));
+  assert.ok(pat.state.events.some(e=>e.type==='kickoff'));assert.ok(two.state.events.some(e=>e.type==='kickoff'));engine.validateState(pat.state);engine.validateState(two.state);
+});
