@@ -67,8 +67,24 @@ const startNewDynasty=async page=>{
       check(`[${label}] tab ${t} renders`, visible && hasContent);
     }
 
-    // Simulate a week and confirm the UI advances.
+    // Simulate a week and confirm the UI advances. Weekly coaching can
+    // legitimately gate advancement behind unresolved decisions, so clear those
+    // decisions through their real UI before testing the Sim Week action.
     await goTab(page, 'dashboard');
+    for (let guard = 0; guard < 6 && await page.$eval('#simWeek', el => el.disabled); guard++) {
+      const resolved = await page.evaluate(() => {
+        const button = [...document.querySelectorAll('[data-decision][data-choice]')]
+          .find(el => !el.disabled && el.offsetParent !== null);
+        if (!button) return false;
+        button.click();
+        return true;
+      });
+      if (!resolved) break;
+      await page.waitForTimeout(80);
+    }
+    const simReady = await page.$eval('#simWeek', el => !el.disabled);
+    check(`[${label}] weekly decision gate clears before sim`, simReady);
+    if (!simReady) throw new Error(`[${label}] Sim Week remained disabled after resolving visible weekly decisions`);
     const t0 = Date.now();
     await page.click('#simWeek');
     await page.waitForFunction(() => /Week 1/.test(document.querySelector('#weekLine').textContent), { timeout: 60000 });
