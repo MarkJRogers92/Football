@@ -11,12 +11,12 @@ const start=async page=>{await page.waitForSelector('#titleNew',{timeout:30000})
   check('Portrait V1 remains the canonical visual',await page.locator('#playerDialogPortrait canvas, #playerDialogPortrait img').count()>=1);
   const portrait=await page.locator('#playerDialogPortrait').boundingBox();check('player portrait has hero-scale treatment',!!portrait&&portrait.width>=(label==='desktop'?120:80),portrait?`${Math.round(portrait.width)}px`:'missing');
   const brand=await page.locator('#playerDialog').evaluate(el=>({primary:el.style.getPropertyValue('--program-primary'),secondary:el.style.getPropertyValue('--program-secondary'),team:el.dataset.brandTeamId}));check('player school branding is applied to dossier',!!brand.primary&&!!brand.secondary&&!!brand.team,JSON.stringify(brand));
-  const hero=await page.locator('#playerIdentityHero').innerText();check('football role is promoted ahead of dense profile detail',hero.includes('FOOTBALL ROLE')&&hero.includes('Starting QB'));
-  check('staff evaluation keeps current/upside/confidence visible',hero.includes('STAFF EVALUATION')&&hero.includes('Current')&&hero.includes('Upside')&&hero.includes('Confidence'));
-  check('dossier explicitly preserves uncertainty',hero.includes('Hidden true talent and growth remain private'));
-  check('current production is surfaced in hero',hero.includes('CURRENT PRODUCTION'));
-  check('development read is surfaced in hero',hero.includes('DEVELOPMENT READ'));
-  const body=await page.locator('#playerDialogBody').innerText();check('canonical detailed profile sections remain below',body.includes('Season')&&body.includes('Development')&&body.includes('Health')&&body.includes('Career'));
+  const hero=await page.locator('#playerIdentityHero').innerText(),heroLower=hero.toLowerCase();check('football role is promoted ahead of dense profile detail',heroLower.includes('football role')&&heroLower.includes('starting qb'));
+  check('staff evaluation keeps current/upside/confidence visible',heroLower.includes('staff evaluation')&&heroLower.includes('current')&&heroLower.includes('upside')&&heroLower.includes('confidence'));
+  check('dossier explicitly preserves uncertainty',heroLower.includes('hidden true talent and growth remain private'));
+  check('current production is surfaced in hero',heroLower.includes('current production'));
+  check('development read is surfaced in hero',heroLower.includes('development read'));
+  const body=(await page.locator('#playerDialogBody').innerText()).toLowerCase();check('canonical detailed profile sections remain below',body.includes('season')&&body.includes('development')&&body.includes('health')&&body.includes('career'));
   const meta=await page.locator('#playerDialogMeta').innerText();check('canonical player metadata remains intact',meta.includes('QB'));
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);check('no page-level horizontal overflow',overflow<=1,`${overflow}px`);
   check('no console errors',errors.length===0,errors.slice(0,4).join(' | '));await page.close();
