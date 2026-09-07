@@ -1,0 +1,93 @@
+name: V0.10.0 Preview Release
+
+on:
+  push:
+    branches:
+      - codex/v0100-preview-release
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v0100-preview-release
+  cancel-in-progress: false
+
+jobs:
+  validate-version-and-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Prepare v0.10.0 candidate
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          fs.writeFileSync('VERSION.txt','0.10.0\n');
+          const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
+          pkg.version='0.10.0';
+          fs.writeFileSync('package.json',JSON.stringify(pkg,null,2)+'\n');
+          let app=fs.readFileSync('app.js','utf8');
+          const next=app.replace(/const APP_VERSION='[^']+';/,"const APP_VERSION='0.10.0';");
+          if(next===app)throw new Error('APP_VERSION marker was not updated');
+          fs.writeFileSync('app.js',next);
+          NODE
+          npm run build
+      - name: Parse v0.10 release modules
+        run: node --check career-history-fix.js && node --check game-engine-v2-presentation.js && node --check tests/game-engine-v2-presentation-browser.js && node --check tests/game-engine-v2-lifecycle-browser.js
+      - name: Game Engine 2 targeted suite
+        run: npm run test:game-engine-v2
+      - name: Frozen calibration gate
+        run: npm run test:game-engine-v2-calibration
+      - name: Locate Chromium
+        id: chromium
+        shell: bash
+        run: |
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$browser" ]; then
+            npx playwright-core install chromium
+            browser="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$browser"
+          echo "path=$browser" >> "$GITHUB_OUTPUT"
+      - name: Release Game Day presentation regression
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: node tests/game-engine-v2-presentation-browser.js
+      - name: Full two-season lifecycle regression
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: node tests/game-engine-v2-lifecycle-browser.js
+      - name: Standard engine and presentation tests
+        run: npm test
+      - name: Standard browser UI and visual regression tests
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: npm run test:browser
+      - name: Browser IndexedDB regression check
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: npm run test:browser-storage
+      - name: Simulation audit
+        run: npm run audit
+      - name: Freeze exact tested v0.10.0 source
+        shell: bash
+        run: |
+          rm -f .github/workflows/v0102-*.yml .github/workflows/v0103-*.yml .github/workflows/v0104-*.yml .github/workflows/v0100-preview-release.yml
+          git config user.name "MarkJRogers92"
+          git config user.email "136272503+MarkJRogers92@users.noreply.github.com"
+          git add -A
+          git commit -m "release: prepare v0.10.0 preview [skip ci]"
+          git push origin HEAD:${GITHUB_REF_NAME}
+      - name: Verify frozen release source and artifact
+        run: npm run verify:release
+      - name: Publish v0.10.0 preview only
+        run: node tools/publish.js --preview v0100
