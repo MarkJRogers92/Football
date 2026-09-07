@@ -10,6 +10,7 @@
     "test:game-engine-v2-decisions": "node --test tests/game-engine-v2-decisions.js",
     "test:game-engine-v2-gameday": "node --test tests/game-engine-v2-gameday.js",
     "test:game-engine-v2-gameday-browser": "node tests/game-engine-v2-gameday-browser.js",
+    "test:game-engine-v2-gameday-record-browser": "node tests/game-engine-v2-gameday-record-browser.js",
     "test:game-engine-v2-attribution": "node --test tests/game-engine-v2-attribution.js tests/game-engine-v2-transaction.js",
     "test:game-engine-v2-calibration": "node --test tests/game-engine-v2-calibration-report.js",
     "test:game-engine-v2-recorded-browser": "node tests/game-engine-v2-recorded-browser.js",
