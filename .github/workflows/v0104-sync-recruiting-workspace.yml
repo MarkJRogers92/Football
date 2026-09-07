@@ -35,8 +35,6 @@ jobs:
         run: npm run build
       - name: Targeted recruiting and scouting regression
         run: node --test tests/scouting.js tests/scouting-actions.js tests/scouting-trail.js tests/recruiting-filters.js tests/scouting-receipts.js tests/recruiting-history.js tests/recruit-compare.js tests/recruiting-shortlist.js tests/staff-scouting-v0955.js tests/recruiting-battles-v0955.js
-      - name: Verify release source
-        run: npm run verify:release
       - name: Locate Chromium
         id: chromium
         shell: bash
@@ -62,9 +60,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
           git rm .github/workflows/v0104-sync-recruiting-workspace.yml
-          if git diff --cached --quiet; then
-            echo "No generated changes to commit"
-            exit 0
-          fi
           git commit -m "build: sync v0.10.4 recruiting workspace artifact"
-          git push origin HEAD:codex/v0104-recruiting-workspace-integrated
+      - name: Verify clean reproducible release source
+        run: npm run verify:release
+      - name: Push verified checkpoint
+        run: git push origin HEAD:codex/v0104-recruiting-workspace-integrated
