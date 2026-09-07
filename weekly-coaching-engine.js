@@ -57,5 +57,19 @@
     return out
   }
   function focusSummary(focuses){return normalizeFocuses(focuses).map(id=>({id,label:FOCUSES[id].label,side:FOCUSES[id].side,description:FOCUSES[id].description}))}
-  return{VERSION,MAX_POINTS,FOCUSES,normalizeFocuses,buildReport,applyPrepProfile,focusSummary,confidenceLabel}
+  function struggleSignal(pos,stats={}){
+    if(pos==='QB'&&(stats.passAtt||0)>=25){const comp=(stats.passComp||0)/stats.passAtt,intRate=(stats.int||0)/stats.passAtt;return{score:(comp<.55?1:0)+(intRate>.05?1:0),text:comp<.55||intRate>.05?'passing efficiency has slipped':'passing production is stable'}}
+    if(pos==='RB'&&(stats.rushAtt||0)>=25){const ypc=(stats.rushYds||0)/stats.rushAtt;return{score:ypc<3.5?2:ypc<4?1:0,text:ypc<3.5?'rushing efficiency has been poor':ypc<4?'rushing efficiency is under pressure':'rushing production is stable'}}
+    if(['WR','TE'].includes(pos)&&(stats.targets||0)>=15){const rate=(stats.receptions||0)/stats.targets;return{score:rate<.5?2:rate<.58?1:0,text:rate<.5?'target conversion has been poor':rate<.58?'target conversion has dipped':'receiving production is stable'}}
+    return{score:0,text:'season production is not a major warning'}
+  }
+  function selectStarterChallenge(groups=[]){
+    const rows=[];for(const g of groups){const s=g?.starter,c=g?.challenger;if(!s||!c)continue;const gap=Number(c.grade||0)-Number(s.grade||0),upsideGap=Number(c.upside||0)-Number(s.upside||0),struggle=struggleSignal(g.pos,s.stats||{}),youthPush=(c.year==='FR'||c.year==='SO')&&upsideGap>=6;
+      if(!(gap>=1||(gap>=-3&&struggle.score>0)||(gap>=-2&&youthPush)))continue;
+      const score=gap*4+struggle.score*6+Math.max(0,upsideGap)*.3+(youthPush?2:0),recommendation=(gap>=2||(struggle.score>=2&&gap>=-1))?'promote':(gap>=-2?'split':'stay');
+      const reason=gap>=2?`${c.name} is grading ahead of ${s.name}.`:struggle.score?`${s.name} is under performance pressure and ${c.name} is close enough to force a decision.`:`${c.name}'s development has closed the gap on ${s.name}.`;
+      rows.push({pos:g.pos,starterId:s.id,starterName:s.name,challengerId:c.id,challengerName:c.name,gap,upsideGap,struggleScore:struggle.score,struggleText:struggle.text,recommendation,reason,score})
+    }return rows.sort((a,b)=>b.score-a.score||a.pos.localeCompare(b.pos))[0]||null
+  }
+  return{VERSION,MAX_POINTS,FOCUSES,normalizeFocuses,buildReport,applyPrepProfile,focusSummary,confidenceLabel,struggleSignal,selectStarterChallenge}
 });
