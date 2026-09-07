@@ -1,0 +1,71 @@
+name: V0.11.0 World and History Checkpoint
+
+on:
+  push:
+    branches:
+      - codex/v0110-world-history-integrated
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v0110-world-history-checkpoint
+  cancel-in-progress: true
+
+jobs:
+  verify-and-sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/v0110-world-history-integrated
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Parse World and History presentation sources
+        run: |
+          node --check world-history-presentation-adapter.js
+          node --check world-history-presentation.js
+          node --check tests/world-history-presentation-model.js
+          node --check tests/world-history-presentation-browser.js
+      - name: Build standalone artifact
+        run: npm run build
+      - name: World and History model regression
+        run: node tests/world-history-presentation-model.js
+      - name: Locate Chromium
+        id: chromium
+        shell: bash
+        run: |
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$browser" ]; then
+            npx playwright-core install chromium
+            browser="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$browser"
+          echo "path=$browser" >> "$GITHUB_OUTPUT"
+      - name: World and History browser regression
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: node tests/world-history-presentation-browser.js
+      - name: Commit generated artifact and retire helper
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git rm .github/workflows/v0110-world-history-checkpoint.yml
+          if ! git diff --cached --quiet; then
+            git commit -m "build: checkpoint v0.11.0 World and History presentation"
+          fi
+      - name: Verify clean reproducible release source
+        run: |
+          npm run build
+          git diff --exit-code -- index.html
+          npm run verify:release
+      - name: Push verified checkpoint
+        run: git push origin HEAD:codex/v0110-world-history-integrated
