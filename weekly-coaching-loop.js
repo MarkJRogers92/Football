@@ -62,4 +62,5 @@ if(globalThis.__DL_TEST__){
   globalThis.__DL_TEST__.weeklyCoachingDebug=()=>{const t=selected(),g=findUserGame(),opp=t&&g?T(g.home===t.name?g.away:g.home):null;if(!t||!opp)return null;const report=v0102WeeklyOpponentReport(t,opp),prep=v0102WeeklyPrepSnapshot(t,opp.name),base=gameProfilesBeforeWeeklyPrep(t,opp.name),active=gameProfiles(t,opp.name);return{opponent:opp.name,report,prep,profile:{base,active}}};
   globalThis.__DL_TEST__.weeklyCoachingSet=(focuses=[])=>{const t=selected(),g=findUserGame(),opp=t&&g?T(g.home===t.name?g.away:g.home):null;return!!(t&&opp&&v0102SetWeeklyPrep(t,opp,focuses))};
   globalThis.__DL_TEST__.weeklyCoachingDelegate=()=>{const t=selected(),g=findUserGame(),opp=t&&g?T(g.home===t.name?g.away:g.home):null;return!!(t&&opp&&v0102DelegateWeeklyPrep(t,opp))};
+  globalThis.__DL_TEST__.weeklyCoachingLastArchive=()=>{const r=(universe.gameArchive||[]).at(-1);return r?{id:r.id,weeklyPrepVersion:r.weeklyPrepVersion||null,weeklyPrep:v2RecordClone(r.weeklyPrep||null)}:null};
 }
