@@ -1,3 +1,4 @@
+# Retry after routing the scouting-trail browser check through the canonical hidden router.
 name: V0.10.4 Recruiting Workspace Sync
 
 on:
