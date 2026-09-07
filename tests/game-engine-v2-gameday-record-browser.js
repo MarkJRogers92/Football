@@ -32,14 +32,14 @@ async function startNewDynasty(page){
     const after=await page.evaluate(()=>window.__DL_TEST__.v2GameDayCommitDebug()),archive=await page.evaluate(()=>window.__DL_TEST__.v2GameDayLastArchiveDebug());
     assert.equal(after.userRecord,before.userRecord+1,'official Game Day result should advance the controlled team record once');
     assert.equal(after.archiveLength,before.archiveLength+1,'official Game Day result should create exactly one permanent archive');
-    assert.equal(after.last.engine,'v2');assert.equal(after.last.gameDayVersion,1);
-    assert.equal(archive.engine,'v2');assert.equal(archive.transactionVersion,1);assert.equal(archive.gameDayVersion,1);assert.equal(archive.coachingDecisionVersion,1);
+    assert.equal(after.last.engine,'v2');assert.equal(after.last.gameDayVersion,2);
+    assert.equal(archive.engine,'v2');assert.equal(archive.transactionVersion,1);assert.equal(archive.gameDayVersion,2);assert.equal(archive.coachingDecisionVersion,1);
     assert.ok(archive.coachingDecisions.length>0,'archive should retain compact coaching decision receipts');assert.ok(archive.drives>0);assert.ok(archive.playerLines>0);assert.ok(archive.playByPlayLines>10);assert.equal(archive.playByPlayHasCoachDecision,true,'archived play-by-play should retain coaching decisions');
 
     await goTab(page,'season');const link=page.locator(`[data-game="${archive.id}"]:visible`).first();assert.equal(await link.count()>0,true,'recorded Game Day should remain linked from the schedule');await link.click();
     await page.waitForSelector('#gameDialog[open]',{timeout:10000});await page.locator('#gameTabs button').filter({hasText:/^Play-by-Play$/}).click();
     const pbp=await page.locator('#gameDialogBody').textContent();assert.match(pbp,/coach/i,'Game Center play-by-play should visibly include the coaching decision');
     assert.deepEqual(errors,[],`Interactive Game Day commit browser emitted errors: ${errors.join('\n')}`);
-    console.log('PASS v0.10.1 Interactive Game Day permanent commit: injected archive rollback exact, official transaction durable, coaching decisions archived');
+    console.log('PASS v0.10.1 Interactive Game Day permanent commit: injected archive rollback exact, official transaction durable, Game Day v2 coaching decisions archived');
   }finally{await browser.close()}
 })().catch(err=>{console.error(err);process.exit(1)});
