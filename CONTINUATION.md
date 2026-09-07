@@ -388,3 +388,20 @@ Integrated artifact build/currentness and release-source checks passed. Targeted
 
 ## v0.9.52 Program Lab polish
 Branch: codex/v0952-program-goals-polish. Builds on the v0.9.51 Program Lab hotfix. Adds deterministic goal variety, Critical/Important/Bonus weights, live risk states, a Program Overview card, tighter Program Lab layout, and explicit render regression coverage. Production remains v0.9.51 until this branch is reviewed and published.
+
+
+## v0.10.4 Premium Presentation — Recruiting Workspace continuation
+
+Current branch: `codex/v0104-recruiting-workspace-integrated`
+Current source head before this note: `962515854ae1f0fd8343547fb79f5e6a09b38943`
+
+Milestone B source work is present:
+- `recruiting-workspace.js` — Workspace/Table switch, three-pane board/list/dossier presentation, board/all/commits scope and prospect search.
+- `recruiting-workspace.css` — workspace-specific presentation styling.
+- `tools/build.js` includes both assets in the standalone build.
+
+The latest validator run (`34106092578`) completed and failed only at **Verify committed build is current** after `npm run build`; substantive suites were therefore skipped. The failure is generated-artifact drift: committed `index.html` predates the v0.10.4 workspace assets.
+
+During the automated continuation, the exact branch state and build recipe were re-inspected. Attempts to write the regenerated ~1 MB `index.html` through both GitHub's normal contents API and low-level blob/tree API were blocked by connector safety controls before any branch ref was moved. No simulation, save, balance, hidden-rating, or production code was changed in that attempt, and production remains untouched.
+
+Next action: regenerate `index.html` from this branch with `npm run build`, commit only the generated artifact, then run the targeted recruiting/scouting regressions plus the normal build-currentness check. Once green, continue Milestone B with richer dossier/battle-state and signing-class presentation before moving to Milestone C.
