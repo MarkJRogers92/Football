@@ -9,6 +9,12 @@ const goTab=async(page,id)=>{await page.click(`.tab-groups button[data-group="${
 // v0.9.34 added a title screen in front of the app; every browser test now has to click through
 // it (New Dynasty -> Start Dynasty, which defaults to Chicago Metropolitan) before #userTeam exists.
 const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeout:30000});await page.waitForFunction(()=>document.querySelector('#titleTeam')?.options.length>0,{timeout:60000});await page.click('#titleNew');await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});await page.click('#titleStart');await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000})};
+const clickShellUtility=async(page,selector)=>{
+ const target=page.locator(selector);if(await target.isVisible()){await target.click();return}
+ const quick=page.locator('.client-mobile-nav');if(await quick.count()&&await quick.isVisible()&&!await page.$eval('#app',el=>el.classList.contains('client-rail-open')))await page.click('[data-client-more]');
+ const details=page.locator('.client-utilities');if(await details.count()&&!await details.evaluate(el=>el.open))await details.locator('summary').click();
+ await page.locator(selector).click();
+};
 
 (async()=>{
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});
@@ -20,7 +26,7 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   await page.waitForFunction(()=>document.querySelector('#userTeam').options.length===120);
   const tab=id=>goTab(page, id);
   const status=pattern=>page.waitForFunction(source=>new RegExp(source).test(document.querySelector('#saveStatus').textContent),pattern,{timeout:30000});
-  const replaceSavedSlot=async()=>{page.once('dialog',dialog=>dialog.accept());await page.click('#saveBrowser');await status('^Saved')};
+  const replaceSavedSlot=async()=>{page.once('dialog',dialog=>dialog.accept());await clickShellUtility(page,'#saveBrowser');await status('^Saved')};
   await page.click('#simSeason');await tab('season');await page.click('#simConf');await page.click('#simPlayoff');
   // The ordered offseason calendar introduced before v0.9.52 requires review, departures,
   // signing and portal resolution before Spring Development becomes actionable.
@@ -28,7 +34,7 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   await tab('development');await page.click('#runSpringCamp');await page.click('#runFallCamp');
   await tab('offseason');await page.click('#runOffseason');
   await page.waitForFunction(()=>document.querySelector('#weekLine').textContent.includes('2028'));
-  await page.click('#saveBrowser');await status('^Saved');
+  await clickShellUtility(page,'#saveBrowser');await status('^Saved');
   const record=await page.evaluate(()=>new Promise((resolve,reject)=>{
    // Open the app-created database at its current schema version. This check
    // validates stored data, not an obsolete historical version number.
@@ -56,7 +62,7 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   assert.equal(record.games.length,745+bowlGames.length);
   const historical=record.games.find(g=>g.home.name==='Chicago Metropolitan'||g.away.name==='Chicago Metropolitan');
   // Loading and saving before any archive access must preserve stored careers.
-  await page.click('#loadBrowser');await status('^Loaded');await page.click('#saveBrowser');await status('^Saved');
+  await clickShellUtility(page,'#loadBrowser');await status('^Loaded');await clickShellUtility(page,'#saveBrowser');await status('^Saved');
   await tab('history');await page.fill('#archiveSearch',record.first.name);
   await page.click(`#archiveResults [data-player="${record.first.id}"]`);
   assert.equal(await page.textContent('#playerDialogName'),record.first.name);
@@ -64,8 +70,8 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   await page.locator('#playerDialog button').filter({hasText:'Close'}).click();
   console.log('PASS deferred archive search and historical player profile');
   // Force a fresh load before export so export must load the archive itself.
-  await tab('dashboard');await page.click('#loadBrowser');await status('^Loaded');
-  const downloadEvent=page.waitForEvent('download');await page.click('#exportSave');const download=await downloadEvent;
+  await tab('dashboard');await clickShellUtility(page,'#loadBrowser');await status('^Loaded');
+  const downloadEvent=page.waitForEvent('download');await clickShellUtility(page,'#exportSave');const download=await downloadEvent;
   await status('^Save exported');
   const exported=JSON.parse(await readFile(await download.path(),'utf8'));
   assert.equal(exported.universe.playerArchive.length,record.ref.count);
@@ -74,7 +80,7 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   console.log('PASS complete portable JSON export hydrates deferred history');
   // Import the actual downloaded JSON through the app's file input.
   await page.locator('#importFile').setInputFiles(await download.path());await status('^Imported');
-  await replaceSavedSlot();await page.click('#loadBrowser');await status('^Loaded');
+  await replaceSavedSlot();await clickShellUtility(page,'#loadBrowser');await status('^Loaded');
   await tab('history');await page.fill('#archiveSearch',record.first.name);
   await page.click(`#archiveResults [data-player="${record.first.id}"]`);
   assert.equal(await page.textContent('#playerDialogName'),record.first.name);
@@ -87,7 +93,7 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   await page.locator('#playerDialog button').filter({hasText:'Close'}).click();
   await tab('dashboard');
   await page.locator('#importFile').setInputFiles({name:'promise-save.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(exported))});await status('^Imported');
-  await replaceSavedSlot();await page.click('#loadBrowser');await status('^Loaded');
+  await replaceSavedSlot();await clickShellUtility(page,'#loadBrowser');await status('^Loaded');
   await tab('history');await page.fill('#archiveSearch',record.first.name);await page.click(`#archiveResults [data-player="${record.first.id}"]`);
   assert.match(await page.textContent('#playerDialogBody'),/Early Role · BROKEN/);
   assert.match(await page.textContent('#playerDialogBody'),/Coach <Test>/);
