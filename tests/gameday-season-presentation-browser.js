@@ -6,7 +6,9 @@ const start=async page=>{await page.waitForSelector('#titleNew',{timeout:30000})
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/google-chrome',args:['--no-sandbox']});let pass=0,fail=0;
  for(const [label,viewport] of [['desktop',{width:1280,height:900}],['iphone',{width:390,height:844}]]){
   const page=await browser.newPage({viewport}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));const check=(name,ok,detail='')=>{ok?pass++:fail++;console.log(`${ok?'PASS':'FAIL'} [${label}] ${name}${detail?` — ${detail}`:''}`)};
-  await page.goto('file://'+path.join(__dirname,'..','index.html'));await start(page);await goTab(page,'gamelab');await page.waitForSelector('#gamedayEventHero:not([hidden])',{timeout:10000});const event=(await page.locator('#gamedayEventHero').innerText()).toLowerCase();
+  await page.goto('file://'+path.join(__dirname,'..','index.html'));await start(page);
+  const ready=await page.evaluate(()=>window.__DL_TEST__?.v2PrepareDetailedGame?.());check('canonical weekly setup resolves a real Game Day matchup',!!ready?.ready,JSON.stringify(ready));
+  await goTab(page,'gamelab');await page.waitForSelector('#gamedayEventHero:not([hidden])',{timeout:15000});const event=(await page.locator('#gamedayEventHero').innerText()).toLowerCase();
   check('game day event hero is visible',await page.locator('#gamedayEventHero').isVisible());
   check('both real school identities are presented',await page.locator('#gamedayEventHero [data-event-team]').count()===2);
   check('both team logos use the existing atlas',await page.locator('#gamedayEventHero .event-team-logo[data-team-id]').count()===2);
