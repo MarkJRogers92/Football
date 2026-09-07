@@ -2,22 +2,25 @@
 
 Production remains **v0.10.0**. All work here is isolated on `codex/v0101-gameday-coaching`.
 
-## Green through focused CI
+## Feature checkpoint — green through focused CI
 
-The following are implemented and have passed the focused Game Day workflow, including the staged browser game and permanent rollback/commit regression:
+The following are implemented and have passed the focused Game Day workflow, including staged browser play, frozen calibration, injected archive rollback and permanent recording:
 
-- deterministic fourth-down decision windows
-- user-sideline ownership (opponent fourth downs remain automatic)
-- paused/resumable Game Day sessions
-- live Game Day scoreboard, clock/down/field/possession/timeouts and play feed
-- permanent recording of the exact staged result through the existing rollback-protected transaction path
-- coaching-decision receipts in permanent archive / Game Center play-by-play
-- cloned weekly recovery + preparation so staged kickoff inputs exactly match the eventual permanent transaction
+- deterministic fourth-down decisions: go / punt / field goal / delegate
+- user-sideline ownership; opponent decisions remain automatic
+- paused/resumable deterministic Game Day sessions
+- live scoreboard, clock, down/distance, field position, possession, timeouts and play feed
+- exact staged result recorded through the existing v2 attribution/transaction/rollback path
+- compact coaching-decision receipts in the permanent archive and Game Center play-by-play
+- cloned weekly recovery + preparation so staged kickoff inputs exactly match the official transaction
 - late-game tempo: hurry / normal / drain / delegate
 - halftime adjustment: open it up / balanced / ball control / delegate
-- all-delegated Game Day remains equivalent to the frozen calibrated adapter result apart from coaching-decision receipt events
+- meaningful Q4 touchdown conversion choice: PAT / two-point / delegate
+- all-delegated Game Day remains equivalent to the frozen calibrated v0.10 adapter result apart from coaching-decision receipt events
+- pregame Game Day Intelligence: matchup edges, opponent tendency, availability, key players, stakes, active plan and staff recommendation
+- postgame Game Plan Receipt derived only from archived production; it grades the plan target without claiming unsupported causation
 
-Latest known-green focused gate before two-point work: workflow `V0.10.1 Game Day Decisions`, with targeted engine tests, frozen calibration, browser Game Day, injected archive rollback and permanent commit all passing.
+Latest focused gate with all of the above green: **V0.10.1 Game Day Decisions run 34076334883**.
 
 ## Current Game Day contract
 
@@ -30,25 +33,20 @@ Interactive sessions carry:
 - calibrated matchup inputs
 - late-game tempo strategy
 - halftime approach
-- pending strategy decision
+- pending touchdown conversion / strategy decision
 
-Permanent archives retain compact coaching decision receipts and normal v2 player/team statistics.
+Permanent archives retain compact coaching decision receipts, normal v2 player/team statistics, drives, play-by-play and the pregame game-plan snapshot.
 
-## Next bounded task
+## Release hardening — next
 
-Implement meaningful late-game **two-point conversion decisions** without faking the decision after an automatic PAT.
+1. Prove a multiweek / full regular-season run using the Interactive Game Day transaction.
+2. Re-run postseason v2 soak and confirm the new Game Day modules do not disturb conference/bowl/playoff settlement.
+3. Re-run the two-season lifecycle soak.
+4. Verify browser save / IndexedDB durability and clarify the contract for an in-progress Interactive Game Day session.
+5. Add mobile Game Day / matchup regression.
+6. Run simulation audit and broad browser suite.
+7. Synchronize the generated standalone `index.html` only after the source tree is stable.
+8. Prepare and publish **v0.10.1 preview only** for hands-on testing.
+9. Production remains v0.10.0 until explicitly authorized.
 
-Preferred architecture:
-
-1. Add an opt-in deferred-conversion capability to Game Engine 2.
-2. Ordinary/AI/legacy v2 simulation remains unchanged by default.
-3. Interactive Game Day enables deferred regulation conversions.
-4. After a controlled-team touchdown in a meaningful late-game score state, pause before conversion.
-5. Options: kick PAT / go for two / delegate.
-6. Delegate must reproduce the current automatic PAT behavior and RNG stream.
-7. Resolve the conversion before any kickoff or period transition.
-8. Same seed + same choice must resume identically.
-9. Conversion choice and result must be archived in normal play-by-play and coaching receipts.
-10. Run core v2, calibration, staged browser, injected rollback, and permanent commit gates before proceeding to Slice 5.
-
-Do not loosen calibration or transaction assertions to make the feature pass.
+Do not weaken calibration, transaction, rollback or lifecycle assertions to make a release gate pass.
