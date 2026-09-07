@@ -23,6 +23,9 @@ function attach(){
  watch('#playerIdentityHero',null,'detail',true);
  watch('#gamedayEventHero',null,'result',true);
  watch('#seasonPulse',null,'result',true);
+ watch('#seasonStoryRail',null,'surface',false);
+ watch('#rosterPositionBoard',null,'surface',false);
+ watch('#depthFormationBoard',null,'surface',false);
  watch('#dynastyMuseum',null,'surface',true);
 }
 function routeReveal(){
@@ -33,7 +36,7 @@ function routeReveal(){
 markMode();motion?.addEventListener?.('change',()=>{markMode();document.querySelectorAll('.dl-motion-surface,.dl-motion-detail,.dl-motion-value,.dl-motion-result').forEach(el=>el.classList.remove('dl-motion-surface','dl-motion-detail','dl-motion-value','dl-motion-result'))});
 document.addEventListener('click',e=>{
  const route=e.target.closest?.('[data-client-tab],.tabs button[data-tab]');if(route)setTimeout(()=>{attach();routeReveal()},0);
- if(e.target.closest?.('[data-rwid],[data-rwf],[data-rwa],[data-scout-action],[data-dev-player],[data-player]'))setTimeout(attach,0);
+ if(e.target.closest?.('[data-rwid],[data-rwf],[data-rwa],[data-scout-action],[data-dev-player],[data-player],[data-rd-player],[data-rd-assign],.season-story-card'))setTimeout(attach,0);
 },true);
 const bodyObserver=new MutationObserver(()=>attach());if(document.body)bodyObserver.observe(document.body,{childList:true,subtree:true});
 attach();setTimeout(attach,0);setTimeout(attach,150);
