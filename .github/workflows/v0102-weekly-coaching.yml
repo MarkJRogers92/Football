@@ -1,0 +1,61 @@
+name: V0.10.2 Weekly Coaching Loop
+
+on:
+  push:
+    branches:
+      - codex/v0102-weekly-coaching-loop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v0102-weekly-coaching-loop
+  cancel-in-progress: true
+
+jobs:
+  weekly-coaching-slice1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Parse weekly coaching modules
+        run: node --check weekly-coaching-engine.js && node --check weekly-coaching-loop.js && node --check tests/weekly-coaching-loop.js && node --check tests/weekly-coaching-loop-browser.js
+      - name: Weekly scouting and preparation contract
+        run: node tests/weekly-coaching-loop.js
+      - name: Game Engine 2 targeted suite
+        run: npm run test:game-engine-v2
+      - name: Frozen v0.10 calibration guardrail
+        run: npm run test:game-engine-v2-calibration
+      - name: Build standalone artifact
+        run: npm run build
+      - name: Verify weekly coaching is embedded
+        shell: bash
+        run: |
+          grep -q 'V0.10.2 WEEKLY COACHING' index.html
+          grep -q 'DynastyWeeklyCoaching' index.html
+          grep -q 'weeklyPrepVersion' index.html
+      - name: Locate Chromium
+        id: chromium
+        shell: bash
+        run: |
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$browser" ]; then
+            npx playwright-core install chromium
+            browser="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$browser"
+          echo "path=$browser" >> "$GITHUB_OUTPUT"
+      - name: Existing matchup intelligence regression
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: node tests/game-engine-v2-matchup-browser.js
+      - name: Weekly coaching browser and archive regression
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+        run: node tests/weekly-coaching-loop-browser.js
