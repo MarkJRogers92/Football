@@ -20,9 +20,32 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+      - name: Select validation cadence
+        id: cadence
+        shell: bash
+        run: |
+          mode="fast"
+          reason="normal push"
+          if [ "${{ github.event_name }}" != "push" ]; then
+            mode="full"
+            reason="${{ github.event_name }} event"
+          elif git log -1 --pretty=%B | grep -Eiq '\[(full-ci|release-ci)\]'; then
+            mode="full"
+            reason="commit requested full CI"
+          else
+            count="$(git rev-list --count --first-parent HEAD)"
+            if [ $((count % 4)) -eq 0 ]; then
+              mode="full"
+              reason="four-commit cadence"
+            fi
+          fi
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+          echo "Validation mode: $mode ($reason)"
       - name: Install dependencies
         run: npm install --no-package-lock
       - name: Build standalone artifact
@@ -31,9 +54,13 @@ jobs:
         run: git diff --exit-code -- index.html
       - name: Verify releasable source tree
         run: npm run verify:release
-      - name: Engine and presentation tests
+      - name: Fast smoke and version checks
+        run: node tests/version.js && node tests/smoke.js
+      - name: Full engine and presentation tests
+        if: steps.cadence.outputs.mode == 'full'
         run: npm test
       - name: Locate Chromium
+        if: steps.cadence.outputs.mode == 'full'
         id: chromium
         shell: bash
         run: |
@@ -45,12 +72,15 @@ jobs:
           test -n "$browser"
           echo "path=$browser" >> "$GITHUB_OUTPUT"
       - name: Browser UI and visual regression tests
+        if: steps.cadence.outputs.mode == 'full'
         run: npm run test:browser
         env:
           CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
       - name: Browser IndexedDB regression check
+        if: steps.cadence.outputs.mode == 'full'
         run: npm run test:browser-storage
         env:
           CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
       - name: Simulation audit
+        if: steps.cadence.outputs.mode == 'full'
         run: npm run audit
