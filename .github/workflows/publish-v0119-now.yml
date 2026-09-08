@@ -1,0 +1,28 @@
+name: Publish v0.11.9 production now
+
+on:
+  push:
+    branches:
+      - codex/v0119-options-about
+    paths:
+      - .github/workflows/publish-v0119-now.yml
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 1f71406f7f04a0b68627f9768d2676962f9f8ca3
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Validate and publish v0.11.9
+        run: npm run publish
