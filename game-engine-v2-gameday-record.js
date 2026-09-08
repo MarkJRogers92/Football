@@ -26,7 +26,7 @@ function recordInteractiveV2GameDay(session,options={}){
   if(options.expectedIntegrity&&v2LabIntegrity(g,home,away)!==options.expectedIntegrity)throw new Error('The live dynasty changed after this Interactive Game Day preview began. Reset the preview before recording.');
   recoverWeek();const rollback=v2RecordCapture(g,home,away);
   try{
-    const before=beginGame(home,away,false,{week:g.week,label:'Regular season'}),homeProfile=gameProfiles(home,away.name),awayProfile=gameProfiles(away,home.name);
+    advanceAcademicsForWeek(selected());const before=beginGame(home,away,false,{week:g.week,label:'Regular season'}),homeProfile=gameProfiles(home,away.name),awayProfile=gameProfiles(away,home.name);
     if(!v2GameDayInputMatches(session,home,away,homeProfile,awayProfile))throw new Error('Matchup inputs changed after the Interactive Game Day session began. Reset the preview before recording.');
     const summary=adapter.eventSummary(session.state),attribution=actors.attributeGame(session.state,{home:v2AttributionContext(home),away:v2AttributionContext(away)});actors.attachEventSummary(attribution,summary);
     const candidate=tx.buildCandidate({state:session.state,attribution,homeTeam:home,awayTeam:away,starterIds:{home:v2StarterIds(home),away:v2StarterIds(away)},meta:{season:universe.year,week:g.week??universe.week+1,phase:universe.phase,label:'Regular season',venue:`${home.name} · ${home.city||''}`},conference:g.conf??home.conference===away.conference,homeOpponentOverall:awayProfile.overall,awayOpponentOverall:homeProfile.overall});

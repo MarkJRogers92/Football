@@ -40,16 +40,16 @@ function v2PostseasonFail(stage,stageSnapshot,err){console.error(err);v2Postseas
 simConferenceChampionships=function simConferenceChampionshipsV2(){
   if(universe.phase!=='confReady')return;const stage=v2PostseasonStageCapture();
   try{
-    universe.latest=[];universe.confChamps=[];
-    allConfs().forEach(c=>{let s=confStand(c);if(s.length<2)return;const label=c+' Championship',r=v2PostseasonSim(s[0],s[1],{week:13,label,neutral:true,conference:false}),w=T(r.winner);w.champ=true;universe.confChamps.push(w);universe.latest.push({...r,label})});
-    universe.phase='bowlReady';ranked();autosaveAfter('postseason');render()
+    universe.latest=[];universe.confChamps=[];universe.playoffFieldIds=[];universe.playoffFieldUnavailable=false;
+    allConfs().forEach(c=>{let s=confStand(c);if(s.length<2)return;const label=c+' Championship',r=v2PostseasonSim(s[0],s[1],{week:13,label,neutral:true,conference:false}),w=T(r.winner);w.champ=true;universe.confChamps.push(w.id);universe.latest.push({...r,label})});
+    ranked();freezePlayoffField();universe.phase='bowlReady';autosaveAfter('postseason');render()
   }catch(err){v2PostseasonFail('Conference championships',stage,err)}
 };
 
 simBowls=function simBowlsV2(){
   if(universe.phase!=='bowlReady')return [];const stage=v2PostseasonStageCapture();
   try{
-    const field=bowlField(),logs=[];universe.bowls=[];
+    freezePlayoffField();const field=bowlField(),logs=[];universe.bowls=[];
     for(let i=0;i+1<field.length;i+=2){
       const a=field[i],b=field[i+1],label=bowlNameFor(i/2),r=v2PostseasonSim(a,b,{week:13,label,neutral:true,conference:false}),w=T(r.winner),l=w===a?b:a;
       universe.bowls.push({label,winner:w.name,loser:l.name,score:[r.ap,r.hp],gameId:r.gameId});logs.push({...r,label});
@@ -64,7 +64,8 @@ simBowls=function simBowlsV2(){
 simPlayoff=function simPlayoffV2(){
   if(universe.phase==='bowlReady')simBowls();if(universe.phase!=='playoffReady')return;const stage=v2PostseasonStageCapture();
   try{
-    const field=seedField();field.forEach((t,i)=>t.seed=i+1);let logs=[];
+    if(universe.playoffFieldUnavailable){setStatus('This older postseason save predates frozen playoff selections after its bowls. The original field is unavailable, so no playoff was simulated.');return}
+    const field=seedField();if(field.length!==16){setStatus('The saved playoff field is incomplete, so no playoff was simulated.');return}field.forEach((t,i)=>t.seed=i+1);let logs=[];
     function round(arr,label){let out=[];for(let i=0;i<arr.length/2;i++){let a=arr[i],b=arr[arr.length-1-i],week=14+['Round of 16','Quarterfinal','Semifinal','National Championship'].indexOf(label),r=v2PostseasonSim(a,b,{week,label,neutral:true,conference:false});logs.push({...r,label});out.push(T(r.winner))}return out}
     let r16=round(field,'Round of 16'),q=round(r16,'Quarterfinal'),s=round(q,'Semifinal'),f=round(s,'National Championship');
     universe.champion=f[0].name;universe.phase='complete';universe.offseason=makeOffseasonState(universe.year,'review');universe.latest=logs;finalizeRecruiting();finalizeSeasonHonors();archiveSeason();ranked();autosaveAfter('postseason');render()
@@ -90,10 +91,10 @@ function v2PostseasonTestPrepare(stage){
   }
   if(stage==='bowl'){
     universe.phase='bowlReady';for(const t of universe.teams){t.champ=false;t.w=Math.max(6,t.w||0);t.l=Math.max(0,12-t.w)}
-    me.w=6;me.l=6;const elite=others.slice(0,20);for(const t of elite){t.w=12;t.l=0}universe.confChamps=elite.slice(0,10);ranked();const field=bowlField().map(t=>t.id);if(!field.includes(me.id))throw new Error('Bowl test fixture did not place the controlled program in a bowl.');render();return{stage,field,userId:me.id}
+    me.w=6;me.l=6;const elite=others.slice(0,20);for(const t of elite){t.w=12;t.l=0}universe.confChamps=elite.slice(0,10).map(t=>t.id);universe.playoffFieldIds=[];universe.playoffFieldUnavailable=false;ranked();freezePlayoffField();const field=bowlField().map(t=>t.id);if(!field.includes(me.id))throw new Error('Bowl test fixture did not place the controlled program in a bowl.');render();return{stage,field,userId:me.id}
   }
   if(stage==='playoff'){
-    universe.phase='playoffReady';for(const t of universe.teams){t.champ=false}me.w=12;me.l=0;const champs=[me,...others.slice(0,9)];for(const t of champs){t.w=Math.max(10,t.w||0);t.l=Math.min(2,t.l||0)}universe.confChamps=champs;ranked();const field=seedField().map(t=>t.id);if(!field.includes(me.id))throw new Error('Playoff test fixture did not place the controlled program in the field.');render();return{stage,field,userId:me.id}
+    universe.phase='playoffReady';for(const t of universe.teams){t.champ=false}me.w=12;me.l=0;const champs=[me,...others.slice(0,9)];for(const t of champs){t.w=Math.max(10,t.w||0);t.l=Math.min(2,t.l||0)}universe.confChamps=champs.map(t=>t.id);universe.playoffFieldIds=[];universe.playoffFieldUnavailable=false;ranked();const field=freezePlayoffField().map(t=>t.id);if(!field.includes(me.id))throw new Error('Playoff test fixture did not place the controlled program in the field.');render();return{stage,field,userId:me.id}
   }
   throw new Error(`Unknown postseason test stage: ${stage}`)
 }

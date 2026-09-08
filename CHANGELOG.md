@@ -1,3 +1,10 @@
+## v0.11.7 — Save integrity and postseason consistency
+
+- Rejects unsafe object keys in imported saves and safely escapes pipeline labels in recruiting views.
+- Reconnects saved conference champions to live teams, freezes the playoff field before bowls, and preserves that bracket across reloads.
+- Applies academic eligibility progression once at a consistent weekly boundary in Quick, Detailed and Interactive games.
+- Keeps recruiting scholarship counts correct after program renames and retains saved recruit work/development traits during enrollment.
+
 ## v0.11.4 — Weekly advance and save-safety hotfix
 
 - Restores the Command Center's regular-season Next Action button so it advances the scheduled week instead of reopening the current tab.

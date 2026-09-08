@@ -1,5 +1,9 @@
 # WORKLOG
 
+## v0.11.7 — reviewed save and postseason fixes
+
+Applied the six focused review findings without changing the helmet assets. The runtime regression suite exercises the production extension order, portable import/load paths, postseason rollback, frozen playoff membership, academic timing, rename scholarship limits and enrollment trait migration. Existing saves normalize idempotently; ambiguous older saves that already simulated bowls without a frozen playoff field stop with an explicit recovery message rather than fabricate a historical bracket.
+
 ## v0.9.41 — team branding
 
 Followed `TEAM_BRANDING_V1_ASSET_HANDOFF.md` (from GPT's `codex/team-branding-v1-assets`) directly rather than redesigning it: numeric `teamId` as the only valid key, one central helper, graceful fallback, no simulation-logic changes. The handoff was well-specified enough that the implementation itself was mechanical — the real work was in the validation pass it required.

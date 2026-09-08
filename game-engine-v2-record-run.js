@@ -28,7 +28,7 @@ function recordV2GameLabResult(options={}){
   if(hasPendingWeeklyDecisions())throw new Error('Resolve the Coach’s Desk decisions before playing this week.');
   recoverWeek();const home=T(g.home),away=T(g.away);if(!home||!away)throw new Error('Scheduled teams could not be resolved.');const rollback=v2RecordCapture(g,home,away);
   try{
-    const before=beginGame(home,away,false,{week:g.week,label:'Regular season'}),homeProfile=gameProfiles(home,away.name),awayProfile=gameProfiles(away,home.name),prepared=v2RecordPrepared(g,home,away,homeProfile,awayProfile),preview=prepared.preview,candidate=prepared.candidate;
+    advanceAcademicsForWeek(selected());const before=beginGame(home,away,false,{week:g.week,label:'Regular season'}),homeProfile=gameProfiles(home,away.name),awayProfile=gameProfiles(away,home.name),prepared=v2RecordPrepared(g,home,away,homeProfile,awayProfile),preview=prepared.preview,candidate=prepared.candidate;
     preview.transactionProof=prepared.tx.dryRunTransaction({candidate,homeTeam:home,awayTeam:away,homeGameplan:gameplanSnapshot(home,away.name),awayGameplan:gameplanSnapshot(away,home.name)});
     if(options.testFault==='afterDryRun')throw new Error('Injected v2 rollback fault after dry run.');
     v2RecordApplyPlayerStats(home,candidate.playerStats.home);v2RecordApplyPlayerStats(away,candidate.playerStats.away);const win=recordGame(home,away,candidate.hp,candidate.ap,candidate.conference,homeProfile,awayProfile);

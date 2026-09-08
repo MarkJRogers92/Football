@@ -6,10 +6,10 @@ const path = require('path');
 function makeEl(id) {
   const el = {
     id, value: '', textContent: '', innerHTML: '', dataset: {}, disabled: false,
-    children: [], classList: { add(){}, remove(){}, contains(){return false} },
-    appendChild(c){ this.children.push(c); }, click(){},
+    children: [], options: [], classList: { add(){}, remove(){}, contains(){return false} },
+    appendChild(c){ this.children.push(c);this.options.push(c); }, click(){},
     querySelector(){ return makeEl('x'); }, querySelectorAll(){ return []; },
-    addEventListener(){}, removeAttribute(){}, setAttribute(){}, showModal(){}, close(){},
+    addEventListener(){}, removeAttribute(){}, setAttribute(){}, showModal(){}, close(){}, remove(){}, insertAdjacentHTML(){},
   };
   return el;
 }
@@ -38,6 +38,7 @@ function installDom() {
   global.URL.revokeObjectURL = () => {};
   global.FileReader = class FileReader { readAsText(){} };
   global.confirm = () => true;
+  global.alert = () => {};
   return els;
 }
 
@@ -45,7 +46,10 @@ function installDom() {
  * Loads app.js with its bootstrap replaced by an export hook, so tests can
  * reach the engine internals (initUniverse, simWeek, universe, ...).
  */
-function loadEngine({ seed, stubRender = true, indexedDB } = {}) {
+const runtimeDependencies=['game-engine-v2.js','game-engine-v2-decisions.js','game-engine-v2-adapter.js','game-engine-v2-gameday.js','game-engine-v2-attribution.js','game-engine-v2-transaction.js','game-engine-v2-lab.js','game-engine-v2-gameplan-feedback.js','weekly-coaching-engine.js','weekly-player-stories-engine.js'];
+const runtimeExtensions=['staff-scouting-core.js','scouting-actions.js','scouting-trail.js','recruiting-filters.js','recruit-compare.js','recruiting-shortlist.js','scouting-receipts.js','staff-scouting-ui.js','recruiting-history.js','development-tendencies.js','recruiting-battles.js','recruiting-workspace-adapter.js','development-plans.js','development-visualization-adapter.js','roster-depth-presentation-adapter.js','staff-organization-adapter.js','player-identity-adapter.js','season-presentation-adapter.js','world-history-presentation-adapter.js','game-engine-v2-lab-integration.js','game-engine-v2-record-state.js','game-engine-v2-record-run.js','game-engine-v2-record-ui.js','game-engine-v2-cutover.js','game-engine-v2-postseason.js','career-history-fix.js','game-engine-v2-presentation.js','game-engine-v2-gameday-prep.js','game-engine-v2-gameday-record.js','game-engine-v2-gameday-ui.js','game-engine-v2-gameday-prep-bridge.js','game-engine-v2-matchup-ui.js','game-engine-v2-gameday-soak.js','weekly-coaching-loop.js','weekly-personnel-decisions.js','weekly-player-stories.js'];
+let fullRuntimeDependenciesLoaded=false;
+function loadEngine({ seed, stubRender = true, indexedDB, fullRuntime = false } = {}) {
   const els = installDom();
   if (indexedDB) global.indexedDB = indexedDB;
   global.DynastyStorage = require('../storage.js');
@@ -71,7 +75,18 @@ function loadEngine({ seed, stubRender = true, indexedDB } = {}) {
       return values;
     };
   }
-  const src = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  if(fullRuntime&&!fullRuntimeDependenciesLoaded){
+    global.DynastyEscape=global.esc;
+    const nodeModule=global.module;global.module=undefined;
+    try{for(const file of runtimeDependencies)(0,eval)(fs.readFileSync(path.join(__dirname,'..',file),'utf8'))}finally{global.module=nodeModule}
+    fullRuntimeDependenciesLoaded=true;
+  }
+  let src = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  if(fullRuntime){
+    const anchor='loadSchools().then(',at=src.lastIndexOf(anchor);
+    if(at<0)throw new Error('runtime extension anchor not found');
+    src=src.slice(0,at)+runtimeExtensions.map(file=>fs.readFileSync(path.join(__dirname,'..',file),'utf8')).join('\n')+'\n'+src.slice(at);
+  }
   const bootstrap = src.lastIndexOf('loadSchools().then(');
   if (bootstrap < 0) throw new Error('bootstrap not found in app.js');
   let head = src.slice(0, bootstrap);
@@ -101,13 +116,13 @@ globalThis.__ENGINE__ = {
   STYLES, STYLE_TRAITS, STYLE_USAGE, ARCHETYPE_META, archetypeMeta, archetypeLabel, archetypeDescription, archetypeChipHTML, styleForTraits,
   ensurePortrait, portraitSeedFor, jerseyFor, schoolColors, ensureSchoolColors, commissionerMode, renderControlMode, PORTRAIT_VERSION,
   APP_VERSION,
-  T, findPlayer, rebuildIndexes, packUniverse, packPlayer,
+  T, teamById, findPlayer, rebuildIndexes, packUniverse, packPlayer, conferenceChampionIdsFor, conferenceChampionTeams, freezePlayoffField, normalizePlayoffField, rebuildRecruitClassCounts,
   setRecruitPromise, commitRecruit, signPlayerPromise, auditPlayerPromises, auditPromises, normalizePromiseState,
-  recordPromiseTraining, recordPromisePositionChange, promisePenalty, archiveRecord, rememberCoach, promiseHubItems, recordChaseHubItems, deriveRivalries, rivalOf, rivalryGameFor, isRivalryGame, rivalryHubItems, settleRivalryGame, rivalrySeriesText, seasonExpectation, ensureAdminState, ensureSeasonGoals, seasonGoalStatus, seasonGoalStatusLabel, evaluateSeasonGoals, seasonGoalsHTML, programOverviewHTML, adminSeasonReview, reviewControlledProgram, adminHubItems, adminConfidenceLabel, nilBudgetFor, nilRemaining, nilDealCost, nilDealActive, nilRetentionRelief, signNilDeal, applyGameplanWear, gameplanSnapshot, teamLogoHTML, careerTotals, careerWinPct, hiringCeiling, hiringMarket, closeTenure, acceptPost, careerSummaryText, tenureRecord, careerHubItems, simBowls, bowlField, seedField, buildSigningDay, signingDayOdds, ensureAcademics, academicTarget, allKnownCoaches, coachingTree, ensureAllTimeRecord, recordSeasonInHistory, programCoachingLineage, programHistoryHTML, weeklyGameplanDecision, applyGameplanDecision, teamGameplanFor, applyGameplanEdge, schemeTransition, treeHeadCoaches, creditCoachingTree, coachTreeHubItems, academicRisk, academicallyIneligible, academicStatusText, advanceAcademics, academicDecision, applyAcademicDecision, academicHubItems, gameAvailable, signingDayPending, revealNextSigning, revealAllSigning, signingDayHubItems, decommitRecruit, bowlEligible, bowlHubItems, fanSupportTarget, updateFanSupport, homeFieldFor, cancelNilDeal, ensureNilState, resetNilSeason, careerChronologyHTML, RECORD_CATS, ensurePortalCycle, ensurePortalEntry, normalizePortalState, portalCandidates, portalCandidateId, portalLog, PORTAL_ROUNDS, PORTAL_LOG_CAP, PORTAL_TARGET_CAP, PORTAL_ATTENTION_POOL, PORTAL_ATTENTION_MAX, PORTAL_FINALISTS, openPortalCycle, advancePortalRound, targetPortalCandidate, untargetPortalCandidate, portalTargetFor, portalAttentionLeft, portalAttentionSpent, portalEntry, portalFit, portalResolveEntry, offerPortalNil, withdrawPortalNil, promisePortalCandidate, resolvePortalCommitments, portalRoomFor, attachPortalPromise, PORTAL_NIL_INTEREST, PORTAL_PROMISE_INTEREST, compactGameArchive, compactGame, gameIsProtected, keptStatLines, GAME_DETAIL_HORIZON, validateSchedule, conferenceOpponentsFor, nonConferenceOpponentsFor, buildSchedule, SCHEDULE_GAMES, SCHEDULE_CONF_GAMES, SCHEDULE_HOME_MIN, SCHEDULE_HOME_MAX, autosaveAfter, runAutosave, yieldToUserAction, autosaveBlocked, writeBrowserSave, AUTOSAVE_KINDS, ensureProtectedRivals, primaryRivalId, setPrimaryRival, recordRivalryResult, RIVALRY_POSTSEASON_CAP, migrateProtectedRivals, ensureScheduleRotation, conferenceRotationOrder, assignHomeAway,
+  recordPromiseTraining, recordPromisePositionChange, promisePenalty, archiveRecord, rememberCoach, promiseHubItems, recordChaseHubItems, deriveRivalries, rivalOf, rivalryGameFor, isRivalryGame, rivalryHubItems, settleRivalryGame, rivalrySeriesText, seasonExpectation, ensureAdminState, ensureSeasonGoals, seasonGoalStatus, seasonGoalStatusLabel, evaluateSeasonGoals, seasonGoalsHTML, programOverviewHTML, adminSeasonReview, reviewControlledProgram, adminHubItems, adminConfidenceLabel, nilBudgetFor, nilRemaining, nilDealCost, nilDealActive, nilRetentionRelief, signNilDeal, applyGameplanWear, gameplanSnapshot, teamLogoHTML, careerTotals, careerWinPct, hiringCeiling, hiringMarket, closeTenure, acceptPost, careerSummaryText, tenureRecord, careerHubItems, simBowls, bowlField, seedField, buildSigningDay, signingDayOdds, ensureAcademics, academicTarget, allKnownCoaches, coachingTree, ensureAllTimeRecord, recordSeasonInHistory, programCoachingLineage, programHistoryHTML, weeklyGameplanDecision, applyGameplanDecision, teamGameplanFor, applyGameplanEdge, schemeTransition, treeHeadCoaches, creditCoachingTree, coachTreeHubItems, academicRisk, academicallyIneligible, academicStatusText, advanceAcademics, advanceAcademicsForWeek, academicDecision, applyAcademicDecision, academicHubItems, gameAvailable, signingDayPending, revealNextSigning, revealAllSigning, signingDayHubItems, decommitRecruit, bowlEligible, bowlHubItems, fanSupportTarget, updateFanSupport, homeFieldFor, cancelNilDeal, ensureNilState, resetNilSeason, careerChronologyHTML, RECORD_CATS, ensurePortalCycle, ensurePortalEntry, normalizePortalState, portalCandidates, portalCandidateId, portalLog, PORTAL_ROUNDS, PORTAL_LOG_CAP, PORTAL_TARGET_CAP, PORTAL_ATTENTION_POOL, PORTAL_ATTENTION_MAX, PORTAL_FINALISTS, openPortalCycle, advancePortalRound, targetPortalCandidate, untargetPortalCandidate, portalTargetFor, portalAttentionLeft, portalAttentionSpent, portalEntry, portalFit, portalResolveEntry, offerPortalNil, withdrawPortalNil, promisePortalCandidate, resolvePortalCommitments, portalRoomFor, attachPortalPromise, PORTAL_NIL_INTEREST, PORTAL_PROMISE_INTEREST, compactGameArchive, compactGame, gameIsProtected, keptStatLines, GAME_DETAIL_HORIZON, validateSchedule, conferenceOpponentsFor, nonConferenceOpponentsFor, buildSchedule, SCHEDULE_GAMES, SCHEDULE_CONF_GAMES, SCHEDULE_HOME_MIN, SCHEDULE_HOME_MAX, autosaveAfter, runAutosave, yieldToUserAction, autosaveBlocked, writeBrowserSave, AUTOSAVE_KINDS, ensureProtectedRivals, primaryRivalId, setPrimaryRival, recordRivalryResult, RIVALRY_POSTSEASON_CAP, migrateProtectedRivals, ensureScheduleRotation, conferenceRotationOrder, assignHomeAway,
   generateCoach, coachById, ensureCoachCareer, normalizeCoachState, recordCoachSeason, closeCoachStint, openCoachStint, archiveCoach, addCoachEvent, applyCoachRelationshipChange, coachFalloutHubItems, replaceStaffCoach, promoteCoachWithinTeam, moveCoach, retireCoach, coachCareerTotals, coachProfileHTML, chooseCoachMoveDestination, carousel, promiseHTML, applyDevelopmentPhase,
   teamStaffBudget, teamStaffSpend, candidateFitScore, generateCandidatePool, createOpening, interviewCandidate, candidateAcceptChance, extendOffer, hireCandidate, coachOpeningHubItems, COACH_SLOT_ROLES,
   captureRecruitment, transferFit, chooseTransferDestination, placeTransfer, familiarFaceItems, buildWeeklyHub, releasePlayerPromises, transferHistoryHTML, archivePlayerSeason,
-  saveBrowser, loadBrowser, exportSave, importSave, installSave, validateSave, validateSaveText, ensureArchiveLoaded, archiveIsDeferred, ensureGamesLoaded, gamesAreDeferred,
+  saveBrowser, loadBrowser, exportSave, importSave, installSave, validateSave, validateSaveText, validateImportedSaveText, ensureArchiveLoaded, archiveIsDeferred, ensureGamesLoaded, gamesAreDeferred, renderRecruiting, applyProgramEdit, inheritRecruitTraits,
   POS, POS_COUNTS, ROLE_DEFS, OFF_SCHEMES, DEF_SCHEMES, GROWTH_CURVES, OFF_POS,
   render: () => {},
 };

@@ -26,7 +26,7 @@ function v2RecordCapture(g,home,away){
     hadEvents:Array.isArray(universe.events),eventsLength:Array.isArray(universe.events)?universe.events.length:0,
     hadNextEventId:Object.prototype.hasOwnProperty.call(universe,'nextEventId'),nextEventId:universe.nextEventId,
     hadCounter:Object.prototype.hasOwnProperty.call(universe,'gameCounter'),gameCounter:universe.gameCounter,
-    lastDetailedGame:v2RecordClone(universe.lastDetailedGame),latest:v2RecordClone(universe.latest||[]),rng:v2RecordClone(universe.rng),
+    lastDetailedGame:v2RecordClone(universe.lastDetailedGame),latest:v2RecordClone(universe.latest||[]),academicProgression:v2RecordClone(universe.academicProgression),rng:v2RecordClone(universe.rng),
     ranks:universe.teams.map(t=>({id:t.id,rank:t.rank}))
   }
 }
@@ -37,7 +37,7 @@ function v2RecordRestore(snapshot,g,home,away){
   if(snapshot.hadEvents)universe.events.length=snapshot.eventsLength;else delete universe.events;
   if(snapshot.hadNextEventId)universe.nextEventId=snapshot.nextEventId;else delete universe.nextEventId;
   if(snapshot.hadCounter)universe.gameCounter=snapshot.gameCounter;else delete universe.gameCounter;
-  universe.lastDetailedGame=v2RecordClone(snapshot.lastDetailedGame);universe.latest=v2RecordClone(snapshot.latest);
+  universe.lastDetailedGame=v2RecordClone(snapshot.lastDetailedGame);universe.latest=v2RecordClone(snapshot.latest);universe.academicProgression=v2RecordClone(snapshot.academicProgression);
   const ranks=new Map(snapshot.ranks.map(x=>[x.id,x.rank]));for(const t of universe.teams)if(ranks.has(t.id))t.rank=ranks.get(t.id);
   activateGameplayRng(snapshot.rng,universe);universe.rng=v2RecordClone(snapshot.rng);rebuildIndexes()
 }
