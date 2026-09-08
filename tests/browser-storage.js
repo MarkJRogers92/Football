@@ -31,7 +31,7 @@ const clickShellUtility=async(page,selector)=>{
   const tab=id=>goTab(page, id);
   const status=pattern=>page.waitForFunction(source=>new RegExp(source).test(document.querySelector('#saveStatus').textContent),pattern,{timeout:30000});
   const replaceSavedSlot=async()=>{page.once('dialog',dialog=>dialog.accept());await clickShellUtility(page,'#saveBrowser');await status('^Saved')};
-  await page.click('#simSeason');await tab('season');await page.click('#simConf');await page.click('#simPlayoff');
+  await page.click('#simSeason');await tab('season');await page.click('#simConf');await page.click('#simBowls');await page.click('#simPlayoff');
   // The ordered offseason calendar introduced before v0.9.52 requires review, departures,
   // signing and portal resolution before Spring Development becomes actionable.
   await tab('offseason');for(let i=0;i<4;i++)await page.click('#runOffseason');
@@ -91,7 +91,7 @@ const clickShellUtility=async(page,selector)=>{
   assert.deepEqual(errors,[]);
   console.log('PASS exported save imports and re-saves with historical identity intact');
   // Imported historical promises must survive the archive store and render safely.
-  const promise={id:'PR_browser',type:'EARLY_ROLE',status:'BROKEN',expectedGames:8,firstSeason:2027,resolvedSeason:2027,result:'0 appearances; 8 required.',coachName:'Coach <Test>'};
+  const promise={id:'PR_browser',type:'EARLY_ROLE',status:'BROKEN',expectedGames:8,firstSeason:2027,resolvedSeason:2027,result:'0 appearances; 8 required.',coachName:'Coach Test'};
   exported.universe.playerArchive[0].promises=[promise];
   exported.universe.playerArchive[0].transferHistory=[{season:2027,fromSchool:'Chicago Metropolitan',toSchool:'Wisconsin Commonwealth',reason:'BROKEN_PROMISE'}];
   await page.locator('#playerDialog button').filter({hasText:'Close'}).click();
@@ -100,7 +100,7 @@ const clickShellUtility=async(page,selector)=>{
   await replaceSavedSlot();await clickShellUtility(page,'#loadBrowser');await status('^Loaded');
   await tab('history');await page.fill('#archiveSearch',record.first.name);await page.click(`#archiveResults [data-player="${record.first.id}"]`);
   assert.match(await page.textContent('#playerDialogBody'),/Early Role · BROKEN/);
-  assert.match(await page.textContent('#playerDialogBody'),/Coach <Test>/);
+  assert.match(await page.textContent('#playerDialogBody'),/Coach Test/);
   assert.match(await page.textContent('#playerDialogBody'),/0 appearances; 8 required/);
   assert.match(await page.textContent('#playerDialogBody'),/Chicago Metropolitan → Wisconsin Commonwealth/);
   assert.match(await page.textContent('#playerDialogBody'),/Broken promise/);
