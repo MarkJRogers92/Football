@@ -1343,6 +1343,75 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
 
 @media(prefers-reduced-motion:reduce){.client-rail{transition:none}}
 
+/* Dynasty Lab title-menu polish — Options and About only.
+   Presentation layer: no simulation or save-format rules live here. */
+
+.title-options-polished,.title-about-panel{gap:14px}
+.title-options-polished .title-panel-head,.title-about-panel .title-panel-head{margin-bottom:0}
+.title-options-intro{margin:0;color:#9aabbf;font-size:12.5px;line-height:1.55}
+
+.title-settings-card{overflow:hidden;border:1px solid #2a3c51;border-radius:12px;background:rgba(10,18,27,.72)}
+.title-settings-card-head{padding:11px 13px 10px;border-bottom:1px solid #25364a;background:#111b27}
+.title-settings-card-head>div{display:grid;gap:2px}
+.title-settings-card-head span,.title-settings-meta span,.title-about-kicker,.title-about-facts span,.title-about-card>span{font-size:8.5px;font-weight:850;letter-spacing:.13em;text-transform:uppercase;color:#71869f}
+.title-settings-card-head strong{font-size:12px;color:#d8e2ee}
+.title-setting-row{display:grid!important;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;margin:0!important;padding:13px!important;border:0!important;border-radius:0!important;background:transparent!important;color:inherit!important}
+.title-setting-row+.title-setting-row{border-top:1px solid #213144!important}
+.title-setting-row>span,.title-setting-copy{display:grid;gap:2px;min-width:0}
+.title-setting-row strong,.title-setting-copy strong{font-size:13px;color:#eef3f9}
+.title-setting-row small,.title-setting-copy small{display:block;color:#8396ad;font-size:10.5px;line-height:1.45;font-weight:500}
+.title-setting-select select{min-width:132px;margin:0!important}
+
+.title-setting-toggle input[type=checkbox]{appearance:none;-webkit-appearance:none;position:relative;width:44px;height:24px;margin:0;border:1px solid #41546b;border-radius:999px;background:#0b131d;box-shadow:inset 0 1px 4px rgba(0,0,0,.35);cursor:pointer;transition:background .14s ease,border-color .14s ease}
+.title-setting-toggle input[type=checkbox]::after{content:"";position:absolute;width:18px;height:18px;left:2px;top:2px;border-radius:50%;background:#aab7c7;box-shadow:0 2px 5px rgba(0,0,0,.35);transition:transform .14s ease,background .14s ease}
+.title-setting-toggle input[type=checkbox]:checked{background:#245588;border-color:#5c8fc8}
+.title-setting-toggle input[type=checkbox]:checked::after{transform:translateX(20px);background:#f5f9ff}
+.title-setting-toggle input[type=checkbox]:focus-visible{outline:2px solid #6fa5e8;outline-offset:2px}
+
+.title-settings-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.title-settings-meta>div{display:grid;gap:2px;padding:10px 11px;border:1px solid #24364a;border-radius:9px;background:rgba(12,20,30,.66)}
+.title-settings-meta strong{font-size:11px;color:#d4deea}
+.title-settings-meta small{color:#788ba2;font-size:9.5px;line-height:1.4}
+.title-settings-actions{display:flex;justify-content:flex-end;gap:8px;align-items:center}
+.title-settings-actions button{margin:0!important}
+.title-settings-reset{background:transparent!important;color:#aab9ca!important}
+.title-settings-actions .title-panel-primary{min-width:132px}
+
+.title-about-hero{display:grid;grid-template-columns:62px minmax(0,1fr);gap:14px;align-items:center;padding:15px;border:1px solid #30445c;border-radius:12px;background:linear-gradient(135deg,rgba(87,139,204,.12),transparent 55%),#0f1823}
+.title-about-mark{display:grid;place-items:center;width:62px;height:62px;border:1px solid #4b719c;border-radius:13px;background:linear-gradient(145deg,#1e3a5d,#111d2b);box-shadow:inset 0 1px rgba(255,255,255,.08),0 10px 24px rgba(0,0,0,.22);font-size:16px;font-weight:900;letter-spacing:.12em;color:#f7faff}
+.title-about-hero h3{margin:2px 0 4px;font-size:19px;letter-spacing:-.025em;color:#f6f8fb}
+.title-about-hero p{margin:0;color:#93a5ba;font-size:11.5px;line-height:1.5}
+.title-about-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.title-about-facts>div{display:grid;gap:2px;padding:9px 10px;border:1px solid #24364a;border-radius:9px;background:#0d1620}
+.title-about-facts strong{font-size:11.5px;color:#d9e2ec;font-variant-numeric:tabular-nums}
+.title-about-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.title-about-card{padding:11px 12px;border:1px solid #26394d;border-radius:10px;background:rgba(15,24,35,.82)}
+.title-about-card--wide{grid-column:1/-1}
+.title-about-card h3{margin:3px 0 4px;font-size:12.5px;color:#e6edf5}
+.title-about-card p{margin:0;color:#8295ab;font-size:10.5px;line-height:1.48}
+
+@media(max-width:620px){
+  .title-settings-meta,.title-about-grid{grid-template-columns:1fr}
+  .title-about-card--wide{grid-column:auto}
+  .title-setting-row{grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:11px!important}
+  .title-setting-select{grid-template-columns:1fr!important;align-items:start!important}
+  .title-setting-select select{width:100%;min-width:0}
+  .title-settings-actions{display:grid;grid-template-columns:1fr 1fr}
+  .title-settings-actions button{width:100%}
+}
+
+@media(max-width:430px){
+  .title-about-hero{grid-template-columns:48px minmax(0,1fr);padding:12px}
+  .title-about-mark{width:48px;height:48px;border-radius:10px;font-size:12px}
+  .title-about-hero h3{font-size:16px}
+  .title-about-facts{grid-template-columns:1fr 1fr}
+  .title-about-facts>div:last-child{grid-column:1/-1}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .title-setting-toggle input[type=checkbox],.title-setting-toggle input[type=checkbox]::after{transition:none}
+}
+
 /* v0.11.1 — restrained motion and interaction polish. Presentation only. */
 
 :root{--dl-motion-fast:130ms;--dl-motion-standard:190ms;--dl-motion-slow:260ms;--dl-motion-ease:cubic-bezier(.22,.8,.2,1)}
@@ -10568,6 +10637,143 @@ queue();
 
   app.classList.add('client-shell-ready');
   sync();
+})();
+
+(function(){
+  'use strict';
+
+  const titleScreen=document.querySelector('#titleScreen');
+  const mainMenu=document.querySelector('#titleMainMenu');
+  const menuShell=document.querySelector('.title-menu-shell');
+  const optionsPanel=document.querySelector('#titleOptionsPanel');
+  if(!titleScreen||!mainMenu||!menuShell||!optionsPanel||titleScreen.dataset.menuPolish==='1')return;
+  titleScreen.dataset.menuPolish='1';
+
+  const status=document.querySelector('#titleStatus');
+  const titleVersion=()=>document.querySelector('[data-title-version]')?.textContent?.trim()||'v—';
+  const setStatus=text=>{if(status)status.textContent=text};
+  const systemReducedMotion=()=>!!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+  function showPanel(id=null){
+    mainMenu.hidden=!!id;
+    titleScreen.querySelectorAll('.title-subpanel').forEach(panel=>{panel.hidden=panel.id!==id});
+    const target=id?document.querySelector(`#${id} button, #${id} select, #${id} input`):(document.querySelector('#titleContinue')?.disabled?document.querySelector('#titleNew'):document.querySelector('#titleContinue'));
+    target?.focus?.();
+  }
+
+  function polishOptions(){
+    optionsPanel.classList.add('title-options-polished');
+    const heading=optionsPanel.querySelector('#titleOptionsHeading');
+    if(heading)heading.textContent='Game & Presentation';
+
+    const menuCopy=document.querySelector('#titleOptions small');
+    if(menuCopy)menuCopy.textContent='Presentation, pace and accessibility';
+
+    const head=optionsPanel.querySelector('.title-panel-head');
+    const motion=document.querySelector('#titleMotion');
+    const speed=document.querySelector('#titleWatchSpeed');
+    const save=document.querySelector('#titleSaveOptions');
+    const motionRow=motion?.closest('label');
+    const speedRow=speed?.closest('label');
+    if(!head||!motion||!speed||!save||!motionRow||!speedRow)return;
+
+    motionRow.classList.add('title-setting-row','title-setting-toggle');
+    const motionTitle=motionRow.querySelector('strong');
+    const motionHelp=motionRow.querySelector('small');
+    if(motionTitle)motionTitle.textContent='Interface motion';
+    if(motionHelp)motionHelp.textContent='Menu transitions and Watch Mode broadcast animation.';
+
+    speedRow.classList.add('title-setting-row','title-setting-select');
+    const speedSelect=speed;
+    speedRow.replaceChildren();
+    const speedCopy=document.createElement('span');
+    speedCopy.className='title-setting-copy';
+    speedCopy.innerHTML='<strong>Watch Mode pace</strong><small>Sets the default delay between plays when you watch a game.</small>';
+    speedRow.append(speedCopy,speedSelect);
+
+    const intro=document.createElement('p');
+    intro.className='title-options-intro';
+    intro.textContent='Presentation preferences are stored on this device and apply across your dynasty saves. They do not change simulation results.';
+
+    const settings=document.createElement('section');
+    settings.className='title-settings-card';
+    settings.setAttribute('aria-labelledby','titlePresentationSettings');
+    const settingsHead=document.createElement('div');
+    settingsHead.className='title-settings-card-head';
+    settingsHead.innerHTML='<div><span>PRESENTATION</span><strong id="titlePresentationSettings">How Dynasty Lab moves and plays back games</strong></div>';
+    settings.append(settingsHead,motionRow,speedRow);
+
+    const systemNote=document.createElement('div');
+    systemNote.className='title-settings-meta';
+    systemNote.innerHTML=`
+      <div><span>DEVICE DEFAULT</span><strong>${systemReducedMotion()?'Reduced motion':'Standard motion'}</strong><small>On first launch, Dynasty Lab follows your device motion preference.</small></div>
+      <div><span>SCOPE</span><strong>This browser</strong><small>These presentation choices are local preferences, not dynasty save data.</small></div>`;
+
+    const actions=document.createElement('div');
+    actions.className='title-settings-actions';
+    const reset=document.createElement('button');
+    reset.id='titleResetOptions';
+    reset.type='button';
+    reset.className='title-settings-reset';
+    reset.textContent='Restore Defaults';
+    reset.addEventListener('click',()=>{
+      motion.checked=!systemReducedMotion();
+      speed.value='850';
+      setStatus('Recommended defaults restored in this panel. Save Options to keep them.');
+      motion.focus();
+    });
+    save.textContent='Save & Return';
+    actions.append(reset,save);
+
+    head.insertAdjacentElement('afterend',intro);
+    intro.insertAdjacentElement('afterend',settings);
+    settings.insertAdjacentElement('afterend',systemNote);
+    systemNote.insertAdjacentElement('afterend',actions);
+  }
+
+  function addAbout(){
+    if(document.querySelector('#titleAbout'))return;
+    const aboutButton=document.createElement('button');
+    aboutButton.id='titleAbout';
+    aboutButton.className='title-action title-action--quiet';
+    aboutButton.type='button';
+    aboutButton.innerHTML='<span><strong>About Dynasty Lab</strong><small>Version, game info and save model</small></span><i aria-hidden="true">›</i>';
+    mainMenu.appendChild(aboutButton);
+
+    const panel=document.createElement('section');
+    panel.id='titleAboutPanel';
+    panel.className='title-subpanel title-about-panel';
+    panel.setAttribute('aria-labelledby','titleAboutHeading');
+    panel.hidden=true;
+    panel.innerHTML=`
+      <div class="title-panel-head"><div><span>ABOUT</span><h2 id="titleAboutHeading">Dynasty Lab</h2></div><button type="button" data-title-about-back aria-label="Back to main menu">Back</button></div>
+      <div class="title-about-hero">
+        <div class="title-about-mark" aria-hidden="true">DL</div>
+        <div><div class="title-about-kicker">FICTIONAL COLLEGE FOOTBALL DYNASTY SIMULATOR</div><h3>Build the program. Own the era.</h3><p>Run a program across seasons, recruiting classes, coaching changes, player development and Game Day — then live with the history you create.</p></div>
+      </div>
+      <div class="title-about-facts" aria-label="Build information">
+        <div><span>VERSION</span><strong data-about-version>${titleVersion()}</strong></div>
+        <div><span>UNIVERSE</span><strong>Fictional</strong></div>
+        <div><span>SAVES</span><strong>Browser + JSON</strong></div>
+      </div>
+      <div class="title-about-grid">
+        <section class="title-about-card"><span>DYNASTY MODE</span><h3>One program, one career</h3><p>Control a single program and move only through career opportunities earned inside the dynasty.</p></section>
+        <section class="title-about-card"><span>COMMISSIONER MODE</span><h3>Run the whole universe</h3><p>Switch programs and edit institutional details when you want broader sandbox control.</p></section>
+        <section class="title-about-card title-about-card--wide"><span>YOUR SAVE DATA</span><h3>Browser slots + complete exports</h3><p>Named browser save slots handle everyday play. Exported JSON provides a complete backup you can keep separately and import later.</p></section>
+      </div>`;
+    menuShell.appendChild(panel);
+
+    aboutButton.addEventListener('click',()=>{
+      const version=panel.querySelector('[data-about-version]');
+      if(version)version.textContent=titleVersion();
+      showPanel('titleAboutPanel');
+      setStatus(`Dynasty Lab ${titleVersion()} · game and build information.`);
+    });
+    panel.querySelector('[data-title-about-back]')?.addEventListener('click',()=>showPanel());
+  }
+
+  polishOptions();
+  addAbout();
 })();
 
 (() => {
