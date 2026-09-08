@@ -1,4 +1,5 @@
 node_modules/
 .pages/
+out/
 __pycache__/
 *.pyc
