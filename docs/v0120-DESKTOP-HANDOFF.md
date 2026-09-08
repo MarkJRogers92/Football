@@ -4,7 +4,8 @@
 
 - Branch: `codex/v0120-desktop-foundation`
 - Source baseline: `3f5704ca974d0f8b05f836bf334da5b64885ebf6` (`codex/v0119-options-about`)
-- Implementation head before this validation/handoff checkpoint: `65d4482`
+- Validated integration checkpoint: `e7e309d`
+- Current head: the branch tip containing this handoff (`git rev-parse HEAD`)
 - Version remains `0.11.9`; production remains `20d99a4` on `gh-pages`
 - Production and previews were not published or modified
 

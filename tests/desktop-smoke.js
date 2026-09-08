@@ -15,21 +15,40 @@ const electronPath = require('electron');
   let app;
   const pageErrors = [];
   const consoleErrors = [];
+  const watchedPages = new WeakSet();
   const launch = () => electron.launch({
     executablePath: electronPath,
     args: [`--user-data-dir=${profile}`, root],
     cwd: root,
   });
   const watchErrors = page => {
+    if (watchedPages.has(page)) return;
+    watchedPages.add(page);
     page.on('pageerror', error => pageErrors.push(String(error)));
     page.on('console', message => {
       if (message.type() === 'error') consoleErrors.push(message.text());
     });
   };
+  const watchApp = electronApp => {
+    electronApp.on('window', watchErrors);
+    electronApp.windows().forEach(watchErrors);
+  };
   try {
     app = await launch();
+    watchApp(app);
+    assert.equal(
+      fs.realpathSync(await app.evaluate(({ app }) => app.getPath('userData'))),
+      fs.realpathSync(profile),
+      'smoke test must use its disposable Electron profile'
+    );
     const page = await app.firstWindow();
     watchErrors(page);
+    const preferences = await app.evaluate(({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows()[0].webContents.getLastWebPreferences()
+    );
+    assert.equal(preferences.contextIsolation, true, 'renderer context isolation is enabled');
+    assert.equal(preferences.nodeIntegration, false, 'renderer Node integration is disabled');
+    assert.equal(preferences.sandbox, true, 'renderer sandbox is enabled');
 
     await page.waitForFunction(() => document.querySelector('#titleTeam')?.options.length > 0, { timeout: 60000 });
     assert.match(await page.title(), /Dynasty Lab/i);
@@ -52,6 +71,7 @@ const electronPath = require('electron');
     await app.close();
     app = null;
     app = await launch();
+    watchApp(app);
     const restoredPage = await app.firstWindow();
     watchErrors(restoredPage);
     await restoredPage.waitForFunction(() => !document.querySelector('#titleContinue')?.disabled, { timeout: 60000 });
