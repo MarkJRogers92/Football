@@ -236,14 +236,21 @@ So the full Node suite, browser suites, storage suite and audit run only on
 every fourth commit, or when a commit message contains `[full-ci]`. Three pushes
 in four get build + `verify:release` + smoke + version only.
 
-As a credit-saving measure in isolation this is reasonable. Combined with
-parallel agent branches and a demonstrated history of production drift
-(section 1), it is a plausible path for a regression to reach `gh-pages`.
-`docs/roadmap/STATUS.md` independently records the same worry: "Full suite +
-browser suite are still owed before the next release."
+The cadence exists for a reason: `npm test` alone takes **23 minutes** on a
+4-core container, before the browser, storage and audit steps. So "always run
+full CI" is not a free recommendation.
+
+But combined with parallel agent branches and a demonstrated history of
+production drift (section 1), three-in-four shallow pushes is a plausible path
+for a regression to reach `gh-pages`. `docs/roadmap/STATUS.md` independently
+records the same worry: "Full suite + browser suite are still owed before the
+next release."
 
 **Do:** keep the cadence for ordinary pushes, but force full validation on any
-commit the publish workflow will build.
+commit the publish workflow will build — that is the one place where the
+23 minutes is unambiguously worth paying. If the wall time becomes the binding
+constraint, the suite parallelises cleanly by file; `node --test` already
+accepts a concurrency flag.
 
 ---
 
@@ -333,21 +340,27 @@ onboarding/tutorial, walk-ons and JUCO recruiting, team captains and leadership.
 ## Appendix — reproducing every number
 
 ```bash
-npm ci                      # required: four suites fail without fake-indexeddb
+npm ci                      # required: six suites fail without fake-indexeddb
 npm run build               # confirm committed artifact is current
 SEASONS=4 npm run audit     # usage, injuries, transfers, decommits, timings
 SEASONS=12 npm run longrun  # prestige mean/sd, trueNow, save MB, champions
-npm test                    # full Node suite
+npm test                    # full Node suite; ~23 min
 ```
 
-**Test-suite note.** On a container without `node_modules`, four suites fail
-with `Cannot find module 'fake-indexeddb'` — `tests/coaches.js`,
-`tests/games.js`, `tests/gamestore.js`, `tests/persistence.js`. These are
-environment failures, not product defects; they pass after `npm ci`.
-`docs/roadmap/STATUS.md` records the same trap ("eight storage-backed files
-initially could not load because the ignored local `fake-indexeddb` dependency
-was absent"). Anyone reporting suite results should say whether deps were
-installed, because the failure looks like a storage regression and is not.
+**Test-suite result.** With dependencies installed: **342 tests, 342 pass,
+0 fail.**
+
+On a container without `node_modules`, six suites fail with `Cannot find module
+'fake-indexeddb'` — `tests/coaches.js`, `tests/games.js`, `tests/gamestore.js`,
+`tests/persistence.js`, `tests/portraits.js`, `tests/promises.js` — giving
+336/342 and exit 1. These are environment failures, not product defects; all six
+pass after `npm ci`. `docs/roadmap/STATUS.md` records the same trap ("eight
+storage-backed files initially could not load because the ignored local
+`fake-indexeddb` dependency was absent"), so this has now cost at least two
+sessions. Anyone reporting suite results should state whether deps were
+installed, because the failure presents as a storage regression and is not one.
+Worth considering a preflight check in `tests/version.js` that fails with a
+one-line "run npm ci" rather than six misleading stack traces.
 
 **Morale / transfer-risk probe.** The morale and `transferRisk` distributions in
 section 3 are not produced by any committed tool. They came from a throwaway
