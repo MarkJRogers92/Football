@@ -1,0 +1,722 @@
+[
+ {
+  "id": 1,
+  "name": "Chicago Metropolitan",
+  "primary": "#1c6932",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 2,
+  "name": "Great Lakes University",
+  "primary": "#57217d",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 3,
+  "name": "Wisconsin Commonwealth",
+  "primary": "#786e26",
+  "secondary": "#597fcf"
+ },
+ {
+  "id": 4,
+  "name": "Milwaukee State",
+  "primary": "#216e7d",
+  "secondary": "#5c6ee0"
+ },
+ {
+  "id": 5,
+  "name": "Michigan Commonwealth",
+  "primary": "#691c45",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 6,
+  "name": "Detroit Metropolitan",
+  "primary": "#387d21",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 7,
+  "name": "Lake Erie University",
+  "primary": "#292678",
+  "secondary": "#cfbc59"
+ },
+ {
+  "id": 8,
+  "name": "Ohio Western",
+  "primary": "#7d4021",
+  "secondary": "#dbe05c"
+ },
+ {
+  "id": 9,
+  "name": "Indiana Commonwealth",
+  "primary": "#1c694c",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 10,
+  "name": "Fort Wayne State",
+  "primary": "#75217d",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 11,
+  "name": "Twin Cities University",
+  "primary": "#677826",
+  "secondary": "#5a59cf"
+ },
+ {
+  "id": 12,
+  "name": "Iowa Lakes University",
+  "primary": "#214f7d",
+  "secondary": "#775ce0"
+ },
+ {
+  "id": 13,
+  "name": "New England Commonwealth",
+  "primary": "#691c2c",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 14,
+  "name": "Massachusetts Bay University",
+  "primary": "#217d29",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 15,
+  "name": "Hudson University",
+  "primary": "#452678",
+  "secondary": "#bacf59"
+ },
+ {
+  "id": 16,
+  "name": "New York Metropolitan",
+  "primary": "#7d5f21",
+  "secondary": "#afe05c"
+ },
+ {
+  "id": 17,
+  "name": "Long Island State",
+  "primary": "#1c6966",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 18,
+  "name": "Connecticut Commonwealth",
+  "primary": "#7d2166",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 19,
+  "name": "Rhode Island Maritime",
+  "primary": "#4b7826",
+  "secondary": "#8259cf"
+ },
+ {
+  "id": 20,
+  "name": "Vermont State",
+  "primary": "#21307d",
+  "secondary": "#a35ce0"
+ },
+ {
+  "id": 21,
+  "name": "New Hampshire Tech",
+  "primary": "#69261c",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 22,
+  "name": "Maine Commonwealth",
+  "primary": "#217d48",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 23,
+  "name": "Delaware Valley University",
+  "primary": "#602678",
+  "secondary": "#93cf59"
+ },
+ {
+  "id": 24,
+  "name": "Jersey Coastal University",
+  "primary": "#7d7d21",
+  "secondary": "#83e05c"
+ },
+ {
+  "id": 25,
+  "name": "Chesapeake University",
+  "primary": "#1c5269",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 26,
+  "name": "Potomac Commonwealth",
+  "primary": "#7d2147",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 27,
+  "name": "Virginia Commonwealth Tech",
+  "primary": "#307826",
+  "secondary": "#a959cf"
+ },
+ {
+  "id": 28,
+  "name": "Tidewater State",
+  "primary": "#31217d",
+  "secondary": "#cf5ce0"
+ },
+ {
+  "id": 29,
+  "name": "Blue Ridge University",
+  "primary": "#693f1c",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 30,
+  "name": "Carolina Commonwealth",
+  "primary": "#217d66",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 31,
+  "name": "Piedmont University",
+  "primary": "#782674",
+  "secondary": "#6bcf59"
+ },
+ {
+  "id": 32,
+  "name": "Cape Fear State",
+  "primary": "#5e7d21",
+  "secondary": "#5ce061"
+ },
+ {
+  "id": 33,
+  "name": "Palmetto University",
+  "primary": "#1c3869",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 34,
+  "name": "Charleston Maritime",
+  "primary": "#7d2128",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 35,
+  "name": "Appalachian Commonwealth",
+  "primary": "#267837",
+  "secondary": "#cf59cd"
+ },
+ {
+  "id": 36,
+  "name": "Shenandoah University",
+  "primary": "#4f217d",
+  "secondary": "#e05cc5"
+ },
+ {
+  "id": 37,
+  "name": "Georgia Commonwealth",
+  "primary": "#69591c",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 38,
+  "name": "Georgia Coastal",
+  "primary": "#21757d",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 39,
+  "name": "Florida Commonwealth",
+  "primary": "#782659",
+  "secondary": "#59cf6e"
+ },
+ {
+  "id": 40,
+  "name": "South Florida Metropolitan",
+  "primary": "#3f7d21",
+  "secondary": "#5ce08d"
+ },
+ {
+  "id": 41,
+  "name": "Florida Gulf University",
+  "primary": "#1c1f69",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 42,
+  "name": "Alabama Commonwealth",
+  "primary": "#7d3921",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 43,
+  "name": "Mobile State",
+  "primary": "#267853",
+  "secondary": "#cf59a6"
+ },
+ {
+  "id": 44,
+  "name": "Tennessee Commonwealth",
+  "primary": "#6e217d",
+  "secondary": "#e05c99"
+ },
+ {
+  "id": 45,
+  "name": "Knoxville Tech",
+  "primary": "#5f691c",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 46,
+  "name": "Mississippi Commonwealth",
+  "primary": "#21567d",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 47,
+  "name": "Magnolia State",
+  "primary": "#78263d",
+  "secondary": "#59cf96"
+ },
+ {
+  "id": 48,
+  "name": "Kentucky Commonwealth",
+  "primary": "#217d22",
+  "secondary": "#5ce0b9"
+ },
+ {
+  "id": 49,
+  "name": "Louisiana Commonwealth",
+  "primary": "#331c69",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 50,
+  "name": "New Orleans University",
+  "primary": "#7d5721",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 51,
+  "name": "Acadiana State",
+  "primary": "#26786e",
+  "secondary": "#cf597e"
+ },
+ {
+  "id": 52,
+  "name": "Gulf Coast Tech",
+  "primary": "#7d216d",
+  "secondary": "#e05c6d"
+ },
+ {
+  "id": 53,
+  "name": "Houston Metropolitan",
+  "primary": "#45691c",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 54,
+  "name": "East Texas University",
+  "primary": "#21377d",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 55,
+  "name": "Arkansas Delta",
+  "primary": "#782a26",
+  "secondary": "#59cfbd"
+ },
+ {
+  "id": 56,
+  "name": "Ozark Commonwealth",
+  "primary": "#217d40",
+  "secondary": "#5cdbe0"
+ },
+ {
+  "id": 57,
+  "name": "Memphis Metropolitan",
+  "primary": "#4c1c69",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 58,
+  "name": "Red River University",
+  "primary": "#7d7621",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 59,
+  "name": "Coastal Bend State",
+  "primary": "#266678",
+  "secondary": "#cf5b59"
+ },
+ {
+  "id": 60,
+  "name": "Gulf Plains University",
+  "primary": "#7d214e",
+  "secondary": "#e0785c"
+ },
+ {
+  "id": 61,
+  "name": "Missouri Commonwealth",
+  "primary": "#2b691c",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 62,
+  "name": "St. Louis Metropolitan",
+  "primary": "#2a217d",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 63,
+  "name": "Kansas Commonwealth",
+  "primary": "#784526",
+  "secondary": "#59b9cf"
+ },
+ {
+  "id": 64,
+  "name": "Prairie Tech",
+  "primary": "#217d5f",
+  "secondary": "#5cafe0"
+ },
+ {
+  "id": 65,
+  "name": "Nebraska Commonwealth",
+  "primary": "#661c69",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 66,
+  "name": "Omaha State",
+  "primary": "#657d21",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 67,
+  "name": "Iowa Commonwealth",
+  "primary": "#264b78",
+  "secondary": "#cf8259"
+ },
+ {
+  "id": 68,
+  "name": "Dakota University",
+  "primary": "#7d2130",
+  "secondary": "#e0a45c"
+ },
+ {
+  "id": 69,
+  "name": "North Dakota Commonwealth",
+  "primary": "#1c6926",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 70,
+  "name": "Oklahoma Northern",
+  "primary": "#48217d",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 71,
+  "name": "Springfield State",
+  "primary": "#786126",
+  "secondary": "#5992cf"
+ },
+ {
+  "id": 72,
+  "name": "Central Plains University",
+  "primary": "#217c7d",
+  "secondary": "#5c82e0"
+ },
+ {
+  "id": 73,
+  "name": "Texas Republic University",
+  "primary": "#691c52",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 74,
+  "name": "Lone Star Tech",
+  "primary": "#477d21",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 75,
+  "name": "Fort Worth State",
+  "primary": "#262f78",
+  "secondary": "#cfaa59"
+ },
+ {
+  "id": 76,
+  "name": "San Antonio Commonwealth",
+  "primary": "#7d3121",
+  "secondary": "#e0d05c"
+ },
+ {
+  "id": 77,
+  "name": "West Texas University",
+  "primary": "#1c6940",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 78,
+  "name": "Rio Grande State",
+  "primary": "#67217d",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 79,
+  "name": "Oklahoma Commonwealth",
+  "primary": "#747826",
+  "secondary": "#596acf"
+ },
+ {
+  "id": 80,
+  "name": "Red Dirt University",
+  "primary": "#215d7d",
+  "secondary": "#625ce0"
+ },
+ {
+  "id": 81,
+  "name": "New Mexico Commonwealth",
+  "primary": "#691c38",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 82,
+  "name": "Santa Fe Tech",
+  "primary": "#287d21",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 83,
+  "name": "Arizona Commonwealth",
+  "primary": "#382678",
+  "secondary": "#cdcf59"
+ },
+ {
+  "id": 84,
+  "name": "Desert State University",
+  "primary": "#7d5021",
+  "secondary": "#c4e05c"
+ },
+ {
+  "id": 85,
+  "name": "Colorado Commonwealth",
+  "primary": "#1c695a",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 86,
+  "name": "Front Range University",
+  "primary": "#7d2174",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 87,
+  "name": "Utah Commonwealth",
+  "primary": "#587826",
+  "secondary": "#6f59cf"
+ },
+ {
+  "id": 88,
+  "name": "Wasatch Tech",
+  "primary": "#213f7d",
+  "secondary": "#8e5ce0"
+ },
+ {
+  "id": 89,
+  "name": "Boise Commonwealth",
+  "primary": "#691c1e",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 90,
+  "name": "Montana Commonwealth",
+  "primary": "#217d39",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 91,
+  "name": "Big Sky State",
+  "primary": "#532678",
+  "secondary": "#a5cf59"
+ },
+ {
+  "id": 92,
+  "name": "Wyoming State",
+  "primary": "#7d6f21",
+  "secondary": "#98e05c"
+ },
+ {
+  "id": 93,
+  "name": "Nevada Commonwealth",
+  "primary": "#1c5e69",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 94,
+  "name": "Las Vegas Metropolitan",
+  "primary": "#7d2156",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 95,
+  "name": "Idaho Northern",
+  "primary": "#3d7826",
+  "secondary": "#9659cf"
+ },
+ {
+  "id": 96,
+  "name": "Rocky Mountain University",
+  "primary": "#22217d",
+  "secondary": "#ba5ce0"
+ },
+ {
+  "id": 97,
+  "name": "Southern California Commonwealth",
+  "primary": "#69331c",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 98,
+  "name": "Los Angeles Metropolitan",
+  "primary": "#217d58",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 99,
+  "name": "California Pacific",
+  "primary": "#6f2678",
+  "secondary": "#7ecf59"
+ },
+ {
+  "id": 100,
+  "name": "Bay Area University",
+  "primary": "#6c7d21",
+  "secondary": "#6ce05c"
+ },
+ {
+  "id": 101,
+  "name": "Sacramento State College",
+  "primary": "#1c4469",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 102,
+  "name": "Central California Tech",
+  "primary": "#7d2137",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 103,
+  "name": "Oregon Commonwealth",
+  "primary": "#26782a",
+  "secondary": "#be59cf"
+ },
+ {
+  "id": 104,
+  "name": "Cascade University",
+  "primary": "#41217d",
+  "secondary": "#e05cda"
+ },
+ {
+  "id": 105,
+  "name": "Washington Commonwealth",
+  "primary": "#694d1c",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 106,
+  "name": "Puget Sound State",
+  "primary": "#217d77",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 107,
+  "name": "Hawaii Commonwealth",
+  "primary": "#782666",
+  "secondary": "#59cf5c"
+ },
+ {
+  "id": 108,
+  "name": "Alaska Pacific",
+  "primary": "#4e7d21",
+  "secondary": "#5ce078"
+ },
+ {
+  "id": 109,
+  "name": "Philadelphia Metropolitan",
+  "primary": "#1c2b69",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 110,
+  "name": "Pittsburgh Commonwealth",
+  "primary": "#7d2a21",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 111,
+  "name": "Baltimore Metropolitan",
+  "primary": "#267846",
+  "secondary": "#cf59b8"
+ },
+ {
+  "id": 112,
+  "name": "Cincinnati Commonwealth",
+  "primary": "#60217d",
+  "secondary": "#e05cae"
+ },
+ {
+  "id": 113,
+  "name": "Louisville Metropolitan",
+  "primary": "#69671c",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 114,
+  "name": "Nashville Tech",
+  "primary": "#21657d",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 115,
+  "name": "Indianapolis Metropolitan",
+  "primary": "#78264a",
+  "secondary": "#59cf83"
+ },
+ {
+  "id": 116,
+  "name": "Columbus Metropolitan",
+  "primary": "#2f7d21",
+  "secondary": "#5ce0a5"
+ },
+ {
+  "id": 117,
+  "name": "Buffalo State University",
+  "primary": "#271c69",
+  "secondary": "#f2ede3"
+ },
+ {
+  "id": 118,
+  "name": "Pittsburgh Tech",
+  "primary": "#7d4921",
+  "secondary": "#c9d2d8"
+ },
+ {
+  "id": 119,
+  "name": "Richmond Metropolitan",
+  "primary": "#267861",
+  "secondary": "#cf5991"
+ },
+ {
+  "id": 120,
+  "name": "Toronto International University",
+  "primary": "#7d217b",
+  "secondary": "#e05c82"
+ }
+]
