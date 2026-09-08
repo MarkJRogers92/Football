@@ -1,0 +1,34 @@
+{
+  "atlas": "assets/team-helmets-atlas-64.png",
+  "cellSize": 64,
+  "columns": 12,
+  "rows": 10,
+  "layout": "row-major, id 1 at row 0 col 0, id 120 at row 9 col 11 (idx = id - 1; col = idx % 12; row = Math.floor(idx / 12))",
+  "teamCount": 120,
+  "idRange": [1, 120],
+  "duplicatesOrGaps": false,
+  "source": {
+    "blendFile": "Dynasty_Lab_Helmet_Studio_V2.blend",
+    "templateRig": "TEAM_001",
+    "colorManifest": "team-colors.json",
+    "colorMapping": {
+      "primary": ["TEAM_001_SHELL_MAT.Base Color"],
+      "secondary": ["TEAM_001_STRIPE_PRIMARY_MAT.Base Color", "TEAM_001_STRIPE_SECONDARY_MAT.Base Color"],
+      "unchanged": ["FACEMASK_MAT", "HARDWARE_MAT", "INTERIOR_MAT", "CHINSTRAP_MAT", "VISOR_MAT"],
+      "colorSpaceConversion": "sRGB hex -> linear RGB before writing to Base Color (Blender Principled BSDF expects linear)"
+    },
+    "logoDecal": "hidden (LOGO_LEFT/LOGO_RIGHT objects set hide_render=True) - not carried on this atlas, existing teamLogoHTML crest remains the logo source of truth",
+    "camera": "CAM_3Q_FRONT",
+    "renderEngine": "BLENDER_EEVEE (EEVEE Next, Blender 5.2)",
+    "viewTransform": "AgX",
+    "renderSettings": {
+      "resolution": "256x256 (rendered), cropped-to-content then padded to square then downsampled to 64x64 per cell",
+      "samples": 64,
+      "filmTransparent": true,
+      "groundPlane": "hidden (STUDIO_GROUND hide_render=True)",
+      "raytracing": true
+    },
+    "postProcess": "each render's alpha bbox cropped, padded ~6% on the long edge, centered on a square canvas, LANCZOS-resized to 64x64, pasted row-major into the atlas"
+  },
+  "regeneration": "To regenerate at higher resolution: reopen Dynasty_Lab_Helmet_Studio_V2.blend, isolate TEAM_001 collection, hide STUDIO_GROUND and TEAM_001_LOGO_LEFT/RIGHT, set scene.render.film_transparent=True, loop team-colors.json applying primary/secondary (sRGB->linear) to the materials listed above, render each from CAM_3Q_FRONT, then re-run the crop/pad/resize/pack step at the new target cell size."
+}
