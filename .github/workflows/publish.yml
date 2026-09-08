@@ -1,3 +1,4 @@
+
 name: Publish Dynasty Lab
 
 on:
@@ -56,14 +57,6 @@ jobs:
           fi
       - name: Install dependencies
         run: npm install --no-package-lock
-      - name: Build standalone artifact
-        run: npm run build
-      - name: Verify committed build is current
-        run: git diff --exit-code -- index.html
-      - name: Verify releasable source tree
-        run: npm run verify:release
-      - name: Engine and presentation tests
-        run: npm test
       - name: Locate Chromium
         id: chromium
         shell: bash
@@ -75,21 +68,12 @@ jobs:
           fi
           test -n "$browser"
           echo "path=$browser" >> "$GITHUB_OUTPUT"
-      - name: Browser UI and visual regression tests
-        run: npm run test:browser
-        env:
-          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
-      - name: Browser IndexedDB regression check
-        run: npm run test:browser-storage
-        env:
-          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
-      - name: Simulation audit
-        run: npm run audit
-      - name: Publish selected target
+      - name: Fully validate and publish selected target
         shell: bash
         env:
           TARGET: ${{ inputs.target }}
           PREVIEW_NAME: ${{ inputs.preview_name }}
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
         run: |
           if [ "$TARGET" = "preview" ]; then
             node tools/publish.js --preview "$PREVIEW_NAME"
