@@ -1,0 +1,37 @@
+name: Build title menu artifact
+
+on:
+  push:
+    branches:
+      - codex/v0119-options-about
+    paths:
+      - .github/workflows/build-title-menu-artifact.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Rebuild standalone artifact
+        run: node tools/build.js
+      - name: Commit generated index
+        shell: bash
+        run: |
+          if git diff --quiet -- index.html; then
+            echo "index.html already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "build: refresh title menu standalone artifact"
+          git push origin HEAD:${GITHUB_REF_NAME}
