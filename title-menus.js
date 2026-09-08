@@ -118,7 +118,7 @@
       <div class="title-about-grid">
         <section class="title-about-card"><span>DYNASTY MODE</span><h3>One program, one career</h3><p>Control a single program and move only through career opportunities earned inside the dynasty.</p></section>
         <section class="title-about-card"><span>COMMISSIONER MODE</span><h3>Run the whole universe</h3><p>Switch programs and edit institutional details when you want broader sandbox control.</p></section>
-        <section class="title-about-card title-about-card--wide"><span>YOUR SAVE DATA</span><h3>Built for long-running dynasties</h3><p>Named browser save slots handle everyday play. Exported JSON provides a complete backup you can keep separately and import later.</p></section>
+        <section class="title-about-card title-about-card--wide"><span>YOUR SAVE DATA</span><h3>Browser slots + complete exports</h3><p>Named browser save slots handle everyday play. Exported JSON provides a complete backup you can keep separately and import later.</p></section>
       </div>`;
     menuShell.appendChild(panel);
 
