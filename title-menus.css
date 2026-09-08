@@ -1,0 +1,68 @@
+/* Dynasty Lab title-menu polish — Options and About only.
+   Presentation layer: no simulation or save-format rules live here. */
+
+.title-options-polished,.title-about-panel{gap:14px}
+.title-options-polished .title-panel-head,.title-about-panel .title-panel-head{margin-bottom:0}
+.title-options-intro{margin:0;color:#9aabbf;font-size:12.5px;line-height:1.55}
+
+.title-settings-card{overflow:hidden;border:1px solid #2a3c51;border-radius:12px;background:rgba(10,18,27,.72)}
+.title-settings-card-head{padding:11px 13px 10px;border-bottom:1px solid #25364a;background:#111b27}
+.title-settings-card-head>div{display:grid;gap:2px}
+.title-settings-card-head span,.title-settings-meta span,.title-about-kicker,.title-about-facts span,.title-about-card>span{font-size:8.5px;font-weight:850;letter-spacing:.13em;text-transform:uppercase;color:#71869f}
+.title-settings-card-head strong{font-size:12px;color:#d8e2ee}
+.title-setting-row{display:grid!important;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;margin:0!important;padding:13px!important;border:0!important;border-radius:0!important;background:transparent!important;color:inherit!important}
+.title-setting-row+.title-setting-row{border-top:1px solid #213144!important}
+.title-setting-row>span,.title-setting-copy{display:grid;gap:2px;min-width:0}
+.title-setting-row strong,.title-setting-copy strong{font-size:13px;color:#eef3f9}
+.title-setting-row small,.title-setting-copy small{display:block;color:#8396ad;font-size:10.5px;line-height:1.45;font-weight:500}
+.title-setting-select select{min-width:132px;margin:0!important}
+
+.title-setting-toggle input[type=checkbox]{appearance:none;-webkit-appearance:none;position:relative;width:44px;height:24px;margin:0;border:1px solid #41546b;border-radius:999px;background:#0b131d;box-shadow:inset 0 1px 4px rgba(0,0,0,.35);cursor:pointer;transition:background .14s ease,border-color .14s ease}
+.title-setting-toggle input[type=checkbox]::after{content:"";position:absolute;width:18px;height:18px;left:2px;top:2px;border-radius:50%;background:#aab7c7;box-shadow:0 2px 5px rgba(0,0,0,.35);transition:transform .14s ease,background .14s ease}
+.title-setting-toggle input[type=checkbox]:checked{background:#245588;border-color:#5c8fc8}
+.title-setting-toggle input[type=checkbox]:checked::after{transform:translateX(20px);background:#f5f9ff}
+.title-setting-toggle input[type=checkbox]:focus-visible{outline:2px solid #6fa5e8;outline-offset:2px}
+
+.title-settings-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.title-settings-meta>div{display:grid;gap:2px;padding:10px 11px;border:1px solid #24364a;border-radius:9px;background:rgba(12,20,30,.66)}
+.title-settings-meta strong{font-size:11px;color:#d4deea}
+.title-settings-meta small{color:#788ba2;font-size:9.5px;line-height:1.4}
+.title-settings-actions{display:flex;justify-content:flex-end;gap:8px;align-items:center}
+.title-settings-actions button{margin:0!important}
+.title-settings-reset{background:transparent!important;color:#aab9ca!important}
+.title-settings-actions .title-panel-primary{min-width:132px}
+
+.title-about-hero{display:grid;grid-template-columns:62px minmax(0,1fr);gap:14px;align-items:center;padding:15px;border:1px solid #30445c;border-radius:12px;background:linear-gradient(135deg,rgba(87,139,204,.12),transparent 55%),#0f1823}
+.title-about-mark{display:grid;place-items:center;width:62px;height:62px;border:1px solid #4b719c;border-radius:13px;background:linear-gradient(145deg,#1e3a5d,#111d2b);box-shadow:inset 0 1px rgba(255,255,255,.08),0 10px 24px rgba(0,0,0,.22);font-size:16px;font-weight:900;letter-spacing:.12em;color:#f7faff}
+.title-about-hero h3{margin:2px 0 4px;font-size:19px;letter-spacing:-.025em;color:#f6f8fb}
+.title-about-hero p{margin:0;color:#93a5ba;font-size:11.5px;line-height:1.5}
+.title-about-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.title-about-facts>div{display:grid;gap:2px;padding:9px 10px;border:1px solid #24364a;border-radius:9px;background:#0d1620}
+.title-about-facts strong{font-size:11.5px;color:#d9e2ec;font-variant-numeric:tabular-nums}
+.title-about-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.title-about-card{padding:11px 12px;border:1px solid #26394d;border-radius:10px;background:rgba(15,24,35,.82)}
+.title-about-card--wide{grid-column:1/-1}
+.title-about-card h3{margin:3px 0 4px;font-size:12.5px;color:#e6edf5}
+.title-about-card p{margin:0;color:#8295ab;font-size:10.5px;line-height:1.48}
+
+@media(max-width:620px){
+  .title-settings-meta,.title-about-grid{grid-template-columns:1fr}
+  .title-about-card--wide{grid-column:auto}
+  .title-setting-row{grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:11px!important}
+  .title-setting-select{grid-template-columns:1fr!important;align-items:start!important}
+  .title-setting-select select{width:100%;min-width:0}
+  .title-settings-actions{display:grid;grid-template-columns:1fr 1fr}
+  .title-settings-actions button{width:100%}
+}
+
+@media(max-width:430px){
+  .title-about-hero{grid-template-columns:48px minmax(0,1fr);padding:12px}
+  .title-about-mark{width:48px;height:48px;border-radius:10px;font-size:12px}
+  .title-about-hero h3{font-size:16px}
+  .title-about-facts{grid-template-columns:1fr 1fr}
+  .title-about-facts>div:last-child{grid-column:1/-1}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .title-setting-toggle input[type=checkbox],.title-setting-toggle input[type=checkbox]::after{transition:none}
+}
