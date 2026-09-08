@@ -17,6 +17,7 @@
 const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const { requirePushedSourceCommit } = require('./release-guard');
 
 const ROOT = path.join(__dirname, '..');
 const BRANCH = 'gh-pages';
@@ -108,6 +109,24 @@ function validateSourceArtifact() {
   }
 }
 
+function validatePublishCandidate() {
+  const dirty = sourceGit('status', '--porcelain', '--untracked-files=all');
+  if (dirty) {
+    usage(
+      `Refusing to publish from a dirty source tree:\n${dirty}\n` +
+      'Commit or stash every source change before publishing.'
+    );
+  }
+  try {
+    const branches = requirePushedSourceCommit(ROOT);
+    console.log(`source commit is pushed on ${branches.join(', ')}`);
+  } catch (err) {
+    usage(`Refusing to publish: ${err.message}`);
+  }
+  console.log('running full release validation...');
+  execFileSync('npm', ['run', 'validate:full'], { cwd: ROOT, stdio: 'inherit' });
+}
+
 // Regenerated on every publish so the list always matches the folders on disk.
 function writePreviewIndex() {
   const names = listPreviews();
@@ -151,7 +170,7 @@ ${rows}
 }
 
 function publish({ preview, remove }) {
-  if (!remove) validateSourceArtifact();
+  if (!remove) validatePublishCandidate();
   ensureCheckout();
 
   let target, label;

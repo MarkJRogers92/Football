@@ -3,6 +3,23 @@ const assert=require('node:assert/strict');
 const {IDBFactory}=require('fake-indexeddb');
 const {loadEngine}=require('../tools/harness');
 
+test('a broken promise can pass the real portal-entry gate',async()=>{
+ const e=loadEngine({seed:11700});await e.loadSchools();e.setUserTeam('Chicago Metropolitan');e.initUniverse();
+ const from=e.universe.teams[0],p=from.roster[0];p.morale=70;p.role='Rotation';
+ p.promises=[{id:'PR_portal_gate',type:'EARLY_ROLE',schoolId:from.id,status:'BROKEN',resolvedSeason:e.universe.year,transferPenalty:18}];
+ assert.ok(e.promisePenalty(p)>0,'the broken promise creates transfer pressure');
+ assert.equal(e.transferPortalEntryReason(p,0),'BROKEN_PROMISE','a qualifying roll preserves the broken-promise cause');
+ assert.equal(e.transferPortalEntryReason(p,1),null,'a non-qualifying roll still stays out');
+});
+
+test('league-wide portal volume stays active but bounded',async()=>{
+ const e=loadEngine({seed:11701});await e.loadSchools();e.setUserTeam('Chicago Metropolitan');e.initUniverse();
+ e.simSeason();e.simConferenceChampionships();e.simPlayoff();e.offseasonReview();e.offseasonDepartures();
+ const count=e.universe.transferPortal.length,perTeam=count/e.universe.teams.length;
+ assert.ok(count>=120&&count<=300,`${count} entrants must stay inside the 120-300 league band`);
+ assert.ok(perTeam>=1&&perTeam<=2.5,`${perTeam.toFixed(2)} entrants per team must stay believable and bounded`);
+});
+
 test('transfer weighting, capacity, identity, history and former-player alerts',async()=>{
  const e=loadEngine({seed:919,indexedDB:new IDBFactory()});await e.loadSchools();e.setUserTeam('Chicago Metropolitan');e.initUniverse();
  const u=e.universe,from=u.teams[0],p=from.roster[0],teams=u.teams;

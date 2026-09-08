@@ -1,3 +1,12 @@
+# Changelog
+
+## v0.11.8 — Source integrity and portal activation
+
+- Reconciles the live v0.11.7 ID-based postseason and champion resolution back into source with a byte-identical rebuild.
+- Refuses publication unless the exact source commit is reachable from a pushed remote source branch, and makes every publish run full release validation.
+- Recentres transfer risk against the measured current morale distribution and pins league-wide portal participation with a broken-promise entry regression.
+- Removes obsolete branch-pinned workflows and the confirmed-unused weekly postgame prototype.
+
 ## v0.11.7 — Save integrity and postseason consistency
 
 - Rejects unsafe object keys in imported saves and safely escapes pipeline labels in recruiting views.
@@ -49,11 +58,6 @@
 - Live progress appears on the dashboard and Program Lab and is introduced in the preseason briefing.
 - Secondary/stretch results now feed the year-end administration review without replacing the existing wins-against-expectation model.
 - Adds headless regression coverage for goal generation, persistence, and administration consequences.
-
-# Changelog
-
-
-# Changelog
 
 ## v0.9.49 — Named saves, autosave and long-dynasty protection
 

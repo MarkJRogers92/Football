@@ -111,7 +111,7 @@ globalThis.__ENGINE__ = {
   runSpringCamp, runFallCamp, developmentSnapshot, developmentDelta, developmentResult, developmentTeamSummary, developmentGroupSummary, developmentFocusSummary, developmentMovementDistribution, developmentResultDetailHTML, developmentResultsHTML, makeOffseasonState, normalizeOffseasonState, OFFSEASON_PHASES, advanceRecruiting, finalizeRecruiting,
   generateRecruitPool, generatePlayer, generateRoster, conditionRating,
   roleFit, unit, starter, roleStarter, participants, eligibilityBase,
-  transferRisk, draftProjection, seasonScore, normalizeUniverse, recruitPitch, recruitCoachRelationshipBoost, ensureRecruitRelationships, assignPrimaryRecruiter, growRecruiterRelationship, coachTransferPressure,
+  transferRisk, transferPortalEntryReason, TRANSFER_MORALE_PIVOT, TRANSFER_ENTRY_DIVISOR, draftProjection, seasonScore, normalizeUniverse, recruitPitch, recruitCoachRelationshipBoost, ensureRecruitRelationships, assignPrimaryRecruiter, growRecruiterRelationship, coachTransferPressure,
   scoutingDefs, ensureScoutingIntel, scoutingDomainView, scoutingConfidenceLabel, refreshScoutingIntel, snapshotScouting, firstRecruitEvaluation, scoutingPanelHTML, scoutingHistoryHTML,
   STYLES, STYLE_TRAITS, STYLE_USAGE, ARCHETYPE_META, archetypeMeta, archetypeLabel, archetypeDescription, archetypeChipHTML, styleForTraits,
   ensurePortrait, portraitSeedFor, jerseyFor, schoolColors, ensureSchoolColors, commissionerMode, renderControlMode, PORTRAIT_VERSION,

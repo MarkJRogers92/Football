@@ -1,9 +1,9 @@
 # Roadmap execution status
 
-Last inspected source: `77877e9` (`v0.11.4`), published and live on `gh-pages`.
-This file had drifted several releases behind actual `git log` — trust
-`CHANGELOG.md` and `git log --oneline` over this table's history, only the
-current row states are being asserted here.
+Last inspected source: `b004f8a` (`v0.11.7`) on
+`codex/v0117-audit-items-1-4-7`. Production remains `7f02634` (`v0.11.7`) on
+`gh-pages`. The reconciled source at `0ce2c39` rebuilt byte-for-byte identically
+to that live artifact before the unreleased audit-maintenance commits began.
 
 | Packet | Status | Active branch | Blocking decision |
 | --- | --- | --- | --- |
@@ -15,7 +15,8 @@ current row states are being asserted here.
 | v0.9.50 modules/RNG | SHIPPED — RNG infra + all 4 gameplay domains routed through `gameplayRandom()` | `claude/review-improvement-dwjemy` | None |
 | v0.9.51-55 season goals/recruiting/development | SHIPPED | `claude/review-improvement-dwjemy` | None |
 | v0.10 Game Engine 2 | SHIPPED | `claude/review-improvement-dwjemy` | None |
-| v0.11 program economy | SHIPPED `77877e9` (`v0.11.4`, current production) | `claude/review-improvement-dwjemy` | None |
+| v0.11 program economy | SHIPPED `77877e9` (`v0.11.4`, historical baseline) | `claude/review-improvement-dwjemy` | Superseded by v0.11.7 production |
+| v0.11.8 audit maintenance | RELEASE AUTHORIZED — source reconciliation, publish guard and portal calibration complete | `codex/v0117-audit-items-1-4-7` | Push exact source, pass guarded full validation, then publish production |
 | v0.12 encyclopedia | READY FOR SLICING | — | Not started |
 
 `READY` means the packet can begin as one bounded release. `READY FOR SLICING`
@@ -24,15 +25,24 @@ slices, but the whole major version must not be attempted in one branch.
 
 ## Next action
 
-`docs/roadmap/09-v012-encyclopedia.md` is the only unstarted packet with a
-written contract. Read it before beginning; no branch has touched it yet.
+Publish `codex/v0117-audit-items-1-4-7` as v0.11.8 through the guarded full
+release path authorized on 2026-09-08. After this maintenance branch is live,
+the next simulation task is the multi-seed prestige/dynasty measurement from
+the audit; do not tune prestige from the original single seed.
 
-## Most recent check (v0.11.4)
+## Most recent check (v0.11.8 release candidate)
 
-Build, `tests/version.js`, and a static sweep (no merge-conflict markers, no
-duplicate `function` declarations, no debug statements) passed on `77877e9`.
-The full `npm test` suite was not run for this check — same open gap noted
-below. Full suite + browser suite are still owed before the next release.
+The reconciled build matched live production byte-for-byte. The portal-focused
+suite passed 28/28, and the full Node suite passed 362/362 after installing the
+locked dependencies. The functional browser suite passed 115/115, and the
+focused visual suite passed 35/35 in the verified logo-refresh run. A fresh
+rerun on this host is currently blocked by local Chromium availability: the
+bundled Playwright path is missing, and the system Chrome binary aborts under
+Playwright here.
+
+The current multi-season audit run recorded 159, 165, 165, 234 and 213 portal
+transfers across its five seasons. Those exits were driven by playing-time and
+fresh-start pressure, with zero broken-promise transfers in this pass.
 
 ## Current validation checkpoint (historical, pre-v0.10 — kept for provenance only)
 

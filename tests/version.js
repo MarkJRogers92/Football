@@ -21,13 +21,19 @@ try {
 
   const version = read('VERSION.txt').trim().replace(/^Dynasty Lab\s*/, '').replace(/^v/, '');
   const packageVersion = JSON.parse(read('package.json')).version;
+  const packageLock = JSON.parse(read('package-lock.json'));
   const appVersion = (read('app.js').match(/APP_VERSION='([^']+)'/) || [])[1];
   const body = read('body.html');
+  const changelog = read('CHANGELOG.md');
   const html = fs.readFileSync(outPath, 'utf8');
   const v = escapeRe(version);
 
   assert.equal(packageVersion, version, 'package.json version must match VERSION.txt');
+  assert.equal(packageLock.version, version, 'package-lock.json version must match VERSION.txt');
+  assert.equal(packageLock.packages[''].version, version, 'package-lock root package version must match VERSION.txt');
   assert.equal(appVersion, version, 'APP_VERSION must match VERSION.txt');
+  assert.match(changelog, new RegExp(`^## v${v}(?:\\s|$)`, 'm'), 'CHANGELOG.md must contain the current VERSION.txt release');
+  assert.equal((changelog.match(/^# Changelog$/gm) || []).length, 1, 'CHANGELOG.md must have one top-level heading');
   assert.doesNotMatch(body, /data-(?:title-)?version>v\d+\.\d+\.\d+</,
     'body.html must use neutral version placeholders rather than a stale release');
   assert.match(html, new RegExp(`<title>Dynasty Lab v${v}<\\/title>`), 'document title must use VERSION.txt');

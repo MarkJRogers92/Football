@@ -1,407 +1,60 @@
-# Dynasty Lab — v0.9.51 integrated checkpoint
-
-Branch: `codex/v0951-integrated`
-Baseline: Claude RNG-routing commit `4ba3657d`
-Production: v0.9.50 remains live on `gh-pages` until this branch passes validation and is deliberately published.
-
-This branch combines:
-- the completed persistent gameplay RNG routing across recruiting, portal, offseason/coaching and game simulation;
-- the two signing-day consistency fixes discovered during RNG routing;
-- v0.9.51 season goals with contextual primary/secondary/stretch objectives, dashboard + Program Lab progress, and year-end administration consequences;
-- RNG domain regression suites plus `tests/season-goals.js`;
-- synchronized 0.9.51 version metadata.
-
-Validation is being run on PR #8. The standalone `index.html` has now been rebuilt from the integrated source tree by the branch build workflow (artifact commit `8575e0e8`). Canonical full validation must pass before release.
-
-## Prior continuation history
-
-# Dynasty Lab — v0.9.44 production checkpoint
-
-Source commit: `dc3c76c`
-Production commit: `99d8a88` on `gh-pages`
-
-v0.9.44 is a presentation-only conference identity and game-day pass. It adds ten CSS-rendered conference crests/identities and upgrades Game Lab using only existing engine facts. No simulation rules, save schema, migration or IndexedDB behavior changed.
-
-v0.9.44 is live. The next bounded work is specified in
-`docs/roadmap/STATUS.md`; do not infer the current task from the older historical
-sections below.
-
-## Prior checkpoint
-
-# Dynasty Lab — v0.9.42 checkpoint
-
-Production: v0.9.42 at https://markjrogers92.github.io/Football/
-
-v0.9.42 completes team-logo coverage across the remaining presentation surfaces. This release is presentation-only: no simulation rules, save schema, migration or IndexedDB behavior changed.
-
-## Prior continuation notes
-
-# Dynasty Lab — v0.9.37 checkpoint
-
-Repository: https://github.com/MarkJRogers92/Football
-Current source branch: `claude/review-improvement-dwjemy` (reconciled directly —
-see below)
-Production branch: `gh-pages`
-Production: v0.9.37 at https://markjrogers92.github.io/Football/
-
-## Current release
-
-v0.9.37 merges two parallel v0.9.36 releases — GPT's and this branch's — after
-both cut from v0.9.35 and this branch's publish overwrote GPT's in production.
-
-**Read this before publishing again:** the actual defect was publishing to a
-shared target without first checking whether that version number was already
-taken on `gh-pages`. Check `git log origin/gh-pages` for the version you are
-about to publish, every time.
-
-GPT's gameplan design won on merit and supersedes v0.9.35's: directional prep
-(stop the run / protect the pass / pressure the QB, each giving one thing and
-costing another) instead of an intensity slider, and wear deferred to game
-time via `wearPending`/`wearApplied` instead of charged when the card is
-answered. This branch's Game Lab freshness fix rebased cleanly on top.
-
-## Previous release
-
-v0.9.36 fixes a player-reported inconsistency: the Game Lab's lower panels
-showed the last game run through *its* buttons while the card above them
-showed the current next game, with no week label on either. A dashboard sim of
-your own game now clears the stale detail, a game played through the Game Lab
-keeps it (`simWeek` skips already-played games — that asymmetry is the whole
-fix), and the box is stamped with season/week.
-
-Note for anyone working here: the two engines are not interchangeable. A
-dashboard-simmed game has a box score but `drives: []` and no play-by-play;
-only `detailedGame` produces those. The Game Lab is the only way to generate
-that detail, so it is not redundant with Game Center.
-
-## Previous release
-
-v0.9.35 reconciles v0.9.34 (GPT's title screen — New/Continue/Load Dynasty)
-the same way v0.9.29-32 was reconciled: extract changed source files out of
-the live build using byte-identical unchanged neighbors as anchors, verify
-the rebuild matches production exactly. If you do this again: **polish.css
-is the last CSS file before `</style>` and cannot be verified by prefix
-matching** — extract it using the `</style></head><body>` boundary directly,
-first time, not after a failed byte-diff points you at it.
-
-Two things reconciling this exposed, fixed here: the title screen's
-background image (`assets/title-stadium-v1.jpg`) lives on `gh-pages` but was
-never committed to the repo — pulled and committed. This is the project's
-first dependency on an external file rather than a single self-contained
-HTML page; worth a deliberate look, not something to quietly keep growing.
-And all four browser test files needed a `startNewDynasty()` helper since
-`#userTeam` no longer exists until a dynasty is started from the title screen.
-
-Also fixed: full scout in the weekly gameplan (v0.9.33) had no real cost
-outside an active scheme installation, which is nearly always — reported
-directly by the player as "why wouldn't you always do it." Added an
-unconditional starter-wear cost alongside the existing conditional
-familiarity cost.
-
-## Previous release
-
-v0.9.33 adds program history (all-time record + coaching lineage on the
-Program tab, for whichever program is selected) and the weekly gameplan (a
-Coach's Desk card that scouts the upcoming opponent for a small in-game edge,
-costing real scheme-install progress only while a program is mid-transition).
-Both closed out items on IDEAS.md.
-
-## Previous: reconciliation, not a feature
-
-v0.9.29-32 shipped from a parallel GPT/codex session directly to `gh-pages`
-with no source ever pushed to any branch or PR — the only record was the
-built `index.html` in gh-pages history. Reconciled by exact extraction (see
-CHANGELOG/WORKLOG for method); the rebuild is byte-identical to what was live.
-Added: Game Center drive-by-drive replay / watch mode. This branch's own
-v0.9.21-28 work is untouched and still fully present.
-
-**If this happens again:** check `git fetch origin gh-pages` vs your branch's
-VERSION.txt before assuming production matches source. `tools/build.js`'s
-file-concatenation is exploitable for exactly this kind of reconciliation —
-diff each source file against the live bundle with `String.indexOf` before
-assuming any of them changed.
-
-## Previous release
-
-v0.9.28 fixes a real bug found by a 7-season headless soak test (not by hand
-play): an ignored job offer froze career progression forever while the rest of
-the game kept running. `simWeek`, `simSeason` and `simulateUserDetailed` now
-block on `hasPendingCareerChoice()`, the same pattern the Coach's Desk already
-used for weekly decisions. The one non-obvious part: `simSeason`'s fast-forward
-loop needed its own guard, or a blocked `simWeek` would leave it spinning
-forever rather than hanging cleanly. See WORKLOG.
-
-If you soak-test again: this confirms multi-season headless runs find things
-single-season tests structurally cannot. Worth doing again after the next
-batch of features that touches offseason/tenure/career state.
-
-## Previous release
-
-v0.9.27 adds the coaching tree (Staff tab; producing a head coach is worth up
-to two prestige a season, credited once per coach via `t.coachTreeCredited`),
-a `no-cache` meta on the built page because GitHub Pages holds HTML for ten
-minutes, and **roadmap B's measurement**.
-
-## Roadmap B: measured, and the roadmap was wrong
-
-Read `docs/SAVE_SIZE_MEASUREMENT.md` before doing anything here. The roadmap
-said growth was ~4 MB/season driven by `universe.events` and `seasonHistory`.
-Measured over six seasons: growth is **11.4 MB/season**, `events` is **2.0%**
-of the save, `seasonHistory` grows 0.33 MB/season, and the real drivers are
-`gameArchive` (41.8%) and `playerArchive` (22.9%) — 80% of growth between them.
-Implementing the roadmap as written would have cost the wire and the story
-surface to reclaim under 3%.
-
-Next step is **another measurement, not an optimisation**: those are
-`packUniverse` numbers and the browser already chunks/defers `playerArchive`,
-so instrument `saveBrowser` and read back real IndexedDB record sizes first.
-
-## Previous release
-
-v0.9.26 closes roadmap milestone C: fourteen flat tabs become five groups
-(Program, Team, Recruiting, Games, Staff & Offseason). The tab buttons are
-untouched — same markup, same `data-tab` values — so `go()`, hub tiles and
-weekly-plan steps all still resolve; grouping is a visibility layer on top.
-
-If you add a tab, add it to `TAB_GROUPS` or it will never be visible. And note
-`setActiveTab()` syncs the group on every activation: a programmatic jump with
-`el.click()` works on a hidden button, so without that sync a hub tile would
-open a tab with the wrong group highlighted.
-
-## Previous release
-
-v0.9.25 adds academic eligibility. Standing drifts weekly toward
-`academicTarget()` (program support + player iq - wear); below 30 the player is
-ineligible for two weeks, enforced in `gameAvailable()` so no selection path can
-route around it. A new Coach's Desk card trades academic standing against scheme
-familiarity, with no option that is simply correct.
-
-Carry this forward if you touch the curve: standing equilibrates about **8
-below** target under the weekly drag, so the target range decides whether the
-floor is reachable at all. The first tuning bottomed out near 38 against a floor
-of 30 and the feature would have shipped inert. See WORKLOG.
-
-## Previous release
-
-v0.9.24 makes signing day a live event. Contested commitments are resolved
-inside `buildSigningDay()` during `finalizeRecruiting` and revealed one name at
-a time; revealing is pure presentation and changes no outcome, which is the
-invariant to protect if this is ever extended. It also fixed a pre-existing
-bug: `r.challenger` was never cleared on commitment, so a recruit who flipped
-to his challenger kept naming that school as his challenger, and the WAVERING
-pill and the weekly plan's "Hold X" step both fired on recruits nobody was
-chasing.
-
-## Previous release
-
-v0.9.23 adds bowl season and a fanbase that answers to results. A `bowlReady`
-phase sits between the conference round and the playoff; every six-win team
-outside the playoff field plays one more game. `simPlayoff()` deliberately
-plays the bowls itself if called from `bowlReady`, so bowls cannot be skipped
-and the thirteen existing test files that call it directly still work.
-
-`fan_support` now moves once a season and decays toward a per-program
-`fanBaseline`, and it drives home-field advantage — previously a flat 2.2 for
-all 120 programs, now `2.2 + (fan_support-60)*0.03`, deliberately centred so a
-median program is unchanged. `gameSim` is the most load-bearing function in the
-engine; that centring is why this is a spread around current behaviour rather
-than a league-wide rebalance, and a test pins the median to 2.2.
-
-## Previous release
-
-v0.9.22 closes the hole v0.9.21 opened: the administration could end a tenure
-and the run had nowhere to go. A closed tenure now archives to
-`universe.careerHistory`, and up to three programs at or below a ceiling
-derived from your resume will hire you. The career record carries across
-posts. Two guards are load-bearing and easy to break: a closed tenure stops
-accruing seasons until a post is taken, and switching the controlled program
-by hand closes the old tenure as "stepped away" rather than misattributing
-its seasons. See WORKLOG for both.
-
-## Previous release
-
-v0.9.21 adds the three stakes features from `IDEAS.md`: rivalries (derived
-from the schedule, with persistent series and trophies), the administration
-(a preseason expectation and a confidence score that judges the player on the
-same formula `carousel()` uses on AI coaches), and NIL as a finite per-season
-budget spent on retention or recruiting. Read `IDEAS.md` for the remaining
-nine ideas and WORKLOG for the two assumptions that turned out wrong during
-implementation.
-
-Known trade-off worth carrying forward: rivals are the nearest conference
-school **that is actually on the schedule**, because the round-robin plays
-eight of eleven opponents. That means a program's true geographic neighbour is
-sometimes not its rival. 114 of 120 programs are paired.
-
-## Previous release
-
-v0.9.20 completes roadmap milestone A with the story surface: record-chase
-alerts on the wire, and a career chronology in the player profile. Both read
-data the game already stored. The record chase works because season records
-are rewritten only at year end (`finalizeSeasonHonors`), so a running stat
-line compared against them is a real chase against a prior year's mark; see
-WORKLOG for why that single fact shaped the design. Milestone A is done.
-
-## Previous release
-
-v0.9.19 ranks the weekly hub ("the wire") by importance instead of insertion
-order. Every tile now carries a numeric importance on the same 0–100 scale
-`universe.events` uses — previously only the coach-fallout and familiar-face
-tiles did, so the sort the roadmap asked for would have compared `undefined`
-on most of a normal week. See CHANGELOG/WORKLOG for the per-tile values. The
-CSS `order` grouping by tile type in `polish.css` is unchanged.
-
-## Previous release
-
-v0.9.18 reconciles three previously-diverged GPT/codex feature branches
-(v0.9.14–v0.9.16, only in their own previews before this) onto the
-commercial polish pass (v0.9.17). All three feature branches are now fully
-part of the main line — nothing is orphaned.
-
-- **The Coach's Desk** (v0.9.14): the Weekly Command Center can open up to
-  three state-backed coaching decisions in a controlled-team week (workload,
-  redshirt threshold, playing-time concern, recruiting priority choice).
-  Reuses existing rotation/morale/trust/promise/visit systems.
-- **Player Agency / Locker Room** (v0.9.15): players can now initiate five
-  Coach's Desk conversations (playing time, transfer concerns, role
-  requests, redshirt, position change). Shares `universe.weeklyDecisions`
-  and the event ledger with the Coach's Desk; capped cadence so it never
-  becomes a constant interruption.
-- **Scouting Intelligence** (v0.9.16): recruit and player profiles show five
-  position-specific scouting domains as ranges with confidence labels,
-  derived from existing attributes. Confidence responds to evaluation
-  exposure; belief snapshots are preserved at meaningful checkpoints
-  (first evaluation, signing day, first fall camp, end of freshman season).
-  Hidden true ratings remain hidden.
-- The player profile no longer shows raw Speed/Power/Technique/IQ grades
-  (removed by the scouting-intel branch itself, kept removed here) — showing
-  an exact number next to a deliberately-uncertain scouted range would have
-  undermined the feature.
-
-## Validation checkpoint
-
-- 53/53 engine smoke checks;
-- 86/86 Node tests across all suites (10 new: `weeklydecisions.js`,
-  `playeragency.js`, `scouting.js`);
-- 134 desktop + iPhone-layout browser checks (99 + 14 + 21 across the three
-  Chromium suites);
-- direct Playwright pass of the merged UI at every real conflict site:
-  player profile (scouting panel + polish section layout together), recruit
-  profile (same), and a live-driven Dashboard state showing an actual
-  Coach's Desk decision card rendering inside the polish pass's `.plan-card`.
-  Zero console errors throughout.
-
-## How the merge was done
-
-Three commits, sequential (v0.9.14 → v0.9.15 → v0.9.16, each built on the
-last), rebased as one chain onto v0.9.17. 10 of 13 conflicts across the
-three commits were mechanical (version files, generated `index.html`,
-`CONTINUATION.md` — always taken as "ours" and rewritten wholesale
-regardless). 3 were real, all in `app.js`, all the same shape: the polish
-pass's `profile-sections` layout on one side, scouting-intelligence's new
-panels/behavior on the other, woven together by hand rather than picking
-one side. See `WORKLOG.md`'s v0.9.18 entry for the specific reasoning,
-including the Speed/Power/Technique/IQ removal call.
-
-## Not addressed in this release
-
-Hub tile order still follows CSS `order` per type rather than the engine's
-`importance` values (recommended milestone A below). Roster/Season/Stats
-tabs still have only the shared design system, no screen-specific hierarchy
-work. The 390px header is still three rows. These are cosmetic gaps, not
-simulation gaps.
-
-## Storage guardrail
-
-Read `STORAGE.md` before altering saves. v0.9.33 adds `t.allTimeRecord` and
-`t.gameplan`, additive. v0.9.29-32 (GPT) added Game Center
-watch-mode presentation only, no new persisted fields as far as reconciliation
-could tell — verify against STORAGE.md if anything looks off.
-v0.9.28 changed no stored state.
-v0.9.27 added `t.coachTreeCredited`,
-additive. v0.9.26 changed no stored state at all.
-v0.9.25 added `p.academicStanding`,
-`p.academicPlan` and `p.academicHold`, additive. v0.9.24 added `universe.signingDay`,
-additive. v0.9.23 added `universe.bowls`,
-`t.bowlResult` and `t.fanBaseline`, all additive. v0.9.22 added `universe.careerHistory`,
-`universe.jobOffers` and `closed` on `universe.tenure`, all additive.
-v0.9.21 added only additive fields
-(`t.rivalry`, `t.adminConfidence`, `t.mandate`, `t.nilSpent`, `universe.tenure`,
-`nilDeal` on players and recruits), all backfilled in `normalizeUniverse`;
-IndexedDB stays at schema 3. v0.9.20 added no save-format change of
-its own (`importance` is an additive field on hub tiles, which are rebuilt
-every week). v0.9.18 was a merge of already-shipped
-additive changes — no new save-format changes of its own. IndexedDB remains
-schema 3. Scouting/decision/agency state uses additive fields on existing
-player/recruit/universe records with no IndexedDB version bump.
-
-## Next roadmap sequence
-
-### A) ~~Hub priority + story surface~~ — done (v0.9.19 + v0.9.20)
-Both halves shipped. Any new wire tile type needs an `importance` on the
-0–100 scale to rank correctly among the others.
-
-### B) Live-league save size — fully measured (v0.9.27 + v0.9.38), not yet built
-See `docs/SAVE_SIZE_MEASUREMENT.md`. Growth is +11.5 MB/season (~188 MB by
-season 15). v0.9.38 checked the one open caveat from the original
-measurement — that resident IndexedDB might be smaller than the portable
-export because of chunking/deferral — directly, against real `storage.js` +
-`fake-indexeddb`. It is not smaller; chunking only affects load timing, not
-bytes on disk. `gameArchive` is the largest, fastest-growing store (41-42%)
-and the recommended first target if this is ever built: roll old seasons'
-play-level detail down to box-score granularity after N seasons.
-
-
-### C) ~~14-tab coherence~~ — done (v0.9.26)
-The weekly plan (v0.9.13), the Coach's Desk decision cards (v0.9.14/15) and
-the polish pass (v0.9.17) covered the worst of it. What remains is the tab
-surface itself — grouping, or a first-run path.
-
-## Resume prompt
-
-Continue Dynasty Lab from `MarkJRogers92/Football`. Read `CONTINUATION.md`,
-`STORAGE.md`, `CHANGELOG.md` and `WORKLOG.md` — but note the header of this
-file still says "v0.9.37 checkpoint" and that is stale: `CHANGELOG.md` now
-has entries through v0.9.41 (team branding, on `claude/v0941-team-branding`,
-branched from `claude/review-improvement-dwjemy` at the publish-guard
-commit). Check `git branch -r`, `git log --oneline -10` on both the source
-branch and `gh-pages`, and the top of `CHANGELOG.md` before trusting any
-version number stated as current anywhere in this file — this checkpoint
-was not kept in sync through v0.9.38-41 and needs a real rewrite, not a
-patch, next time someone has the credit budget for it.
-
-Team branding (v0.9.41): the atlas and `teamLogoHTML()` helper are in;
-deferred surfaces are recruiting-board interest/commitment display and any
-future postseason/history views — see the v0.9.41 `CHANGELOG.md` entry for
-the full list and for a CSS bug found and fixed along the way that was
-already there before this pass. Higher-resolution per-team art (64/128px+)
-was not requested by the handoff and the 32px atlas reads fine even at the
-48px Game Center size — only worth revisiting if it looks soft on a real
-high-DPI display.
-
-Work in a new bounded branch, validate fully (`npm test` +
-`npm run test:browser`), update CHANGELOG/WORKLOG/STORAGE/CONTINUATION,
-publish a preview first, then promote only after review.
-
-## v0.9.51 validation note
-Integrated artifact build/currentness and release-source checks passed. Targeted Node regression passed for RNG core/integration, RNG domains 2 and 4, season goals, admin confidence, signing day, transfers, scouting, games, Game Lab, bowls, gameplan, persistence and storage. The standalone browser check failed only while locating Chromium in CI, matching the known environment problem; browser suites did not execute. Two long-running targeted files (portal-recruiting and rng-domain3) were not waited out here, but Claude had already run those successfully on the immediately preceding RNG-routing baseline and the season-goals integration does not touch their code paths. Production was intentionally left unchanged until explicit publish.
-
-## v0.9.52 Program Lab polish
-Branch: codex/v0952-program-goals-polish. Builds on the v0.9.51 Program Lab hotfix. Adds deterministic goal variety, Critical/Important/Bonus weights, live risk states, a Program Overview card, tighter Program Lab layout, and explicit render regression coverage. Production remains v0.9.51 until this branch is reviewed and published.
-
-
-## v0.10.4 Premium Presentation — Recruiting Workspace continuation
-
-Current branch: `codex/v0104-recruiting-workspace-integrated`
-Current source head before this note: `962515854ae1f0fd8343547fb79f5e6a09b38943`
-
-Milestone B source work is present:
-- `recruiting-workspace.js` — Workspace/Table switch, three-pane board/list/dossier presentation, board/all/commits scope and prospect search.
-- `recruiting-workspace.css` — workspace-specific presentation styling.
-- `tools/build.js` includes both assets in the standalone build.
-
-The latest validator run (`34106092578`) completed and failed only at **Verify committed build is current** after `npm run build`; substantive suites were therefore skipped. The failure is generated-artifact drift: committed `index.html` predates the v0.10.4 workspace assets.
-
-During the automated continuation, the exact branch state and build recipe were re-inspected. Attempts to write the regenerated ~1 MB `index.html` through both GitHub's normal contents API and low-level blob/tree API were blocked by connector safety controls before any branch ref was moved. No simulation, save, balance, hidden-rating, or production code was changed in that attempt, and production remains untouched.
-
-Next action: regenerate `index.html` from this branch with `npm run build`, commit only the generated artifact, then run the targeted recruiting/scouting regressions plus the normal build-currentness check. Once green, continue Milestone B with richer dossier/battle-state and signing-class presentation before moving to Milestone C.
+# Dynasty Lab v0.11.8 release handoff
+
+Repository: `MarkJRogers92/Football`
+
+Working branch: `codex/v0117-audit-items-1-4-7`
+
+Production: `7f02634` on `gh-pages`, version 0.11.7. Production was not changed
+by this work.
+
+## Current source state
+
+`0ce2c39` reconciled the live v0.11.7 ID-based conference-champion and frozen
+playoff-field behavior back into source. A fresh source build was compared with
+`origin/gh-pages:index.html`; both had SHA-256
+`95f619bcded4d9975d5150a76a36d993afa6586a09e5fd81c8fd15ed91f773b7`.
+
+The maintenance branch then added two bounded checkpoints:
+
+- `6ba7647` requires the exact source commit to be reachable from a pushed
+  remote source branch and makes preview/production publishing run the complete
+  release validator.
+- `73253c6` moves the transfer morale pivot from 58 to 70 after measuring the
+  current first-season median at 72. Seed 11701 moved from 53 entrants (0.44 per
+  team) to 164 (1.37 per team). The `/360` divisor, portal competition,
+  promises, capacity and destination selection are unchanged.
+
+## Validation and known state
+
+- Source rebuild versus live v0.11.7 before the maintenance delta: byte-identical.
+- Publish-guard unit test: passed.
+- Transfer and portal regressions: 28/28 passed.
+- Full Node regression suite: 362/362 passed with `npm ci` dependencies installed.
+- Functional desktop/iPhone browser suite: 115/115 passed.
+- Focused visual suite: 35/35 passed in the verified logo-refresh run. A fresh
+  local rerun on this host is blocked because the bundled Chromium path is
+  absent and the system Chrome binary aborts under Playwright here, so the
+  previously recorded pass remains the current evidence for the presentation fix.
+- Current multi-season audit: 5 seasons, seeded at 20260903, with portal
+  transfers recorded at 159, 165, 165, 234 and 213 per season; transfer causes
+  stayed concentrated in playing time plus fresh-start exits, with zero broken-
+  promise exits in this run.
+
+## Release boundary
+
+Production publication of this completed branch was explicitly authorized on
+2026-09-08. The release candidate is version 0.11.8 because production already
+owns v0.11.7. The guarded publisher must still confirm that the exact source
+commit is pushed and pass the complete release validator before promotion.
+
+No remote branches were deleted. The three obsolete branch-pinned workflows
+were removed, including the job that rewrote and committed `tests/browser.js`.
+`weekly-postgame-engine.js` was removed only after repository-wide reference
+search confirmed that neither the build, tests, tools nor docs used its
+`DynastyPostgameConsequences` export.
+
+## Next engineering task after review
+
+Run the audit's multi-seed prestige/dynasty measurement before changing any
+prestige constants. The original twelve-season, single-seed parity result is a
+reason to measure, not enough evidence to tune.

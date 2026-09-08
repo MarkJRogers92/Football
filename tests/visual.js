@@ -49,7 +49,10 @@ const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeo
   check(`[${label}] visual weekly decision gate clears before sim`,visualSimReady);
   if(!visualSimReady)throw new Error(`[${label}] Sim Week remained disabled in visual regression after resolving visible weekly decisions`);
   await page.click('#simWeek');await page.waitForFunction(()=>/Week 1/.test(document.querySelector('#weekLine')?.textContent),{timeout:60000});await page.waitForSelector('#broadcastFeature .broadcast-matchup');
-  await page.waitForFunction(()=>document.querySelectorAll('#broadcastFeature .sports-mark.coverage-real-logo').length>=2);
+  await page.waitForFunction(()=>document.querySelectorAll('#broadcastFeature .sports-mark.coverage-real-logo').length>=2,undefined,{timeout:60000}).catch(async err=>{
+   const state=await page.$eval('#broadcastFeature',el=>({logos:el.querySelectorAll('.sports-mark.coverage-real-logo').length,text:el.textContent.trim().slice(0,240)}));
+   throw new Error(`[${label}] post-week matchup logos did not settle: ${JSON.stringify(state)} errors=${JSON.stringify(errors.slice(-3))} (${err.message})`);
+  });
   check(`[${label}] dashboard promotes next matchup after sim`,/NEXT MATCHUP/.test(await page.locator('#broadcastFeature').innerText()));
   check(`[${label}] dashboard matchup uses real team logos`,await page.locator('#broadcastFeature .sports-mark.coverage-real-logo').count()>=2);
   if(label==='iphone'){const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);check(`[${label}] visual layer has no horizontal overflow`,overflow<=1,`${overflow}px`)}
