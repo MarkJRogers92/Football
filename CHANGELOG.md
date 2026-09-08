@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.11.9 — Options and About menu polish
+
+- Reworks the title-screen Options panel into a clearer Game & Presentation settings screen while preserving the existing motion and Watch Mode pace preferences.
+- Adds device-default and local-preference guidance plus Restore Defaults without changing simulation behavior or dynasty save data.
+- Adds an About Dynasty Lab screen with the current version, game identity, Dynasty/Commissioner mode descriptions, and browser/JSON save model.
+- Adds dedicated desktop and iPhone browser coverage for menu navigation, version display, preference persistence/reset, viewport fit, and console errors.
+
 ## v0.11.8 — Source integrity and portal activation
 
 - Reconciles the live v0.11.7 ID-based postseason and champion resolution back into source with a byte-identical rebuild.
