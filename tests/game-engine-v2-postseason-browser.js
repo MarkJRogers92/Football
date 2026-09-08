@@ -32,6 +32,7 @@ function checkDurable(row,label){
     // Bowl: force the user outside the playoff field, then use the normal postseason button. Bowls run first and playoffs remain legacy.
     const bowl=await browser.newPage({viewport:{width:1280,height:900}});bowl.on('pageerror',e=>browserErrors.push(String(e)));bowl.on('console',m=>{if(m.type()==='error')browserErrors.push(m.text())});
     await startNewDynasty(bowl);await reachPostseason(bowl);const bowlPrep=await bowl.evaluate(()=>window.__DL_TEST__.v2PostseasonPrepare('bowl'));assert.ok(bowlPrep.field.includes(bowlPrep.userId));
+    await bowl.evaluate(()=>document.querySelector('#simBowls').click());
     await bowl.evaluate(()=>document.querySelector('#simPlayoff').click());audit=await bowl.evaluate(()=>window.__DL_TEST__.v2PostseasonAudit());
     assert.equal(audit.phase,'complete',`bowl path should complete; captured errors: ${browserErrors.join(' | ')}`);assert.equal(audit.userV2,1,'bowl-only controlled program should record exactly one postseason v2 game');assert.equal(audit.v2Postseason,1,'AI bowls and AI playoff games must remain legacy');assert.ok(audit.legacyPostseason>10,'bowl/playoff stage should still contain many legacy AI games');assert.match(audit.user[0].label,/ Bowl$/);checkDurable(audit.user[0],'bowl');await bowl.close();
 
