@@ -1,5 +1,8 @@
 # Dynasty Lab v0.12.0 — Desktop Storage Handoff
 
+> Milestone C now continues this work in
+> [`v0120-DESKTOP-ALPHA-PACKAGING-HANDOFF.md`](v0120-DESKTOP-ALPHA-PACKAGING-HANDOFF.md).
+
 ## Continuation state
 
 - Branch: `codex/v0120-desktop-storage`
