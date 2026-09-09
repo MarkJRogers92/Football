@@ -54,6 +54,16 @@ const electronPath = require('electron');
     assert.match(await page.title(), /Dynasty Lab/i);
     assert.equal(await page.evaluate(() => location.protocol), 'file:');
     assert.equal(await page.evaluate(() => typeof window.require), 'undefined');
+    const rendererStorage = await page.evaluate(() => ({
+      adapterKind: window.DynastyStorage?.kind,
+      bridgeKind: window.DynastyDesktopStorage?.kind,
+      bridgeKeys: Object.keys(window.DynastyDesktopStorage || {}).sort(),
+    }));
+    assert.equal(rendererStorage.adapterKind, 'desktop', 'renderer selects the desktop storage adapter');
+    assert.equal(rendererStorage.bridgeKind, 'desktop', 'narrow preload storage bridge is present');
+    assert.deepEqual(rendererStorage.bridgeKeys,
+      ['kind', 'listSlots', 'load', 'readArchive', 'readGames', 'rename', 'save'],
+      'preload exposes only named desktop storage capabilities');
     assert.equal(await page.locator('#titleNew').isVisible(), true, 'title screen is visible');
 
     await page.click('#titleNew');
@@ -67,6 +77,14 @@ const electronPath = require('electron');
     await page.locator('#roster.active').waitFor({ state: 'visible', timeout: 10000 });
     await page.locator('#saveBrowser').evaluate(button => button.click());
     await page.waitForFunction(() => /^Saved /.test(document.querySelector('#saveStatus')?.textContent || ''), { timeout: 30000 });
+    assert.match(await page.locator('#saveStatus').textContent(), /on this computer\.$/);
+    const nativeSave = path.join(profile, 'Saves', 'Dynasty 1', 'dynasty.json');
+    assert.equal(fs.existsSync(nativeSave), true, 'save is committed to the desktop profile');
+    const nativeWrapper = JSON.parse(fs.readFileSync(nativeSave, 'utf8'));
+    assert.equal(nativeWrapper.formatVersion, 1);
+    assert.equal(nativeWrapper.slot, 'main');
+    assert.equal(nativeWrapper.core.storageVersion, 3);
+    assert.equal(nativeWrapper.core.userTeam, 'Chicago Metropolitan');
 
     await app.close();
     app = null;
@@ -80,7 +98,7 @@ const electronPath = require('electron');
     assert.match(await restoredPage.locator('#teamName').textContent(), /Chicago Metropolitan/i);
     assert.deepEqual(pageErrors, [], `fatal renderer errors: ${pageErrors.join(' | ')}`);
     assert.deepEqual(consoleErrors, [], `renderer console errors: ${consoleErrors.join(' | ')}`);
-    console.log('PASS desktop shell loads local game, navigates, saves, restarts, restores, and closes cleanly');
+    console.log('PASS desktop shell uses native storage, navigates, saves, restarts, restores, and closes cleanly');
   } finally {
     if (app) await app.close();
     fs.rmSync(profile, { recursive: true, force: true });
