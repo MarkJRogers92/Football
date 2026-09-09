@@ -38,6 +38,7 @@
     "publish": "node tools/publish.js",
     "publish:preview": "node tools/publish.js --preview",
     "test:game-engine-v2-multiweek-browser": "node tests/game-engine-v2-multiweek-browser.js",
+    "test:desktop-storage": "node --test tests/desktop-storage.js",
     "test:desktop-smoke": "npm run build && node tests/desktop-smoke.js"
   },
   "devDependencies": {

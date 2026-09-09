@@ -1,4 +1,5 @@
-// Browser-only save layout. Portable JSON remains a complete, inlined dynasty.
+// Browser saves use IndexedDB. The desktop shell supplies the same narrow storage
+// contract through a preload bridge, while portable JSON remains complete and inlined.
 // IndexedDB requests are queued inside request callbacks (never across awaits).
 (function(root){
   'use strict';
@@ -19,7 +20,7 @@
     return unescape(encodeURIComponent(text)).length;
   };
 
-  function create({indexedDB = root.indexedDB, name = 'DynastyLabDB', slot = DEFAULT_SLOT} = {}) {
+  function createBrowser({indexedDB = root.indexedDB, name = 'DynastyLabDB', slot = DEFAULT_SLOT} = {}) {
     if (typeof slot !== 'string' || !slot || /[:;]/.test(slot))
       throw new Error(`Invalid save slot "${slot}".`);
     function open() {
@@ -283,7 +284,72 @@
     }
     return {load, readArchive, readGames, save, listSlots, rename, slot};
   }
-  const api = {create, revisionOf, SLOT_IDS};
+
+  let migrationPromise = null;
+  async function migrateLegacyDesktopSaves(bridge) {
+    if (!root.indexedDB) return;
+    const nativeSlots = await bridge.listSlots();
+    const legacyIndex = createBrowser({indexedDB: root.indexedDB});
+    const legacySlots = await legacyIndex.listSlots();
+    for (const slot of SLOT_IDS) {
+      const nativeMeta = nativeSlots.find(row => row.slot === slot);
+      const legacyMeta = legacySlots.find(row => row.slot === slot);
+      if (!nativeMeta?.empty || legacyMeta?.empty !== false) continue;
+      const legacy = createBrowser({indexedDB: root.indexedDB, slot});
+      const saved = await legacy.load();
+      if (!saved) continue;
+      const playerArchive = saved.storageVersion >= 2
+        ? await legacy.readArchive(saved.archiveRef)
+        : saved.universe?.playerArchive || [];
+      const gameArchive = saved.storageVersion === 3
+        ? await legacy.readGames(saved.gameRef)
+        : saved.universe?.gameArchive || [];
+      const {storageVersion, archiveRef, gameRef, revision, ...portable} = saved;
+      portable.universe = {...(saved.universe || {}), playerArchive, gameArchive};
+      if (legacyMeta.label && legacyMeta.label !== nativeMeta.label)
+        await bridge.rename({slot, label: legacyMeta.label});
+      await bridge.save({
+        slot,
+        snapshot: portable,
+        options: {additions: playerArchive, gameAdditions: gameArchive, checkpointType: 'migration'},
+      });
+    }
+  }
+
+  function ensureLegacyMigration(bridge) {
+    if (!migrationPromise) migrationPromise = migrateLegacyDesktopSaves(bridge);
+    return migrationPromise;
+  }
+
+  function createDesktop(bridge, slot) {
+    if (typeof slot !== 'string' || !SLOT_IDS.includes(slot))
+      throw new Error(`Invalid save slot "${slot}".`);
+    const afterMigration = action => ensureLegacyMigration(bridge).then(action);
+    return {
+      load: () => afterMigration(() => bridge.load({slot})),
+      readArchive: ref => afterMigration(() => bridge.readArchive({slot, ref})),
+      readGames: ref => afterMigration(() => bridge.readGames({slot, ref})),
+      save: (snapshot, options = {}) => afterMigration(() => bridge.save({slot, snapshot, options})),
+      listSlots: () => afterMigration(() => bridge.listSlots()),
+      rename: label => afterMigration(() => bridge.rename({slot, label})),
+      slot,
+    };
+  }
+
+  function create(options = {}) {
+    const bridge = root.DynastyDesktopStorage;
+    const forceBrowser = options.forceBrowser || Object.prototype.hasOwnProperty.call(options, 'indexedDB');
+    if (bridge && !forceBrowser) return createDesktop(bridge, options.slot || DEFAULT_SLOT);
+    return createBrowser(options);
+  }
+
+  const api = {
+    create,
+    createBrowser,
+    revisionOf,
+    SLOT_IDS,
+    get kind() { return root.DynastyDesktopStorage ? 'desktop' : 'browser'; },
+  };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.DynastyStorage = api;
 })(typeof window === 'object' ? window : globalThis);
