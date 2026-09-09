@@ -3,7 +3,7 @@
 ## Continuation state
 
 - Branch: `codex/v0120-desktop-storage`
-- Latest tested code commit: `83ef018` (`fix: recover interrupted desktop saves`)
+- Latest tested code commit: `4105155` (`fix: isolate corrupt desktop save slots`)
 - Production remains `v0.11.9` on `gh-pages`; this branch has not been published.
 - `VERSION.txt` and `package.json` remain `0.11.9` during Desktop Alpha development.
 
@@ -56,6 +56,8 @@ recovers from the newest valid backup; missing history chunks fail closed with a
 backup message. An interrupted append can safely retry over its uncommitted chunks.
 Legacy migration failures are isolated to the affected slot, retried on the next
 operation, and cannot silently mark that slot as replaceable.
+Likewise, a native slot whose current file and backups are all damaged is marked for
+recovery without preventing healthy slots from loading or appearing in the picker.
 
 ## Commands
 
@@ -74,7 +76,7 @@ not required for development.
 ## Validation completed
 
 - `npm run build`
-- `npm run test:desktop-storage` — 12 focused backend/adapter tests passed, including interrupted-commit retry and isolated migration failure
+- `npm run test:desktop-storage` — 13 focused backend/adapter tests passed, including interrupted-append retry, isolated migration failure, and corrupt-slot isolation
 - `node --test tests/persistence.js tests/reviewed-fixes.js` — 8 persistence and portable import/export tests passed
 - `node --test tests/storage.js` — 9 browser IndexedDB tests passed
 - `CHROMIUM_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' node tests/title-menus-browser.js` — desktop and iPhone title menus passed in the web target
