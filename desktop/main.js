@@ -1,5 +1,5 @@
 const path = require('path');
-const { pathToFileURL } = require('url');
+const {fileURLToPath, pathToFileURL} = require('url');
 const { app, BrowserWindow, ipcMain, session } = require('electron');
 const { createDesktopStorage } = require('./storage.js');
 
@@ -8,10 +8,22 @@ const GAME_URL = pathToFileURL(GAME_ENTRY).href;
 const PRELOAD_ENTRY = path.join(__dirname, 'preload.js');
 let mainWindow = null;
 
+function isGameEntryUrl(url) {
+  try {
+    const actual = path.resolve(fileURLToPath(url));
+    const expected = path.resolve(GAME_ENTRY);
+    return process.platform === 'win32'
+      ? actual.toLowerCase() === expected.toLowerCase()
+      : actual === expected;
+  } catch {
+    return false;
+  }
+}
+
 function validateIpcSender(event) {
   const frame = event.senderFrame;
   if (!mainWindow || event.sender !== mainWindow.webContents || !frame
-    || frame !== event.sender.mainFrame || frame.url !== GAME_URL)
+    || frame !== event.sender.mainFrame || !isGameEntryUrl(frame.url))
     throw new Error('Desktop storage request rejected.');
 }
 
