@@ -11,7 +11,14 @@ async function startNewDynasty(page,{beginSeason=true}={}){
   await page.click('#setupContinue');
   await page.waitForFunction(()=>/Accept the Contract/.test(document.querySelector('#setupStatus')?.textContent||''),{timeout:10000});
   await page.click('#setupContinue');
-  await page.locator('#app').waitFor({state:'visible',timeout:60000});
+  await page.waitForFunction(()=>{
+    const debug=window.__DL_TEST__?.setupDebug?.();
+    return !document.querySelector('#app')?.hidden||(debug&&!debug.submitting&&!document.querySelector('#dynastySetup')?.hidden);
+  },{timeout:180000});
+  if(await page.locator('#app').isHidden()){
+    const failure=await page.evaluate(()=>({status:document.querySelector('#setupStatus')?.textContent||'',debug:window.__DL_TEST__?.setupDebug?.()}));
+    throw new Error(`Setup acceptance failed: ${failure.status} · ${JSON.stringify(failure.debug)}`);
+  }
   if(beginSeason){
     await page.click('#hubAdvance');
     await page.waitForFunction(()=>window.__DL_TEST__.preseasonDebug().phase==='regular',{timeout:30000});
