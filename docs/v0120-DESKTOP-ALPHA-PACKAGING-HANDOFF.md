@@ -4,7 +4,7 @@
 
 - Source branch: `codex/v0120-desktop-alpha-packaging`
 - Milestone B baseline: `23704779907df576b7e6f6d259f3d52f37c71e80`
-- Packaging implementation checkpoint: `995093f`
+- Packaging implementation checkpoint: `9679873`
 - Source/package version remains `0.11.9` during Desktop Alpha development.
 - Production remains `v0.11.9` at `20d99a44d00cd19f5bbcb45c5566002690811b61` on `gh-pages`.
 - No preview, production deployment, or public GitHub Release was created.
