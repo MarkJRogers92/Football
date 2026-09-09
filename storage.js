@@ -285,52 +285,70 @@
     return {load, readArchive, readGames, save, listSlots, rename, slot};
   }
 
-  let migrationPromise = null;
-  async function migrateLegacyDesktopSaves(bridge) {
+  const migrationPromises = new Map();
+  const MIGRATION_ERROR = 'An older desktop save could not be migrated. Restart Dynasty Lab or import a complete JSON backup.';
+  async function migrateLegacyDesktopSlot(bridge, slot) {
     if (!root.indexedDB) return;
     const nativeSlots = await bridge.listSlots();
     const legacyIndex = createBrowser({indexedDB: root.indexedDB});
     const legacySlots = await legacyIndex.listSlots();
-    for (const slot of SLOT_IDS) {
-      const nativeMeta = nativeSlots.find(row => row.slot === slot);
-      const legacyMeta = legacySlots.find(row => row.slot === slot);
-      if (!nativeMeta?.empty || legacyMeta?.empty !== false) continue;
-      const legacy = createBrowser({indexedDB: root.indexedDB, slot});
-      const saved = await legacy.load();
-      if (!saved) continue;
-      const playerArchive = saved.storageVersion >= 2
-        ? await legacy.readArchive(saved.archiveRef)
-        : saved.universe?.playerArchive || [];
-      const gameArchive = saved.storageVersion === 3
-        ? await legacy.readGames(saved.gameRef)
-        : saved.universe?.gameArchive || [];
-      const {storageVersion, archiveRef, gameRef, revision, ...portable} = saved;
-      portable.universe = {...(saved.universe || {}), playerArchive, gameArchive};
-      if (legacyMeta.label && legacyMeta.label !== nativeMeta.label)
-        await bridge.rename({slot, label: legacyMeta.label});
-      await bridge.save({
-        slot,
-        snapshot: portable,
-        options: {additions: playerArchive, gameAdditions: gameArchive, checkpointType: 'migration'},
-      });
-    }
+    const nativeMeta = nativeSlots.find(row => row.slot === slot);
+    const legacyMeta = legacySlots.find(row => row.slot === slot);
+    if (!nativeMeta?.empty || !legacyMeta) return;
+    if (legacyMeta.label && legacyMeta.label !== nativeMeta.label)
+      await bridge.rename({slot, label: legacyMeta.label});
+    if (legacyMeta.empty !== false) return;
+    const legacy = createBrowser({indexedDB: root.indexedDB, slot});
+    const saved = await legacy.load();
+    if (!saved) return;
+    const playerArchive = saved.storageVersion >= 2
+      ? await legacy.readArchive(saved.archiveRef)
+      : saved.universe?.playerArchive || [];
+    const gameArchive = saved.storageVersion === 3
+      ? await legacy.readGames(saved.gameRef)
+      : saved.universe?.gameArchive || [];
+    const {storageVersion, archiveRef, gameRef, revision, ...portable} = saved;
+    portable.universe = {...(saved.universe || {}), playerArchive, gameArchive};
+    await bridge.save({
+      slot,
+      snapshot: portable,
+      options: {additions: playerArchive, gameAdditions: gameArchive, checkpointType: 'migration'},
+    });
   }
 
-  function ensureLegacyMigration(bridge) {
-    if (!migrationPromise) migrationPromise = migrateLegacyDesktopSaves(bridge);
-    return migrationPromise;
+  function ensureLegacyMigration(bridge, slot) {
+    if (!migrationPromises.has(slot)) {
+      const attempt = migrateLegacyDesktopSlot(bridge, slot).catch(() => {
+        migrationPromises.delete(slot);
+        throw new Error(MIGRATION_ERROR);
+      });
+      migrationPromises.set(slot, attempt);
+    }
+    return migrationPromises.get(slot);
+  }
+
+  async function listDesktopSlots(bridge) {
+    const failed = new Set();
+    for (const id of SLOT_IDS) {
+      try { await ensureLegacyMigration(bridge, id); }
+      catch { failed.add(id); }
+    }
+    const rows = await bridge.listSlots();
+    return rows.map(row => failed.has(row.slot) && row.empty
+      ? {...row, empty: false, migrationError: MIGRATION_ERROR}
+      : row);
   }
 
   function createDesktop(bridge, slot) {
     if (typeof slot !== 'string' || !SLOT_IDS.includes(slot))
       throw new Error(`Invalid save slot "${slot}".`);
-    const afterMigration = action => ensureLegacyMigration(bridge).then(action);
+    const afterMigration = action => ensureLegacyMigration(bridge, slot).then(action);
     return {
       load: () => afterMigration(() => bridge.load({slot})),
       readArchive: ref => afterMigration(() => bridge.readArchive({slot, ref})),
       readGames: ref => afterMigration(() => bridge.readGames({slot, ref})),
       save: (snapshot, options = {}) => afterMigration(() => bridge.save({slot, snapshot, options})),
-      listSlots: () => afterMigration(() => bridge.listSlots()),
+      listSlots: () => listDesktopSlots(bridge),
       rename: label => afterMigration(() => bridge.rename({slot, label})),
       slot,
     };

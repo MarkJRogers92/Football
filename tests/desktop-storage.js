@@ -118,12 +118,36 @@ test('missing chunks fail closed instead of silently dropping history', async ()
   await assert.rejects(() => store.readArchive({slot: 'main', ref: saved.archiveRef}), /missing or damaged/i);
 });
 
+test('an interrupted commit can retry over its uncommitted chunk files', async () => {
+  let failCommit = true;
+  const faultFs = {...fs, rename: async (from, to) => {
+    if (failCommit && to.endsWith(`${path.sep}dynasty.json`)) {
+      failCommit = false;
+      const error = new Error('simulated interruption before commit');
+      error.code = 'EIO';
+      throw error;
+    }
+    return fs.rename(from, to);
+  }};
+  const interrupted = createDesktopStorage({rootDir: root, fsModule: faultFs});
+  const payload = {slot: 'main', snapshot: snapshot(), options: {
+    additions: rows('retry-career', 2), gameAdditions: rows('retry-game', 1),
+  }};
+  await assert.rejects(() => interrupted.save(payload), /simulated interruption/);
+  const retried = await interrupted.save(payload);
+  assert.deepEqual((await interrupted.readArchive({slot: 'main', ref: retried.archiveRef})).map(row => row.id),
+    ['retry-career-0', 'retry-career-1']);
+  assert.deepEqual((await interrupted.readGames({slot: 'main', ref: retried.gameRef})).map(row => row.id),
+    ['retry-game-0']);
+});
+
 test('invalid slots, labels, refs, and renderer paths are rejected', async () => {
   await assert.rejects(() => store.load({slot: '../Dynasty 1'}), /Invalid save slot/);
   await assert.rejects(() => store.load({slot: 'main/../../elsewhere'}), /Invalid save slot/);
   await assert.rejects(() => store.rename({slot: 'main', label: ''}), /1–40/);
   await assert.rejects(() => store.rename({slot: 'main', label: 'x'.repeat(41)}), /1–40/);
   await assert.rejects(() => store.readArchive({slot: 'main', ref: {id: '../escape', count: 1, chunks: 1}}), /Invalid archive/);
+  await assert.rejects(() => store.readArchive({slot: 'main', ref: {id: 'huge', count: 524289, chunks: 1}}), /Invalid archive/);
   await assert.rejects(() => store.save({slot: 'main', snapshot: snapshot(), options: {additions: [null]}}), /Invalid additions/);
   await assert.rejects(() => store.save({slot: 'main', snapshot: snapshot(), options: {gameAdditions: [{}]}}), /Archived games/);
   await assert.rejects(() => store.save({slot: 'main', snapshot: snapshot(), options: {checkpointType: {raw: true}}}), /checkpoint type/);
@@ -174,6 +198,50 @@ test('renderer adapter migrates the Milestone A IndexedDB save once and keeps th
     assert.deepEqual((await desktop.readGames(loaded.gameRef)).map(row => row.id), ['legacy-game-0']);
     assert.equal((await desktop.listSlots())[0].label, 'Original Desktop Career');
     assert.equal((await legacy.load()).universe.year, 2032, 'migration preserves the IndexedDB source copy');
+  } finally {
+    delete globalThis.DynastyDesktopStorage;
+    delete globalThis.indexedDB;
+    delete require.cache[modulePath];
+  }
+});
+
+test('one failed legacy migration does not block other slots and is retried', async () => {
+  const modulePath = require.resolve('../storage.js');
+  delete require.cache[modulePath];
+  const indexedDB = new IDBFactory();
+  const browserApi = require('../storage.js');
+  const legacyMain = browserApi.create({indexedDB, slot: 'main'});
+  const legacySecond = browserApi.create({indexedDB, slot: 'dynasty-2'});
+  await legacyMain.save(snapshot(2031), {additions: rows('main-career', 1)});
+  await legacySecond.save(snapshot(2041, 'Great Lakes University'), {additions: rows('second-career', 1)});
+
+  const native = createDesktopStorage({rootDir: root});
+  let failMain = true;
+  globalThis.indexedDB = indexedDB;
+  globalThis.DynastyDesktopStorage = Object.freeze({
+    load: payload => native.load(payload),
+    readArchive: payload => native.readArchive(payload),
+    readGames: payload => native.readGames(payload),
+    save: payload => {
+      if (failMain && payload.slot === 'main') {
+        failMain = false;
+        return Promise.reject(new Error('simulated disk error'));
+      }
+      return native.save(payload);
+    },
+    listSlots: () => native.listSlots(),
+    rename: payload => native.rename(payload),
+  });
+  delete require.cache[modulePath];
+  try {
+    const desktopApi = require('../storage.js');
+    const firstList = await desktopApi.create({slot: 'main'}).listSlots();
+    assert.match(firstList[0].migrationError, /could not be migrated/i);
+    assert.equal(firstList[0].empty, false, 'failed legacy slot is protected from replacement');
+    assert.equal((await desktopApi.create({slot: 'dynasty-2'}).load()).universe.year, 2041,
+      'unaffected slot remains usable');
+    assert.equal((await desktopApi.create({slot: 'main'}).load()).universe.year, 2031,
+      'failed slot retries on its next operation');
   } finally {
     delete globalThis.DynastyDesktopStorage;
     delete globalThis.indexedDB;

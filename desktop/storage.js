@@ -9,6 +9,8 @@ const STORAGE_VERSION = 3;
 const FORMAT_VERSION = 1;
 const BACKUP_LIMIT = 5;
 const MAX_JSON_BYTES = 256 * 1024 * 1024;
+const MAX_CHUNKS = 4096;
+const MAX_ROWS = CHUNK_SIZE * MAX_CHUNKS;
 const SLOT_DIRS = Object.freeze({
   main: 'Dynasty 1',
   'dynasty-2': 'Dynasty 2',
@@ -43,8 +45,8 @@ function validateLabel(label) {
 function validateRef(ref, label = 'archive') {
   if (!isPlainObject(ref)
     || typeof ref.id !== 'string' || !/^[A-Za-z0-9_-]{1,200}$/.test(ref.id)
-    || !Number.isSafeInteger(ref.count) || ref.count < 0
-    || !Number.isSafeInteger(ref.chunks) || ref.chunks < 0
+    || !Number.isSafeInteger(ref.count) || ref.count < 0 || ref.count > MAX_ROWS
+    || !Number.isSafeInteger(ref.chunks) || ref.chunks < 0 || ref.chunks > MAX_CHUNKS
     || ref.chunks > ref.count || (ref.count === 0) !== (ref.chunks === 0))
     invalid(`Invalid ${label} reference.`);
   return ref;
@@ -172,22 +174,23 @@ function createDesktopStorage({rootDir, fsModule = fs, cryptoModule = crypto, no
       handle = await io.open(temporary, 'wx', 0o600);
       await handle.writeFile(text, 'utf8');
       await handle.sync();
+      await closeQuietly(handle);
+      handle = null;
+      try {
+        await io.rename(temporary, file);
+      } catch (error) {
+        if (!['EEXIST', 'EPERM', 'ENOTEMPTY'].includes(error.code)) throw error;
+        // POSIX rename replaces atomically. Some Windows Node versions refuse
+        // to replace an existing file; the recovery backup makes this fallback
+        // recoverable even though the replacement itself has a small gap.
+        try { await io.unlink(file); } catch (unlinkError) { if (unlinkError.code !== 'ENOENT') throw error; }
+        await io.rename(temporary, file);
+      }
+      await syncDirectory(dir);
     } finally {
       if (handle) await closeQuietly(handle);
-    }
-    try {
-      await io.rename(temporary, file);
-    } catch (error) {
-      // POSIX rename replaces atomically. Some Windows Node versions refuse
-      // to replace an existing file; the recovery backup makes this fallback
-      // recoverable even though the replacement itself has a small gap.
-      if (!['EEXIST', 'EPERM', 'ENOTEMPTY'].includes(error.code)) throw error;
-      try { await io.unlink(file); } catch (unlinkError) { if (unlinkError.code !== 'ENOENT') throw error; }
-      await io.rename(temporary, file);
-    } finally {
       try { await io.unlink(temporary); } catch {}
     }
-    await syncDirectory(dir);
   }
 
   async function readJson(file) {
@@ -292,7 +295,10 @@ function createDesktopStorage({rootDir, fsModule = fs, cryptoModule = crypto, no
       const index = start + Math.floor(offset / CHUNK_SIZE);
       const file = path.join(base, `${String(index).padStart(8, '0')}.json`);
       validateChunkRows(additions.slice(offset, offset + CHUNK_SIZE), kind === 'archive' ? 'Archived careers' : 'Archived games');
-      await writeNewJson(file, additions.slice(offset, offset + CHUNK_SIZE));
+      // The committed reference never reaches this index until dynasty.json is
+      // replaced below. Replacing an orphan left by an interrupted prior attempt
+      // is therefore safe and lets the player retry without manual cleanup.
+      await atomicWrite(file, additions.slice(offset, offset + CHUNK_SIZE));
     }
   }
 

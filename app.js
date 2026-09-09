@@ -3209,11 +3209,12 @@ let titleSaveSlots=[];
 let browserStore = DynastyStorage.create({slot:activeSaveSlot});
 function currentArchiveState(){const state=browserArchives.get(activeSaveSlot);return state?.universe===universe?state:null}
 function activeSlotMeta(){return titleSaveSlots.find(s=>s.slot===activeSaveSlot)||null}
+function loadableSlotMeta(){const meta=activeSlotMeta();return !meta?.empty&&!meta?.migrationError?meta:null}
 function setActiveSaveSlot(slot){
  if(!SAVE_SLOT_IDS.includes(slot))throw new Error('Unknown save slot.');
  activeSaveSlot=slot;browserStore=DynastyStorage.create({slot});
  if($('#saveSlot'))$('#saveSlot').value=slot;if($('#titleSaveSlot'))$('#titleSaveSlot').value=slot;
- titleBrowserSave=activeSlotMeta()?.empty?null:activeSlotMeta();
+ titleBrowserSave=loadableSlotMeta();
  renderTitleState();return slot;
 }
 function archiveIsDeferred(){const s=currentArchiveState();return !!s&&!s.loaded}
@@ -3439,7 +3440,7 @@ function titleSummary(d){
 function renderSaveSlotControls(){
  for(const id of ['saveSlot','titleSaveSlot']){
   const el=$('#'+id);if(!el)continue;el.innerHTML='';
-  for(const slot of titleSaveSlots){const o=document.createElement('option');o.value=slot.slot;o.textContent=`${slot.label}${slot.empty?' · Empty':slot.program?` · ${slot.program}`:''}`;el.appendChild(o)}
+  for(const slot of titleSaveSlots){const o=document.createElement('option');o.value=slot.slot;o.textContent=`${slot.label}${slot.migrationError?' · Migration needed':slot.empty?' · Empty':slot.program?` · ${slot.program}`:''}`;el.appendChild(o)}
   el.value=activeSaveSlot;
  }
  const meta=activeSlotMeta();if($('#titleSlotName'))$('#titleSlotName').value=meta?.label||'';
@@ -3447,7 +3448,7 @@ function renderSaveSlotControls(){
 function renderTitleState(){
  const current=universe?{universe,userTeam:$('#userTeam').value}:null,continuation=current||titleBrowserSave,summary=titleSummary(continuation),has=!!summary;
  $('#titleContinue').disabled=!has;$('#titleContinueMeta').textContent=has?summary:`No saved dynasty found ${storageLocation()}`;
- $('#titleLoadBrowser').disabled=!titleBrowserSave;$('#titleLoadMeta').textContent=titleBrowserSave?titleSummary(titleBrowserSave):'This slot is empty';
+ const slot=activeSlotMeta();$('#titleLoadBrowser').disabled=!titleBrowserSave;$('#titleLoadMeta').textContent=slot?.migrationError?'Migration needs attention':titleBrowserSave?titleSummary(titleBrowserSave):'This slot is empty';
  $('#titleContinue').classList.toggle('title-action--primary',has);$('#titleNew').classList.toggle('title-action--primary',!has);
 }
 function showTitlePanel(id=null){
@@ -3455,14 +3456,14 @@ function showTitlePanel(id=null){
  const target=id?$('#'+id)?.querySelector('button,select,input'):($('#titleContinue').disabled?$('#titleNew'):$('#titleContinue'));target?.focus();
 }
 function showTitleScreen(){
- $('#app').hidden=true;$('#titleScreen').hidden=false;document.body.classList.remove('dynasty-open');renderTitleState();showTitlePanel();setTitleStatus(universe?'Current session is ready to resume.':titleBrowserSave?`${storageKind()==='desktop'?'Desktop save':'Browser save'} ready ${storageLocation()}.`:'Choose New Dynasty or load a save.');window.scrollTo?.(0,0);
+ $('#app').hidden=true;$('#titleScreen').hidden=false;document.body.classList.remove('dynasty-open');renderTitleState();showTitlePanel();setTitleStatus(universe?'Current session is ready to resume.':activeSlotMeta()?.migrationError||(titleBrowserSave?`${storageKind()==='desktop'?'Desktop save':'Browser save'} ready ${storageLocation()}.`:'Choose New Dynasty or load a save.'));window.scrollTo?.(0,0);
 }
 function enterDynasty(){if(!universe)return;$('#titleScreen').hidden=true;$('#app').hidden=false;document.body.classList.add('dynasty-open');render();window.scrollTo?.(0,0);$('#app .topbar')?.focus?.()}
 function populateTitleTeams(){
  $('#titleTeam').innerHTML='';schools.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(s=>{const o=document.createElement('option');o.value=s.name;o.textContent=`${s.name} · ${s.conference}`;$('#titleTeam').appendChild(o)});$('#titleTeam').value='Chicago Metropolitan';
 }
 async function refreshTitleSave(){
- try{titleSaveSlots=await browserStore.listSlots();titleBrowserSave=activeSlotMeta()?.empty?null:activeSlotMeta();renderSaveSlotControls();renderTitleState();setTitleStatus(titleBrowserSave?`${storageKind()==='desktop'?'Desktop save':'Browser save'} ready ${storageLocation()}.`:'This slot is empty. Start a new dynasty when you are ready.')}
+ try{titleSaveSlots=await browserStore.listSlots();titleBrowserSave=loadableSlotMeta();renderSaveSlotControls();renderTitleState();setTitleStatus(activeSlotMeta()?.migrationError||(titleBrowserSave?`${storageKind()==='desktop'?'Desktop save':'Browser save'} ready ${storageLocation()}.`:'This slot is empty. Start a new dynasty when you are ready.'))}
  catch(e){titleBrowserSave=null;renderTitleState();setTitleStatus(e.message||`The ${savedDynastyLabel()} could not be read. You can still import a backup.`)}
 }
 async function chooseSaveSlot(slot){setActiveSaveSlot(slot);await refreshTitleSave()}

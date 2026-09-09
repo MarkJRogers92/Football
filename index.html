@@ -2583,52 +2583,70 @@ html[data-dl-motion="reduced"] .dl-motion-result{animation:none!important;transf
     return {load, readArchive, readGames, save, listSlots, rename, slot};
   }
 
-  let migrationPromise = null;
-  async function migrateLegacyDesktopSaves(bridge) {
+  const migrationPromises = new Map();
+  const MIGRATION_ERROR = 'An older desktop save could not be migrated. Restart Dynasty Lab or import a complete JSON backup.';
+  async function migrateLegacyDesktopSlot(bridge, slot) {
     if (!root.indexedDB) return;
     const nativeSlots = await bridge.listSlots();
     const legacyIndex = createBrowser({indexedDB: root.indexedDB});
     const legacySlots = await legacyIndex.listSlots();
-    for (const slot of SLOT_IDS) {
-      const nativeMeta = nativeSlots.find(row => row.slot === slot);
-      const legacyMeta = legacySlots.find(row => row.slot === slot);
-      if (!nativeMeta?.empty || legacyMeta?.empty !== false) continue;
-      const legacy = createBrowser({indexedDB: root.indexedDB, slot});
-      const saved = await legacy.load();
-      if (!saved) continue;
-      const playerArchive = saved.storageVersion >= 2
-        ? await legacy.readArchive(saved.archiveRef)
-        : saved.universe?.playerArchive || [];
-      const gameArchive = saved.storageVersion === 3
-        ? await legacy.readGames(saved.gameRef)
-        : saved.universe?.gameArchive || [];
-      const {storageVersion, archiveRef, gameRef, revision, ...portable} = saved;
-      portable.universe = {...(saved.universe || {}), playerArchive, gameArchive};
-      if (legacyMeta.label && legacyMeta.label !== nativeMeta.label)
-        await bridge.rename({slot, label: legacyMeta.label});
-      await bridge.save({
-        slot,
-        snapshot: portable,
-        options: {additions: playerArchive, gameAdditions: gameArchive, checkpointType: 'migration'},
-      });
-    }
+    const nativeMeta = nativeSlots.find(row => row.slot === slot);
+    const legacyMeta = legacySlots.find(row => row.slot === slot);
+    if (!nativeMeta?.empty || !legacyMeta) return;
+    if (legacyMeta.label && legacyMeta.label !== nativeMeta.label)
+      await bridge.rename({slot, label: legacyMeta.label});
+    if (legacyMeta.empty !== false) return;
+    const legacy = createBrowser({indexedDB: root.indexedDB, slot});
+    const saved = await legacy.load();
+    if (!saved) return;
+    const playerArchive = saved.storageVersion >= 2
+      ? await legacy.readArchive(saved.archiveRef)
+      : saved.universe?.playerArchive || [];
+    const gameArchive = saved.storageVersion === 3
+      ? await legacy.readGames(saved.gameRef)
+      : saved.universe?.gameArchive || [];
+    const {storageVersion, archiveRef, gameRef, revision, ...portable} = saved;
+    portable.universe = {...(saved.universe || {}), playerArchive, gameArchive};
+    await bridge.save({
+      slot,
+      snapshot: portable,
+      options: {additions: playerArchive, gameAdditions: gameArchive, checkpointType: 'migration'},
+    });
   }
 
-  function ensureLegacyMigration(bridge) {
-    if (!migrationPromise) migrationPromise = migrateLegacyDesktopSaves(bridge);
-    return migrationPromise;
+  function ensureLegacyMigration(bridge, slot) {
+    if (!migrationPromises.has(slot)) {
+      const attempt = migrateLegacyDesktopSlot(bridge, slot).catch(() => {
+        migrationPromises.delete(slot);
+        throw new Error(MIGRATION_ERROR);
+      });
+      migrationPromises.set(slot, attempt);
+    }
+    return migrationPromises.get(slot);
+  }
+
+  async function listDesktopSlots(bridge) {
+    const failed = new Set();
+    for (const id of SLOT_IDS) {
+      try { await ensureLegacyMigration(bridge, id); }
+      catch { failed.add(id); }
+    }
+    const rows = await bridge.listSlots();
+    return rows.map(row => failed.has(row.slot) && row.empty
+      ? {...row, empty: false, migrationError: MIGRATION_ERROR}
+      : row);
   }
 
   function createDesktop(bridge, slot) {
     if (typeof slot !== 'string' || !SLOT_IDS.includes(slot))
       throw new Error(`Invalid save slot "${slot}".`);
-    const afterMigration = action => ensureLegacyMigration(bridge).then(action);
+    const afterMigration = action => ensureLegacyMigration(bridge, slot).then(action);
     return {
       load: () => afterMigration(() => bridge.load({slot})),
       readArchive: ref => afterMigration(() => bridge.readArchive({slot, ref})),
       readGames: ref => afterMigration(() => bridge.readGames({slot, ref})),
       save: (snapshot, options = {}) => afterMigration(() => bridge.save({slot, snapshot, options})),
-      listSlots: () => afterMigration(() => bridge.listSlots()),
+      listSlots: () => listDesktopSlots(bridge),
       rename: label => afterMigration(() => bridge.rename({slot, label})),
       slot,
     };
@@ -7476,11 +7494,12 @@ let titleSaveSlots=[];
 let browserStore = DynastyStorage.create({slot:activeSaveSlot});
 function currentArchiveState(){const state=browserArchives.get(activeSaveSlot);return state?.universe===universe?state:null}
 function activeSlotMeta(){return titleSaveSlots.find(s=>s.slot===activeSaveSlot)||null}
+function loadableSlotMeta(){const meta=activeSlotMeta();return !meta?.empty&&!meta?.migrationError?meta:null}
 function setActiveSaveSlot(slot){
  if(!SAVE_SLOT_IDS.includes(slot))throw new Error('Unknown save slot.');
  activeSaveSlot=slot;browserStore=DynastyStorage.create({slot});
  if($('#saveSlot'))$('#saveSlot').value=slot;if($('#titleSaveSlot'))$('#titleSaveSlot').value=slot;
- titleBrowserSave=activeSlotMeta()?.empty?null:activeSlotMeta();
+ titleBrowserSave=loadableSlotMeta();
  renderTitleState();return slot;
 }
 function archiveIsDeferred(){const s=currentArchiveState();return !!s&&!s.loaded}
@@ -7706,7 +7725,7 @@ function titleSummary(d){
 function renderSaveSlotControls(){
  for(const id of ['saveSlot','titleSaveSlot']){
   const el=$('#'+id);if(!el)continue;el.innerHTML='';
-  for(const slot of titleSaveSlots){const o=document.createElement('option');o.value=slot.slot;o.textContent=`${slot.label}${slot.empty?' · Empty':slot.program?` · ${slot.program}`:''}`;el.appendChild(o)}
+  for(const slot of titleSaveSlots){const o=document.createElement('option');o.value=slot.slot;o.textContent=`${slot.label}${slot.migrationError?' · Migration needed':slot.empty?' · Empty':slot.program?` · ${slot.program}`:''}`;el.appendChild(o)}
   el.value=activeSaveSlot;
  }
  const meta=activeSlotMeta();if($('#titleSlotName'))$('#titleSlotName').value=meta?.label||'';
@@ -7714,7 +7733,7 @@ function renderSaveSlotControls(){
 function renderTitleState(){
  const current=universe?{universe,userTeam:$('#userTeam').value}:null,continuation=current||titleBrowserSave,summary=titleSummary(continuation),has=!!summary;
  $('#titleContinue').disabled=!has;$('#titleContinueMeta').textContent=has?summary:`No saved dynasty found ${storageLocation()}`;
- $('#titleLoadBrowser').disabled=!titleBrowserSave;$('#titleLoadMeta').textContent=titleBrowserSave?titleSummary(titleBrowserSave):'This slot is empty';
+ const slot=activeSlotMeta();$('#titleLoadBrowser').disabled=!titleBrowserSave;$('#titleLoadMeta').textContent=slot?.migrationError?'Migration needs attention':titleBrowserSave?titleSummary(titleBrowserSave):'This slot is empty';
  $('#titleContinue').classList.toggle('title-action--primary',has);$('#titleNew').classList.toggle('title-action--primary',!has);
 }
 function showTitlePanel(id=null){
@@ -7722,14 +7741,14 @@ function showTitlePanel(id=null){
  const target=id?$('#'+id)?.querySelector('button,select,input'):($('#titleContinue').disabled?$('#titleNew'):$('#titleContinue'));target?.focus();
 }
 function showTitleScreen(){
- $('#app').hidden=true;$('#titleScreen').hidden=false;document.body.classList.remove('dynasty-open');renderTitleState();showTitlePanel();setTitleStatus(universe?'Current session is ready to resume.':titleBrowserSave?`${storageKind()==='desktop'?'Desktop save':'Browser save'} ready ${storageLocation()}.`:'Choose New Dynasty or load a save.');window.scrollTo?.(0,0);
+ $('#app').hidden=true;$('#titleScreen').hidden=false;document.body.classList.remove('dynasty-open');renderTitleState();showTitlePanel();setTitleStatus(universe?'Current session is ready to resume.':activeSlotMeta()?.migrationError||(titleBrowserSave?`${storageKind()==='desktop'?'Desktop save':'Browser save'} ready ${storageLocation()}.`:'Choose New Dynasty or load a save.'));window.scrollTo?.(0,0);
 }
 function enterDynasty(){if(!universe)return;$('#titleScreen').hidden=true;$('#app').hidden=false;document.body.classList.add('dynasty-open');render();window.scrollTo?.(0,0);$('#app .topbar')?.focus?.()}
 function populateTitleTeams(){
  $('#titleTeam').innerHTML='';schools.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(s=>{const o=document.createElement('option');o.value=s.name;o.textContent=`${s.name} · ${s.conference}`;$('#titleTeam').appendChild(o)});$('#titleTeam').value='Chicago Metropolitan';
 }
 async function refreshTitleSave(){
- try{titleSaveSlots=await browserStore.listSlots();titleBrowserSave=activeSlotMeta()?.empty?null:activeSlotMeta();renderSaveSlotControls();renderTitleState();setTitleStatus(titleBrowserSave?`${storageKind()==='desktop'?'Desktop save':'Browser save'} ready ${storageLocation()}.`:'This slot is empty. Start a new dynasty when you are ready.')}
+ try{titleSaveSlots=await browserStore.listSlots();titleBrowserSave=loadableSlotMeta();renderSaveSlotControls();renderTitleState();setTitleStatus(activeSlotMeta()?.migrationError||(titleBrowserSave?`${storageKind()==='desktop'?'Desktop save':'Browser save'} ready ${storageLocation()}.`:'This slot is empty. Start a new dynasty when you are ready.'))}
  catch(e){titleBrowserSave=null;renderTitleState();setTitleStatus(e.message||`The ${savedDynastyLabel()} could not be read. You can still import a backup.`)}
 }
 async function chooseSaveSlot(slot){setActiveSaveSlot(slot);await refreshTitleSave()}
