@@ -2,12 +2,18 @@
 const {test} = require('node:test');
 const assert = require('node:assert/strict');
 const {IDBFactory, IDBObjectStore} = require('fake-indexeddb');
-const {create, revisionOf} = require('../storage.js');
+const storageApi = require('../storage.js');
+const {create, revisionOf} = storageApi;
 const player = i => ({id: `p${i}`, name: `Alumnus ${i}`, career: {passYds: i}, seasonHistory: [{year: 2027, team: 'Chicago Metropolitan', passYds: i}], awards: [{year: 2027, name: 'Award'}], draftResult: {year: 2028, round: 1, pick: i}});
 const snapshot = (year = 2028) => ({version: '0.8.1', savedAt: '2026-09-03', userTeam: 'Chicago Metropolitan', universe: {year, week: 0, teams: [], records: {nationalCareer: {passYds: 999}}}});
 function fixture(){const indexedDB=new IDBFactory();return {indexedDB, store:create({indexedDB})}}
 async function open(indexedDB, version){return new Promise((res,rej)=>{const r=indexedDB.open('DynastyLabDB',version);r.onupgradeneeded=()=>r.result.createObjectStore('saves');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
 async function transact(db,names,mode,work){return new Promise((res,rej)=>{const tx=db.transaction(names,mode);tx.oncomplete=res;tx.onabort=()=>rej(tx.error);work(tx)})}
+
+ test('web target selects the IndexedDB adapter when no desktop bridge exists',()=>{
+  assert.equal(storageApi.kind,'browser');
+  assert.equal(create({indexedDB:new IDBFactory()}).slot,'main');
+ });
 
  test('legacy DB upgrades without rewriting the save; next save atomically splits all history', async()=>{
   const {indexedDB,store}=fixture();const old=snapshot();old.universe.playerArchive=Array.from({length:257},(_,i)=>player(i));

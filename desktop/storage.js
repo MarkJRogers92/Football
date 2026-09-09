@@ -418,7 +418,12 @@ function createDesktopStorage({rootDir, fsModule = fs, cryptoModule = crypto, no
         return {slot, label: slotMeta?.label || defaultLabel(slot), empty: false, storageError: STORAGE_ERROR};
       }
       const slotMeta = await readSlotMeta(info);
-      if (!wrapper) return {slot, label: slotMeta?.label || defaultLabel(slot), empty: true};
+      if (!wrapper) {
+        if (slotMeta?.empty === false) {
+          return {slot, label: slotMeta.label || defaultLabel(slot), empty: false, storageError: STORAGE_ERROR};
+        }
+        return {slot, label: slotMeta?.label || defaultLabel(slot), empty: true};
+      }
       return {...wrapper.meta, slot, label: slotMeta?.label || wrapper.meta.label || defaultLabel(slot), empty: false};
     })));
   }

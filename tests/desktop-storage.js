@@ -157,6 +157,18 @@ test('one corrupt native slot does not block healthy slots from listing', async 
   assert.equal(listed.find(row => row.slot === 'dynasty-3').empty, true);
 });
 
+test('a missing occupied save cannot be mistaken for an empty replacement slot', async () => {
+  await store.save({slot: 'main', snapshot: snapshot()});
+  const slotDir = path.join(root, 'Dynasty 1');
+  await fs.unlink(path.join(slotDir, 'dynasty.json'));
+
+  const listed = await store.listSlots();
+  const damaged = listed.find(row => row.slot === 'main');
+  assert.equal(damaged.empty, false);
+  assert.match(damaged.storageError, /damaged/i);
+  assert.equal(damaged.label, 'Dynasty 1');
+});
+
 test('invalid slots, labels, refs, and renderer paths are rejected', async () => {
   await assert.rejects(() => store.load({slot: '../Dynasty 1'}), /Invalid save slot/);
   await assert.rejects(() => store.load({slot: 'main/../../elsewhere'}), /Invalid save slot/);
