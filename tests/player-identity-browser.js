@@ -13,6 +13,7 @@ const start=async page=>{await page.waitForSelector('#titleNew',{timeout:30000})
   const brand=await page.locator('#playerDialog').evaluate(el=>({primary:el.style.getPropertyValue('--program-primary'),secondary:el.style.getPropertyValue('--program-secondary'),team:el.dataset.brandTeamId}));check('player school branding is applied to dossier',!!brand.primary&&!!brand.secondary&&!!brand.team,JSON.stringify(brand));
   const hero=await page.locator('#playerIdentityHero').innerText(),heroLower=hero.toLowerCase();check('football role is promoted ahead of dense profile detail',heroLower.includes('football role')&&heroLower.includes('starting qb'));
   check('staff evaluation keeps current/upside/confidence visible',heroLower.includes('staff evaluation')&&heroLower.includes('current')&&heroLower.includes('upside')&&heroLower.includes('confidence'));
+  const currentRead=await page.locator('#playerIdentityHero .pi-evaluation .pi-stat strong').first().innerText();check('staff evaluation renders without escaped HTML',/^[A-F][+-]? · \d+–\d+$/.test(currentRead),currentRead);
   check('dossier explicitly preserves uncertainty',heroLower.includes('hidden true talent and growth remain private'));
   check('current production is surfaced in hero',heroLower.includes('current production'));
   check('development read is surfaced in hero',heroLower.includes('development read'));

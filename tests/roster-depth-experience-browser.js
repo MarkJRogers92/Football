@@ -12,6 +12,7 @@ const start=async page=>{await page.waitForSelector('#titleNew',{timeout:30000})
   check('position-group roster board is visible',await page.locator('#rosterPositionBoard').isVisible());
   check('position groups cover football roster',await page.locator('.rd-position-group').count()>=10);
   check('position groups show staff-visible player hierarchy',await page.locator('.rd-position-group .rd-player').count()>25);
+  const staffRead=await page.locator('.rd-position-group .rd-player small').first().innerText();check('staff read renders as text without escaped HTML',/^[A-Z]+ · [A-F][+-]? · \d+–\d+$/.test(staffRead),staffRead);
   check('dense canonical roster table remains available',await page.locator('#rosterBody tr').count()>40);
   await goTab(page,'depth');await page.waitForSelector('#depthFormationBoard',{timeout:10000});
   check('football formation view is visible',await page.locator('#depthFormationBoard').isVisible());

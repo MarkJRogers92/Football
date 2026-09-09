@@ -175,6 +175,7 @@ function ensurePlayerDevelopment(p,t){inheritRecruitTraits(p);ensurePortrait(p);
 }
 function growthFactor(p){ensurePlayerDevelopment(p);let idx=Math.min(3,eligibilityBase(p)),base=GROWTH_CURVES[p.growthProfile]?.[idx]??1;if(p.growthProfile==='volatile')base*=clamp(1+gauss()*(p.growthVolatility/170),.35,1.8);return base}
 function scoutRange(p,t,potential=false){ensurePlayerDevelopment(p,t);let center=potential?p.perceivedUpside:p.perceived,evalAdj=(100-staffEval(t))/28,width=(100-p.scoutConfidence)/7+evalAdj+(potential?2.5:0);width=clamp(Math.round(width),2,potential?15:12);let lo=clamp(center-width,25,99),hi=clamp(center+width,25,99);if(potential)lo=Math.max(lo,scoutRange(p,t,false)[0]);return [Math.min(lo,hi),hi]}
+function scoutRangeLabel(p,t,potential=false){let [lo,hi]=scoutRange(p,t,potential),mid=Math.round((lo+hi)/2);return `${grade(mid)} · ${lo}–${hi}`}
 function scoutRangeText(p,t,potential=false){let [lo,hi]=scoutRange(p,t,potential),mid=Math.round((lo+hi)/2);return `<span class="scout-range"><strong>${grade(mid)}</strong> <span class="muted">${lo}–${hi}</span></span>`}
 function confidenceText(p){let c=clamp(Math.round(p.scoutConfidence||50),1,100);return `<span class="dev-confidence"><span class="confidence-meter"><i style="width:${c}%"></i></span>${c}%</span>`}
 function familiarity(p,pos=p.pos){let v=p.positionFamiliarity?.[pos];if(v==null){ensurePlayerDevelopment(p);v=p.positionFamiliarity?.[pos]}return clamp(v??(pos===p.pos?100:25),0,100)}

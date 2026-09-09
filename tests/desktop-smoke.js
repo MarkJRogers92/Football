@@ -121,6 +121,16 @@ async function startAndSave(page, profile) {
   assert.ok(await page.locator('#userTeam option').count() > 0, 'team selector is populated');
   await page.click('[data-client-tab="roster"]');
   await page.locator('#roster.active').waitFor({state: 'visible', timeout: 10000});
+  const staffRead = await page.locator('#rosterPositionBoard .rd-player small').first().innerText();
+  assert.match(staffRead, /^[A-Z]+ · [A-F][+-]? · \d+–\d+$/,
+    'roster card renders its scouting range without escaped HTML');
+  await page.locator('#rosterPositionBoard [data-rd-player]').first().click();
+  await page.locator('#playerDialog[open] #playerIdentityHero').waitFor({state: 'visible', timeout: 10000});
+  const profileRead = await page.locator('#playerIdentityHero .pi-evaluation .pi-stat strong').first().innerText();
+  assert.match(profileRead, /^[A-F][+-]? · \d+–\d+$/,
+    'player dossier renders its scouting range without escaped HTML');
+  await page.locator('#playerDialog .dialog-close').click();
+  await page.locator('#playerDialog').waitFor({state: 'hidden', timeout: 10000});
   await page.locator('#saveBrowser').evaluate(button => button.click());
   await page.waitForFunction(() => /^Saved /.test(document.querySelector('#saveStatus')?.textContent || ''), {timeout: 30000});
   assert.match(await page.locator('#saveStatus').textContent(), /on this computer\.$/);
