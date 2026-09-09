@@ -53,7 +53,7 @@ const {chromium} = require('playwright-core');
     await page.click('#setupContinue');
     assert.match(await page.locator('#setupHeading').innerText(), /Configure the world/);
     assert.match(await page.locator('#setupContent').innerText(), /120 fictional programs/);
-    assert.match(await page.locator('#setupContent').innerText(), /Not exposed yet/);
+    assert.match(await page.locator('#setupContent').innerText(), /Not exposed yet/i);
     await page.click('label:has([data-setup-field="mode"][value="commissioner"])');
 
     await page.click('#setupContinue');

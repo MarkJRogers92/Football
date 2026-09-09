@@ -15,6 +15,36 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  cadence:
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.cadence.outputs.mode }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Select validation cadence
+        id: cadence
+        shell: bash
+        run: |
+          mode="fast"
+          reason="normal push"
+          if [ "${{ github.event_name }}" != "push" ]; then
+            mode="full"
+            reason="${{ github.event_name }} event"
+          elif git log -1 --pretty=%B | grep -Eiq '\[(full-ci|release-ci)\]'; then
+            mode="full"
+            reason="commit requested full CI"
+          else
+            count="$(git rev-list --count --first-parent HEAD)"
+            if [ $((count % 4)) -eq 0 ]; then
+              mode="full"
+              reason="four-commit cadence"
+            fi
+          fi
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+          echo "Validation mode: $mode ($reason)"
+
   desktop-macos:
     if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/codex/v0121-take-the-job' || github.head_ref == 'codex/v0121-take-the-job'
     runs-on: macos-15
@@ -64,6 +94,7 @@ jobs:
           retention-days: 14
 
   validate:
+    needs: cadence
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -73,27 +104,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Select validation cadence
-        id: cadence
-        shell: bash
-        run: |
-          mode="fast"
-          reason="normal push"
-          if [ "${{ github.event_name }}" != "push" ]; then
-            mode="full"
-            reason="${{ github.event_name }} event"
-          elif git log -1 --pretty=%B | grep -Eiq '\[(full-ci|release-ci)\]'; then
-            mode="full"
-            reason="commit requested full CI"
-          else
-            count="$(git rev-list --count --first-parent HEAD)"
-            if [ $((count % 4)) -eq 0 ]; then
-              mode="full"
-              reason="four-commit cadence"
-            fi
-          fi
-          echo "mode=$mode" >> "$GITHUB_OUTPUT"
-          echo "Validation mode: $mode ($reason)"
       - name: Install dependencies
         run: npm install --no-package-lock
       - name: Build standalone artifact
@@ -105,10 +115,26 @@ jobs:
       - name: Fast smoke and version checks
         run: node tests/version.js && node tests/smoke.js
       - name: Full engine and presentation tests
-        if: steps.cadence.outputs.mode == 'full'
+        if: needs.cadence.outputs.mode == 'full'
         run: npm test
+
+  browser:
+    needs: cadence
+    if: needs.cadence.outputs.mode == 'full'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Build standalone artifact
+        run: npm run build
+      - name: Verify committed build is current
+        run: git diff --exit-code -- index.html
       - name: Locate Chromium
-        if: steps.cadence.outputs.mode == 'full'
         id: chromium
         shell: bash
         run: |
@@ -120,15 +146,27 @@ jobs:
           test -n "$browser"
           echo "path=$browser" >> "$GITHUB_OUTPUT"
       - name: Browser UI and visual regression tests
-        if: steps.cadence.outputs.mode == 'full'
         run: npm run test:browser
         env:
           CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
       - name: Browser IndexedDB regression check
-        if: steps.cadence.outputs.mode == 'full'
         run: npm run test:browser-storage
         env:
           CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+
+  audit:
+    needs: cadence
+    if: needs.cadence.outputs.mode == 'full'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: npm install --no-package-lock
+      - name: Build standalone artifact
+        run: npm run build
       - name: Simulation audit
-        if: steps.cadence.outputs.mode == 'full'
         run: npm run audit
