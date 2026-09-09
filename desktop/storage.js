@@ -52,7 +52,8 @@ function validateRef(ref, label = 'archive') {
 
 function validateChunkRows(rows, label, allowEmpty = false) {
   if (!Array.isArray(rows) || (!allowEmpty && !rows.length) || rows.length > CHUNK_SIZE
-    || rows.some(row => !isPlainObject(row)))
+    || rows.some(row => !isPlainObject(row)
+      || (label === 'Archived games' && (typeof row.id !== 'string' || !row.id))))
     invalid(`${label} are missing or damaged. Use a complete JSON backup.`);
 }
 
@@ -63,6 +64,8 @@ function validateCore(core) {
   if (core.storageVersion !== 2 && core.storageVersion !== STORAGE_VERSION)
     invalid('Saved dynasty data is missing or damaged.');
   if (!isPlainObject(core.universe)) invalid('Saved dynasty data is missing or damaged.');
+  if (typeof core.userTeam !== 'string' || typeof core.version !== 'string'
+    || typeof core.savedAt !== 'string') invalid('Saved dynasty data is missing or damaged.');
   if (!core.revision || typeof core.revision !== 'string')
     invalid('Saved dynasty data is missing or damaged.');
   validateRef(core.archiveRef, 'archive');
@@ -72,7 +75,8 @@ function validateCore(core) {
 
 function validateWrapper(wrapper, slot) {
   if (!isPlainObject(wrapper) || wrapper.formatVersion !== FORMAT_VERSION || wrapper.slot !== slot
-    || !isPlainObject(wrapper.meta)) invalid('Saved dynasty data is missing or damaged.');
+    || !isPlainObject(wrapper.meta) || wrapper.meta.slot !== slot || wrapper.meta.empty !== false)
+    invalid('Saved dynasty data is missing or damaged.');
   validateCore(wrapper.core);
   return wrapper;
 }
@@ -99,6 +103,8 @@ function validateOptions(options = {}) {
     validateRef(options.archiveRef, 'archive');
   if (options.gameRef !== null && options.gameRef !== undefined)
     validateRef(options.gameRef, 'game archive');
+  if (options.checkpointType !== undefined && (typeof options.checkpointType !== 'string'
+    || !/^[A-Za-z0-9_-]{1,40}$/.test(options.checkpointType))) invalid('Invalid checkpoint type.');
   for (const [name, value] of [['additions', options.additions], ['gameAdditions', options.gameAdditions]]) {
     if (value !== undefined && (!Array.isArray(value) || value.some(row => !isPlainObject(row))))
       invalid(`Invalid ${name}.`);

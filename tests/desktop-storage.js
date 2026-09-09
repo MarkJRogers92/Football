@@ -125,6 +125,8 @@ test('invalid slots, labels, refs, and renderer paths are rejected', async () =>
   await assert.rejects(() => store.rename({slot: 'main', label: 'x'.repeat(41)}), /1–40/);
   await assert.rejects(() => store.readArchive({slot: 'main', ref: {id: '../escape', count: 1, chunks: 1}}), /Invalid archive/);
   await assert.rejects(() => store.save({slot: 'main', snapshot: snapshot(), options: {additions: [null]}}), /Invalid additions/);
+  await assert.rejects(() => store.save({slot: 'main', snapshot: snapshot(), options: {gameAdditions: [{}]}}), /Archived games/);
+  await assert.rejects(() => store.save({slot: 'main', snapshot: snapshot(), options: {checkpointType: {raw: true}}}), /checkpoint type/);
 });
 
 test('per-slot serialization rejects one of two stale concurrent appends', async () => {
