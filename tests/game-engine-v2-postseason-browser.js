@@ -1,13 +1,8 @@
 const assert=require('node:assert/strict');
 const path=require('path');
 const {chromium}=require('playwright-core');
-async function startNewDynasty(page){
-  await page.goto('file://'+path.join(__dirname,'..','index.html'));await page.waitForSelector('#titleNew',{timeout:30000});
-  await page.waitForFunction(()=>document.querySelector('#titleTeam')?.options.length>0,{timeout:60000});
-  await page.click('#titleNew');await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});await page.click('#titleStart');
-  await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000});
-  await page.click('#hubAdvance');await page.waitForFunction(()=>window.__DL_TEST__.preseasonDebug().phase==='regular');
-}
+const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
+const startNewDynasty=async page=>{await page.goto('file://'+path.join(__dirname,'..','index.html'));return sharedStartNewDynasty(page)};
 async function reachPostseason(page){
   await page.click('#simSeason');await page.waitForFunction(()=>window.DynastyGameEngineV2LabBridge.cutoverDebug().phase==='confReady',{timeout:60000});
 }

@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   desktop-macos:
-    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/codex/v0120-desktop-alpha-packaging' || github.head_ref == 'codex/v0120-desktop-alpha-packaging'
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/codex/v0121-take-the-job' || github.head_ref == 'codex/v0121-take-the-job'
     runs-on: macos-15
     timeout-minutes: 30
     steps:
@@ -36,6 +36,30 @@ jobs:
         with:
           name: dynasty-lab-desktop-alpha-macos-arm64-${{ github.sha }}
           path: out/make/zip/darwin/arm64/Dynasty-Lab-Desktop-Alpha-macOS-arm64.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  desktop-windows:
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/codex/v0121-take-the-job' || github.head_ref == 'codex/v0121-take-the-job'
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build x64 Windows desktop package
+        run: npm run desktop:make:windows
+      - name: Smoke test packaged desktop app
+        run: node tests/desktop-smoke.js --packaged
+      - name: Upload x64 Windows ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: dynasty-lab-desktop-alpha-windows-x64-${{ github.sha }}
+          path: out/make/zip/win32/x64/Dynasty-Lab-Desktop-Alpha-Windows-x64.zip
           if-no-files-found: error
           retention-days: 14
 

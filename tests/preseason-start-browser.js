@@ -12,14 +12,8 @@ const goTab = (page, id) => page.evaluate(({id, group}) => {
 }, {id, group: TAB_GROUP[id]});
 const debug = page => page.evaluate(() => window.__DL_TEST__.preseasonDebug());
 
-async function startNewDynasty(page) {
-  await page.waitForFunction(() => document.querySelector('#titleTeam')?.options.length > 0,
-    {timeout: 60000});
-  await page.click('#titleNew');
-  await page.locator('#titleStart').waitFor({state: 'visible', timeout: 10000});
-  await page.click('#titleStart');
-  await page.locator('#app').waitFor({state: 'visible', timeout: 60000});
-}
+const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
+const startNewDynasty=page=>sharedStartNewDynasty(page,{beginSeason:false});
 
 (async () => {
   const browser = await chromium.launch({

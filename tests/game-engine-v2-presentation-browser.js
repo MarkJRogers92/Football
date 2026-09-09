@@ -1,10 +1,11 @@
 const assert=require('node:assert/strict');
 const path=require('path');
 const {chromium}=require('playwright-core');
+const {startNewDynasty}=require('./helpers/start-new-dynasty');
 (async()=>{
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
  try{
-  await page.goto('file://'+path.join(__dirname,'..','index.html'));await page.waitForFunction(()=>document.querySelector('#titleTeam')?.options.length>0,{timeout:60000});await page.click('#titleNew');await page.click('#titleStart');await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000});
+  await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);
   await page.click('.tab-groups button[data-group="games"]');await page.click('.tabs button[data-tab="gamelab"]');
   assert.equal(await page.locator('#v2ShadowLab').count(),0,'release Game Lab must hide the shadow preview');assert.equal(await page.locator('#v2RecordGate').count(),0,'release Game Lab must hide the dev record gate');
   await page.click('#simDetailedGame');await page.waitForSelector('#v2GameDayRecap:not([hidden])',{timeout:60000});

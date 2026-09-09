@@ -1412,6 +1412,36 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
   .title-setting-toggle input[type=checkbox],.title-setting-toggle input[type=checkbox]::after{transition:none}
 }
 
+/* Take the Job — a focused front-office setup shell, separate from the game client. */
+.dynasty-setup{--program-primary:#234875;--program-secondary:#73a8ff;--program-accent:#d6b45e;position:fixed;inset:0;z-index:110;min-height:100dvh;overflow:auto;color:#eaf0f7;background:#070b10;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.dynasty-setup[hidden]{display:none!important}
+.setup-backdrop{position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 82% 8%,rgba(var(--program-primary-rgb,35,72,117),.28),transparent 38%),linear-gradient(125deg,#060a0f 0%,#0a1119 52%,#071019 100%)}
+.setup-backdrop::after{content:"";position:absolute;inset:0;opacity:.22;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.014) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 80%)}
+.setup-frame{position:relative;display:grid;grid-template-rows:auto minmax(0,1fr) auto;min-height:100dvh}
+.setup-header{position:sticky;top:0;z-index:4;display:grid;grid-template-columns:190px minmax(0,1fr) 190px;align-items:center;gap:24px;padding:15px clamp(20px,3vw,48px);border-bottom:1px solid #243345;background:rgba(7,12,18,.94);backdrop-filter:blur(16px)}
+.setup-brand{display:flex;align-items:center;gap:10px}.setup-brand-mark{display:grid;place-items:center;width:36px;height:36px;border:1px solid color-mix(in srgb,var(--program-secondary) 62%,#526579);border-radius:8px;background:linear-gradient(145deg,var(--program-primary),#101a25);font-size:10px;font-weight:950;letter-spacing:.12em}.setup-brand>span:last-child{display:grid;gap:1px}.setup-brand b,.setup-brand small{font-size:9px;letter-spacing:.14em}.setup-brand small{color:#75869a}
+.setup-progress{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));max-width:780px;width:100%;margin:auto}.setup-progress-step{position:relative;display:grid;justify-items:center;gap:5px;color:#637489}.setup-progress-step::before{content:"";position:absolute;top:12px;right:50%;width:100%;height:1px;background:#2a394b}.setup-progress-step:first-child::before{display:none}.setup-progress-step span{position:relative;z-index:1;display:grid;place-items:center;width:25px;height:25px;border:1px solid #35475b;border-radius:50%;background:#101822;font-size:9px;font-weight:850}.setup-progress-step small{font-size:8px;font-weight:750;letter-spacing:.04em;text-align:center;white-space:nowrap}.setup-progress-step.complete span{border-color:color-mix(in srgb,var(--program-secondary) 56%,#43546a);background:color-mix(in srgb,var(--program-primary) 68%,#121b26);color:#fff}.setup-progress-step.active{color:#eaf0f7}.setup-progress-step.active span{border-color:var(--program-secondary);background:var(--program-primary);box-shadow:0 0 0 4px color-mix(in srgb,var(--program-secondary) 13%,transparent)}
+.setup-exit,.setup-back,.setup-continue,.setup-feature button{min-height:38px;border:1px solid #34475c;border-radius:7px;padding:0 16px;background:#111b26;color:#c7d2df;font-weight:750;cursor:pointer}.setup-exit{justify-self:end;background:transparent}.setup-continue,.setup-feature button{border-color:color-mix(in srgb,var(--program-secondary) 55%,#38536f);background:linear-gradient(180deg,color-mix(in srgb,var(--program-primary) 82%,#264d77),var(--program-primary));color:#fff;box-shadow:inset 0 1px rgba(255,255,255,.12)}
+.setup-content{width:min(1180px,calc(100% - 40px));margin:0 auto;padding:clamp(34px,5vw,72px) 0 110px;outline:none}
+.setup-screen-head{max-width:760px;margin-bottom:30px}.setup-screen-head>span,.setup-section-title>span,.setup-feature>span,.setup-program-dossier>span,.setup-trajectory>span,.setup-contract-top span,.setup-report-block>strong,.setup-staff-list>div>span,.setup-world-facts span,.setup-deferred strong,.setup-note>span{display:block;color:var(--program-accent,#d6b45e);font-size:9px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}.setup-screen-head h1{margin:6px 0 10px;color:#f7f9fc;font-family:Georgia,"Times New Roman",serif;font-size:clamp(34px,5.5vw,65px);font-weight:500;letter-spacing:-.045em;line-height:.98}.setup-screen-head p{max-width:700px;margin:0;color:#91a2b7;font-size:14px;line-height:1.65}
+.setup-welcome-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:14px}.setup-feature{min-height:205px;padding:26px;border:1px solid #293a4e;border-radius:12px;background:linear-gradient(145deg,color-mix(in srgb,var(--program-primary) 18%,#0e1721),#0b121a);box-shadow:0 20px 55px rgba(0,0,0,.18)}.setup-feature h2{margin:10px 0 8px;font-family:Georgia,serif;font-size:25px;font-weight:500}.setup-feature p{max-width:520px;margin:0;color:#8fa1b5;line-height:1.6}.setup-feature button{margin-top:28px}
+.setup-ledger{display:grid;grid-template-columns:repeat(3,1fr);margin-top:14px;border:1px solid #26374a;border-radius:10px;background:#0b131c}.setup-metric{display:grid;gap:3px;min-width:0;padding:15px 17px}.setup-metric+.setup-metric{border-left:1px solid #26374a}.setup-metric>span{color:#70839a;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.setup-metric>strong{overflow-wrap:anywhere;color:#edf2f8;font-size:14px}.setup-metric>small{color:#74869b;font-size:10px;line-height:1.35}
+.setup-form-narrow{max-width:700px}.setup-field{display:grid;gap:9px}.setup-field>span{color:#cdd7e3;font-size:12px;font-weight:800}.setup-field>span b{margin-left:6px;color:#71859d;font-size:8px;letter-spacing:.1em;text-transform:uppercase}.setup-field input,.setup-program-tools input,.setup-program-tools select{width:100%;min-height:46px;border:1px solid #33465c;border-radius:7px;padding:0 13px;background:#0b141e;color:#eef3f8;font:inherit}.setup-field input{font-size:19px}.setup-field small{color:#75899f;font-size:10.5px;line-height:1.5}.setup-validation{margin:9px 0 0;color:#ef9d94;font-size:11px}.setup-validation.hidden{visibility:hidden}.setup-note{margin-top:28px;padding:18px;border-left:3px solid var(--program-secondary);background:#0c151f}.setup-note strong{display:block;margin:6px 0;color:#e9eff6}.setup-note p{margin:0;color:#8092a7;font-size:12px;line-height:1.55}
+.setup-program-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.65fr);gap:18px}.setup-program-browser,.setup-program-dossier{border:1px solid #27384b;border-radius:11px;background:#0a121a}.setup-program-browser{overflow:hidden}.setup-program-tools{display:grid;grid-template-columns:minmax(190px,1fr) 180px 140px;gap:8px;padding:12px;border-bottom:1px solid #243446;background:#101923}.setup-program-tools input,.setup-program-tools select{min-height:39px;font-size:11px}.setup-program-count{padding:8px 13px;color:#6f8197;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.setup-program-list{max-height:510px;overflow:auto}.setup-program-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:14px;width:100%;padding:11px 13px;border:0;border-top:1px solid #1e2c3b;background:transparent;color:#dce5ee;text-align:left;cursor:pointer}.setup-program-row>span{display:grid;grid-template-columns:34px minmax(0,1fr);column-gap:10px;align-items:center}.setup-program-row>span:first-child small{grid-column:2}.setup-program-row>span:last-child{display:grid;justify-items:end}.setup-program-row b{font-size:11.5px}.setup-program-row small{margin-top:2px;color:#6f8298;font-size:9.5px}.setup-program-row:hover,.setup-program-row.selected{background:color-mix(in srgb,var(--program-primary) 25%,#101a24)}.setup-program-row.selected{box-shadow:inset 3px 0 var(--program-secondary)}.setup-empty{padding:30px;color:#8394a7;text-align:center}.setup-program-dossier{align-self:start;position:sticky;top:96px;padding:24px;background:linear-gradient(160deg,color-mix(in srgb,var(--program-primary) 24%,#0e1721),#091119 54%)}.setup-program-logo{display:block;margin-bottom:18px}.setup-program-dossier h2{margin:6px 0 4px;font-family:Georgia,serif;font-size:25px;font-weight:500}.setup-program-dossier>p{margin:0 0 18px;color:#8395aa;font-size:11px}.setup-dossier-grid{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #2a3a4d;border-bottom:1px solid #2a3a4d}.setup-dossier-grid .setup-metric{padding:12px 0}.setup-dossier-grid .setup-metric:nth-child(even){padding-left:14px;border-left:1px solid #2a3a4d}.setup-dossier-grid .setup-metric:nth-child(n+3){border-top:1px solid #2a3a4d}.setup-trajectory{margin-top:18px}.setup-trajectory strong,.setup-trajectory small{display:block;margin-top:5px}.setup-trajectory small{color:#74879b;font-size:10px}
+.setup-identity{display:grid;gap:28px}.setup-section-title{margin-bottom:10px}.setup-section-title h2{margin:4px 0 0;font-size:17px}.setup-choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.setup-choice-grid--training{grid-template-columns:repeat(3,minmax(0,1fr))}.setup-choice{position:relative;display:block;min-height:86px;border:1px solid #293b4f;border-radius:9px;background:#0b141d;cursor:pointer}.setup-choice input{position:absolute;opacity:0;pointer-events:none}.setup-choice>span{display:grid;gap:5px;height:100%;padding:15px}.setup-choice strong{color:#dce5ef;font-size:12px}.setup-choice small{color:#74879c;font-size:10px;line-height:1.45}.setup-choice:hover,.setup-choice.selected{border-color:color-mix(in srgb,var(--program-secondary) 70%,#465a71);background:color-mix(in srgb,var(--program-primary) 24%,#0d1721)}.setup-choice.selected::after{content:"SELECTED";position:absolute;right:9px;top:8px;color:var(--program-accent);font-size:7px;font-weight:900;letter-spacing:.1em}
+.setup-mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:900px}.setup-mode-grid .setup-choice{min-height:130px}.setup-mode-grid .setup-choice strong{font-size:18px}.setup-mode-grid .setup-choice small{max-width:340px;font-size:12px}.setup-world-facts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:18px}.setup-world-facts>div{padding:15px;border:1px solid #26374a;border-radius:8px;background:#0b131c}.setup-world-facts strong,.setup-world-facts small{display:block;margin-top:5px}.setup-world-facts strong{font-size:12px}.setup-world-facts small{color:#74869a;font-size:9.5px;line-height:1.4}.setup-deferred{display:grid;grid-template-columns:130px minmax(0,1fr);gap:12px;margin-top:18px;padding:13px 15px;border-left:2px solid #536579;background:#0a121a;color:#7c8da1;font-size:11px;line-height:1.5}
+.setup-loading{display:grid;place-items:center;gap:16px;min-height:220px;color:#aebdcd}.setup-loading span{width:38px;height:38px;border:3px solid #2f4053;border-top-color:var(--program-secondary);border-radius:50%;animation:setup-spin .8s linear infinite}@keyframes setup-spin{to{transform:rotate(360deg)}}
+.setup-briefing-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,.8fr);gap:18px;align-items:end;padding:22px;border:1px solid #2e4155;border-radius:11px;background:linear-gradient(130deg,color-mix(in srgb,var(--program-primary) 34%,#0d1721),#0a121a 62%)}.setup-briefing-hero>div:first-child{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:18px;align-items:center}.setup-briefing-hero>div:first-child .setup-program-logo{grid-row:1/4;margin:0}.setup-briefing-hero>div:first-child span{color:var(--program-accent);font-size:9px;font-weight:900;letter-spacing:.14em}.setup-briefing-hero h2{margin:3px 0;font-family:Georgia,serif;font-size:28px;font-weight:500}.setup-briefing-hero p{margin:0;color:#8395a9;font-size:11px}.setup-briefing-hero>div:last-child{display:grid;grid-template-columns:repeat(3,1fr)}.setup-briefing-hero .setup-metric{padding:7px 13px}
+.setup-briefing-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}.setup-report-block{margin-top:9px;padding:14px;border:1px solid #27384b;border-radius:8px;background:#0b131c}.setup-report-block.warning{border-color:#5d4936}.setup-report-block>div{display:flex;justify-content:space-between;gap:20px;padding-top:9px;color:#8ea0b5;font-size:11px}.setup-report-block>div b{color:#dfe7ef}.setup-report-block p{margin:7px 0 0;color:#8698ac;font-size:11px;line-height:1.5}.setup-staff-list{border:1px solid #27384b;border-radius:8px;overflow:hidden}.setup-staff-list>div{display:grid;grid-template-columns:145px minmax(0,1fr);gap:2px 12px;padding:10px 12px;background:#0b131c}.setup-staff-list>div+div{border-top:1px solid #213143}.setup-staff-list>div>span{grid-row:1/3}.setup-staff-list strong{font-size:11.5px}.setup-staff-list small{color:#72859a;font-size:9.5px}.setup-priorities{grid-column:1/-1}.setup-priorities ol{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0;padding:0;counter-reset:priority;list-style:none}.setup-priorities li{counter-increment:priority;padding:15px;border-top:2px solid var(--program-secondary);background:#0b131c;color:#aab9c9;font-size:11px;line-height:1.5}.setup-priorities li::before{content:"0" counter(priority);display:block;margin-bottom:8px;color:var(--program-accent);font-size:9px;font-weight:900;letter-spacing:.12em}
+.setup-contract{max-width:940px;border:1px solid #314459;border-radius:12px;background:linear-gradient(145deg,color-mix(in srgb,var(--program-primary) 18%,#101923),#091119);overflow:hidden}.setup-contract-top{display:flex;align-items:center;gap:18px;padding:24px;border-bottom:1px solid #2b3c4f}.setup-contract-top .setup-program-logo{margin:0}.setup-contract-top h2{margin:4px 0;font-family:Georgia,serif;font-size:27px;font-weight:500}.setup-contract-top p{margin:0;color:#8496aa}.setup-contract-grid{display:grid;grid-template-columns:repeat(3,1fr)}.setup-contract-grid .setup-metric{min-height:100px;border-bottom:1px solid #26374a}.setup-contract-grid .setup-metric:nth-child(4){border-left:0}.setup-contract-note{display:flex;justify-content:space-between;gap:20px;padding:16px 18px;color:#8193a7;font-size:11px}.setup-contract-note strong{color:#dfe7ef}
+.setup-footer{position:fixed;z-index:5;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:74px;padding:12px clamp(20px,3vw,48px);border-top:1px solid #29394b;background:rgba(7,12,18,.95);backdrop-filter:blur(16px)}.setup-status{color:#76899f;font-size:10px;font-weight:700;letter-spacing:.04em}.setup-actions{display:flex;gap:8px}.setup-back,.setup-continue{min-width:115px}.setup-back[hidden]{visibility:hidden;display:block}.setup-back:disabled,.setup-continue:disabled{opacity:.42;cursor:not-allowed}
+.dynasty-setup button:focus-visible,.dynasty-setup input:focus-visible,.dynasty-setup select:focus-visible,.setup-choice:has(input:focus-visible){outline:2px solid var(--program-secondary);outline-offset:3px}
+@media(max-width:900px){.setup-header{grid-template-columns:auto 1fr auto}.setup-progress-step small{display:none}.setup-program-layout{grid-template-columns:1fr}.setup-program-dossier{position:static;order:-1}.setup-program-dossier .setup-program-logo{float:left;margin:0 14px 10px 0}.setup-choice-grid,.setup-choice-grid--training{grid-template-columns:repeat(2,1fr)}.setup-world-facts{grid-template-columns:repeat(2,1fr)}.setup-briefing-hero{grid-template-columns:1fr}.setup-contract-grid{grid-template-columns:repeat(2,1fr)}.setup-contract-grid .setup-metric:nth-child(odd){border-left:0}.setup-contract-grid .setup-metric:nth-child(even){border-left:1px solid #26374a}}
+@media(max-width:700px){.setup-header{padding:11px 14px;gap:10px}.setup-brand>span:last-child{display:none}.setup-progress{max-width:270px}.setup-exit{min-height:34px;padding:0 10px;font-size:10px}.setup-content{width:calc(100% - 28px);padding:28px 0 105px}.setup-screen-head{margin-bottom:20px}.setup-screen-head h1{font-size:39px}.setup-screen-head p{font-size:12px}.setup-welcome-grid,.setup-mode-grid,.setup-briefing-grid{grid-template-columns:1fr}.setup-feature{min-height:0;padding:19px}.setup-ledger{grid-template-columns:1fr}.setup-ledger .setup-metric+.setup-metric{border-top:1px solid #26374a;border-left:0}.setup-program-tools{grid-template-columns:1fr 1fr}.setup-program-tools input{grid-column:1/-1}.setup-program-row{grid-template-columns:1fr}.setup-program-row>span:last-child{justify-items:start;padding-left:44px}.setup-program-list{max-height:430px}.setup-choice-grid,.setup-choice-grid--training{grid-template-columns:1fr}.setup-world-facts{grid-template-columns:1fr 1fr}.setup-briefing-hero>div:last-child{grid-template-columns:1fr}.setup-briefing-hero .setup-metric+.setup-metric{border-top:1px solid #26374a;border-left:0}.setup-priorities{grid-column:auto}.setup-priorities ol{grid-template-columns:1fr}.setup-staff-list>div{grid-template-columns:1fr}.setup-staff-list>div>span{grid-row:auto}.setup-footer{min-height:68px;padding:10px 14px}.setup-status{max-width:40%;font-size:8px}.setup-back,.setup-continue{min-width:92px;padding:0 12px}}
+@media(max-width:430px){.setup-screen-head h1{font-size:34px}.setup-world-facts,.setup-contract-grid{grid-template-columns:1fr}.setup-contract-grid .setup-metric{border-left:0!important}.setup-contract-top{align-items:flex-start;padding:18px}.setup-contract-note{display:grid}.setup-briefing-hero{padding:16px}.setup-briefing-hero>div:first-child{grid-template-columns:54px 1fr}.setup-briefing-hero>div:first-child .setup-program-logo{width:54px;height:54px}.setup-dossier-grid{grid-template-columns:1fr}.setup-dossier-grid .setup-metric{padding:10px 0!important;border-left:0!important;border-top:1px solid #2a3a4d}.setup-program-row>span:last-child{padding-left:0}}
+@media(prefers-reduced-motion:reduce){.setup-loading span{animation:none}.dynasty-setup *{scroll-behavior:auto!important}}
+.motion-reduced .setup-loading span{animation:none}
+
 /* v0.11.1 — restrained motion and interaction polish. Presentation only. */
 
 :root{--dl-motion-fast:130ms;--dl-motion-standard:190ms;--dl-motion-slow:260ms;--dl-motion-ease:cubic-bezier(.22,.8,.2,1)}
@@ -1506,6 +1536,25 @@ html[data-dl-motion="reduced"] .dl-motion-result{animation:none!important;transf
     </div>
 
     <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.11.9</b></span></footer>
+  </div>
+</section>
+
+<section id="dynastySetup" class="dynasty-setup" aria-labelledby="setupHeading" hidden>
+  <div class="setup-backdrop" aria-hidden="true"></div>
+  <div class="setup-frame">
+    <header class="setup-header">
+      <div class="setup-brand"><span class="setup-brand-mark" aria-hidden="true">DL</span><span><b>DYNASTY LAB</b><small>NEW DYNASTY</small></span></div>
+      <div id="setupProgress" class="setup-progress" aria-label="Setup progress"></div>
+      <button id="setupExit" class="setup-exit" type="button">Exit Setup</button>
+    </header>
+    <main id="setupContent" class="setup-content" tabindex="-1"></main>
+    <footer class="setup-footer">
+      <div id="setupStatus" class="setup-status" role="status" aria-live="polite"></div>
+      <div class="setup-actions">
+        <button id="setupBack" class="setup-back" type="button">Back</button>
+        <button id="setupContinue" class="setup-continue" type="button">Continue</button>
+      </div>
+    </footer>
   </div>
 </section>
 
@@ -4930,8 +4979,8 @@ function newStats(){return {games:0,starts:0,snaps:0,passAtt:0,passComp:0,passYd
 function generateRoster(s){let r=[];Object.entries(POS_COUNTS).forEach(([p,n])=>{for(let i=0;i<n;i++)r.push(generatePlayer(s,p,i))});while(r.length<93)r.push(generatePlayer(s,pick(POS),99));return r}
 function generateFreshman(s,pos,origin='Walk-on / late addition'){let p=generatePlayer(s,pos,99);p.year='FR';p.eligibilityUsed=0;p.redshirtUsed=false;p.redshirtActive=false;p.redshirtSeason=null;p.origin=origin;return p}
 function generateRecruitPool(n,hsPool=universe?.highSchools||generateHighSchools()){let out=[];for(let i=0;i<n;i++){let pos=pick(POS.filter(x=>!['K','P'].includes(x))),raw=clamp(Math.round(58+gauss()*12),38,97),st=recruitStars(raw),up=clamp(Math.round(raw+rng(4,22)+gauss()*5),raw,99),h=weightedHighSchool(hsPool),traits=generatePositionAttributes(pos,raw),style=styleForTraits(pos,traits);out.push({id:uid(),name:`${pick(FIRST)} ${pick(LAST)}`,pos,stars:st,style,trueNow:raw,upside:up,...traits,scout:clamp(Math.round(raw+gauss()*6),35,99),scoutUp:clamp(Math.round(up+gauss()*8),40,99),highSchoolId:h.id,highSchool:h.name,homeCity:h.city,homeState:h.state,lat:h.lat,lon:h.lon,homeRegion:h.region,distanceImportance:gi(5,100),distanceTolerance:pick([100,150,250,400,600,900,1500,2500]),priority:pick(PRIORITIES),portraitSeed:portraitSeedFor(),portraitVersion:PORTRAIT_VERSION,targeted:false,interest:gi(5,45),prevInterest:0,trend:0,relationship:gi(0,20),leader:null,committed:null,commitWeek:null,visit:false,visitWeek:null,promise:'None',work:clamp(Math.round(65+gauss()*18),15,99),dev:clamp(Math.round(68+gauss()*18),15,99)});out.at(-1).prevInterest=out.at(-1).interest}return assignRecruitRanks(out)}
-function initUniverse(mode='dynasty',{startingPhase='regular'}={}){const phase=startingPhase==='preseason'?'preseason':'regular';IDX.teams=null;IDX.players=null;activateGameplayRng();const os=Object.keys(OFF_SCHEMES),ds=Object.keys(DEF_SCHEMES),highSchools=generateHighSchools();const teams=schools.map(s=>({...s,nickname:'',staff:generateStaff(s),offScheme:pick(os),defScheme:pick(ds),roster:generateRoster(s),...schoolColors(s),w:0,l:0,cw:0,cl:0,pf:0,pa:0,sos:0,rank:null,champ:false,schedule:[],history:[],commits:[],records:{}}));for(const t of teams){t.schemeTransition={off:null,def:null};t.staff.OC.preferredScheme=t.offScheme;t.staff.DC.preferredScheme=t.defScheme;t.pipelines=makePipelines(t);autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)}universe={version:APP_VERSION,mode:mode==='commissioner'?'commissioner':'dynasty',year:2027,week:0,recoveredWeek:-1,phase,teams,highSchools,recruits:generateRecruitPool(2800,highSchools),history:[],playerArchive:[],awards:{},records:{nationalSeason:{},nationalCareer:{}},draftHistory:{},latest:[],weeklyHub:[],weeklyDecisions:[],bowls:[],confChamps:[],playoffFieldIds:[],playoffFieldUnavailable:false,academicProgression:{season:2027,week:0,teamIds:[]},champion:null,lastDetailedGame:null,movementLog:[],recruitClassCounts:{},campHistory:{},developmentState:{year:2027,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]},offseasonDone:false,openings:[],candidateMarket:{}};gameplayRngUniverse=universe;for(const t of teams){ensureTeamDevelopment(t);for(const p of t.roster){ensurePlayerDevelopment(p,t);ensureAcademics(p,t)}}normalizePromiseState();buildSchedule();deriveRivalries();universe.teams.forEach(t=>{ensureAdminState(t);ensureNilState(t)});ranked();buildPreseasonHub();syncGameplayRng()}
-function createNewDynasty(mode='dynasty'){return initUniverse(mode,{startingPhase:'preseason'})}
+function initUniverse(mode='dynasty',{startingPhase='regular',seed=null}={}){const phase=startingPhase==='preseason'?'preseason':'regular';IDX.teams=null;IDX.players=null;activateGameplayRng(seed??undefined);const os=Object.keys(OFF_SCHEMES),ds=Object.keys(DEF_SCHEMES),highSchools=generateHighSchools();const teams=schools.map(s=>({...s,nickname:'',staff:generateStaff(s),offScheme:pick(os),defScheme:pick(ds),roster:generateRoster(s),...schoolColors(s),w:0,l:0,cw:0,cl:0,pf:0,pa:0,sos:0,rank:null,champ:false,schedule:[],history:[],commits:[],records:{}}));for(const t of teams){t.schemeTransition={off:null,def:null};t.staff.OC.preferredScheme=t.offScheme;t.staff.DC.preferredScheme=t.defScheme;t.pipelines=makePipelines(t);autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)}universe={version:APP_VERSION,mode:mode==='commissioner'?'commissioner':'dynasty',year:2027,week:0,recoveredWeek:-1,phase,teams,highSchools,recruits:generateRecruitPool(2800,highSchools),history:[],playerArchive:[],awards:{},records:{nationalSeason:{},nationalCareer:{}},draftHistory:{},latest:[],weeklyHub:[],weeklyDecisions:[],bowls:[],confChamps:[],playoffFieldIds:[],playoffFieldUnavailable:false,academicProgression:{season:2027,week:0,teamIds:[]},champion:null,lastDetailedGame:null,movementLog:[],recruitClassCounts:{},campHistory:{},developmentState:{year:2027,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]},offseasonDone:false,openings:[],candidateMarket:{}};gameplayRngUniverse=universe;for(const t of teams){ensureTeamDevelopment(t);for(const p of t.roster){ensurePlayerDevelopment(p,t);ensureAcademics(p,t)}}normalizePromiseState();buildSchedule();deriveRivalries();universe.teams.forEach(t=>{ensureAdminState(t);ensureNilState(t)});ranked();buildPreseasonHub();syncGameplayRng()}
+function createNewDynasty(mode='dynasty',options={}){return initUniverse(mode,{startingPhase:'preseason',seed:options.seed??null})}
 const IDX={teams:null,players:null,archive:null,archived:0,pop:-1,miss:null};
 function rosterPopulation(){let n=0;for(const t of universe.teams)n+=t.roster.length;return n}
 function rebuildIndexes(){IDX.teams=new Map();IDX.players=new Map();universe.teams.forEach((t,i)=>{IDX.teams.set(t.name,{t,i});for(const p of t.roster)IDX.players.set(p.id,{p,t,i})});IDX.pop=rosterPopulation();IDX.archive=new Map();IDX.archived=0;IDX.miss=null;indexArchive()}
@@ -7784,9 +7833,9 @@ function showTitlePanel(id=null){
  const target=id?$('#'+id)?.querySelector('button,select,input'):($('#titleContinue').disabled?$('#titleNew'):$('#titleContinue'));target?.focus();
 }
 function showTitleScreen(){
- $('#app').hidden=true;$('#titleScreen').hidden=false;document.body.classList.remove('dynasty-open');renderTitleState();showTitlePanel();setTitleStatus(universe?'Current session is ready to resume.':slotStorageError()||(titleBrowserSave?`${storageKind()==='desktop'?'Desktop save':'Browser save'} ready ${storageLocation()}.`:'Choose New Dynasty or load a save.'));window.scrollTo?.(0,0);
+ $('#app').hidden=true;$('#dynastySetup')&&($('#dynastySetup').hidden=true);$('#titleScreen').hidden=false;document.body.classList.remove('dynasty-open','setup-open');renderTitleState();showTitlePanel();setTitleStatus(universe?'Current session is ready to resume.':slotStorageError()||(titleBrowserSave?`${storageKind()==='desktop'?'Desktop save':'Browser save'} ready ${storageLocation()}.`:'Choose New Dynasty or load a save.'));window.scrollTo?.(0,0);
 }
-function enterDynasty(){if(!universe)return;$('#titleScreen').hidden=true;$('#app').hidden=false;document.body.classList.add('dynasty-open');render();window.scrollTo?.(0,0);$('#app .topbar')?.focus?.()}
+function enterDynasty(){if(!universe)return;$('#titleScreen').hidden=true;$('#dynastySetup')&&($('#dynastySetup').hidden=true);$('#app').hidden=false;document.body.classList.remove('setup-open');document.body.classList.add('dynasty-open');render();window.scrollTo?.(0,0);$('#app .topbar')?.focus?.()}
 function populateTitleTeams(){
  $('#titleTeam').innerHTML='';schools.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(s=>{const o=document.createElement('option');o.value=s.name;o.textContent=`${s.name} · ${s.conference}`;$('#titleTeam').appendChild(o)});$('#titleTeam').value='Chicago Metropolitan';
 }
@@ -7820,7 +7869,7 @@ $$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.cla
  $('#saveBrowser').onclick=saveBrowser;$('#loadBrowser').onclick=loadBrowser;$('#exportSave').onclick=exportSave;$('#importSave').onclick=()=>$('#importFile').click();$('#importFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;const fromTitle=!$('#titleScreen').hidden,ok=await importSave(file);e.target.value='';if(ok&&fromTitle)enterDynasty();else if(!ok&&fromTitle)setTitleStatus($('#saveStatus').textContent)};
  $('#saveSlot').onchange=e=>{chooseSaveSlot(e.target.value);setStatus(`Active save slot: ${activeSlotMeta()?.label||e.target.value}.`)};
  $('#newUniverse').onclick=showTitleScreen;
- $('#titleContinue').onclick=continueTitleDynasty;$('#titleNew').onclick=()=>showTitlePanel('titleNewPanel');$('#titleLoad').onclick=()=>showTitlePanel('titleLoadPanel');$('#titleOptions').onclick=()=>showTitlePanel('titleOptionsPanel');$('#titleHowTo').onclick=()=>showTitlePanel('titleHowPanel');
+ $('#titleContinue').onclick=continueTitleDynasty;$('#titleNew').onclick=openNewDynastySetup;$('#titleLoad').onclick=()=>showTitlePanel('titleLoadPanel');$('#titleOptions').onclick=()=>showTitlePanel('titleOptionsPanel');$('#titleHowTo').onclick=()=>showTitlePanel('titleHowPanel');
  $('#titleStart').onclick=startTitleDynasty;$('#titleLoadBrowser').onclick=loadTitleDynasty;$('#titleSaveSlot').onchange=e=>chooseSaveSlot(e.target.value);$('#titleRenameSlot').onclick=renameSaveSlot;$('#titleImport').onclick=()=>$('#importFile').click();$('#titleSaveOptions').onclick=saveTitlePreferences;$$('[data-title-back]').forEach(b=>b.onclick=()=>showTitlePanel());
 }
 if(typeof window!=='undefined')window.__DL_TEST__={selected,createOpening,renderStaff,setTeamScheme,schemeTransition,positionChangeWillingness,commissionerMode,renderControlMode,preseasonDebug(){return{phase:universe?.phase,week:universe?.week,played:(universe?.schedule||[]).flat().filter(g=>g.played).length,targeted:(universe?.recruits||[]).filter(r=>r.targeted).length,rng:JSON.stringify(universe?.rng||null)}},setGameplayRng(seed){activateGameplayRng(seed,universe);syncGameplayRng()},prepareDevelopmentResults(){universe.phase='complete';universe.offseason=makeOffseasonState(universe.year,'spring',['review','departures','signing','portal']);runSpringCamp()}};
@@ -9637,7 +9686,221 @@ if(globalThis.__DL_TEST__){
   globalThis.__DL_TEST__.weeklyPlayerStoriesForceFixture=()=>{const t=selected();if(!t||!t.roster?.length)return null;const p=t.roster[0];p.injuryWeeks=2;p.health=63;p.morale=42;renderV0102PlayerStories();return{id:p.id,name:p.name}}
 }
 
-loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});[...new Set(schools.map(t=>t.conference))].forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();applyTitlePreferences();showTitleScreen();refreshTitleSave();}).catch(e=>{$('#titleStatus').textContent='Could not initialize Dynasty Lab. '+e.message});
+// One-time new-dynasty setup. This extension is injected before app bootstrap so it
+// can use the simulation and persistence services without creating a second state model.
+const NEW_DYNASTY_SETUP_DRAFT_KEY='dynastyLabNewDynastySetupV1';
+const NEW_DYNASTY_SETUP_VERSION=1;
+const NEW_DYNASTY_SETUP_STEPS=['Take the Job','Your Coach','Choose a Program','Program Identity','Configure the World','What You Inherited','Accept the Contract'];
+let newDynastySetupDraft=null;
+let newDynastySetupCandidate=null;
+let newDynastySetupPreviousUniverse=null;
+let newDynastySetupGenerating=false;
+let newDynastySetupSubmitting=false;
+let newDynastySetupSaveCount=0;
+let newDynastySetupProgramView={query:'',conference:'ALL',sort:'challenge'};
+
+function newDynastySetupSeed(){
+ const values=new Uint32Array(1);crypto.getRandomValues(values);return values[0]||0x6d2b79f5;
+}
+function defaultNewDynastySetupDraft(){
+ return {version:NEW_DYNASTY_SETUP_VERSION,active:true,step:0,coachName:'',program:'Chicago Metropolitan',offScheme:'Multiple',defScheme:'Split-Safety Control',trainingFocus:'Balanced',mode:'dynasty',seed:newDynastySetupSeed(),quickStart:false,startedAt:new Date().toISOString()};
+}
+function sanitizeNewDynastySetupDraft(value){
+ const base=defaultNewDynastySetupDraft(),d=value&&typeof value==='object'?value:{};
+ const program=schools.some(s=>s.name===d.program)?d.program:base.program;
+ return {...base,active:d.active===true,step:clamp(Number.isInteger(d.step)?d.step:0,0,6),coachName:typeof d.coachName==='string'?d.coachName.slice(0,40):'',program,offScheme:OFF_SCHEMES[d.offScheme]?d.offScheme:base.offScheme,defScheme:DEF_SCHEMES[d.defScheme]?d.defScheme:base.defScheme,trainingFocus:TEAM_TRAINING[d.trainingFocus]?d.trainingFocus:base.trainingFocus,mode:d.mode==='commissioner'?'commissioner':'dynasty',seed:Number.isInteger(d.seed)&&d.seed>=0&&d.seed<=0xffffffff?d.seed:base.seed,quickStart:d.quickStart===true,startedAt:typeof d.startedAt==='string'?d.startedAt:base.startedAt};
+}
+function readNewDynastySetupDraft(){
+ try{const raw=localStorage.getItem(NEW_DYNASTY_SETUP_DRAFT_KEY);return raw?sanitizeNewDynastySetupDraft(JSON.parse(raw)):null}catch{return null}
+}
+function writeNewDynastySetupDraft(){
+ if(!newDynastySetupDraft)return;try{localStorage.setItem(NEW_DYNASTY_SETUP_DRAFT_KEY,JSON.stringify(newDynastySetupDraft))}catch{}
+}
+function clearNewDynastySetupDraft(){try{localStorage.removeItem(NEW_DYNASTY_SETUP_DRAFT_KEY)}catch{}newDynastySetupDraft=null}
+function validNewDynastyCoachName(name){return /^[A-Za-z0-9 .,'-]{2,40}$/.test(String(name||'').trim())}
+function newDynastySetupSchool(){return schools.find(s=>s.name===newDynastySetupDraft?.program)||schools[0]}
+function newDynastyChallenge(s){return clamp(Math.round(100-((s.prestige+s.resources+s.facilities+s.development)/4)+(100-s.admin_patience)*.22),1,100)}
+function newDynastyChallengeLabel(s){const n=newDynastyChallenge(s);return n>=70?'Program builder':n>=48?'Competitive climb':n>=28?'Win-now pressure':'Championship mandate'}
+function newDynastyTrajectory(s){const gap=(s.program_ceiling||s.prestige)-s.prestige;return gap>=18?'Significant room to build':gap>=8?'Upside remains':s.prestige>=88?'National-title standard':'Stable foundation'}
+function newDynastySetupBrand(){
+ const root=$('#dynastySetup'),s=newDynastySetupSchool();if(!root||!s)return;
+ if(globalThis.DynastyProgramBranding?.applyVars)DynastyProgramBranding.applyVars(root,s.id);
+ else{const c=schoolColors(s);root.style.setProperty('--program-primary',c.primary);root.style.setProperty('--program-secondary',c.secondary)}
+ root.dataset.programId=String(s.id);
+}
+function newDynastySetupProgress(){
+ return NEW_DYNASTY_SETUP_STEPS.map((label,i)=>`<div class="setup-progress-step${i===newDynastySetupDraft.step?' active':i<newDynastySetupDraft.step?' complete':''}" ${i===newDynastySetupDraft.step?'aria-current="step"':''}><span>${i+1}</span><small>${esc(label)}</small></div>`).join('');
+}
+function newDynastySetupMetric(label,value,note=''){return `<div class="setup-metric"><span>${esc(label)}</span><strong>${esc(value)}</strong>${note?`<small>${esc(note)}</small>`:''}</div>`}
+function newDynastySetupChoice(field,value,title,copy,selected){return `<label class="setup-choice${selected?' selected':''}"><input type="radio" name="${field}" value="${esc(value)}" data-setup-field="${field}" ${selected?'checked':''}><span><strong>${esc(title)}</strong><small>${esc(copy)}</small></span></label>`}
+function newDynastySetupHeader(kicker,title,copy){return `<div class="setup-screen-head"><span>${esc(kicker)}</span><h1 id="setupHeading">${esc(title)}</h1><p>${esc(copy)}</p></div>`}
+function newDynastySetupProgramRows(){
+ const q=newDynastySetupProgramView.query.trim().toLowerCase(),conference=newDynastySetupProgramView.conference;
+ let rows=schools.filter(s=>(conference==='ALL'||s.conference===conference)&&(!q||`${s.name} ${s.city} ${s.state} ${s.conference}`.toLowerCase().includes(q)));
+ if(newDynastySetupProgramView.sort==='prestige')rows.sort((a,b)=>b.prestige-a.prestige||a.name.localeCompare(b.name));
+ else if(newDynastySetupProgramView.sort==='resources')rows.sort((a,b)=>(b.resources+b.nil)-(a.resources+a.nil)||a.name.localeCompare(b.name));
+ else if(newDynastySetupProgramView.sort==='name')rows.sort((a,b)=>a.name.localeCompare(b.name));
+ else rows.sort((a,b)=>newDynastyChallenge(b)-newDynastyChallenge(a)||a.name.localeCompare(b.name));
+ return rows;
+}
+function newDynastySetupProgramListHTML(rows,selected){
+ return rows.map(s=>`<button type="button" role="option" aria-selected="${s.name===selected.name}" class="setup-program-row${s.name===selected.name?' selected':''}" data-setup-program="${esc(s.name)}"><span>${teamLogoHTML(s.id,34,'team-logo--inline')}<b>${esc(s.name)}</b><small>${esc(s.conference)} · ${esc(s.city)}, ${esc(s.state)}</small></span><span><b>${esc(newDynastyChallengeLabel(s))}</b><small>Prestige ${s.prestige} · Ceiling ${s.program_ceiling}</small></span></button>`).join('')||'<p class="setup-empty">No programs match those filters.</p>';
+}
+function filterNewDynastySetupPrograms(){
+ const rows=newDynastySetupProgramRows(),selected=newDynastySetupSchool(),count=$('#setupContent .setup-program-count'),list=$('#setupContent .setup-program-list');
+ if(count)count.textContent=`${rows.length} program${rows.length===1?'':'s'}`;if(list)list.innerHTML=newDynastySetupProgramListHTML(rows,selected);
+}
+function newDynastySetupWelcome(){
+ const saves=titleSaveSlots.filter(s=>!s.empty).length;
+ return `${newDynastySetupHeader('THE NEXT ERA STARTS HERE','Take the Job','Build a coach, choose the right program, set your football identity, and see exactly what you inherited before the first preseason meeting.')}
+ <div class="setup-welcome-grid">
+  <section class="setup-feature"><span>FULL SETUP</span><h2>Make the program yours</h2><p>Seven focused steps. Every editable choice on these screens writes to a real Dynasty Lab system.</p></section>
+  <section class="setup-feature"><span>QUICK START</span><h2>Get to the briefing</h2><p>Use recommended defaults, then review the generated roster and staff before accepting the job.</p><button type="button" data-setup-quick>Quick Start</button></section>
+ </div>
+ <div class="setup-ledger">${newDynastySetupMetric('Starting season','2027 Preseason','Week 1 stays locked until you choose Begin Season')}${newDynastySetupMetric('Universe','120 programs','Generated only after your setup choices are ready')}${newDynastySetupMetric('Existing saves',String(saves),'Continue and Load remain on the title screen')}</div>`;
+}
+function newDynastySetupCoach(){
+ const valid=validNewDynastyCoachName(newDynastySetupDraft.coachName);
+ return `${newDynastySetupHeader('STEP 2 · YOUR COACH','Put your name on the office','Coach name is identity, not a hidden ratings bonus. Your results will build the résumé.')}
+ <div class="setup-form-narrow"><label class="setup-field" for="setupCoachName"><span>Coach name <b>Required</b></span><input id="setupCoachName" type="text" maxlength="40" autocomplete="name" value="${esc(newDynastySetupDraft.coachName)}" aria-describedby="setupCoachHelp setupCoachError"><small id="setupCoachHelp">2–40 characters. Letters, numbers, spaces, apostrophes, periods, commas, and hyphens are allowed.</small></label><p id="setupCoachError" class="setup-validation${valid||!newDynastySetupDraft.coachName?' hidden':''}">Enter a valid coach name to continue.</p>
+ <div class="setup-note"><span>CAREER CONTRACT</span><strong>One coach. One active post.</strong><p>Dynasty Mode moves you through earned job opportunities. Commissioner Mode adds sandbox controls without changing your coach identity.</p></div></div>`;
+}
+function newDynastySetupProgram(){
+ const selected=newDynastySetupSchool(),conferences=[...new Set(schools.map(s=>s.conference))].sort(),rows=newDynastySetupProgramRows();
+ return `${newDynastySetupHeader('STEP 3 · JOB BOARD','Choose the program','Search all 120 programs and judge the institution before the generated roster enters the room.')}
+ <div class="setup-program-layout"><section class="setup-program-browser"><div class="setup-program-tools"><input id="setupProgramSearch" type="search" placeholder="Search school, city, state…" value="${esc(newDynastySetupProgramView.query)}" aria-label="Search programs"><select id="setupProgramConference" aria-label="Filter conference"><option value="ALL">All conferences</option>${conferences.map(c=>`<option ${c===newDynastySetupProgramView.conference?'selected':''}>${esc(c)}</option>`).join('')}</select><select id="setupProgramSort" aria-label="Sort programs"><option value="challenge" ${newDynastySetupProgramView.sort==='challenge'?'selected':''}>Challenge</option><option value="prestige" ${newDynastySetupProgramView.sort==='prestige'?'selected':''}>Prestige</option><option value="resources" ${newDynastySetupProgramView.sort==='resources'?'selected':''}>Resources</option><option value="name" ${newDynastySetupProgramView.sort==='name'?'selected':''}>Name</option></select></div>
+ <div class="setup-program-count">${rows.length} program${rows.length===1?'':'s'}</div><div class="setup-program-list" role="listbox" aria-label="Available programs">${newDynastySetupProgramListHTML(rows,selected)}</div></section>
+ <aside class="setup-program-dossier">${teamLogoHTML(selected.id,74,'setup-program-logo')}<span>SELECTED PROGRAM</span><h2>${esc(selected.name)}</h2><p>${esc(selected.city)}, ${esc(selected.state)} · ${esc(selected.conference)}</p><div class="setup-dossier-grid">${newDynastySetupMetric('Prestige',grade(selected.prestige),`${selected.prestige}/100`)}${newDynastySetupMetric('Resources',grade(selected.resources),`${selected.resources}/100`)}${newDynastySetupMetric('NIL position',grade(selected.nil),`${selected.nil}/100`)}${newDynastySetupMetric('Development',grade(selected.development),`${selected.development}/100`)}${newDynastySetupMetric('Facilities',grade(selected.facilities),`${selected.facilities}/100`)}${newDynastySetupMetric('Expectation',`${seasonExpectation(selected)} wins`,newDynastyChallengeLabel(selected))}</div><div class="setup-trajectory"><span>PROGRAM TRAJECTORY</span><strong>${esc(newDynastyTrajectory(selected))}</strong><small>Program ceiling ${selected.program_ceiling} · administration patience ${selected.admin_patience}</small></div></aside></div>`;
+}
+function newDynastySetupIdentity(){
+ const off=Object.entries(OFF_SCHEMES).map(([name,x])=>newDynastySetupChoice('offScheme',name,name,`${Math.round(x.pass*100)}% pass · pace ${x.pace} · ${x.traits.join(', ')}`,newDynastySetupDraft.offScheme===name)).join('');
+ const def=Object.entries(DEF_SCHEMES).map(([name,x])=>newDynastySetupChoice('defScheme',name,name,`Pressure ${x.pressure} · coverage ${x.coverage} · run control ${x.run}`,newDynastySetupDraft.defScheme===name)).join('');
+ const training=Object.entries(TEAM_TRAINING).map(([name,x])=>newDynastySetupChoice('trainingFocus',name,name,x.desc,newDynastySetupDraft.trainingFocus===name)).join('');
+ return `${newDynastySetupHeader('STEP 4 · FOOTBALL IDENTITY','Set the program identity','These choices affect scheme fit, installation, staff alignment, and offseason development.')}
+ <div class="setup-identity"><section><div class="setup-section-title"><span>OFFENSE</span><h2>How you move the ball</h2></div><div class="setup-choice-grid">${off}</div></section><section><div class="setup-section-title"><span>DEFENSE</span><h2>How you get off the field</h2></div><div class="setup-choice-grid">${def}</div></section><section><div class="setup-section-title"><span>PROGRAM DEVELOPMENT</span><h2>Where the offseason work goes</h2></div><div class="setup-choice-grid setup-choice-grid--training">${training}</div></section></div>`;
+}
+function newDynastySetupWorld(){
+ return `${newDynastySetupHeader('STEP 5 · WORLD CONTROL','Configure the world','Choose how much institutional control you want. League rules remain fixed because Dynasty Lab does not pretend unfinished settings are real.')}
+ <div class="setup-mode-grid">${newDynastySetupChoice('mode','dynasty','Dynasty Mode','Control one program. Change jobs only through earned career opportunities.',newDynastySetupDraft.mode==='dynasty')}${newDynastySetupChoice('mode','commissioner','Commissioner Mode','Switch programs and edit institutional details across the fictional universe.',newDynastySetupDraft.mode==='commissioner')}</div>
+ <div class="setup-world-facts"><div><span>UNIVERSE</span><strong>120 fictional programs</strong><small>Ten conferences with a national postseason.</small></div><div><span>CALENDAR</span><strong>12-game regular season</strong><small>Your dynasty opens in the 2027 preseason.</small></div><div><span>SIMULATION</span><strong>One shared football model</strong><small>Mode changes control access, not opponent difficulty.</small></div><div><span>SAVE MODEL</span><strong>Three local slots + JSON export</strong><small>The opening contract creates one durable save.</small></div></div>
+ <div class="setup-deferred"><strong>Not exposed yet</strong><span>Custom playoff formats, transfer rules, conference realignment, and difficulty sliders require real simulation support before they belong here.</span></div>`;
+}
+function buildNewDynastySetupCandidate(){
+ if(newDynastySetupCandidate)return newDynastySetupCandidate;
+ const d=newDynastySetupDraft;if(!d)throw new Error('Setup draft is unavailable.');
+ const previous=universe;createNewDynasty(d.mode,{seed:d.seed});const candidate=universe;
+ try{
+  refreshTeamOptions(d.program);const t=T(d.program);if(!t)throw new Error('The selected program could not be generated.');
+  setTeamScheme(t,'off',d.offScheme,'New head coach identity');setTeamScheme(t,'def',d.defScheme,'New head coach identity');
+  t.staff.OC.preferredScheme=d.offScheme;t.staff.DC.preferredScheme=d.defScheme;t.trainingFocus=d.trainingFocus;
+  t.staff.HC.name=d.coachName.trim();t.staff.HC.userControlled=true;
+  universe.coachProfile={name:d.coachName.trim(),programId:t.id,programName:t.name,startedYear:universe.year};
+  universe.tenure={startYear:universe.year,school:t.name,seasons:[],ended:null,closed:false};
+  universe.setup={version:NEW_DYNASTY_SETUP_VERSION,completed:false,source:'take-the-job',coachName:d.coachName.trim(),programId:t.id,programName:t.name,offScheme:d.offScheme,defScheme:d.defScheme,trainingFocus:d.trainingFocus,mode:d.mode,seed:d.seed,quickStart:d.quickStart,startedAt:d.startedAt,completedAt:null,saveSlot:null};
+  universe.setupCompleted=false;buildPreseasonHub();syncGameplayRng();newDynastySetupCandidate=candidate;return candidate;
+ }catch(e){universe=previous;ensureGameplayRng();rebuildIndexes();throw e}
+}
+function invalidateNewDynastySetupCandidate(){
+ if(!newDynastySetupCandidate)return;
+ if(universe===newDynastySetupCandidate){universe=newDynastySetupPreviousUniverse;ensureGameplayRng();if(universe)rebuildIndexes()}
+ newDynastySetupCandidate=null;newDynastySetupGenerating=false;
+}
+function newDynastySetupBriefing(){
+ if(!newDynastySetupCandidate)return `${newDynastySetupHeader('STEP 6 · PROGRAM BRIEFING','Generating your program','Building the exact 2027 roster, staff, schedule, recruiting pool, and scholarship picture from your setup seed.')}<div class="setup-loading"><span></span><strong>Football operations is assembling the dossier…</strong></div>`;
+ const t=T(newDynastySetupDraft.program),p=profiles(t),sch=scholarshipSummary(t),units=[['Quarterback room',p.qb],['Skill talent',p.skill],['Offensive line',p.ol],['Front seven',p.front],['Coverage unit',p.coverage]].sort((a,b)=>b[1]-a[1]),pipelines=Object.entries(t.pipelines||{}).sort((a,b)=>b[1]-a[1]),strengths=units.slice(0,2),weaknesses=units.slice(-2).reverse();
+ const transition=['off','def'].filter(side=>schemeTransition(t,side)).map(side=>`${side==='off'?'offense':'defense'} at ${schemeFamiliarity(t,side)}% familiarity`);
+ const priorities=[`Build the weekly plan around ${strengths[0][0].toLowerCase()} (${grade(strengths[0][1])}).`,sch.room?`Use the ${sch.room} available scholarship spot${sch.room===1?'':'s'} without exceeding the ${sch.capacity}-player class capacity.`:'Protect roster flexibility; the projected class is already at capacity.',transition.length?`Manage installation: ${transition.join(' and ')}.`:`Preserve the roster's fit in ${t.offScheme} and ${t.defScheme}.`];
+ return `${newDynastySetupHeader('STEP 6 · PROGRAM BRIEFING','What You Inherited','This report is generated from the exact universe that will be saved if you accept the contract.')}
+ <div class="setup-briefing-hero"><div>${teamLogoHTML(t.id,84,'setup-program-logo')}<span>2027 PROGRAM DOSSIER</span><h2>${esc(t.name)}</h2><p>${esc(t.conference)} · ${esc(t.city)}, ${esc(t.state)}</p></div><div>${newDynastySetupMetric('Overall profile',grade(p.overall),`${Math.round(p.overall)}/100`)}${newDynastySetupMetric('Board target',`${seasonExpectation(t)} wins`,adminConfidenceLabel(t.adminConfidence))}${newDynastySetupMetric('Scholarships',`${sch.room} open`,`${sch.returning} projected returners`)}</div></div>
+ <div class="setup-briefing-grid"><section><div class="setup-section-title"><span>ROSTER READ</span><h2>Strengths and pressure points</h2></div><div class="setup-report-block"><strong>Foundation</strong>${strengths.map(x=>`<div><span>${esc(x[0])}</span><b>${grade(x[1])} · ${Math.round(x[1])}</b></div>`).join('')}</div><div class="setup-report-block warning"><strong>Needs attention</strong>${weaknesses.map(x=>`<div><span>${esc(x[0])}</span><b>${grade(x[1])} · ${Math.round(x[1])}</b></div>`).join('')}</div><div class="setup-report-block"><strong>Roster & scholarships</strong><p>${t.roster.length} players · ${sch.departing} projected departures · ${sch.capacity} recruiting capacity · ${sch.room} spots currently open.</p></div></section>
+ <section><div class="setup-section-title"><span>FOOTBALL OPERATIONS</span><h2>Staff and recruiting position</h2></div><div class="setup-staff-list">${Object.values(t.staff).map(c=>`<div><span>${esc(c.role)}</span><strong>${esc(c.name)}</strong><small>Recruit ${grade(c.recruiting)} · Develop ${grade(c.development)} · Call ${grade(c.playCall)}</small></div>`).join('')}</div><div class="setup-report-block"><strong>Best pipelines</strong><p>${pipelines.slice(0,3).map(([name,value])=>`${esc(name)} ${value}`).join(' · ')}</p></div></section>
+ <section class="setup-priorities"><div class="setup-section-title"><span>FIRST 30 DAYS</span><h2>Recommended priorities</h2></div><ol>${priorities.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></section></div>`;
+}
+function newDynastySetupReview(){
+ const d=newDynastySetupDraft,s=newDynastySetupSchool(),slot=titleSaveSlots.find(x=>x.empty)||activeSlotMeta(),occupied=slot&&!slot.empty;
+ return `${newDynastySetupHeader('STEP 7 · CONTRACT REVIEW','Accept the contract','Review the terms. Accepting creates one saved dynasty and opens the Command Center in preseason.')}
+ <div class="setup-contract"><div class="setup-contract-top">${teamLogoHTML(s.id,76,'setup-program-logo')}<div><span>HEAD FOOTBALL COACH</span><h2>${esc(d.coachName)}</h2><p>${esc(s.name)} · ${esc(s.conference)}</p></div></div>
+ <div class="setup-contract-grid">${newDynastySetupMetric('Offense',d.offScheme,'Creates real scheme fit and installation state')}${newDynastySetupMetric('Defense',d.defScheme,'Creates real scheme fit and installation state')}${newDynastySetupMetric('Development',d.trainingFocus,'Sets the team offseason training focus')}${newDynastySetupMetric('Control',d.mode==='commissioner'?'Commissioner':'Dynasty',d.mode==='commissioner'?'Program switching and institutional editing enabled':'Career movement only')}${newDynastySetupMetric('Opening checkpoint','2027 Preseason','Week 1 remains locked until Begin Season')}${newDynastySetupMetric('Save destination',slot?.label||'Dynasty 1',occupied?'Confirmation required: this slot is occupied':'First available empty slot')}</div>
+ <div class="setup-contract-note"><strong>Your inherited roster is fixed.</strong><span>Returning to earlier steps preserves your answers. The dynasty is not written until you accept.</span></div></div>`;
+}
+function newDynastySetupHTML(){return [newDynastySetupWelcome,newDynastySetupCoach,newDynastySetupProgram,newDynastySetupIdentity,newDynastySetupWorld,newDynastySetupBriefing,newDynastySetupReview][newDynastySetupDraft.step]()}
+function updateNewDynastySetupControls(){
+ const back=$('#setupBack'),next=$('#setupContinue'),step=newDynastySetupDraft.step;
+ back.disabled=step===0||newDynastySetupSubmitting;back.hidden=step===0;
+ next.disabled=newDynastySetupSubmitting||(step===1&&!validNewDynastyCoachName(newDynastySetupDraft.coachName))||(step===5&&!newDynastySetupCandidate);
+ next.textContent=newDynastySetupSubmitting?'Creating Dynasty…':step===6?'Accept the Job':step===4?'Generate Briefing':'Continue';
+}
+function renderNewDynastySetup(){
+ if(!newDynastySetupDraft)return;$('#setupProgress').innerHTML=newDynastySetupProgress();$('#setupContent').innerHTML=newDynastySetupHTML();
+ newDynastySetupBrand();updateNewDynastySetupControls();$('#setupStatus').textContent=`Step ${newDynastySetupDraft.step+1} of 7 · ${NEW_DYNASTY_SETUP_STEPS[newDynastySetupDraft.step]}`;
+ $('#setupContent').focus({preventScroll:true});window.scrollTo?.(0,0);
+ if(newDynastySetupDraft.step===5&&!newDynastySetupCandidate&&!newDynastySetupGenerating){
+  newDynastySetupGenerating=true;setTimeout(()=>{try{buildNewDynastySetupCandidate();newDynastySetupGenerating=false;renderNewDynastySetup()}catch(e){newDynastySetupGenerating=false;$('#setupStatus').textContent=e.message||'The program briefing could not be generated.'}},0);
+ }
+}
+function openNewDynastySetup(){
+ if(universe&&!newDynastySetupCandidate&&!confirm('Start a new dynasty setup? Your current session stays intact unless you accept a new job.'))return;
+ if(!newDynastySetupDraft)newDynastySetupDraft=readNewDynastySetupDraft()||defaultNewDynastySetupDraft();
+ newDynastySetupDraft.active=true;newDynastySetupPreviousUniverse=universe;writeNewDynastySetupDraft();
+ $('#titleScreen').hidden=true;$('#app').hidden=true;$('#dynastySetup').hidden=false;document.body.classList.remove('dynasty-open');document.body.classList.add('setup-open');renderNewDynastySetup();
+}
+function exitNewDynastySetup(){
+ if(newDynastySetupSubmitting)return;newDynastySetupDraft.active=false;writeNewDynastySetupDraft();invalidateNewDynastySetupCandidate();universe=newDynastySetupPreviousUniverse;newDynastySetupPreviousUniverse=null;ensureGameplayRng();if(universe)rebuildIndexes();showTitleScreen();setTitleStatus('Setup saved as a local draft. Choose New Dynasty to resume.');
+}
+function restoreNewDynastySetupDraft(){
+ const d=readNewDynastySetupDraft();if(!d?.active)return;newDynastySetupDraft=d;newDynastySetupPreviousUniverse=universe;openNewDynastySetup();
+}
+function setNewDynastySetupField(field,value){
+ if(!['offScheme','defScheme','trainingFocus','mode'].includes(field))return;
+ if(newDynastySetupDraft[field]===value)return;newDynastySetupDraft[field]=value;newDynastySetupDraft.quickStart=false;invalidateNewDynastySetupCandidate();writeNewDynastySetupDraft();renderNewDynastySetup();
+}
+async function acceptNewDynastySetup(){
+ if(newDynastySetupSubmitting)return false;if(!validNewDynastyCoachName(newDynastySetupDraft.coachName))return false;
+ if(!newDynastySetupCandidate)buildNewDynastySetupCandidate();
+ const empty=titleSaveSlots.find(s=>s.empty),target=empty||activeSlotMeta()||{slot:activeSaveSlot,label:'the selected slot',empty:true};
+ if(!target.empty&&!confirm(`Replace ${target.label}? Its current dynasty will be overwritten.`))return false;
+ newDynastySetupSubmitting=true;updateNewDynastySetupControls();$('#setupStatus').textContent='Creating the opening preseason checkpoint…';
+ try{
+  if(target.slot!==activeSaveSlot)setActiveSaveSlot(target.slot);
+  universe=newDynastySetupCandidate;refreshTeamOptions(newDynastySetupDraft.program);
+  universe.setup.completed=true;universe.setupCompleted=true;universe.setup.completedAt=new Date().toISOString();universe.setup.saveSlot=activeSaveSlot;
+  await yieldToUserAction();await writeBrowserSave('setup');newDynastySetupSaveCount++;
+  const program=newDynastySetupDraft.program,mode=newDynastySetupDraft.mode;clearNewDynastySetupDraft();newDynastySetupCandidate=null;newDynastySetupPreviousUniverse=null;newDynastySetupSubmitting=false;enterDynasty();setStatus(`${program} accepted. Your ${mode==='commissioner'?'commissioner universe':'dynasty'} is saved and ready for the 2027 preseason.`);return true;
+ }catch(e){
+  if(universe?.setup){universe.setup.completed=false;universe.setupCompleted=false;universe.setup.completedAt=null;universe.setup.saveSlot=null}
+  newDynastySetupSubmitting=false;updateNewDynastySetupControls();$('#setupStatus').textContent=e.message||'The dynasty could not be saved. Nothing was replaced.';return false;
+ }
+}
+async function continueNewDynastySetup(){
+ const step=newDynastySetupDraft.step;if(step===1&&!validNewDynastyCoachName(newDynastySetupDraft.coachName)){updateNewDynastySetupControls();$('#setupStatus').textContent='Enter a valid coach name to continue.';$('#setupCoachName')?.focus();return}
+ if(step===6){await acceptNewDynastySetup();return}
+ newDynastySetupDraft.step=Math.min(6,step+1);writeNewDynastySetupDraft();renderNewDynastySetup();
+}
+function backNewDynastySetup(){if(newDynastySetupSubmitting||newDynastySetupDraft.step===0)return;newDynastySetupDraft.step--;writeNewDynastySetupDraft();renderNewDynastySetup()}
+function quickStartNewDynastySetup(){
+ newDynastySetupDraft={...defaultNewDynastySetupDraft(),active:true,step:5,coachName:'Alex Morgan',quickStart:true};writeNewDynastySetupDraft();invalidateNewDynastySetupCandidate();renderNewDynastySetup();
+}
+function bindNewDynastySetup(){
+ $('#setupExit').onclick=exitNewDynastySetup;$('#setupBack').onclick=backNewDynastySetup;$('#setupContinue').onclick=continueNewDynastySetup;
+ $('#setupContent').addEventListener('click',e=>{const quick=e.target.closest('[data-setup-quick]');if(quick){quickStartNewDynastySetup();return}const program=e.target.closest('[data-setup-program]');if(program){newDynastySetupDraft.program=program.dataset.setupProgram;newDynastySetupDraft.quickStart=false;invalidateNewDynastySetupCandidate();writeNewDynastySetupDraft();renderNewDynastySetup()}});
+ $('#setupContent').addEventListener('input',e=>{if(e.target.id==='setupCoachName'){newDynastySetupDraft.coachName=e.target.value.slice(0,40);newDynastySetupDraft.quickStart=false;invalidateNewDynastySetupCandidate();writeNewDynastySetupDraft();updateNewDynastySetupControls();$('#setupCoachError')?.classList.toggle('hidden',validNewDynastyCoachName(newDynastySetupDraft.coachName)||!newDynastySetupDraft.coachName)}else if(e.target.id==='setupProgramSearch'){newDynastySetupProgramView.query=e.target.value;filterNewDynastySetupPrograms()}});
+ $('#setupContent').addEventListener('change',e=>{if(e.target.dataset.setupField)setNewDynastySetupField(e.target.dataset.setupField,e.target.value);else if(e.target.id==='setupProgramConference'){newDynastySetupProgramView.conference=e.target.value;filterNewDynastySetupPrograms()}else if(e.target.id==='setupProgramSort'){newDynastySetupProgramView.sort=e.target.value;filterNewDynastySetupPrograms()}});
+ $('#dynastySetup').addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();exitNewDynastySetup()}else if(e.key==='Enter'&&e.target.tagName!=='BUTTON'&&e.target.tagName!=='TEXTAREA'&&!$('#setupContinue').disabled){e.preventDefault();continueNewDynastySetup()}});
+}
+function migrateNewDynastySetupState(target){
+ if(!target||typeof target!=='object')return null;
+ if(!target.setup||typeof target.setup!=='object')target.setup={version:NEW_DYNASTY_SETUP_VERSION,completed:true,source:'legacy'};
+ else{target.setup.version=NEW_DYNASTY_SETUP_VERSION;if(target.setup.completed!==false)target.setup.completed=true}
+ target.setupCompleted=target.setup.completed!==false;return target.setup;
+}
+const normalizeUniverseBeforeNewDynastySetup=normalizeUniverse;
+normalizeUniverse=function(){const result=normalizeUniverseBeforeNewDynastySetup();migrateNewDynastySetupState(universe);return result};
+if(typeof window!=='undefined'){
+ window.DynastyLabNewDynastySetup={open:openNewDynastySetup,restore:restoreNewDynastySetupDraft,migrate:migrateNewDynastySetupState};
+ if(window.__DL_TEST__)Object.assign(window.__DL_TEST__,{openNewDynastySetup,restoreNewDynastySetupDraft,migrateNewDynastySetupState,setupDebug(){return{draft:newDynastySetupDraft?{...newDynastySetupDraft}:null,candidate:!!newDynastySetupCandidate,submitting:newDynastySetupSubmitting,saveCount:newDynastySetupSaveCount,setup:universe?.setup?{...universe.setup}:null}}});
+}
+
+loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});[...new Set(schools.map(t=>t.conference))].forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();bindNewDynastySetup();applyTitlePreferences();showTitleScreen();refreshTitleSave().then(restoreNewDynastySetupDraft);}).catch(e=>{$('#titleStatus').textContent='Could not initialize Dynasty Lab. '+e.message});
 })();
 
 (() => {

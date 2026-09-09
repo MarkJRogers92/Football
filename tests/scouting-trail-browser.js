@@ -1,5 +1,6 @@
 const {chromium}=require('playwright-core');
 const path=require('path');
+const {startNewDynasty}=require('./helpers/start-new-dynasty');
 const goRecruiting=page=>page.evaluate(()=>{const g=document.querySelector('.tab-groups button[data-group="recruiting"]');if(g&&!g.classList.contains('active'))g.click();document.querySelector('.tabs button[data-tab="recruiting"]')?.click()});
 const useTableView=async page=>{await page.waitForSelector('#rwSwitch');await page.click('#rwSwitch [data-rwm="table"]');await page.waitForFunction(()=>!document.querySelector('#recruiting > .table-wrap')?.classList.contains('recruit-table-hidden'))};
 
@@ -7,7 +8,7 @@ const useTableView=async page=>{await page.waitForSelector('#rwSwitch');await pa
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});
  const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
  await page.goto('file://'+path.join(__dirname,'..','index.html'));
- await page.waitForSelector('#titleNew',{timeout:30000});await page.waitForFunction(()=>document.querySelector('#titleTeam')?.options.length>0,{timeout:60000});await page.click('#titleNew');await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});await page.click('#titleStart');await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000});
+ await startNewDynasty(page);
  await goRecruiting(page);await useTableView(page);await page.waitForSelector('#recruitBody tr [data-recruit]');
  await page.locator('#recruitBody tr [data-recruit]').first().click();await page.waitForSelector('#recruitDialog[open] .scouting-trail-card');
  let text=await page.locator('#recruitDialog .scouting-trail-card').innerText();

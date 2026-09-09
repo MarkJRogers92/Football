@@ -4,7 +4,8 @@ const TAB_GROUP={dashboard:'program',program:'program',history:'program',roster:
 let passed=0,failed=0;
 function check(label,ok,detail=''){if(ok){passed++;console.log(`  PASS  ${label}${detail?` — ${detail}`:''}`)}else{failed++;console.error(`  FAIL  ${label}${detail?` — ${detail}`:''}`)}}
 const goTab=async(page,id)=>page.evaluate(({id,group})=>{const g=document.querySelector(`.tab-groups button[data-group="${group}"]`);if(g&&!g.classList.contains('active'))g.click();document.querySelector(`.tabs button[data-tab="${id}"]`)?.click()},{id,group:TAB_GROUP[id]});
-async function startNewDynasty(page){await page.goto('file://'+path.join(__dirname,'..','index.html'));await page.waitForSelector('#titleNew',{timeout:30000});await page.waitForFunction(()=>document.querySelector('#titleTeam')?.options.length>0,{timeout:60000});await page.click('#titleNew');await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});await page.click('#titleStart');await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000});}
+const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
+const startNewDynasty=async page=>{await page.goto('file://'+path.join(__dirname,'..','index.html'));return sharedStartNewDynasty(page)};
 async function run(browser,label,viewport){
  const page=await browser.newPage({viewport}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
  try{

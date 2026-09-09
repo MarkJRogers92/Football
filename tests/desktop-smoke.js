@@ -1,25 +1,41 @@
-// Lightweight Electron smoke coverage for unpackaged development and the made macOS ZIP.
+// Lightweight Electron smoke coverage for unpackaged development and the made desktop ZIP.
 // The invoking script is responsible for building index.html or the Alpha artifact first.
 const assert = require('assert/strict');
 const {execFileSync} = require('child_process');
+const extract = require('extract-zip');
 const fs = require('fs');
 const net = require('net');
 const os = require('os');
 const path = require('path');
 const {chromium, _electron: electron} = require('playwright-core');
+const {startNewDynasty} = require('./helpers/start-new-dynasty');
 
 const root = path.join(__dirname, '..');
 const electronPath = require('electron');
 const packaged = process.argv.includes('--packaged');
-const artifact = path.join(root, 'out', 'make', 'zip', 'darwin', 'arm64',
-  'Dynasty-Lab-Desktop-Alpha-macOS-arm64.zip');
+const packagedTarget = process.platform === 'win32'
+  ? {platform: 'win32', arch: 'x64', name: 'Dynasty-Lab-Desktop-Alpha-Windows-x64.zip'}
+  : {platform: 'darwin', arch: 'arm64', name: 'Dynasty-Lab-Desktop-Alpha-macOS-arm64.zip'};
+const artifact = path.join(root, 'out', 'make', 'zip', packagedTarget.platform,
+  packagedTarget.arch, packagedTarget.name);
 const bridgeKeys = ['kind', 'listSlots', 'load', 'readArchive', 'readGames', 'rename', 'save'];
 
-function extractPackagedBundle(destinationRoot) {
-  assert.equal(process.platform, 'darwin', 'the packaged Alpha smoke test requires macOS');
+async function extractPackagedBundle(destinationRoot) {
+  assert.ok(['darwin', 'win32'].includes(process.platform),
+    'the packaged Alpha smoke test requires macOS or Windows');
   assert.equal(fs.existsSync(artifact), true, `packaged Alpha ZIP is required at ${artifact}`);
   fs.mkdirSync(destinationRoot, {recursive: true});
-  execFileSync('unzip', ['-q', artifact, '-d', destinationRoot]);
+  await extract(artifact, {dir: destinationRoot});
+
+  if (process.platform === 'win32') {
+    const application = path.join(destinationRoot, 'Dynasty Lab-win32-x64');
+    const executable = path.join(application, 'Dynasty Lab.exe');
+    const asar = path.join(application, 'resources', 'app.asar');
+    assert.equal(fs.existsSync(executable), true, `packaged executable is required at ${executable}`);
+    assert.equal(fs.existsSync(asar), true, `packaged ASAR is required at ${asar}`);
+    return executable;
+  }
+
   const bundle = path.join(destinationRoot, 'Dynasty Lab.app');
   const executable = path.join(bundle, 'Contents', 'MacOS', 'Dynasty Lab');
   const plist = path.join(bundle, 'Contents', 'Info.plist');
@@ -87,6 +103,22 @@ async function launchMacBundle(bundle, profile, applicationArgs = []) {
   };
 }
 
+async function launchPackagedApplication(application, profile) {
+  if (process.platform === 'darwin') return launchMacBundle(application, profile);
+
+  const app = await electron.launch({
+    executablePath: application,
+    args: [`--user-data-dir=${profile}`],
+    cwd: path.dirname(application),
+  });
+  assert.equal(fs.realpathSync(await app.evaluate(({app: runtime}) => runtime.getPath('userData'))),
+    fs.realpathSync(profile), 'packaged smoke test must use its disposable Electron profile');
+  return {
+    page: await app.firstWindow(),
+    close: () => app.close(),
+  };
+}
+
 function watchPage(page, pageErrors, consoleErrors) {
   page.on('pageerror', error => pageErrors.push(String(error)));
   page.on('console', message => {
@@ -112,10 +144,7 @@ async function verifyRenderer(page) {
 }
 
 async function startAndSave(page, profile) {
-  await page.click('#titleNew');
-  await page.locator('#titleStart').waitFor({state: 'visible', timeout: 10000});
-  await page.click('#titleStart');
-  await page.waitForFunction(() => document.querySelector('#userTeam')?.options.length > 0, {timeout: 60000});
+  await startNewDynasty(page, {beginSeason: false});
   assert.equal(await page.locator('#app').isVisible(), true, 'new dynasty reaches the application');
   assert.equal(await page.locator('#titleScreen').isVisible(), false, 'title screen closes after starting');
   assert.ok(await page.locator('#userTeam option').count() > 0, 'team selector is populated');
@@ -220,13 +249,13 @@ async function runPackaged(smokeRoot, profile, pageErrors, consoleErrors) {
   let launched;
   try {
     const firstRoot = path.join(smokeRoot, 'first');
-    const firstBundle = extractPackagedBundle(firstRoot);
-    launched = await launchMacBundle(firstBundle, profile);
+    const firstBundle = await extractPackagedBundle(firstRoot);
+    launched = await launchPackagedApplication(firstBundle, profile);
     watchPage(launched.page, pageErrors, consoleErrors);
     const packagedUrl = decodeURIComponent(await launched.page.evaluate(() => location.href));
     assert.equal(packagedUrl.startsWith(`file://${root}`), false,
       'packaged app must run outside the repository');
-    assert.match(packagedUrl, /Dynasty Lab\.app\/Contents\/Resources\/app\.asar\/index\.html$/,
+    assert.match(packagedUrl, /app\.asar\/index\.html$/,
       'packaged app must load the game from its own ASAR');
     await verifyRenderer(launched.page);
     await startAndSave(launched.page, profile);
@@ -234,8 +263,8 @@ async function runPackaged(smokeRoot, profile, pageErrors, consoleErrors) {
     launched = null;
 
     fs.rmSync(firstRoot, {recursive: true, force: true});
-    const replacementBundle = extractPackagedBundle(path.join(smokeRoot, 'replacement'));
-    launched = await launchMacBundle(replacementBundle, profile);
+    const replacementBundle = await extractPackagedBundle(path.join(smokeRoot, 'replacement'));
+    launched = await launchPackagedApplication(replacementBundle, profile);
     watchPage(launched.page, pageErrors, consoleErrors);
     await restoreSave(launched.page);
   } finally {
@@ -253,7 +282,7 @@ async function runPackaged(smokeRoot, profile, pageErrors, consoleErrors) {
     else await runUnpackaged(profile, pageErrors, consoleErrors);
     assert.deepEqual(pageErrors, [], `fatal renderer errors: ${pageErrors.join(' | ')}`);
     assert.deepEqual(consoleErrors, [], `renderer console errors: ${consoleErrors.join(' | ')}`);
-    console.log(`PASS ${packaged ? 'made macOS Alpha' : 'desktop shell'} uses native storage, saves, replaces/restarts, restores, and closes cleanly`);
+    console.log(`PASS ${packaged ? `made ${process.platform === 'win32' ? 'Windows' : 'macOS'} Alpha` : 'desktop shell'} uses native storage, saves, replaces/restarts, restores, and closes cleanly`);
   } finally {
     fs.rmSync(smokeRoot, {recursive: true, force: true});
   }

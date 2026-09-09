@@ -10,18 +10,8 @@ const goTab=async(page,id)=>page.evaluate(({id,group})=>{const g=document.queryS
 // v0.9.34 added a title screen in front of the app; every browser test now has to click
 // through it (New Dynasty -> Start Dynasty, which defaults to Chicago Metropolitan) before
 // #userTeam and the rest of the dashboard exist at all.
-const startNewDynasty=async page=>{
- await page.waitForSelector('#titleNew',{timeout:30000});
- // Static title markup appears before async school loading and event binding finish.
- // A populated title-team picker is the stable signal that New Dynasty is interactive.
- await page.waitForFunction(()=>document.querySelector('#titleTeam')?.options.length>0,{timeout:60000});
- await page.click('#titleNew');
- await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});
- await page.click('#titleStart');
- await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000});
- await page.click('#hubAdvance');
- await page.waitForFunction(()=>window.__DL_TEST__.preseasonDebug().phase==='regular');
-};
+const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
+const startNewDynasty=page=>sharedStartNewDynasty(page);
 
 (async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--no-sandbox'] });

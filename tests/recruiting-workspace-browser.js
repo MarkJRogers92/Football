@@ -1,7 +1,8 @@
 const {chromium}=require('playwright-core');
 const path=require('path');
 const goRecruiting=page=>page.evaluate(()=>{const g=document.querySelector('.tab-groups button[data-group="recruiting"]');if(g&&!g.classList.contains('active'))g.click();document.querySelector('.tabs button[data-tab="recruiting"]')?.click()});
-const startNewDynasty=async page=>{await page.waitForSelector('#titleNew',{timeout:30000});await page.waitForFunction(()=>document.querySelector('#titleTeam')?.options.length>0,{timeout:60000});await page.click('#titleNew');await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});await page.click('#titleStart');await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000})};
+const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
+const startNewDynasty=page=>sharedStartNewDynasty(page);
 (async()=>{
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});
  let pass=0,fail=0;const out=[];const check=(name,ok,detail='')=>{ok?pass++:fail++;out.push(`  ${ok?'PASS':'FAIL'}  ${name}${detail?' — '+detail:''}`)};

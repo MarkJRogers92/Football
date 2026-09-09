@@ -1,14 +1,8 @@
 const {chromium}=require('playwright-core');
 const path=require('path');
 
-const startNewDynasty=async page=>{
-  await page.waitForSelector('#titleNew',{timeout:30000});
-  await page.waitForFunction(()=>document.querySelector('#titleTeam')?.options.length>0,{timeout:60000});
-  await page.click('#titleNew');
-  await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});
-  await page.click('#titleStart');
-  await page.waitForFunction(()=>!document.querySelector('#app')?.hidden,{timeout:60000});
-};
+const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
+const startNewDynasty=page=>sharedStartNewDynasty(page);
 
 (async()=>{
   const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});
