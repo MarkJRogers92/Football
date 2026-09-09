@@ -119,6 +119,9 @@ test('missing chunks fail closed instead of silently dropping history', async ()
 });
 
 test('an interrupted commit can retry over its uncommitted chunk files', async () => {
+  const base = await store.save({slot: 'main', snapshot: snapshot(), options: {
+    additions: rows('base-career', 1), gameAdditions: rows('base-game', 1),
+  }});
   let failCommit = true;
   const faultFs = {...fs, rename: async (from, to) => {
     if (failCommit && to.endsWith(`${path.sep}dynasty.json`)) {
@@ -130,15 +133,28 @@ test('an interrupted commit can retry over its uncommitted chunk files', async (
     return fs.rename(from, to);
   }};
   const interrupted = createDesktopStorage({rootDir: root, fsModule: faultFs});
-  const payload = {slot: 'main', snapshot: snapshot(), options: {
+  const payload = {slot: 'main', snapshot: snapshot(2029), options: {
+    expectedRevision: base.revision, archiveRef: base.archiveRef, gameRef: base.gameRef,
     additions: rows('retry-career', 2), gameAdditions: rows('retry-game', 1),
   }};
   await assert.rejects(() => interrupted.save(payload), /simulated interruption/);
   const retried = await interrupted.save(payload);
   assert.deepEqual((await interrupted.readArchive({slot: 'main', ref: retried.archiveRef})).map(row => row.id),
-    ['retry-career-0', 'retry-career-1']);
+    ['base-career-0', 'retry-career-0', 'retry-career-1']);
   assert.deepEqual((await interrupted.readGames({slot: 'main', ref: retried.gameRef})).map(row => row.id),
-    ['retry-game-0']);
+    ['base-game-0', 'retry-game-0']);
+});
+
+test('one corrupt native slot does not block healthy slots from listing', async () => {
+  await store.save({slot: 'main', snapshot: snapshot(), options: {additions: rows('healthy', 1)}});
+  await store.save({slot: 'dynasty-2', snapshot: snapshot(2030, 'Great Lakes University')});
+  await fs.writeFile(path.join(root, 'Dynasty 2', 'dynasty.json'), '{damaged', 'utf8');
+  const listed = await store.listSlots();
+  assert.equal(listed.find(row => row.slot === 'main').program, 'Chicago Metropolitan');
+  const damaged = listed.find(row => row.slot === 'dynasty-2');
+  assert.match(damaged.storageError, /damaged/i);
+  assert.equal(damaged.empty, false, 'damaged slot cannot be mistaken for an empty replacement target');
+  assert.equal(listed.find(row => row.slot === 'dynasty-3').empty, true);
 });
 
 test('invalid slots, labels, refs, and renderer paths are rejected', async () => {

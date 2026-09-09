@@ -11,6 +11,7 @@ const BACKUP_LIMIT = 5;
 const MAX_JSON_BYTES = 256 * 1024 * 1024;
 const MAX_CHUNKS = 4096;
 const MAX_ROWS = CHUNK_SIZE * MAX_CHUNKS;
+const STORAGE_ERROR = 'This desktop save is damaged. Use another slot or import a complete JSON backup.';
 const SLOT_DIRS = Object.freeze({
   main: 'Dynasty 1',
   'dynasty-2': 'Dynasty 2',
@@ -378,6 +379,8 @@ function createDesktopStorage({rootDir, fsModule = fs, cryptoModule = crypto, no
       const gameStart = gameRef?.chunks || 0;
       const nextGameRef = {id: gameId, count: (gameRef?.count || 0) + gameAdditions.length,
         chunks: gameStart + Math.ceil(gameAdditions.length / CHUNK_SIZE)};
+      validateRef(nextArchiveRef, 'archive');
+      validateRef(nextGameRef, 'game archive');
       await writeChunks(info, 'archive', archiveId, archiveStart, additions);
       await writeChunks(info, 'game', gameId, gameStart, gameAdditions);
 
@@ -408,7 +411,12 @@ function createDesktopStorage({rootDir, fsModule = fs, cryptoModule = crypto, no
   async function listSlots() {
     return Promise.all(SLOT_IDS.map(slot => enqueue(slot, async () => {
       const info = slotInfo(slot);
-      const wrapper = await readCommitted(info);
+      let wrapper;
+      try { wrapper = await readCommitted(info); }
+      catch {
+        const slotMeta = await readSlotMeta(info).catch(() => null);
+        return {slot, label: slotMeta?.label || defaultLabel(slot), empty: false, storageError: STORAGE_ERROR};
+      }
       const slotMeta = await readSlotMeta(info);
       if (!wrapper) return {slot, label: slotMeta?.label || defaultLabel(slot), empty: true};
       return {...wrapper.meta, slot, label: slotMeta?.label || wrapper.meta.label || defaultLabel(slot), empty: false};
