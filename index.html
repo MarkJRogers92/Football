@@ -1468,10 +1468,10 @@ html[data-dl-motion="reduced"] .dl-motion-result{animation:none!important;transf
     <div class="title-menu-shell">
       <nav id="titleMainMenu" class="title-menu" aria-label="Main menu">
         <button id="titleContinue" class="title-action title-action--primary" type="button" disabled>
-          <span><strong>Continue Dynasty</strong><small id="titleContinueMeta">Checking for a browser save…</small></span><i aria-hidden="true">›</i>
+          <span><strong>Continue Dynasty</strong><small id="titleContinueMeta">Checking for a saved dynasty…</small></span><i aria-hidden="true">›</i>
         </button>
         <button id="titleNew" class="title-action" type="button"><span><strong>New Dynasty</strong><small>Choose a program and begin in 2027</small></span><i aria-hidden="true">›</i></button>
-        <button id="titleLoad" class="title-action" type="button"><span><strong>Load Dynasty</strong><small>Browser save or exported JSON</small></span><i aria-hidden="true">›</i></button>
+        <button id="titleLoad" class="title-action" type="button"><span><strong>Load Dynasty</strong><small>Saved dynasty or exported JSON</small></span><i aria-hidden="true">›</i></button>
         <button id="titleOptions" class="title-action" type="button"><span><strong>Options</strong><small>Motion and broadcast playback</small></span><i aria-hidden="true">›</i></button>
         <button id="titleHowTo" class="title-action title-action--quiet" type="button"><span><strong>How to Play</strong><small>Your first season in three steps</small></span><i aria-hidden="true">›</i></button>
       </nav>
@@ -1486,8 +1486,8 @@ html[data-dl-motion="reduced"] .dl-motion-result{animation:none!important;transf
 
       <section id="titleLoadPanel" class="title-subpanel" aria-labelledby="titleLoadHeading" hidden>
         <div class="title-panel-head"><div><span>LOAD DYNASTY</span><h2 id="titleLoadHeading">Return to the sideline</h2></div><button type="button" data-title-back aria-label="Back to main menu">Back</button></div>
-        <label class="title-field">Browser save slot<select id="titleSaveSlot" aria-label="Browser save slot"></select></label>
-        <button id="titleLoadBrowser" class="title-panel-choice" type="button" disabled><strong>Load browser save</strong><small id="titleLoadMeta">Checking this device…</small></button>
+        <label class="title-field">Save slot<select id="titleSaveSlot" aria-label="Save slot"></select></label>
+        <button id="titleLoadBrowser" class="title-panel-choice" type="button" disabled><strong>Load saved dynasty</strong><small id="titleLoadMeta">Checking this device…</small></button>
         <div class="title-slot-name"><input id="titleSlotName" type="text" maxlength="40" aria-label="Save slot name"><button id="titleRenameSlot" type="button">Rename</button></div>
         <button id="titleImport" class="title-panel-choice" type="button"><strong>Import exported save</strong><small>Choose a complete Dynasty Lab JSON backup</small></button>
       </section>
@@ -1517,7 +1517,7 @@ html[data-dl-motion="reduced"] .dl-motion-result{animation:none!important;transf
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
-      <select id="saveSlot" aria-label="Active browser save slot"></select>
+      <select id="saveSlot" aria-label="Active save slot"></select>
       <button id="saveBrowser">Save</button>
       <button id="loadBrowser">Load</button>
       <button id="exportSave">Export</button>
@@ -2296,7 +2296,8 @@ html[data-dl-motion="reduced"] .dl-motion-result{animation:none!important;transf
   return {VERSION,VERSION_STATUS,V1_FREEZE_ID,HAIR,BEARDS,SKIN,HAIR_COLORS,RARE_TRAITS,BODY_ARCHETYPES,FRAME_PRESETS,hash,rng,deriveIdentity,deriveAppearance,deriveCareerGrooming,appearanceSimilarity,findSimilarAppearances,drawingCommands,paint,prepare,getCacheKey,renderPlayerPortrait,PortraitCache,cache};
 });
 
-// Browser-only save layout. Portable JSON remains a complete, inlined dynasty.
+// Browser saves use IndexedDB. The desktop shell supplies the same narrow storage
+// contract through a preload bridge, while portable JSON remains complete and inlined.
 // IndexedDB requests are queued inside request callbacks (never across awaits).
 (function(root){
   'use strict';
@@ -2317,7 +2318,7 @@ html[data-dl-motion="reduced"] .dl-motion-result{animation:none!important;transf
     return unescape(encodeURIComponent(text)).length;
   };
 
-  function create({indexedDB = root.indexedDB, name = 'DynastyLabDB', slot = DEFAULT_SLOT} = {}) {
+  function createBrowser({indexedDB = root.indexedDB, name = 'DynastyLabDB', slot = DEFAULT_SLOT} = {}) {
     if (typeof slot !== 'string' || !slot || /[:;]/.test(slot))
       throw new Error(`Invalid save slot "${slot}".`);
     function open() {
@@ -2581,7 +2582,72 @@ html[data-dl-motion="reduced"] .dl-motion-result{animation:none!important;transf
     }
     return {load, readArchive, readGames, save, listSlots, rename, slot};
   }
-  const api = {create, revisionOf, SLOT_IDS};
+
+  let migrationPromise = null;
+  async function migrateLegacyDesktopSaves(bridge) {
+    if (!root.indexedDB) return;
+    const nativeSlots = await bridge.listSlots();
+    const legacyIndex = createBrowser({indexedDB: root.indexedDB});
+    const legacySlots = await legacyIndex.listSlots();
+    for (const slot of SLOT_IDS) {
+      const nativeMeta = nativeSlots.find(row => row.slot === slot);
+      const legacyMeta = legacySlots.find(row => row.slot === slot);
+      if (!nativeMeta?.empty || legacyMeta?.empty !== false) continue;
+      const legacy = createBrowser({indexedDB: root.indexedDB, slot});
+      const saved = await legacy.load();
+      if (!saved) continue;
+      const playerArchive = saved.storageVersion >= 2
+        ? await legacy.readArchive(saved.archiveRef)
+        : saved.universe?.playerArchive || [];
+      const gameArchive = saved.storageVersion === 3
+        ? await legacy.readGames(saved.gameRef)
+        : saved.universe?.gameArchive || [];
+      const {storageVersion, archiveRef, gameRef, revision, ...portable} = saved;
+      portable.universe = {...(saved.universe || {}), playerArchive, gameArchive};
+      if (legacyMeta.label && legacyMeta.label !== nativeMeta.label)
+        await bridge.rename({slot, label: legacyMeta.label});
+      await bridge.save({
+        slot,
+        snapshot: portable,
+        options: {additions: playerArchive, gameAdditions: gameArchive, checkpointType: 'migration'},
+      });
+    }
+  }
+
+  function ensureLegacyMigration(bridge) {
+    if (!migrationPromise) migrationPromise = migrateLegacyDesktopSaves(bridge);
+    return migrationPromise;
+  }
+
+  function createDesktop(bridge, slot) {
+    if (typeof slot !== 'string' || !SLOT_IDS.includes(slot))
+      throw new Error(`Invalid save slot "${slot}".`);
+    const afterMigration = action => ensureLegacyMigration(bridge).then(action);
+    return {
+      load: () => afterMigration(() => bridge.load({slot})),
+      readArchive: ref => afterMigration(() => bridge.readArchive({slot, ref})),
+      readGames: ref => afterMigration(() => bridge.readGames({slot, ref})),
+      save: (snapshot, options = {}) => afterMigration(() => bridge.save({slot, snapshot, options})),
+      listSlots: () => afterMigration(() => bridge.listSlots()),
+      rename: label => afterMigration(() => bridge.rename({slot, label})),
+      slot,
+    };
+  }
+
+  function create(options = {}) {
+    const bridge = root.DynastyDesktopStorage;
+    const forceBrowser = options.forceBrowser || Object.prototype.hasOwnProperty.call(options, 'indexedDB');
+    if (bridge && !forceBrowser) return createDesktop(bridge, options.slot || DEFAULT_SLOT);
+    return createBrowser(options);
+  }
+
+  const api = {
+    create,
+    createBrowser,
+    revisionOf,
+    SLOT_IDS,
+    get kind() { return root.DynastyDesktopStorage ? 'desktop' : 'browser'; },
+  };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.DynastyStorage = api;
 })(typeof window === 'object' ? window : globalThis);
@@ -7396,6 +7462,9 @@ function packPlayer(p){return {...p,stats:packStats(p.stats),career:packStats(p.
 function packUniverse(u,includeArchive=true){if(u===universe)syncGameplayRng(u);if(includeArchive&&u===universe&&archiveIsDeferred())throw new Error("Load archived careers before exporting.");const {playerArchive,...core}=u;const out={...core,confChamps:conferenceChampionIdsFor(u),playoffFieldIds:playoffFieldIdsFor(u),teams:u.teams.map(t=>({...t,roster:t.roster.map(packPlayer)}))};if(includeArchive)out.playerArchive=(playerArchive||[]).map(packPlayer);return out}
 function normalizeUniverse(){ensureGameplayRng();universe.gameArchive??=[];universe.gameArchiveVersion??=1;universe.gameCounter=universe.gameArchive.reduce((n,g)=>Math.max(n,Number(g.id.split('_').pop())||0),universe.gameCounter||0);universe.version=APP_VERSION;IDX.teams=null;IDX.players=null;universe.movementLog??=[];universe.lastDetailedGame??=null;normalizePortalState();ensureScheduleRotation();migrateProtectedRivals();universe.playerArchive??=[];universe.recoveredWeek??=-1;universe.weeklyHub??=[];universe.highSchools??=generateHighSchools();universe.awards??={};universe.records??={nationalSeason:{},nationalCareer:{}};universe.records.nationalSeason??={};universe.records.nationalCareer??={};universe.draftHistory??={};universe.recruitClassCounts??={};universe.campHistory??={};universe.developmentState??={year:universe.year,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]};if(!Object.keys(universe.recruitClassCounts).length)for(const r of universe.recruits||[])if(r.committed)universe.recruitClassCounts[r.committed]=(universe.recruitClassCounts[r.committed]||0)+1;universe.teams.forEach(t=>{let base=schools.find(s=>s.name===t.name);if(base){t.city??=base.city;t.state??=base.state;t.lat??=base.lat;t.lon??=base.lon}t.staff??=generateStaff(t);for(const c of Object.values(t.staff)){c.contractYears??=gi(1,4);c.salary??=1.2}t.offScheme??=pick(Object.keys(OFF_SCHEMES));t.defScheme??=pick(Object.keys(DEF_SCHEMES));t.nickname??='';t.commits??=[];t.pipelines??=makePipelines(t);t.records??={};ensureSchoolColors(t);ensureTeamDevelopment(t);t.roster.forEach(p=>{p.speed??=clamp(p.trueNow+gi(-8,8),25,99);p.power??=clamp(p.trueNow+gi(-8,8),25,99);p.technique??=clamp(p.trueNow+gi(-8,8),25,99);p.iq??=clamp(p.trueNow+gi(-10,10),20,99);p.composure??=65;p.durability??=70;p.versatility??=60;p.health??=100;p.wear??=0;p.injury??=null;p.injuryWeeks??=0;p.injuryHistory??=[];p.seasonHistory??=[];p.awards??=[];p.draftResult??=null;p.promise??=null;p.promiseBaseline??=p.perceived;p.eligibilityUsed??=({FR:0,SO:1,JR:2,SR:3}[p.year]??0);p.redshirtUsed??=false;p.redshirtActive??=false;p.redshirtSeason??=null;p.stats={...newStats(),...(p.stats||{})};p.career={...newStats(),...(p.career||{})};p.year=CLASS_NAMES[Math.min(3,eligibilityBase(p))]||'SR';ensurePlayerDevelopment(p,t)});ensureDepth(t);ensureRoleDepth(t)});universe.playerArchive.forEach(p=>{p.awards??=[];p.seasonHistory??=[];p.coachRelationships??={};p.primaryRecruiterCoachId??=p.recruitingMemory?.primaryRecruiterCoachId||p.recruitingMemory?.recruiterCoachId||null;p.career={...newStats(),...(p.career||{})};p.stats={...newStats(),...(p.stats||{})};p.eligibilityUsed??=3;p.redshirtUsed??=false;p.redshirtActive=false});if(Array.isArray(universe.schedule)){universe.teams.forEach(t=>t.schedule=[]);universe.schedule.flat().forEach(g=>{T(g.home)?.schedule.push(g);T(g.away)?.schedule.push(g)})}
  universe.weeklyDecisions??=[];if(!universe.teams.some(t=>t.rivalry))deriveRivalries();universe.careerHistory??=[];universe.jobOffers??=[];universe.bowls??=[];universe.signingDay??=null;normalizeConferenceChampions();normalizePlayoffField();if(!universe.academicProgression||universe.academicProgression.season!==universe.year||universe.academicProgression.week!==universe.week||!Array.isArray(universe.academicProgression.teamIds))universe.academicProgression={season:universe.year,week:universe.week,teamIds:[]};rebuildRecruitClassCounts();for(const t of universe.teams){t.fanBaseline??=t.fan_support??60;for(const p of t.roster)ensureAcademics(p,t)}for(const t of universe.teams){ensureAdminState(t);ensureNilState(t)}for(const d of universe.weeklyDecisions)d.source??='STAFF';normalizePromiseState();for(const r of universe.recruits||[])normalizeRecruitGeography(r,universe.highSchools);assignRecruitRanks(universe.recruits||[]);if(!universe.weeklyHub.length)buildPreseasonHub();rebuildIndexes()}
+function storageKind(){return DynastyStorage.kind==='desktop'?'desktop':'browser'}
+function storageLocation(){return storageKind()==='desktop'?'on this computer':'in this browser'}
+function savedDynastyLabel(){return storageKind()==='desktop'?'desktop save':'browser save'}
 function setStatus(x){if($('#saveStatus'))$('#saveStatus').textContent=x}
 // Browser persistence state is deliberately outside the portable universe.
 const SAVE_SLOT_IDS=DynastyStorage.SLOT_IDS||['main','dynasty-2','dynasty-3'];
@@ -7408,7 +7477,7 @@ let browserStore = DynastyStorage.create({slot:activeSaveSlot});
 function currentArchiveState(){const state=browserArchives.get(activeSaveSlot);return state?.universe===universe?state:null}
 function activeSlotMeta(){return titleSaveSlots.find(s=>s.slot===activeSaveSlot)||null}
 function setActiveSaveSlot(slot){
- if(!SAVE_SLOT_IDS.includes(slot))throw new Error('Unknown browser save slot.');
+ if(!SAVE_SLOT_IDS.includes(slot))throw new Error('Unknown save slot.');
  activeSaveSlot=slot;browserStore=DynastyStorage.create({slot});
  if($('#saveSlot'))$('#saveSlot').value=slot;if($('#titleSaveSlot'))$('#titleSaveSlot').value=slot;
  titleBrowserSave=activeSlotMeta()?.empty?null:activeSlotMeta();
@@ -7542,7 +7611,7 @@ function saveBrowser(){return storageOperation(async()=>{
   const occupied=activeSlotMeta()&&!activeSlotMeta().empty&&!currentArchiveState();
   if(occupied&&!confirm(`Replace ${activeSlotMeta().label}? Its current dynasty will be overwritten.`))return false;
   await writeBrowserSave('manual');
-  setStatus(`Saved ${universe.year}, Week ${universe.week} to ${activeSlotMeta()?.label||'browser storage'}.`);
+  setStatus(`Saved ${universe.year}, Week ${universe.week} to ${activeSlotMeta()?.label||savedDynastyLabel()} ${storageLocation()}.`);
 })}
 
 // Autosave fires only after a completed atomic action, never mid-transaction. The debounce
@@ -7596,13 +7665,13 @@ async function runAutosave(){
 }
 function loadBrowser(){return storageOperation(async()=>{
   const d=await browserStore.load();
-  if(!d){setStatus('No browser save found.');return false}
+  if(!d){setStatus(`No ${savedDynastyLabel()} found ${storageLocation()}.`);return false}
   // Careers are chunked from storage 2 on; box scores only from 3. Anything
   // older carried both inline and is already fully resident.
   installSave(d,{revision:DynastyStorage.revisionOf(d),archiveRef:d.archiveRef||null,loaded:!(d.storageVersion>=2),
     gameRef:d.gameRef||null,gamesLoaded:d.storageVersion!==3});
   titleBrowserSave=activeSlotMeta()||d;
-  setStatus(`Loaded ${activeSlotMeta()?.label||'browser save'} from ${d.savedAt||'an earlier session'}.`);
+  setStatus(`Loaded ${activeSlotMeta()?.label||savedDynastyLabel()} from ${d.savedAt||'an earlier session'} ${storageLocation()}.`);
   return true;
 })}
 function exportSave(){return storageOperation(async()=>{
@@ -7614,7 +7683,7 @@ function exportSave(){return storageOperation(async()=>{
 function importSave(file){return storageOperation(async()=>{
   const text=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(new Error('Could not read the save file.'));r.onabort=()=>reject(new Error('Import cancelled.'));r.readAsText(file)});
   const d=JSON.parse(text);
-  if(d.storageVersion||d.archiveRef)throw new Error('Import a complete exported JSON save, not a browser storage record.');
+  if(d.storageVersion||d.archiveRef)throw new Error('Import a complete exported JSON save, not an app storage record.');
   validateImportedSaveText(d?.universe||d);
   installSave(d);setStatus('Imported save file successfully.');
   return true;
@@ -7627,7 +7696,7 @@ function titlePreferences(){
  prefs.motion=prefs.motion!==false;return prefs;
 }
 function applyTitlePreferences(){const p=titlePreferences();document.body.classList.toggle('motion-reduced',!p.motion);$('#titleMotion').checked=p.motion;$('#titleWatchSpeed').value=String(p.watchSpeed)}
-function saveTitlePreferences(){const p={motion:$('#titleMotion').checked,watchSpeed:$('#titleWatchSpeed').value};try{localStorage.setItem('dynastyLabPreferences',JSON.stringify(p))}catch{setTitleStatus('Options could not be saved. Check your browser storage settings.');return}applyTitlePreferences();setTitleStatus('Options saved on this device.');showTitlePanel()}
+function saveTitlePreferences(){const p={motion:$('#titleMotion').checked,watchSpeed:$('#titleWatchSpeed').value};try{localStorage.setItem('dynastyLabPreferences',JSON.stringify(p))}catch{setTitleStatus('Options could not be saved. Check this device\'s storage settings.');return}applyTitlePreferences();setTitleStatus('Options saved on this device.');showTitlePanel()}
 function setTitleStatus(x){if($('#titleStatus'))$('#titleStatus').textContent=x}
 function slotBytes(n){if(!Number.isFinite(n)||n<=0)return'';const mb=n/1048576;return mb>=10?`${mb.toFixed(0)} MB`:`${mb.toFixed(1)} MB`}
 function titleSummary(d){
@@ -7644,7 +7713,7 @@ function renderSaveSlotControls(){
 }
 function renderTitleState(){
  const current=universe?{universe,userTeam:$('#userTeam').value}:null,continuation=current||titleBrowserSave,summary=titleSummary(continuation),has=!!summary;
- $('#titleContinue').disabled=!has;$('#titleContinueMeta').textContent=has?summary:'No browser save found on this device';
+ $('#titleContinue').disabled=!has;$('#titleContinueMeta').textContent=has?summary:`No saved dynasty found ${storageLocation()}`;
  $('#titleLoadBrowser').disabled=!titleBrowserSave;$('#titleLoadMeta').textContent=titleBrowserSave?titleSummary(titleBrowserSave):'This slot is empty';
  $('#titleContinue').classList.toggle('title-action--primary',has);$('#titleNew').classList.toggle('title-action--primary',!has);
 }
@@ -7653,15 +7722,15 @@ function showTitlePanel(id=null){
  const target=id?$('#'+id)?.querySelector('button,select,input'):($('#titleContinue').disabled?$('#titleNew'):$('#titleContinue'));target?.focus();
 }
 function showTitleScreen(){
- $('#app').hidden=true;$('#titleScreen').hidden=false;document.body.classList.remove('dynasty-open');renderTitleState();showTitlePanel();setTitleStatus(universe?'Current session is ready to resume.':titleBrowserSave?'Browser save ready.':'Choose New Dynasty or load a save.');window.scrollTo?.(0,0);
+ $('#app').hidden=true;$('#titleScreen').hidden=false;document.body.classList.remove('dynasty-open');renderTitleState();showTitlePanel();setTitleStatus(universe?'Current session is ready to resume.':titleBrowserSave?`${storageKind()==='desktop'?'Desktop save':'Browser save'} ready ${storageLocation()}.`:'Choose New Dynasty or load a save.');window.scrollTo?.(0,0);
 }
 function enterDynasty(){if(!universe)return;$('#titleScreen').hidden=true;$('#app').hidden=false;document.body.classList.add('dynasty-open');render();window.scrollTo?.(0,0);$('#app .topbar')?.focus?.()}
 function populateTitleTeams(){
  $('#titleTeam').innerHTML='';schools.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(s=>{const o=document.createElement('option');o.value=s.name;o.textContent=`${s.name} · ${s.conference}`;$('#titleTeam').appendChild(o)});$('#titleTeam').value='Chicago Metropolitan';
 }
 async function refreshTitleSave(){
- try{titleSaveSlots=await browserStore.listSlots();titleBrowserSave=activeSlotMeta()?.empty?null:activeSlotMeta();renderSaveSlotControls();renderTitleState();setTitleStatus(titleBrowserSave?'Browser save ready.':'This slot is empty. Start a new dynasty when you are ready.')}
- catch(e){titleBrowserSave=null;renderTitleState();setTitleStatus(e.message||'The browser save could not be read. You can still import a backup.')}
+ try{titleSaveSlots=await browserStore.listSlots();titleBrowserSave=activeSlotMeta()?.empty?null:activeSlotMeta();renderSaveSlotControls();renderTitleState();setTitleStatus(titleBrowserSave?`${storageKind()==='desktop'?'Desktop save':'Browser save'} ready ${storageLocation()}.`:'This slot is empty. Start a new dynasty when you are ready.')}
+ catch(e){titleBrowserSave=null;renderTitleState();setTitleStatus(e.message||`The ${savedDynastyLabel()} could not be read. You can still import a backup.`)}
 }
 async function chooseSaveSlot(slot){setActiveSaveSlot(slot);await refreshTitleSave()}
 async function renameSaveSlot(){
@@ -7673,8 +7742,8 @@ function startTitleDynasty(){
  const empty=titleSaveSlots.find(s=>s.empty);if(empty)setActiveSaveSlot(empty.slot);
  const program=$('#titleTeam').value||'Chicago Metropolitan',mode=$('#titleMode').value||'dynasty';initUniverse(mode);refreshTeamOptions(program);enterDynasty();setStatus(`New ${program} ${mode==='commissioner'?'commissioner universe':'dynasty'} ready in ${activeSlotMeta()?.label||'the selected slot'}. Save to preserve it.`);
 }
-async function continueTitleDynasty(){if(universe){enterDynasty();return}setTitleStatus('Loading browser dynasty…');const ok=await loadBrowser();if(ok)enterDynasty();else setTitleStatus($('#saveStatus').textContent)}
-async function loadTitleDynasty(){if(universe&&!confirm('Load the saved dynasty? Unsaved changes in the current session will be replaced.'))return;setTitleStatus('Loading browser dynasty…');const ok=await loadBrowser();if(ok)enterDynasty();else setTitleStatus($('#saveStatus').textContent)}
+async function continueTitleDynasty(){if(universe){enterDynasty();return}setTitleStatus(`Loading ${savedDynastyLabel()}…`);const ok=await loadBrowser();if(ok)enterDynasty();else setTitleStatus($('#saveStatus').textContent)}
+async function loadTitleDynasty(){if(universe&&!confirm('Load the saved dynasty? Unsaved changes in the current session will be replaced.'))return;setTitleStatus(`Loading ${savedDynastyLabel()}…`);const ok=await loadBrowser();if(ok)enterDynasty();else setTitleStatus($('#saveStatus').textContent)}
 function bind(){
  document.addEventListener('click',e=>{const b=e.target.closest('[data-game]');if(b){e.preventDefault();showGameCenter(b.dataset.game)}});
  document.addEventListener('click',e=>{const b=e.target.closest('[data-archetype]');if(b){e.preventDefault();showArchetypeGuide(b.dataset.archetype)}});
@@ -10745,6 +10814,9 @@ queue();
     panel.className='title-subpanel title-about-panel';
     panel.setAttribute('aria-labelledby','titleAboutHeading');
     panel.hidden=true;
+    const desktopStorage=window.DynastyStorage?.kind==='desktop';
+    const storageSummary=desktopStorage?'Desktop saves + complete exports':'Browser slots + complete exports';
+    const storageCopy=desktopStorage?'Named desktop save slots handle everyday play. Exported JSON provides a complete backup you can keep separately and import later.':'Named browser save slots handle everyday play. Exported JSON provides a complete backup you can keep separately and import later.';
     panel.innerHTML=`
       <div class="title-panel-head"><div><span>ABOUT</span><h2 id="titleAboutHeading">Dynasty Lab</h2></div><button type="button" data-title-about-back aria-label="Back to main menu">Back</button></div>
       <div class="title-about-hero">
@@ -10754,12 +10826,12 @@ queue();
       <div class="title-about-facts" aria-label="Build information">
         <div><span>VERSION</span><strong data-about-version>${titleVersion()}</strong></div>
         <div><span>UNIVERSE</span><strong>Fictional</strong></div>
-        <div><span>SAVES</span><strong>Browser + JSON</strong></div>
+        <div><span>SAVES</span><strong>${desktopStorage?'Desktop + JSON':'Browser + JSON'}</strong></div>
       </div>
       <div class="title-about-grid">
         <section class="title-about-card"><span>DYNASTY MODE</span><h3>One program, one career</h3><p>Control a single program and move only through career opportunities earned inside the dynasty.</p></section>
         <section class="title-about-card"><span>COMMISSIONER MODE</span><h3>Run the whole universe</h3><p>Switch programs and edit institutional details when you want broader sandbox control.</p></section>
-        <section class="title-about-card title-about-card--wide"><span>YOUR SAVE DATA</span><h3>Browser slots + complete exports</h3><p>Named browser save slots handle everyday play. Exported JSON provides a complete backup you can keep separately and import later.</p></section>
+        <section class="title-about-card title-about-card--wide"><span>YOUR SAVE DATA</span><h3>${storageSummary}</h3><p>${storageCopy}</p></section>
       </div>`;
     menuShell.appendChild(panel);
 

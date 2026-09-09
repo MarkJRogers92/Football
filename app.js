@@ -3195,6 +3195,9 @@ function packPlayer(p){return {...p,stats:packStats(p.stats),career:packStats(p.
 function packUniverse(u,includeArchive=true){if(u===universe)syncGameplayRng(u);if(includeArchive&&u===universe&&archiveIsDeferred())throw new Error("Load archived careers before exporting.");const {playerArchive,...core}=u;const out={...core,confChamps:conferenceChampionIdsFor(u),playoffFieldIds:playoffFieldIdsFor(u),teams:u.teams.map(t=>({...t,roster:t.roster.map(packPlayer)}))};if(includeArchive)out.playerArchive=(playerArchive||[]).map(packPlayer);return out}
 function normalizeUniverse(){ensureGameplayRng();universe.gameArchive??=[];universe.gameArchiveVersion??=1;universe.gameCounter=universe.gameArchive.reduce((n,g)=>Math.max(n,Number(g.id.split('_').pop())||0),universe.gameCounter||0);universe.version=APP_VERSION;IDX.teams=null;IDX.players=null;universe.movementLog??=[];universe.lastDetailedGame??=null;normalizePortalState();ensureScheduleRotation();migrateProtectedRivals();universe.playerArchive??=[];universe.recoveredWeek??=-1;universe.weeklyHub??=[];universe.highSchools??=generateHighSchools();universe.awards??={};universe.records??={nationalSeason:{},nationalCareer:{}};universe.records.nationalSeason??={};universe.records.nationalCareer??={};universe.draftHistory??={};universe.recruitClassCounts??={};universe.campHistory??={};universe.developmentState??={year:universe.year,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]};if(!Object.keys(universe.recruitClassCounts).length)for(const r of universe.recruits||[])if(r.committed)universe.recruitClassCounts[r.committed]=(universe.recruitClassCounts[r.committed]||0)+1;universe.teams.forEach(t=>{let base=schools.find(s=>s.name===t.name);if(base){t.city??=base.city;t.state??=base.state;t.lat??=base.lat;t.lon??=base.lon}t.staff??=generateStaff(t);for(const c of Object.values(t.staff)){c.contractYears??=gi(1,4);c.salary??=1.2}t.offScheme??=pick(Object.keys(OFF_SCHEMES));t.defScheme??=pick(Object.keys(DEF_SCHEMES));t.nickname??='';t.commits??=[];t.pipelines??=makePipelines(t);t.records??={};ensureSchoolColors(t);ensureTeamDevelopment(t);t.roster.forEach(p=>{p.speed??=clamp(p.trueNow+gi(-8,8),25,99);p.power??=clamp(p.trueNow+gi(-8,8),25,99);p.technique??=clamp(p.trueNow+gi(-8,8),25,99);p.iq??=clamp(p.trueNow+gi(-10,10),20,99);p.composure??=65;p.durability??=70;p.versatility??=60;p.health??=100;p.wear??=0;p.injury??=null;p.injuryWeeks??=0;p.injuryHistory??=[];p.seasonHistory??=[];p.awards??=[];p.draftResult??=null;p.promise??=null;p.promiseBaseline??=p.perceived;p.eligibilityUsed??=({FR:0,SO:1,JR:2,SR:3}[p.year]??0);p.redshirtUsed??=false;p.redshirtActive??=false;p.redshirtSeason??=null;p.stats={...newStats(),...(p.stats||{})};p.career={...newStats(),...(p.career||{})};p.year=CLASS_NAMES[Math.min(3,eligibilityBase(p))]||'SR';ensurePlayerDevelopment(p,t)});ensureDepth(t);ensureRoleDepth(t)});universe.playerArchive.forEach(p=>{p.awards??=[];p.seasonHistory??=[];p.coachRelationships??={};p.primaryRecruiterCoachId??=p.recruitingMemory?.primaryRecruiterCoachId||p.recruitingMemory?.recruiterCoachId||null;p.career={...newStats(),...(p.career||{})};p.stats={...newStats(),...(p.stats||{})};p.eligibilityUsed??=3;p.redshirtUsed??=false;p.redshirtActive=false});if(Array.isArray(universe.schedule)){universe.teams.forEach(t=>t.schedule=[]);universe.schedule.flat().forEach(g=>{T(g.home)?.schedule.push(g);T(g.away)?.schedule.push(g)})}
  universe.weeklyDecisions??=[];if(!universe.teams.some(t=>t.rivalry))deriveRivalries();universe.careerHistory??=[];universe.jobOffers??=[];universe.bowls??=[];universe.signingDay??=null;normalizeConferenceChampions();normalizePlayoffField();if(!universe.academicProgression||universe.academicProgression.season!==universe.year||universe.academicProgression.week!==universe.week||!Array.isArray(universe.academicProgression.teamIds))universe.academicProgression={season:universe.year,week:universe.week,teamIds:[]};rebuildRecruitClassCounts();for(const t of universe.teams){t.fanBaseline??=t.fan_support??60;for(const p of t.roster)ensureAcademics(p,t)}for(const t of universe.teams){ensureAdminState(t);ensureNilState(t)}for(const d of universe.weeklyDecisions)d.source??='STAFF';normalizePromiseState();for(const r of universe.recruits||[])normalizeRecruitGeography(r,universe.highSchools);assignRecruitRanks(universe.recruits||[]);if(!universe.weeklyHub.length)buildPreseasonHub();rebuildIndexes()}
+function storageKind(){return DynastyStorage.kind==='desktop'?'desktop':'browser'}
+function storageLocation(){return storageKind()==='desktop'?'on this computer':'in this browser'}
+function savedDynastyLabel(){return storageKind()==='desktop'?'desktop save':'browser save'}
 function setStatus(x){if($('#saveStatus'))$('#saveStatus').textContent=x}
 // Browser persistence state is deliberately outside the portable universe.
 const SAVE_SLOT_IDS=DynastyStorage.SLOT_IDS||['main','dynasty-2','dynasty-3'];
@@ -3207,7 +3210,7 @@ let browserStore = DynastyStorage.create({slot:activeSaveSlot});
 function currentArchiveState(){const state=browserArchives.get(activeSaveSlot);return state?.universe===universe?state:null}
 function activeSlotMeta(){return titleSaveSlots.find(s=>s.slot===activeSaveSlot)||null}
 function setActiveSaveSlot(slot){
- if(!SAVE_SLOT_IDS.includes(slot))throw new Error('Unknown browser save slot.');
+ if(!SAVE_SLOT_IDS.includes(slot))throw new Error('Unknown save slot.');
  activeSaveSlot=slot;browserStore=DynastyStorage.create({slot});
  if($('#saveSlot'))$('#saveSlot').value=slot;if($('#titleSaveSlot'))$('#titleSaveSlot').value=slot;
  titleBrowserSave=activeSlotMeta()?.empty?null:activeSlotMeta();
@@ -3341,7 +3344,7 @@ function saveBrowser(){return storageOperation(async()=>{
   const occupied=activeSlotMeta()&&!activeSlotMeta().empty&&!currentArchiveState();
   if(occupied&&!confirm(`Replace ${activeSlotMeta().label}? Its current dynasty will be overwritten.`))return false;
   await writeBrowserSave('manual');
-  setStatus(`Saved ${universe.year}, Week ${universe.week} to ${activeSlotMeta()?.label||'browser storage'}.`);
+  setStatus(`Saved ${universe.year}, Week ${universe.week} to ${activeSlotMeta()?.label||savedDynastyLabel()} ${storageLocation()}.`);
 })}
 
 // Autosave fires only after a completed atomic action, never mid-transaction. The debounce
@@ -3395,13 +3398,13 @@ async function runAutosave(){
 }
 function loadBrowser(){return storageOperation(async()=>{
   const d=await browserStore.load();
-  if(!d){setStatus('No browser save found.');return false}
+  if(!d){setStatus(`No ${savedDynastyLabel()} found ${storageLocation()}.`);return false}
   // Careers are chunked from storage 2 on; box scores only from 3. Anything
   // older carried both inline and is already fully resident.
   installSave(d,{revision:DynastyStorage.revisionOf(d),archiveRef:d.archiveRef||null,loaded:!(d.storageVersion>=2),
     gameRef:d.gameRef||null,gamesLoaded:d.storageVersion!==3});
   titleBrowserSave=activeSlotMeta()||d;
-  setStatus(`Loaded ${activeSlotMeta()?.label||'browser save'} from ${d.savedAt||'an earlier session'}.`);
+  setStatus(`Loaded ${activeSlotMeta()?.label||savedDynastyLabel()} from ${d.savedAt||'an earlier session'} ${storageLocation()}.`);
   return true;
 })}
 function exportSave(){return storageOperation(async()=>{
@@ -3413,7 +3416,7 @@ function exportSave(){return storageOperation(async()=>{
 function importSave(file){return storageOperation(async()=>{
   const text=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(new Error('Could not read the save file.'));r.onabort=()=>reject(new Error('Import cancelled.'));r.readAsText(file)});
   const d=JSON.parse(text);
-  if(d.storageVersion||d.archiveRef)throw new Error('Import a complete exported JSON save, not a browser storage record.');
+  if(d.storageVersion||d.archiveRef)throw new Error('Import a complete exported JSON save, not an app storage record.');
   validateImportedSaveText(d?.universe||d);
   installSave(d);setStatus('Imported save file successfully.');
   return true;
@@ -3426,7 +3429,7 @@ function titlePreferences(){
  prefs.motion=prefs.motion!==false;return prefs;
 }
 function applyTitlePreferences(){const p=titlePreferences();document.body.classList.toggle('motion-reduced',!p.motion);$('#titleMotion').checked=p.motion;$('#titleWatchSpeed').value=String(p.watchSpeed)}
-function saveTitlePreferences(){const p={motion:$('#titleMotion').checked,watchSpeed:$('#titleWatchSpeed').value};try{localStorage.setItem('dynastyLabPreferences',JSON.stringify(p))}catch{setTitleStatus('Options could not be saved. Check your browser storage settings.');return}applyTitlePreferences();setTitleStatus('Options saved on this device.');showTitlePanel()}
+function saveTitlePreferences(){const p={motion:$('#titleMotion').checked,watchSpeed:$('#titleWatchSpeed').value};try{localStorage.setItem('dynastyLabPreferences',JSON.stringify(p))}catch{setTitleStatus('Options could not be saved. Check this device\'s storage settings.');return}applyTitlePreferences();setTitleStatus('Options saved on this device.');showTitlePanel()}
 function setTitleStatus(x){if($('#titleStatus'))$('#titleStatus').textContent=x}
 function slotBytes(n){if(!Number.isFinite(n)||n<=0)return'';const mb=n/1048576;return mb>=10?`${mb.toFixed(0)} MB`:`${mb.toFixed(1)} MB`}
 function titleSummary(d){
@@ -3443,7 +3446,7 @@ function renderSaveSlotControls(){
 }
 function renderTitleState(){
  const current=universe?{universe,userTeam:$('#userTeam').value}:null,continuation=current||titleBrowserSave,summary=titleSummary(continuation),has=!!summary;
- $('#titleContinue').disabled=!has;$('#titleContinueMeta').textContent=has?summary:'No browser save found on this device';
+ $('#titleContinue').disabled=!has;$('#titleContinueMeta').textContent=has?summary:`No saved dynasty found ${storageLocation()}`;
  $('#titleLoadBrowser').disabled=!titleBrowserSave;$('#titleLoadMeta').textContent=titleBrowserSave?titleSummary(titleBrowserSave):'This slot is empty';
  $('#titleContinue').classList.toggle('title-action--primary',has);$('#titleNew').classList.toggle('title-action--primary',!has);
 }
@@ -3452,15 +3455,15 @@ function showTitlePanel(id=null){
  const target=id?$('#'+id)?.querySelector('button,select,input'):($('#titleContinue').disabled?$('#titleNew'):$('#titleContinue'));target?.focus();
 }
 function showTitleScreen(){
- $('#app').hidden=true;$('#titleScreen').hidden=false;document.body.classList.remove('dynasty-open');renderTitleState();showTitlePanel();setTitleStatus(universe?'Current session is ready to resume.':titleBrowserSave?'Browser save ready.':'Choose New Dynasty or load a save.');window.scrollTo?.(0,0);
+ $('#app').hidden=true;$('#titleScreen').hidden=false;document.body.classList.remove('dynasty-open');renderTitleState();showTitlePanel();setTitleStatus(universe?'Current session is ready to resume.':titleBrowserSave?`${storageKind()==='desktop'?'Desktop save':'Browser save'} ready ${storageLocation()}.`:'Choose New Dynasty or load a save.');window.scrollTo?.(0,0);
 }
 function enterDynasty(){if(!universe)return;$('#titleScreen').hidden=true;$('#app').hidden=false;document.body.classList.add('dynasty-open');render();window.scrollTo?.(0,0);$('#app .topbar')?.focus?.()}
 function populateTitleTeams(){
  $('#titleTeam').innerHTML='';schools.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(s=>{const o=document.createElement('option');o.value=s.name;o.textContent=`${s.name} · ${s.conference}`;$('#titleTeam').appendChild(o)});$('#titleTeam').value='Chicago Metropolitan';
 }
 async function refreshTitleSave(){
- try{titleSaveSlots=await browserStore.listSlots();titleBrowserSave=activeSlotMeta()?.empty?null:activeSlotMeta();renderSaveSlotControls();renderTitleState();setTitleStatus(titleBrowserSave?'Browser save ready.':'This slot is empty. Start a new dynasty when you are ready.')}
- catch(e){titleBrowserSave=null;renderTitleState();setTitleStatus(e.message||'The browser save could not be read. You can still import a backup.')}
+ try{titleSaveSlots=await browserStore.listSlots();titleBrowserSave=activeSlotMeta()?.empty?null:activeSlotMeta();renderSaveSlotControls();renderTitleState();setTitleStatus(titleBrowserSave?`${storageKind()==='desktop'?'Desktop save':'Browser save'} ready ${storageLocation()}.`:'This slot is empty. Start a new dynasty when you are ready.')}
+ catch(e){titleBrowserSave=null;renderTitleState();setTitleStatus(e.message||`The ${savedDynastyLabel()} could not be read. You can still import a backup.`)}
 }
 async function chooseSaveSlot(slot){setActiveSaveSlot(slot);await refreshTitleSave()}
 async function renameSaveSlot(){
@@ -3472,8 +3475,8 @@ function startTitleDynasty(){
  const empty=titleSaveSlots.find(s=>s.empty);if(empty)setActiveSaveSlot(empty.slot);
  const program=$('#titleTeam').value||'Chicago Metropolitan',mode=$('#titleMode').value||'dynasty';initUniverse(mode);refreshTeamOptions(program);enterDynasty();setStatus(`New ${program} ${mode==='commissioner'?'commissioner universe':'dynasty'} ready in ${activeSlotMeta()?.label||'the selected slot'}. Save to preserve it.`);
 }
-async function continueTitleDynasty(){if(universe){enterDynasty();return}setTitleStatus('Loading browser dynasty…');const ok=await loadBrowser();if(ok)enterDynasty();else setTitleStatus($('#saveStatus').textContent)}
-async function loadTitleDynasty(){if(universe&&!confirm('Load the saved dynasty? Unsaved changes in the current session will be replaced.'))return;setTitleStatus('Loading browser dynasty…');const ok=await loadBrowser();if(ok)enterDynasty();else setTitleStatus($('#saveStatus').textContent)}
+async function continueTitleDynasty(){if(universe){enterDynasty();return}setTitleStatus(`Loading ${savedDynastyLabel()}…`);const ok=await loadBrowser();if(ok)enterDynasty();else setTitleStatus($('#saveStatus').textContent)}
+async function loadTitleDynasty(){if(universe&&!confirm('Load the saved dynasty? Unsaved changes in the current session will be replaced.'))return;setTitleStatus(`Loading ${savedDynastyLabel()}…`);const ok=await loadBrowser();if(ok)enterDynasty();else setTitleStatus($('#saveStatus').textContent)}
 function bind(){
  document.addEventListener('click',e=>{const b=e.target.closest('[data-game]');if(b){e.preventDefault();showGameCenter(b.dataset.game)}});
  document.addEventListener('click',e=>{const b=e.target.closest('[data-archetype]');if(b){e.preventDefault();showArchetypeGuide(b.dataset.archetype)}});

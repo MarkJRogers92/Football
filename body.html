@@ -14,10 +14,10 @@
     <div class="title-menu-shell">
       <nav id="titleMainMenu" class="title-menu" aria-label="Main menu">
         <button id="titleContinue" class="title-action title-action--primary" type="button" disabled>
-          <span><strong>Continue Dynasty</strong><small id="titleContinueMeta">Checking for a browser save…</small></span><i aria-hidden="true">›</i>
+          <span><strong>Continue Dynasty</strong><small id="titleContinueMeta">Checking for a saved dynasty…</small></span><i aria-hidden="true">›</i>
         </button>
         <button id="titleNew" class="title-action" type="button"><span><strong>New Dynasty</strong><small>Choose a program and begin in 2027</small></span><i aria-hidden="true">›</i></button>
-        <button id="titleLoad" class="title-action" type="button"><span><strong>Load Dynasty</strong><small>Browser save or exported JSON</small></span><i aria-hidden="true">›</i></button>
+        <button id="titleLoad" class="title-action" type="button"><span><strong>Load Dynasty</strong><small>Saved dynasty or exported JSON</small></span><i aria-hidden="true">›</i></button>
         <button id="titleOptions" class="title-action" type="button"><span><strong>Options</strong><small>Motion and broadcast playback</small></span><i aria-hidden="true">›</i></button>
         <button id="titleHowTo" class="title-action title-action--quiet" type="button"><span><strong>How to Play</strong><small>Your first season in three steps</small></span><i aria-hidden="true">›</i></button>
       </nav>
@@ -32,8 +32,8 @@
 
       <section id="titleLoadPanel" class="title-subpanel" aria-labelledby="titleLoadHeading" hidden>
         <div class="title-panel-head"><div><span>LOAD DYNASTY</span><h2 id="titleLoadHeading">Return to the sideline</h2></div><button type="button" data-title-back aria-label="Back to main menu">Back</button></div>
-        <label class="title-field">Browser save slot<select id="titleSaveSlot" aria-label="Browser save slot"></select></label>
-        <button id="titleLoadBrowser" class="title-panel-choice" type="button" disabled><strong>Load browser save</strong><small id="titleLoadMeta">Checking this device…</small></button>
+        <label class="title-field">Save slot<select id="titleSaveSlot" aria-label="Save slot"></select></label>
+        <button id="titleLoadBrowser" class="title-panel-choice" type="button" disabled><strong>Load saved dynasty</strong><small id="titleLoadMeta">Checking this device…</small></button>
         <div class="title-slot-name"><input id="titleSlotName" type="text" maxlength="40" aria-label="Save slot name"><button id="titleRenameSlot" type="button">Rename</button></div>
         <button id="titleImport" class="title-panel-choice" type="button"><strong>Import exported save</strong><small>Choose a complete Dynasty Lab JSON backup</small></button>
       </section>
@@ -63,7 +63,7 @@
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
-      <select id="saveSlot" aria-label="Active browser save slot"></select>
+      <select id="saveSlot" aria-label="Active save slot"></select>
       <button id="saveBrowser">Save</button>
       <button id="loadBrowser">Load</button>
       <button id="exportSave">Export</button>

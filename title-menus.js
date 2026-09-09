@@ -104,6 +104,9 @@
     panel.className='title-subpanel title-about-panel';
     panel.setAttribute('aria-labelledby','titleAboutHeading');
     panel.hidden=true;
+    const desktopStorage=window.DynastyStorage?.kind==='desktop';
+    const storageSummary=desktopStorage?'Desktop saves + complete exports':'Browser slots + complete exports';
+    const storageCopy=desktopStorage?'Named desktop save slots handle everyday play. Exported JSON provides a complete backup you can keep separately and import later.':'Named browser save slots handle everyday play. Exported JSON provides a complete backup you can keep separately and import later.';
     panel.innerHTML=`
       <div class="title-panel-head"><div><span>ABOUT</span><h2 id="titleAboutHeading">Dynasty Lab</h2></div><button type="button" data-title-about-back aria-label="Back to main menu">Back</button></div>
       <div class="title-about-hero">
@@ -113,12 +116,12 @@
       <div class="title-about-facts" aria-label="Build information">
         <div><span>VERSION</span><strong data-about-version>${titleVersion()}</strong></div>
         <div><span>UNIVERSE</span><strong>Fictional</strong></div>
-        <div><span>SAVES</span><strong>Browser + JSON</strong></div>
+        <div><span>SAVES</span><strong>${desktopStorage?'Desktop + JSON':'Browser + JSON'}</strong></div>
       </div>
       <div class="title-about-grid">
         <section class="title-about-card"><span>DYNASTY MODE</span><h3>One program, one career</h3><p>Control a single program and move only through career opportunities earned inside the dynasty.</p></section>
         <section class="title-about-card"><span>COMMISSIONER MODE</span><h3>Run the whole universe</h3><p>Switch programs and edit institutional details when you want broader sandbox control.</p></section>
-        <section class="title-about-card title-about-card--wide"><span>YOUR SAVE DATA</span><h3>Browser slots + complete exports</h3><p>Named browser save slots handle everyday play. Exported JSON provides a complete backup you can keep separately and import later.</p></section>
+        <section class="title-about-card title-about-card--wide"><span>YOUR SAVE DATA</span><h3>${storageSummary}</h3><p>${storageCopy}</p></section>
       </div>`;
     menuShell.appendChild(panel);
 
