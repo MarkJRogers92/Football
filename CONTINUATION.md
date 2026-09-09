@@ -8,6 +8,8 @@ Milestone B baseline: `23704779907df576b7e6f6d259f3d52f37c71e80`
 
 Milestone C packaging implementation: `9679873`
 
+Scouting-label display correction: `d51143a`
+
 Production remains `v0.11.9` at
 `20d99a44d00cd19f5bbcb45c5566002690811b61` on `gh-pages`. Desktop work has not
 been published to the website and no public GitHub Release has been created.

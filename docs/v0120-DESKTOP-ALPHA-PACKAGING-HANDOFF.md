@@ -5,6 +5,7 @@
 - Source branch: `codex/v0120-desktop-alpha-packaging`
 - Milestone B baseline: `23704779907df576b7e6f6d259f3d52f37c71e80`
 - Packaging implementation checkpoint: `9679873`
+- Scouting-label display correction: `d51143a`
 - Source/package version remains `0.11.9` during Desktop Alpha development.
 - Production remains `v0.11.9` at `20d99a44d00cd19f5bbcb45c5566002690811b61` on `gh-pages`.
 - No preview, production deployment, or public GitHub Release was created.
@@ -128,9 +129,11 @@ errors. It never uses or changes the player's real Dynasty Lab saves.
 
 Acceptance result on 2026-09-08: every command above passed on Apple Silicon.
 Desktop storage passed 14/14 tests, browser storage passed 10/10 tests, and the
-existing game smoke passed 53/53 checks. The final local ZIP was 127,989,787
+existing game smoke passed 53/53 checks. A subsequent focused display check
+confirmed that roster cards and player dossiers render plain staff-readable
+scouting labels instead of escaped HTML. The current local ZIP was 127,989,830
 bytes with SHA-256
-`6f1dafc4cdf2c4c50ebb867a96ca0190c95910ff46dc33ed9f0ab692c01323d7`.
+`fc3ccfc8da4ac1c4433f3534fc2a9ef4e3848441a4f8961f19521eb8465e03b4`.
 Its executable is arm64, its ad-hoc signature verifies, and its ASAR contains
 the game entry and desktop shell while excluding tests, docs, tools, `.pages`,
 GitHub metadata, and development `node_modules`.
