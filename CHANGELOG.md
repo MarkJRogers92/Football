@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.12.1 — Take the Job and cross-platform desktop Alpha
+
+- Adds a seven-screen New Dynasty setup that establishes the coach, program, schemes, development focus, control mode, inherited-program briefing, and final contract before entering the Command Center.
+- Creates one durable save only after the contract is accepted, restores interrupted setup drafts after refresh, and keeps completed and legacy dynasties migration-safe.
+- Opens new careers at the true 2027 preseason checkpoint with Week 1 locked until Begin Season.
+- Adds native Windows x64 and macOS Apple-silicon Alpha packages with packaged launch, save, replacement, and restore verification.
+- Runs engine, browser, IndexedDB, audit, Windows, and macOS validation in parallel release lanes.
+
 ## v0.11.9 — Options and About menu polish
 
 - Reworks the title-screen Options panel into a clearer Game & Presentation settings screen while preserving the existing motion and Watch Mode pace preferences.

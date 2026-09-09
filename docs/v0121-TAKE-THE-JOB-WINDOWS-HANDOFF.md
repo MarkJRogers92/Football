@@ -20,4 +20,4 @@ The output files are:
 
 GitHub Actions builds each artifact on its native operating system, launches the packaged application, creates a disposable native save, replaces the extracted app, and confirms the save still restores. Artifacts are retained for 14 days.
 
-These are unsigned Alpha builds. Windows may show a SmartScreen warning; macOS may require an explicit first launch from Finder. Production publishing remains separate and `gh-pages` is not changed by this branch.
+These are unsigned Alpha builds. Windows may show a SmartScreen warning; macOS may require an explicit first launch from Finder. The validated source was released as v0.12.1 after preview approval; production publishing remains isolated on `gh-pages`.
