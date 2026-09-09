@@ -28,9 +28,10 @@ async function extractPackagedBundle(destinationRoot) {
   await extract(artifact, {dir: destinationRoot});
 
   if (process.platform === 'win32') {
-    const application = path.join(destinationRoot, 'Dynasty Lab-win32-x64');
-    const executable = path.join(application, 'Dynasty Lab.exe');
-    const asar = path.join(application, 'resources', 'app.asar');
+    // cross-zip uses CreateFromDirectory on Windows, which puts the packaged
+    // directory's contents at the archive root instead of retaining its name.
+    const executable = path.join(destinationRoot, 'Dynasty Lab.exe');
+    const asar = path.join(destinationRoot, 'resources', 'app.asar');
     assert.equal(fs.existsSync(executable), true, `packaged executable is required at ${executable}`);
     assert.equal(fs.existsSync(asar), true, `packaged ASAR is required at ${asar}`);
     return executable;
