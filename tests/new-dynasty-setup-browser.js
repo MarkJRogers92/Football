@@ -46,15 +46,15 @@ const {chromium} = require('playwright-core');
 
     await page.click('#setupContinue');
     assert.match(await page.locator('#setupHeading').innerText(), /Set the program identity/);
-    await page.check('[data-setup-field="offScheme"][value="Tempo Spread"]');
-    await page.check('[data-setup-field="defScheme"][value="Pressure Multiple"]');
-    await page.check('[data-setup-field="trainingFocus"][value="Fundamentals"]');
+    await page.click('label:has([data-setup-field="offScheme"][value="Tempo Spread"])');
+    await page.click('label:has([data-setup-field="defScheme"][value="Pressure Multiple"])');
+    await page.click('label:has([data-setup-field="trainingFocus"][value="Fundamentals"])');
 
     await page.click('#setupContinue');
     assert.match(await page.locator('#setupHeading').innerText(), /Configure the world/);
     assert.match(await page.locator('#setupContent').innerText(), /120 fictional programs/);
     assert.match(await page.locator('#setupContent').innerText(), /Not exposed yet/);
-    await page.check('[data-setup-field="mode"][value="commissioner"]');
+    await page.click('label:has([data-setup-field="mode"][value="commissioner"])');
 
     await page.click('#setupContinue');
     await page.waitForFunction(() => !document.querySelector('#setupContinue')?.disabled,
