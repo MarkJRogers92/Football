@@ -3,7 +3,7 @@
 ## Continuation state
 
 - Branch: `codex/v0120-desktop-storage`
-- Latest tested code commit: `f81c476` (`test: verify native desktop save lifecycle`)
+- Latest tested code commit: `83ef018` (`fix: recover interrupted desktop saves`)
 - Production remains `v0.11.9` on `gh-pages`; this branch has not been published.
 - `VERSION.txt` and `package.json` remain `0.11.9` during Desktop Alpha development.
 
@@ -53,7 +53,9 @@ after new immutable history/game chunks are durable. Writes use a temporary file
 file sync, and rename. Saves are serialized per slot, stale revisions are rejected,
 and five prior committed wrappers are retained. A damaged or missing current wrapper
 recovers from the newest valid backup; missing history chunks fail closed with a clear
-backup message.
+backup message. An interrupted append can safely retry over its uncommitted chunks.
+Legacy migration failures are isolated to the affected slot, retried on the next
+operation, and cannot silently mark that slot as replaceable.
 
 ## Commands
 
@@ -72,7 +74,7 @@ not required for development.
 ## Validation completed
 
 - `npm run build`
-- `npm run test:desktop-storage` — 10 focused backend/adapter tests passed
+- `npm run test:desktop-storage` — 12 focused backend/adapter tests passed, including interrupted-commit retry and isolated migration failure
 - `node --test tests/persistence.js tests/reviewed-fixes.js` — 8 persistence and portable import/export tests passed
 - `node --test tests/storage.js` — 9 browser IndexedDB tests passed
 - `CHROMIUM_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' node tests/title-menus-browser.js` — desktop and iPhone title menus passed in the web target
