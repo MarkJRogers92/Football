@@ -26,8 +26,9 @@ function legacySave(e, phase, development = {}) {
   return { userTeam: universe.teams[0].name, universe };
 }
 
-test('new dynasties begin with a normalized preseason checkpoint', async () => {
+test('low-level universe fixtures keep the completed offseason checkpoint', async () => {
   const e = await fresh(9461);
+  assert.equal(e.universe.phase, 'regular');
   assert.deepEqual(e.universe.offseason, {
     year: 2027,
     phase: 'preseason',

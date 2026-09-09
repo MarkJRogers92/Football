@@ -93,7 +93,7 @@ function loadEngine({ seed, stubRender = true, indexedDB, fullRuntime = false } 
   if (stubRender) {
     // The UI layer is not under test; short-circuit it so engine timings and
     // distributions are not polluted by innerHTML construction.
-    head = head.replace('function render(){const order=ranked();', 'function render(){if(globalThis.__RENDER_OFF)return;const order=ranked();');
+    head = head.replace("function render(){\n const order=ranked(),u=selected();", "function render(){\n if(globalThis.__RENDER_OFF)return;\n const order=ranked(),u=selected();");
     if (!head.includes('__RENDER_OFF')) throw new Error('render stub anchor not found');
     globalThis.__RENDER_OFF = true;
   }
@@ -102,12 +102,12 @@ globalThis.__ENGINE__ = {
   get universe(){ return universe }, set universe(v){ universe = v },
   get jobOffers(){ return universe.jobOffers },
   get schools(){ return schools },
-  loadSchools, initUniverse, buildSchedule, ranked, rankingScore, profiles, gameProfiles,
+  loadSchools, initUniverse, createNewDynasty, openingPreseason, beginSeason, buildSchedule, ranked, rankingScore, profiles, gameProfiles,
   gameplayRandom, syncGameplayRng,
   weeklyPlan, ensureWeeklyDecisions, currentWeeklyDecisions, hasPendingWeeklyDecisions, hasPendingCareerChoice, resolveWeeklyDecision, delegateWeeklyDecisions, playerAgencyDecision, playerInteractionWindow, promisePlayerOpportunity, applyRequestedPositionChange, importantStarters, weeklyPlayerPlan, pipelineStrength, oversignAppetite, scholarshipRoom, scholarshipCapacity, scholarshipSummary, projectedReturning, projectedDepartures, pullOffer, recruitBlocked, enforceScholarshipLimits, canTakeCommit, classCommitCount, pulledOfferHubItems, SCHOLARSHIP_LIMIT,
   setTeamScheme, schemeTransition, schemeFamiliarity, advanceSchemeInstall, schemeFitFor, schemeDefFor, schemeFitPressure, applyCoachScheme, ensureCoachScheme, positionOptions, positionChangeWillingness, positionTransitionFit, applyPositionChangeCost, playerSchemeFit, SCHEME_SIDE,
   gameRecap, recapFacts, recapPicker, weeklyNewsletter, newsWeight, newsGames, newsWeeks,
-  gameSim, detailedGame, simulateUserDetailed, gameBoxHTML, gameSummaryHTML, renderGameArchive, showGameCenter, simWeek, simSeason, simConferenceChampionships, simPlayoff, runOffseason, advanceOffseasonPhase, advanceOffseasonTo, offseasonPhaseDone, finishOffseasonPhase, offseasonReview, offseasonDepartures, offseasonEnrollment, offseasonPortal, offseasonPreseason,
+  gameSim, detailedGame, findUserGame, simulateUserDetailed, watchUserDetailed, gameBoxHTML, gameSummaryHTML, renderGameArchive, showGameCenter, simWeek, simSeason, simConferenceChampionships, simPlayoff, runOffseason, advanceOffseasonPhase, advanceOffseasonTo, offseasonPhaseDone, finishOffseasonPhase, offseasonReview, offseasonDepartures, offseasonEnrollment, offseasonPortal, offseasonPreseason,
   runSpringCamp, runFallCamp, developmentSnapshot, developmentDelta, developmentResult, developmentTeamSummary, developmentGroupSummary, developmentFocusSummary, developmentMovementDistribution, developmentResultDetailHTML, developmentResultsHTML, makeOffseasonState, normalizeOffseasonState, OFFSEASON_PHASES, advanceRecruiting, finalizeRecruiting,
   generateRecruitPool, generatePlayer, generateRoster, conditionRating,
   roleFit, unit, starter, roleStarter, participants, eligibilityBase,

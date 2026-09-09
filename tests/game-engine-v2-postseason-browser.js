@@ -6,6 +6,7 @@ async function startNewDynasty(page){
   await page.waitForFunction(()=>document.querySelector('#titleTeam')?.options.length>0,{timeout:60000});
   await page.click('#titleNew');await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});await page.click('#titleStart');
   await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000});
+  await page.click('#hubAdvance');await page.waitForFunction(()=>window.__DL_TEST__.preseasonDebug().phase==='regular');
 }
 async function reachPostseason(page){
   await page.click('#simSeason');await page.waitForFunction(()=>window.DynastyGameEngineV2LabBridge.cutoverDebug().phase==='confReady',{timeout:60000});

@@ -32,7 +32,8 @@ function makeScoutingActionSystem(env){
  function actionAvailability(r,t,kind){
   if(!COSTS[kind])return{ok:false,reason:'Unknown scouting action.'};
   if(!r||!t)return{ok:false,reason:'No recruit selected.'};
-  if(universe().phase!=='regular')return{ok:false,reason:'Manual recruit evaluation is available during the regular recruiting season.'};
+  const u=universe(),activeRecruiting=u.phase==='regular'||(u.phase==='preseason'&&u.week===0);
+  if(!activeRecruiting)return{ok:false,reason:'Manual recruit evaluation is available during an active recruiting period.'};
   if(r.committed&&r.committed!==t.name)return{ok:false,reason:`${r.name} is committed elsewhere.`};
   const rec=recruitScoutingRecord(r,t,false);
   if(kind==='quick'&&(rec.quick||rec.full))return{ok:false,reason:'Quick Film is already complete for this recruit.'};

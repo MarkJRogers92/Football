@@ -40,6 +40,8 @@ test('preliminary verdict browsing does not create persistent scouting state',()
 
 test('action availability is read-only until an evaluation is actually performed',()=>{const {api}=fixture(),t=team(),r=recruit();assert.equal(api.actionAvailability(r,t,'quick').ok,true);assert.equal(r.manualScouting,undefined);api.performScoutingAction(r,t,'quick');assert.ok(r.manualScouting?.['1']);assert.ok(r.scoutingDomains)});
 
+test('manual scouting is available in opening preseason but not outside active recruiting',()=>{const {api,universe}=fixture(),t=team(),r=recruit();universe.phase='preseason';universe.week=0;assert.equal(api.actionAvailability(r,t,'quick').ok,true);universe.week=1;assert.equal(api.actionAvailability(r,t,'quick').ok,false);universe.phase='complete';universe.week=0;assert.equal(api.actionAvailability(r,t,'quick').ok,false)});
+
 test('evaluation workload summarizes active targets without reading hidden talent',()=>{
  const {api}=fixture(),tm=team(),a={...recruit(),id:'A',targeted:true},b={...recruit(),id:'B',targeted:true},c={...recruit(),id:'C',targeted:true},other={...recruit(),id:'D',targeted:false};
  api.performScoutingAction(b,tm,'quick');api.performScoutingAction(c,tm,'full');

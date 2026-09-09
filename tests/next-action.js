@@ -11,6 +11,7 @@ test('first unfinished plan item wins',()=>{
 });
 
 test('postseason calendar gates map to their canonical controls',()=>{
+ assert.equal(api.actionSelector('Begin season'),'#hubAdvance');
  assert.equal(api.actionSelector('Play week 7'),'#simWeek');
  assert.equal(api.actionSelector('Play the conference championships'),'#simConf');
  assert.equal(api.actionSelector('Play the bowl games'),'#simBowls');

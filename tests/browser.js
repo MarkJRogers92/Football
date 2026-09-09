@@ -19,6 +19,8 @@ const startNewDynasty=async page=>{
  await page.waitForSelector('#titleStart',{state:'visible',timeout:10000});
  await page.click('#titleStart');
  await page.waitForFunction(()=>document.querySelector('#userTeam')?.options.length>0,{timeout:60000});
+ await page.click('#hubAdvance');
+ await page.waitForFunction(()=>window.__DL_TEST__.preseasonDebug().phase==='regular');
 };
 
 (async () => {

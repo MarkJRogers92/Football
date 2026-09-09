@@ -10,6 +10,7 @@
   'Play the playoff':'#simPlayoff'
  });
  function actionSelector(label){
+  if(/^Begin season$/i.test(label||''))return '#hubAdvance';
   if(/^Play week \d+$/.test(label||''))return '#simWeek';
   return POSTSEASON_ACTIONS[label]||null;
  }
@@ -31,6 +32,9 @@
   button.dataset.nextActionController='1';
   const refresh=()=>{
    const state=readState(doc),next=state.next,action=next.kind==='plan'?actionSelector(next.label):null;
+   if(button.dataset.openingPreseason==='true'){
+    button.textContent='Begin Season';button.disabled=false;button.title='Open Week 1 without simulating a game.';return state;
+   }
    button.textContent=next.kind==='clear'?'All caught up':`Next: ${next.label}`;
    button.disabled=next.kind==='clear';
    button.title=next.kind==='decision'?'Resolve the Coach’s Desk item before advancing.'
@@ -38,6 +42,9 @@
    return state;
   };
   button.addEventListener('click',e=>{
+   if(button.dataset.openingPreseason==='true'){
+    e.preventDefault();e.stopImmediatePropagation();button.__beginSeason?.();return;
+   }
    const state=refresh();
    e.preventDefault();e.stopImmediatePropagation();
    if(state.next.kind==='decision'){

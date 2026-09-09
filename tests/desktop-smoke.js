@@ -119,6 +119,10 @@ async function startAndSave(page, profile) {
   assert.equal(await page.locator('#app').isVisible(), true, 'new dynasty reaches the application');
   assert.equal(await page.locator('#titleScreen').isVisible(), false, 'title screen closes after starting');
   assert.ok(await page.locator('#userTeam option').count() > 0, 'team selector is populated');
+  assert.match(await page.locator('#weekLine').innerText(), /Preseason/,
+    'desktop creation opens at the preseason checkpoint');
+  assert.equal(await page.locator('#hubAdvance').innerText(), 'Begin Season',
+    'desktop creation exposes the explicit season boundary');
   await page.click('[data-client-tab="roster"]');
   await page.locator('#roster.active').waitFor({state: 'visible', timeout: 10000});
   const staffRead = await page.locator('#rosterPositionBoard .rd-player small').first().innerText();
@@ -141,6 +145,8 @@ async function startAndSave(page, profile) {
   assert.equal(nativeWrapper.slot, 'main');
   assert.equal(nativeWrapper.core.storageVersion, 3);
   assert.equal(nativeWrapper.core.userTeam, 'Chicago Metropolitan');
+  assert.equal(nativeWrapper.core.universe.phase, 'preseason',
+    'native saves preserve the opening preseason phase');
 }
 
 async function restoreSave(page) {
@@ -148,6 +154,9 @@ async function restoreSave(page) {
   await page.click('#titleContinue');
   await page.locator('#app').waitFor({state: 'visible', timeout: 30000});
   assert.match(await page.locator('#teamName').textContent(), /Chicago Metropolitan/i);
+  assert.match(await page.locator('#weekLine').innerText(), /Preseason/,
+    'desktop restart restores the preseason checkpoint');
+  assert.equal(await page.locator('#hubAdvance').innerText(), 'Begin Season');
 }
 
 async function runUnpackaged(profile, pageErrors, consoleErrors) {
