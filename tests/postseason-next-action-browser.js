@@ -21,7 +21,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
     assert.match(await page.locator('#hubAdvance').innerText(),/playoff/i);
     await page.click('#hubAdvance');
     await page.waitForFunction(()=>document.querySelector('#simPlayoff').disabled,{timeout:30000});
-    const text=await page.locator('#weeklyPlan').innerText();
+    const text=(await page.locator('#coachingAgenda').innerText())+' '+(await page.locator('#advanceForecast').innerText());
     assert.match(text,/Scholarship limit warning|Run season review|Process departures|Enroll the signing class|Nothing pending/i);
     assert.doesNotMatch(text,/Get under the scholarship limit/i);
     assert.deepEqual(errors,[],`browser emitted errors: ${errors.join('\n')}`);
