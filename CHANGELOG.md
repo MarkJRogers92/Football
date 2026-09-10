@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.12.3 — Postgame box-score access
+
+- Promotes a direct View Box Score action from the Command Center and Game Lab postgame displays, while retaining the complete Game Center entry point.
+- Moves the Quick Box above secondary postgame analysis so the score, team production, turnovers, drives, and key performers are easier to find.
+- Adds player-team and statistical-category filters, visible sortable column controls, and leader-first default ordering to full box scores.
+- Clarifies the sidebar by naming the current-week workspace Game Lab and reserving Game Center for an individual completed game.
+- Preserves existing simulation, save, archive, and gameplay-RNG behavior while sharing the same interface improvements across web and desktop builds.
+
 ## v0.12.2 — Guided preseason
 
 - Preserves the seven-screen Take the Job setup before a new dynasty is created, including draft recovery and the final contract confirmation.
