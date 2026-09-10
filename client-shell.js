@@ -6,7 +6,7 @@
     {label:'Home',items:[['dashboard','Command Center'],['newsletter','News / Inbox']]},
     {label:'Program',items:[['program','Program Overview'],['roster','Roster'],['depth','Roles & Depth'],['development','Development'],['staff','Staff'],['offseason','Offseason']]},
     {label:'Recruiting',items:[['recruiting','Recruiting Board']]},
-    {label:'Season',items:[['gamelab','Game Center'],['season','Schedule'],['stats','Stats & Rankings']]},
+    {label:'Season',items:[['gamelab','Game Lab'],['season','Schedule'],['stats','Stats & Rankings']]},
     {label:'World',items:[['history','History'],['records','Awards & Records']]}
   ];
 

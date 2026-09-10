@@ -84,6 +84,15 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
     check(`[${label}] sim week advances the UI (${simMs}ms)`, true);
     check(`[${label}] sim week is responsive`, simMs < 4000, `${simMs}ms`);
 
+    // The latest result promotes its permanent statistical box score.
+    await goTab(page, 'dashboard');
+    const dashboardBox=page.locator('#broadcastFeature [data-game][data-game-tab="Box Score"]');
+    await dashboardBox.waitFor({state:'visible'});
+    check(`[${label}] Command Center promotes View Box Score`,(await dashboardBox.innerText()).trim()==='View Box Score');
+    await dashboardBox.click();await page.waitForSelector('#gameDialog[open]',{timeout:10000});
+    check(`[${label}] promoted result opens directly to Box Score`,await page.locator('#gameTabs [data-game-tab="Box Score"]').getAttribute('aria-pressed')==='true');
+    await page.getByRole('button',{name:'Close Game Center',exact:true}).click();
+
     // Weekly hub items link to the tab they describe.
     const hubTab = await page.$eval('#weeklyHub .hub-link', el => el.dataset.tab);
     await page.click('#weeklyHub .hub-link');

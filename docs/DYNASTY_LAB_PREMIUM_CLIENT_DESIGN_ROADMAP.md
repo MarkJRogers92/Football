@@ -744,6 +744,24 @@ Then legitimate archived facts:
 - turning point if derivable from real game archive/play-by-play;
 - relevant consequences.
 
+### Box-score prominence follow-up
+
+Treat the statistical box score as a primary postgame destination rather than a
+secondary tab players must discover inside Game Center.
+
+- Put a prominent **View Box Score** action on the Game Day final-result card and
+  the Command Center's latest-result presentation.
+- Open that action directly on the permanent Box Score tab while retaining
+  **Full Game Center** as the secondary path to the recap, drives, and play-by-play.
+- Keep the latest game's Quick Box above postgame analysis when detailed data is
+  available.
+- Default each player-stat category to leader order and provide sortable columns
+  plus player-team and category filters inside the full Box Score.
+- Label the season navigation destination **Game Lab** because it opens the
+  current-game workspace, not a completed game's modal.
+- Preserve the existing archive, save, and simulation contracts; this is an
+  information-hierarchy change only.
+
 ## Schedule
 
 Use stronger hierarchy for important games and compact rows for routine information.
