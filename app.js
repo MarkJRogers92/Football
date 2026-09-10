@@ -645,7 +645,7 @@ function newStats(){return {games:0,starts:0,snaps:0,passAtt:0,passComp:0,passYd
 function generateRoster(s){let r=[];Object.entries(POS_COUNTS).forEach(([p,n])=>{for(let i=0;i<n;i++)r.push(generatePlayer(s,p,i))});while(r.length<93)r.push(generatePlayer(s,pick(POS),99));return r}
 function generateFreshman(s,pos,origin='Walk-on / late addition'){let p=generatePlayer(s,pos,99);p.year='FR';p.eligibilityUsed=0;p.redshirtUsed=false;p.redshirtActive=false;p.redshirtSeason=null;p.origin=origin;return p}
 function generateRecruitPool(n,hsPool=universe?.highSchools||generateHighSchools()){let out=[];for(let i=0;i<n;i++){let pos=pick(POS.filter(x=>!['K','P'].includes(x))),raw=clamp(Math.round(58+gauss()*12),38,97),st=recruitStars(raw),up=clamp(Math.round(raw+rng(4,22)+gauss()*5),raw,99),h=weightedHighSchool(hsPool),traits=generatePositionAttributes(pos,raw),style=styleForTraits(pos,traits);out.push({id:uid(),name:`${pick(FIRST)} ${pick(LAST)}`,pos,stars:st,style,trueNow:raw,upside:up,...traits,scout:clamp(Math.round(raw+gauss()*6),35,99),scoutUp:clamp(Math.round(up+gauss()*8),40,99),highSchoolId:h.id,highSchool:h.name,homeCity:h.city,homeState:h.state,lat:h.lat,lon:h.lon,homeRegion:h.region,distanceImportance:gi(5,100),distanceTolerance:pick([100,150,250,400,600,900,1500,2500]),priority:pick(PRIORITIES),portraitSeed:portraitSeedFor(),portraitVersion:PORTRAIT_VERSION,targeted:false,interest:gi(5,45),prevInterest:0,trend:0,relationship:gi(0,20),leader:null,committed:null,commitWeek:null,visit:false,visitWeek:null,promise:'None',work:clamp(Math.round(65+gauss()*18),15,99),dev:clamp(Math.round(68+gauss()*18),15,99)});out.at(-1).prevInterest=out.at(-1).interest}return assignRecruitRanks(out)}
-function initUniverse(mode='dynasty',{startingPhase='regular',seed=null}={}){const phase=startingPhase==='preseason'?'preseason':'regular';IDX.teams=null;IDX.players=null;activateGameplayRng(seed??undefined);const os=Object.keys(OFF_SCHEMES),ds=Object.keys(DEF_SCHEMES),highSchools=generateHighSchools();const teams=schools.map(s=>({...s,nickname:'',staff:generateStaff(s),offScheme:pick(os),defScheme:pick(ds),roster:generateRoster(s),...schoolColors(s),w:0,l:0,cw:0,cl:0,pf:0,pa:0,sos:0,rank:null,champ:false,schedule:[],history:[],commits:[],records:{}}));for(const t of teams){t.schemeTransition={off:null,def:null};t.staff.OC.preferredScheme=t.offScheme;t.staff.DC.preferredScheme=t.defScheme;t.pipelines=makePipelines(t);autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)}universe={version:APP_VERSION,mode:mode==='commissioner'?'commissioner':'dynasty',year:2027,week:0,recoveredWeek:-1,phase,teams,highSchools,recruits:generateRecruitPool(2800,highSchools),history:[],playerArchive:[],awards:{},records:{nationalSeason:{},nationalCareer:{}},draftHistory:{},latest:[],weeklyHub:[],weeklyDecisions:[],bowls:[],confChamps:[],playoffFieldIds:[],playoffFieldUnavailable:false,academicProgression:{season:2027,week:0,teamIds:[]},champion:null,lastDetailedGame:null,movementLog:[],recruitClassCounts:{},campHistory:{},developmentState:{year:2027,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]},offseasonDone:false,openings:[],candidateMarket:{}};gameplayRngUniverse=universe;for(const t of teams){ensureTeamDevelopment(t);for(const p of t.roster){ensurePlayerDevelopment(p,t);ensureAcademics(p,t)}}normalizePromiseState();buildSchedule();deriveRivalries();universe.teams.forEach(t=>{ensureAdminState(t);ensureNilState(t)});ranked();buildPreseasonHub();syncGameplayRng()}
+function initUniverse(mode='dynasty',{startingPhase='regular',seed=null}={}){const phase=startingPhase==='preseason'?'preseason':'regular';IDX.teams=null;IDX.players=null;activateGameplayRng(seed??undefined);const os=Object.keys(OFF_SCHEMES),ds=Object.keys(DEF_SCHEMES),highSchools=generateHighSchools();const teams=schools.map(s=>({...s,nickname:'',staff:generateStaff(s),offScheme:pick(os),defScheme:pick(ds),roster:generateRoster(s),...schoolColors(s),w:0,l:0,cw:0,cl:0,pf:0,pa:0,sos:0,rank:null,champ:false,schedule:[],history:[],commits:[],records:{}}));for(const t of teams){t.schemeTransition={off:null,def:null};t.staff.OC.preferredScheme=t.offScheme;t.staff.DC.preferredScheme=t.defScheme;t.pipelines=makePipelines(t);autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)}universe={version:APP_VERSION,mode:mode==='commissioner'?'commissioner':'dynasty',year:2027,week:0,recoveredWeek:-1,phase,teams,highSchools,recruits:generateRecruitPool(2800,highSchools),history:[],playerArchive:[],awards:{},records:{nationalSeason:{},nationalCareer:{}},draftHistory:{},latest:[],weeklyHub:[],weeklyDecisions:[],bowls:[],confChamps:[],playoffFieldIds:[],playoffFieldUnavailable:false,academicProgression:{season:2027,week:0,teamIds:[]},champion:null,lastDetailedGame:null,movementLog:[],recruitClassCounts:{},campHistory:{},developmentState:{year:2027,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]},offseasonDone:false,openings:[],candidateMarket:{},guidanceState:{version:1,teams:{}}};guidanceReturnState=null;normalizeGuidanceState();gameplayRngUniverse=universe;for(const t of teams){ensureTeamDevelopment(t);for(const p of t.roster){ensurePlayerDevelopment(p,t);ensureAcademics(p,t)}}normalizePromiseState();buildSchedule();deriveRivalries();universe.teams.forEach(t=>{ensureAdminState(t);ensureNilState(t)});ranked();buildPreseasonHub();syncGameplayRng()}
 function createNewDynasty(mode='dynasty',options={}){return initUniverse(mode,{startingPhase:'preseason',seed:options.seed??null})}
 const IDX={teams:null,players:null,archive:null,archived:0,pop:-1,miss:null};
 function rosterPopulation(){let n=0;for(const t of universe.teams)n+=t.roster.length;return n}
@@ -2181,6 +2181,65 @@ function applyGameplanDecision(t,option){
 }
 function buildWeeklyHub(beforeRank=selected()?.rank||null){const u=selected(),items=[...pulledOfferHubItems(u),...coachOpeningHubItems(u),...coachFalloutHubItems(u),...promiseHubItems(u),...recordChaseHubItems(u),...rivalryHubItems(u),...adminHubItems(u),...careerHubItems(u),...bowlHubItems(u),...signingDayHubItems(),...academicHubItems(u),...coachTreeHubItems(u)],res=userWeekResult(u);if(res)items.push({type:res.win?'good-news':'bad-news',tab:'season',kicker:'FINAL',importance:res.win?50:60,gameId:res.gameId,main:`${res.win?'Win':'Loss'} ${res.userPts}–${res.oppPts} ${res.loc} ${res.opp}`,sub:`${u.w}-${u.l} overall · ${u.cw}-${u.cl} conference`});if(beforeRank&&u.rank!==beforeRank)items.push({type:u.rank<beforeRank?'good-news':'alert',tab:'season',kicker:'RANKINGS',importance:45,main:`${u.rank<beforeRank?'Up':'Down'} to #${u.rank}`,sub:`Previous ranking: #${beforeRank}`});let inj=u.roster.filter(p=>(p.injuryHistory||[]).some(x=>x.year===universe.year&&x.week===universe.week)).slice(0,2);for(const p of inj)items.push({type:'bad-news',tab:'roster',player:p.id,kicker:'MEDICAL',importance:55,main:`${p.name}: ${p.injury}`,sub:`Expected absence: ${p.injuryWeeks} week${p.injuryWeeks===1?'':'s'}`});let commits=universe.recruits.filter(r=>r.committed===u.name&&r.commitWeek===universe.week).slice(0,3);for(const r of commits)items.push({type:'good-news',tab:'recruiting',recruit:r.id,kicker:'COMMITMENT',importance:40+r.stars*3,main:`${'★'.repeat(r.stars)} ${r.pos} ${r.name}`,sub:`#${r.nationalRank} nationally · ${r.homeCity}, ${r.homeState}`});let next=findUserGame();if(next){let opp=T(next.home===u.name?next.away:next.home);items.push({type:'action',tab:'gamelab',kicker:'NEXT UP',importance:48,main:`Week ${universe.week+1}: ${next.home===u.name?'vs':'@'} ${opp.name}`,sub:`${opp.w}-${opp.l} · #${opp.rank<=25?opp.rank:'—'} · ${opp.offScheme}`})}let risk=u.roster.map(p=>({p,r:transferRisk(p)})).sort((a,b)=>b.r-a.r)[0];if(risk?.r>=42)items.push({type:'alert',tab:'roster',player:risk.p.id,kicker:'LOCKER ROOM',importance:Math.min(80,Math.round(risk.r)),main:`${risk.p.name} transfer risk: ${Math.round(risk.r)}`,sub:`${risk.p.role} · morale ${risk.p.morale}`});for(const e of (universe.decommitLog||[]).filter(e=>e.year===universe.year&&e.week===universe.week&&(e.from===u.name||e.to===u.name)).slice(0,3))items.push(e.from===u.name?{type:'bad-news',tab:'recruiting',recruit:e.id,kicker:'DECOMMIT',importance:50+e.stars*3,main:`${'★'.repeat(e.stars)} ${e.pos} ${e.name}`,sub:e.to?`Flipped to ${e.to}`:'Reopened his recruitment'}:{type:'good-news',tab:'recruiting',recruit:e.id,kicker:'FLIP',importance:45+e.stars*3,main:`${'★'.repeat(e.stars)} ${e.pos} ${e.name}`,sub:`Flipped from ${e.from}`});let waver=universe.recruits.filter(r=>r.committed===u.name&&r.challenger&&r.pressure>0).sort((a,b)=>b.pressure-a.pressure)[0];if(waver)items.push({type:'alert',tab:'recruiting',recruit:waver.id,kicker:'WAVERING',importance:52,main:`${waver.name} hearing from ${waver.challenger}`,sub:`${'★'.repeat(waver.stars)} ${waver.pos} commit · target, visit or promise to hold him`});let hot=universe.recruits.filter(r=>r.targeted&&!r.committed).sort((a,b)=>b.interest-a.interest)[0];if(hot)items.push({type:'action',tab:'recruiting',recruit:hot.id,kicker:'TOP TARGET',importance:35,main:`${hot.name} · ${hot.interest}%`,sub:`#${hot.nationalRank} ${hot.pos} · ${hot.trend>0?'↑ '+hot.trend:hot.trend<0?'↓ '+Math.abs(hot.trend):'steady'}`});universe.weeklyHub=items.sort((a,b)=>(b.importance??40)-(a.importance??40)).slice(0,9)}
 
+const GUIDANCE_STATE_VERSION=1,GUIDANCE_FAMILIARITY_MAX=3,GUIDANCE_RETURN_AFTER_MS=6*60*60*1000;
+const GUIDANCE_CATEGORIES=new Set(['career','coach_desk','game_plan','roster_management','staffing','recruiting','monitoring']);
+let guidanceReturnState=null;
+function guidanceCalendarStamp(target=universe){
+ const os=target?.phase==='complete'?(OFFSEASON_PHASES.includes(target?.offseason?.phase)?target.offseason.phase:'review'):'season';
+ return `${target?.year??0}:${target?.phase||'none'}:${target?.week??0}:${os}`;
+}
+function normalizeGuidanceState(target=universe){
+ const raw=target?.guidanceState,valid=raw?.version===GUIDANCE_STATE_VERSION&&raw.teams&&typeof raw.teams==='object'&&!Array.isArray(raw.teams),out={version:GUIDANCE_STATE_VERSION,teams:{}},currentStamp=guidanceCalendarStamp(target);
+ for(const team of target?.teams||[]){
+  const prior=valid&&raw.teams[String(team.id)]&&typeof raw.teams[String(team.id)]==='object'?raw.teams[String(team.id)]:{},familiarity={},deferred={};
+  for(const category of GUIDANCE_CATEGORIES){const score=Number(prior.familiarity?.[category]);if(Number.isFinite(score)&&score>0)familiarity[category]=Math.min(GUIDANCE_FAMILIARITY_MAX,Math.floor(score))}
+  for(const [id,record] of Object.entries(prior.deferred||{}).slice(-100))if(id.startsWith(`guidance:${team.id}:`)&&id.length<=240&&record?.stamp===currentStamp)deferred[id]={stamp:record.stamp};
+  out.teams[String(team.id)]={familiarity,deferred};
+ }
+ target.guidanceState=out;return out;
+}
+function guidanceStateFor(t=selected(),target=universe){
+ const state=target?.guidanceState?.version===GUIDANCE_STATE_VERSION?target.guidanceState.teams?.[String(t?.id)]:null;
+ return state&&typeof state==='object'?state:{familiarity:{},deferred:{}};
+}
+function guidanceMutableStateFor(t=selected()){
+ normalizeGuidanceState();return universe.guidanceState.teams[String(t.id)];
+}
+function guidanceRecordFamiliarity(category,t=selected()){
+ if(!t||!GUIDANCE_CATEGORIES.has(category))return 0;
+ const state=guidanceMutableStateFor(t),next=Math.min(GUIDANCE_FAMILIARITY_MAX,(Number(state.familiarity[category])||0)+1);
+ state.familiarity[category]=next;autosaveAfter('guidance');return next;
+}
+function guidanceMarkFamiliar(id,t=selected()){
+ const model=guidanceModel(t),item=[...(model.items||[]),...(model.snoozed||[])].find(x=>x.id===id);
+ return item?guidanceRecordFamiliarity(item.category,t):0;
+}
+function snoozeGuidance(id,t=selected()){
+ if(!t)return false;const item=guidanceModel(t).items.find(x=>x.id===id);
+ if(!item||!['staff_recommendation','monitoring'].includes(item.meaning))return false;
+ const state=guidanceMutableStateFor(t);state.deferred[id]={stamp:guidanceCalendarStamp()};autosaveAfter('guidance');return true;
+}
+function restoreGuidance(id,t=selected()){
+ if(!t)return false;const state=guidanceMutableStateFor(t);if(!state.deferred[id])return false;
+ delete state.deferred[id];autosaveAfter('guidance');return true;
+}
+function guidanceCurrentLabel(target=universe){
+ if(openingPreseason(target))return `${target.year} preseason`;
+ if(target?.phase==='regular')return `${target.year} · Week ${Number(target.week||0)+1}`;
+ if(target?.phase==='complete')return `${target.year} offseason · ${guidanceOffseasonPhase()}`;
+ return `${target?.year??''} · ${target?.phase||'dynasty'}`;
+}
+function guidanceWelcomeBack(savedAt,t=selected(),loadedAt=Date.now()){
+ const saved=Date.parse(savedAt),elapsed=loadedAt-saved;if(!t||!Number.isFinite(saved)||!Number.isFinite(loadedAt)||elapsed<GUIDANCE_RETURN_AFTER_MS)return null;
+ const model=guidanceModel(t),counts={required:model.items.filter(x=>x.meaning==='must_resolve').length,due:model.items.filter(x=>x.meaning==='decision_due').length,recommended:model.items.filter(x=>x.meaning==='staff_recommendation').length};
+ return {kind:'guidance_return',savedAt,elapsedMs:elapsed,currentLabel:guidanceCurrentLabel(),boundary:{key:model.forecast?.key||'none',label:model.forecast?.label||'No advance available',status:model.forecast?.status||'ready'},counts,items:model.leading.slice(0,3).map(x=>({id:x.id,title:x.title,meaning:x.meaning}))};
+}
+function guidancePrepareReturn(savedAt){const loadedAt=Date.now();guidanceReturnState=guidanceWelcomeBack(savedAt,selected(),loadedAt)?{savedAt,loadedAt}:null;return guidanceReturnState}
+function guidanceReturnSummary(){return guidanceReturnState?guidanceWelcomeBack(guidanceReturnState.savedAt,selected(),guidanceReturnState.loadedAt):null}
+function dismissGuidanceReturnSummary(){guidanceReturnState=null;return true}
+function guidanceDeferItem(id,t=selected()){return snoozeGuidance(id,t)}
+function guidanceRestoreItem(id,t=selected()){return restoreGuidance(id,t)}
+
 function guidanceActionBlockers(action,t=selected()){
  const out=[],careerActions=new Set(['advance-week','simulate-season','detailed-game','offseason-phase']);
  const reviewCanRun=action==='offseason-phase'&&guidanceOffseasonPhase()==='review';
@@ -2262,15 +2321,17 @@ function guidanceModel(t=selected()){
  for(const o of (universe.openings||[]).filter(o=>o.schoolId===t.id&&o.status==='OPEN'))add({id:guidanceItemId(t,'staff-opening',o.id||o.slot),occurrence:o.id||o.slot,meaning:'staff_recommendation',category:'staffing',priority:190,title:`Hire a ${o.role}`,cause:`The ${o.role} position is open${o.reason?`: ${o.reason}`:''}.`,affectedEntity:{type:'staff_role',id:o.slot,label:o.role},destination:{tab:'staff',focus:'coach-opening',coachId:o.coachId||null},boundary:null,consequence:'The interim arrangement remains in place if you advance; this recommendation never blocks time.'});
  const targets=(universe.recruits||[]).filter(r=>r.targeted&&!r.committed).length;
  if(!targets&&sch.room>0&&(universe.phase==='regular'||openingPreseason()))add({id:guidanceItemId(t,'recruiting-board','empty'),occurrence:'empty',meaning:'staff_recommendation',category:'recruiting',priority:170,title:'Build a recruiting board',cause:`You have ${sch.room} scholarship${sch.room===1?'':'s'} available and no active targets.`,affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'recruiting',focus:'recruiting-board'},boundary:null,consequence:'Recruiting still advances if left unchanged; no new rule blocks the week.'});
+ const state=guidanceStateFor(t),stamp=guidanceCalendarStamp();
+ for(const item of items){item.familiarity=Number(state.familiarity?.[item.category])||0;item.deferred=['staff_recommendation','monitoring'].includes(item.meaning)&&state.deferred?.[item.id]?.stamp===stamp}
  const meaningRank={must_resolve:4,decision_due:3,staff_recommendation:2,monitoring:1};
  items.sort((a,b)=>(meaningRank[b.meaning]-meaningRank[a.meaning])||(b.priority-a.priority)||a.id.localeCompare(b.id));
- const blockers=items.filter(x=>x.meaning==='must_resolve'),leading=blockers.concat(items.filter(x=>x.meaning!=='must_resolve').slice(0,Math.max(0,3-blockers.length))),leadIds=new Set(leading.map(x=>x.id)),remaining=items.filter(x=>!leadIds.has(x.id));
+ const snoozed=items.filter(x=>x.deferred),activeItems=items.filter(x=>!x.deferred),blockers=activeItems.filter(x=>x.meaning==='must_resolve'),leading=blockers.concat(activeItems.filter(x=>x.meaning!=='must_resolve').slice(0,Math.max(0,3-blockers.length))),leadIds=new Set(leading.map(x=>x.id)),remaining=activeItems.filter(x=>!leadIds.has(x.id));
  const forecast=guidanceNextBoundary(t),eligibilityAction=forecast.key==='spring-development'||forecast.key==='fall-camp'?'offseason-phase':forecast.key,eligibility=guidanceActionEligibility(eligibilityAction,t),cautions=items.filter(x=>x.meaning==='decision_due'&&x.boundaryKey===forecast.key);
  forecast.eligibility=eligibility;forecast.status=eligibility.blockers.length?'blocked':cautions.length?'caution':'ready';forecast.cautions=cautions.map(x=>x.id);
  const game=(universe.phase==='regular'&&(universe.schedule?.[universe.week]||[]).find(g=>!g.played&&(g.home===t.name||g.away===t.name)))||null,opponent=game?(game.home===t.name?game.away:game.home):null,activePlan=opponent?gameplanSnapshot(t,opponent).label:null;
  const plan=[{key:'schemes',label:'Schemes',value:`${t.offScheme} / ${t.defScheme}`,note:'Remain active until you change staff or scheme.'},{key:'training',label:'Team training',value:t.trainingFocus||'Balanced',note:'Applies at spring and fall development, not every week.'},{key:'recruiting',label:'Recruiting board',value:`${targets} active target${targets===1?'':'s'}`,note:'Targets remain active as recruiting advances.'}];
  if(activePlan)plan.push({key:'gameplan',label:'This week’s gameplan',value:activePlan,note:'Applies only to the current opponent and week.'});
- return {items,leading,remaining,forecast,plan,quiet:!items.some(x=>x.meaning==='must_resolve'||x.meaning==='decision_due')};
+ return {items:activeItems,snoozed,leading,remaining,forecast,plan,quiet:!items.some(x=>x.meaning==='must_resolve'||x.meaning==='decision_due')};
 }
 function simulateUserDetailed(){const g=findUserGame();if(!g)return;const gate=guidanceActionEligibility('detailed-game');if(!gate.allowed){setStatus(gate.blockers[0]?.message||'This game is not available.');return}recoverWeek();advanceAcademicsForWeek(selected());const r=detailedGame(T(g.home),T(g.away),false,g.conf);completeScheduledGame(g,r,true);universe.lastDetailedGame={...r,season:universe.year,week:g.week};universe.latest=[r];ranked();render()}
 function completeScheduledGame(g,r,detailed=false){
@@ -3432,14 +3493,14 @@ function validateSave(d){
   return u;
 }
 function installSave(d,state=null){
-  const candidate=validateSave(d),previous=universe,previousArchive=browserArchives.get(activeSaveSlot),previousTeam=$('#userTeam').value;
+  const candidate=validateSave(d),previous=universe,previousArchive=browserArchives.get(activeSaveSlot),previousTeam=$('#userTeam').value,previousGuidanceReturn=guidanceReturnState;
   try{
     syncGameplayRng(previous);universe=candidate;ensureGameplayRng();if(!universe.mode)universe.mode=legacyControlMode(d,universe);
     if(state)browserArchives.set(activeSaveSlot,{...state,slot:activeSaveSlot,universe:candidate,loading:null,gamesLoading:null,gamesDirty:false});
     else browserArchives.delete(activeSaveSlot);
-    normalizeUniverse();normalizeOffseasonState();refreshTeamOptions(d.userTeam||universe.teams[0].name);render();
+    normalizeUniverse();normalizeGuidanceState();normalizeOffseasonState();refreshTeamOptions(d.userTeam||universe.teams[0].name);guidancePrepareReturn(d.savedAt);render();
   }catch(e){
-    universe=previous;ensureGameplayRng();if(previousArchive)browserArchives.set(activeSaveSlot,previousArchive);else browserArchives.delete(activeSaveSlot);rebuildIndexes();refreshTeamOptions(previousTeam);throw e;
+    universe=previous;guidanceReturnState=previousGuidanceReturn;ensureGameplayRng();if(previousArchive)browserArchives.set(activeSaveSlot,previousArchive);else browserArchives.delete(activeSaveSlot);rebuildIndexes();refreshTeamOptions(previousTeam);throw e;
   }
 }
 // v0.9.49 commit 3: one write path, two callers. A manual save reports success and may
@@ -3485,7 +3546,7 @@ function saveBrowser(){return storageOperation(async()=>{
 // Autosave fires only after a completed atomic action, never mid-transaction. The debounce
 // coalesces a burst (simming a season fires one per week) into a single write.
 const AUTOSAVE_DEBOUNCE_MS=900;
-const AUTOSAVE_KINDS=['week','postseason','signing','portal','camp','preseason'];
+const AUTOSAVE_KINDS=['week','postseason','signing','portal','camp','preseason','guidance'];
 let autosaveTimer=null,autosaveKind=null,autosaveEnabled=true,autosaveInFlight=null;
 // Drops a queued checkpoint and waits out one already writing, so the caller finds the
 // store free. Never rejects: a failed checkpoint must not break the action the player asked for.
@@ -3631,5 +3692,6 @@ $$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.cla
  $('#titleStart').onclick=startTitleDynasty;$('#titleLoadBrowser').onclick=loadTitleDynasty;$('#titleSaveSlot').onchange=e=>chooseSaveSlot(e.target.value);$('#titleRenameSlot').onclick=renameSaveSlot;$('#titleImport').onclick=()=>$('#importFile').click();$('#titleSaveOptions').onclick=saveTitlePreferences;$$('[data-title-back]').forEach(b=>b.onclick=()=>showTitlePanel());
 }
 if(typeof window!=='undefined')window.__DL_TEST__={selected,createOpening,renderStaff,setTeamScheme,schemeTransition,positionChangeWillingness,commissionerMode,renderControlMode,preseasonDebug(){return{phase:universe?.phase,week:universe?.week,played:(universe?.schedule||[]).flat().filter(g=>g.played).length,targeted:(universe?.recruits||[]).filter(r=>r.targeted).length,rng:JSON.stringify(universe?.rng||null)}},setGameplayRng(seed){activateGameplayRng(seed,universe);syncGameplayRng()},prepareDevelopmentResults(){universe.phase='complete';universe.offseason=makeOffseasonState(universe.year,'spring',['review','departures','signing','portal']);runSpringCamp()}};
+if(typeof window!=='undefined')Object.assign(window.__DL_TEST__,{prepareGuidanceReturn(savedAt){guidancePrepareReturn(savedAt);renderGuidanceSystem()}});
 loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});[...new Set(schools.map(t=>t.conference))].forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();bindNewDynastySetup();applyTitlePreferences();showTitleScreen();refreshTitleSave().then(restoreNewDynastySetupDraft);}).catch(e=>{$('#titleStatus').textContent='Could not initialize Dynasty Lab. '+e.message});
 })();

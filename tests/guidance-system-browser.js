@@ -52,6 +52,24 @@ async function startNewDynasty(page){
   const weekBefore=await page.locator('#weekLine').innerText();
   const recruitingItem=await page.evaluate(()=>window.getDynastyGuidance().items.find(x=>x.category==='recruiting')?.id||null);
   assert.ok(recruitingItem,'an empty opening board should have a staff recommendation');
+
+  await page.locator(`[data-guidance-defer="${recruitingItem}"]`).click();
+  assert.equal(await page.evaluate(id=>window.getDynastyGuidance().items.some(x=>x.id===id),recruitingItem),false);
+  assert.equal(await page.evaluate(id=>window.getDynastyGuidance().snoozed.some(x=>x.id===id),recruitingItem),true);
+  assert.match(await page.locator('#coachingAgenda').innerText(),/Snoozed for now/i);
+  assert.equal(await page.locator('#weekLine').innerText(),weekBefore,'snoozing does not advance time');
+  await page.click('.guidance-snoozed > summary');
+  await page.locator(`[data-guidance-restore="${recruitingItem}"]`).click();
+
+  await page.evaluate(id=>window.openGuidanceItem(id),recruitingItem);
+  await page.waitForSelector('#recruiting.active');
+  await page.click('.guidance-return');
+  await page.evaluate(id=>window.openGuidanceItem(id),recruitingItem);
+  await page.waitForSelector('#recruiting.active');
+  await page.click('.guidance-return');
+  assert.equal(await page.locator(`[data-guidance-item="${recruitingItem}"]`).locator('xpath=ancestor::article').locator('.guidance-why').count(),1,
+   'a familiar topic keeps its action visible and collapses repeated explanation');
+
   await page.evaluate(id=>window.openGuidanceItem(id),recruitingItem);
   await page.waitForSelector('#recruiting.active');
   assert.match(await page.locator('.guidance-return-context').innerText(),/From Coaching Agenda: Build a recruiting board/i);
@@ -72,6 +90,14 @@ async function startNewDynasty(page){
   await page.waitForFunction(before=>window.__DL_TEST__.preseasonDebug().week===before+1,numericWeek);
   assert.equal(await page.evaluate(()=>window.__guidanceConfirmCount),0,'a routine valid week advances without a confirmation');
 
+  const returnWeek=await page.locator('#weekLine').innerText();
+  await page.evaluate(()=>window.__DL_TEST__.prepareGuidanceReturn(new Date(Date.now()-8*24*60*60*1000).toISOString()));
+  assert.match(await page.locator('#guidanceReturnSummary').innerText(),/WELCOME BACK/i);
+  assert.match(await page.locator('#guidanceReturnSummary').innerText(),/No simulation occurred while you were away/i);
+  await page.click('[data-guidance-dismiss-return]');
+  assert.equal(await page.locator('#guidanceReturnSummary').innerText(),'');
+  assert.equal(await page.locator('#weekLine').innerText(),returnWeek,'welcome-back context and dismissal do not advance time');
+
   await page.setViewportSize({width:390,height:844});
   await page.waitForTimeout(100);
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
@@ -79,6 +105,6 @@ async function startNewDynasty(page){
   assert.equal(await page.locator('#coachingAgenda').isVisible(),true);
   assert.equal(await page.locator('#advanceForecast').isVisible(),true);
   assert.deepEqual(errors,[],`browser emitted errors: ${errors.join('\n')}`);
-  console.log('PASS guidance agenda, forecast, navigation, recomputation and narrow layout');
+  console.log('PASS guidance agenda, familiarity, snooze, welcome-back, navigation and narrow layout');
  }finally{await browser.close()}
 })().catch(error=>{console.error(error);process.exit(1)});
