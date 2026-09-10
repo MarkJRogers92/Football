@@ -2,13 +2,13 @@
 
 ## Completion state
 
-- Branch: `codex/guidance-system-m2`
+- Original branch: `codex/guidance-system-m2`
 - Milestone 1 base: `7310e41c0de89d9250a1aae279b8cddfae6fec53`
 - Milestone 2 implementation: `05796974d6a5f27ea87e9e88fe8f23bbf82e14c3`
 - Status: the planned player-facing guidance foundation is complete through Milestone 2.
-- This work is local only. It was not pushed, merged, published, deployed, packaged,
-  or released.
-- `VERSION.txt` and `package.json` remain at `0.11.9`.
+- Integrated onto the current Take the Job source line for the `v0.12.2` release.
+- `VERSION.txt`, `APP_VERSION`, `package.json`, and the generated user-visible labels
+  are aligned at `0.12.2`.
 
 ## What Milestone 2 adds
 

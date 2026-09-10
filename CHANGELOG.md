@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.12.2 — Guided preseason
+
+- Preserves the seven-screen Take the Job setup before a new dynasty is created, including draft recovery and the final contract confirmation.
+- Adds one state-derived Coaching Agenda that distinguishes required decisions, decisions due soon, staff recommendations, and monitoring without turning the career into a linear tutorial.
+- Adds a truthful Advance Forecast and Current Plan so coaches can see what will happen next, what can wait, and whether advancing is safe.
+- Adds team-scoped familiarity, optional snooze/restore controls, and a save-aware welcome-back summary without changing simulation outcomes or gameplay RNG.
+- Keeps the true 2027 preseason checkpoint saveable and blocks gameplay until Begin Season unlocks Week 1.
+
 ## v0.12.1 — Take the Job and cross-platform desktop Alpha
 
 - Adds a seven-screen New Dynasty setup that establishes the coach, program, schemes, development focus, control mode, inherited-program briefing, and final contract before entering the Command Center.

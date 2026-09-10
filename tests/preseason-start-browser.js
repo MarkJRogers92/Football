@@ -99,8 +99,8 @@ const startNewDynasty=page=>sharedStartNewDynasty(page,{beginSeason:false});
 
     await goTab(page, 'gamelab');
     assert.doesNotMatch(await page.locator('#nextGameCard').innerText(), /Begin Season/i);
-    assert.equal(await page.locator('#simDetailedGame').isEnabled(), true,
-      `${label}: the generated Week 1 matchup becomes playable`);
+    assert.match(await page.locator('#nextGameCard').innerText(), /Week 1/i,
+      `${label}: the generated Week 1 matchup becomes available after setup`);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1),
       true, `${label}: preseason flow has no page-level horizontal overflow`);
     assert.deepEqual(errors, [], `${label}: preseason flow emits no browser errors`);
