@@ -12,8 +12,6 @@ const startNewDynasty=async page=>{await page.goto('file://'+path.join(__dirname
     const page=await browser.newPage({viewport:{width:1280,height:900}});page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
     await startNewDynasty(page);await goTab(page,'gamelab');
     assert.equal(await page.locator('#v2RecordGate').count(),0,'obsolete development record gate should be removed after cutover');
-    const rollback=await page.evaluate(()=>window.__DL_TEST__.v2RollbackProbe('afterArchive'));
-    assert.equal(rollback.ok,true,`rollback protection regressed: ${rollback.message}`);
     const prep=await page.evaluate(()=>window.__DL_TEST__.v2PrepareDetailedGame());
     assert.equal(prep.career,false,'fresh cutover browser fixture should not have a career choice blocking Detailed Game');
     assert.equal(prep.ready,true,'cutover browser should resolve legitimate weekly decisions before Detailed Game');
@@ -26,6 +24,9 @@ const startNewDynasty=async page=>{await page.goto('file://'+path.join(__dirname
     });
     await goTab(page,'gamelab');
     assert.equal(await page.locator('#simDetailedGame').isEnabled(),true,'Detailed Game should re-enable after weekly decisions are resolved and the UI rerenders');
+    const rollback=await page.evaluate(()=>window.__DL_TEST__.v2RollbackProbe('afterArchive'));
+    assert.equal(rollback.ok,true,`rollback protection regressed: ${rollback.message}`);
+    assert.match(rollback.message,/Injected v2 rollback fault after archive write/,'rollback probe should reach the requested afterArchive fault rather than pass on an earlier gameplay gate');
     const before=await page.evaluate(()=>({record:window.DynastyGameEngineV2LabBridge.debug(),cutover:window.DynastyGameEngineV2LabBridge.cutoverDebug()}));
     await page.click('#simDetailedGame');
     await page.waitForFunction(()=>window.DynastyGameEngineV2LabBridge.debug().lastArchive?.engine==='v2',{timeout:30000});
