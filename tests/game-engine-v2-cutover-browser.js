@@ -17,7 +17,15 @@ const startNewDynasty=async page=>{await page.goto('file://'+path.join(__dirname
     const prep=await page.evaluate(()=>window.__DL_TEST__.v2PrepareDetailedGame());
     assert.equal(prep.career,false,'fresh cutover browser fixture should not have a career choice blocking Detailed Game');
     assert.equal(prep.ready,true,'cutover browser should resolve legitimate weekly decisions before Detailed Game');
+    // The test helper resolves state directly. Trigger the same full render that a normal UI action would
+    // so the authoritative guidance eligibility gate can refresh the Detailed Game controls.
+    await page.evaluate(()=>{
+      const teamSelector=document.querySelector('#userTeam');
+      if(!teamSelector)throw new Error('Program selector unavailable for Detailed Game gate refresh.');
+      teamSelector.dispatchEvent(new Event('change',{bubbles:true}));
+    });
     await goTab(page,'gamelab');
+    assert.equal(await page.locator('#simDetailedGame').isEnabled(),true,'Detailed Game should re-enable after weekly decisions are resolved and the UI rerenders');
     const before=await page.evaluate(()=>({record:window.DynastyGameEngineV2LabBridge.debug(),cutover:window.DynastyGameEngineV2LabBridge.cutoverDebug()}));
     await page.click('#simDetailedGame');
     await page.waitForFunction(()=>window.DynastyGameEngineV2LabBridge.debug().lastArchive?.engine==='v2',{timeout:30000});
