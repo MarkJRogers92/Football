@@ -96,6 +96,22 @@ test('prep path blocks later stages until required work is resolved',()=>{
   assert.equal(status.gameday,'blocked');
 });
 
+test('optional prep never creates a fake Game Day blocker',()=>{
+  const Flow=flow();
+  const path=Flow.buildPrepPath({
+    hasGame:true,
+    opponentReviewed:true,
+    requiredCount:0,
+    prepSet:false,
+    personnelPending:false,
+    gamedayReady:true
+  });
+  const status=Object.fromEntries(path.stages.map(x=>[x.key,x.status]));
+  assert.equal(status.decisions,'done');
+  assert.equal(status.prep,'optional','weekly prep is useful but not an authoritative requirement');
+  assert.equal(status.gameday,'current','the path must mirror authoritative Game Day eligibility');
+});
+
 test('prep path advances to Game Day after review, decisions and prep are complete',()=>{
   const Flow=flow();
   const path=Flow.buildPrepPath({
