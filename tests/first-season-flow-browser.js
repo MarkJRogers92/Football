@@ -36,13 +36,13 @@ const goTab=async(page,id)=>page.evaluate(({id,group})=>{
     const defer=page.locator('#coachingAgenda [data-guidance-defer]').first();
     assert.ok(await defer.count(),'opening agenda should include at least one deferable recommendation');
     await defer.click();
-    await page.waitForFunction(()=>document.querySelectorAll('#coachingAgenda [data-guidance-group]').length===3,{timeout:5000});
+    await page.waitForFunction(()=>document.querySelectorAll('#coachingAgenda [data-guidance-group]').length===3,undefined,{timeout:5000});
     assert.equal(await page.locator('#coachingAgenda .guidance-snoozed').count(),1,'snoozing still uses the existing Guidance state');
     await page.locator('#coachingAgenda .guidance-snoozed > summary').click();
     const restore=page.locator('#coachingAgenda [data-guidance-restore]').first();
     assert.ok(await restore.count(),'snoozed recommendation remains restorable');
     await restore.click();
-    await page.waitForFunction(()=>document.querySelectorAll('#coachingAgenda [data-guidance-group]').length===3,{timeout:5000});
+    await page.waitForFunction(()=>document.querySelectorAll('#coachingAgenda [data-guidance-group]').length===3,undefined,{timeout:5000});
 
     await goTab(page,'gamelab');
     await page.waitForSelector('#firstSeasonPrepPath',{state:'visible',timeout:15000});
@@ -87,7 +87,7 @@ const goTab=async(page,id)=>page.evaluate(({id,group})=>{
     assert.ok(beforeGame.game,'opening week should have a scheduled user game');
     assert.equal(await page.locator('#simDetailedGame').isEnabled(),true,'real Detailed Game control should be enabled');
     await page.click('#simDetailedGame');
-    await page.waitForFunction(()=>window.DynastyGameEngineV2LabBridge.debug().lastArchive?.engine==='v2',{timeout:30000});
+    await page.waitForFunction(()=>window.DynastyGameEngineV2LabBridge.debug().lastArchive?.engine==='v2',undefined,{timeout:30000});
     const afterGame=await page.evaluate(()=>window.DynastyGameEngineV2LabBridge.debug());
     const userSide=beforeGame.game.home===beforeGame.team.name?'home':'away',otherSide=userSide==='home'?'away':'home';
     const mine=afterGame.lastArchive.score[userSide],theirs=afterGame.lastArchive.score[otherSide];
@@ -112,7 +112,7 @@ const goTab=async(page,id)=>page.evaluate(({id,group})=>{
     const soak=await page.evaluate(()=>window.__DL_TEST__.v2RecordedSoakProbe(1));
     assert.equal(soak.ok,true,'existing v2 soak helper should carry the dynasty into Week 3');
     await goTab(page,'dashboard');
-    await page.waitForFunction(()=>window.getFirstSeasonFlow?.().mode==='concise',{timeout:10000});
+    await page.waitForFunction(()=>window.getFirstSeasonFlow?.().mode==='concise',undefined,{timeout:10000});
     const conciseFlow=await page.evaluate(()=>window.getFirstSeasonFlow());
     assert.equal(conciseFlow.mode,'concise','Week 3 should switch to concise first-season guidance');
     assert.equal(await page.locator('#coachingAgenda').getAttribute('data-first-season-mode'),'concise');
