@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.12.4 — First-season coaching flow
+
+- Adds a Week Opening briefing that carries forward the actual previous result, existing Game Engine v2 game-plan feedback, the current opponent, required work, and factual player-story context.
+- Groups the Coaching Agenda into Required, Recommended, and Optional work while preserving the existing authoritative guidance meanings, snooze/restore state, and advancement gates.
+- Adds a five-stage Game Week path through opponent review, real weekly decisions, optional preparation, personnel review, and Game Day without duplicating controls or inventing blockers.
+- Keeps Weeks 1–2 explicit, condenses familiar non-required explanation text in Weeks 3–4, and returns to the normal coaching view afterward.
+- Keeps the feature derived and deterministic: no new gameplay RNG, save authority, simulation effects, or parallel checklist state.
+
+
 ## v0.12.3 — Postgame box-score access
 
 - Promotes a direct View Box Score action from the Command Center and Game Lab postgame displays, while retaining the complete Game Center entry point.
