@@ -33,6 +33,17 @@ const goTab=async(page,id)=>page.evaluate(({id,group})=>{
     assert.match(await page.locator('#coachingAgenda').innerText(),/Recommended/i);
     assert.match(await page.locator('#coachingAgenda').innerText(),/Optional/i);
 
+    const defer=page.locator('#coachingAgenda [data-guidance-defer]').first();
+    assert.ok(await defer.count(),'opening agenda should include at least one deferable recommendation');
+    await defer.click();
+    await page.waitForFunction(()=>document.querySelectorAll('#coachingAgenda [data-guidance-group]').length===3,{timeout:5000});
+    assert.equal(await page.locator('#coachingAgenda .guidance-snoozed').count(),1,'snoozing still uses the existing Guidance state');
+    await page.locator('#coachingAgenda .guidance-snoozed > summary').click();
+    const restore=page.locator('#coachingAgenda [data-guidance-restore]').first();
+    assert.ok(await restore.count(),'snoozed recommendation remains restorable');
+    await restore.click();
+    await page.waitForFunction(()=>document.querySelectorAll('#coachingAgenda [data-guidance-group]').length===3,{timeout:5000});
+
     await goTab(page,'gamelab');
     await page.waitForSelector('#firstSeasonPrepPath',{state:'visible',timeout:15000});
     const prepText=await page.locator('#firstSeasonPrepPath').innerText();
@@ -98,7 +109,21 @@ const goTab=async(page,id)=>page.evaluate(({id,group})=>{
     assert.ok(briefingText.includes(expectedResult),'next-week briefing should show the actual prior result');
     assert.ok(briefingText.includes(nextFlow.carryForward.headline),'next-week briefing should show existing game-plan feedback evidence');
 
+    const soak=await page.evaluate(()=>window.__DL_TEST__.v2RecordedSoakProbe(1));
+    assert.equal(soak.ok,true,'existing v2 soak helper should carry the dynasty into Week 3');
+    await goTab(page,'dashboard');
+    await page.waitForFunction(()=>window.getFirstSeasonFlow?.().mode==='concise',{timeout:10000});
+    const conciseFlow=await page.evaluate(()=>window.getFirstSeasonFlow());
+    assert.equal(conciseFlow.mode,'concise','Week 3 should switch to concise first-season guidance');
+    assert.equal(await page.locator('#coachingAgenda').getAttribute('data-first-season-mode'),'concise');
+    assert.match(await page.locator('#firstSeasonBriefing').innerText(),/Condensed/i);
+    const nonRequired=page.locator('#coachingAgenda .guidance-flow-recommended article.guidance-item, #coachingAgenda .guidance-flow-optional article.guidance-item').first();
+    assert.ok(await nonRequired.count(),'Week 3 should retain at least one non-required guidance item for fade verification');
+    const explanation=nonRequired.locator(':scope > p, :scope > .guidance-why').first();
+    assert.ok(await explanation.count(),'non-required guidance item should retain explanatory markup for accessibility/state continuity');
+    assert.equal(await explanation.evaluate(el=>getComputedStyle(el).display),'none','concise mode should visually collapse familiar non-required explanation copy');
+
     assert.deepEqual(errors,[],`first-season flow emitted browser errors: ${errors.join('\n')}`);
-    console.log('PASS first-season briefing, grouped agenda, optional prep path, recorded-game carry-forward and narrow layout');
+    console.log('PASS first-season briefing, grouping repair, optional prep path, carry-forward, concise fade and narrow layout');
   }finally{await browser.close()}
 })().catch(error=>{console.error(error);process.exit(1)});
