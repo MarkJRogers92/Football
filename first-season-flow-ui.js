@@ -6,6 +6,8 @@ const Flow=globalThis.DynastyFirstSeasonFlow;
 if(!Flow)return;
 let lastState=null;
 let regrouping=false;
+let agendaObserver=null;
+let agendaRepairQueued=false;
 const esc=value=>typeof gameEscape==='function'?gameEscape(value):String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const target=(selector,root=document)=>root.querySelector(selector);
 const copy=value=>value==null?value:JSON.parse(JSON.stringify(value));
@@ -105,7 +107,11 @@ function groupHeading(key,count){
 }
 function regroupAgenda(state){
   const host=target('#coachingAgenda');
-  if(!host||regrouping||state.mode==='normal')return;
+  if(!host||regrouping)return;
+  if(state.mode==='normal'){
+    delete host.dataset.firstSeasonMode;
+    return
+  }
   regrouping=true;
   try{
     host.querySelectorAll('[data-guidance-group]').forEach(section=>section.remove());
@@ -126,6 +132,28 @@ function regroupAgenda(state){
     }
     host.dataset.firstSeasonMode=state.mode;
   }finally{regrouping=false}
+}
+function groupedAgendaIsCurrent(host,state){
+  return state.mode==='normal'||(host.dataset.firstSeasonMode===state.mode&&host.querySelectorAll(':scope > [data-guidance-group]').length===3)
+}
+function repairAgendaAfterInternalRender(){
+  if(agendaRepairQueued||regrouping)return;
+  agendaRepairQueued=true;
+  queueMicrotask(()=>{
+    agendaRepairQueued=false;
+    if(regrouping||!universe)return;
+    const host=target('#coachingAgenda');if(!host)return;
+    const state=currentContext();
+    if(groupedAgendaIsCurrent(host,state))return;
+    lastState=state;
+    renderBriefing(state);
+    regroupAgenda(state)
+  })
+}
+function ensureAgendaObserver(){
+  const host=target('#coachingAgenda');if(!host||agendaObserver)return;
+  agendaObserver=new MutationObserver(()=>repairAgendaAfterInternalRender());
+  agendaObserver.observe(host,{childList:true,subtree:false})
 }
 
 function ensurePrepPathHost(){
@@ -160,7 +188,7 @@ function renderPrepPath(state){
 function renderFirstSeasonFlow({prep=true}={}){
   if(!universe)return null;
   const state=currentContext();lastState=state;
-  renderBriefing(state);regroupAgenda(state);if(prep)renderPrepPath(state);
+  renderBriefing(state);regroupAgenda(state);ensureAgendaObserver();if(prep)renderPrepPath(state);
   return state
 }
 
