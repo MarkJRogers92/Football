@@ -34,6 +34,12 @@ jobs:
           lock.version=version;
           lock.packages[''].version=version;
           fs.writeFileSync('package-lock.json',JSON.stringify(lock,null,2)+'\n');
+          let changelog=fs.readFileSync('CHANGELOG.md','utf8');
+          if(!new RegExp(`^## v${version.replace(/\./g,'\\.')}\\s`,'m').test(changelog)){
+            const section=`## v${version} — First-season coaching flow\n\n- Adds a Week Opening briefing that carries forward the actual previous result, existing Game Engine v2 game-plan feedback, the current opponent, required work, and factual player-story context.\n- Groups the Coaching Agenda into Required, Recommended, and Optional work while preserving the existing authoritative guidance meanings, snooze/restore state, and advancement gates.\n- Adds a five-stage Game Week path through opponent review, real weekly decisions, optional preparation, personnel review, and Game Day without duplicating controls or inventing blockers.\n- Keeps Weeks 1–2 explicit, condenses familiar non-required explanation text in Weeks 3–4, and returns to the normal coaching view afterward.\n- Keeps the feature derived and deterministic: no new gameplay RNG, save authority, simulation effects, or parallel checklist state.\n`;
+            changelog=changelog.replace('# Changelog\n','# Changelog\n\n'+section+'\n');
+            fs.writeFileSync('CHANGELOG.md',changelog);
+          }
           NODE
       - name: Install dependencies
         run: npm install --no-package-lock
@@ -61,11 +67,11 @@ jobs:
       - name: Sync release markers and generated artifact
         shell: bash
         run: |
-          if git diff --quiet -- app.js package-lock.json index.html; then
+          if git diff --quiet -- app.js package-lock.json CHANGELOG.md index.html; then
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app.js package-lock.json index.html
+          git add app.js package-lock.json CHANGELOG.md index.html
           git commit -m "build: sync v0.12.4 release markers"
           git push
