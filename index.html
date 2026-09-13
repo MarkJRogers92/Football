@@ -782,6 +782,7 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 /* v0.12.4 first-season flow — presentation only. */
 .first-season-briefing{margin:0 0 14px;padding:13px;border:1px solid color-mix(in srgb,var(--accent2) 34%,var(--line));border-radius:12px;background:linear-gradient(145deg,color-mix(in srgb,var(--accent2) 8%,var(--panel)),var(--panel))}.first-season-briefing-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.first-season-briefing-head h3{margin:3px 0 0;font-size:18px}.first-season-briefing-summary{margin:8px 0;color:var(--text);font-size:13px;font-weight:700}.first-season-briefing ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}.first-season-briefing-item{display:grid;grid-template-columns:7px minmax(0,1fr);gap:8px;align-items:start;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:color-mix(in srgb,var(--panel2) 82%,transparent)}.first-season-briefing-item>span{width:7px;height:7px;margin-top:5px;border-radius:50%;background:var(--muted)}.first-season-briefing-item.first-season-required>span{background:var(--bad)}.first-season-briefing-item.first-season-opponent>span{background:var(--accent2)}.first-season-briefing-item.first-season-last_game>span{background:var(--good)}.first-season-briefing-item p{margin:0;font-size:12px;line-height:1.4;color:var(--muted)}.first-season-next{display:flex;align-items:center;gap:8px;margin-top:9px;padding-top:9px;border-top:1px solid var(--line);font-size:12px}.first-season-next>span{color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.06em}.first-season-next strong{min-width:0;flex:1}.first-season-next button{padding:5px 8px;font-size:11px}
 .guidance-flow-group{margin-top:10px}.guidance-flow-group-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 2px 6px;border-bottom:1px solid var(--line)}.guidance-flow-group-head strong,.guidance-flow-group-head small{display:block}.guidance-flow-group-head strong{font-size:12px;letter-spacing:.04em;text-transform:uppercase}.guidance-flow-group-head small{margin-top:2px;color:var(--muted);font-size:10px;line-height:1.35}.guidance-flow-group-head>span{min-width:24px;text-align:center;padding:2px 6px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:10px;font-weight:800}.guidance-flow-required .guidance-flow-group-head strong{color:var(--bad)}.guidance-flow-recommended .guidance-flow-group-head strong{color:var(--warn)}.guidance-flow-optional .guidance-flow-group-head strong{color:var(--accent2)}.guidance-flow-list{margin-top:7px}.guidance-flow-empty{margin:0;padding:7px 9px;border:1px dashed var(--line);border-radius:8px;color:var(--muted);font-size:11px}
+#coachingAgenda[data-first-season-mode="concise"] .guidance-flow-recommended article.guidance-item>p,#coachingAgenda[data-first-season-mode="concise"] .guidance-flow-optional article.guidance-item>p,#coachingAgenda[data-first-season-mode="concise"] .guidance-flow-recommended article.guidance-item>.guidance-why,#coachingAgenda[data-first-season-mode="concise"] .guidance-flow-optional article.guidance-item>.guidance-why{display:none}#coachingAgenda[data-first-season-mode="concise"] .guidance-flow-recommended .guidance-flow-group-head small,#coachingAgenda[data-first-season-mode="concise"] .guidance-flow-optional .guidance-flow-group-head small{display:none}
 .first-season-prep-path{margin-bottom:14px}.first-season-stage-list{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}.first-season-stage{display:flex;align-items:center;gap:8px;min-width:0;padding:9px;text-align:left;background:var(--panel);border:1px solid var(--line)}.first-season-stage-index{display:grid;place-items:center;flex:0 0 24px;width:24px;height:24px;border:1px solid var(--line);border-radius:50%;font-size:10px;font-weight:900;color:var(--muted)}.first-season-stage strong,.first-season-stage small{display:block;overflow-wrap:anywhere}.first-season-stage strong{font-size:11px}.first-season-stage small{margin-top:2px;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.05em}.first-season-stage-done{border-color:color-mix(in srgb,var(--good) 45%,var(--line))}.first-season-stage-done .first-season-stage-index{color:var(--good);border-color:var(--good)}.first-season-stage-current{border-color:color-mix(in srgb,var(--accent2) 58%,var(--line));background:color-mix(in srgb,var(--accent2) 7%,var(--panel))}.first-season-stage-current .first-season-stage-index{color:var(--accent2);border-color:var(--accent2)}.first-season-stage-blocked{opacity:.72}.first-season-stage-optional{border-style:dashed}
 @media(max-width:900px){.first-season-stage-list{grid-template-columns:repeat(2,minmax(0,1fr))}.first-season-stage:last-child{grid-column:1/-1}}@media(max-width:700px){.first-season-briefing-head{align-items:flex-start}.first-season-next{align-items:stretch;flex-wrap:wrap}.first-season-next strong{flex-basis:70%}.first-season-next button{width:100%}.guidance-flow-group-head{align-items:flex-start}.first-season-stage-list{grid-template-columns:1fr}.first-season-stage:last-child{grid-column:auto}.first-season-stage{width:100%}}
 
@@ -10126,6 +10127,8 @@ const Flow=globalThis.DynastyFirstSeasonFlow;
 if(!Flow)return;
 let lastState=null;
 let regrouping=false;
+let agendaObserver=null;
+let agendaRepairQueued=false;
 const esc=value=>typeof gameEscape==='function'?gameEscape(value):String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const target=(selector,root=document)=>root.querySelector(selector);
 const copy=value=>value==null?value:JSON.parse(JSON.stringify(value));
@@ -10225,7 +10228,11 @@ function groupHeading(key,count){
 }
 function regroupAgenda(state){
   const host=target('#coachingAgenda');
-  if(!host||regrouping||state.mode==='normal')return;
+  if(!host||regrouping)return;
+  if(state.mode==='normal'){
+    delete host.dataset.firstSeasonMode;
+    return
+  }
   regrouping=true;
   try{
     host.querySelectorAll('[data-guidance-group]').forEach(section=>section.remove());
@@ -10246,6 +10253,28 @@ function regroupAgenda(state){
     }
     host.dataset.firstSeasonMode=state.mode;
   }finally{regrouping=false}
+}
+function groupedAgendaIsCurrent(host,state){
+  return state.mode==='normal'||(host.dataset.firstSeasonMode===state.mode&&host.querySelectorAll(':scope > [data-guidance-group]').length===3)
+}
+function repairAgendaAfterInternalRender(){
+  if(agendaRepairQueued||regrouping)return;
+  agendaRepairQueued=true;
+  queueMicrotask(()=>{
+    agendaRepairQueued=false;
+    if(regrouping||!universe)return;
+    const host=target('#coachingAgenda');if(!host)return;
+    const state=currentContext();
+    if(groupedAgendaIsCurrent(host,state))return;
+    lastState=state;
+    renderBriefing(state);
+    regroupAgenda(state)
+  })
+}
+function ensureAgendaObserver(){
+  const host=target('#coachingAgenda');if(!host||agendaObserver)return;
+  agendaObserver=new MutationObserver(()=>repairAgendaAfterInternalRender());
+  agendaObserver.observe(host,{childList:true,subtree:false})
 }
 
 function ensurePrepPathHost(){
@@ -10280,7 +10309,7 @@ function renderPrepPath(state){
 function renderFirstSeasonFlow({prep=true}={}){
   if(!universe)return null;
   const state=currentContext();lastState=state;
-  renderBriefing(state);regroupAgenda(state);if(prep)renderPrepPath(state);
+  renderBriefing(state);regroupAgenda(state);ensureAgendaObserver();if(prep)renderPrepPath(state);
   return state
 }
 
