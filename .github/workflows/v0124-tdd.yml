@@ -18,10 +18,29 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+      - name: Sync release version markers in worktree
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          const version=fs.readFileSync('VERSION.txt','utf8').trim().replace(/^Dynasty Lab\s*/,'').replace(/^v/,'');
+          const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
+          if(pkg.version!==version)throw new Error(`package.json ${pkg.version} does not match VERSION.txt ${version}`);
+          let app=fs.readFileSync('app.js','utf8');
+          if(!/APP_VERSION='[^']+'/.test(app))throw new Error('APP_VERSION marker not found');
+          app=app.replace(/APP_VERSION='[^']+'/,`APP_VERSION='${version}'`);
+          fs.writeFileSync('app.js',app);
+          const lock=JSON.parse(fs.readFileSync('package-lock.json','utf8'));
+          lock.version=version;
+          lock.packages[''].version=version;
+          fs.writeFileSync('package-lock.json',JSON.stringify(lock,null,2)+'\n');
+          NODE
       - name: Install dependencies
         run: npm install --no-package-lock
       - name: Build standalone artifact
         run: npm run build
+      - name: Run release version guard
+        run: node tests/version.js
       - name: Run pure first-season flow contract
         run: node --test tests/first-season-flow.js
       - name: Locate Chromium
@@ -39,14 +58,14 @@ jobs:
         run: node tests/first-season-flow-browser.js
         env:
           CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
-      - name: Sync generated standalone artifact
+      - name: Sync release markers and generated artifact
         shell: bash
         run: |
-          if git diff --quiet -- index.html; then
+          if git diff --quiet -- app.js package-lock.json index.html; then
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html
-          git commit -m "build: sync v0.12.4 first-season flow"
+          git add app.js package-lock.json index.html
+          git commit -m "build: sync v0.12.4 release markers"
           git push
