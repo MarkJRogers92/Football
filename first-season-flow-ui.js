@@ -14,6 +14,32 @@ function firstSeasonIndex(){
   const year=Number(universe?.year)||2027;
   return Math.max(0,year-2027)
 }
+function recordHasTeam(record,team){
+  if(!record||!team)return false;
+  const id=String(team.id),name=String(team.name||'');
+  return [record.home,record.away].some(side=>side&&(String(side.id)===id||String(side.name||'')===name))
+}
+function latestUserArchive(team){
+  const records=Array.isArray(universe?.gameArchive)?universe.gameArchive:[];
+  for(let i=records.length-1;i>=0;i--)if(recordHasTeam(records[i],team))return records[i];
+  return null
+}
+function carryForwardFor(team){
+  const record=latestUserArchive(team);if(!record)return null;
+  let feedback=null;
+  if(record.engine==='v2'&&globalThis.DynastyGameplanFeedback?.forTeam){
+    try{feedback=globalThis.DynastyGameplanFeedback.forTeam(record,team.id)}catch(err){
+      if(!/not part of the supplied game archive record/i.test(String(err?.message||err)))console.warn('First-season game-plan feedback unavailable:',err)
+    }
+  }
+  return Flow.buildCarryForward({record,feedback,teamId:team.id,teamName:team.name})
+}
+function factualTextureFor(team){
+  if(!team||typeof v0102PlayerStories!=='function')return[];
+  const story=(v0102PlayerStories(team)||[])[0];
+  if(!story?.summary)return[];
+  return[{kind:'player',text:`${story.name}: ${story.summary}`}]
+}
 function currentContext(){
   const team=typeof selected==='function'?selected():null;
   const game=typeof findUserGame==='function'?findUserGame():null;
@@ -23,15 +49,18 @@ function currentContext(){
   const agenda=Flow.classifyAgenda(model?.items||[],mode);
   const report=team&&opponent&&typeof v0102WeeklyOpponentReport==='function'?v0102WeeklyOpponentReport(team,opponent):null;
   const prep=team&&opponent&&typeof v0102WeeklyPrepFor==='function'?v0102WeeklyPrepFor(team,opponent.name):null;
+  const carryForward=team?carryForwardFor(team):null;
+  const texture=team?factualTextureFor(team):[];
   const nextItem=(model?.leading||[])[0]||(model?.items||[])[0]||null;
   const next=nextItem?{id:nextItem.id,label:nextItem.title,destination:copy(nextItem.destination||{})}:{label:model?.forecast?.label||'Advance Week',destination:null};
   const briefing=Flow.buildBriefing({
     mode,
     week:Number(universe?.week)||0,
     opponent:opponent?.name||'',
+    carryForward,
     agenda,
     scout:report?.observations||[],
-    texture:[],
+    texture,
     next
   });
   const personnelPending=(model?.items||[]).some(item=>item.category==='roster_management'&&['must_resolve','decision_due'].includes(item.meaning));
@@ -45,7 +74,7 @@ function currentContext(){
     gamedayReady,
     gameStarted:Boolean(typeof v2InteractiveGameDay!=='undefined'&&v2InteractiveGameDay)
   });
-  return{mode,team:team?.name||null,opponent:opponent?.name||null,briefing,agenda,prepPath,report:report?{observations:[...(report.observations||[])],confidence:report.confidence,confidenceLabel:report.confidenceLabel}:null,prep:prep?copy(prep):null,next}
+  return{mode,team:team?.name||null,opponent:opponent?.name||null,briefing,agenda,prepPath,carryForward:carryForward?copy(carryForward):null,texture:copy(texture),report:report?{observations:[...(report.observations||[])],confidence:report.confidence,confidenceLabel:report.confidenceLabel}:null,prep:prep?copy(prep):null,next}
 }
 
 function ensureBriefingHost(){
