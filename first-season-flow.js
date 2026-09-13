@@ -103,12 +103,10 @@ function buildPrepPath({hasGame=false,opponentReviewed=false,requiredCount=0,pre
   if(!hasGame)return{hasGame:false,stages:[],currentKey:null};
   const required=Math.max(0,finite(requiredCount));
   const opponentStatus=opponentReviewed?'done':'current';
-  const decisionsStatus=required>0?(opponentReviewed?'current':'blocked'):(opponentReviewed?'done':'blocked');
-  const prepStatus=prepSet?'done':(!opponentReviewed||required>0?'blocked':'current');
-  let personnelStatus='optional';
-  if(personnelPending)personnelStatus=!prepSet?'blocked':'current';
-  const clearForGame=Boolean(opponentReviewed&&required===0&&prepSet&&!personnelPending);
-  const gamedayStatus=gameStarted?'done':(gamedayReady&&clearForGame?'current':'blocked');
+  const decisionsStatus=required>0?'current':'done';
+  const prepStatus=prepSet?'done':required>0?'blocked':gamedayReady?'optional':'current';
+  const personnelStatus=personnelPending?'current':'optional';
+  const gamedayStatus=gameStarted?'done':gamedayReady?'current':'blocked';
   const stages=[
     {key:'opponent',label:'Review opponent',status:opponentStatus},
     {key:'decisions',label:'Resolve decisions',status:decisionsStatus},
