@@ -1,11 +1,12 @@
 const {chromium}=require('playwright-core');
+const {chromiumPath}=require('./helpers/chromium-path');
 const path=require('path');
 
 const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
 const startNewDynasty=page=>sharedStartNewDynasty(page);
 
 (async()=>{
-  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});
+  const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});
   let fail=0,pass=0;const lines=[];
   const check=(name,ok,detail='')=>{ok?pass++:fail++;lines.push(`${ok?'PASS':'FAIL'} ${name}${detail?' — '+detail:''}`)};
 

@@ -1,6 +1,7 @@
 // Focused visual-identity smoke checks. These assert presentation surfaces only;
 // the existing browser suite remains responsible for game behavior.
 const { chromium } = require('playwright-core');
+const {chromiumPath}=require('./helpers/chromium-path');
 const path = require('path');
 // Tabs live inside groups since v0.9.26; selecting the group is part of navigating to a tab.
 const TAB_GROUP={"dashboard": "program", "program": "program", "history": "program", "roster": "team", "depth": "team", "development": "team", "recruiting": "recruiting", "gamelab": "games", "season": "games", "stats": "games", "newsletter": "games", "staff": "staff", "offseason": "staff", "records": "staff"};
@@ -10,7 +11,7 @@ const goTab=async(page,id)=>page.evaluate(({id,group})=>{const g=document.queryS
 const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
 const startNewDynasty=page=>sharedStartNewDynasty(page);
 (async()=>{
- const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});
+ const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});
  let fail=0,pass=0;const out=[];const check=(name,ok,detail='')=>{ok?pass++:fail++;out.push(`  ${ok?'PASS':'FAIL'}  ${name}${detail?' — '+detail:''}`)};
  for(const [label,viewport] of [['desktop',{width:1280,height:900}],['iphone',{width:390,height:844}]]){
   const page=await browser.newPage({viewport}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));

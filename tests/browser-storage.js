@@ -1,5 +1,6 @@
 // Real IndexedDB and real UI, in a fresh disposable browser context.
 const {chromium}=require('playwright-core');
+const {chromiumPath}=require('./helpers/chromium-path');
 const {readFile}=require('node:fs/promises');
 const path=require('node:path');
 const assert=require('node:assert/strict');
@@ -22,7 +23,7 @@ const clickShellUtility=async(page,selector)=>{
 };
 
 (async()=>{
- const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});
+ const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});
  try{
   const page=await browser.newPage({viewport:{width:390,height:844},acceptDownloads:true});
   const errors=[];page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});

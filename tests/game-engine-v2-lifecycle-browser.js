@@ -1,6 +1,7 @@
 const assert=require('node:assert/strict');
 const path=require('path');
 const {chromium}=require('playwright-core');
+const {chromiumPath}=require('./helpers/chromium-path');
 const TAB_GROUP={dashboard:'program',program:'program',history:'program',roster:'team',depth:'team',development:'team',recruiting:'recruiting',gamelab:'games',season:'games',stats:'games',newsletter:'games',staff:'staff',offseason:'staff',records:'staff'};
 const goTab=async(page,id)=>page.evaluate(({id,group})=>{const g=document.querySelector(`.tab-groups button[data-group="${group}"]`);if(g&&!g.classList.contains("active"))g.click();document.querySelector(`.tabs button[data-tab="${id}"]`)?.click()},{id,group:TAB_GROUP[id]});
 const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
@@ -8,7 +9,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
 async function openGamePlayByPlay(page,id,label){const link=page.locator(`[data-game="${id}"]:visible`).first();assert.ok(await link.count()>0,`${label} should remain reachable from game history/schedule`);await link.click();await page.waitForSelector('#gameDialog[open]',{timeout:10000});await page.locator('#gameTabs button').filter({hasText:/^Play-by-Play$/}).click();assert.ok(await page.locator('#gameDialogBody .playline').count()>10,`${label} should retain durable v2 play-by-play`);await page.evaluate(()=>document.querySelector('#gameDialog')?.close())}
 async function waitButtonText(page,selector,pattern){await page.waitForFunction(([sel,src,flags])=>{const el=document.querySelector(sel);return !!el&&new RegExp(src,flags).test(el.textContent||'')},[selector,pattern.source,pattern.flags],{timeout:60000})}
 (async()=>{
-  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
+  const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
   try{
     await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);const year1=Number((await page.locator('#weekLine').textContent()).match(/\d{4}/)?.[0]);assert.ok(year1>2000);
     const soak=await page.evaluate(()=>window.__DL_TEST__.v2InteractiveSeasonSoakProbe());assert.equal(soak.ok,true,`Year 1 Interactive Game Day soak failed: ${JSON.stringify(soak)}`);assert.equal(soak.phase,'confReady');assert.equal(soak.ids.length,12);const firstYear1Id=soak.ids[0],lastYear1Id=soak.ids.at(-1);
