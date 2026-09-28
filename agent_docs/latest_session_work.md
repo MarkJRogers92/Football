@@ -4,13 +4,13 @@ This is the first workflow documentation entry, initialized on 2026-09-10. No pr
 
 ## Detailed Current State
 
-- Repository: Dynasty Lab, source branch `codex/v0122-guidance-setup-release`.
-- Version authorities agree on `0.12.2` (`VERSION.txt`, `app.js`, `package.json`). The latest commit is `74fc13a` (`ui: promote sortable postgame box scores`).
+- Repository: Dynasty Lab, development branch `claude/modest-brown-0gpskn`.
+- Version authorities agree on `0.12.3` (`VERSION.txt`, `app.js`, `package.json`). Recent work on this branch: weekly briefing label/status-line fix; roughly 3.4x faster season simulation (recruiting hot spots); unit suite cut from ~16 min to ~7 min.
 - The product is a generated standalone web build with an Electron desktop target, browser/desktop save adapters, extensive Node/browser tests, and GitHub Actions validation/publishing workflows.
 
 ## Session Changes
 
-Initialized the six new framework documents under `agent_docs/`. No production source, tests, runtime configuration, `AGENTS.md`, or hidden workflow resources were changed.
+Initialized the six framework documents under `agent_docs/`, then refreshed them on 2026-09-28 for 0.12.3. The same day, root handoff/roadmap files were moved to `docs/archive/`, stray `.release-*`/`.validation-*` marker files were removed, and the README was rewritten. No source, tests, or workflows were changed by this documentation pass.
 
 ## Verification
 
@@ -18,7 +18,7 @@ Read-only inspection covered `README.md`, `package.json`, `tools/build.js`, stor
 
 ## Pending Work and Blockers
 
-There is no active deployment plan. Historical README and continuation documents contain older release/branch claims; publication status for the current source was not inferred.
+There is no active deployment plan. Archived handoffs in `docs/archive/` contain older release/branch claims; publication status for the current source was not inferred.
 
 ## Next Entry Point
 

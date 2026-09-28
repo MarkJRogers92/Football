@@ -214,7 +214,7 @@ function publish({ preview, remove }) {
         `Refusing to publish production: ${version} — that version was already published ` +
         `(${prior.split('\n')[0]}), and the build about to go out differs from what is live.\n` +
         `Someone else likely shipped this version number from different source. Reconcile ` +
-        `first (see CONTINUATION.md), or bump VERSION.txt to a version never published before.`
+        `first (compare with the published gh-pages commit), or bump VERSION.txt to a version never published before.`
       );
     }
   }

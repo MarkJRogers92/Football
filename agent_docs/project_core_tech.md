@@ -20,8 +20,8 @@
 
 ## External Services and Infrastructure
 
-- GitHub Actions runs validation and the manually authorized publish workflow.
-- GitHub Pages serves the `gh-pages` branch. The project README documents production and preview URLs, but this installation does not infer the publication state of the current `0.12.2` source.
+- GitHub Actions runs validation and the manually authorized publish workflow. Validation runs unit tests on every push with `npm ci`; desktop packaging jobs run only for desktop-related changes, `[release-ci]`/`[desktop-ci]` commits, or manual dispatch. Browser tests locate Chromium via `tests/helpers/chromium-path.js` (`CHROMIUM_PATH` overrides).
+- GitHub Pages serves the `gh-pages` branch. The project README documents production and preview URLs, but this installation does not infer the publication state of the current `0.12.3` source.
 
 ## Important Technical Constraints
 
