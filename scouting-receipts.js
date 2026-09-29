@@ -101,10 +101,8 @@ if(typeof module==='object'&&module.exports){
  commitRecruit=function(r,name){const ok=commitRecruitBeforeScoutingReceipts(r,name);if(ok){const t=T(name);if(t&&selected()?.id===t.id)freezeRecruitReceipt(r,t)}return ok};
  const finalizeRecruitingBeforeScoutingReceipts=finalizeRecruiting;
  finalizeRecruiting=function(){const out=finalizeRecruitingBeforeScoutingReceipts();freezeControlledCommitReceipts();return out};
- const renderRecruitingBeforeScoutingReceipts=renderRecruiting;
- renderRecruiting=function(){freezeControlledCommitReceipts();renderRecruitingBeforeScoutingReceipts();renderRecruitingReceiptRecap()};
- const renderRosterBeforeScoutingReceipts=renderRoster;
- renderRoster=function(){renderRosterBeforeScoutingReceipts();renderRosterReceiptBadges()};
- if(typeof TAB_RENDERERS==='object'){TAB_RENDERERS.recruiting=renderRecruiting;TAB_RENDERERS.roster=renderRoster}
+ extendRender('recruiting',freezeControlledCommitReceipts,{before:true});
+ extendRender('recruiting',renderRecruitingReceiptRecap);
+ extendRender('roster',renderRosterReceiptBadges);
  globalThis.DynastyLabScoutingReceipts={classifyPlayer:p=>scoutingReceiptSystem.classifyPlayer(p,universe.year),summary:p=>scoutingReceiptSystem.receiptSummary(scoutingReceiptSystem.classifyPlayer(p,universe.year)),teamSummary:t=>scoutingReceiptSystem.summarizePlayers(receiptPlayers(t),universe.year,t.id)};
 }

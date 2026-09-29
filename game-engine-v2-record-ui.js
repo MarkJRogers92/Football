@@ -27,6 +27,6 @@ function renderV2RecordGate(){
   host.innerHTML=`<div class="section-head"><div><div class="eyebrow">V0.10.1 DEVELOPMENT GATE</div><h3>Recorded Game Engine 2</h3><div class="muted">All-or-nothing scheduled-game commit using real-player v2 stats, the permanent Game Center archive and rollback protection.</div></div><button type="button" data-v2-record ${disabled?'disabled':''}>Record with V2 (Dev)</button></div><div class="v2-shadow-safety"><strong>Development only.</strong> This gate is not a production cutover and does not replace Quick Sim.</div>`;
   const button=host.querySelector('[data-v2-record]');if(button)button.onclick=()=>{if(!confirm('Development-only Game Engine 2 test: permanently record this scheduled game with v2?'))return;try{const out=recordV2GameLabResult();setStatus(`Game Engine 2 recorded ${out.result.away} ${out.result.ap} – ${out.result.hp} ${out.result.home}.`);render()}catch(err){console.error(err);setStatus(`V2 recorded-game transaction rolled back: ${err.message||err}`)}}
 }
-const renderGameLabWithV2Recorded=TAB_RENDERERS.gamelab;TAB_RENDERERS.gamelab=()=>{renderGameLabWithV2Recorded();renderV2RecordGate()};
+extendRender('gamelab',()=>renderV2RecordGate());
 globalThis.DynastyGameEngineV2LabBridge.recordCurrent=recordV2GameLabResult;globalThis.DynastyGameEngineV2LabBridge.debug=v2RecordDebugState;
 if(globalThis.__DL_TEST__){globalThis.__DL_TEST__.v2RollbackProbe=v2RollbackProbe;globalThis.__DL_TEST__.v2RecordedSoakProbe=v2RecordedSoakProbe}

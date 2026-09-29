@@ -43,6 +43,6 @@ function renderV2ReleaseGameLab(){
 }
 renderV2GameLabPanel=function renderV2GameLabPanelRelease(){document.querySelector('#v2ShadowLab')?.remove()};
 renderV2RecordGate=function renderV2RecordGateRelease(){document.querySelector('#v2RecordGate')?.remove()};
-const renderGameLabBeforeV2Release=TAB_RENDERERS.gamelab;TAB_RENDERERS.gamelab=()=>{renderGameLabBeforeV2Release();renderV2ReleaseGameLab()};
+extendRender('gamelab',renderV2ReleaseGameLab);
 globalThis.DynastyGameEngineV2LabBridge.releaseRecord=v2ReleaseRecord;
 globalThis.DynastyGameEngineV2LabBridge.renderRelease=renderV2ReleaseGameLab;
