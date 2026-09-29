@@ -183,6 +183,39 @@ jobs:
         env:
           CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
 
+  browser-extended:
+    needs: cadence
+    if: needs.cadence.outputs.mode == 'full'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build standalone artifact
+        run: npm run build
+      - name: Verify committed build is current
+        run: git diff --exit-code -- index.html
+      - name: Locate Chromium
+        id: chromium
+        shell: bash
+        run: |
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$browser" ]; then
+            npx playwright-core install chromium
+            browser="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$browser"
+          echo "path=$browser" >> "$GITHUB_OUTPUT"
+      - name: Extended feature browser suites
+        run: npm run test:browser-extended
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+
   audit:
     needs: cadence
     if: needs.cadence.outputs.mode == 'full'
