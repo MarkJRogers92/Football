@@ -11,7 +11,10 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
   const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];
   page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
   try{
-    await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);await goTab(page,'gamelab');
+    await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);
+    // Coach's Desk decisions block official records (added after this test); let staff settle them first.
+    const ready=await page.evaluate(()=>window.__DL_TEST__.v2PrepareDetailedGame());assert.equal(ready.ready,true,`Game Day fixture should be ready to record: ${JSON.stringify(ready)}`);
+    await goTab(page,'gamelab');
     await page.waitForSelector('[data-v2-gameday-start]',{timeout:15000});
     const before=await page.evaluate(()=>window.__DL_TEST__.v2GameDayCommitDebug());
     await page.click('[data-v2-gameday-start]');await page.waitForSelector('.v2-gameday-scoreboard',{timeout:10000});

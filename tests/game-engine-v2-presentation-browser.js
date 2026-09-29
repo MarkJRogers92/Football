@@ -7,7 +7,9 @@ const {startNewDynasty}=require('./helpers/start-new-dynasty');
  const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
  try{
   await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);
-  await page.click('.tab-groups button[data-group="games"]');await page.click('.tabs button[data-tab="gamelab"]');
+  // The client shell hides the legacy tab-group strip, so navigate the way the other suites do.
+  const ready=await page.evaluate(()=>window.__DL_TEST__.v2PrepareDetailedGame());assert.equal(ready.ready,true,`Game Day fixture should be ready: ${JSON.stringify(ready)}`);
+  await page.evaluate(()=>{const g=document.querySelector('.tab-groups button[data-group="games"]');if(g&&!g.classList.contains('active'))g.click();document.querySelector('.tabs button[data-tab="gamelab"]')?.click()});
   assert.equal(await page.locator('#v2ShadowLab').count(),0,'release Game Lab must hide the shadow preview');assert.equal(await page.locator('#v2RecordGate').count(),0,'release Game Lab must hide the dev record gate');
   await page.click('#simDetailedGame');await page.waitForSelector('#v2GameDayRecap:not([hidden])',{timeout:60000});
   const recap=page.locator('#v2GameDayRecap');assert.match(await recap.textContent(),/GAME DAY/);assert.match(await recap.textContent(),/FINAL/);assert.ok(await recap.locator('.v2-release-drive').count()>5,'recap should expose the variable drive chart');assert.ok(await recap.locator('.v2-release-leader').count()>=6,'recap should show real-player leaders');assert.ok(await recap.locator('.v2-release-scoring-row').count()>0,'recap should show scoring flow');

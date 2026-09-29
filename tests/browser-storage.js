@@ -11,16 +11,7 @@ const goTab=async(page,id)=>page.evaluate(({id,group})=>{const g=document.queryS
 // it (New Dynasty -> Start Dynasty, which defaults to Chicago Metropolitan) before #userTeam exists.
 const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
 const startNewDynasty=page=>sharedStartNewDynasty(page);
-const clickShellUtility=async(page,selector)=>{
- const shell=page.locator('#clientRail');
- if(await shell.count()){
-  const quick=page.locator('.client-mobile-nav');
-  if(await quick.count()&&await quick.isVisible()&&!await page.$eval('#app',el=>el.classList.contains('client-rail-open')))await page.click('[data-client-more]');
-  const details=page.locator('.client-utilities');
-  if(await details.count()&&!await details.evaluate(el=>el.open))await details.locator('summary').click();
- }
- await page.locator(selector).click();
-};
+const {clickShellUtility}=require('./helpers/client-shell');
 
 (async()=>{
  const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});
