@@ -8,7 +8,7 @@ No workflow deployment goal is recorded. The documentation framework was initial
 
 ## Overall Progress
 
-Source version is `0.12.2` on branch `codex/v0122-guidance-setup-release`. The latest commit promotes sortable postgame box scores. No source, test, or runtime change was made by this installation.
+Source version is `0.12.5` on `claude/modest-brown-0gpskn` (includes the merged v0.12.4 first-season flow). Recent work: weekly briefing label/status-line fix; ~3.4x faster season simulation (recruiting hot spots); unit suite ~16 min to ~7 min; CI gating for desktop packaging jobs.
 
 ## Current Position
 

@@ -1,6 +1,7 @@
 const assert=require('node:assert/strict');
 const path=require('path');
 const {chromium}=require('playwright-core');
+const {chromiumPath}=require('./helpers/chromium-path');
 const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
 const startNewDynasty=async page=>{await page.goto('file://'+path.join(__dirname,'..','index.html'));return sharedStartNewDynasty(page)};
 async function reachPostseason(page){
@@ -10,7 +11,7 @@ function checkDurable(row,label){
   assert.equal(row.engine,'v2',`${label} should retain v2 identity`);assert.ok(row.drives>0,`${label} should retain drives`);assert.ok(row.playLines>10,`${label} should retain archived play-by-play`);assert.ok(row.playerLines>0,`${label} should retain real-player stat lines`);
 }
 (async()=>{
-  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});
+  const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});
   const browserErrors=[];
   try{
     // Conference championship: prove whole-stage rollback, then prove the real UI action records only the user's game with v2.

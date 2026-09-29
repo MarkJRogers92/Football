@@ -1,5 +1,6 @@
 const path=require('path');
 const {chromium}=require('playwright-core');
+const {chromiumPath}=require('./helpers/chromium-path');
 const TAB_GROUP={dashboard:'program',program:'program',history:'program',roster:'team',depth:'team',development:'team',recruiting:'recruiting',gamelab:'games',season:'games',stats:'games',newsletter:'games',staff:'staff',offseason:'staff',records:'staff'};
 let passed=0,failed=0;
 function check(label,ok,detail=''){if(ok){passed++;console.log(`  PASS  ${label}${detail?` — ${detail}`:''}`)}else{failed++;console.error(`  FAIL  ${label}${detail?` — ${detail}`:''}`)}}
@@ -38,4 +39,4 @@ async function run(browser,label,viewport){
   check(`[${label}] presentation pass throws no console errors`,errors.length===0,errors.join(' | '));
  }finally{await page.close()}
 }
-(async()=>{const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/google-chrome',args:['--no-sandbox']});try{await run(browser,'desktop',{width:1280,height:900});await run(browser,'iphone',{width:390,height:844})}finally{await browser.close()}console.log(`\n${passed} passed, ${failed} failed`);if(failed)process.exit(1)})().catch(e=>{console.error(e);process.exit(1)});
+(async()=>{const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});try{await run(browser,'desktop',{width:1280,height:900});await run(browser,'iphone',{width:390,height:844})}finally{await browser.close()}console.log(`\n${passed} passed, ${failed} failed`);if(failed)process.exit(1)})().catch(e=>{console.error(e);process.exit(1)});

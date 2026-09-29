@@ -1,5 +1,6 @@
 /* Sports-presentation components. Progressive visual enhancement only. */
 .broadcast-feature{display:grid;grid-template-columns:minmax(0,2.1fr) minmax(240px,.72fr);gap:14px;margin:0 0 18px}
+.broadcast-feature.broadcast-no-result{grid-template-columns:minmax(0,1fr)}
 .broadcast-feature-main,.broadcast-result{position:relative;overflow:hidden;border:1px solid #30445c;border-radius:14px;background:linear-gradient(155deg,#111b27,#0c131c);box-shadow:0 12px 32px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.025)}
 .broadcast-feature-main{padding:17px 18px 15px;background:radial-gradient(circle at 13% -40%,rgba(var(--team-rgb),.15),transparent 22rem),linear-gradient(155deg,#14202e,#0e1620 62%,#0c121a)}
 .broadcast-feature-main:after{content:"";position:absolute;width:240px;height:240px;right:-135px;top:-155px;border:1px solid rgba(var(--team-rgb),.12);border-radius:50%;box-shadow:0 0 0 28px rgba(var(--team-rgb),.022),0 0 0 56px rgba(var(--team-rgb),.016);pointer-events:none}

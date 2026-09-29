@@ -1,0 +1,33 @@
+/* Recruiting map. Status colours are a validated trio on the dark surface (blue / orange / aqua);
+   targets are diamonds and open recruits are small grey dots, so shape backs up colour. */
+.recruit-map{--rm-mine:#3987e5;--rm-target:#d95926;--rm-else:#199e70;--rm-open:#5d6878}
+.rm-filters{display:flex;flex-wrap:wrap;gap:6px}
+.rm-filters button{padding:5px 10px;font-size:.78rem}
+.rm-filters button[aria-pressed="true"]{border-color:var(--accent2);color:var(--text);background:rgba(143,177,255,.12)}
+.rm-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0 0 8px;font-size:.8rem;color:var(--muted)}
+.rm-key{display:inline-flex;align-items:center;gap:6px;background:none;padding:0}
+.rm-key b{color:var(--text);font-weight:600}
+.rm-key i{width:10px;height:10px;border-radius:50%;background:var(--rm-open)}
+.rm-key.rm-s-mine i{background:var(--rm-mine)}
+.rm-key.rm-s-target i{background:var(--rm-target);border-radius:1px;transform:rotate(45deg) scale(.85)}
+.rm-key.rm-s-elsewhere i{background:var(--rm-else)}
+.rm-key.rm-s-ring i{background:none;border:1px dashed var(--muted)}
+.rm-stage{position:relative}
+.rm-stage svg{display:block;width:100%;height:auto;border-radius:10px;background:#0f1520}
+.rm-land{fill:#1c2533;stroke:#324158;stroke-width:1.2}
+.rm-inset{fill:none;stroke:#2a3444;stroke-width:1;stroke-dasharray:3 3}
+.rm-ring{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:5 5;opacity:.55}
+.rm-schools rect{fill:#6b778a;opacity:.55}
+.rm-arcs path{fill:none;stroke:var(--rm-mine);stroke-width:1.6;opacity:.55}
+.rm-mark{cursor:pointer}
+.rm-mark circle,.rm-mark path{stroke:#0f1520;stroke-width:1}
+.rm-mark.rm-s-mine circle{fill:var(--rm-mine)}
+.rm-mark.rm-s-target path{fill:var(--rm-target)}
+.rm-mark.rm-s-elsewhere circle{fill:var(--rm-else);opacity:.6}
+.rm-mark.rm-s-open circle{fill:var(--rm-open);opacity:.7}
+.rm-mark:hover circle,.rm-mark:hover path{stroke:var(--text);stroke-width:2}
+.rm-campus circle{fill:var(--text);stroke:var(--rm-mine);stroke-width:3}
+.rm-campus text{fill:var(--rm-mine);font-size:12px;font-weight:700}
+.rm-tip{position:absolute;z-index:2;display:grid;gap:2px;width:220px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);box-shadow:0 8px 24px rgba(0,0,0,.35);font-size:.76rem;color:var(--muted);pointer-events:none}
+.rm-tip strong{color:var(--text)}
+.rm-tip[hidden]{display:none}

@@ -1,5 +1,6 @@
 // Real IndexedDB and real UI, in a fresh disposable browser context.
 const {chromium}=require('playwright-core');
+const {chromiumPath}=require('./helpers/chromium-path');
 const {readFile}=require('node:fs/promises');
 const path=require('node:path');
 const assert=require('node:assert/strict');
@@ -10,19 +11,10 @@ const goTab=async(page,id)=>page.evaluate(({id,group})=>{const g=document.queryS
 // it (New Dynasty -> Start Dynasty, which defaults to Chicago Metropolitan) before #userTeam exists.
 const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
 const startNewDynasty=page=>sharedStartNewDynasty(page);
-const clickShellUtility=async(page,selector)=>{
- const shell=page.locator('#clientRail');
- if(await shell.count()){
-  const quick=page.locator('.client-mobile-nav');
-  if(await quick.count()&&await quick.isVisible()&&!await page.$eval('#app',el=>el.classList.contains('client-rail-open')))await page.click('[data-client-more]');
-  const details=page.locator('.client-utilities');
-  if(await details.count()&&!await details.evaluate(el=>el.open))await details.locator('summary').click();
- }
- await page.locator(selector).click();
-};
+const {clickShellUtility}=require('./helpers/client-shell');
 
 (async()=>{
- const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});
+ const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});
  try{
   const page=await browser.newPage({viewport:{width:390,height:844},acceptDownloads:true});
   const errors=[];page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});

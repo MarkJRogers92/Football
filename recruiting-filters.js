@@ -67,9 +67,7 @@ if(typeof module==='object'&&module.exports){
   table.insertAdjacentHTML?.('beforebegin',`${recruitingBoardViewHTML()}${recruitingFilterHTML()}`);
   bindRecruitingFilters();
  }
- const renderRecruitingBeforeFilters=renderRecruiting;
- renderRecruiting=function(){renderRecruitingBeforeFilters();renderRecruitingFilters()};
- if(typeof TAB_RENDERERS==='object')TAB_RENDERERS.recruiting=renderRecruiting;
+ extendRender('recruiting',renderRecruitingFilters);
  globalThis.DynastyLabRecruitingFilters={
   getState:()=>({...recruitBoardFilters}),
   setState:s=>{recruitBoardFilters=recruitingFilterSystem.normalize({...recruitBoardFilters,...s});renderRecruiting()},

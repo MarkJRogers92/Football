@@ -1,95 +1,97 @@
 # Dynasty Lab
 
 A fictional college-football dynasty simulator: 120 D-I programs, hidden player
-ability, role-based depth charts, recruiting with real geography, development
-and camp, permanent game history, persistent transfers/promises, procedural
-player portraits, persistent coaching careers and portable coach relationships.
+ability, role-based depth charts, recruiting with real geography, scouting and
+development, coaching careers, weekly game-day play and permanent program
+history. It ships as a standalone web build and as an Electron desktop alpha.
+
+Current version: **0.12.5** (see `VERSION.txt`). `CHANGELOG.md` has the
+version-by-version record.
 
 ## Source layout
 
-The deployable artifact is a single standalone HTML file, but it is **generated**
-— do not hand-edit it.
+`index.html` is **generated** by `npm run build` -- never hand-edit it.
 
-| File | Role |
+| Path | Role |
 | --- | --- |
-| `app.js` | The engine and UI layer. Source of truth. |
-| `storage.js` | IndexedDB archive persistence; included in the standalone build. |
-| `styles.css` | Stylesheet. Source of truth. |
-| `body.html` | Page markup. Source of truth. |
-| `portraits/renderer-v1.js` | Frozen deterministic Portrait V1 renderer. |
-| `index.html` | Generated standalone build. Rebuild with `npm run build`. |
+| `app.js` | Engine and UI core. Source of truth. |
+| `*.js` / `*.css` feature modules | Feature extensions (recruiting, scouting, game-engine-v2, weekly coaching, presentation, guidance, etc.). `tools/build.js` injects them into `app.js` (engine extensions) or appends them after it (presentation modules) in a fixed, dependency-ordered list. A new module must be added to that list. |
+| `schools-data.js` | The 120 fictional programs every new universe starts from (`DynastySchools`). |
+| `storage.js` | Browser IndexedDB archive persistence (`DynastyStorage`). |
+| `body.html`, `styles.css` | Page markup and base stylesheet. |
+| `portraits/` | Frozen deterministic Portrait V1 renderer. |
+| `assets/`, `team-colors.json` | Logos, helmets and program colors. |
+| `desktop/` | Electron shell (`main.js`, `preload.js`, `storage.js`); packaged with Electron Forge (`forge.config.js`). |
+| `tests/` | Node unit tests, browser (Playwright) tests, desktop tests. |
+| `tools/` | Build, publish, audit, long-run and release-guard scripts; `harness.js` runs the engine in Node behind a DOM shim. |
+
+## Build and test
 
 ```bash
-npm run build
-npm test
-npm run test:browser
-npm run test:browser-storage
-npm run audit
-npm run longrun
-npm run verify:release
+npm ci
+npm run build                 # generate index.html
+npm test                      # version check, smoke, and Node unit suites
+npm run test:browser          # Chromium UI/visual suites
+npm run test:browser-storage  # browser save/load and storage
+npm run audit                 # engine balance/consistency audit
+npm run longrun               # multi-season (12) stability run
+npm run verify:release        # release-source and build-currentness checks
+npm run validate:full         # build + verify + all of the above
 ```
 
-`tools/harness.js` loads the engine in Node behind a small DOM shim so the
-simulation can be exercised and measured without a browser.
+Browser tests locate Chromium through `tests/helpers/chromium-path.js`; set
+`CHROMIUM_PATH` to point at a specific binary.
 
-## Version
+Desktop alpha:
 
-The live release is **v0.9.44**. `VERSION.txt` is the single release-version
-source and the build/test pipeline checks it against the application/package
-version so mismatched labels fail before publishing.
+```bash
+npm run desktop:dev           # build and launch in Electron
+npm run desktop:make          # macOS arm64 zip
+npm run desktop:make:windows  # Windows x64 zip
+```
 
-The v0.9 line now includes durable promises/transfers/game archives, coaching
-careers and hiring, player agency and scouting, scholarships, scheme changes,
-rivalries, administration/NIL stakes, bowls, academics, program history,
-gameplans, Watch Mode, team branding, program colors and conference/game-day
-presentation. See `CHANGELOG.md` for the version-by-version record.
+Other targeted suites are listed in `package.json` (`test:guidance`,
+`test:game-engine-v2`, `test:development`, `test:desktop-storage`, ...).
 
-See `CHANGELOG.md` and `CONTINUATION.md` for the current checkpoint and next
-bounded milestone.
+## Version policy
 
-## Continuation checkpoint
+`VERSION.txt` is the single release-version source. `APP_VERSION` in `app.js`
+and `version` in `package.json` must match it; `tools/build.js` and
+`tests/version.js` fail on a mismatch. Bump all three together.
 
-Read `CONTINUATION.md` and `STORAGE.md` before changing game/save behavior.
-The canonical development source is this repository; `gh-pages` is deployment
-output only. Do not resume from the old Property-Lookup deployment or treat the
-historical `codex/v081-save-continuation` branch as the current release head.
+## CI
 
-The post-v0.9.44 implementation order and bounded work packets live in
-`docs/roadmap/README.md` and `docs/roadmap/STATUS.md`.
+`.github/workflows/validate.yml` runs on pull requests and pushes (except
+`gh-pages`) using `npm ci`: build, release verification and the unit suite on
+every push; browser and audit jobs follow the validation cadence (full on
+pull requests, manual runs, `[full-ci]`/`[release-ci]` commits and periodically).
+Desktop packaging jobs (macOS, Windows) run only when desktop-related files
+change, a commit contains `[release-ci]` or `[desktop-ci]`, or on manual dispatch.
 
 ## Publishing
 
-The game is served by GitHub Pages from this repository's `gh-pages` branch.
-Production and previews share one Pages site. The preferred release path is the
-manual **Publish Dynasty Lab** GitHub Actions workflow: choose `preview` and a
-preview name, or choose `production` and enter `PUBLISH` as confirmation. It
-runs the complete validation suite before publishing and never edits the source
-branch.
-
-The local commands remain available for maintainers:
+The manual **Publish Dynasty Lab** workflow (`.github/workflows/publish.yml`)
+validates and then publishes the build to the `gh-pages` branch: choose `preview`
+plus a name, or `production` and confirm with `PUBLISH`. Local equivalents:
 
 ```bash
-npm run publish                        # -> /            (production)
-npm run publish:preview -- v094       # -> /preview/v094/
-node tools/publish.js --list           # what is published right now
-node tools/publish.js --remove v094    # delete a preview
+npm run publish                     # production (/)
+npm run publish:preview -- <name>   # /preview/<name>/
+node tools/publish.js --list        # what is published
+node tools/publish.js --remove <name>
 ```
 
-| | URL |
-| --- | --- |
-| Production | https://markjrogers92.github.io/Football/ |
-| Previews | https://markjrogers92.github.io/Football/preview/ |
+This README does not state which version is currently live; check the publish
+workflow runs and git history. The source branch is canonical; `gh-pages` is
+deployment output only. Previews and production share one origin and therefore
+share browser save storage -- export a JSON backup before switching builds.
 
-`tools/publish.js` builds first, then copies the generated result into a
-`gh-pages` worktree at `.pages/` (override with `PAGES_WORKTREE`), regenerates
-the preview index from the folders that actually exist, commits and pushes. It
-refuses a dirty source tree, a stale generated build, or a conflicting repeat
-of an already-published production version.
+## Docs
 
-`gh-pages` holds only what the site serves. The source lives on the development
-branch; the site branch is not a source mirror and should not be hand-edited as
-the canonical game.
-
-Each preview runs on the same origin as production, so **previews and production
-share browser save storage**. Export a JSON backup before switching builds when
-a dynasty matters.
+- `CHANGELOG.md` -- release history.
+- `STORAGE.md` -- save format and persistence contract; read before changing save behavior.
+- `VISUAL_IDENTITY.md` -- visual identity rules.
+- `IDEAS.md` -- idea backlog.
+- `docs/` -- milestone checkpoints, validation policy, release notes, `docs/roadmap/`.
+- `docs/archive/` -- historical root-level handoffs, worklog and roadmaps (may be out of date).
+- `agent_docs/` -- working context for coding agents.

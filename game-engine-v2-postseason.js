@@ -42,7 +42,7 @@ simConferenceChampionships=function simConferenceChampionshipsV2(){
   try{
     universe.latest=[];universe.confChamps=[];universe.playoffFieldIds=[];universe.playoffFieldUnavailable=false;
     allConfs().forEach(c=>{let s=confStand(c);if(s.length<2)return;const label=c+' Championship',r=v2PostseasonSim(s[0],s[1],{week:13,label,neutral:true,conference:false}),w=T(r.winner);w.champ=true;universe.confChamps.push(w.id);universe.latest.push({...r,label})});
-    ranked();freezePlayoffField();universe.phase='bowlReady';autosaveAfter('postseason');render()
+    ranked();freezePlayoffField();universe.phase='bowlReady';buildWeeklyHub();autosaveAfter('postseason');render()
   }catch(err){v2PostseasonFail('Conference championships',stage,err)}
 };
 
@@ -57,7 +57,7 @@ simBowls=function simBowlsV2(){
       w.fan_support=clamp((w.fan_support||60)+2,0,100);l.fan_support=clamp((l.fan_support||60)+1,0,100);
       const order=universe.nextEventId++;universe.events??=[];universe.events.push({id:`EVT_${order}`,season:universe.year,week:13,timestampOrder:order,type:'BOWL_RESULT',importance:58,schoolIds:[w.id,l.id],playerIds:[],coachIds:[],recruitIds:[],gameIds:r.gameId?[r.gameId]:[],summary:`${w.name} wins the ${label}.`,metadata:{label,winnerId:w.id}})
     }
-    universe.phase='playoffReady';if(universe.latest)universe.latest=logs.length?logs:universe.latest;ranked();render();return logs
+    universe.phase='playoffReady';if(universe.latest)universe.latest=logs.length?logs:universe.latest;ranked();buildWeeklyHub();render();return logs
   }catch(err){v2PostseasonFail('Bowl simulation',stage,err);return[]}
 };
 
@@ -68,7 +68,7 @@ simPlayoff=function simPlayoffV2(){
     const field=seedField();if(field.length!==16){setStatus('The saved playoff field is incomplete, so no playoff was simulated.');return}field.forEach((t,i)=>t.seed=i+1);let logs=[];
     function round(arr,label){let out=[];for(let i=0;i<arr.length/2;i++){let a=arr[i],b=arr[arr.length-1-i],week=14+['Round of 16','Quarterfinal','Semifinal','National Championship'].indexOf(label),r=v2PostseasonSim(a,b,{week,label,neutral:true,conference:false});logs.push({...r,label});out.push(T(r.winner))}return out}
     let r16=round(field,'Round of 16'),q=round(r16,'Quarterfinal'),s=round(q,'Semifinal'),f=round(s,'National Championship');
-    universe.champion=f[0].name;universe.phase='complete';universe.offseason=makeOffseasonState(universe.year,'review');universe.latest=logs;finalizeRecruiting();finalizeSeasonHonors();archiveSeason();ranked();autosaveAfter('postseason');render()
+    universe.champion=f[0].name;universe.phase='complete';universe.offseason=makeOffseasonState(universe.year,'review');universe.latest=logs;finalizeRecruiting();finalizeSeasonHonors();archiveSeason();ranked();buildWeeklyHub();autosaveAfter('postseason');render()
   }catch(err){v2PostseasonFail('Playoff simulation',stage,err)}
 };
 

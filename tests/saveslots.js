@@ -246,21 +246,6 @@ function rollSeasons(e,n){
  }
 }
 
-test('compaction never touches a game a player would go back and read',async()=>{
- const e=await engine(4906);
- rollSeasons(e,5);
- const user=e.T('Chicago Metropolitan')?.name;
- assert.ok(e.universe.gameArchive.some(g=>g.compacted),'season rollover compacted eligible history automatically');
- for(const g of e.universe.gameArchive){
-  if(!g.compacted)continue;
-  assert.equal(g.label==='Regular season'||!g.label,true,`compacted a ${g.label}`);
-  assert.notEqual(g.home.name,user,'compacted a controlled-team game');
-  assert.notEqual(g.away.name,user,'compacted a controlled-team game');
-  assert.equal((g.drives||[]).length,0,'compacted a game that carries drive detail');
-  assert.ok((g.season??0)<=e.universe.year-e.GAME_DETAIL_HORIZON,'compacted a game inside the horizon');
- }
-});
-
 test('a compacted game keeps its score, team box, injuries and leaders',async()=>{
  const e=await engine(4907);
  rollSeasons(e,1);
@@ -286,9 +271,32 @@ test('a compacted game keeps its score, team box, injuries and leaders',async()=
  }
 });
 
+// Five simulated seasons are the expensive part of this file, so the remaining compaction
+// tests share one rolled dynasty. They run in order: read-only checks first, then the
+// explicit horizon-0 pass, then the reload, which replaces the in-memory universe.
+// Saved before rolling so the final test can prove the rollover is written back to the slot.
+let rolledDynasty=null;
+async function rolledFiveSeasons(){
+ if(!rolledDynasty){const e=await engine(4906);await e.saveBrowser();rollSeasons(e,5);rolledDynasty=e}
+ return rolledDynasty;
+}
+
+test('compaction never touches a game a player would go back and read',async()=>{
+ const e=await rolledFiveSeasons();
+ const user=e.T('Chicago Metropolitan')?.name;
+ assert.ok(e.universe.gameArchive.some(g=>g.compacted),'season rollover compacted eligible history automatically');
+ for(const g of e.universe.gameArchive){
+  if(!g.compacted)continue;
+  assert.equal(g.label==='Regular season'||!g.label,true,`compacted a ${g.label}`);
+  assert.notEqual(g.home.name,user,'compacted a controlled-team game');
+  assert.notEqual(g.away.name,user,'compacted a controlled-team game');
+  assert.equal((g.drives||[]).length,0,'compacted a game that carries drive detail');
+  assert.ok((g.season??0)<=e.universe.year-e.GAME_DETAIL_HORIZON,'compacted a game inside the horizon');
+ }
+});
+
 test('a compacted game still opens to Summary and Box Score, and says it was compacted',async()=>{
- const e=await engine(4908);
- rollSeasons(e,5);
+ const e=await rolledFiveSeasons();
  const g=e.universe.gameArchive.find(x=>x.compacted);
  assert.ok(g,'something was compacted');
  const box=e.gameBoxHTML(g);
@@ -297,12 +305,17 @@ test('a compacted game still opens to Summary and Box Score, and says it was com
  assert.doesNotThrow(()=>e.gameSummaryHTML(g));
 });
 
-test('compaction is idempotent and recorded in a bounded manifest',async()=>{
- const e=await engine(4909);
- rollSeasons(e,5);
+test('compaction shrinks the archive without losing a game, and is idempotent with a bounded manifest',async()=>{
+ const e=await rolledFiveSeasons();
+ const size=o=>Buffer.byteLength(JSON.stringify(o));
+ const ids=e.universe.gameArchive.map(g=>g.id);
  const prior=e.universe.compactionManifest.length;
+ const before=size(e.universe.gameArchive);
  const first=e.compactGameArchive({horizon:0});
+ const after=size(e.universe.gameArchive);
  assert.ok(first.games>0,'the first pass did work');
+ assert.deepEqual(e.universe.gameArchive.map(g=>g.id),ids,'every game is still present, in order');
+ assert.ok(after<before*0.85,`expected a real saving, got ${(100*(before-after)/before).toFixed(1)}%`);
  const second=e.compactGameArchive({horizon:0});
  assert.equal(second.games,0,'a second pass finds nothing left to do');
  assert.equal(e.universe.compactionManifest.length,prior+1,'and records nothing new');
@@ -311,22 +324,8 @@ test('compaction is idempotent and recorded in a bounded manifest',async()=>{
  assert.equal(m.dropped,first.dropped);
 });
 
-test('compaction measurably shrinks the archive without losing a single game',async()=>{
- const e=await engine(4910);
- rollSeasons(e,5);
- const size=o=>Buffer.byteLength(JSON.stringify(o));
- const ids=e.universe.gameArchive.map(g=>g.id);
- const before=size(e.universe.gameArchive);
- e.compactGameArchive({horizon:0});
- const after=size(e.universe.gameArchive);
- assert.deepEqual(e.universe.gameArchive.map(g=>g.id),ids,'every game is still present, in order');
- assert.ok(after<before*0.85,`expected a real saving, got ${(100*(before-after)/before).toFixed(1)}%`);
-});
-
 test('season-boundary compaction is written back to the active slot',async()=>{
- const e=await engine(4911);
- await e.saveBrowser();
- rollSeasons(e,5);
+ const e=await rolledFiveSeasons();
  assert.ok(e.universe.gameArchive.some(g=>g.compacted),'the rollover compacted eligible games');
  e.autosaveAfter('preseason');await e.runAutosave();
  await e.loadBrowser();await e.ensureGamesLoaded();

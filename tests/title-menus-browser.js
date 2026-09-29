@@ -2,12 +2,13 @@ const assert = require('assert/strict');
 const fs = require('fs');
 const path = require('path');
 const { chromium } = require('playwright-core');
+const {chromiumPath}=require('./helpers/chromium-path');
 
 const expectedVersion = 'v' + fs.readFileSync(path.join(__dirname, '..', 'VERSION.txt'), 'utf8').trim().replace(/^v/, '');
 
 (async()=>{
   const browser = await chromium.launch({
-    executablePath: process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
+    executablePath:chromiumPath(),
     args: ['--no-sandbox']
   });
 

@@ -1,0 +1,55 @@
+/* Game Cast: win probability chart and real-field replay (Game Center tab). Home is blue and
+   away is orange (a validated pair on the dark surface); team names always label the colors. */
+.game-cast{--gc-home:#3987e5;--gc-away:#d95926;display:grid;grid-template-columns:minmax(0,1fr);gap:14px;min-width:0}
+.game-cast>*{min-width:0}
+.gc-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 24px;align-items:flex-start}
+.gc-head h3{margin:2px 0 0}
+.gc-facts{margin:0;padding:0;list-style:none;display:grid;gap:4px;font-size:.86rem;color:var(--muted);max-width:620px;min-width:0;flex:1 1 280px;overflow-wrap:anywhere}
+.gc-facts strong{color:var(--text)}
+.gc-legend{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:.82rem}
+.gc-key{display:inline-flex;align-items:center;gap:6px;color:var(--text)}
+.gc-key::before{content:"";width:12px;height:12px;border-radius:3px;background:var(--gc-home)}
+.gc-key.away::before{background:var(--gc-away)}
+.gc-chart{position:relative;width:100%;min-width:0;min-height:180px}
+.gc-chart svg{display:block;overflow:visible}
+.gc-grid{stroke:var(--line);stroke-width:1}
+.gc-mid{stroke:var(--muted);stroke-width:1;stroke-dasharray:4 4}
+.gc-axis{fill:var(--muted);font-size:11px}
+.gc-side{fill:var(--muted);font-size:11px;font-weight:600}
+.gc-area.home{fill:var(--gc-home);opacity:.22}
+.gc-area.away{fill:var(--gc-away);opacity:.22}
+.gc-line{fill:none;stroke:var(--text);stroke-width:2;stroke-linejoin:round}
+.gc-score{stroke:var(--panel);stroke-width:2}
+.gc-score.home{fill:var(--gc-home)}
+.gc-score.away{fill:var(--gc-away)}
+.gc-cross{stroke:var(--muted);stroke-width:1}
+.gc-dot{fill:var(--text);stroke:var(--panel);stroke-width:2}
+.gc-now{stroke:var(--accent2);stroke-width:2;opacity:.8}
+.gc-tip{position:absolute;z-index:2;display:grid;gap:2px;width:220px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);box-shadow:0 8px 24px rgba(0,0,0,.35);font-size:.76rem;color:var(--muted);pointer-events:none}
+.gc-tip strong,.gc-tip b{color:var(--text)}
+.gc-replay{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel2)}
+.gc-board{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;font-size:.88rem}
+.gc-board strong{font-size:1.4rem;font-variant-numeric:tabular-nums}
+.gc-team{display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gc-team.home{justify-content:flex-end}
+.gc-team::before{content:"";flex:0 0 10px;height:10px;border-radius:2px;background:var(--gc-away)}
+.gc-team.home::before{order:2;background:var(--gc-home)}
+.gc-field{display:grid;grid-template-columns:8% 1fr 8%;height:64px;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+.gc-endzone{display:flex;align-items:center;justify-content:center;background:var(--gc-away)}
+.gc-endzone.home{background:var(--gc-home)}
+.gc-endzone span{writing-mode:vertical-rl;transform:rotate(180deg);font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;white-space:nowrap;overflow:hidden;max-height:60px}
+.gc-turf{position:relative;background:linear-gradient(180deg,#1f4a2c,#1a4026)}
+.gc-turf i{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.28)}
+.gc-turf i.mid{background:rgba(255,255,255,.55)}
+.gc-ball{position:absolute;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;display:grid;place-items:center;border-radius:50%;background:var(--text);color:var(--bg);font-size:.72rem;box-shadow:0 0 0 2px var(--bg);transition:left .45s ease}
+.gc-ball[data-offense="home"]{background:var(--gc-home);color:#fff}
+.gc-ball[data-offense="away"]{background:var(--gc-away);color:#fff}
+.gc-play{min-height:2.6em;font-size:.86rem;color:var(--muted)}
+.gc-play strong{color:var(--text)}
+.gc-controls{display:flex;align-items:center;gap:10px}
+.gc-controls input[type=range]{flex:1;min-width:0}
+.gc-table table{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:8px}
+.gc-table th,.gc-table td{text-align:left;padding:4px 6px;border-bottom:1px solid var(--line)}
+@media(prefers-reduced-motion:reduce){.gc-ball{transition:none}}
+@media(max-width:560px){.gc-field{height:52px}.gc-board strong{font-size:1.15rem}}
+.gc-tip[hidden]{display:none}

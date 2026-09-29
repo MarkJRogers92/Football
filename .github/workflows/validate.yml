@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       mode: ${{ steps.cadence.outputs.mode }}
+      desktop: ${{ steps.cadence.outputs.desktop }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -26,12 +27,15 @@ jobs:
       - name: Select validation cadence
         id: cadence
         shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
         run: |
           mode="fast"
           reason="normal push"
-          if [ "${{ github.event_name }}" != "push" ]; then
+          if [ "$EVENT_NAME" != "push" ]; then
             mode="full"
-            reason="${{ github.event_name }} event"
+            reason="$EVENT_NAME event"
           elif git log -1 --pretty=%B | grep -Eiq '\[(full-ci|release-ci)\]'; then
             mode="full"
             reason="commit requested full CI"
@@ -45,8 +49,31 @@ jobs:
           echo "mode=$mode" >> "$GITHUB_OUTPUT"
           echo "Validation mode: $mode ($reason)"
 
+          # Desktop packaging is slow (macOS/Windows runners), so build it only when a
+          # change can affect it, when a commit asks for it, or on manual dispatch.
+          desktop="false"
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            desktop="true"
+          elif git log -1 --pretty=%B | grep -Eiq '\[(release-ci|desktop-ci)\]'; then
+            desktop="true"
+          else
+            if [ "$EVENT_NAME" = "pull_request" ]; then
+              base="HEAD^1"
+            elif [ -n "$BEFORE_SHA" ] && ! [[ "$BEFORE_SHA" =~ ^0+$ ]] && git cat-file -e "$BEFORE_SHA^{commit}" 2>/dev/null; then
+              base="$BEFORE_SHA"
+            else
+              base="HEAD~1"
+            fi
+            if git diff --name-only "$base" HEAD | grep -Eq '^(desktop/|forge\.config\.js$|package(-lock)?\.json$|tools/rename-desktop-zip\.js$|tests/desktop-)'; then
+              desktop="true"
+            fi
+          fi
+          echo "desktop=$desktop" >> "$GITHUB_OUTPUT"
+          echo "Desktop packaging: $desktop"
+
   desktop-macos:
-    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/codex/v0121-take-the-job' || github.head_ref == 'codex/v0121-take-the-job'
+    needs: cadence
+    if: needs.cadence.outputs.desktop == 'true'
     runs-on: macos-15
     timeout-minutes: 30
     steps:
@@ -70,7 +97,8 @@ jobs:
           retention-days: 14
 
   desktop-windows:
-    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/codex/v0121-take-the-job' || github.head_ref == 'codex/v0121-take-the-job'
+    needs: cadence
+    if: needs.cadence.outputs.desktop == 'true'
     runs-on: windows-latest
     timeout-minutes: 30
     steps:
@@ -104,8 +132,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+          cache: npm
       - name: Install dependencies
-        run: npm install --no-package-lock
+        run: npm ci
       - name: Build standalone artifact
         run: npm run build
       - name: Verify committed build is current
@@ -114,8 +143,7 @@ jobs:
         run: npm run verify:release
       - name: Fast smoke and version checks
         run: node tests/version.js && node tests/smoke.js
-      - name: Full engine and presentation tests
-        if: needs.cadence.outputs.mode == 'full'
+      - name: Engine and presentation unit tests
         run: npm test
 
   browser:
@@ -128,8 +156,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+          cache: npm
       - name: Install dependencies
-        run: npm install --no-package-lock
+        run: npm ci
       - name: Build standalone artifact
         run: npm run build
       - name: Verify committed build is current
@@ -154,6 +183,39 @@ jobs:
         env:
           CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
 
+  browser-extended:
+    needs: cadence
+    if: needs.cadence.outputs.mode == 'full'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build standalone artifact
+        run: npm run build
+      - name: Verify committed build is current
+        run: git diff --exit-code -- index.html
+      - name: Locate Chromium
+        id: chromium
+        shell: bash
+        run: |
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$browser" ]; then
+            npx playwright-core install chromium
+            browser="$(find "$HOME/.cache/ms-playwright" -type f \( -name chrome -o -name chromium \) | head -1)"
+          fi
+          test -n "$browser"
+          echo "path=$browser" >> "$GITHUB_OUTPUT"
+      - name: Extended feature browser suites
+        run: npm run test:browser-extended
+        env:
+          CHROMIUM_PATH: ${{ steps.chromium.outputs.path }}
+
   audit:
     needs: cadence
     if: needs.cadence.outputs.mode == 'full'
@@ -164,8 +226,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+          cache: npm
       - name: Install dependencies
-        run: npm install --no-package-lock
+        run: npm ci
       - name: Build standalone artifact
         run: npm run build
       - name: Simulation audit
