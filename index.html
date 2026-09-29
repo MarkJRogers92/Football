@@ -4926,6 +4926,20 @@ function makeRoleDepth(t,useScout=false){let out={},used=new Set();for(const rol
 function ensureRoleDepth(t){t.roleDepth??=makeRoleDepth(t,false);for(const role of ROLE_DEFS){let valid=new Set(t.roster.filter(p=>role.eligible.includes(p.pos)).map(p=>p.id)),arr=(t.roleDepth[role.id]||[]).filter(id=>valid.has(id));for(const p of t.roster.filter(p=>role.eligible.includes(p.pos)))if(!arr.includes(p.id))arr.push(p.id);t.roleDepth[role.id]=arr}}
 function rolePlayers(t,id){if(!t.roleDepth||!t.roleDepth[id])ensureRoleDepth(t);let role=ROLE_BY_ID[id],by=new Map(t.roster.filter(p=>role?.eligible.includes(p.pos)).map(p=>[p.id,p]));return (t.roleDepth[id]||[]).map(x=>by.get(x)).filter(Boolean)}
 function roleStarter(t,id){let a=rolePlayers(t,id),ready=a.filter(gameAvailable);return ready.find(p=>weeklyPlayerPlan(p)?.role!=='limited')||ready[0]||a[0]||null}
+// One definition of a player's roles for every screen. The listed starter keeps the role with a
+// designation when he won't play (redshirt protected, or out), and whoever actually starts in
+// games in his place is marked as filling in.
+function roleDesignations(t,p){
+ if(!t||!p)return[];
+ return ROLE_DEFS.flatMap(role=>{
+  const listed=rolePlayers(t,role.id)[0],plays=roleStarter(t,role.id);
+  if(listed?.id===p.id){
+   if(plays?.id===p.id)return[role.label];
+   return[`${role.label} (${p.redshirtActive?'redshirt':gameAvailable(p)?'limited':'out'})`];
+  }
+  return plays?.id===p.id?[`${role.label} (fills in)`]:[];
+ });
+}
 function autoRoleDepth(t,useScout=false){t.roleDepth=makeRoleDepth(t,useScout)}
 function autoRedshirts(t){for(const p of t.roster){p.redshirtActive??=false;if(canRedshirt(p)&&eligibilityBase(p)===0&&(p.role==='Redshirt candidate'||p.perceived<68))p.redshirtActive=true}}
 function toggleRedshirt(id){let f=findPlayer(id);if(!f?.active)return;let p=f.p;if(p.redshirtActive){p.redshirtActive=false;render();return}if(!canRedshirt(p)){setStatus(`${p.name} is no longer redshirt-eligible this season.`);return}p.redshirtActive=true;render()}
@@ -9222,7 +9236,7 @@ if(typeof module==='object'&&module.exports){module.exports={makeRosterDepthPres
 else{
  const rosterDepthPresentationModel=makeRosterDepthPresentationModel();
  function rosterDepthReady(){return !!universe&&Array.isArray(universe.teams)}
- function presentationRolesForPlayer(t,p){if(!t?.roleDepth)return[];return ROLE_DEFS.filter(r=>(t.roleDepth[r.id]||[])[0]===p.id).map(r=>r.label)}
+ function presentationRolesForPlayer(t,p){if(!t?.roleDepth)return[];return roleDesignations(t,p)}
  function presentationPlayer(t,p){return{id:p.id,name:p.name,pos:p.pos,jerseyNumber:p.jerseyNumber??0,eligibility:eligibilityLabel(p),height:heightStr(p.height),weight:p.weight,style:p.style,currentRead:Number.isFinite(Number(p.perceived))?Math.round(Number(p.perceived)):null,currentLabel:scoutRangeLabel(p,t,false),upsideLabel:scoutRangeLabel(p,t,true),health:p.health,healthLabel:healthText(p),injuryWeeks:p.injuryWeeks||0,redshirtActive:!!p.redshirtActive,academicLabel:academicStatusText(p),morale:p.morale,roles:presentationRolesForPlayer(t,p)};}
  function presentationRole(t,role){if(!t?.roleDepth?.[role.id])return null;const active=roleStarter(t,role.id),candidates=rolePlayers(t,role.id).slice(0,4).map(p=>({...presentationPlayer(t,p),fit:roleFit(p,t,role,true),fitGrade:grade(roleFit(p,t,role,true))}));return{id:role.id,label:role.label,side:role.side,base:!!role.base,active:active?presentationPlayer(t,active):null,candidates};}
  globalThis.DynastyLabRosterDepthView={
@@ -9276,7 +9290,7 @@ else{
  function identityReady(){return !!universe&&Array.isArray(universe.teams)}
  function identitySnapshot(id){
   if(!identityReady()||!id)return null;const f=findPlayer(id);if(!f)return null;const p=f.p,t=f.team,active=!!f.active&&!!t;if(active)ensurePlayerDevelopment(p,t);
-  const roles=active&&t?ROLE_DEFS.filter(r=>roleStarter(t,r.id)?.id===p.id).map(r=>r.label):[];
+  const roles=active&&t?roleDesignations(t,p):[];
   const redshirtLabel=p.redshirtUsed?`Redshirt used${p.redshirtSeason?` ${p.redshirtSeason}`:''}`:p.redshirtActive?'Redshirt protected':null;
   const raw={id:p.id,teamId:t?.id??p.schoolId??null,teamName:t?.name??p.lastTeam??null,name:p.name,jerseyNumber:p.jerseyNumber??0,pos:p.pos,eligibility:eligibilityLabel(p),height:heightStr(p.height),weight:p.weight,style:p.style,status:f.portal?'TRANSFER PORTAL':active?'ACTIVE PLAYER':'PLAYER ARCHIVE',currentLabel:active?scoutRangeLabel(p,t,false):grade(p.perceived),upsideLabel:active?scoutRangeLabel(p,t,true):grade(p.perceivedUpside),confidence:active?Math.round(p.scoutConfidence||50):null,healthLabel:active?healthText(p):(f.portal?'Awaiting a destination':p.exitReason||'Career complete'),schemeFit:active?playerSchemeFit(p,t):null,schemeFitGrade:active?grade(playerSchemeFit(p,t)):'—',roles,seasonProduction:statLine(p.stats),careerProduction:statLine(p.career),developmentNote:active?devStaffNote(p,t):'Career complete',trainingFocus:p.trainingFocus||'Balanced',positionFamiliarity:active?familiarity(p,p.pos):null,wear:p.wear||0,redshirtLabel,academicLabel:active?academicStatusText(p):null,morale:p.morale};
   const clean=playerIdentityPresentationModel.cleanPlayer(raw);return{player:clean,headline:playerIdentityPresentationModel.headline(clean),chips:playerIdentityPresentationModel.statusChips(clean)};

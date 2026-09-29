@@ -274,6 +274,20 @@ function makeRoleDepth(t,useScout=false){let out={},used=new Set();for(const rol
 function ensureRoleDepth(t){t.roleDepth??=makeRoleDepth(t,false);for(const role of ROLE_DEFS){let valid=new Set(t.roster.filter(p=>role.eligible.includes(p.pos)).map(p=>p.id)),arr=(t.roleDepth[role.id]||[]).filter(id=>valid.has(id));for(const p of t.roster.filter(p=>role.eligible.includes(p.pos)))if(!arr.includes(p.id))arr.push(p.id);t.roleDepth[role.id]=arr}}
 function rolePlayers(t,id){if(!t.roleDepth||!t.roleDepth[id])ensureRoleDepth(t);let role=ROLE_BY_ID[id],by=new Map(t.roster.filter(p=>role?.eligible.includes(p.pos)).map(p=>[p.id,p]));return (t.roleDepth[id]||[]).map(x=>by.get(x)).filter(Boolean)}
 function roleStarter(t,id){let a=rolePlayers(t,id),ready=a.filter(gameAvailable);return ready.find(p=>weeklyPlayerPlan(p)?.role!=='limited')||ready[0]||a[0]||null}
+// One definition of a player's roles for every screen. The listed starter keeps the role with a
+// designation when he won't play (redshirt protected, or out), and whoever actually starts in
+// games in his place is marked as filling in.
+function roleDesignations(t,p){
+ if(!t||!p)return[];
+ return ROLE_DEFS.flatMap(role=>{
+  const listed=rolePlayers(t,role.id)[0],plays=roleStarter(t,role.id);
+  if(listed?.id===p.id){
+   if(plays?.id===p.id)return[role.label];
+   return[`${role.label} (${p.redshirtActive?'redshirt':gameAvailable(p)?'limited':'out'})`];
+  }
+  return plays?.id===p.id?[`${role.label} (fills in)`]:[];
+ });
+}
 function autoRoleDepth(t,useScout=false){t.roleDepth=makeRoleDepth(t,useScout)}
 function autoRedshirts(t){for(const p of t.roster){p.redshirtActive??=false;if(canRedshirt(p)&&eligibilityBase(p)===0&&(p.role==='Redshirt candidate'||p.perceived<68))p.redshirtActive=true}}
 function toggleRedshirt(id){let f=findPlayer(id);if(!f?.active)return;let p=f.p;if(p.redshirtActive){p.redshirtActive=false;render();return}if(!canRedshirt(p)){setStatus(`${p.name} is no longer redshirt-eligible this season.`);return}p.redshirtActive=true;render()}
