@@ -518,7 +518,10 @@ function schoolColors(school){
 }
 function hashString(str){let h=0;for(let i=0;i<str.length;i++)h=(h*31+str.charCodeAt(i))|0;return h}
 function ensureSchoolColors(t){if(!t)return t;const c=schoolColors(t);t.primary??=c.primary;t.secondary??=c.secondary;return t}
-function portraitSeedFor(){return `p${Date.now().toString(36)}${Math.floor(Math.random()*1e9).toString(36)}`}
+// A per-load counter plus one Math.random draw: unique within a universe, and reproducible
+// when Math.random is seeded (the old Date.now() prefix made seeded dynasties differ run to run).
+let portraitSeedCount=0;
+function portraitSeedFor(){return `p${(++portraitSeedCount).toString(36)}-${Math.floor(Math.random()*1e9).toString(36)}`}
 function jerseyFor(pos,seed){
  const bands={QB:[1,19],RB:[20,49],WR:[1,19],TE:[80,89],OT:[70,79],OG:[60,69],C:[50,59],EDGE:[40,59],DT:[90,99],LB:[40,59],CB:[20,39],S:[20,39],K:[1,19],P:[1,19]};
  const [lo,hi]=bands[pos]||[1,99];let h=0,str=String(seed);
@@ -3016,8 +3019,10 @@ function teamLogoHTML(teamId,size=24,extraClass=''){
 }
 function renderProgressionControls(){
  const preseason=openingPreseason(),regular=universe.phase==='regular'&&universe.week<12,u=selected(),weekGate=guidanceActionEligibility('advance-week',u),seasonGate=guidanceActionEligibility('simulate-season',u);
- for(const id of ['#simWeek','#seasonWeek'])$(id).disabled=!regular||!weekGate.allowed;
- $('#simSeason').disabled=!regular||!seasonGate.allowed;
+ // Explain the split state: a blocked week can still be simmed through by delegating to staff.
+ const weekBlocked=regular&&!weekGate.allowed,weekHint=weekBlocked?`${weekGate.blockers[0]?.message||'Resolve this week’s decisions first.'}${seasonGate.allowed?' Sim Regular Season lets your staff decide instead.':''}`:'';
+ for(const id of ['#simWeek','#seasonWeek']){$(id).disabled=!regular||!weekGate.allowed;$(id).title=weekHint}
+ $('#simSeason').disabled=!regular||!seasonGate.allowed;$('#simSeason').title=weekBlocked&&seasonGate.allowed?'Your staff will make the pending decisions each week.':'';
  const hub=$('#hubAdvance');hub.dataset.openingPreseason=preseason?'true':'false';hub.__beginSeason=beginSeason;
  if(preseason){hub.textContent='Begin Season';hub.disabled=false;hub.classList.add('recommended')}
  else{if(hub.textContent==='Begin Season')hub.textContent='Advance Week';hub.disabled=!weekGate.allowed;hub.classList.remove('recommended')}
