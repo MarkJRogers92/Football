@@ -1637,10 +1637,13 @@ function adminHubItems(t){
  if(universe.week<3)return[];
  if(reachable<exp)out.push({type:'bad-news',tab:'program',importance:82,
   kicker:'ADMINISTRATION',main:`${exp} wins is now out of reach`,
-  sub:`${t.w}-${t.l} with ${left} to play · confidence ${conf} (${adminConfidenceLabel(conf)})`});
+  sub:`${t.w}-${t.l} with ${left} to play · confidence ${conf} (${adminConfidenceLabel(conf)})${typeof adminOutlookModel==='function'&&adminOutlookModel(t)?.mode==='pace'?` → ${adminOutlookModel(t).projected} at this pace`:''}`});
  else if(conf<40)out.push({type:'alert',tab:'program',importance:72,
   kicker:'ADMINISTRATION',main:t.mandate?t.mandate.text:`The administration expects ${exp} wins`,
   sub:`${t.w}-${t.l} · confidence ${conf} (${adminConfidenceLabel(conf)})`});
+ // Early warning: the current pace would drop confidence into a worse band at the review.
+ else if(typeof adminOutlookModel==='function'){const o=adminOutlookModel(t);if(o?.mode==='pace'&&o.projected<conf&&o.projectedLabel!==adminConfidenceLabel(conf))out.push({type:'alert',tab:'dashboard',importance:66,
+  kicker:'ADMINISTRATION',main:`On pace to slip to ${o.projectedLabel}`,sub:`${o.projectedWins} projected wins against ${exp} expected · confidence ${conf} → ${o.projected}`})}
  return out;
 }
 // NIL. t.nil was a static number that only tilted recruitPitch; here it becomes a budget you spend.
