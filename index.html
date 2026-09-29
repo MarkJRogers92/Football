@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.4</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.5</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -832,6 +832,96 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 .ao-marker.before{border-color:var(--muted)}
 @media(max-width:500px){.ao-labels span{font-size:.55rem}}
 
+/* Game Cast: win probability chart and real-field replay (Game Center tab). Home is blue and
+   away is orange (a validated pair on the dark surface); team names always label the colors. */
+.game-cast{--gc-home:#3987e5;--gc-away:#d95926;display:grid;grid-template-columns:minmax(0,1fr);gap:14px;min-width:0}
+.game-cast>*{min-width:0}
+.gc-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 24px;align-items:flex-start}
+.gc-head h3{margin:2px 0 0}
+.gc-facts{margin:0;padding:0;list-style:none;display:grid;gap:4px;font-size:.86rem;color:var(--muted);max-width:620px;min-width:0;flex:1 1 280px;overflow-wrap:anywhere}
+.gc-facts strong{color:var(--text)}
+.gc-legend{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:.82rem}
+.gc-key{display:inline-flex;align-items:center;gap:6px;color:var(--text)}
+.gc-key::before{content:"";width:12px;height:12px;border-radius:3px;background:var(--gc-home)}
+.gc-key.away::before{background:var(--gc-away)}
+.gc-chart{position:relative;width:100%;min-width:0;min-height:180px}
+.gc-chart svg{display:block;overflow:visible}
+.gc-grid{stroke:var(--line);stroke-width:1}
+.gc-mid{stroke:var(--muted);stroke-width:1;stroke-dasharray:4 4}
+.gc-axis{fill:var(--muted);font-size:11px}
+.gc-side{fill:var(--muted);font-size:11px;font-weight:600}
+.gc-area.home{fill:var(--gc-home);opacity:.22}
+.gc-area.away{fill:var(--gc-away);opacity:.22}
+.gc-line{fill:none;stroke:var(--text);stroke-width:2;stroke-linejoin:round}
+.gc-score{stroke:var(--panel);stroke-width:2}
+.gc-score.home{fill:var(--gc-home)}
+.gc-score.away{fill:var(--gc-away)}
+.gc-cross{stroke:var(--muted);stroke-width:1}
+.gc-dot{fill:var(--text);stroke:var(--panel);stroke-width:2}
+.gc-now{stroke:var(--accent2);stroke-width:2;opacity:.8}
+.gc-tip{position:absolute;z-index:2;display:grid;gap:2px;width:220px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);box-shadow:0 8px 24px rgba(0,0,0,.35);font-size:.76rem;color:var(--muted);pointer-events:none}
+.gc-tip strong,.gc-tip b{color:var(--text)}
+.gc-replay{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel2)}
+.gc-board{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;font-size:.88rem}
+.gc-board strong{font-size:1.4rem;font-variant-numeric:tabular-nums}
+.gc-team{display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gc-team.home{justify-content:flex-end}
+.gc-team::before{content:"";flex:0 0 10px;height:10px;border-radius:2px;background:var(--gc-away)}
+.gc-team.home::before{order:2;background:var(--gc-home)}
+.gc-field{display:grid;grid-template-columns:8% 1fr 8%;height:64px;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+.gc-endzone{display:flex;align-items:center;justify-content:center;background:var(--gc-away)}
+.gc-endzone.home{background:var(--gc-home)}
+.gc-endzone span{writing-mode:vertical-rl;transform:rotate(180deg);font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;white-space:nowrap;overflow:hidden;max-height:60px}
+.gc-turf{position:relative;background:linear-gradient(180deg,#1f4a2c,#1a4026)}
+.gc-turf i{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.28)}
+.gc-turf i.mid{background:rgba(255,255,255,.55)}
+.gc-ball{position:absolute;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;display:grid;place-items:center;border-radius:50%;background:var(--text);color:var(--bg);font-size:.72rem;box-shadow:0 0 0 2px var(--bg);transition:left .45s ease}
+.gc-ball[data-offense="home"]{background:var(--gc-home);color:#fff}
+.gc-ball[data-offense="away"]{background:var(--gc-away);color:#fff}
+.gc-play{min-height:2.6em;font-size:.86rem;color:var(--muted)}
+.gc-play strong{color:var(--text)}
+.gc-controls{display:flex;align-items:center;gap:10px}
+.gc-controls input[type=range]{flex:1;min-width:0}
+.gc-table table{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:8px}
+.gc-table th,.gc-table td{text-align:left;padding:4px 6px;border-bottom:1px solid var(--line)}
+@media(prefers-reduced-motion:reduce){.gc-ball{transition:none}}
+@media(max-width:560px){.gc-field{height:52px}.gc-board strong{font-size:1.15rem}}
+.gc-tip[hidden]{display:none}
+
+/* Recruiting map. Status colours are a validated trio on the dark surface (blue / orange / aqua);
+   targets are diamonds and open recruits are small grey dots, so shape backs up colour. */
+.recruit-map{--rm-mine:#3987e5;--rm-target:#d95926;--rm-else:#199e70;--rm-open:#5d6878}
+.rm-filters{display:flex;flex-wrap:wrap;gap:6px}
+.rm-filters button{padding:5px 10px;font-size:.78rem}
+.rm-filters button[aria-pressed="true"]{border-color:var(--accent2);color:var(--text);background:rgba(143,177,255,.12)}
+.rm-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0 0 8px;font-size:.8rem;color:var(--muted)}
+.rm-key{display:inline-flex;align-items:center;gap:6px;background:none;padding:0}
+.rm-key b{color:var(--text);font-weight:600}
+.rm-key i{width:10px;height:10px;border-radius:50%;background:var(--rm-open)}
+.rm-key.rm-s-mine i{background:var(--rm-mine)}
+.rm-key.rm-s-target i{background:var(--rm-target);border-radius:1px;transform:rotate(45deg) scale(.85)}
+.rm-key.rm-s-elsewhere i{background:var(--rm-else)}
+.rm-key.rm-s-ring i{background:none;border:1px dashed var(--muted)}
+.rm-stage{position:relative}
+.rm-stage svg{display:block;width:100%;height:auto;border-radius:10px;background:#0f1520}
+.rm-land{fill:#1c2533;stroke:#324158;stroke-width:1.2}
+.rm-inset{fill:none;stroke:#2a3444;stroke-width:1;stroke-dasharray:3 3}
+.rm-ring{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:5 5;opacity:.55}
+.rm-schools rect{fill:#6b778a;opacity:.55}
+.rm-arcs path{fill:none;stroke:var(--rm-mine);stroke-width:1.6;opacity:.55}
+.rm-mark{cursor:pointer}
+.rm-mark circle,.rm-mark path{stroke:#0f1520;stroke-width:1}
+.rm-mark.rm-s-mine circle{fill:var(--rm-mine)}
+.rm-mark.rm-s-target path{fill:var(--rm-target)}
+.rm-mark.rm-s-elsewhere circle{fill:var(--rm-else);opacity:.6}
+.rm-mark.rm-s-open circle{fill:var(--rm-open);opacity:.7}
+.rm-mark:hover circle,.rm-mark:hover path{stroke:var(--text);stroke-width:2}
+.rm-campus circle{fill:var(--text);stroke:var(--rm-mine);stroke-width:3}
+.rm-campus text{fill:var(--rm-mine);font-size:12px;font-weight:700}
+.rm-tip{position:absolute;z-index:2;display:grid;gap:2px;width:220px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);box-shadow:0 8px 24px rgba(0,0,0,.35);font-size:.76rem;color:var(--muted);pointer-events:none}
+.rm-tip strong{color:var(--text)}
+.rm-tip[hidden]{display:none}
+
 /* Dynasty Lab commercial polish layer (v0.9.14 pass).
    Loaded last. Presentation only: no simulation, storage or save-format code depends on it.
    Section 1 — flagship Dashboard. Later sections add shared primitives. */
@@ -1600,7 +1690,7 @@ html[data-dl-motion="reduced"] .dl-motion-result{animation:none!important;transf
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.4</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.5</b></span></footer>
   </div>
 </section>
 
@@ -1627,7 +1717,7 @@ html[data-dl-motion="reduced"] .dl-motion-result{animation:none!important;transf
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.12.4</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.12.5</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -1982,7 +2072,7 @@ html[data-dl-motion="reduced"] .dl-motion-result{animation:none!important;transf
   <div class="dialog-head"><div><div class="eyebrow">GAME CENTER</div><h2 id="gameDialogName"></h2></div><button class="dialog-close" aria-label="Close Game Center">Close</button></div>
   <p id="gameDialogMeta" class="muted"></p><p id="gamePregame" class="muted"></p>
   <div id="gameTabs" class="button-row" aria-label="Game Center sections">
-   <button type="button" data-game-tab="Watch">Watch</button><button type="button" data-game-tab="Summary">Summary</button><button type="button" data-game-tab="Box Score">Box Score</button><button type="button" data-game-tab="Drives">Drives</button><button type="button" data-game-tab="Play-by-Play">Play-by-Play</button>
+   <button type="button" data-game-tab="Watch">Watch</button><button type="button" data-game-tab="Summary">Summary</button><button type="button" data-game-tab="Game Cast" hidden>Game Cast</button><button type="button" data-game-tab="Box Score">Box Score</button><button type="button" data-game-tab="Drives">Drives</button><button type="button" data-game-tab="Play-by-Play">Play-by-Play</button>
   </div><div id="gameDialogBody"></div>
  </form>
 </dialog>
@@ -4654,7 +4744,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.12.4';
+const APP_VERSION='0.12.5';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -6021,9 +6111,9 @@ function showGameCenter(id,tab='Summary'){
  $('#gameDialogName').innerHTML=watching?`${teamLogoHTML(g.away.id,48,'team-logo--inline')} ${g.away.name} at ${teamLogoHTML(g.home.id,48,'team-logo--inline')} ${g.home.name}`:`${teamLogoHTML(g.away.id,48,'team-logo--inline')} ${g.away.name} ${g.score.away} — ${g.score.home} ${teamLogoHTML(g.home.id,48,'team-logo--inline')} ${g.home.name}`;
  $('#gameDialogMeta').textContent=`${watching?'WATCH MODE':'FINAL'} · ${g.season} · Week ${g.week} · ${g.label} · ${g.venue}`;
  $('#gamePregame').textContent=`Pregame: ${g.away.name} ${g.away.record} (#${g.away.rank??'—'}) · ${g.home.name} ${g.home.record} (#${g.home.rank??'—'})`;
- $$('#gameTabs button').forEach(b=>{b.classList.toggle('active',b.dataset.gameTab===tab);b.setAttribute('aria-pressed',String(b.dataset.gameTab===tab))});
- let html;if(tab==='Watch')html=gameWatchHTML(g);else if(tab==='Box Score')html=gameBoxHTML(g);else if(tab==='Drives')html=gameDrivesHTML(g);else if(tab==='Play-by-Play'){const archived=(g.drives||[]).flatMap(d=>(d.playByPlay||[]).map(x=>`${d.label}: ${x}`)),d=universe.lastDetailedGame,lines=archived.length?archived:(d?.gameId===id?d.log||[]:[]);html=lines.length?`<p class="muted">${archived.length?'Archived generated play log.':'Temporary simulation log (last 160 entries).'} The drive model names primary players; box scores allocate production across the rotation. Clock and exact field position are unavailable.</p>`+lines.map(x=>`<div class="playline">${gameEscape(x)}</div>`).join(''):'<p>Play-by-play is unavailable for this archived game. Box scores and recorded drive summaries remain permanent.</p>'}else html=gameSummaryHTML(g);
- $('#gameDialogBody').innerHTML=html;if(tab==='Box Score')bindGameBoxControls();const dialog=$('#gameDialog');if(!dialog.open)dialog.showModal();
+ $$('#gameTabs button').forEach(b=>{b.classList.toggle('active',b.dataset.gameTab===tab);b.setAttribute('aria-pressed',String(b.dataset.gameTab===tab));if(b.dataset.gameTab==='Game Cast')b.hidden=!g.drives?.length});
+ let html;if(tab==='Game Cast')html=gameCastHTML(g);else if(tab==='Watch')html=gameWatchHTML(g);else if(tab==='Box Score')html=gameBoxHTML(g);else if(tab==='Drives')html=gameDrivesHTML(g);else if(tab==='Play-by-Play'){const archived=(g.drives||[]).flatMap(d=>(d.playByPlay||[]).map(x=>`${d.label}: ${x}`)),d=universe.lastDetailedGame,lines=archived.length?archived:(d?.gameId===id?d.log||[]:[]);html=lines.length?`<p class="muted">${archived.length?'Archived generated play log.':'Temporary simulation log (last 160 entries).'} The drive model names primary players; box scores allocate production across the rotation. Clock and exact field position are unavailable.</p>`+lines.map(x=>`<div class="playline">${gameEscape(x)}</div>`).join(''):'<p>Play-by-play is unavailable for this archived game. Box scores and recorded drive summaries remain permanent.</p>'}else html=gameSummaryHTML(g);
+ $('#gameDialogBody').innerHTML=html;if(tab==='Box Score')bindGameBoxControls();if(tab==='Game Cast')bindGameCast();const dialog=$('#gameDialog');if(!dialog.open)dialog.showModal();
 }
 function renderGameArchive(){
  if(gamesAreDeferred())return storageOperation(async()=>{await ensureGamesLoaded();renderGameArchive()});
@@ -10681,6 +10771,193 @@ function renderAdminOutlook(){
 }
 extendRender('dashboard',renderAdminOutlook);
 globalThis.DynastyAdminOutlook={model:adminOutlookModel};
+
+// Game Cast: win probability and a real-field replay for games with recorded play-by-play.
+// Every point comes from the archived play lines ("Q1 14:18 · 1st & 10 at own 25 · ...") and
+// drive records; the model below only interprets them, it never alters a game.
+const GAME_CAST_LINE=/^(Q([1-4])|OT(\d*)) (\d+):(\d\d) · (\d)(?:st|nd|rd|th) & (\d+) at (own (\d+)|opp (\d+)|(50)) · (.*)$/;
+// Normal CDF (Abramowitz-Stegun 7.1.26), enough precision for a chart.
+function gameCastPhi(z){const t=1/(1+.3275911*Math.abs(z)/Math.SQRT2),y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-.284496736)*t+.254829592)*t*Math.exp(-z*z/2);return z>=0?(1+y)/2:(1-y)/2}
+// Home win probability from the lead, the value of the ball and the time left. Field position is
+// worth roughly 1.4 points at your own 25 and 5 points at the opponent's 20; the spread of possible
+// outcomes shrinks with the square root of time remaining.
+function gameCastWinProbability(lead,offense,yardsToGoal,secondsLeft){
+ const ep=offense?(6.5-.068*yardsToGoal)*(offense==='home'?1:-1):0;
+ const sigma=13.5*Math.sqrt(Math.max(secondsLeft,20)/3600);
+ return gameCastPhi((lead+ep*.6+1.2*secondsLeft/3600)/sigma);
+}
+function gameCastModel(g){
+ if(!g?.drives?.length)return null;
+ const plays=[],score={home:0,away:0};
+ for(const [di,d] of g.drives.entries()){
+  const side=d.side==='home'?'home':'away';let scored=0;
+  for(const line of d.playByPlay||[]){
+   const m=GAME_CAST_LINE.exec(line);if(!m)continue;
+   const q=m[2]?Number(m[2]):4+Math.max(1,Number(m[3])||1),clock=Number(m[4])*60+Number(m[5]);
+   const own=m[9]!=null?Number(m[9]):null,opp=m[10]!=null?Number(m[10]):null;
+   // x runs 0..100 from the away end zone (left) to the home end zone (right).
+   const fromOwn=own!=null?own:opp!=null?100-opp:50,x=side==='away'?fromOwn:100-fromOwn;
+   const secondsLeft=q<=4?(4-q)*900+clock:Math.min(clock,300),elapsed=q<=4?3600-secondsLeft:3600+(q-5)*300+(300-Math.min(clock,300));
+   const text=m[12],lead=score.home-score.away;
+   plays.push({drive:di,label:d.label,q,quarter:q<=4?`Q${q}`:`OT${q-4}`,clock:`${m[4]}:${m[5]}`,elapsed,x,offense:side,down:Number(m[6]),distance:Number(m[7]),text,
+    home:score.home,away:score.away,wp:gameCastWinProbability(lead,side,100-fromOwn,secondsLeft)});
+   const pts=/TOUCHDOWN/.test(text)?6:/extra point good/.test(text)?1:/field goal good/.test(text)?3:0;
+   if(pts){score[side]+=pts;scored+=pts;plays.at(-1).scoring=pts}
+  }
+  // Reconcile anything the text doesn't spell out (two-point tries, adjustments) at the drive's end.
+  const rest=(Number(d.points)||0)-scored;if(rest)score[side]+=rest;
+ }
+ if(!plays.length)return null;
+ const final={home:g.score.home,away:g.score.away},end=Math.max(3600,plays.at(-1).elapsed+30);
+ plays.push({final:true,quarter:'Final',clock:'0:00',elapsed:end,x:50,offense:null,text:'Final',home:final.home,away:final.away,wp:final.home>final.away?1:final.home<final.away?0:.5});
+ let swing=null;for(let i=1;i<plays.length-1;i++){const delta=plays[i+1].wp-plays[i].wp;if(!swing||Math.abs(delta)>Math.abs(swing.delta))swing={i,delta}}
+ const winner=final.home>final.away?'home':'away',winnerLow=Math.min(...plays.map(p=>winner==='home'?p.wp:1-p.wp));
+ return{home:g.home.name,away:g.away.name,plays,end,final,winner,swing,winnerLow};
+}
+function gameCastPct(v){return`${Math.round(v*100)}%`}
+function gameCastHTML(g){
+ const m=gameCastModel(g);
+ if(!m)return'<section class="watch-unavailable"><h3>Game Cast unavailable</h3><p>Game Cast needs recorded play-by-play, which is kept for games played in Game Lab or Game Day. Summary and Box Score still have the full result.</p></section>';
+ const W=m[m.winner],L=m[m.winner==='home'?'away':'home'],s=m.swing&&m.plays[m.swing.i],sp=s&&m.plays[m.swing.i+1];
+ const swingTeam=m.swing&&(m.swing.delta>0?m.home:m.away);
+ const facts=[`<li><strong>${gameEscape(W)}</strong> won ${m.final[m.winner]}–${m.final[m.winner==='home'?'away':'home']}${m.winnerLow<.25?`, rallying from as low as ${gameCastPct(m.winnerLow)} to win`:''}.</li>`];
+ if(s)facts.push(`<li>Biggest swing: <strong>${gameEscape(swingTeam)} +${gameCastPct(Math.abs(m.swing.delta))}</strong> · ${gameEscape(s.quarter)} ${gameEscape(s.clock)} · ${gameEscape(s.text)}</li>`);
+ const scoring=m.plays.filter(p=>p.scoring).map(p=>`<tr><td>${gameEscape(p.quarter)} ${gameEscape(p.clock)}</td><td>${gameEscape(m[p.offense])}</td><td>${gameEscape(p.text)}</td><td>${p.home+(p.offense==='home'?p.scoring:0)}–${p.away+(p.offense==='away'?p.scoring:0)}</td><td>${gameCastPct(p.wp)}</td></tr>`).join('');
+ return `<section class="game-cast" data-game-cast="${gameEscape(g.id)}">
+ <div class="gc-head"><div><div class="eyebrow">GAME CAST</div><h3>Win probability</h3></div><ul class="gc-facts">${facts.join('')}</ul></div>
+ <div class="gc-legend"><span class="gc-key home">${gameEscape(m.home)}</span><span class="gc-key away">${gameEscape(m.away)}</span><span class="muted small">Hover the chart for any moment · click to jump the replay</span></div>
+ <div class="gc-chart" data-gc-chart><div class="gc-tip" data-gc-tip hidden></div></div>
+ <div class="gc-replay">
+  <div class="gc-board"><span class="gc-team away">${gameEscape(m.away)}</span><strong data-gc-score>0 – 0</strong><span class="gc-team home">${gameEscape(m.home)}</span></div>
+  <div class="gc-field" role="img" aria-label="Field position replay"><div class="gc-endzone away"><span>${gameEscape(m.away)}</span></div><div class="gc-turf"><i style="left:10%"></i><i style="left:20%"></i><i style="left:30%"></i><i style="left:40%"></i><i class="mid" style="left:50%"></i><i style="left:60%"></i><i style="left:70%"></i><i style="left:80%"></i><i style="left:90%"></i><span class="gc-ball" data-gc-ball></span></div><div class="gc-endzone home"><span>${gameEscape(m.home)}</span></div></div>
+  <div class="gc-play" data-gc-play aria-live="polite"></div>
+  <div class="gc-controls"><button type="button" data-gc-toggle aria-pressed="false">▶ Play</button><input type="range" min="0" max="${m.plays.length-1}" value="0" step="1" data-gc-scrub aria-label="Replay position"><span class="small muted" data-gc-pos></span></div>
+ </div>
+ <details class="gc-table"><summary>Scoring plays table</summary><table><thead><tr><th>Time</th><th>Team</th><th>Play</th><th>Score (away–home)</th><th>${gameEscape(m.home)} win %</th></tr></thead><tbody>${scoring||'<tr><td colspan="5">No scoring plays recorded.</td></tr>'}</tbody></table></details>
+ </section>`;
+}
+function bindGameCast(){
+ const root=document.querySelector('[data-game-cast]');if(!root)return;
+ const g=(universe.gameArchive||[]).find(x=>x.id===root.dataset.gameCast),m=gameCastModel(g);if(!m)return;
+ const chart=root.querySelector('[data-gc-chart]'),tip=root.querySelector('[data-gc-tip]'),scrub=root.querySelector('[data-gc-scrub]'),toggle=root.querySelector('[data-gc-toggle]');
+ let current=0,timer=null,geo=null;
+ const draw=()=>{
+  const width=Math.max(280,chart.clientWidth||640),height=width<520?180:220,pad={l:36,r:10,t:12,b:24},iw=width-pad.l-pad.r,ih=height-pad.t-pad.b;
+  const X=e=>pad.l+e/m.end*iw,Y=v=>pad.t+(1-v)*ih;
+  geo={X,Y,width,height,pad,iw,ih};
+  const pts=m.plays.map(p=>[X(p.elapsed),Y(p.wp)]),line=pts.map((p,i)=>`${i?'L':'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(''),mid=Y(.5);
+  const area=`${line}L${pts.at(-1)[0].toFixed(1)},${mid}L${pts[0][0].toFixed(1)},${mid}Z`;
+  const quarters=[0,900,1800,2700,3600].filter(e=>e<=m.end).map((e,i)=>`<line x1="${X(e)}" x2="${X(e)}" y1="${pad.t}" y2="${pad.t+ih}" class="gc-grid"/>${i<4?`<text x="${X(e+450)}" y="${height-6}" class="gc-axis" text-anchor="middle">Q${i+1}</text>`:''}`).join('');
+  const marks=m.plays.map((p,i)=>p.scoring?`<circle cx="${pts[i+1][0].toFixed(1)}" cy="${pts[i+1][1].toFixed(1)}" r="4" class="gc-score ${p.offense}"/>`:'').join('');
+  chart.innerHTML=`<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="${gameEscape(`${m.home} win probability over the game, ending ${gameCastPct(m.plays.at(-1).wp)}`)}">
+   <defs><clipPath id="gcTop"><rect x="0" y="0" width="${width}" height="${mid}"/></clipPath><clipPath id="gcBottom"><rect x="0" y="${mid}" width="${width}" height="${height-mid}"/></clipPath></defs>
+   ${quarters}
+   <line x1="${pad.l}" x2="${pad.l+iw}" y1="${mid}" y2="${mid}" class="gc-mid"/>
+   <text x="${pad.l-6}" y="${Y(1)+4}" class="gc-axis" text-anchor="end">100%</text><text x="${pad.l-6}" y="${mid+4}" class="gc-axis" text-anchor="end">50%</text><text x="${pad.l-6}" y="${Y(0)}" class="gc-axis" text-anchor="end">100%</text>
+   <text x="${pad.l+6}" y="${Y(1)+12}" class="gc-side">▲ ${gameEscape(m.home)}</text><text x="${pad.l+6}" y="${Y(0)-6}" class="gc-side">▼ ${gameEscape(m.away)}</text>
+   <path d="${area}" class="gc-area home" clip-path="url(#gcTop)"/><path d="${area}" class="gc-area away" clip-path="url(#gcBottom)"/>
+   <path d="${line}" class="gc-line"/>${marks}
+   <line class="gc-cross" data-gc-cross x1="0" x2="0" y1="${pad.t}" y2="${pad.t+ih}" visibility="hidden"/><circle class="gc-dot" data-gc-dot r="5" visibility="hidden"/>
+   <line class="gc-now" data-gc-now x1="0" x2="0" y1="${pad.t}" y2="${pad.t+ih}"/>
+   <rect x="${pad.l}" y="${pad.t}" width="${iw}" height="${ih}" fill="transparent" data-gc-hit/>
+  </svg>`+tip.outerHTML;
+  const hit=chart.querySelector('[data-gc-hit]'),newTip=chart.querySelector('[data-gc-tip]');
+  const nearest=ev=>{const r=hit.getBoundingClientRect(),x=(ev.clientX-r.left)/r.width*iw+pad.l;let best=0;for(let i=0;i<m.plays.length;i++)if(Math.abs(X(m.plays[i].elapsed)-x)<Math.abs(X(m.plays[best].elapsed)-x))best=i;return best};
+  hit.addEventListener('mousemove',ev=>{const i=nearest(ev),p=m.plays[i],cx=X(p.elapsed),cy=Y(p.wp),cross=chart.querySelector('[data-gc-cross]'),dot=chart.querySelector('[data-gc-dot]');
+   cross.setAttribute('x1',cx);cross.setAttribute('x2',cx);cross.setAttribute('visibility','visible');dot.setAttribute('cx',cx);dot.setAttribute('cy',cy);dot.setAttribute('visibility','visible');
+   const leader=p.wp>=.5?m.home:m.away;
+   newTip.innerHTML=`<strong>${gameEscape(p.quarter)} ${gameEscape(p.clock)}</strong><span>${gameEscape(m.away)} ${p.away} – ${p.home} ${gameEscape(m.home)}</span>${p.final?'':`<span>${p.down}${['','st','nd','rd','th'][p.down]} & ${p.distance} · ${gameEscape(m[p.offense])} ball</span>`}<span>${gameEscape(p.text)}</span><span><b>${gameEscape(leader)} ${gameCastPct(Math.max(p.wp,1-p.wp))}</b> to win</span>`;
+   newTip.hidden=false;const left=Math.min(Math.max(cx+12,0),width-230);newTip.style.left=`${left}px`;newTip.style.top=`${Math.max(0,cy-40)}px`});
+  hit.addEventListener('mouseleave',()=>{chart.querySelector('[data-gc-cross]').setAttribute('visibility','hidden');chart.querySelector('[data-gc-dot]').setAttribute('visibility','hidden');newTip.hidden=true});
+  hit.addEventListener('click',ev=>{stop();show(nearest(ev))});
+  show(current);
+ };
+ const show=i=>{
+  current=Math.max(0,Math.min(m.plays.length-1,i));const p=m.plays[current];scrub.value=String(current);
+  root.querySelector('[data-gc-score]').textContent=`${p.away} – ${p.home}`;
+  const ball=root.querySelector('[data-gc-ball]');ball.style.left=`${p.x}%`;ball.dataset.offense=p.offense||'';ball.textContent=p.offense==='away'?'▶':p.offense==='home'?'◀':'●';
+  root.querySelector('[data-gc-play]').innerHTML=p.final?`<strong>Final</strong> · ${gameEscape(m[m.winner])} win`:`<strong>${gameEscape(p.quarter)} ${gameEscape(p.clock)}</strong> · ${p.down}${['','st','nd','rd','th'][p.down]} & ${p.distance} · ${gameEscape(p.text)}`;
+  root.querySelector('[data-gc-pos]').textContent=`Play ${current+1} of ${m.plays.length}`;
+  const now=chart.querySelector('[data-gc-now]');if(now&&geo){const cx=geo.X(p.elapsed);now.setAttribute('x1',cx);now.setAttribute('x2',cx)}
+ };
+ const stop=()=>{if(timer){clearInterval(timer);timer=null}toggle.textContent='▶ Play';toggle.setAttribute('aria-pressed','false')};
+ toggle.onclick=()=>{if(timer)return stop();if(current>=m.plays.length-1)show(0);toggle.textContent='❚❚ Pause';toggle.setAttribute('aria-pressed','true');timer=setInterval(()=>{if(current>=m.plays.length-1||!document.body.contains(root))return stop();show(current+1)},650)};
+ scrub.oninput=()=>{stop();show(Number(scrub.value))};
+ const start=()=>{if(!chart.clientWidth)return requestAnimationFrame(start);draw()};start();
+ if(window.ResizeObserver){const ro=new ResizeObserver(()=>{if(!document.body.contains(root))return ro.disconnect();const w=chart.clientWidth;if(w&&geo&&Math.abs(w-geo.width)>8)draw()});ro.observe(chart)}
+}
+globalThis.DynastyGameCast={model:gameCastModel,winProbability:gameCastWinProbability};
+
+// Recruiting map: every recruit plotted at his real hometown, with your commits arcing to campus.
+// Coordinates come from the recruit and school records; the outline is a simplified contiguous US
+// plus Alaska and Hawaii insets. Status colours are a CVD-validated trio, and shape carries the
+// same meaning so colour is never the only cue.
+const RECRUIT_MAP_US=[[-124.7,48.4],[-123.1,49],[-95.2,49],[-94.8,49.4],[-94.6,48.7],[-93,48.6],[-91,48.2],[-89.6,48],[-88.4,48.3],[-84.8,46.9],[-84.1,46.5],[-83.5,46.1],[-82.4,45.3],[-82.5,43],[-83.1,42.1],[-82.6,41.7],[-79.8,42.3],[-79,43.3],[-76.8,43.6],[-75,44.9],[-71.5,45],[-70.8,45.4],[-70,46.7],[-69.2,47.4],[-67.8,47.1],[-67.8,45.7],[-67,44.8],[-68.8,44.3],[-70.2,43.7],[-70.8,42.9],[-70.6,42],[-70,41.8],[-71.4,41.4],[-72.9,41.2],[-74,40.6],[-74.1,39.8],[-74.9,38.9],[-75.5,38.5],[-75.9,37.3],[-76.3,36.9],[-75.5,35.2],[-76.5,34.7],[-77.9,33.9],[-79.2,33.2],[-80.8,32.1],[-81.4,31],[-81.3,29.7],[-80.5,28.1],[-80,26.7],[-80.4,25.2],[-81.1,25.1],[-81.8,26.1],[-82.7,27.5],[-82.9,29.1],[-84,30],[-85.4,29.7],[-86.5,30.4],[-88,30.4],[-89.6,30.2],[-89.4,29.2],[-90.2,29.1],[-91.3,29.3],[-92.3,29.6],[-93.8,29.7],[-94.8,29.3],[-96.4,28.4],[-97.2,27.6],[-97.4,26],[-99.1,26.4],[-99.5,27.5],[-100.3,28.3],[-101.4,29.8],[-102.4,29.8],[-103.1,29],[-104.5,29.6],[-106.4,31.8],[-108.2,31.8],[-108.2,31.3],[-111.1,31.3],[-114.8,32.5],[-117.1,32.5],[-117.3,33.2],[-118.5,34],[-120.6,34.6],[-121.9,36.6],[-122.5,37.8],[-123.7,39],[-124.2,40.4],[-124.2,42],[-124.5,43],[-124,46.3],[-124.7,48.4]];
+const RECRUIT_MAP_AK=[[-141,69.6],[-156.8,71.3],[-166.4,68.9],[-162,66.5],[-166,65.3],[-164.6,63.2],[-166,61.5],[-161.9,58.7],[-157.5,58.8],[-162,55.2],[-152,57.5],[-150.5,59.5],[-146,60.5],[-141,60],[-135,58.5],[-131,55.3],[-133.5,57.8],[-137,59.2],[-141,60]];
+const RECRUIT_MAP_HI=[[-155.5,19.6,.55],[-156.3,20.8,.3],[-158,21.45,.25],[-159.5,22.05,.22]];
+const RECRUIT_MAP_W=1000,RECRUIT_MAP_H=560;
+function recruitMapProject(lat,lon){
+ if(lat>50&&lon<-129)return[20+(lon+170)*3.3,RECRUIT_MAP_H-8-(lat-51)*5.4];          // Alaska inset
+ if(lon<-150&&lat<24)return[225+(lon+160.5)*13,RECRUIT_MAP_H-18-(lat-18.8)*13];      // Hawaii inset
+ return[(lon+125)*.788*21.7+4,(49.6-lat)*21.7+6];
+}
+const recruitMapPath=pts=>pts.map(([lon,lat],i)=>{const [x,y]=recruitMapProject(lat,lon);return`${i?'L':'M'}${x.toFixed(1)},${y.toFixed(1)}`}).join('')+'Z';
+// Miles to map units near a latitude, for the distance rings around campus.
+function recruitMapMiles(miles){return miles/69*21.7}
+const RECRUIT_MAP_STATUS=[
+ {id:'mine',label:'Committed to you'},{id:'target',label:'Your targets'},{id:'elsewhere',label:'Committed elsewhere'},{id:'open',label:'Uncommitted'}];
+let recruitMapFilter='3';
+function recruitMapJitter(id){let h=2166136261;for(const c of String(id)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)>>>0}const a=(h%360)*Math.PI/180,r=((h>>>9)%100)/100*6;return[Math.cos(a)*r,Math.sin(a)*r]}
+function recruitMapModel(t=selected()){
+ if(!t||!universe?.recruits?.length)return null;
+ const min=recruitMapFilter==='all'?0:Number(recruitMapFilter);
+ const status=r=>r.committed===t.name?'mine':r.targeted&&!r.committed?'target':r.committed?'elsewhere':'open';
+ const recruits=universe.recruits.filter(r=>Number.isFinite(r.lat)&&Number.isFinite(r.lon)).map(r=>({r,status:status(r)}))
+  .filter(x=>x.status==='mine'||x.status==='target'||(x.r.stars||0)>=min);
+ const counts=Object.fromEntries(RECRUIT_MAP_STATUS.map(s=>[s.id,recruits.filter(x=>x.status===s.id).length]));
+ return{team:t,recruits,counts,campus:recruitMapProject(t.lat||0,t.lon||0)};
+}
+function recruitMapHTML(m){
+ const [cx,cy]=m.campus,order={open:0,elsewhere:1,target:2,mine:3};
+ const marks=m.recruits.slice().sort((a,b)=>order[a.status]-order[b.status]||(a.r.stars||0)-(b.r.stars||0)).map(({r,status})=>{
+  const [px,py]=recruitMapProject(r.lat,r.lon),[jx,jy]=recruitMapJitter(r.id),x=px+jx,y=py+jy,s=(2+(r.stars||1)*1.2)*(status==='elsewhere'?.8:1);
+  const shape=status==='target'?`<path d="M${x.toFixed(1)},${(y-s-1).toFixed(1)}l${s+1},${s+1}l-${s+1},${s+1}l-${s+1},-${s+1}z"/>`:`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(status==='open'?s*.7:s).toFixed(1)}"/>`;
+  return`<g class="rm-mark rm-s-${status}" data-rm-recruit="${esc(r.id)}" tabindex="-1">${shape}</g>`;
+ }).join('');
+ const arcs=m.recruits.filter(x=>x.status==='mine').map(({r})=>{const [px,py]=recruitMapProject(r.lat,r.lon),[jx,jy]=recruitMapJitter(r.id),x=px+jx,y=py+jy,mx=(x+cx)/2,my=Math.min(y,cy)-Math.hypot(x-cx,y-cy)*.22;return`<path d="M${x.toFixed(1)},${y.toFixed(1)}Q${mx.toFixed(1)},${my.toFixed(1)} ${cx.toFixed(1)},${cy.toFixed(1)}"/>`}).join('');
+ const schools=universe.teams.filter(s=>s.id!==m.team.id&&Number.isFinite(s.lat)).map(s=>{const [x,y]=recruitMapProject(s.lat,s.lon);return`<rect x="${(x-1.6).toFixed(1)}" y="${(y-1.6).toFixed(1)}" width="3.2" height="3.2"/>`}).join('');
+ const hawaii=RECRUIT_MAP_HI.map(([lon,lat,r])=>{const [x,y]=recruitMapProject(lat,lon);return`<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${(r*13).toFixed(1)}" ry="${(r*9).toFixed(1)}"/>`}).join('');
+ const filters=[['3','3★ and up'],['4','4★ and up'],['5','5★ only'],['all','All recruits']].map(([v,l])=>`<button type="button" data-rm-filter="${v}" aria-pressed="${recruitMapFilter===v}">${l}</button>`).join('');
+ const legend=RECRUIT_MAP_STATUS.map(s=>`<span class="rm-key rm-s-${s.id}"><i></i>${esc(s.label)} <b>${m.counts[s.id]}</b></span>`).join('');
+ return`<div class="section-head"><div><div class="eyebrow">RECRUITING MAP</div><h3>Where your class is coming from</h3></div><div class="rm-filters" role="group" aria-label="Star filter">${filters}</div></div>
+ <div class="rm-legend">${legend}<span class="rm-key rm-s-ring"><i></i>250 / 500 miles from campus</span></div>
+ <div class="rm-stage"><svg viewBox="0 0 ${RECRUIT_MAP_W} ${RECRUIT_MAP_H}" role="img" aria-label="${esc(`Map of ${m.recruits.length} recruits: ${m.counts.mine} committed to ${m.team.name}, ${m.counts.target} targets`)}">
+  <path class="rm-land" d="${recruitMapPath(RECRUIT_MAP_US)}"/><path class="rm-land" d="${recruitMapPath(RECRUIT_MAP_AK)}"/><g class="rm-land">${hawaii}</g>
+  <rect class="rm-inset" x="8" y="${RECRUIT_MAP_H-128}" width="160" height="122" rx="6"/><rect class="rm-inset" x="176" y="${RECRUIT_MAP_H-72}" width="120" height="66" rx="6"/>
+  <circle class="rm-ring" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${recruitMapMiles(250).toFixed(1)}"/><circle class="rm-ring" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${recruitMapMiles(500).toFixed(1)}"/>
+  <g class="rm-schools">${schools}</g><g class="rm-arcs">${arcs}</g><g class="rm-marks">${marks}</g>
+  <g class="rm-campus"><circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="9"/><text x="${cx.toFixed(1)}" y="${(cy+4).toFixed(1)}" text-anchor="middle">★</text></g>
+ </svg><div class="rm-tip" data-rm-tip hidden></div></div>
+ <p class="small muted">Dot size is star rating. Click a recruit to open his profile. Small squares are other programs.</p>`;
+}
+function renderRecruitMap(){
+ const anchor=document.querySelector('#classSummary');if(!anchor)return;
+ let host=document.querySelector('#recruitMap');const m=recruitMapModel();
+ if(!m){if(host)host.hidden=true;return}
+ if(!host){host=document.createElement('section');host.id='recruitMap';host.className='card recruit-map';anchor.after(host)}
+ host.hidden=false;host.innerHTML=recruitMapHTML(m);
+ const tip=host.querySelector('[data-rm-tip]'),stage=host.querySelector('.rm-stage'),byId=new Map(m.recruits.map(x=>[String(x.r.id),x]));
+ host.querySelectorAll('[data-rm-filter]').forEach(b=>b.onclick=()=>{recruitMapFilter=b.dataset.rmFilter;renderRecruitMap()});
+ const find=ev=>ev.target.closest?.('[data-rm-recruit]');
+ stage.addEventListener('mousemove',ev=>{const g=find(ev);if(!g){tip.hidden=true;return}const {r,status}=byId.get(g.dataset.rmRecruit)||{};if(!r)return;
+  const where=status==='mine'?`Committed to ${esc(m.team.name)}`:r.committed?`Committed to ${esc(r.committed)}`:`${r.interest??0}% interest${r.leader?` · leader: ${esc(r.leader)}`:''}`;
+  tip.innerHTML=`<strong>${'★'.repeat(r.stars||0)} ${esc(r.pos)} ${esc(r.name)}</strong><span>${esc(r.homeCity||'')}, ${esc(r.homeState||'')} · #${esc(r.nationalRank??'—')} nationally</span><span>${where}</span><span>${Math.round(recruitDistance(m.team,r))} miles from campus</span>`;
+  const box=stage.getBoundingClientRect();tip.hidden=false;tip.style.left=`${Math.min(ev.clientX-box.left+14,box.width-230)}px`;tip.style.top=`${Math.max(0,ev.clientY-box.top-10)}px`});
+ stage.addEventListener('mouseleave',()=>{tip.hidden=true});
+ stage.addEventListener('click',ev=>{const g=find(ev),hit=g&&byId.get(g.dataset.rmRecruit);if(hit)showRecruitProfile(hit.r.id)});
+}
+extendRender('recruiting',renderRecruitMap);
+globalThis.DynastyRecruitMap={model:recruitMapModel,project:recruitMapProject,setFilter:v=>{recruitMapFilter=v}};
 
 // One-time new-dynasty setup. This extension is injected before app bootstrap so it
 // can use the simulation and persistence services without creating a second state model.
