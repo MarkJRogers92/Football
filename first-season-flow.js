@@ -92,7 +92,8 @@ function buildBriefing({mode='normal',week=0,opponent='',carryForward=null,agend
   const nextStep=next&&typeof next==='object'?{...next}:next;
   return{
     mode:resolvedMode,
-    title:`Week ${Math.max(0,finite(week))+1} briefing`,
+    // Twelve regular-season weeks; after the last one the next briefing is the postseason, not Week 13.
+    title:finite(week)>=12?'Postseason briefing':`Week ${Math.max(0,finite(week))+1} briefing`,
     summary:text(opponent)?`Prepare for ${text(opponent)}.`:(bullets[0]?.text||'Review the week ahead.'),
     bullets,
     next:nextStep||null
