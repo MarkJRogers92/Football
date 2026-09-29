@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.12.5 — Game Cast, recruiting map and season review
+
+- Adds Game Cast to the Game Center for games with recorded play-by-play: a win-probability chart rebuilt from the real clock, score, possession and field position, a field replay that moves the ball to its recorded yard line, and a scoring-plays table.
+- Adds a recruiting map of every recruit's hometown, with commits arcing to campus, targets, rival commits and distance rings, filterable by stars and linked to recruit profiles.
+- Adds a Season in Review dashboard panel after the postseason, a board confidence meter with an in-season projection that matches the administration review, and weekly headlines in the newsletter and dashboard feed.
+- Keeps redshirted players on the depth chart with a redshirt designation, and gives every screen the same role labels (redshirt, out, limited, fills in).
+- Fixes stale postseason displays (last result, briefing titles, settled season goals), the weekly briefing label and the per-week status line.
+- Simulates seasons about 3.4 times faster with byte-identical same-seed results, and runs unit tests on every push and 23 more browser suites in CI.
+
 ## v0.12.4 — First-season coaching flow
 
 - Adds a Week Opening briefing that carries forward the actual previous result, existing Game Engine v2 game-plan feedback, the current opponent, required work, and factual player-story context.
