@@ -23,5 +23,5 @@ The deployable web product is one generated HTML file containing markup, CSS, an
 
 - Source files, not `index.html` or `gh-pages`, are canonical; generated output must remain current through `npm run build`.
 - Guidance derives from authoritative gameplay state and advancement rules rather than creating a parallel task system. Persistent preferences are normalized as backward-compatible save state.
-- Version authority is `VERSION.txt`, checked against `app.js` and `package.json`; the current source version is `0.12.3`.
+- Version authority is `VERSION.txt`, checked against `app.js` and `package.json`; the current source version is `0.12.4`.
 - Publication is separate from source work. This documentation installation records no new deployment or release.

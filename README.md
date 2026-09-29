@@ -5,7 +5,7 @@ ability, role-based depth charts, recruiting with real geography, scouting and
 development, coaching careers, weekly game-day play and permanent program
 history. It ships as a standalone web build and as an Electron desktop alpha.
 
-Current version: **0.12.3** (see `VERSION.txt`). `CHANGELOG.md` has the
+Current version: **0.12.4** (see `VERSION.txt`). `CHANGELOG.md` has the
 version-by-version record.
 
 ## Source layout
