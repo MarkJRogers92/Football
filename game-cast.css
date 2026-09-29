@@ -52,3 +52,4 @@
 .gc-table th,.gc-table td{text-align:left;padding:4px 6px;border-bottom:1px solid var(--line)}
 @media(prefers-reduced-motion:reduce){.gc-ball{transition:none}}
 @media(max-width:560px){.gc-field{height:52px}.gc-board strong{font-size:1.15rem}}
+.gc-tip[hidden]{display:none}
