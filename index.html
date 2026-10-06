@@ -7209,7 +7209,7 @@ function completeScheduledGame(g,r,detailed=false){
  if(detailed)g.detailed=true;
  settleRivalryGame(g);
 }
-function watchUserDetailed(){const before=universe.lastDetailedGame?.gameId;simulateUserDetailed();const id=universe.lastDetailedGame?.gameId;if(id&&id!==before)showGameCenter(id,'Watch')}
+function watchUserDetailed(){const before=universe.lastDetailedGame?.gameId;simulateUserDetailed();const id=universe.lastDetailedGame?.gameId;if(id&&id!==before)showGameCenter(id,universe.playLogs?.[id]?'Game Cast':'Watch')}
 function hasPendingCareerChoice(){return !!(universe.jobOffers||[]).length}
 function simWeek(skipDecisions=false){const gate=guidanceActionEligibility(skipDecisions===true?'simulate-season':'advance-week');if(!gate.allowed){if(gate.blockers[0])setStatus(gate.blockers[0].message);return}recoverWeek();const u=selected(),beforeRank=u.rank;advanceAcademicsForWeek(u);let results=[];for(const g of universe.schedule[universe.week]){if(g.played){settleRivalryGame(g);continue;}let r=gameSim(T(g.home),T(g.away),false,g.conf);completeScheduledGame(g,r);results.push(r);if(g.home===u.name||g.away===u.name)universe.lastDetailedGame=null}const userGame=universe.schedule[universe.week].find(g=>g.played&&(g.home===u.name||g.away===u.name));universe.week++;if(results.length)universe.latest=results;ranked();advanceRecruiting();buildWeeklyHub(beforeRank);if(universe.week===12)universe.phase='confReady';setStatus(weekResultStatus(universe.week,u,userGame));autosaveAfter('week');render()}
 function weekResultStatus(week,u,g){if(!g?.score)return `Week ${week} complete.`;const home=g.home===u.name,us=home?g.score[1]:g.score[0],them=home?g.score[0]:g.score[1];return `Week ${week} final: ${g.winner===u.name?'W':'L'} ${us}-${them} ${home?'vs':'at'} ${home?g.away:g.home}.`}
@@ -10937,10 +10937,11 @@ function gameCastHTML(g){
  const scoring=m.plays.filter(p=>p.scoring).map(p=>`<tr><td>${gameEscape(p.quarter)} ${gameEscape(p.clock)}</td><td>${gameEscape(m[p.offense])}</td><td>${gameEscape(p.text)}</td><td>${p.home+(p.offense==='home'?p.scoring:0)}–${p.away+(p.offense==='away'?p.scoring:0)}</td><td>${gameCastPct(p.wp)}</td></tr>`).join('');
  return `<section class="game-cast" data-game-cast="${gameEscape(g.id)}">
  <div class="gc-head"><div><div class="eyebrow">GAME CAST</div><h3>Win probability</h3></div><ul class="gc-facts">${facts.join('')}</ul></div>
- <div class="gc-legend"><span class="gc-key home">${gameEscape(m.home)}</span><span class="gc-key away">${gameEscape(m.away)}</span><span class="muted small">Hover the chart for any moment · click to jump the replay</span></div>
  <p class="gc-mode small muted" data-gc-mode>${full?'Full 3D replay: every snap, with players, from the saved play log.':'Position replay. Full 3D replays are kept for your team’s games this season.'}</p>
+ ${full?'<div class="gc-replay gc-replay-3d" data-gcf-host></div>':''}
+ <div class="gc-legend"><span class="gc-key home">${gameEscape(m.home)}</span><span class="gc-key away">${gameEscape(m.away)}</span><span class="muted small">Hover the chart for any moment · click to jump the replay</span></div>
  <div class="gc-chart" data-gc-chart><div class="gc-tip" data-gc-tip hidden></div></div>
- ${full?'<div class="gc-replay gc-replay-3d" data-gcf-host></div>':`<div class="gc-replay">
+ ${full?'':`<div class="gc-replay">
   <div class="gc-board"><span class="gc-team away">${gameEscape(m.away)}</span><strong data-gc-score>0 – 0</strong><span class="gc-team home">${gameEscape(m.home)}</span></div>
   <div class="gc-field" role="img" aria-label="Field position replay"><div class="gc-endzone away"><span>${gameEscape(m.away)}</span></div><div class="gc-turf"><i style="left:10%"></i><i style="left:20%"></i><i style="left:30%"></i><i style="left:40%"></i><i class="mid" style="left:50%"></i><i style="left:60%"></i><i style="left:70%"></i><i style="left:80%"></i><i style="left:90%"></i><span class="gc-ball" data-gc-ball></span></div><div class="gc-endzone home"><span>${gameEscape(m.home)}</span></div></div>
   <div class="gc-play" data-gc-play aria-live="polite"></div>

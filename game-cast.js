@@ -61,10 +61,11 @@ function gameCastHTML(g){
  const scoring=m.plays.filter(p=>p.scoring).map(p=>`<tr><td>${gameEscape(p.quarter)} ${gameEscape(p.clock)}</td><td>${gameEscape(m[p.offense])}</td><td>${gameEscape(p.text)}</td><td>${p.home+(p.offense==='home'?p.scoring:0)}–${p.away+(p.offense==='away'?p.scoring:0)}</td><td>${gameCastPct(p.wp)}</td></tr>`).join('');
  return `<section class="game-cast" data-game-cast="${gameEscape(g.id)}">
  <div class="gc-head"><div><div class="eyebrow">GAME CAST</div><h3>Win probability</h3></div><ul class="gc-facts">${facts.join('')}</ul></div>
- <div class="gc-legend"><span class="gc-key home">${gameEscape(m.home)}</span><span class="gc-key away">${gameEscape(m.away)}</span><span class="muted small">Hover the chart for any moment · click to jump the replay</span></div>
  <p class="gc-mode small muted" data-gc-mode>${full?'Full 3D replay: every snap, with players, from the saved play log.':'Position replay. Full 3D replays are kept for your team’s games this season.'}</p>
+ ${full?'<div class="gc-replay gc-replay-3d" data-gcf-host></div>':''}
+ <div class="gc-legend"><span class="gc-key home">${gameEscape(m.home)}</span><span class="gc-key away">${gameEscape(m.away)}</span><span class="muted small">Hover the chart for any moment · click to jump the replay</span></div>
  <div class="gc-chart" data-gc-chart><div class="gc-tip" data-gc-tip hidden></div></div>
- ${full?'<div class="gc-replay gc-replay-3d" data-gcf-host></div>':`<div class="gc-replay">
+ ${full?'':`<div class="gc-replay">
   <div class="gc-board"><span class="gc-team away">${gameEscape(m.away)}</span><strong data-gc-score>0 – 0</strong><span class="gc-team home">${gameEscape(m.home)}</span></div>
   <div class="gc-field" role="img" aria-label="Field position replay"><div class="gc-endzone away"><span>${gameEscape(m.away)}</span></div><div class="gc-turf"><i style="left:10%"></i><i style="left:20%"></i><i style="left:30%"></i><i style="left:40%"></i><i class="mid" style="left:50%"></i><i style="left:60%"></i><i style="left:70%"></i><i style="left:80%"></i><i style="left:90%"></i><span class="gc-ball" data-gc-ball></span></div><div class="gc-endzone home"><span>${gameEscape(m.home)}</span></div></div>
   <div class="gc-play" data-gc-play aria-live="polite"></div>
