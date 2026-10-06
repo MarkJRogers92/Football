@@ -51,6 +51,7 @@ function gameCastHTML(g){
  const scoring=m.plays.filter(p=>p.scoring).map(p=>`<tr><td>${gameEscape(p.quarter)} ${gameEscape(p.clock)}</td><td>${gameEscape(m[p.offense])}</td><td>${gameEscape(p.text)}</td><td>${p.home+(p.offense==='home'?p.scoring:0)}–${p.away+(p.offense==='away'?p.scoring:0)}</td><td>${gameCastPct(p.wp)}</td></tr>`).join('');
  return `<section class="game-cast" data-game-cast="${gameEscape(g.id)}">
  <div class="gc-head"><div><div class="eyebrow">GAME CAST</div><h3>Win probability</h3></div><ul class="gc-facts">${facts.join('')}</ul></div>
+ ${gameCastPlayLog(g)?`<div class="gc-watch-cta"><button type="button" class="game-link game-link--primary" data-game="${gameEscape(g.id)}" data-game-tab="Watch">▶ Watch the 3D replay</button><span class="small muted">Every snap on an angled field, with players.</span></div>`:''}
  <div class="gc-legend"><span class="gc-key home">${gameEscape(m.home)}</span><span class="gc-key away">${gameEscape(m.away)}</span><span class="muted small">Hover the chart for any moment · click to jump the replay</span></div>
  <div class="gc-chart" data-gc-chart><div class="gc-tip" data-gc-tip hidden></div></div>
  <div class="gc-replay">
@@ -112,4 +113,29 @@ function bindGameCast(){
  const start=()=>{if(!chart.clientWidth)return requestAnimationFrame(start);draw()};start();
  if(window.ResizeObserver){const ro=new ResizeObserver(()=>{if(!document.body.contains(root))return ro.disconnect();const w=chart.clientWidth;if(w&&geo&&Math.abs(w-geo.width)>8)draw()});ro.observe(chart)}
 }
+// Watch tab: the 3D replay for games with a saved play log (the user's games this season).
+// Games without one keep the drive-by-drive Watch view.
+function gameCastPlayLog(g){const rows=g?.id!=null?universe.playLogs?.[g.id]:null;return Array.isArray(rows)&&rows.length&&globalThis.DynastyGameCastField?rows:null}
+function gameCastFieldMeta(g,rows){
+ const names={},brand=id=>globalThis.DynastyProgramBranding?.brandFor?.(id)||null;
+ for(const side of ['home','away'])for(const line of g.playerStats?.[side]||[])if(line?.id!=null)names[line.id]=line.name;
+ const missing=new Set();for(const r of rows)for(const id of Object.values(r.a||{}))if(typeof id==='string'&&!(id in names))missing.add(id);
+ if(missing.size)for(const t of [T(g.home?.name),T(g.away?.name)])for(const p of t?.roster||[])if(missing.has(p.id))names[p.id]=p.name;
+ return{names,home:{name:g.home.name,brand:brand(g.home.id)},away:{name:g.away.name,brand:brand(g.away.id)}};
+}
+function gameCastWatchHTML(g){
+ if(!gameCastPlayLog(g))return null;
+ return `<section class="gc-watch" data-game-cast-watch="${gameEscape(g.id)}"><div class="gc-replay gc-replay-3d" data-gcf-host></div>
+ <p class="gc-watch-foot small muted">Space plays or pauses · ← → step a play · Shift + ← → change drive · win probability and scoring plays are on the Game Cast tab.</p></section>`;
+}
+function bindGameCastWatch({autoplay=true}={}){
+ const root=document.querySelector('[data-game-cast-watch]');if(!root)return null;
+ const g=(universe.gameArchive||[]).find(x=>x.id===root.dataset.gameCastWatch),rows=gameCastPlayLog(g);if(!rows)return null;
+ const host=root.querySelector('[data-gcf-host]'),field=globalThis.DynastyGameCastField.mount(host,{rows,meta:gameCastFieldMeta(g,rows)});
+ host.focus?.({preventScroll:true});
+ const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+ if(field&&autoplay&&!reduced)setTimeout(()=>{if(root.isConnected&&!field.state.playing&&field.state.step===0)field.play()},450);
+ return field;
+}
 globalThis.DynastyGameCast={model:gameCastModel,winProbability:gameCastWinProbability};
+if(globalThis.__DL_TEST__)globalThis.__DL_TEST__.playLogKeys=()=>Object.keys(universe.playLogs||{});

@@ -26,6 +26,7 @@ function v2RecordCapture(g,home,away){
     hadEvents:Array.isArray(universe.events),eventsLength:Array.isArray(universe.events)?universe.events.length:0,
     hadNextEventId:Object.prototype.hasOwnProperty.call(universe,'nextEventId'),nextEventId:universe.nextEventId,
     hadCounter:Object.prototype.hasOwnProperty.call(universe,'gameCounter'),gameCounter:universe.gameCounter,
+    playLogKeys:universe.playLogs?Object.keys(universe.playLogs):null,
     lastDetailedGame:v2RecordClone(universe.lastDetailedGame),latest:v2RecordClone(universe.latest||[]),academicProgression:v2RecordClone(universe.academicProgression),rng:v2RecordClone(universe.rng),
     ranks:universe.teams.map(t=>({id:t.id,rank:t.rank}))
   }
@@ -37,6 +38,7 @@ function v2RecordRestore(snapshot,g,home,away){
   if(snapshot.hadEvents)universe.events.length=snapshot.eventsLength;else delete universe.events;
   if(snapshot.hadNextEventId)universe.nextEventId=snapshot.nextEventId;else delete universe.nextEventId;
   if(snapshot.hadCounter)universe.gameCounter=snapshot.gameCounter;else delete universe.gameCounter;
+  if(snapshot.playLogKeys==null)delete universe.playLogs;else if(universe.playLogs){const keep=new Set(snapshot.playLogKeys);for(const key of Object.keys(universe.playLogs))if(!keep.has(key))delete universe.playLogs[key]}
   universe.lastDetailedGame=v2RecordClone(snapshot.lastDetailedGame);universe.latest=v2RecordClone(snapshot.latest);universe.academicProgression=v2RecordClone(snapshot.academicProgression);
   const ranks=new Map(snapshot.ranks.map(x=>[x.id,x.rank]));for(const t of universe.teams)if(ranks.has(t.id))t.rank=ranks.get(t.id);
   activateGameplayRng(snapshot.rng,universe);universe.rng=v2RecordClone(snapshot.rng);rebuildIndexes()
@@ -77,4 +79,46 @@ function v2RecordDriveArchive(preview){
     else if(e.type==='safety'){drive.points+=2;drive.result='SAFETY';drive.playByPlay.push(v2RecordArchiveText(e,names))}
   }
   finish();return drives.slice(-40)
+}
+// v0.12.6 compact play log for the Game Cast field replay. One short-key row per Engine 2 event:
+// s seq, t type, sd side ('h'|'a'), q period, c clock after the event, p spot before the snap
+// (or where a new possession starts) from that side's own goal line, dn/ds down and distance
+// before the snap, y yards, k 'p' pass | 'r' rush, cp completed, sk sack, n punt net, tb touchback,
+// fd/m field goal distance and made, sc score [home, away] after a scoring event, a actor ids.
+const V2_PLAY_LOG_SCORING=new Set(['touchdown','extra_point','two_point','field_goal','safety','game_end']);
+function v2PlayLogSide(e){const s=e.team||e.receiver||e.to||e.possession;return s==='home'?'h':s==='away'?'a':undefined}
+function v2PlayLogProjection(state,attribution){
+  const rows=[],actors=attribution?.playActors||{};let prev=null;
+  for(const e of state?.events||[]){
+    const st=e.state||{};
+    if(e.type==='game_start'||e.type==='coaching_decision'){prev=st;continue}
+    const row={s:e.seq,t:e.type},sd=v2PlayLogSide(e);if(sd)row.sd=sd;
+    if(Number.isFinite(st.period))row.q=st.period;if(Number.isFinite(st.clock))row.c=st.clock;
+    const before=e.from||prev||{};
+    if(['scrimmage','interception','fumble','punt','field_goal'].includes(e.type)){
+      if(Number.isFinite(before.fieldPosition))row.p=before.fieldPosition;
+      if(before.down)row.dn=before.down;if(before.distance)row.ds=before.distance;
+    }
+    if(['scrimmage','interception','fumble'].includes(e.type)){
+      row.y=Number(e.yards)||0;
+      if(e.kind==='pass')row.k='p';else if(e.kind==='rush')row.k='r';
+      if(e.completed)row.cp=1;if(e.sack)row.sk=1;
+    }
+    if(e.type==='kickoff'||e.type==='possession_change'||e.type==='overtime_possession'||e.type==='overtime_start'){if(Number.isFinite(st.fieldPosition))row.p=st.fieldPosition;if(e.type==='kickoff')row.tb=1}
+    if(e.type==='possession_change'&&e.reason)row.r=e.reason;
+    if(e.type==='punt'){row.n=Number(e.net)||0;if(e.touchback)row.tb=1}
+    if(e.type==='field_goal'){row.fd=Number(e.distance)||0;if(e.made)row.m=1}
+    if((e.type==='extra_point'||e.type==='two_point')&&e.made!==false)row.m=1;
+    if(V2_PLAY_LOG_SCORING.has(e.type)&&st.score)row.sc=[st.score.home,st.score.away];
+    const a=actors[e.seq];if(a&&Object.keys(a).length)row.a=a;
+    rows.push(row);prev=st;
+  }
+  return rows;
+}
+// Kept for the user's games this season only; cleared at the season rollover.
+function v2StorePlayLog(gameId,state,attribution){
+  if(gameId==null||!state)return null;
+  universe.playLogs??={};
+  const rows=v2PlayLogProjection(state,attribution);
+  universe.playLogs[gameId]=rows;return rows;
 }

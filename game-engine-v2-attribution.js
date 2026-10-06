@@ -113,6 +113,14 @@ function addSnapToLine(result,offSide){
     ensureLine(result.lines[offSide],x.player).stats.snaps++;
   }
 }
+// Per-play actors for replays: ids only, keyed by event seq. Recording them draws no random
+// numbers, so stat lines are identical with or without this map.
+function noteActors(result,e,actors){
+  if(!Number.isFinite(e?.seq))return;
+  const row={};
+  for(const [key,p] of Object.entries(actors))if(p&&p.id!=null)row[key]=p.id;
+  result.playActors[e.seq]=row;
+}
 function eventIsSnap(e){
   return e.type==='scrimmage'||e.type==='interception'||e.type==='fumble';
 }
@@ -128,15 +136,20 @@ function completedPass(result,side,def,e,rng,team,qb,q,target){
   r.stats.recYds+=yards;
   r.stats.yac+=Math.max(0,Math.round(yards*.34));
   result.lastPlay[side]={type:'pass',qb,receiver:target};
-  if(e.state?.fieldPosition<100)addTackle(result,def,e,rng);
+  const tackler=e.state?.fieldPosition<100?addTackle(result,def,e,rng):null;
+  noteActors(result,e,{qb,tg:target,tk:tackler});
 }
 function incompletePass(result,side,def,e,rng,qb,target){
   result.lastPlay[side]={type:'pass',qb,receiver:target};
-  if(rng.next()<.10)ensureLine(result.lines[side],target).stats.drops++;
+  const dropped=rng.next()<.10;
+  if(dropped)ensureLine(result.lines[side],target).stats.drops++;
+  let breakup=null;
   if(rng.next()<.32){
-    const p=weightedPick(result.contexts[def].defenders,rng,'coverage');
-    if(p)ensureLine(result.lines[def],p).stats.passBreakups++;
+    breakup=weightedPick(result.contexts[def].defenders,rng,'coverage');
+    if(breakup)ensureLine(result.lines[def],breakup).stats.passBreakups++;
   }
+  noteActors(result,e,{qb,tg:target,pb:breakup});
+  if(dropped)result.playActors[e.seq].dr=1;
 }
 function attributeScrimmage(result,e,rng,side,def,team,ctx){
   const yards=Number(e.yards)||0;
@@ -156,9 +169,10 @@ function attributeScrimmage(result,e,rng,side,def,team,ctx){
       team.sacksTaken++;
       team.rushAtt++;
       team.rushYds+=yards;
-      addTackle(result,def,e,rng,{sack:true});
+      const sacker=addTackle(result,def,e,rng,{sack:true});
       addProtectionBlame(result,side,rng);
       result.lastPlay[side]={type:'sack',rusher:qb,qb};
+      noteActors(result,e,{qb,sb:sacker});
       return;
     }
 
@@ -181,7 +195,8 @@ function attributeScrimmage(result,e,rng,side,def,team,ctx){
   team.rushAtt++;
   team.rushYds+=yards;
   result.lastPlay[side]={type:'rush',rusher:runner};
-  if(e.state?.fieldPosition<100)addTackle(result,def,e,rng);
+  const tackler=e.state?.fieldPosition<100?addTackle(result,def,e,rng):null;
+  noteActors(result,e,{ca:runner,qb:ctx.qb,tk:tackler});
 }
 function attributeInterception(result,e,rng,side,def,team,ctx){
   const qb=ctx.qb||weightedPick(ctx.rushers,rng,'carry');
@@ -201,6 +216,7 @@ function attributeInterception(result,e,rng,side,def,team,ctx){
   const thief=weightedPick(dbs,rng,'takeaway')||weightedPick(result.contexts[def].defenders,rng,'takeaway');
   if(thief)ensureLine(result.lines[def],thief).stats.intDef++;
   result.lastPlay[side]={type:'interception',qb,receiver:target};
+  noteActors(result,e,{qb,tg:target,ib:thief});
 }
 function attributeFumble(result,e,rng,side,def,team,ctx){
   const yards=Number(e.yards)||0;
@@ -223,6 +239,7 @@ function attributeFumble(result,e,rng,side,def,team,ctx){
   const tackler=addTackle(result,def,e,rng,{sack:!!e.sack});
   if(tackler)ensureLine(result.lines[def],tackler).stats.forcedFumbles++;
   result.lastPlay[side]={type:'fumble',rusher:runner,qb:isPass?runner:null};
+  noteActors(result,e,{ca:runner,qb:isPass?runner:ctx.qb,ff:tackler});
 }
 function attributeTouchdown(result,side,team){
   const last=result.lastPlay[side];
@@ -248,7 +265,8 @@ function attributeGame(state,contexts={}){
     contexts:{home:normalizeContext(contexts.home),away:normalizeContext(contexts.away)},
     teamStats:{home:blankTeam(state.score?.home||0),away:blankTeam(state.score?.away||0)},
     lines:{home:new Map(),away:new Map()},
-    lastPlay:{home:null,away:null}
+    lastPlay:{home:null,away:null},
+    playActors:{}
   };
   const rng=DynastyRng.create(`${result.stateSeed}:attribution:v${VERSION}`);
 
@@ -283,6 +301,7 @@ function attributeGame(state,contexts={}){
     }else if(e.type==='field_goal'){
       team.fgAtt++;
       if(e.made)team.fgMade++;
+      noteActors(result,e,{kk:ctx.kicker});
       if(ctx.kicker){
         const k=ensureLine(result.lines[side],ctx.kicker);
         k.stats.fgAtt++;
@@ -291,6 +310,7 @@ function attributeGame(state,contexts={}){
     }else if(e.type==='punt'){
       team.punts++;
       team.puntYds+=Number(e.net)||0;
+      noteActors(result,e,{pt:ctx.punter});
       if(ctx.punter){
         const p=ensureLine(result.lines[side],ctx.punter);
         p.stats.punts++;

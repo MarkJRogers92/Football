@@ -1,6 +1,31 @@
 # Latest Session Work
 
-Updated 2026-09-12 for Dynasty Lab v0.12.4 release preparation.
+Updated 2026-10-06 for Dynasty Lab v0.12.6 (3D Game Cast replay).
+
+## v0.12.6 session (branch `claude/new-session-jhm5fm`)
+
+Built Parts 2 and 3 of `DYNASTY_LAB_HANDOFF_PlayByPlay_v0_12_5_rev2.md`. Part 1 (full detail for user games advanced with Sim Week / Sim Season) was **not** done; it still needs the owner's decision.
+
+- **Per-play actors** (`game-engine-v2-attribution.js`): `attributeGame()` returns `playActors[seq]` with player ids (`qb`, `tg`, `ca`, `tk`, `sb`, `ib`, `ff`, `pb`, `kk`, `pt`, `dr`). It draws no extra random numbers; `tests/game-cast-field.js` pins a digest of 200 games' stat lines taken from the v0.12.5 module.
+- **Play log** (`game-engine-v2-record-state.js`): `v2PlayLogProjection()` turns Engine 2 events into short-key rows, and `v2StorePlayLog()` saves them to `universe.playLogs[gameId]`. It's called from the Detailed Game, postseason and Game Day record paths, before the post-archive fault point, and the rollback snapshot removes any key it added. `normalizeUniverse()` defaults it to `{}`; the season rollover in `offseasonPreseason()` clears it.
+- **Where it lives:** the Game Center **Watch** tab renders the 3D replay when the game has a play log (`gameCastWatchHTML`/`bindGameCastWatch` in `game-cast.js`) and falls back to the original drive-by-drive `gameWatchHTML` otherwise. Watch My Next Game opens it and autoplays (not under reduced motion). Watch Replay buttons appear in `gameResultActions()` and on the Game Lab last-game card (`season-presentation-adapter.js` passes `hasReplay`). Game Cast keeps its chart and position replay, with a link to Watch. The owner chose not to fully simulate Sim Week games (Part 1 declined).
+- **Renderer** (`game-cast-field.js`, new): canvas 2D under a perspective camera on the near sideline (no library). `timeline()` turns rows into steps (game state before and after each step, drives, big-play flags computed at render time); `mount()` builds the scorebug, field, drive strip, play log and controls. `game-cast.js` uses it when a play log exists and keeps the text-parsed position replay otherwise.
+- **Measured:** about 18 KB per game; one season with 12 regular-season games and 1 postseason game came to 229 KB (34 MB universe). Key-plays mode finished a full game in 16.5–19.8 s in the browser test.
+
+### Deviations from the rev 2 handoff
+
+- `sc` (score) is written only on scoring rows and `game_end`; the timeline carries it forward. That's smaller, with the same result.
+- `possession_change` rows also carry `r` (reason), so the replay can show "Turnover on downs".
+- Play logs live in `universe.playLogs` (core save), not on archive records. Browser storage appends archive records and doesn't rewrite them, so clearing per-season data from records would need the `gamesDirty` rewrite path.
+- The Electron smoke run was not executed in this container (no display). The browser suite covers the same `index.html`.
+
+### Findings for the owner
+
+- **Safety drives:** by code reading, `v2RecordDriveArchive()` opens a zero-play drive for the scoring team after a safety (`safety` events carry the defense as `team`). The replay credits the safety to the drive it ended; the archive builder was left unchanged.
+- **Watch vs Game Cast:** per the owner, Watch is now the 3D replay wherever a play log exists. The old drive-by-drive Watch remains only as the fallback for older games.
+- **`detailedGame()`:** no remaining callers in the app; only the harness exports it (`tools/harness.js`). It is a candidate for removal rather than fixing.
+
+## Previous session (v0.12.4)
 
 ## Detailed Current State
 

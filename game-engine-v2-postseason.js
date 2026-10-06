@@ -24,6 +24,7 @@ function v2PostseasonRecordMatch(home,away,options={}){
     const record=(universe.gameArchive||[]).find(x=>x.id===result.gameId);if(!record)throw new Error('Postseason v2 game was not found in the permanent archive.');
     record.engine='v2';record.transactionVersion=tx.VERSION;record.eventCount=candidate.eventCount;record.seed=candidate.seed;
     for(const side of ['home','away']){const drivePoints=drives.filter(d=>d.side===side).reduce((n,d)=>n+(Number(d.points)||0),0);record.scoreAdjustment[side]=record.score[side]-drivePoints}
+    v2StorePlayLog(record.id,preview.state,attribution);
     if(options.testFault==='afterArchive')throw new Error('Injected postseason v2 rollback fault after archive write.');
     Object.assign(stub,{played:true,gameId:result.gameId,winner:candidate.winner,score:[candidate.ap,candidate.hp]});
     const validation=v2RecordValidate(candidate,record,home,away,rollback,stub);if(!validation.ok)throw new Error(`Postseason v2 game failed post-commit validation: ${validation.errors.join('; ')}`);
