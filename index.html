@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.5</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.6</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -1725,7 +1725,7 @@ html[data-dl-motion="reduced"] .dl-motion-result{animation:none!important;transf
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.5</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.6</b></span></footer>
   </div>
 </section>
 
@@ -1752,7 +1752,7 @@ html[data-dl-motion="reduced"] .dl-motion-result{animation:none!important;transf
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.12.5</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.12.6</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -4799,7 +4799,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.12.5';
+const APP_VERSION='0.12.6';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -11052,10 +11052,10 @@ function timeline(rows,meta={}){
    case 'kickoff':
     poss=side;spot=r.p??25;openDrive(side,spot,s.i);s.kind='cut';s.label='Touchback';s.text=`Kickoff through the end zone. ${team(side)} start at their own ${spot}.`;break;
    case 'possession_change':
-    poss=side;spot=r.p??spot;if(side&&(!drive||drive.side!==side))openDrive(side,spot,s.i);s.kind='cut';
-    if(r.r==='turnover_on_downs'){s.text=`Turnover on downs. ${team(side)} take over at the ${spotText(spot).toLowerCase()}.`;s.key=true;s.banner={text:'TURNOVER ON DOWNS',side};if(drives.at(-2))drives.at(-2).result='DOWNS'}
+    {const ended=drive;poss=side;spot=r.p??spot;if(side&&(!drive||drive.side!==side))openDrive(side,spot,s.i);s.kind='cut';
+    if(r.r==='turnover_on_downs'){s.text=`Turnover on downs. ${team(side)} take over at the ${spotText(spot).toLowerCase()}.`;s.key=true;s.banner={text:'TURNOVER ON DOWNS',side};if(ended&&ended!==drive)ended.result='DOWNS'}
     else s.text=`${team(side)} ball at the ${spotText(spot).toLowerCase()}.`;
-    break;
+    break}
    case 'overtime_possession':
     poss=side;spot=r.p??75;openDrive(side,spot,s.i);s.kind='cut';s.text=`Overtime possession: ${team(side)} from the ${spotText(spot).toLowerCase()}.`;break;
    case 'overtime_start':s.kind='card';s.card='Overtime';s.text='Overtime.';s.key=true;if(Number.isFinite(r.p))spot=r.p;break;
@@ -11114,14 +11114,15 @@ function durations(s){
  if(SNAP_KINDS.has(s.kind))return{pre:600,play:s.kind==='punt'?1700:s.kind==='fg'?1500:1200,post:s.big||s.banner?1500:500};
  if(s.kind==='cut')return{pre:0,play:0,post:s.banner?1500:800};
  if(s.kind==='score')return{pre:0,play:0,post:1500};
- if(s.kind==='after')return{pre:0,play:0,post:650};
+ if(s.kind==='after')return{pre:0,play:0,post:s.banner?1500:650};
  if(s.kind==='card')return{pre:0,play:0,post:1400};
  return{pre:0,play:0,post:0};
 }
 // Key-plays mode runs each key play faster, scaled so a whole game stays under 25 seconds.
 function keyRate(tl){
+ if(tl.keyRate)return tl.keyRate;
  const ms=tl.steps.filter(isKey).reduce((n,s)=>{const d=durations(s);return n+d.pre*.5+d.play+d.post},0);
- return Math.max(2.2,ms/25000);
+ return tl.keyRate=Math.max(2.2,ms/25000);
 }
 
 // ---- Camera: elevated on the near sideline, looking across the field ----
@@ -11364,8 +11365,8 @@ function mount(host,{rows,meta,onStep}={}){
   if(camX==null)camX=want;cam.x=camX;
   ctx.setTransform(dpr,0,0,dpr,0,0);drawField(ctx,cam,colors,names);
   if(SNAP_KINDS.has(s.kind)&&s.kind!=='punt'&&s.kind!=='fg'){
-   const L=worldX(s.side,s.los),d=dirOf(s.side);quad(ctx,cam,L-.18,0,L+.18,FIELD_W,'rgba(70,140,255,.85)',.01);
-   const fd=s.los+s.toGo;if(fd<100&&phase!=='post')quad(ctx,cam,worldX(s.side,fd)-.18,0,worldX(s.side,fd)+.18,FIELD_W,'rgba(255,214,10,.9)',.01);void d;
+   const L=worldX(s.side,s.los);quad(ctx,cam,L-.18,0,L+.18,FIELD_W,'rgba(70,140,255,.85)',.01);
+   const fd=s.los+s.toGo;if(fd<100&&phase!=='post')quad(ctx,cam,worldX(s.side,fd)-.18,0,worldX(s.side,fd)+.18,FIELD_W,'rgba(255,214,10,.9)',.01);
   }
   const items=sc.figs.map(f=>({y:f.y,draw:()=>{const hl=f===sc.carrier?(f.team===s.side?'#fff':colors[f.team].primary):null;drawFig(ctx,cam,f,colors,hl,f===sc.carrier&&phase!=='pre'?carrierName(s,f):null)}}));
   for(const x of [0,120])items.push({y:MID_Y,draw:()=>drawPosts(ctx,cam,x)});
