@@ -1,10 +1,11 @@
 # Changelog
 
-## v0.12.6 — 3D Game Cast replay
+## v0.12.6 — 3D Watch replay
 
-- Adds a full 3D replay to Game Cast for your games this season: an angled broadcast view of the field in team colours, with both teams lined up at the line of scrimmage, the first-down line, pass arcs, handoffs, sacks, interceptions, fumbles, punts and field goals at the uprights, plus banners for touchdowns, turnovers and other big plays.
-- Adds replay controls: play/pause, 1x, 4x and a key-plays mode that covers a whole game in under 30 seconds, previous/next drive, restart, a scrubber, and a drive strip you can click to jump to any play. Clicking the win-probability chart jumps the replay to that moment.
-- Saves a compact play log for every game your team plays in Game Lab, Game Day or the postseason (about 18 KB a game, about 230 KB a season). Logs are kept for the current season and cleared at rollover. Older games, other teams' games and games advanced with Sim Week keep the existing position replay.
+- Replaces the Watch view with a 3D replay for your games this season: an angled broadcast view of the field in team colours, with both teams lined up at the line of scrimmage, the first-down line, pass arcs, handoffs, sacks, interceptions, fumbles, punts and field goals at the uprights, plus banners for touchdowns, turnovers and other big plays. Older games and games advanced with Sim Week keep the drive-by-drive Watch view.
+- Watch My Next Game opens straight into the replay and starts playing. A Watch Replay button sits on the Game Lab result card and in the Quick Box, and Game Cast links to it.
+- The controls sit directly under the field: play/pause, previous and next play, previous and next drive, a jump-to-drive picker, 1x, 4x or key plays only (a whole game in under 30 seconds), restart and a scrubber. Keyboard: Space plays or pauses, ← → step a play, Shift + ← → change drive. A drive strip under the play text jumps to any snap.
+- Saves a compact play log for every game your team plays in Game Lab, Game Day or the postseason (about 18 KB a game, about 230 KB a season). Logs are kept for the current season and cleared at rollover.
 - Records who threw, caught, ran, tackled, sacked or intercepted on each play without changing any stat line: same-seed box scores are byte-identical to v0.12.5.
 - A rolled-back Detailed Game leaves no play log behind, and older saves load with an empty play-log map.
 

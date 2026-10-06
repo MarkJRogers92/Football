@@ -916,12 +916,20 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 .gcf-play strong{color:var(--muted);font-variant-numeric:tabular-nums}
 .gcf-log{margin:0;padding-left:18px;display:grid;gap:2px;max-height:6.4em;overflow:hidden;font-size:.78rem;color:var(--muted);text-transform:none;letter-spacing:normal}
 .gcf-log li{text-transform:none;letter-spacing:normal}
-.gcf-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-.gcf-controls button{min-width:40px;min-height:34px}
-.gcf-controls .gcf-primary{min-width:92px}
-.gcf-controls select{min-height:34px}
-.gcf-controls input[type=range]{flex:1 1 140px;min-width:0}
-@media(max-width:560px){.gcf-bug{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:'away home' 'sit sit';font-size:.76rem;padding:6px 8px;gap:4px 10px}.gcf-team.away{grid-area:away}.gcf-team.home{grid-area:home}.gcf-situation{grid-area:sit;grid-auto-flow:column;justify-content:center;gap:8px}.gcf-team strong{font-size:1.1rem}.gcf-controls input[type=range]{flex-basis:100%}}
+.gcf-controls{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px 12px}
+.gcf-transport,.gcf-options{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.gcf-options{justify-content:flex-end}
+.gcf-controls button{min-width:40px;min-height:36px;font-size:1rem}
+.gcf-controls .gcf-primary{min-width:104px;font-weight:700}
+.gcf-controls select{min-height:36px;max-width:100%}
+.gcf-options [data-gcf-restart]{font-size:.85rem}
+.gcf-controls input[type=range]{grid-column:1/-1;width:100%;min-width:0}
+.gc-replay-3d:focus{outline:none}
+.gc-replay-3d:focus-visible{outline:1px solid var(--line);outline-offset:2px}
+.gc-watch{display:grid;gap:8px;min-width:0}
+.gc-watch-foot{margin:0}
+.gc-watch-cta{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+@media(max-width:560px){.gcf-bug{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:'away home' 'sit sit';font-size:.76rem;padding:6px 8px;gap:4px 10px}.gcf-team.away{grid-area:away}.gcf-team.home{grid-area:home}.gcf-situation{grid-area:sit;grid-auto-flow:column;justify-content:center;gap:8px}.gcf-team strong{font-size:1.1rem}.gcf-controls{grid-template-columns:minmax(0,1fr)}.gcf-transport{justify-content:center}.gcf-options{justify-content:stretch}.gcf-options select{flex:1 1 140px}}
 
 /* Recruiting map. Status colours are a validated trio on the dark surface (blue / orange / aqua);
    targets are diamonds and open recruits are small grey dots, so shape backs up colour. */
@@ -5819,7 +5827,7 @@ function finishGame(before,home,away,result){
 }
 const gameEscape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function gameLink(id,label='Open Game Center',tab='Summary',primary=false){return id?`<button type="button" class="game-link${primary?' game-link--primary':''}" data-game="${gameEscape(id)}" data-game-tab="${gameEscape(tab)}">${gameEscape(label)}</button>`:'<span class="muted">Box score unavailable (older save)</span>'}
-function gameResultActions(id){return id?`<div class="game-result-actions">${gameLink(id,'View Box Score','Box Score',true)}${gameLink(id,'Full Game Center')}</div>`:'<span class="muted">Box score unavailable (older save)</span>'}
+function gameResultActions(id){return id?`<div class="game-result-actions">${universe.playLogs?.[id]?gameLink(id,'▶ Watch Replay','Watch',true):''}${gameLink(id,'View Box Score','Box Score',true)}${gameLink(id,'Full Game Center')}</div>`:'<span class="muted">Box score unavailable (older save)</span>'}
 function gameSortCompare(a,b){const av=a??'',bv=b??'',an=Number(av),bn=Number(bv),numeric=av!==''&&bv!==''&&Number.isFinite(an)&&Number.isFinite(bn);return numeric?an-bn:String(av).localeCompare(String(bv),undefined,{numeric:true,sensitivity:'base'})}
 function gameTable(headers,rows,{sortable=false,defaultSort=null}={}){
  const ordered=defaultSort==null?rows:[...rows].sort((a,b)=>gameSortCompare(b[defaultSort],a[defaultSort])||gameSortCompare(a[0],b[0]));
@@ -6167,8 +6175,8 @@ function showGameCenter(id,tab='Summary'){
  $('#gameDialogMeta').textContent=`${watching?'WATCH MODE':'FINAL'} · ${g.season} · Week ${g.week} · ${g.label} · ${g.venue}`;
  $('#gamePregame').textContent=`Pregame: ${g.away.name} ${g.away.record} (#${g.away.rank??'—'}) · ${g.home.name} ${g.home.record} (#${g.home.rank??'—'})`;
  $$('#gameTabs button').forEach(b=>{b.classList.toggle('active',b.dataset.gameTab===tab);b.setAttribute('aria-pressed',String(b.dataset.gameTab===tab));if(b.dataset.gameTab==='Game Cast')b.hidden=!g.drives?.length});
- let html;if(tab==='Game Cast')html=gameCastHTML(g);else if(tab==='Watch')html=gameWatchHTML(g);else if(tab==='Box Score')html=gameBoxHTML(g);else if(tab==='Drives')html=gameDrivesHTML(g);else if(tab==='Play-by-Play'){const archived=(g.drives||[]).flatMap(d=>(d.playByPlay||[]).map(x=>`${d.label}: ${x}`)),d=universe.lastDetailedGame,lines=archived.length?archived:(d?.gameId===id?d.log||[]:[]);html=lines.length?`<p class="muted">${archived.length?'Archived generated play log.':'Temporary simulation log (last 160 entries).'} The drive model names primary players; box scores allocate production across the rotation. Clock and exact field position are unavailable.</p>`+lines.map(x=>`<div class="playline">${gameEscape(x)}</div>`).join(''):'<p>Play-by-play is unavailable for this archived game. Box scores and recorded drive summaries remain permanent.</p>'}else html=gameSummaryHTML(g);
- $('#gameDialogBody').innerHTML=html;if(tab==='Box Score')bindGameBoxControls();if(tab==='Game Cast')bindGameCast();const dialog=$('#gameDialog');if(!dialog.open)dialog.showModal();
+ let html;if(tab==='Game Cast')html=gameCastHTML(g);else if(tab==='Watch')html=(typeof gameCastWatchHTML==='function'&&gameCastWatchHTML(g))||gameWatchHTML(g);else if(tab==='Box Score')html=gameBoxHTML(g);else if(tab==='Drives')html=gameDrivesHTML(g);else if(tab==='Play-by-Play'){const archived=(g.drives||[]).flatMap(d=>(d.playByPlay||[]).map(x=>`${d.label}: ${x}`)),d=universe.lastDetailedGame,lines=archived.length?archived:(d?.gameId===id?d.log||[]:[]);html=lines.length?`<p class="muted">${archived.length?'Archived generated play log.':'Temporary simulation log (last 160 entries).'} The drive model names primary players; box scores allocate production across the rotation. Clock and exact field position are unavailable.</p>`+lines.map(x=>`<div class="playline">${gameEscape(x)}</div>`).join(''):'<p>Play-by-play is unavailable for this archived game. Box scores and recorded drive summaries remain permanent.</p>'}else html=gameSummaryHTML(g);
+ $('#gameDialogBody').innerHTML=html;if(tab==='Box Score')bindGameBoxControls();if(tab==='Game Cast')bindGameCast();const dialog=$('#gameDialog');if(!dialog.open)dialog.showModal();if(tab==='Watch'&&typeof bindGameCastWatch==='function')bindGameCastWatch();
 }
 function renderGameArchive(){
  if(gamesAreDeferred())return storageOperation(async()=>{await ensureGamesLoaded();renderGameArchive()});
@@ -7209,7 +7217,7 @@ function completeScheduledGame(g,r,detailed=false){
  if(detailed)g.detailed=true;
  settleRivalryGame(g);
 }
-function watchUserDetailed(){const before=universe.lastDetailedGame?.gameId;simulateUserDetailed();const id=universe.lastDetailedGame?.gameId;if(id&&id!==before)showGameCenter(id,universe.playLogs?.[id]?'Game Cast':'Watch')}
+function watchUserDetailed(){const before=universe.lastDetailedGame?.gameId;simulateUserDetailed();const id=universe.lastDetailedGame?.gameId;if(id&&id!==before)showGameCenter(id,'Watch')}
 function hasPendingCareerChoice(){return !!(universe.jobOffers||[]).length}
 function simWeek(skipDecisions=false){const gate=guidanceActionEligibility(skipDecisions===true?'simulate-season':'advance-week');if(!gate.allowed){if(gate.blockers[0])setStatus(gate.blockers[0].message);return}recoverWeek();const u=selected(),beforeRank=u.rank;advanceAcademicsForWeek(u);let results=[];for(const g of universe.schedule[universe.week]){if(g.played){settleRivalryGame(g);continue;}let r=gameSim(T(g.home),T(g.away),false,g.conf);completeScheduledGame(g,r);results.push(r);if(g.home===u.name||g.away===u.name)universe.lastDetailedGame=null}const userGame=universe.schedule[universe.week].find(g=>g.played&&(g.home===u.name||g.away===u.name));universe.week++;if(results.length)universe.latest=results;ranked();advanceRecruiting();buildWeeklyHub(beforeRank);if(universe.week===12)universe.phase='confReady';setStatus(weekResultStatus(universe.week,u,userGame));autosaveAfter('week');render()}
 function weekResultStatus(week,u,g){if(!g?.score)return `Week ${week} complete.`;const home=g.home===u.name,us=home?g.score[1]:g.score[0],them=home?g.score[0]:g.score[1];return `Week ${week} final: ${g.winner===u.name?'W':'L'} ${us}-${them} ${home?'vs':'at'} ${home?g.away:g.home}.`}
@@ -9463,7 +9471,7 @@ else{
  function latestShowcase(u){
   const records=(universe.gameArchive||[]).filter(r=>{const h=archiveTeamName(r,'home'),a=archiveTeamName(r,'away');return h===u.name||a===u.name}).slice().sort((a,b)=>(b.season||universe.year)-(a.season||universe.year)||(b.week||0)-(a.week||0));const r=records[0];if(!r)return null;
   const userSide=archiveTeamName(r,'home')===u.name?'home':'away',oppSide=userSide==='home'?'away':'home',oppName=archiveTeamName(r,oppSide),userScore=archiveScore(r,userSide),oppScore=archiveScore(r,oppSide),lines=(r.playerStats?.[userSide]||[]).slice().sort((a,b)=>performerImpact(b)-performerImpact(a)).slice(0,3);
-  return{id:r.id||null,week:r.week??null,season:r.season??universe.year,result:userScore>oppScore?'W':'L',userScore,oppScore,opponent:oppName||'Opponent',opponentId:archiveTeamId(r,oppSide),location:userSide==='home'?'vs':'@',engine:r.engine||null,drives:(r.drives||[]).map(d=>({side:d.side,points:Number(d.points)||0})).slice(-18),performers:lines.map(x=>({id:x.id,name:x.name,pos:x.pos,summary:performerSummary(x)}))};
+  return{id:r.id||null,hasReplay:!!(r.id&&universe.playLogs?.[r.id]),week:r.week??null,season:r.season??universe.year,result:userScore>oppScore?'W':'L',userScore,oppScore,opponent:oppName||'Opponent',opponentId:archiveTeamId(r,oppSide),location:userSide==='home'?'vs':'@',engine:r.engine||null,drives:(r.drives||[]).map(d=>({side:d.side,points:Number(d.points)||0})).slice(-18),performers:lines.map(x=>({id:x.id,name:x.name,pos:x.pos,summary:performerSummary(x)}))};
  }
  function seasonStorySnapshot(){
   if(!universe?.teams)return null;const t=selected?.();if(!t)return null;const stories=[],games=(t.schedule||[]).slice().sort((a,b)=>(a.week||0)-(b.week||0)),teamStreak=seasonPresentationModel.streak(games,t.name);
@@ -10917,19 +10925,9 @@ function gameCastModel(g){
  return{home:g.home.name,away:g.away.name,plays,end,final,winner,swing,winnerLow};
 }
 function gameCastPct(v){return`${Math.round(v*100)}%`}
-// Full 3D replay data: the user's games this season keep a structured play log (universe.playLogs).
-function gameCastPlayLog(g){const rows=g?.id!=null?universe.playLogs?.[g.id]:null;return Array.isArray(rows)&&rows.length&&globalThis.DynastyGameCastField?rows:null}
-function gameCastFieldMeta(g,rows){
- const names={},brand=id=>globalThis.DynastyProgramBranding?.brandFor?.(id)||null;
- for(const side of ['home','away'])for(const line of g.playerStats?.[side]||[])if(line?.id!=null)names[line.id]=line.name;
- const missing=new Set();for(const r of rows)for(const id of Object.values(r.a||{}))if(typeof id==='string'&&!(id in names))missing.add(id);
- if(missing.size)for(const t of [T(g.home?.name),T(g.away?.name)])for(const p of t?.roster||[])if(missing.has(p.id))names[p.id]=p.name;
- return{names,home:{name:g.home.name,brand:brand(g.home.id)},away:{name:g.away.name,brand:brand(g.away.id)}};
-}
 function gameCastHTML(g){
  const m=gameCastModel(g);
  if(!m)return'<section class="watch-unavailable"><h3>Game Cast unavailable</h3><p>Game Cast needs recorded play-by-play, which is kept for games played in Game Lab or Game Day. Summary and Box Score still have the full result.</p></section>';
- const full=!!gameCastPlayLog(g);
  const W=m[m.winner],L=m[m.winner==='home'?'away':'home'],s=m.swing&&m.plays[m.swing.i],sp=s&&m.plays[m.swing.i+1];
  const swingTeam=m.swing&&(m.swing.delta>0?m.home:m.away);
  const facts=[`<li><strong>${gameEscape(W)}</strong> won ${m.final[m.winner]}–${m.final[m.winner==='home'?'away':'home']}${m.winnerLow<.25?`, rallying from as low as ${gameCastPct(m.winnerLow)} to win`:''}.</li>`];
@@ -10937,26 +10935,23 @@ function gameCastHTML(g){
  const scoring=m.plays.filter(p=>p.scoring).map(p=>`<tr><td>${gameEscape(p.quarter)} ${gameEscape(p.clock)}</td><td>${gameEscape(m[p.offense])}</td><td>${gameEscape(p.text)}</td><td>${p.home+(p.offense==='home'?p.scoring:0)}–${p.away+(p.offense==='away'?p.scoring:0)}</td><td>${gameCastPct(p.wp)}</td></tr>`).join('');
  return `<section class="game-cast" data-game-cast="${gameEscape(g.id)}">
  <div class="gc-head"><div><div class="eyebrow">GAME CAST</div><h3>Win probability</h3></div><ul class="gc-facts">${facts.join('')}</ul></div>
- <p class="gc-mode small muted" data-gc-mode>${full?'Full 3D replay: every snap, with players, from the saved play log.':'Position replay. Full 3D replays are kept for your team’s games this season.'}</p>
- ${full?'<div class="gc-replay gc-replay-3d" data-gcf-host></div>':''}
+ ${gameCastPlayLog(g)?`<div class="gc-watch-cta"><button type="button" class="game-link game-link--primary" data-game="${gameEscape(g.id)}" data-game-tab="Watch">▶ Watch the 3D replay</button><span class="small muted">Every snap on an angled field, with players.</span></div>`:''}
  <div class="gc-legend"><span class="gc-key home">${gameEscape(m.home)}</span><span class="gc-key away">${gameEscape(m.away)}</span><span class="muted small">Hover the chart for any moment · click to jump the replay</span></div>
  <div class="gc-chart" data-gc-chart><div class="gc-tip" data-gc-tip hidden></div></div>
- ${full?'':`<div class="gc-replay">
+ <div class="gc-replay">
   <div class="gc-board"><span class="gc-team away">${gameEscape(m.away)}</span><strong data-gc-score>0 – 0</strong><span class="gc-team home">${gameEscape(m.home)}</span></div>
   <div class="gc-field" role="img" aria-label="Field position replay"><div class="gc-endzone away"><span>${gameEscape(m.away)}</span></div><div class="gc-turf"><i style="left:10%"></i><i style="left:20%"></i><i style="left:30%"></i><i style="left:40%"></i><i class="mid" style="left:50%"></i><i style="left:60%"></i><i style="left:70%"></i><i style="left:80%"></i><i style="left:90%"></i><span class="gc-ball" data-gc-ball></span></div><div class="gc-endzone home"><span>${gameEscape(m.home)}</span></div></div>
   <div class="gc-play" data-gc-play aria-live="polite"></div>
   <div class="gc-controls"><button type="button" data-gc-toggle aria-pressed="false">▶ Play</button><input type="range" min="0" max="${m.plays.length-1}" value="0" step="1" data-gc-scrub aria-label="Replay position"><span class="small muted" data-gc-pos></span></div>
- </div>`}
+ </div>
  <details class="gc-table"><summary>Scoring plays table</summary><table><thead><tr><th>Time</th><th>Team</th><th>Play</th><th>Score (away–home)</th><th>${gameEscape(m.home)} win %</th></tr></thead><tbody>${scoring||'<tr><td colspan="5">No scoring plays recorded.</td></tr>'}</tbody></table></details>
  </section>`;
 }
 function bindGameCast(){
  const root=document.querySelector('[data-game-cast]');if(!root)return;
  const g=(universe.gameArchive||[]).find(x=>x.id===root.dataset.gameCast),m=gameCastModel(g);if(!m)return;
- const chart=root.querySelector('[data-gc-chart]'),tip=root.querySelector('[data-gc-tip]'),scrub=root.querySelector('[data-gc-scrub]'),toggle=root.querySelector('[data-gc-toggle]'),host=root.querySelector('[data-gcf-host]');
- let current=0,timer=null,geo=null,field=null;
- const nowAt=e=>{const now=chart.querySelector('[data-gc-now]');if(now&&geo){const cx=geo.X(Math.min(e,m.end));now.setAttribute('x1',cx);now.setAttribute('x2',cx)}};
- if(host){const rows=gameCastPlayLog(g);field=rows?globalThis.DynastyGameCastField.mount(host,{rows,meta:gameCastFieldMeta(g,rows),onStep:s=>nowAt(s.elapsed)}):null}
+ const chart=root.querySelector('[data-gc-chart]'),tip=root.querySelector('[data-gc-tip]'),scrub=root.querySelector('[data-gc-scrub]'),toggle=root.querySelector('[data-gc-toggle]');
+ let current=0,timer=null,geo=null;
  const draw=()=>{
   const width=Math.max(280,chart.clientWidth||640),height=width<520?180:220,pad={l:36,r:10,t:12,b:24},iw=width-pad.l-pad.r,ih=height-pad.t-pad.b;
   const X=e=>pad.l+e/m.end*iw,Y=v=>pad.t+(1-v)*ih;
@@ -10986,24 +10981,45 @@ function bindGameCast(){
    newTip.hidden=false;const left=Math.min(Math.max(cx+12,0),width-230);newTip.style.left=`${left}px`;newTip.style.top=`${Math.max(0,cy-40)}px`});
   hit.addEventListener('mouseleave',()=>{chart.querySelector('[data-gc-cross]').setAttribute('visibility','hidden');chart.querySelector('[data-gc-dot]').setAttribute('visibility','hidden');newTip.hidden=true});
   hit.addEventListener('click',ev=>{stop();show(nearest(ev))});
-  if(host)nowAt(field?field.timeline.steps[field.state.step]?.elapsed||0:0);else show(current);
+  show(current);
  };
  const show=i=>{
-  current=Math.max(0,Math.min(m.plays.length-1,i));const p=m.plays[current];
-  // Full replay: a click on the chart jumps the 3D field to that moment.
-  if(host){if(field){if(p.final)field.seek(field.timeline.steps.length-1);else field.seekElapsed(p.elapsed)}return}
-  scrub.value=String(current);
+  current=Math.max(0,Math.min(m.plays.length-1,i));const p=m.plays[current];scrub.value=String(current);
   root.querySelector('[data-gc-score]').textContent=`${p.away} – ${p.home}`;
   const ball=root.querySelector('[data-gc-ball]');ball.style.left=`${p.x}%`;ball.dataset.offense=p.offense||'';ball.textContent=p.offense==='away'?'▶':p.offense==='home'?'◀':'●';
   root.querySelector('[data-gc-play]').innerHTML=p.final?`<strong>Final</strong> · ${gameEscape(m[m.winner])} win`:`<strong>${gameEscape(p.quarter)} ${gameEscape(p.clock)}</strong> · ${p.down}${['','st','nd','rd','th'][p.down]} & ${p.distance} · ${gameEscape(p.text)}`;
   root.querySelector('[data-gc-pos]').textContent=`Play ${current+1} of ${m.plays.length}`;
   const now=chart.querySelector('[data-gc-now]');if(now&&geo){const cx=geo.X(p.elapsed);now.setAttribute('x1',cx);now.setAttribute('x2',cx)}
  };
- const stop=()=>{if(field)field.pause();if(!toggle)return;if(timer){clearInterval(timer);timer=null}toggle.textContent='▶ Play';toggle.setAttribute('aria-pressed','false')};
- if(toggle)toggle.onclick=()=>{if(timer)return stop();if(current>=m.plays.length-1)show(0);toggle.textContent='❚❚ Pause';toggle.setAttribute('aria-pressed','true');timer=setInterval(()=>{if(current>=m.plays.length-1||!document.body.contains(root))return stop();show(current+1)},650)};
- if(scrub)scrub.oninput=()=>{stop();show(Number(scrub.value))};
+ const stop=()=>{if(timer){clearInterval(timer);timer=null}toggle.textContent='▶ Play';toggle.setAttribute('aria-pressed','false')};
+ toggle.onclick=()=>{if(timer)return stop();if(current>=m.plays.length-1)show(0);toggle.textContent='❚❚ Pause';toggle.setAttribute('aria-pressed','true');timer=setInterval(()=>{if(current>=m.plays.length-1||!document.body.contains(root))return stop();show(current+1)},650)};
+ scrub.oninput=()=>{stop();show(Number(scrub.value))};
  const start=()=>{if(!chart.clientWidth)return requestAnimationFrame(start);draw()};start();
  if(window.ResizeObserver){const ro=new ResizeObserver(()=>{if(!document.body.contains(root))return ro.disconnect();const w=chart.clientWidth;if(w&&geo&&Math.abs(w-geo.width)>8)draw()});ro.observe(chart)}
+}
+// Watch tab: the 3D replay for games with a saved play log (the user's games this season).
+// Games without one keep the drive-by-drive Watch view.
+function gameCastPlayLog(g){const rows=g?.id!=null?universe.playLogs?.[g.id]:null;return Array.isArray(rows)&&rows.length&&globalThis.DynastyGameCastField?rows:null}
+function gameCastFieldMeta(g,rows){
+ const names={},brand=id=>globalThis.DynastyProgramBranding?.brandFor?.(id)||null;
+ for(const side of ['home','away'])for(const line of g.playerStats?.[side]||[])if(line?.id!=null)names[line.id]=line.name;
+ const missing=new Set();for(const r of rows)for(const id of Object.values(r.a||{}))if(typeof id==='string'&&!(id in names))missing.add(id);
+ if(missing.size)for(const t of [T(g.home?.name),T(g.away?.name)])for(const p of t?.roster||[])if(missing.has(p.id))names[p.id]=p.name;
+ return{names,home:{name:g.home.name,brand:brand(g.home.id)},away:{name:g.away.name,brand:brand(g.away.id)}};
+}
+function gameCastWatchHTML(g){
+ if(!gameCastPlayLog(g))return null;
+ return `<section class="gc-watch" data-game-cast-watch="${gameEscape(g.id)}"><div class="gc-replay gc-replay-3d" data-gcf-host></div>
+ <p class="gc-watch-foot small muted">Space plays or pauses · ← → step a play · Shift + ← → change drive · win probability and scoring plays are on the Game Cast tab.</p></section>`;
+}
+function bindGameCastWatch({autoplay=true}={}){
+ const root=document.querySelector('[data-game-cast-watch]');if(!root)return null;
+ const g=(universe.gameArchive||[]).find(x=>x.id===root.dataset.gameCastWatch),rows=gameCastPlayLog(g);if(!rows)return null;
+ const host=root.querySelector('[data-gcf-host]'),field=globalThis.DynastyGameCastField.mount(host,{rows,meta:gameCastFieldMeta(g,rows)});
+ host.focus?.({preventScroll:true});
+ const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+ if(field&&autoplay&&!reduced)setTimeout(()=>{if(root.isConnected&&!field.state.playing&&field.state.step===0)field.play()},450);
+ return field;
 }
 globalThis.DynastyGameCast={model:gameCastModel,winProbability:gameCastWinProbability};
 if(globalThis.__DL_TEST__)globalThis.__DL_TEST__.playLogKeys=()=>Object.keys(universe.playLogs||{});
@@ -11337,19 +11353,27 @@ function mount(host,{rows,meta,onStep}={}){
    <span class="gcf-situation"><b data-gcf-clock>Q1 15:00</b><span data-gcf-down></span></span>
    <span class="gcf-team home" style="--gcf-team:${esc(colors.home.ui)}"><strong data-gcf-score="home">0</strong><b>${esc(names.home)}</b></span></div>
   <div class="gcf-stage"><canvas data-gcf-canvas role="img" aria-label="Angled field replay"></canvas></div>
-  <div class="gcf-drive"><div class="gcf-drive-head" data-gcf-drive-head></div><div class="gcf-strip" data-gcf-strip></div></div>
-  <div class="gcf-play" data-gcf-play aria-live="polite"></div>
-  <ol class="gcf-log" data-gcf-log></ol>
   <div class="gcf-controls">
-   <button type="button" data-gcf-restart title="Restart" aria-label="Restart">⟲</button>
-   <button type="button" data-gcf-prev title="Previous drive" aria-label="Previous drive">⏮</button>
-   <button type="button" class="gcf-primary" data-gcf-toggle aria-pressed="false">▶ Play</button>
-   <button type="button" data-gcf-next title="Next drive" aria-label="Next drive">⏭</button>
-   <select data-gcf-speed aria-label="Replay speed"><option value="1">1x</option><option value="4">4x</option><option value="key">Key plays</option></select>
+   <div class="gcf-transport">
+    <button type="button" data-gcf-prev title="Previous drive (Shift + ←)" aria-label="Previous drive">⏮</button>
+    <button type="button" data-gcf-back title="Previous play (←)" aria-label="Previous play">◂</button>
+    <button type="button" class="gcf-primary" data-gcf-toggle aria-pressed="false" title="Play or pause (Space)">▶ Play</button>
+    <button type="button" data-gcf-fwd title="Next play (→)" aria-label="Next play">▸</button>
+    <button type="button" data-gcf-next title="Next drive (Shift + →)" aria-label="Next drive">⏭</button>
+   </div>
+   <div class="gcf-options">
+    <select data-gcf-speed aria-label="Replay speed"><option value="1">1x speed</option><option value="4">4x speed</option><option value="key">Key plays only</option></select>
+    <select data-gcf-drive-pick aria-label="Jump to drive">${tl.drives.map(d=>{const st=steps[d.start]?.pre||{};return `<option value="${d.index}">Drive ${d.index+1} · ${esc(names[d.side])} · ${esc(periodText(st.q))} ${esc(clockText(st.c))}</option>`}).join('')}</select>
+    <button type="button" data-gcf-restart title="Restart from kickoff">⟲ Restart</button>
+   </div>
    <input type="range" min="0" max="${steps.length-1}" value="0" step="1" data-gcf-scrub aria-label="Replay position">
-  </div></div>`;
- const $q=sel=>host.querySelector(sel),canvas=$q('[data-gcf-canvas]'),ctx=canvas.getContext('2d'),toggle=$q('[data-gcf-toggle]'),scrub=$q('[data-gcf-scrub]'),speedSel=$q('[data-gcf-speed]');
- let si=0,pt=0,playing=false,speed='1',raf=null,last=null,camX=null,W=0,H=0,dpr=1,shownStep=-1,shownPhase='';
+  </div>
+  <div class="gcf-play" data-gcf-play aria-live="polite"></div>
+  <div class="gcf-drive"><div class="gcf-drive-head" data-gcf-drive-head></div><div class="gcf-strip" data-gcf-strip></div></div>
+  <ol class="gcf-log" data-gcf-log></ol>
+  </div>`;
+ const $q=sel=>host.querySelector(sel),canvas=$q('[data-gcf-canvas]'),ctx=canvas.getContext('2d'),toggle=$q('[data-gcf-toggle]'),scrub=$q('[data-gcf-scrub]'),speedSel=$q('[data-gcf-speed]'),drivePick=$q('[data-gcf-drive-pick]');
+ let si=0,pt=0,playing=false,stepOnce=false,speed='1',raf=null,last=null,camX=null,W=0,H=0,dpr=1,shownStep=-1,shownPhase='';
  const rateFor=()=>speed==='4'?4:speed==='key'?keyRate(tl):1;
  const total=s=>{const d=durations(s),k=speed==='key';return(k?d.pre*.5:d.pre)+d.play+d.post};
  const nextIndex=i=>{let j=i+1;while(j<steps.length&&(durations(steps[j]).post+durations(steps[j]).play===0||(speed==='key'&&!isKey(steps[j]))))j++;return j};
@@ -11405,6 +11429,7 @@ function mount(host,{rows,meta,onStep}={}){
  const updateDrive=s=>{
   const dr=tl.drives[s.drive],strip=$q('[data-gcf-strip]'),head=$q('[data-gcf-drive-head]');
   if(!dr){strip.innerHTML='';head.textContent='';return}
+  if(drivePick)drivePick.value=String(dr.index);
   const segW=p=>p.kind==='punt'||p.kind==='fg'?3:Math.max(2,Math.abs(p.y||0)),done=s.i>=dr.end,snaps=dr.snaps.filter(j=>j<=s.i||done),total=dr.snaps.reduce((n,j)=>n+segW(steps[j]),0)||1;
   head.innerHTML=`${esc(names[dr.side])} drive ${dr.index+1} · from the ${esc(spotText(dr.startSpot).toLowerCase())} · ${snaps.length} play${snaps.length===1?'':'s'}${done&&dr.result?` · <b>${esc(dr.result)}</b>`:''}`;
   strip.innerHTML=dr.snaps.map(j=>{const p=steps[j],w=segW(p)/total*100,cls=p.big?'big':(p.kind==='inc'||(p.y||0)<0||p.kind==='int'||p.kind==='fumble')?'loss':'gain';
@@ -11415,19 +11440,35 @@ function mount(host,{rows,meta,onStep}={}){
   const dialog=host.closest('dialog');if(dialog&&!dialog.open){pause();return}
   if(document.hidden){last=null;return}
   const dt=last==null?16:Math.min(100,ts-last);last=ts;
-  if(playing){pt+=dt*rateFor();while(playing&&pt>=total(steps[si])){const n=nextIndex(si);if(n>=steps.length){pt=total(steps[si]);pause();break}pt-=total(steps[si]);si=n;if(speed==='key')camX=null}}
+  if(playing){pt+=dt*rateFor();while(playing&&pt>=total(steps[si])){if(stepOnce){pt=total(steps[si]);pause();break}const n=nextIndex(si);if(n>=steps.length){pt=total(steps[si]);pause();break}pt-=total(steps[si]);si=n;if(speed==='key')camX=null}}
   const moving=render();
   if(playing||moving)raf=requestAnimationFrame(loop);else last=null;
  };
  const kick=()=>{if(!raf&&!destroyed)raf=requestAnimationFrame(loop)};
  const play=()=>{if(si>=steps.length-1&&pt>=total(steps[si])-1){si=0;pt=0;camX=null}if(speed==='key'&&!isKey(steps[si])){const n=nextIndex(si);if(n<steps.length){si=n;pt=0;camX=null}}playing=true;toggle.textContent='❚❚ Pause';toggle.setAttribute('aria-pressed','true');last=null;kick()};
- function pause(){playing=false;toggle.textContent='▶ Play';toggle.setAttribute('aria-pressed','false')}
+ function pause(){playing=false;stepOnce=false;toggle.textContent='▶ Play';toggle.setAttribute('aria-pressed','false')}
  const seek=(i,{snap=true}={})=>{si=clampN(i|0,0,steps.length-1);pt=0;if(snap)camX=null;shownPhase='';render();kick()};
  const driveJump=dir=>{const cur=steps[si].drive;let target=cur+dir;if(dir<0&&pt>0&&tl.drives[cur]&&si>tl.drives[cur].start)target=cur;const dr=tl.drives[clampN(target,0,tl.drives.length-1)];if(dr)seek(dr.start)};
+ // Step one play at a time: Next plays the current snap if it hasn't run yet, otherwise the next one.
+ const visible=i=>i>=0&&i<steps.length&&steps[i].kind!=='mark';
+ const stepPlay=dir=>{
+  if(dir>0){let i=si;if(!(pt===0&&visible(si))){i=si+1;while(i<steps.length&&!visible(i))i++}if(i>=steps.length)return;pause();seek(i);stepOnce=true;playing=true;toggle.textContent='❚❚ Pause';toggle.setAttribute('aria-pressed','true');last=null;kick()}
+  else{let i=pt>0&&visible(si)?si:si-1;while(i>0&&!visible(i))i--;pause();seek(Math.max(0,i))}
+ };
  toggle.onclick=()=>playing?pause():play();
+ $q('[data-gcf-fwd]').onclick=()=>stepPlay(1);
+ $q('[data-gcf-back]').onclick=()=>stepPlay(-1);
+ drivePick.onchange=()=>{const dr=tl.drives[Number(drivePick.value)];if(dr){pause();seek(dr.start)}};
+ host.tabIndex=0;
+ host.addEventListener('keydown',ev=>{
+  if(ev.target.closest?.('select,input')&&ev.key!==' ')return;
+  if(ev.key===' '||ev.key==='k'){ev.preventDefault();playing?pause():play()}
+  else if(ev.key==='ArrowRight'){ev.preventDefault();if(ev.shiftKey){pause();driveJump(1)}else stepPlay(1)}
+  else if(ev.key==='ArrowLeft'){ev.preventDefault();if(ev.shiftKey){pause();driveJump(-1)}else stepPlay(-1)}
+ });
  $q('[data-gcf-restart]').onclick=()=>{pause();seek(0)};
- $q('[data-gcf-prev]').onclick=()=>driveJump(-1);
- $q('[data-gcf-next]').onclick=()=>driveJump(1);
+ $q('[data-gcf-prev]').onclick=()=>{pause();driveJump(-1)};
+ $q('[data-gcf-next]').onclick=()=>{pause();driveJump(1)};
  speedSel.onchange=()=>{speed=speedSel.value;pt=0;if(playing&&speed==='key'&&!isKey(steps[si])){const n=nextIndex(si);if(n<steps.length)si=n}camX=null;kick()};
  scrub.oninput=()=>{pause();seek(Number(scrub.value))};
  host.addEventListener('click',ev=>{const b=ev.target.closest?.('[data-gcf-seek]');if(b){pause();seek(Number(b.dataset.gcfSeek))}});
@@ -12354,7 +12395,7 @@ function recentShowcase(last){
  if(!last)return'';const userSide=last.location==='vs'?'home':'away';
  const drives=last.drives.length?`<div class="event-drive-strip" aria-label="Last game scoring drives">${last.drives.map((d,i)=>`<i class="${d.side===userSide?'user':'opp'} ${d.points>0?'score':'empty'}" title="Drive ${i+1}: ${d.points} points"><b>${d.points||'·'}</b></i>`).join('')}</div>`:'<div class="event-drive-empty">Drive detail unavailable for this archived game.</div>';
  const performers=last.performers.length?`<div class="event-performers">${last.performers.map(p=>`<button type="button" data-event-player="${esc(p.id)}"><span>${esc(p.pos)}</span><strong>${esc(p.name)}</strong><small>${esc(p.summary)}</small></button>`).join('')}</div>`:'<div class="event-performers-empty">No individual stat leaders stored for this result.</div>';
- const actions=last.id?`<div class="event-result-actions"><button type="button" class="event-box-score-action" data-game="${esc(last.id)}" data-game-tab="Box Score">View Box Score</button><button type="button" data-game="${esc(last.id)}" data-game-tab="Summary">Full Game Center</button></div>`:'';
+ const actions=last.id?`<div class="event-result-actions">${last.hasReplay?`<button type="button" class="event-box-score-action event-watch-action" data-game="${esc(last.id)}" data-game-tab="Watch">▶ Watch Replay</button>`:''}<button type="button" class="event-box-score-action" data-game="${esc(last.id)}" data-game-tab="Box Score">View Box Score</button><button type="button" data-game="${esc(last.id)}" data-game-tab="Summary">Full Game Center</button></div>`:'';
  return `<section class="event-recent ${last.result==='W'?'win':'loss'}"><div class="event-recent-score"><div><span>LAST GAME · WEEK ${esc(last.week)}</span><strong>${esc(last.result)} ${esc(last.userScore)}–${esc(last.oppScore)}</strong><small>${esc(last.location)} ${esc(last.opponent)}</small></div><div class="event-final-mark">FINAL</div></div>${actions}${drives}<div class="event-recent-label">KEY PERFORMERS</div>${performers}</section>`;
 }
 function renderGameDay(){

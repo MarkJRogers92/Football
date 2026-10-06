@@ -82,9 +82,17 @@
 .gcf-play strong{color:var(--muted);font-variant-numeric:tabular-nums}
 .gcf-log{margin:0;padding-left:18px;display:grid;gap:2px;max-height:6.4em;overflow:hidden;font-size:.78rem;color:var(--muted);text-transform:none;letter-spacing:normal}
 .gcf-log li{text-transform:none;letter-spacing:normal}
-.gcf-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-.gcf-controls button{min-width:40px;min-height:34px}
-.gcf-controls .gcf-primary{min-width:92px}
-.gcf-controls select{min-height:34px}
-.gcf-controls input[type=range]{flex:1 1 140px;min-width:0}
-@media(max-width:560px){.gcf-bug{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:'away home' 'sit sit';font-size:.76rem;padding:6px 8px;gap:4px 10px}.gcf-team.away{grid-area:away}.gcf-team.home{grid-area:home}.gcf-situation{grid-area:sit;grid-auto-flow:column;justify-content:center;gap:8px}.gcf-team strong{font-size:1.1rem}.gcf-controls input[type=range]{flex-basis:100%}}
+.gcf-controls{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px 12px}
+.gcf-transport,.gcf-options{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.gcf-options{justify-content:flex-end}
+.gcf-controls button{min-width:40px;min-height:36px;font-size:1rem}
+.gcf-controls .gcf-primary{min-width:104px;font-weight:700}
+.gcf-controls select{min-height:36px;max-width:100%}
+.gcf-options [data-gcf-restart]{font-size:.85rem}
+.gcf-controls input[type=range]{grid-column:1/-1;width:100%;min-width:0}
+.gc-replay-3d:focus{outline:none}
+.gc-replay-3d:focus-visible{outline:1px solid var(--line);outline-offset:2px}
+.gc-watch{display:grid;gap:8px;min-width:0}
+.gc-watch-foot{margin:0}
+.gc-watch-cta{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+@media(max-width:560px){.gcf-bug{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:'away home' 'sit sit';font-size:.76rem;padding:6px 8px;gap:4px 10px}.gcf-team.away{grid-area:away}.gcf-team.home{grid-area:home}.gcf-situation{grid-area:sit;grid-auto-flow:column;justify-content:center;gap:8px}.gcf-team strong{font-size:1.1rem}.gcf-controls{grid-template-columns:minmax(0,1fr)}.gcf-transport{justify-content:center}.gcf-options{justify-content:stretch}.gcf-options select{flex:1 1 140px}}

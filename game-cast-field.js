@@ -327,19 +327,27 @@ function mount(host,{rows,meta,onStep}={}){
    <span class="gcf-situation"><b data-gcf-clock>Q1 15:00</b><span data-gcf-down></span></span>
    <span class="gcf-team home" style="--gcf-team:${esc(colors.home.ui)}"><strong data-gcf-score="home">0</strong><b>${esc(names.home)}</b></span></div>
   <div class="gcf-stage"><canvas data-gcf-canvas role="img" aria-label="Angled field replay"></canvas></div>
-  <div class="gcf-drive"><div class="gcf-drive-head" data-gcf-drive-head></div><div class="gcf-strip" data-gcf-strip></div></div>
-  <div class="gcf-play" data-gcf-play aria-live="polite"></div>
-  <ol class="gcf-log" data-gcf-log></ol>
   <div class="gcf-controls">
-   <button type="button" data-gcf-restart title="Restart" aria-label="Restart">⟲</button>
-   <button type="button" data-gcf-prev title="Previous drive" aria-label="Previous drive">⏮</button>
-   <button type="button" class="gcf-primary" data-gcf-toggle aria-pressed="false">▶ Play</button>
-   <button type="button" data-gcf-next title="Next drive" aria-label="Next drive">⏭</button>
-   <select data-gcf-speed aria-label="Replay speed"><option value="1">1x</option><option value="4">4x</option><option value="key">Key plays</option></select>
+   <div class="gcf-transport">
+    <button type="button" data-gcf-prev title="Previous drive (Shift + ←)" aria-label="Previous drive">⏮</button>
+    <button type="button" data-gcf-back title="Previous play (←)" aria-label="Previous play">◂</button>
+    <button type="button" class="gcf-primary" data-gcf-toggle aria-pressed="false" title="Play or pause (Space)">▶ Play</button>
+    <button type="button" data-gcf-fwd title="Next play (→)" aria-label="Next play">▸</button>
+    <button type="button" data-gcf-next title="Next drive (Shift + →)" aria-label="Next drive">⏭</button>
+   </div>
+   <div class="gcf-options">
+    <select data-gcf-speed aria-label="Replay speed"><option value="1">1x speed</option><option value="4">4x speed</option><option value="key">Key plays only</option></select>
+    <select data-gcf-drive-pick aria-label="Jump to drive">${tl.drives.map(d=>{const st=steps[d.start]?.pre||{};return `<option value="${d.index}">Drive ${d.index+1} · ${esc(names[d.side])} · ${esc(periodText(st.q))} ${esc(clockText(st.c))}</option>`}).join('')}</select>
+    <button type="button" data-gcf-restart title="Restart from kickoff">⟲ Restart</button>
+   </div>
    <input type="range" min="0" max="${steps.length-1}" value="0" step="1" data-gcf-scrub aria-label="Replay position">
-  </div></div>`;
- const $q=sel=>host.querySelector(sel),canvas=$q('[data-gcf-canvas]'),ctx=canvas.getContext('2d'),toggle=$q('[data-gcf-toggle]'),scrub=$q('[data-gcf-scrub]'),speedSel=$q('[data-gcf-speed]');
- let si=0,pt=0,playing=false,speed='1',raf=null,last=null,camX=null,W=0,H=0,dpr=1,shownStep=-1,shownPhase='';
+  </div>
+  <div class="gcf-play" data-gcf-play aria-live="polite"></div>
+  <div class="gcf-drive"><div class="gcf-drive-head" data-gcf-drive-head></div><div class="gcf-strip" data-gcf-strip></div></div>
+  <ol class="gcf-log" data-gcf-log></ol>
+  </div>`;
+ const $q=sel=>host.querySelector(sel),canvas=$q('[data-gcf-canvas]'),ctx=canvas.getContext('2d'),toggle=$q('[data-gcf-toggle]'),scrub=$q('[data-gcf-scrub]'),speedSel=$q('[data-gcf-speed]'),drivePick=$q('[data-gcf-drive-pick]');
+ let si=0,pt=0,playing=false,stepOnce=false,speed='1',raf=null,last=null,camX=null,W=0,H=0,dpr=1,shownStep=-1,shownPhase='';
  const rateFor=()=>speed==='4'?4:speed==='key'?keyRate(tl):1;
  const total=s=>{const d=durations(s),k=speed==='key';return(k?d.pre*.5:d.pre)+d.play+d.post};
  const nextIndex=i=>{let j=i+1;while(j<steps.length&&(durations(steps[j]).post+durations(steps[j]).play===0||(speed==='key'&&!isKey(steps[j]))))j++;return j};
@@ -395,6 +403,7 @@ function mount(host,{rows,meta,onStep}={}){
  const updateDrive=s=>{
   const dr=tl.drives[s.drive],strip=$q('[data-gcf-strip]'),head=$q('[data-gcf-drive-head]');
   if(!dr){strip.innerHTML='';head.textContent='';return}
+  if(drivePick)drivePick.value=String(dr.index);
   const segW=p=>p.kind==='punt'||p.kind==='fg'?3:Math.max(2,Math.abs(p.y||0)),done=s.i>=dr.end,snaps=dr.snaps.filter(j=>j<=s.i||done),total=dr.snaps.reduce((n,j)=>n+segW(steps[j]),0)||1;
   head.innerHTML=`${esc(names[dr.side])} drive ${dr.index+1} · from the ${esc(spotText(dr.startSpot).toLowerCase())} · ${snaps.length} play${snaps.length===1?'':'s'}${done&&dr.result?` · <b>${esc(dr.result)}</b>`:''}`;
   strip.innerHTML=dr.snaps.map(j=>{const p=steps[j],w=segW(p)/total*100,cls=p.big?'big':(p.kind==='inc'||(p.y||0)<0||p.kind==='int'||p.kind==='fumble')?'loss':'gain';
@@ -405,19 +414,35 @@ function mount(host,{rows,meta,onStep}={}){
   const dialog=host.closest('dialog');if(dialog&&!dialog.open){pause();return}
   if(document.hidden){last=null;return}
   const dt=last==null?16:Math.min(100,ts-last);last=ts;
-  if(playing){pt+=dt*rateFor();while(playing&&pt>=total(steps[si])){const n=nextIndex(si);if(n>=steps.length){pt=total(steps[si]);pause();break}pt-=total(steps[si]);si=n;if(speed==='key')camX=null}}
+  if(playing){pt+=dt*rateFor();while(playing&&pt>=total(steps[si])){if(stepOnce){pt=total(steps[si]);pause();break}const n=nextIndex(si);if(n>=steps.length){pt=total(steps[si]);pause();break}pt-=total(steps[si]);si=n;if(speed==='key')camX=null}}
   const moving=render();
   if(playing||moving)raf=requestAnimationFrame(loop);else last=null;
  };
  const kick=()=>{if(!raf&&!destroyed)raf=requestAnimationFrame(loop)};
  const play=()=>{if(si>=steps.length-1&&pt>=total(steps[si])-1){si=0;pt=0;camX=null}if(speed==='key'&&!isKey(steps[si])){const n=nextIndex(si);if(n<steps.length){si=n;pt=0;camX=null}}playing=true;toggle.textContent='❚❚ Pause';toggle.setAttribute('aria-pressed','true');last=null;kick()};
- function pause(){playing=false;toggle.textContent='▶ Play';toggle.setAttribute('aria-pressed','false')}
+ function pause(){playing=false;stepOnce=false;toggle.textContent='▶ Play';toggle.setAttribute('aria-pressed','false')}
  const seek=(i,{snap=true}={})=>{si=clampN(i|0,0,steps.length-1);pt=0;if(snap)camX=null;shownPhase='';render();kick()};
  const driveJump=dir=>{const cur=steps[si].drive;let target=cur+dir;if(dir<0&&pt>0&&tl.drives[cur]&&si>tl.drives[cur].start)target=cur;const dr=tl.drives[clampN(target,0,tl.drives.length-1)];if(dr)seek(dr.start)};
+ // Step one play at a time: Next plays the current snap if it hasn't run yet, otherwise the next one.
+ const visible=i=>i>=0&&i<steps.length&&steps[i].kind!=='mark';
+ const stepPlay=dir=>{
+  if(dir>0){let i=si;if(!(pt===0&&visible(si))){i=si+1;while(i<steps.length&&!visible(i))i++}if(i>=steps.length)return;pause();seek(i);stepOnce=true;playing=true;toggle.textContent='❚❚ Pause';toggle.setAttribute('aria-pressed','true');last=null;kick()}
+  else{let i=pt>0&&visible(si)?si:si-1;while(i>0&&!visible(i))i--;pause();seek(Math.max(0,i))}
+ };
  toggle.onclick=()=>playing?pause():play();
+ $q('[data-gcf-fwd]').onclick=()=>stepPlay(1);
+ $q('[data-gcf-back]').onclick=()=>stepPlay(-1);
+ drivePick.onchange=()=>{const dr=tl.drives[Number(drivePick.value)];if(dr){pause();seek(dr.start)}};
+ host.tabIndex=0;
+ host.addEventListener('keydown',ev=>{
+  if(ev.target.closest?.('select,input')&&ev.key!==' ')return;
+  if(ev.key===' '||ev.key==='k'){ev.preventDefault();playing?pause():play()}
+  else if(ev.key==='ArrowRight'){ev.preventDefault();if(ev.shiftKey){pause();driveJump(1)}else stepPlay(1)}
+  else if(ev.key==='ArrowLeft'){ev.preventDefault();if(ev.shiftKey){pause();driveJump(-1)}else stepPlay(-1)}
+ });
  $q('[data-gcf-restart]').onclick=()=>{pause();seek(0)};
- $q('[data-gcf-prev]').onclick=()=>driveJump(-1);
- $q('[data-gcf-next]').onclick=()=>driveJump(1);
+ $q('[data-gcf-prev]').onclick=()=>{pause();driveJump(-1)};
+ $q('[data-gcf-next]').onclick=()=>{pause();driveJump(1)};
  speedSel.onchange=()=>{speed=speedSel.value;pt=0;if(playing&&speed==='key'&&!isKey(steps[si])){const n=nextIndex(si);if(n<steps.length)si=n}camX=null;kick()};
  scrub.oninput=()=>{pause();seek(Number(scrub.value))};
  host.addEventListener('click',ev=>{const b=ev.target.closest?.('[data-gcf-seek]');if(b){pause();seek(Number(b.dataset.gcfSeek))}});
