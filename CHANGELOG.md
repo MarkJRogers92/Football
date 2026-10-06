@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.12.6 — 3D Game Cast replay
+
+- Adds a full 3D replay to Game Cast for your games this season: an angled broadcast view of the field in team colours, with both teams lined up at the line of scrimmage, the first-down line, pass arcs, handoffs, sacks, interceptions, fumbles, punts and field goals at the uprights, plus banners for touchdowns, turnovers and other big plays.
+- Adds replay controls: play/pause, 1x, 4x and a key-plays mode that covers a whole game in under 30 seconds, previous/next drive, restart, a scrubber, and a drive strip you can click to jump to any play. Clicking the win-probability chart jumps the replay to that moment.
+- Saves a compact play log for every game your team plays in Game Lab, Game Day or the postseason (about 18 KB a game, about 230 KB a season). Logs are kept for the current season and cleared at rollover. Older games, other teams' games and games advanced with Sim Week keep the existing position replay.
+- Records who threw, caught, ran, tackled, sacked or intercepted on each play without changing any stat line: same-seed box scores are byte-identical to v0.12.5.
+- A rolled-back Detailed Game leaves no play log behind, and older saves load with an empty play-log map.
+
 ## v0.12.5 — Game Cast, recruiting map and season review
 
 - Adds Game Cast to the Game Center for games with recorded play-by-play: a win-probability chart rebuilt from the real clock, score, possession and field position, a field replay that moves the ball to its recorded yard line, and a scoring-plays table.

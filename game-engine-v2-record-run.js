@@ -38,6 +38,7 @@ function recordV2GameLabResult(options={}){
     const record=(universe.gameArchive||[]).find(x=>x.id===result.gameId);if(!record)throw new Error('Recorded v2 game was not found in the permanent archive.');
     record.engine='v2';record.transactionVersion=prepared.tx.VERSION;record.eventCount=candidate.eventCount;record.seed=candidate.seed;
     for(const side of ['home','away']){const drivePoints=drives.filter(d=>d.side===side).reduce((n,d)=>n+(Number(d.points)||0),0);record.scoreAdjustment[side]=record.score[side]-drivePoints}
+    v2StorePlayLog(record.id,preview.state,preview.attribution);
     if(options.testFault==='afterArchive')throw new Error('Injected v2 rollback fault after archive write.');
     completeScheduledGame(g,result,true);if(options.testFault==='afterSchedule')throw new Error('Injected v2 rollback fault after schedule settlement.');
     universe.lastDetailedGame={...result,season:universe.year,week:g.week,engine:'v2',transactionVersion:prepared.tx.VERSION};universe.latest=[result];

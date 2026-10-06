@@ -53,3 +53,38 @@
 @media(prefers-reduced-motion:reduce){.gc-ball{transition:none}}
 @media(max-width:560px){.gc-field{height:52px}.gc-board strong{font-size:1.15rem}}
 .gc-tip[hidden]{display:none}
+/* Full 3D replay (game-cast-field.js): angled broadcast field on a canvas, scorebug, drive strip.
+   The canvas keeps fixed field colors in both themes; the chrome around it uses theme tokens. */
+.gc-mode{margin:-6px 0 0}
+.gc-replay-3d{padding:10px;gap:0}
+.gcf{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;min-width:0}
+.gcf-bug{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px;padding:6px 10px;border-radius:10px;background:#0d1524;color:#f3f5f8;font-size:.82rem}
+.gcf-team{display:flex;align-items:center;gap:8px;min-width:0}
+.gcf-team b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+.gcf-team.home{justify-content:flex-end}
+.gcf-team::before{content:"";flex:0 0 6px;align-self:stretch;min-height:22px;border-radius:3px;background:var(--gcf-team)}
+.gcf-team.home::before{order:3}
+.gcf-team strong{font-size:1.35rem;font-variant-numeric:tabular-nums;line-height:1}
+.gcf-situation{display:grid;justify-items:center;gap:1px;text-align:center;font-size:.72rem;color:#c3cad6;font-variant-numeric:tabular-nums}
+.gcf-situation b{color:#fff;font-size:.86rem}
+.gcf-stage{position:relative;border-radius:10px;overflow:hidden;background:#0b1220;line-height:0}
+.gcf-stage canvas{display:block;width:100%}
+.gcf-drive{display:grid;gap:4px}
+.gcf-drive-head{font-size:.78rem;color:var(--muted)}
+.gcf-drive-head b{color:var(--text)}
+.gcf-strip{display:flex;gap:2px;height:12px;min-width:0}
+.gcf-seg{flex:0 1 auto;min-width:4px;height:100%;padding:0;border:0;border-radius:2px;background:var(--gcf-team);cursor:pointer}
+.gcf-seg.loss{background:#d64545}
+.gcf-seg.big{background:#f2a516}
+.gcf-seg.future{opacity:.22}
+.gcf-seg.now{outline:2px solid var(--text);outline-offset:1px}
+.gcf-play{min-height:2.6em;font-size:.88rem;color:var(--text)}
+.gcf-play strong{color:var(--muted);font-variant-numeric:tabular-nums}
+.gcf-log{margin:0;padding-left:18px;display:grid;gap:2px;max-height:6.4em;overflow:hidden;font-size:.78rem;color:var(--muted);text-transform:none;letter-spacing:normal}
+.gcf-log li{text-transform:none;letter-spacing:normal}
+.gcf-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.gcf-controls button{min-width:40px;min-height:34px}
+.gcf-controls .gcf-primary{min-width:92px}
+.gcf-controls select{min-height:34px}
+.gcf-controls input[type=range]{flex:1 1 140px;min-width:0}
+@media(max-width:560px){.gcf-bug{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:'away home' 'sit sit';font-size:.76rem;padding:6px 8px;gap:4px 10px}.gcf-team.away{grid-area:away}.gcf-team.home{grid-area:home}.gcf-situation{grid-area:sit;grid-auto-flow:column;justify-content:center;gap:8px}.gcf-team strong{font-size:1.1rem}.gcf-controls input[type=range]{flex-basis:100%}}

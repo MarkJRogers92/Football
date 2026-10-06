@@ -40,6 +40,7 @@ function recordInteractiveV2GameDay(session,options={}){
     const record=(universe.gameArchive||[]).find(x=>x.id===result.gameId);if(!record)throw new Error('Interactive Game Day archive record was not created.');
     record.engine='v2';record.transactionVersion=tx.VERSION;record.eventCount=candidate.eventCount;record.seed=candidate.seed;record.gameDayVersion=gameday.VERSION;record.coachingDecisionVersion=globalThis.DynastyGameEngineV2Decisions?.VERSION||1;record.coachingDecisions=v2GameDayDecisionReceipts(session.state);
     for(const side of ['home','away']){const drivePoints=drives.filter(d=>d.side===side).reduce((n,d)=>n+(Number(d.points)||0),0);record.scoreAdjustment[side]=record.score[side]-drivePoints}
+    v2StorePlayLog(record.id,session.state,attribution);
     if(options.testFault==='afterArchive')throw new Error('Injected Interactive Game Day rollback fault after archive write.');
     completeScheduledGame(g,result,true);if(options.testFault==='afterSchedule')throw new Error('Injected Interactive Game Day rollback fault after schedule settlement.');
     universe.lastDetailedGame={...result,season:universe.year,week:g.week,engine:'v2',transactionVersion:tx.VERSION,gameDayVersion:gameday.VERSION};universe.latest=[result];
