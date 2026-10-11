@@ -1,13 +1,16 @@
 # Latest Session Work
 
-2026-10-10: Completed the development/player-evidence improvements. The user has now authorized merging, publication, and desktop installation as v0.12.7.
+2026-10-11: Merged, published, and installed v0.12.7 with the development/player-evidence improvements. The user authorized all three delivery actions.
 
 ## Detailed Current State
 
-- Repository: Dynasty Lab, branch `codex/development-plan-camp-coaching`.
-- Implementation checkpoint: `39193ee` (`feat: add scouting, career stories and production insights`).
+- Repository: Dynasty Lab, current/default branch `claude/review-improvement-dwjemy`.
+- Released source and tag `v0.12.7`: `f7e3c03aa5b40e5e8d196cca25a01bbb64831240` (`release: integrate development and player insights for v0.12.7`). The local default branch was fast-forwarded to this merge.
+- Player-evidence implementation checkpoint: `39193ee` (`feat: add scouting, career stories and production insights`).
 - The previously verified featured-plan results and camp coaching work remains in `0b97487`, with its prior handoff in `48c27f3`. This package began with a clean working tree and preserves that work.
-- Version remains `0.12.3`. `app.js` and extensions are source; `tools/build.js` regenerates the standalone `index.html`.
+- Version is `0.12.7` in `VERSION.txt`, `APP_VERSION`, package metadata, the published page, and the installed desktop app. `app.js` and extensions are source; `tools/build.js` regenerates the standalone `index.html`.
+- Integration preserves the already released v0.12.6 first-season flow, Game Cast, 3D Watch, rendering composition, school data, simulation improvements, and release gates. The previously declined full-detail Sim Week path remains disabled.
+- Camp result recording still runs through the canonical completion path before autosave. Development rendering retains `extendRender`; the Stats evidence wrapper refreshes `TAB_RENDERERS.stats` so the active-tab renderer actually uses it.
 
 ## Session Changes
 
@@ -21,22 +24,22 @@
 
 ## Verification
 
-- Final focused verification: `node --test tests/player-evidence.js`, 12/12 passed. Covers scouting provenance, recorded staff/save restoration, weighted samples, unknown historical positions, actual game breakout/rollback, accepted weekly/camp outcomes, replay, same-week phase display/order, eligibility-only completion, and presentation purity.
-- Earlier stable-checkpoint regressions: `npm run test:development`, 95/95 passed. Broader relevant regression command below passed 47/47. Final repairs were verified by the focused suite and final browser flow; these counts overlap and are not additive.
+- `npm run publish` completed successfully with the unchanged required `validate:full` gate: build, clean/reproducible release verification, 448/448 core tests, standard and extended browser suites, six browser persistence scenarios, and the five-season audit. The long core run completed without a five-minute cutoff.
+- Integrated focused suites passed 28/28, first-season pure tests passed 9/9, and desktop storage tests passed 14/14. Counts overlap the full suite and are not additive.
+- The parent feature flow passed at 1280x900 and 390x844 on the release build: actual personnel decisions, four recorded weeks, rollback, breakout deduplication, weighted statistics, career links, Spring/Fall camp acceptance and replay, phase order, saved coach perspectives, read purity, and layout/error checks. The fixture aligns both initial QB charts before the real promotion so independent random charts cannot change its participant.
+- Independent native Sol review accepted the integrated diff and separately verified both downloadable packages and the disposable-profile installed-app verifier.
+- [Source CI run 38111772628](https://github.com/MarkJRogers92/Football/actions/runs/38111772628) passed validation and both macOS/Windows packaging and native save/restart checks. Its fast cadence skipped browser/audit jobs; the required browser/audit checks ran in the local full publication gate.
+- The locally made Mac app passed native save/restart/replacement checks and strict signature verification. Its packaged HTML is byte-identical to the validated source. The Windows artifact comes from the exact-source CI run and matches the game source after platform newline normalization; its separate raw hash is recorded.
+- The actual `/Applications/Dynasty Lab.app` passed a fresh-profile launch with native storage, no Node exposure, the new player and statistics views, and no renderer errors. The regular user profile was then opened; its v0.12.7 title menu shows the existing Continue Dynasty and desktop save ready. No gameplay action was taken in that profile.
 
-  `node --test tests/weekly-player-stories.js tests/career.js tests/programhistory.js tests/persistence.js tests/games.js tests/transfers.js tests/weeklydecisions.js tests/relationships.js tests/offseason-calendar.js tests/preseason-start.js tests/game-engine-v2-transaction.js tests/rng-integration.js`
+## Delivered Release
 
-- Parent browser flow passed at 1280x900 and 390x844 on the final build, using fresh dynasties with controlled fixtures: real personnel resolution, four recorded game weeks, failed-game rollback, breakout deduplication, team/national scope, linked career history, Spring/Fall camp acceptance/replay and explicit ordering/labels, saved coach details, read purity, overflow, and browser errors. The fixture aligns both initial QB charts before the actual promotion so randomly generated chart differences do not change the test's participant.
-- Syntax checks, `git diff --check`, and `npm run build` passed. On clean implementation checkpoint `39193ee`, `npm run verify:release` confirmed a byte-identical rebuild of `index.html`.
-- Independent native Sol review accepted the final diff and independently probed camp facts/timing/roles, phase identities, ordering across four surfaces, source-array purity, and unknown legacy positions. The full release suite and desktop packaging were not run.
-- Parent browser evidence and screenshots: `/Users/markrogers/Documents/Codex/2026-10-10/dynasty-player-insights/` (`check-player-insights.cjs`, `ui-verification.json`, desktop/mobile screenshots). Previous development/coaching evidence remains in `/Users/markrogers/Documents/Codex/2026-10-10/dynasty-development-upgrade/`.
-
-## Pending Work and Blockers
-
-The user authorized merge, publish, and install after local acceptance. Release preparation integrates the already released default branch `claude/review-improvement-dwjemy` at `1ecc117` (web v0.12.6), preserving its first-season flow, Game Cast, 3D Watch replay, rendering composition, tests, and release gates. It does not enable the previously declined full-detail Sim Week path. Existing save identity and storage paths stay intact.
-
-Release v0.12.7 must pass integration review, the required full publication gate, and packaged macOS/native-save verification before delivery. Production was v0.12.6 and the inactive installed app was v0.12.2 at intake; neither has been replaced yet. Checksums of all 17 native save files were recorded in `/Users/markrogers/Documents/Codex/2026-10-10/dynasty-release-0.12.7/saves-before.json`. Older saves may lack historical coach perspectives, positions, or retained game lines; the UI reports missing/partial evidence instead of inventing it.
+- [Production](https://markjrogers92.github.io/Football/) serves the exact validated v0.12.7 HTML, SHA-256 `fdfdb53688fa0efaef664beb9e3b3e721c02c64f970d4a962e756a2b708a3033`. Pages commit: `0d9e36ca19bf91deb83a4f7f57ccc5885f5e3b39`. Both referenced external image assets returned HTTP 200.
+- [Release and downloads](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.7) are published as a desktop Alpha prerelease, with Mac arm64 and Windows x64 ZIPs. The tag resolves to released source `f7e3c03`; both uploaded asset sizes and GitHub SHA-256 digests match the verified local packages.
+- Installed version is v0.12.7, retaining bundle identity `com.electron.dynasty-lab` and the native save location. Its ASAR matches the verified Mac package. All 17 original native save files retained their exact checksums after replacement, fresh-profile verification, and normal user-profile startup.
+- Release evidence, package hashes, browser screenshots, publication log, installation checks, and before/after save manifests are under `/Users/markrogers/Documents/Codex/2026-10-10/dynasty-release-0.12.7/`. The `backups/` directory retains the prior v0.12.2 app and exact save backup. Earlier implementation evidence remains under `dynasty-player-insights/` and `dynasty-development-upgrade/` in the same date directory.
+- No blocker remains for this authorized release. Older saves may lack historical coach perspectives, positions, or retained game lines; the UI reports missing/partial evidence rather than backfilling it.
 
 ## Next Entry Point
 
-Complete the authorized v0.12.7 release from the integrated branch, then record the exact merged source, production deployment, download artifact, and installed-app evidence. The pre-integration player-evidence checkpoint is `39193ee`. Player-evidence tests are registered in the standard suite and `test:development`, with `test:player-evidence` for focused iteration. Before an authorized release, choose its version and run the release workflow's required validation. Other framework documents still contain older snapshots; inspect current source before relying on those details.
+The requested release is complete. Continue from the current default branch and inspect its actual state before new work. Player-evidence tests are registered in the standard suite and `test:development`, with `test:player-evidence` for focused iteration. Other framework documents contain older snapshots; this handoff is the release evidence for v0.12.7.
