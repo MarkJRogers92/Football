@@ -8,13 +8,15 @@ const goDevelopment=page=>page.evaluate(()=>{const g=document.querySelector('.ta
  for(const [label,viewport] of [['desktop',{width:1280,height:900}],['iphone',{width:390,height:844}]]){
   const page=await browser.newPage({viewport}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
   await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);
-  await page.evaluate(()=>window.__DL_TEST__.prepareDevelopmentResults());await goDevelopment(page);await page.waitForSelector('.development-results-hero');await page.waitForSelector('#developmentVisualLab');
+  const featuredPrepared=await page.evaluate(()=>window.__DL_TEST__.prepareFeaturedDevelopmentPlans());if(!featuredPrepared)throw new Error('Featured development-plan fixture could not find QB, RB, and WR players');await page.evaluate(()=>window.__DL_TEST__.prepareDevelopmentResults());await goDevelopment(page);await page.waitForSelector('.development-results-hero');await page.waitForSelector('#developmentVisualLab');
   const lab=page.locator('#developmentVisualLab'),guardrail=(await lab.locator('.dev-viz-guardrail').innerText()).toLowerCase(),picker=lab.locator('.dev-player-picker [data-dev-player]');
   const checks=[
    ['results summary hero',await page.locator('.development-results-hero').count()===1],
    ['results player rows',await page.locator('[data-development-result]').count()>20],
    ['results detail panel',await page.locator('#developmentResultDetail .development-attribute').count()===7],
    ['results position filters',await page.locator('.development-groups [data-development-filter]').count()>8],
+   ['featured plan results board renders after camp',await page.locator('.development-plan-board').count()===1&&await page.locator('.development-plan-row').count()===3],
+   ['featured plans show compact outcomes and expandable recorded coaching support',await page.locator('.development-plan-row').evaluateAll(rows=>rows.length===3&&rows.every(row=>{const text=row.textContent||'';return /Observed SPRING camp:/.test(text)&&/Coach fit:/.test(text)&&row.querySelector('details.development-plan-coaching summary')?.textContent==='Recorded coach context'&&/supports camp growth|may limit camp growth|neutral camp support/.test(text)})&&['Technique','Rehab','Position Transition'].every(focus=>rows.some(row=>(row.textContent||'').includes(focus)))&&document.querySelectorAll('.development-plan-attribution').length===1)],
    ['development lab visible',await lab.isVisible()],
    ['team dashboard has three analysis surfaces',await lab.locator('.dev-team-grid > section').count()===3],
    ['player files available',await picker.count()>0],
