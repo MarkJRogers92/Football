@@ -2,7 +2,7 @@
 function v0102PersonnelGroups(t){
   ensureDepth(t);const positions=['QB','RB','WR','TE','EDGE','DT','LB','CB','S'],rows=[];
   for(const pos of positions){const ids=t.depthChart?.[pos]||[],starter=t.roster.find(p=>p.id===ids[0]),challenger=t.roster.find(p=>p.id===ids[1]);if(!starter||!challenger||starter.redshirtActive||challenger.redshirtActive||(starter.injuryWeeks||0)>0||(challenger.injuryWeeks||0)>0)continue;
-    rows.push({pos,starter:{id:starter.id,name:starter.name,grade:starter.perceived??starter.trueNow??60,upside:starter.perceivedUpside??starter.upside??60,year:starter.year,stats:starter.stats||{}},challenger:{id:challenger.id,name:challenger.name,grade:challenger.perceived??challenger.trueNow??60,upside:challenger.perceivedUpside??challenger.upside??60,year:challenger.year,stats:challenger.stats||{}}})
+    rows.push({pos,starter:{id:starter.id,name:starter.name,pos:starter.pos,grade:starter.perceived??starter.trueNow??60,upside:starter.perceivedUpside??starter.upside??60,year:starter.year,stats:starter.stats||{}},challenger:{id:challenger.id,name:challenger.name,pos:challenger.pos,grade:challenger.perceived??challenger.trueNow??60,upside:challenger.perceivedUpside??challenger.upside??60,year:challenger.year,stats:challenger.stats||{}}})
   }return rows
 }
 function v0102StarterChallenge(t){return globalThis.DynastyWeeklyCoaching?.selectStarterChallenge(v0102PersonnelGroups(t))||null}
@@ -27,6 +27,7 @@ const resolveWeeklyDecisionBeforePersonnelV0102=resolveWeeklyDecision;
 resolveWeeklyDecision=function resolveWeeklyDecisionWithPersonnel(id,optionId){
   const d=(universe.weeklyDecisions||[]).find(x=>x.id===id);if(d?.type!=='STARTER_CHALLENGE')return resolveWeeklyDecisionBeforePersonnelV0102(id,optionId);
   const t=universe.teams.find(x=>x.id===d.teamId),option=d.options?.find(x=>x.id===optionId),challenger=t?.roster.find(x=>x.id===d.playerId),starter=t?.roster.find(x=>x.id===d.starterId);if(!t||!option||!challenger||!starter||d.resolved)return false;
+  d.roleBattle={position:d.pos,incumbent:{id:starter.id,name:starter.name,roleBefore:starter.role||'Unassigned'},challenger:{id:challenger.id,name:challenger.name,roleBefore:challenger.role||'Unassigned'}};
   if(option.id==='stay'){starter.staffTrust=clamp((starter.staffTrust??70)+1,0,100);challenger.morale=clamp((challenger.morale??70)-1,15,99)}
   else if(option.id==='split'){challenger.role='Rotation';challenger.morale=clamp((challenger.morale??70)+3,15,99);challenger.staffTrust=clamp((challenger.staffTrust??70)+2,0,100);v0102BumpRolePackage(t,challenger)}
   else if(option.id==='promote'){starter.role='Rotation';challenger.role='Starter';promoteRotationPlayer(t,challenger);challenger.morale=clamp((challenger.morale??70)+5,15,99);challenger.staffTrust=clamp((challenger.staffTrust??70)+3,0,100);starter.morale=clamp((starter.morale??70)-3,15,99)}
