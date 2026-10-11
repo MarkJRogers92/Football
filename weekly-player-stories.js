@@ -13,7 +13,7 @@ function renderV0102PlayerStories(){
   const host=ensureV0102PlayerStoriesHost();if(!host)return;const t=selected(),stories=v0102PlayerStories(t);if(!t||!stories.length){host.hidden=true;return}host.hidden=false;
   host.innerHTML=`<div class="section-head"><div><div class="eyebrow">PLAYERS TO WATCH</div><h3>This week’s player stories</h3><div class="muted">Selected from real roster status, promises, role pressure and accumulated production.</div></div><span class="pill">${stories.length} active</span></div><div class="v0102-story-grid">${stories.map(s=>{const milestone=v0102LatestRecordedPlayerMilestone(s.playerId);return`<article class="v0102-story-card ${s.tone?`v0102-story-${gameEscape(s.tone)}`:''}" data-v0102-story="${gameEscape(s.type)}"><div class="v0102-story-kicker">${gameEscape(String(s.type).replaceAll('_',' '))}</div><button class="player-button v0102-story-name" data-player="${gameEscape(s.playerId)}">${gameEscape(s.name)}</button><div class="small muted">${gameEscape(s.pos)}</div><div class="compact">${gameEscape(s.summary)}</div>${milestone?`<div class="v0102-story-history"><small>${gameEscape(v0102PlayerMilestoneLabel(milestone))}</small><div>${gameEscape(milestone.summary)}</div></div>`:''}</article>`}).join('')}</div>`;attachPlayerLinks()
 }
-const renderDashboardBeforePlayerStoriesV0102=TAB_RENDERERS.dashboard;TAB_RENDERERS.dashboard=()=>{renderDashboardBeforePlayerStoriesV0102();renderV0102PlayerStories()};
+extendRender('dashboard',renderV0102PlayerStories);
 if(globalThis.__DL_TEST__){
   globalThis.__DL_TEST__.weeklyPlayerStoriesDebug=()=>v0102PlayerStories().map(x=>({...x}));
   globalThis.__DL_TEST__.weeklyPlayerStoryMilestone=(id,events)=>v0102LatestRecordedPlayerMilestone(id,events??universe?.events??[]);

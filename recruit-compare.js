@@ -35,8 +35,7 @@ if(typeof module==='object'&&module.exports){
   $$('[data-recruit]').forEach(link=>{const r=universe.recruits.find(x=>String(x.id)===String(link.dataset.recruit)),row=link.closest?.('tr'),cell=row?.querySelector?.('td[data-label="Scout"]');if(!r||!cell||cell.querySelector?.('.recruit-compare-toggle'))return;cell.insertAdjacentHTML?.('beforeend',compareToggleHTML(r))});
   summary.insertAdjacentHTML?.('beforeend',recruitCompareTrayHTML(t));bindRecruitCompare();attachRecruitLinks();
  }
- const renderRecruitingBeforeCompare=renderRecruiting;
- renderRecruiting=function(){renderRecruitingBeforeCompare();augmentRecruitCompare()};
+ extendRender('recruiting',augmentRecruitCompare);
  const showRecruitProfileBeforeCompare=showRecruitProfile;
  showRecruitProfile=function(id){
   showRecruitProfileBeforeCompare(id);

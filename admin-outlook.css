@@ -1,0 +1,22 @@
+/* Board confidence meter on the dashboard's Administration card. */
+.admin-outlook{margin:0 0 14px;padding:0 0 12px;border-bottom:1px solid var(--line)}
+.ao-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin-bottom:8px}
+.ao-head strong{font-size:1.05rem}
+.ao-shift{font-size:.8rem;font-weight:700}
+.ao-shift.down{color:var(--bad)}
+.ao-shift.up{color:var(--good)}
+.ao-meter{position:relative;height:16px;margin:4px 0 4px;border-radius:6px;overflow:hidden;background:var(--panel2)}
+.ao-band{position:absolute;top:0;bottom:0;border-right:1px solid var(--bg)}
+.ao-labels{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;margin-bottom:8px}
+.ao-labels span{font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);text-align:center;line-height:1.2}
+.ao-note{margin:0;font-size:.82rem;line-height:1.4;color:var(--muted);text-transform:none;letter-spacing:normal;font-weight:400}
+.ao-band.b0{background:rgba(239,143,146,.30)}
+.ao-band.b1{background:rgba(239,143,146,.17)}
+.ao-band.b2{background:rgba(243,202,120,.14)}
+.ao-band.b3{background:rgba(119,214,163,.14)}
+.ao-band.b4{background:rgba(119,214,163,.26)}
+.ao-marker{position:absolute;top:2px;bottom:2px;width:4px;margin-left:-2px;border-radius:2px}
+.ao-marker.now{background:var(--text);box-shadow:0 0 0 1px var(--bg)}
+.ao-marker.projected,.ao-marker.before{background:transparent;border:2px dashed var(--accent2);width:6px;margin-left:-3px}
+.ao-marker.before{border-color:var(--muted)}
+@media(max-width:500px){.ao-labels span{font-size:.55rem}}

@@ -40,10 +40,7 @@ else{
   const summary=developmentTendencySystem.summarize(t?.roster||[]),rows=summary.notable;if(!rows.length)return'';
   return `<div class="development-tendency-panel"><div class="development-tendency-head"><div><div class="eyebrow">STAFF DEVELOPMENT READ</div><h3>Observed Growth Patterns</h3></div><span>${rows.length} notable pattern${rows.length===1?'':'s'}</span></div><div class="development-tendency-grid">${rows.map(({p,clue:x})=>`<button type="button" class="development-tendency-card development-tendency-${x.tone}" data-player="${p.id}"><strong>${p.pos} ${p.name}</strong><b>${x.label}</b><small>${x.summary}</small><span>${x.observations} camp observations · ${x.confidence}% staff confidence</span></button>`).join('')}</div><div class="small muted development-tendency-note">These labels are inferred only from observed camp receipts and staff confidence. They do not reveal a hidden development curve or ceiling.</div></div>`;
  }
- const renderRosterBeforeDevelopmentTendencies=renderRoster;
- renderRoster=function(){renderRosterBeforeDevelopmentTendencies();renderDevelopmentTendencyBadges()};
- const renderDevelopmentBeforeTendencies=renderDevelopment;
- renderDevelopment=function(){renderDevelopmentBeforeTendencies();const t=selected(),host=$('#development');if(host&&!host.querySelector?.('.development-tendency-panel')){const panel=developmentTendencyPanelHTML(t);if(panel)host.insertAdjacentHTML?.('beforeend',panel);attachPlayerLinks()}};
- if(typeof TAB_RENDERERS==='object'){TAB_RENDERERS.roster=renderRoster;TAB_RENDERERS.development=renderDevelopment}
+ extendRender('roster',renderDevelopmentTendencyBadges);
+ extendRender('development',()=>{const t=selected(),host=$('#development');if(host&&!host.querySelector?.('.development-tendency-panel')){const panel=developmentTendencyPanelHTML(t);if(panel)host.insertAdjacentHTML?.('beforeend',panel);attachPlayerLinks()}});
  globalThis.DynastyLabDevelopmentTendencies={clue:p=>developmentTendencySystem.clue(p),summary:t=>developmentTendencySystem.summarize(t?.roster||[])};
 }

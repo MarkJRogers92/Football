@@ -66,7 +66,7 @@ fresh-start pressure, with zero broken-promise transfers in this pass.
   separate slots reload without mixing archive chunks, zero horizontal overflow on
   `#titleLoadPanel`, `.topbar` and the document at both widths, no console errors.
 - Full `npm test` Node runner: still NOT rerun this session. Largest open
-  verification gap; see HANDOFF_TO_GPT.md.
+  verification gap; see archive/HANDOFF_TO_GPT.md.
 
 Release metadata is prepared at v0.9.49.
 

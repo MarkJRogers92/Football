@@ -58,7 +58,7 @@ try {
     showRecruitProfile: noop, renderRoster: noop, renderDevelopment: noop,
     commitRecruit: noop, finalizeRecruiting: noop, selected: () => null,
     setStatus: noop, attachRecruitLinks: noop, $$: () => [], $: () => null,
-    TAB_RENDERERS: {}
+    TAB_RENDERERS: {}, extendRender: noop
   };
   vm.runInNewContext(`(()=>{'use strict';\n${extensions}\n})()`, extensionContext);
 

@@ -6,7 +6,7 @@
 - `index.html` is the generated standalone artifact; `tools/build.js` assembles it from source.
 - `desktop/` contains the Electron main process, preload bridge, and native save implementation.
 - `tests/` contains Node and Chromium/browser checks; `tools/` contains build, publish, audit, long-run, and packaging helpers.
-- `docs/` contains roadmap entries and milestone/release handoffs. `assets/` and `portraits/` hold visual assets and the deterministic portrait renderer.
+- `docs/` contains roadmap entries and milestone/release handoffs; `docs/archive/` holds historical root-level handoffs, worklogs and roadmaps (see its README). `assets/` and `portraits/` hold visual assets and the deterministic portrait renderer.
 - `agent_docs/` is the durable workflow documentation surface.
 
 ## Modules and Responsibilities

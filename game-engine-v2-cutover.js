@@ -23,7 +23,8 @@ function v2DetailedSeasonSoakProbe(){
 }
 function v2PrepareDetailedGameForTest(){
   const career=hasPendingCareerChoice(),weekly=hasPendingWeeklyDecisions();
-  if(!career&&weekly)delegateWeeklyDecisions();
+  // Refresh the UI too, so controls gated on these decisions (e.g. Detailed Game) match the new state.
+  if(!career&&weekly){delegateWeeklyDecisions();render()}
   return{career,weeklyDelegated:!career&&weekly,ready:!hasPendingCareerChoice()&&!hasPendingWeeklyDecisions()};
 }
 simulateUserDetailed=function simulateUserDetailedV2Cutover(){

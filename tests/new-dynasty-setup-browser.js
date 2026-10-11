@@ -1,10 +1,11 @@
 const assert = require('assert/strict');
 const path = require('path');
 const {chromium} = require('playwright-core');
+const {chromiumPath}=require('./helpers/chromium-path');
 
 (async () => {
   const browser = await chromium.launch({
-    executablePath: process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
+    executablePath:chromiumPath(),
     args: ['--no-sandbox'],
   });
   const page = await browser.newPage({viewport: {width: 1440, height: 960}});

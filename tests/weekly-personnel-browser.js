@@ -1,10 +1,11 @@
 const assert=require('node:assert/strict');
 const path=require('path');
 const {chromium}=require('playwright-core');
+const {chromiumPath}=require('./helpers/chromium-path');
 const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
 const startNewDynasty=page=>sharedStartNewDynasty(page);
 (async()=>{
-  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
+  const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
   try{
     await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);
     const fx=await page.evaluate(()=>window.__DL_TEST__.weeklyPersonnelForceFixture());assert.ok(fx,'fixture should create a starter-pressure decision');const before=await page.evaluate(()=>window.__DL_TEST__.weeklyPersonnelDepth('QB'));assert.equal(before[0],fx.starterId);

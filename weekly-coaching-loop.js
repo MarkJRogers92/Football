@@ -60,7 +60,7 @@ function renderV0102WeeklyCoaching(){
   host.querySelector('[data-v0102-prep-clear]')?.addEventListener('click',()=>v0102SetWeeklyPrep(t,opp,[],{source:'manual'}));
   host.querySelectorAll('[data-v0102-staff-plan]').forEach(button=>button.addEventListener('click',()=>v0102UseStaffRoomPlan(t,opp,button.dataset.v0102StaffPlan)))
 }
-const renderGameLabBeforeWeeklyCoachingV0102=TAB_RENDERERS.gamelab;TAB_RENDERERS.gamelab=()=>{renderGameLabBeforeWeeklyCoachingV0102();renderV0102WeeklyCoaching()};
+extendRender('gamelab',renderV0102WeeklyCoaching);
 const renderV2InteractiveGameDayBeforeWeeklyLockV0102=renderV2InteractiveGameDay;
 renderV2InteractiveGameDay=function renderV2InteractiveGameDayWithWeeklyLock(){const out=renderV2InteractiveGameDayBeforeWeeklyLockV0102();renderV0102WeeklyCoaching();return out};
 if(globalThis.DynastyGameEngineV2LabBridge?.interactive)globalThis.DynastyGameEngineV2LabBridge.interactive.render=renderV2InteractiveGameDay;

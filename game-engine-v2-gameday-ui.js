@@ -65,8 +65,7 @@ function renderV2InteractiveGameDay(){
   host.querySelector('[data-v2-gameday-record]')?.addEventListener('click',()=>{try{v2GameDayUIRecord()}catch(err){console.error(err);setStatus(`Interactive Game Day rolled back: ${err.message||err}`)}});
   host.querySelectorAll('[data-v2-gameday-choice]').forEach(button=>button.addEventListener('click',()=>{try{v2GameDayUIRun((x,s)=>x.resolve(s,button.dataset.v2GamedayChoice))}catch(err){console.error(err);setStatus(`Interactive Game Day stopped: ${err.message||err}`)}}))
 }
-const renderGameLabBeforeInteractiveV2=TAB_RENDERERS.gamelab;
-TAB_RENDERERS.gamelab=()=>{renderGameLabBeforeInteractiveV2();renderV2InteractiveGameDay()};
+extendRender('gamelab',()=>renderV2InteractiveGameDay());
 globalThis.DynastyGameEngineV2LabBridge.interactive={start:v2GameDayUIPrepare,render:renderV2InteractiveGameDay,getSession:()=>v2InteractiveGameDay?.session||null,record:v2GameDayUIRecord,reset:()=>{v2InteractiveGameDay=null;renderV2InteractiveGameDay()}};
 if(globalThis.__DL_TEST__){
   globalThis.__DL_TEST__.v2GameDayPreviewDigest=()=>v2GameDayUIDigest();

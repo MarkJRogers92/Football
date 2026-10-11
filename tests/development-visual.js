@@ -1,10 +1,11 @@
 const {chromium}=require('playwright-core');
+const {chromiumPath}=require('./helpers/chromium-path');
 const path=require('path');
 const {startNewDynasty}=require('./helpers/start-new-dynasty');
 const goDevelopment=page=>page.evaluate(()=>{const g=document.querySelector('.tab-groups button[data-group="team"]');if(g&&!g.classList.contains('active'))g.click();document.querySelector('.tabs button[data-tab="development"]')?.click()});
 
 (async()=>{
- const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});let failures=0;
+ const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});let failures=0;
  for(const [label,viewport] of [['desktop',{width:1280,height:900}],['iphone',{width:390,height:844}]]){
   const page=await browser.newPage({viewport}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
   await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);

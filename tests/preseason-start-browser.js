@@ -1,5 +1,6 @@
 // Focused browser coverage for the new-dynasty preseason boundary.
 const {chromium} = require('playwright-core');
+const {chromiumPath}=require('./helpers/chromium-path');
 const assert = require('node:assert/strict');
 const path = require('path');
 
@@ -17,7 +18,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page,{beginSeason:false});
 
 (async () => {
   const browser = await chromium.launch({
-    executablePath: process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
+    executablePath:chromiumPath(),
     args: ['--no-sandbox'],
   });
 

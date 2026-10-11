@@ -18,10 +18,7 @@ if(typeof module!=='object'||!module.exports){
  }
  const commitRecruitBeforeStaffScoutingIdentity=commitRecruit;
  commitRecruit=function(r,name){const ok=commitRecruitBeforeStaffScoutingIdentity(r,name);if(ok){const t=T(name);if(t&&selected()?.id===t.id)tagRecruitReceiptCoach(r,t)}return ok};
- const renderStaffBeforeStaffScoutingIdentity=renderStaff;
- renderStaff=function(){renderStaffBeforeStaffScoutingIdentity();const t=selected();if(t)appendStaffScoutingIdentity(t)};
- const renderRecruitingBeforeStaffScoutingIdentity=renderRecruiting;
- renderRecruiting=function(){renderRecruitingBeforeStaffScoutingIdentity();tagControlledScoutingReceipts()};
- if(typeof TAB_RENDERERS==='object'){TAB_RENDERERS.staff=renderStaff;TAB_RENDERERS.recruiting=renderRecruiting}
+ extendRender('staff',()=>{const t=selected();if(t)appendStaffScoutingIdentity(t)});
+ extendRender('recruiting',tagControlledScoutingReceipts);
  globalThis.DynastyLabStaffScouting={profile:c=>staffScoutingIdentity.profileForCoach(c),record:(c,t=selected())=>staffRecordFor(c,t),modifier:(t,r)=>staffScoutingIdentity.evaluationModifier(t,r)};
 }

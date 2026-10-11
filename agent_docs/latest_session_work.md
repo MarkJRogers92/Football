@@ -1,6 +1,6 @@
 # Latest Session Work
 
-2026-10-10: Completed the remaining three OOTP-inspired improvements: scouting explanations, continuing player stories, and recorded production comparisons.
+2026-10-10: Completed the development/player-evidence improvements. The user has now authorized merging, publication, and desktop installation as v0.12.7.
 
 ## Detailed Current State
 
@@ -33,8 +33,10 @@
 
 ## Pending Work and Blockers
 
-All three requested findings are complete in the local branch/build. Older saves may lack historical coach perspectives, positions, or retained game lines; the UI reports missing/partial evidence instead of inventing it. Publication and replacing the installed desktop package were not requested or performed.
+The user authorized merge, publish, and install after local acceptance. Release preparation integrates the already released default branch `claude/review-improvement-dwjemy` at `1ecc117` (web v0.12.6), preserving its first-season flow, Game Cast, 3D Watch replay, rendering composition, tests, and release gates. It does not enable the previously declined full-detail Sim Week path. Existing save identity and storage paths stay intact.
+
+Release v0.12.7 must pass integration review, the required full publication gate, and packaged macOS/native-save verification before delivery. Production was v0.12.6 and the inactive installed app was v0.12.2 at intake; neither has been replaced yet. Checksums of all 17 native save files were recorded in `/Users/markrogers/Documents/Codex/2026-10-10/dynasty-release-0.12.7/saves-before.json`. Older saves may lack historical coach perspectives, positions, or retained game lines; the UI reports missing/partial evidence instead of inventing it.
 
 ## Next Entry Point
 
-Continue from `39193ee` and this handoff. Player-evidence tests are registered in the standard suite and `test:development`, with `test:player-evidence` for focused iteration. Before an authorized release, choose its version and run the release workflow's required validation. Other framework documents still contain older snapshots; inspect current source before relying on those details.
+Complete the authorized v0.12.7 release from the integrated branch, then record the exact merged source, production deployment, download artifact, and installed-app evidence. The pre-integration player-evidence checkpoint is `39193ee`. Player-evidence tests are registered in the standard suite and `test:development`, with `test:player-evidence` for focused iteration. Before an authorized release, choose its version and run the release workflow's required validation. Other framework documents still contain older snapshots; inspect current source before relying on those details.

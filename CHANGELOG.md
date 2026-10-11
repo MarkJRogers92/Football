@@ -1,5 +1,37 @@
 # Changelog
 
+## v0.12.7 — Player development and career stories
+
+- Adds focus-based camp results with recorded coach support, clearer scouting estimate history, staff perspectives, player milestones, career chronology and position-group stat trends.
+- Carries forward Game Cast, recruiting map, season review and first-season coaching flow improvements from v0.12.6.
+
+## v0.12.6 — 3D Watch replay
+
+- Replaces the Watch view with a 3D replay for your games this season: an angled broadcast view of the field in team colours, with both teams lined up at the line of scrimmage, the first-down line, pass arcs, handoffs, sacks, interceptions, fumbles, punts and field goals at the uprights, plus banners for touchdowns, turnovers and other big plays. Older games and games advanced with Sim Week keep the drive-by-drive Watch view.
+- Watch My Next Game opens straight into the replay and starts playing. A Watch Replay button sits on the Game Lab result card and in the Quick Box, and Game Cast links to it.
+- The controls sit directly under the field: play/pause, previous and next play, previous and next drive, a jump-to-drive picker, 1x, 4x or key plays only (a whole game in under 30 seconds), restart and a scrubber. Keyboard: Space plays or pauses, ← → step a play, Shift + ← → change drive. A drive strip under the play text jumps to any snap.
+- Saves a compact play log for every game your team plays in Game Lab, Game Day or the postseason (about 18 KB a game, about 230 KB a season). Logs are kept for the current season and cleared at rollover.
+- Records who threw, caught, ran, tackled, sacked or intercepted on each play without changing any stat line: same-seed box scores are byte-identical to v0.12.5.
+- A rolled-back Detailed Game leaves no play log behind, and older saves load with an empty play-log map.
+
+## v0.12.5 — Game Cast, recruiting map and season review
+
+- Adds Game Cast to the Game Center for games with recorded play-by-play: a win-probability chart rebuilt from the real clock, score, possession and field position, a field replay that moves the ball to its recorded yard line, and a scoring-plays table.
+- Adds a recruiting map of every recruit's hometown, with commits arcing to campus, targets, rival commits and distance rings, filterable by stars and linked to recruit profiles.
+- Adds a Season in Review dashboard panel after the postseason, a board confidence meter with an in-season projection that matches the administration review, and weekly headlines in the newsletter and dashboard feed.
+- Keeps redshirted players on the depth chart with a redshirt designation, and gives every screen the same role labels (redshirt, out, limited, fills in).
+- Fixes stale postseason displays (last result, briefing titles, settled season goals), the weekly briefing label and the per-week status line.
+- Simulates seasons about 3.4 times faster with byte-identical same-seed results, and runs unit tests on every push and 23 more browser suites in CI.
+
+## v0.12.4 — First-season coaching flow
+
+- Adds a Week Opening briefing that carries forward the actual previous result, existing Game Engine v2 game-plan feedback, the current opponent, required work, and factual player-story context.
+- Groups the Coaching Agenda into Required, Recommended, and Optional work while preserving the existing authoritative guidance meanings, snooze/restore state, and advancement gates.
+- Adds a five-stage Game Week path through opponent review, real weekly decisions, optional preparation, personnel review, and Game Day without duplicating controls or inventing blockers.
+- Keeps Weeks 1–2 explicit, condenses familiar non-required explanation text in Weeks 3–4, and returns to the normal coaching view afterward.
+- Keeps the feature derived and deterministic: no new gameplay RNG, save authority, simulation effects, or parallel checklist state.
+
+
 ## v0.12.3 — Postgame box-score access
 
 - Promotes a direct View Box Score action from the Command Center and Game Lab postgame displays, while retaining the complete Game Center entry point.

@@ -124,8 +124,7 @@ if(typeof module==='object'&&module.exports){
   });
   bindScoutingActionButtons();
  }
- const renderRecruitingBeforeScoutingActions=renderRecruiting;
- renderRecruiting=function(){renderRecruitingBeforeScoutingActions();renderScoutingActionUI()};
+ extendRender('recruiting',renderScoutingActionUI);
  const showRecruitProfileBeforeScoutingActions=showRecruitProfile;
  showRecruitProfile=function(id){
   showRecruitProfileBeforeScoutingActions(id);

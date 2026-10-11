@@ -38,8 +38,6 @@ else{
  renderRecruitBattles=function(){renderRecruitBattlesBeforeV0955();renderEnhancedBattleBoard()};
  const showRecruitProfileBeforeV0955Battles=showRecruitProfile;
  showRecruitProfile=function(id){showRecruitProfileBeforeV0955Battles(id);const r=universe.recruits.find(x=>String(x.id)===String(id)),t=selected(),body=$('#recruitDialogBody');if(r&&t&&body&&!body.querySelector('.recruit-race-card')){body.insertAdjacentHTML('afterbegin',raceCard(r,t));bindRecruitFocus()}};
- const renderRecruitingBeforeV0955Battles=renderRecruiting;
- renderRecruiting=function(){renderRecruitingBeforeV0955Battles();const t=selected(),summary=$('#classSummary');if(t&&summary&&!summary.querySelector('.recruit-focus-strip')){const used=recruitingBattleSystem.focusCount(universe.recruits,t,universe);summary.insertAdjacentHTML('beforeend',`<div class="recruit-focus-strip"><strong>Weekly Priority Push</strong><span>${used} / ${RECRUITING_FOCUS_LIMIT} assigned</span><small>Use these on your most important open battles or to help protect a challenged commitment.</small></div>`)}bindRecruitFocus()};
- if(typeof TAB_RENDERERS==='object')TAB_RENDERERS.recruiting=renderRecruiting;
+ extendRender('recruiting',()=>{const t=selected(),summary=$('#classSummary');if(t&&summary&&!summary.querySelector('.recruit-focus-strip')){const used=recruitingBattleSystem.focusCount(universe.recruits,t,universe);summary.insertAdjacentHTML('beforeend',`<div class="recruit-focus-strip"><strong>Weekly Priority Push</strong><span>${used} / ${RECRUITING_FOCUS_LIMIT} assigned</span><small>Use these on your most important open battles or to help protect a challenged commitment.</small></div>`)}bindRecruitFocus()});
  globalThis.DynastyLabRecruitingBattles={summary:r=>recruitingBattleSystem.raceSummary(battleRows(r,5),selected()?.id),toggle:r=>recruitingBattleSystem.toggleFocus(r,selected(),universe,RECRUITING_FOCUS_LIMIT)};
 }

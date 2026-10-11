@@ -73,6 +73,5 @@ if(typeof module==='object'&&module.exports){
   if(!host){summary.insertAdjacentHTML?.('afterend','<div class="card" id="staffRecruitShortlist"></div>');host=$('#staffRecruitShortlist')}
   if(!host)return;host.innerHTML=staffShortlistHTML(t);bindStaffShortlist();
  }
- const renderRecruitingBeforeStaffShortlist=renderRecruiting;
- renderRecruiting=function(){renderRecruitingBeforeStaffShortlist();renderStaffShortlist()};
+ extendRender('recruiting',renderStaffShortlist);
 }

@@ -1,6 +1,7 @@
 // Browser smoke test: loads the built standalone HTML in Chromium, exercises
 // the UI end to end and fails on any console error or page exception.
 const { chromium } = require('playwright-core');
+const {chromiumPath}=require('./helpers/chromium-path');
 const path = require('path');
 // Tabs live inside groups since v0.9.26; selecting the group is part of navigating to a tab.
 const TAB_GROUP={"dashboard": "program", "program": "program", "history": "program", "roster": "team", "depth": "team", "development": "team", "recruiting": "recruiting", "gamelab": "games", "season": "games", "stats": "games", "newsletter": "games", "staff": "staff", "offseason": "staff", "records": "staff"};
@@ -14,7 +15,7 @@ const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynas
 const startNewDynasty=page=>sharedStartNewDynasty(page);
 
 (async () => {
-  const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--no-sandbox'] });
+  const browser = await chromium.launch({ executablePath:chromiumPath(), args: ['--no-sandbox'] });
   const results = [];
   let pass = 0, fail = 0;
   const check = (name, cond, detail = '') => {
