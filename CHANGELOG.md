@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.12.8 — Range-aware recruit comparison
+
+- Recruit Compare now lines up the selected recruits' scouted attribute ranges in one table, so two prospects with similar verdicts are no longer presented as interchangeable.
+- A prospect leads an attribute only when their staff low estimate clears every other recruit's high estimate; otherwise the row stays indeterminate rather than implying an order the scouting data has not established.
+- Shows a per-row confidence and a header count ("N of M comparable attributes separate the group"), and highlights the decisive leader.
+- Uses staff scouting estimates only — hidden player ability is never read.
+
 ## v0.12.7 — Player development and career stories
 
 - Adds focus-based camp results with recorded coach support, clearer scouting estimate history, staff perspectives, player milestones, career chronology and position-group stat trends.
