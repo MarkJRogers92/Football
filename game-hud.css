@@ -1,0 +1,133 @@
+/* Game HUD v1 — Playbook command menu, group indicator, section transitions, card/button feel. */
+.tab-groups{position:relative}
+.tab-groups .hud-group-bar{position:absolute;left:0;top:0;height:3px;border-radius:3px;pointer-events:none;
+  background:linear-gradient(90deg,var(--team-primary,#3b82f6),var(--team-accent,#f59e0b));
+  box-shadow:0 0 12px rgba(var(--team-primary-rgb,59,130,246),.7);
+  transition:transform .32s cubic-bezier(.2,.9,.25,1.15),width .32s cubic-bezier(.2,.9,.25,1.15),opacity .2s}
+.tab-groups .hud-key{margin-left:.45em;font:600 .62rem/1 ui-monospace,Menlo,monospace;padding:.14em .36em;border-radius:4px;
+  border:1px solid rgba(255,255,255,.18);opacity:.5;vertical-align:.12em}
+.tab-groups button.active .hud-key{opacity:.9;border-color:var(--team-accent,#f59e0b)}
+
+.hud-playbook-trigger{display:inline-flex;align-items:center;gap:.45em;margin:.4rem 0 .2rem;padding:.38rem .8rem;border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:inherit;font:600 .78rem/1.2 inherit;letter-spacing:.04em;cursor:pointer;
+  transition:background .18s,border-color .18s,transform .18s}
+.hud-playbook-trigger:hover,.hud-playbook-trigger:focus-visible{background:rgba(var(--team-primary-rgb,59,130,246),.18);border-color:var(--team-primary,#3b82f6);transform:translateY(-1px)}
+.hud-playbook-trigger kbd,.hud-playbook kbd{font:600 .66rem/1 ui-monospace,Menlo,monospace;padding:.18em .4em;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.25)}
+
+.hud-playbook{position:fixed;inset:0;z-index:9000;display:grid;place-items:start center;padding:12vh 1rem 1rem;
+  background:radial-gradient(circle at 50% 20%,rgba(var(--team-primary-rgb,59,130,246),.22),rgba(4,8,16,.82) 60%);backdrop-filter:blur(6px)}
+.hud-playbook[hidden]{display:none}
+.hud-playbook-card{width:min(560px,100%);border-radius:16px;overflow:hidden;color:#e8eefc;
+  background:linear-gradient(180deg,#141c2e,#0c121f);border:1px solid rgba(255,255,255,.1);
+  box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);
+  transform:translateY(-14px) scale(.97);opacity:0;transition:transform .22s cubic-bezier(.2,.9,.25,1.2),opacity .18s}
+.hud-playbook.is-open .hud-playbook-card{transform:none;opacity:1}
+.hud-playbook header{display:flex;flex-direction:column;gap:.15rem;padding:1rem 1.15rem .6rem;
+  background:repeating-linear-gradient(90deg,transparent 0 46px,rgba(255,255,255,.035) 46px 48px),linear-gradient(90deg,rgba(var(--team-primary-rgb,59,130,246),.35),transparent)}
+.hud-eyebrow{font:800 .66rem/1 inherit;letter-spacing:.22em;color:var(--team-accent,#f59e0b)}
+.hud-playbook header strong{font-size:1.15rem;letter-spacing:.01em}
+.hud-playbook-search{margin:.5rem 1rem .4rem;width:calc(100% - 2rem);box-sizing:border-box;padding:.65rem .8rem;border-radius:10px;
+  border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.3);color:inherit;font:inherit;font-size:.95rem;outline:none}
+.hud-playbook-search:focus{border-color:var(--team-primary,#3b82f6);box-shadow:0 0 0 3px rgba(var(--team-primary-rgb,59,130,246),.3)}
+.hud-playbook-list{list-style:none;margin:0;padding:.25rem .5rem .5rem;max-height:50vh;overflow:auto}
+.hud-playbook-list li{display:flex;align-items:center;gap:.75rem;padding:.55rem .65rem;border-radius:10px;cursor:pointer;border-left:3px solid transparent;transition:background .12s,border-color .12s}
+.hud-playbook-list li.is-cursor{background:rgba(var(--team-primary-rgb,59,130,246),.2);border-left-color:var(--team-accent,#f59e0b)}
+.hud-playbook-list li.hud-empty{cursor:default;opacity:.6;justify-content:center}
+.hud-icon{flex:none;display:grid;place-items:center;width:2rem;height:2rem;border-radius:8px;font-size:1rem;
+  background:linear-gradient(135deg,rgba(var(--team-primary-rgb,59,130,246),.5),rgba(var(--team-secondary-rgb,30,41,59),.6));box-shadow:inset 0 1px 0 rgba(255,255,255,.15)}
+.hud-copy{flex:1;min-width:0;display:flex;flex-direction:column}
+.hud-copy small{opacity:.6;font-size:.76rem}
+.hud-chip{font:700 .6rem/1 inherit;letter-spacing:.12em;padding:.3em .55em;border-radius:999px;background:rgba(255,255,255,.07);opacity:.75;white-space:nowrap}
+li.is-current .hud-chip{background:var(--team-accent,#f59e0b);color:#111;opacity:1}
+.hud-playbook footer{display:flex;flex-wrap:wrap;gap:.9rem;padding:.6rem 1rem;font-size:.72rem;opacity:.65;border-top:1px solid rgba(255,255,255,.07)}
+
+/* Section entry: quick broadcast-style wipe */
+.tab.hud-enter{animation:hudEnter .34s cubic-bezier(.2,.8,.2,1)}
+@keyframes hudEnter{from{opacity:0;transform:translateY(10px);clip-path:inset(0 0 0 12%)}to{opacity:1;transform:none;clip-path:inset(0)}}
+
+/* Tactile feel on cards and buttons */
+.card{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.card:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,0,0,.35),0 0 0 1px rgba(var(--team-primary-rgb,59,130,246),.25)}
+button:not(:disabled):active{transform:translateY(1px) scale(.985)}
+
+@media (max-width:700px){.tab-groups .hud-key,.hud-playbook-trigger kbd{display:none}.hud-playbook{padding-top:6vh}}
+.motion-reduced .tab.hud-enter,.motion-reduced .hud-playbook-card,.motion-reduced .hud-group-bar,.motion-reduced .card{animation:none!important;transition:none!important}
+.motion-reduced .card:hover{transform:none}
+@media (prefers-reduced-motion:reduce){.tab.hud-enter{animation:none}.hud-playbook-card,.hud-group-bar,.card{transition:none}.card:hover{transform:none}}
+
+/* v2: topbar trigger, Esc pause menu, toasts */
+.hud-playbook-trigger.in-topbar{margin:0 0 0 auto;flex:none}
+.hud-pause{position:fixed;inset:0;z-index:9001;display:grid;place-items:center;padding:1rem;
+  background:linear-gradient(115deg,rgba(var(--team-primary-rgb,59,130,246),.35),rgba(4,8,16,.88) 55%);backdrop-filter:blur(8px) saturate(.8)}
+.hud-pause[hidden]{display:none}
+.hud-pause-card{width:min(380px,100%);display:flex;flex-direction:column;gap:.3rem;padding:1.6rem 1.4rem 1.1rem;border-radius:18px;color:#eef3fc;
+  background:linear-gradient(160deg,#162036,#0b111d 70%);border:1px solid rgba(255,255,255,.1);border-top:3px solid var(--team-accent,#f59e0b);
+  box-shadow:0 40px 90px rgba(0,0,0,.65);transform:scale(.94);opacity:0;transition:transform .24s cubic-bezier(.2,.9,.25,1.25),opacity .18s}
+.hud-pause.is-open .hud-pause-card{transform:none;opacity:1}
+.hud-pause-title{font-size:1.5rem;font-weight:800;letter-spacing:.01em;line-height:1.1}
+.hud-pause-meta{font-size:.8rem;opacity:.65;font-variant-numeric:tabular-nums;margin-bottom:.8rem}
+.hud-pause-menu{display:flex;flex-direction:column;gap:.35rem}
+.hud-pause-item{display:flex;align-items:center;gap:.8rem;padding:.7rem .9rem;border-radius:10px;border:1px solid transparent;background:rgba(255,255,255,.04);
+  color:inherit;font:inherit;text-align:left;cursor:pointer;opacity:0;transform:translateX(-12px);
+  animation:hudSlide .3s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:calc(var(--i)*40ms);transition:background .15s,border-color .15s,padding .15s}
+.hud-pause-item span{width:1.4rem;text-align:center;opacity:.8}
+.hud-pause-item:hover,.hud-pause-item:focus-visible{outline:none;background:rgba(var(--team-primary-rgb,59,130,246),.25);border-color:var(--team-accent,#f59e0b);padding-left:1.15rem}
+.hud-pause-item:last-child{margin-top:.4rem;color:#ffb4a8}
+.hud-pause-foot{margin-top:.9rem;text-align:center;opacity:.45;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase}
+@keyframes hudSlide{to{opacity:1;transform:none}}
+
+.hud-toasts{position:fixed;right:18px;bottom:18px;z-index:8999;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:min(380px,calc(100vw - 36px))}
+.hud-toast{display:flex;align-items:center;gap:.7rem;padding:.7rem .9rem;border-radius:12px;color:#eef3fc;font-size:.82rem;
+  background:rgba(14,21,35,.95);border:1px solid rgba(255,255,255,.1);border-left:4px solid var(--team-primary,#3b82f6);box-shadow:0 14px 36px rgba(0,0,0,.45);
+  animation:hudToastIn .3s cubic-bezier(.2,.9,.25,1.2);transition:opacity .35s,transform .35s}
+.hud-toast p{margin:0}
+.hud-toast span{flex:none;display:grid;place-items:center;width:1.4rem;height:1.4rem;border-radius:50%;font-weight:800;font-size:.75rem;background:var(--team-primary,#3b82f6)}
+.hud-toast.is-good{border-left-color:#22c55e}.hud-toast.is-good span{background:#22c55e;color:#06210f}
+.hud-toast.is-bad{border-left-color:#ef4444}.hud-toast.is-bad span{background:#ef4444}
+.hud-toast.is-leaving{opacity:0;transform:translateX(30px)}
+@keyframes hudToastIn{from{opacity:0;transform:translateX(40px)}}
+.motion-reduced .hud-pause-card,.motion-reduced .hud-pause-item,.motion-reduced .hud-toast{animation:none!important;transition:none!important;opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.hud-pause-card,.hud-pause-item,.hud-toast{animation:none;transition:none;opacity:1;transform:none}}
+
+/* v3: result splash, ticker, mobile */
+.hud-splash{position:fixed;inset:0;z-index:9002;display:grid;place-items:center;pointer-events:auto;overflow:hidden;
+  background:radial-gradient(circle,rgba(var(--team-primary-rgb,59,130,246),.35),rgba(3,6,12,.7) 70%);animation:hudFade .25s ease;transition:opacity .45s}
+.hud-splash.is-leaving{opacity:0}
+.hud-splash-band{width:100%;padding:1.6rem 1rem;text-align:center;display:flex;flex-direction:column;gap:.35rem;color:#fff;
+  background:linear-gradient(90deg,transparent,rgba(var(--team-primary-rgb,59,130,246),.92) 18%,rgba(var(--team-primary-rgb,59,130,246),.92) 82%,transparent);
+  border-block:3px solid var(--team-accent,#f59e0b);transform:skewY(-3deg);animation:hudBand .5s cubic-bezier(.2,.9,.25,1.2)}
+.hud-splash-band strong{font-size:clamp(2.6rem,9vw,6rem);font-weight:900;font-style:italic;letter-spacing:.06em;line-height:1;text-shadow:0 6px 30px rgba(0,0,0,.5);animation:hudPunch .55s cubic-bezier(.2,.9,.25,1.4)}
+.hud-splash-band small{font-size:1rem;font-weight:700;font-variant-numeric:tabular-nums;opacity:.92}
+.hud-splash.is-loss .hud-splash-band{background:linear-gradient(90deg,transparent,rgba(30,38,52,.95) 18%,rgba(30,38,52,.95) 82%,transparent);border-color:#64748b}
+.hud-splash.is-job .hud-splash-band{border-color:#fff}
+.hud-splash i{position:absolute;top:-4%;left:var(--x);width:9px;height:15px;border-radius:2px;background:var(--team-accent,#f59e0b);
+  animation:hudConfetti 2.4s cubic-bezier(.3,.6,.4,1) var(--d) forwards}
+.hud-splash i:nth-child(3n){background:var(--team-primary,#3b82f6)}.hud-splash i:nth-child(3n+1){background:#fff}
+@keyframes hudFade{from{opacity:0}}
+@keyframes hudBand{from{transform:skewY(-3deg) scaleX(0)}}
+@keyframes hudPunch{from{transform:scale(2.2);opacity:0}}
+@keyframes hudConfetti{to{transform:translateY(110vh) rotate(var(--r))}}
+
+.hud-ticker{display:flex;align-items:stretch;height:28px;overflow:hidden;background:#070c14;border-bottom:1px solid #223146;font-size:.74rem}
+.hud-ticker-tag{flex:none;display:grid;place-items:center;padding:0 .7rem;font-weight:900;letter-spacing:.16em;font-size:.62rem;color:#111;background:var(--team-accent,#f59e0b)}
+.hud-ticker-track{flex:1;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent)}
+.hud-ticker-reel{display:inline-flex;white-space:nowrap;height:100%;align-items:center;animation:hudTicker var(--dur,24s) linear infinite}
+.hud-ticker-reel span{padding:0 1.4rem;color:#c7d3e2}
+.hud-ticker-reel span::before{content:'◆';margin-right:1.4rem;color:var(--team-primary,#3b82f6);font-size:.6rem}
+.hud-ticker:hover .hud-ticker-reel{animation-play-state:paused}
+@keyframes hudTicker{to{transform:translateX(-50%)}}
+
+@media (max-width:700px){
+  .hud-playbook-trigger.in-topbar{padding:.38rem .55rem;font-size:0;gap:0}
+  .hud-playbook-trigger.in-topbar span{font-size:.9rem}
+  .hud-toasts{left:12px;right:12px;bottom:12px;max-width:none}
+  .hud-pause{place-items:end center;padding:0}
+  .hud-pause-card{width:100%;border-radius:18px 18px 0 0;padding-bottom:calc(1.1rem + env(safe-area-inset-bottom))}
+  .hud-playbook footer{display:none}
+}
+.motion-reduced .hud-splash,.motion-reduced .hud-splash-band,.motion-reduced .hud-splash-band strong{animation:none!important}
+.motion-reduced .hud-ticker-reel{animation:none!important;flex-wrap:nowrap;overflow-x:auto}
+@media (prefers-reduced-motion:reduce){.hud-splash,.hud-splash-band,.hud-splash-band strong{animation:none}.hud-ticker-reel{animation:none}}
+.hud-pause-trigger{flex:none;margin-left:.4rem;width:2rem;height:2rem;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:inherit;font-size:.6rem;letter-spacing:-.05em;cursor:pointer}
+.hud-pause-trigger:hover,.hud-pause-trigger:focus-visible{border-color:var(--team-accent,#f59e0b);background:rgba(var(--team-primary-rgb,59,130,246),.2)}
+@media (max-width:700px){.hud-toasts{bottom:calc(72px + env(safe-area-inset-bottom))}}
