@@ -263,7 +263,9 @@ async function runPackaged(smokeRoot, profile, pageErrors, consoleErrors) {
     await launched.close();
     launched = null;
 
-    fs.rmSync(firstRoot, {recursive: true, force: true});
+    // Windows can hold handles on the bundle's profile for a moment after the
+    // process exits; retry the delete rather than failing the smoke test.
+    fs.rmSync(firstRoot, {recursive: true, force: true, maxRetries: 20, retryDelay: 250});
     const replacementBundle = await extractPackagedBundle(path.join(smokeRoot, 'replacement'));
     launched = await launchPackagedApplication(replacementBundle, profile);
     watchPage(launched.page, pageErrors, consoleErrors);
