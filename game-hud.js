@@ -207,7 +207,6 @@
     el.querySelector('.hud-eyebrow').textContent=kind==='job'?'CAREER MOVE':(document.querySelector('#teamName')?.textContent?.trim()||'FINAL SCORE').toUpperCase();
     el.querySelector('strong').textContent=big;el.querySelector('small').textContent=sub;
     if(kind==='win'&&!reduced())for(let i=0;i<28;i++){const c=document.createElement('i');c.style.setProperty('--x',Math.random()*100+'%');c.style.setProperty('--d',(Math.random()*.6)+'s');c.style.setProperty('--r',(Math.random()*720-360)+'deg');el.append(c)}
-    el.addEventListener('click',()=>el.remove());
     document.body.append(el);
     setTimeout(()=>el.classList.add('is-leaving'),2400);setTimeout(()=>el.remove(),2900);
     return true;
@@ -225,6 +224,57 @@
     reel.replaceChildren(...[...feed,...feed].map(t=>{const s=document.createElement('span');s.textContent=t;return s}));
     reel.style.setProperty('--dur',Math.max(18,feed.join(' ').length/7)+'s');
   }
+
+  // ---- Status bar: animated record/rank, rank movement, week flip ----
+  const rankNum=t=>{const m=String(t).match(/#(\d+)/);return m?Number(m[1]):null};
+  function flash(el,dir){el.classList.remove('hud-up','hud-down','hud-pulse');void el.offsetWidth;el.classList.add(dir>0?'hud-up':dir<0?'hud-down':'hud-pulse')}
+  function weekFlip(label){
+    const show=()=>{
+      document.querySelector('.hud-weekflip')?.remove();
+      const el=document.createElement('div');el.className='hud-weekflip';el.setAttribute('aria-hidden','true');
+      el.innerHTML='<div><small>NOW ENTERING</small><strong></strong></div>';el.querySelector('strong').textContent=label.toUpperCase();
+      document.body.append(el);setTimeout(()=>el.remove(),1500);
+    };
+    if(reduced()||document.querySelector('.hud-intro'))return;
+    document.querySelector('.hud-splash')?setTimeout(show,2900):show();
+  }
+  const watched=new WeakSet();
+  function watchStatus(){
+    const rec=document.querySelector('[data-client-record]'),rank=document.querySelector('[data-client-rank]'),week=document.querySelector('[data-client-week]');
+    if(rec&&!watched.has(rec)){watched.add(rec);let last=rec.textContent;new MutationObserver(()=>{const v=rec.textContent;if(v===last)return;
+      const w=a=>Number((a.match(/^(\d+)/)||[])[1]||0);flash(rec,w(v)>w(last)?1:w(v)===w(last)?-1:0);last=v}).observe(rec,{childList:true,characterData:true,subtree:true})}
+    if(rank&&!watched.has(rank)){watched.add(rank);let last=rank.textContent;
+      const badge=document.createElement('span');badge.className='hud-rank-move';badge.hidden=true;rank.after(badge);
+      new MutationObserver(()=>{const v=rank.textContent;if(v===last)return;const a=rankNum(last),b=rankNum(v);last=v;
+        if(a!=null&&b!=null&&a!==b){const up=b<a;badge.hidden=false;badge.className='hud-rank-move '+(up?'is-up':'is-down');badge.textContent=(up?'▲':'▼')+Math.abs(a-b);flash(rank,up?1:-1)}
+        else if(b==null)badge.hidden=true;
+      }).observe(rank,{childList:true,characterData:true,subtree:true})}
+    if(week&&!watched.has(week)){watched.add(week);let last=week.textContent;new MutationObserver(()=>{const v=week.textContent;if(v===last)return;
+      const m=v.match(/Week \d+|Bowl[^·]*|Playoff[^·]*|Offseason|Preseason/i);if(m&&!titleOpen()&&!last.includes(m[0]))weekFlip(m[0].trim());last=v}).observe(week,{childList:true,characterData:true,subtree:true})}
+  }
+  watchStatus();setTimeout(watchStatus,500);new MutationObserver(watchStatus).observe(document.body,{childList:true});
+
+  // ---- Game-day intro (first appearance of a live scoreboard) ----
+  const introduced=new Set();let armed=0;
+  document.addEventListener('click',ev=>{if(ev.target.closest?.('[data-v2-gameday-start]'))armed=Date.now()},true);
+  function maybeIntro(){
+    const board=document.querySelector('.v2-gameday-scoreboard');
+    if(!board||reduced())return;
+    const away=board.querySelector('.away'),home=board.querySelector('.home');
+    const names=[away,home].map(t=>t?.querySelector('span:not(.team-logo)')?.textContent?.trim()||'');
+    const key=names.join('|')+'|'+(document.querySelector('[data-client-week]')?.textContent||'');
+    if(!names[0]||introduced.has(key)||Date.now()-armed>4000)return;
+    introduced.add(key);
+    const el=document.createElement('div');el.className='hud-intro';el.setAttribute('role','status');
+    el.innerHTML='<div class="hud-intro-side away"></div><div class="hud-intro-vs">VS</div><div class="hud-intro-side home"></div><small class="hud-intro-tag">KICKOFF</small>';
+    [[away,'.away',names[0]],[home,'.home',names[1]]].forEach(([src,sel,name])=>{
+      const side=el.querySelector('.hud-intro-side'+sel);
+      const logo=src.querySelector('.team-logo, img, svg, [class*="logo"]');if(logo)side.append(logo.cloneNode(true));
+      const n=document.createElement('strong');n.textContent=name;side.append(n);
+    });
+    document.body.append(el);setTimeout(()=>el.classList.add('is-leaving'),1900);setTimeout(()=>el.remove(),2400);
+  }
+  new MutationObserver(maybeIntro).observe(document.querySelector('#app')||document.body,{childList:true,subtree:true});
 
   // ---- Section entry transitions + indicator sync ----
   let last=document.querySelector('.tab.active');
