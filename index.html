@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.8</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.9</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -1683,6 +1683,173 @@ html[data-dl-motion="reduced"] .dl-motion-result{animation:none!important;transf
   .dl-motion-surface,.dl-motion-detail,.dl-motion-value,.dl-motion-result{animation:none!important;transform:none!important}
   .client-nav-item,.client-mobile-item,.client-nav-toggle,.recruit-workspace-card,.rw-filter-stack button,.rw-actions button,.dev-viz-row,.dev-player-picker button,.dev-player-head button,.pi-chip,.event-team,.season-result,.season-next,.legacy-chip,.legacy-season,.rw-confidence>i,.dev-attr-row i>b,.dev-group-row i>b,.season-progress i,.dev-chart polyline,.dev-chart-point{transition:none!important;transform:none!important}
 }
+
+/* Game HUD v1 — Playbook command menu, group indicator, section transitions, card/button feel. */
+.tab-groups{position:relative}
+.tab-groups .hud-group-bar{position:absolute;left:0;top:0;height:3px;border-radius:3px;pointer-events:none;
+  background:linear-gradient(90deg,var(--team-primary,#3b82f6),var(--team-accent,#f59e0b));
+  box-shadow:0 0 12px rgba(var(--team-primary-rgb,59,130,246),.7);
+  transition:transform .32s cubic-bezier(.2,.9,.25,1.15),width .32s cubic-bezier(.2,.9,.25,1.15),opacity .2s}
+.tab-groups .hud-key{margin-left:.45em;font:600 .62rem/1 ui-monospace,Menlo,monospace;padding:.14em .36em;border-radius:4px;
+  border:1px solid rgba(255,255,255,.18);opacity:.5;vertical-align:.12em}
+.tab-groups button.active .hud-key{opacity:.9;border-color:var(--team-accent,#f59e0b)}
+
+.hud-playbook-trigger{display:inline-flex;align-items:center;gap:.45em;margin:.4rem 0 .2rem;padding:.38rem .8rem;border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:inherit;font:600 .78rem/1.2 inherit;letter-spacing:.04em;cursor:pointer;
+  transition:background .18s,border-color .18s,transform .18s}
+.hud-playbook-trigger:hover,.hud-playbook-trigger:focus-visible{background:rgba(var(--team-primary-rgb,59,130,246),.18);border-color:var(--team-primary,#3b82f6);transform:translateY(-1px)}
+.hud-playbook-trigger kbd,.hud-playbook kbd{font:600 .66rem/1 ui-monospace,Menlo,monospace;padding:.18em .4em;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.25)}
+
+.hud-playbook{position:fixed;inset:0;z-index:9000;display:grid;place-items:start center;padding:12vh 1rem 1rem;
+  background:radial-gradient(circle at 50% 20%,rgba(var(--team-primary-rgb,59,130,246),.22),rgba(4,8,16,.82) 60%);backdrop-filter:blur(6px)}
+.hud-playbook[hidden]{display:none}
+.hud-playbook-card{width:min(560px,100%);border-radius:16px;overflow:hidden;color:#e8eefc;
+  background:linear-gradient(180deg,#141c2e,#0c121f);border:1px solid rgba(255,255,255,.1);
+  box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);
+  transform:translateY(-14px) scale(.97);opacity:0;transition:transform .22s cubic-bezier(.2,.9,.25,1.2),opacity .18s}
+.hud-playbook.is-open .hud-playbook-card{transform:none;opacity:1}
+.hud-playbook header{display:flex;flex-direction:column;gap:.15rem;padding:1rem 1.15rem .6rem;
+  background:repeating-linear-gradient(90deg,transparent 0 46px,rgba(255,255,255,.035) 46px 48px),linear-gradient(90deg,rgba(var(--team-primary-rgb,59,130,246),.35),transparent)}
+.hud-eyebrow{font:800 .66rem/1 inherit;letter-spacing:.22em;color:var(--team-accent,#f59e0b)}
+.hud-playbook header strong{font-size:1.15rem;letter-spacing:.01em}
+.hud-playbook-search{margin:.5rem 1rem .4rem;width:calc(100% - 2rem);box-sizing:border-box;padding:.65rem .8rem;border-radius:10px;
+  border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.3);color:inherit;font:inherit;font-size:.95rem;outline:none}
+.hud-playbook-search:focus{border-color:var(--team-primary,#3b82f6);box-shadow:0 0 0 3px rgba(var(--team-primary-rgb,59,130,246),.3)}
+.hud-playbook-list{list-style:none;margin:0;padding:.25rem .5rem .5rem;max-height:50vh;overflow:auto}
+.hud-playbook-list li{display:flex;align-items:center;gap:.75rem;padding:.55rem .65rem;border-radius:10px;cursor:pointer;border-left:3px solid transparent;transition:background .12s,border-color .12s}
+.hud-playbook-list li.is-cursor{background:rgba(var(--team-primary-rgb,59,130,246),.2);border-left-color:var(--team-accent,#f59e0b)}
+.hud-playbook-list li.hud-empty{cursor:default;opacity:.6;justify-content:center}
+.hud-icon{flex:none;display:grid;place-items:center;width:2rem;height:2rem;border-radius:8px;font-size:1rem;
+  background:linear-gradient(135deg,rgba(var(--team-primary-rgb,59,130,246),.5),rgba(var(--team-secondary-rgb,30,41,59),.6));box-shadow:inset 0 1px 0 rgba(255,255,255,.15)}
+.hud-copy{flex:1;min-width:0;display:flex;flex-direction:column}
+.hud-copy small{opacity:.6;font-size:.76rem}
+.hud-chip{font:700 .6rem/1 inherit;letter-spacing:.12em;padding:.3em .55em;border-radius:999px;background:rgba(255,255,255,.07);opacity:.75;white-space:nowrap}
+li.is-current .hud-chip{background:var(--team-accent,#f59e0b);color:#111;opacity:1}
+.hud-playbook footer{display:flex;flex-wrap:wrap;gap:.9rem;padding:.6rem 1rem;font-size:.72rem;opacity:.65;border-top:1px solid rgba(255,255,255,.07)}
+
+/* Section entry: quick broadcast-style wipe */
+.tab.hud-enter{animation:hudEnter .34s cubic-bezier(.2,.8,.2,1)}
+@keyframes hudEnter{from{opacity:0;transform:translateY(10px);clip-path:inset(0 0 0 12%)}to{opacity:1;transform:none;clip-path:inset(0)}}
+
+/* Tactile feel on cards and buttons */
+.card{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.card:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,0,0,.35),0 0 0 1px rgba(var(--team-primary-rgb,59,130,246),.25)}
+button:not(:disabled):active{transform:translateY(1px) scale(.985)}
+
+@media (max-width:700px){.tab-groups .hud-key,.hud-playbook-trigger kbd{display:none}.hud-playbook{padding-top:6vh}}
+.motion-reduced .tab.hud-enter,.motion-reduced .hud-playbook-card,.motion-reduced .hud-group-bar,.motion-reduced .card{animation:none!important;transition:none!important}
+.motion-reduced .card:hover{transform:none}
+@media (prefers-reduced-motion:reduce){.tab.hud-enter{animation:none}.hud-playbook-card,.hud-group-bar,.card{transition:none}.card:hover{transform:none}}
+
+/* v2: topbar trigger, Esc pause menu, toasts */
+.hud-playbook-trigger.in-topbar{margin:0 0 0 auto;flex:none}
+.hud-pause{position:fixed;inset:0;z-index:9001;display:grid;place-items:center;padding:1rem;
+  background:linear-gradient(115deg,rgba(var(--team-primary-rgb,59,130,246),.35),rgba(4,8,16,.88) 55%);backdrop-filter:blur(8px) saturate(.8)}
+.hud-pause[hidden]{display:none}
+.hud-pause-card{width:min(380px,100%);display:flex;flex-direction:column;gap:.3rem;padding:1.6rem 1.4rem 1.1rem;border-radius:18px;color:#eef3fc;
+  background:linear-gradient(160deg,#162036,#0b111d 70%);border:1px solid rgba(255,255,255,.1);border-top:3px solid var(--team-accent,#f59e0b);
+  box-shadow:0 40px 90px rgba(0,0,0,.65);transform:scale(.94);opacity:0;transition:transform .24s cubic-bezier(.2,.9,.25,1.25),opacity .18s}
+.hud-pause.is-open .hud-pause-card{transform:none;opacity:1}
+.hud-pause-title{font-size:1.5rem;font-weight:800;letter-spacing:.01em;line-height:1.1}
+.hud-pause-meta{font-size:.8rem;opacity:.65;font-variant-numeric:tabular-nums;margin-bottom:.8rem}
+.hud-pause-menu{display:flex;flex-direction:column;gap:.35rem}
+.hud-pause-item{display:flex;align-items:center;gap:.8rem;padding:.7rem .9rem;border-radius:10px;border:1px solid transparent;background:rgba(255,255,255,.04);
+  color:inherit;font:inherit;text-align:left;cursor:pointer;opacity:0;transform:translateX(-12px);
+  animation:hudSlide .3s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:calc(var(--i)*40ms);transition:background .15s,border-color .15s,padding .15s}
+.hud-pause-item span{width:1.4rem;text-align:center;opacity:.8}
+.hud-pause-item:hover,.hud-pause-item:focus-visible{outline:none;background:rgba(var(--team-primary-rgb,59,130,246),.25);border-color:var(--team-accent,#f59e0b);padding-left:1.15rem}
+.hud-pause-item:last-child{margin-top:.4rem;color:#ffb4a8}
+.hud-pause-foot{margin-top:.9rem;text-align:center;opacity:.45;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase}
+@keyframes hudSlide{to{opacity:1;transform:none}}
+
+.hud-toasts{position:fixed;right:18px;bottom:18px;z-index:8999;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:min(380px,calc(100vw - 36px))}
+.hud-toast{display:flex;align-items:center;gap:.7rem;padding:.7rem .9rem;border-radius:12px;color:#eef3fc;font-size:.82rem;
+  background:rgba(14,21,35,.95);border:1px solid rgba(255,255,255,.1);border-left:4px solid var(--team-primary,#3b82f6);box-shadow:0 14px 36px rgba(0,0,0,.45);
+  animation:hudToastIn .3s cubic-bezier(.2,.9,.25,1.2);transition:opacity .35s,transform .35s}
+.hud-toast p{margin:0}
+.hud-toast span{flex:none;display:grid;place-items:center;width:1.4rem;height:1.4rem;border-radius:50%;font-weight:800;font-size:.75rem;background:var(--team-primary,#3b82f6)}
+.hud-toast.is-good{border-left-color:#22c55e}.hud-toast.is-good span{background:#22c55e;color:#06210f}
+.hud-toast.is-bad{border-left-color:#ef4444}.hud-toast.is-bad span{background:#ef4444}
+.hud-toast.is-leaving{opacity:0;transform:translateX(30px)}
+@keyframes hudToastIn{from{opacity:0;transform:translateX(40px)}}
+.motion-reduced .hud-pause-card,.motion-reduced .hud-pause-item,.motion-reduced .hud-toast{animation:none!important;transition:none!important;opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.hud-pause-card,.hud-pause-item,.hud-toast{animation:none;transition:none;opacity:1;transform:none}}
+
+/* v3: result splash, ticker, mobile */
+.hud-splash{position:fixed;inset:0;z-index:9002;display:grid;place-items:center;pointer-events:none;overflow:hidden;
+  background:radial-gradient(circle,rgba(var(--team-primary-rgb,59,130,246),.35),rgba(3,6,12,.7) 70%);animation:hudFade .25s ease;transition:opacity .45s}
+.hud-splash.is-leaving{opacity:0}
+.hud-splash-band{width:100%;padding:1.6rem 1rem;text-align:center;display:flex;flex-direction:column;gap:.35rem;color:#fff;
+  background:linear-gradient(90deg,transparent,rgba(var(--team-primary-rgb,59,130,246),.92) 18%,rgba(var(--team-primary-rgb,59,130,246),.92) 82%,transparent);
+  border-block:3px solid var(--team-accent,#f59e0b);transform:skewY(-3deg);animation:hudBand .5s cubic-bezier(.2,.9,.25,1.2)}
+.hud-splash-band strong{font-size:clamp(2.6rem,9vw,6rem);font-weight:900;font-style:italic;letter-spacing:.06em;line-height:1;text-shadow:0 6px 30px rgba(0,0,0,.5);animation:hudPunch .55s cubic-bezier(.2,.9,.25,1.4)}
+.hud-splash-band small{font-size:1rem;font-weight:700;font-variant-numeric:tabular-nums;opacity:.92}
+.hud-splash.is-loss .hud-splash-band{background:linear-gradient(90deg,transparent,rgba(30,38,52,.95) 18%,rgba(30,38,52,.95) 82%,transparent);border-color:#64748b}
+.hud-splash.is-job .hud-splash-band{border-color:#fff}
+.hud-splash i{position:absolute;top:-4%;left:var(--x);width:9px;height:15px;border-radius:2px;background:var(--team-accent,#f59e0b);
+  animation:hudConfetti 2.4s cubic-bezier(.3,.6,.4,1) var(--d) forwards}
+.hud-splash i:nth-child(3n){background:var(--team-primary,#3b82f6)}.hud-splash i:nth-child(3n+1){background:#fff}
+@keyframes hudFade{from{opacity:0}}
+@keyframes hudBand{from{transform:skewY(-3deg) scaleX(0)}}
+@keyframes hudPunch{from{transform:scale(2.2);opacity:0}}
+@keyframes hudConfetti{to{transform:translateY(110vh) rotate(var(--r))}}
+
+.hud-ticker{display:flex;align-items:stretch;height:28px;overflow:hidden;background:#070c14;border-bottom:1px solid #223146;font-size:.74rem}
+.hud-ticker-tag{flex:none;display:grid;place-items:center;padding:0 .7rem;font-weight:900;letter-spacing:.16em;font-size:.62rem;color:#111;background:var(--team-accent,#f59e0b)}
+.hud-ticker-track{flex:1;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent)}
+.hud-ticker-reel{display:inline-flex;white-space:nowrap;height:100%;align-items:center;animation:hudTicker var(--dur,24s) linear infinite}
+.hud-ticker-reel span{padding:0 1.4rem;color:#c7d3e2}
+.hud-ticker-reel span::before{content:'◆';margin-right:1.4rem;color:var(--team-primary,#3b82f6);font-size:.6rem}
+.hud-ticker:hover .hud-ticker-reel{animation-play-state:paused}
+@keyframes hudTicker{to{transform:translateX(-50%)}}
+
+@media (max-width:700px){
+  .hud-playbook-trigger.in-topbar{padding:.38rem .55rem;font-size:0;gap:0}
+  .hud-playbook-trigger.in-topbar span{font-size:.9rem}
+  .hud-toasts{left:12px;right:12px;bottom:12px;max-width:none}
+  .hud-pause{place-items:end center;padding:0}
+  .hud-pause-card{width:100%;border-radius:18px 18px 0 0;padding-bottom:calc(1.1rem + env(safe-area-inset-bottom))}
+  .hud-playbook footer{display:none}
+}
+.motion-reduced .hud-splash,.motion-reduced .hud-splash-band,.motion-reduced .hud-splash-band strong{animation:none!important}
+.motion-reduced .hud-ticker-reel{animation:none!important;flex-wrap:nowrap;overflow-x:auto}
+@media (prefers-reduced-motion:reduce){.hud-splash,.hud-splash-band,.hud-splash-band strong{animation:none}.hud-ticker-reel{animation:none}}
+.hud-pause-trigger{flex:none;margin-left:.4rem;width:2rem;height:2rem;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:inherit;font-size:.6rem;letter-spacing:-.05em;cursor:pointer}
+.hud-pause-trigger:hover,.hud-pause-trigger:focus-visible{border-color:var(--team-accent,#f59e0b);background:rgba(var(--team-primary-rgb,59,130,246),.2)}
+@media (max-width:700px){.hud-toasts{bottom:calc(72px + env(safe-area-inset-bottom))}}
+
+/* v4: status flashes, rank movement, week flip, game-day intro */
+.hud-up{animation:hudUp 1.1s ease}.hud-down{animation:hudDown 1.1s ease}.hud-pulse{animation:hudPulse 1.1s ease}
+@keyframes hudUp{0%,30%{color:#4ade80;text-shadow:0 0 14px rgba(74,222,128,.8)}}
+@keyframes hudDown{0%,30%{color:#f87171;text-shadow:0 0 14px rgba(248,113,113,.7)}}
+@keyframes hudPulse{0%,30%{color:var(--team-accent,#f59e0b)}}
+.hud-rank-move{margin-left:-6px;margin-right:6px;padding:.1em .4em;border-radius:5px;font-size:10px;font-weight:800;font-variant-numeric:tabular-nums;align-self:center;animation:hudPop .4s cubic-bezier(.2,.9,.25,1.5)}
+.hud-rank-move.is-up{color:#4ade80;background:rgba(74,222,128,.12)}.hud-rank-move.is-down{color:#f87171;background:rgba(248,113,113,.12)}
+@keyframes hudPop{from{transform:scale(0)}}
+
+.hud-weekflip{position:fixed;inset:0;z-index:9003;display:grid;place-items:center;pointer-events:none;perspective:900px;background:rgba(3,6,12,.45);animation:hudFadeOut 1.5s ease forwards}
+.hud-weekflip div{display:flex;flex-direction:column;align-items:center;padding:1rem 2.6rem 1.2rem;border-radius:14px;color:#fff;
+  background:linear-gradient(180deg,#1b2740 0 50%,#141e33 50%);border:1px solid rgba(255,255,255,.12);border-top:4px solid var(--team-accent,#f59e0b);
+  box-shadow:0 30px 70px rgba(0,0,0,.6);transform-origin:50% 0;animation:hudFlip .6s cubic-bezier(.2,.9,.3,1.2)}
+.hud-weekflip small{font-size:.7rem;letter-spacing:.24em;color:var(--team-accent,#f59e0b);font-weight:800}
+.hud-weekflip strong{font-size:clamp(2.4rem,8vw,4.4rem);font-weight:900;letter-spacing:.04em;line-height:1.05;font-variant-numeric:tabular-nums}
+@keyframes hudFlip{from{transform:rotateX(-95deg);opacity:0}}
+@keyframes hudFadeOut{0%,70%{opacity:1}to{opacity:0}}
+
+.hud-intro{position:fixed;inset:0;z-index:9002;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;overflow:hidden;pointer-events:none;
+  background:#05080f;transition:opacity .5s}
+.hud-intro.is-leaving{opacity:0}
+.hud-intro-side{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;color:#fff;padding:1rem}
+.hud-intro-side.away{background:linear-gradient(115deg,#1e293b,#0f172a);clip-path:polygon(0 0,100% 0,88% 100%,0 100%);animation:hudInL .5s cubic-bezier(.2,.9,.25,1.1)}
+.hud-intro-side.home{background:linear-gradient(245deg,rgba(var(--team-primary-rgb,59,130,246),.75),#0f172a);clip-path:polygon(12% 0,100% 0,100% 100%,0 100%);animation:hudInR .5s cubic-bezier(.2,.9,.25,1.1)}
+.hud-intro-side>:first-child:not(strong){transform:scale(2.2);margin-bottom:1.6rem;filter:drop-shadow(0 10px 20px rgba(0,0,0,.5))}
+.hud-intro-side strong{font-size:clamp(1.1rem,3vw,2.2rem);font-weight:900;text-transform:uppercase;letter-spacing:.04em;text-align:center}
+.hud-intro-vs{font-size:clamp(2.4rem,7vw,5rem);font-weight:900;font-style:italic;color:var(--team-accent,#f59e0b);text-shadow:0 0 30px rgba(0,0,0,.8);z-index:1;animation:hudSlam .5s .35s cubic-bezier(.2,.9,.3,1.6) both}
+.hud-intro-tag{position:absolute;bottom:12%;left:50%;transform:translateX(-50%);font-weight:800;letter-spacing:.4em;font-size:.8rem;color:#fff;opacity:.8;animation:hudFade .4s .7s both}
+@keyframes hudInL{from{transform:translateX(-100%)}}@keyframes hudInR{from{transform:translateX(100%)}}
+@keyframes hudSlam{from{transform:scale(4);opacity:0}}
+@media (max-width:700px){.hud-intro{grid-template-columns:1fr;grid-template-rows:1fr auto 1fr}.hud-intro-side.away,.hud-intro-side.home{clip-path:none}}
+.motion-reduced .hud-up,.motion-reduced .hud-down,.motion-reduced .hud-pulse,.motion-reduced .hud-rank-move{animation:none!important}
 </style></head><body>
 <section id="titleScreen" class="title-screen" aria-labelledby="titleGameName">
   <div class="title-screen-art" aria-hidden="true"></div>
@@ -1737,7 +1904,7 @@ html[data-dl-motion="reduced"] .dl-motion-result{animation:none!important;transf
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.8</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.9</b></span></footer>
   </div>
 </section>
 
@@ -1764,7 +1931,7 @@ html[data-dl-motion="reduced"] .dl-motion-result{animation:none!important;transf
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.12.8</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.12.9</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -4868,7 +5035,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.12.8';
+const APP_VERSION='0.12.9';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -13325,5 +13492,301 @@ document.addEventListener('click',e=>{
 },true);
 const bodyObserver=new MutationObserver(()=>attach());if(document.body)bodyObserver.observe(document.body,{childList:true,subtree:true});
 attach();setTimeout(attach,0);setTimeout(attach,150);
+})();
+
+// Game HUD v1 — presentation only. Adds a "Playbook" command menu (Ctrl/Cmd+K or /),
+// number-key group switching, a sliding group indicator and section entry transitions.
+// It navigates only through the existing goToTab / tab buttons and never reads or writes save state.
+(function(){
+  'use strict';
+  if(document.body.dataset.gameHud==='1')return;
+  document.body.dataset.gameHud='1';
+
+  const groupsNav=document.querySelector('.tab-groups');
+  const tabsNav=document.querySelector('.tabs');
+  if(!groupsNav||!tabsNav)return;
+
+  // Mirrors TAB_GROUPS in app.js (app scope is not global).
+  const GROUP_TABS={program:['dashboard','program','history'],team:['roster','depth','development'],recruiting:['recruiting'],games:['gamelab','season','stats','newsletter'],staff:['staff','offseason','records']};
+  const ICONS={dashboard:'◆',program:'⚑',history:'⌛',roster:'☰',depth:'⇅',development:'▲',recruiting:'★',gamelab:'⚙',season:'▦',stats:'∑',newsletter:'✉',staff:'♟',offseason:'↻',records:'♛'};
+  const HINTS={dashboard:'Weekly command center',program:'Identity, budget & facilities',history:'Archive & program legacy',roster:'Full player list',depth:'Roles and depth chart',development:'Training plans & camp',recruiting:'Board, scouting & signing class',gamelab:'Game plan & matchup',season:'Schedule & standings',stats:'Leaders & team stats',newsletter:'Weekly headlines',staff:'Coordinators & schemes',offseason:'Transitions & portal',records:'Awards & record book'};
+  const titleOpen=()=>{const t=document.querySelector('#titleScreen');return !!t&&!t.hidden&&getComputedStyle(t).display!=='none'};
+  const typing=el=>!!el&&(el.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName));
+  const groupButtons=()=>[...groupsNav.querySelectorAll('button[data-group]')];
+
+  function entries(){
+    return groupButtons().flatMap(g=>{
+      const ids=GROUP_TABS[g.dataset.group]||[];
+      return ids.map(id=>{const b=tabsNav.querySelector(`button[data-tab="${id}"]`);return b&&{id,group:g.firstChild.textContent.trim(),label:b.textContent.trim()}}).filter(Boolean);
+    });
+  }
+  function go(id){
+    const g=Object.keys(GROUP_TABS).find(k=>GROUP_TABS[k].includes(id));
+    groupsNav.querySelector(`button[data-group="${g}"]`)?.click();
+    tabsNav.querySelector(`button[data-tab="${id}"]`)?.click();
+  }
+
+  // ---- Sliding group indicator + number keys ----
+  const bar=document.createElement('span');
+  bar.className='hud-group-bar';bar.setAttribute('aria-hidden','true');
+  groupsNav.append(bar);
+  function moveBar(){
+    const a=groupsNav.querySelector('button.active');
+    if(!a||!a.offsetWidth){bar.style.opacity='0';return}
+    bar.style.opacity='1';
+    bar.style.width=a.offsetWidth+'px';
+    bar.style.transform=`translate(${a.offsetLeft}px,${a.offsetTop+a.offsetHeight-3}px)`;
+  }
+  groupButtons().forEach((b,i)=>{
+    const k=document.createElement('kbd');k.className='hud-key';k.textContent=String(i+1);k.setAttribute('aria-hidden','true');
+    b.append(k);
+  });
+
+  // ---- Playbook trigger ----
+  const trigger=document.createElement('button');
+  trigger.type='button';trigger.className='hud-playbook-trigger';
+  trigger.setAttribute('aria-haspopup','dialog');
+  trigger.innerHTML='<span aria-hidden="true">⌕</span> Playbook <kbd>'+(/Mac/i.test(navigator.platform)?'⌘':'Ctrl')+' K</kbd>';
+  const pauseBtn=document.createElement('button');
+  pauseBtn.type='button';pauseBtn.className='hud-pause-trigger';pauseBtn.setAttribute('aria-label','Open pause menu (Esc)');pauseBtn.title='Menu (Esc)';
+  pauseBtn.textContent='❚❚';pauseBtn.addEventListener('click',()=>openPause());
+  function placeTrigger(){
+    const top=document.querySelector('.client-shell-ready .topbar');
+    const host=top&&(top.querySelector('.client-status')||top);
+    if(host&&trigger.parentNode!==host){host.append(trigger,pauseBtn);trigger.classList.add('in-topbar')}
+    else if(!trigger.parentNode)groupsNav.after(trigger);
+  }
+  placeTrigger();setTimeout(placeTrigger,300);
+
+  // ---- Playbook dialog ----
+  const overlay=document.createElement('div');
+  overlay.className='hud-playbook';overlay.hidden=true;
+  overlay.innerHTML=`<div class="hud-playbook-card" role="dialog" aria-modal="true" aria-labelledby="hudPlaybookTitle">
+    <header><span class="hud-eyebrow">PLAYBOOK</span><strong id="hudPlaybookTitle">Call your next play</strong></header>
+    <input type="search" class="hud-playbook-search" placeholder="Jump to a section…" aria-label="Search sections" autocomplete="off">
+    <ul class="hud-playbook-list" role="listbox" aria-label="Sections"></ul>
+    <footer><span><kbd>↑</kbd><kbd>↓</kbd> move</span><span><kbd>Enter</kbd> run play</span><span><kbd>1</kbd>–<kbd>5</kbd> groups</span><span><kbd>Esc</kbd> close · pause</span></footer>
+  </div>`;
+  document.body.append(overlay);
+  const input=overlay.querySelector('input'),list=overlay.querySelector('ul');
+  let items=[],cursor=0,returnFocus=null;
+
+  function render(){
+    const q=input.value.trim().toLowerCase();
+    items=entries().filter(e=>!q||`${e.label} ${e.group} ${HINTS[e.id]||''}`.toLowerCase().includes(q));
+    cursor=Math.min(cursor,Math.max(0,items.length-1));
+    const current=tabsNav.querySelector('button.active')?.dataset.tab||null;
+    list.replaceChildren(...items.map((e,i)=>{
+      const li=document.createElement('li');
+      li.setAttribute('role','option');li.id='hudOpt'+i;li.dataset.tab=e.id;
+      li.setAttribute('aria-selected',String(i===cursor));
+      li.className=(i===cursor?'is-cursor ':'')+(e.id===current?'is-current':'');
+      li.innerHTML='<span class="hud-icon" aria-hidden="true"></span><span class="hud-copy"><strong></strong><small></small></span><span class="hud-chip"></span>';
+      li.querySelector('.hud-icon').textContent=ICONS[e.id]||'•';
+      li.querySelector('strong').textContent=e.label;
+      li.querySelector('small').textContent=HINTS[e.id]||'';
+      li.querySelector('.hud-chip').textContent=e.id===current?'ON FIELD':e.group.toUpperCase();
+      li.addEventListener('mousemove',()=>{if(cursor!==i){cursor=i;render()}});
+      li.addEventListener('click',()=>pick(i));
+      return li;
+    }));
+    if(!items.length){const li=document.createElement('li');li.className='hud-empty';li.textContent='No matching section.';list.append(li)}
+    input.setAttribute('aria-activedescendant',items.length?'hudOpt'+cursor:'');
+    list.querySelector('.is-cursor')?.scrollIntoView?.({block:'nearest'});
+  }
+  function open(){
+    if(titleOpen()||!overlay.hidden)return;
+    returnFocus=document.activeElement;
+    overlay.hidden=false;input.value='';cursor=0;render();
+    requestAnimationFrame(()=>{overlay.classList.add('is-open');input.focus()});
+  }
+  function close(){
+    overlay.classList.remove('is-open');overlay.hidden=true;
+    returnFocus?.focus?.();
+  }
+  function pick(i){const e=items[i];if(!e)return;close();go(e.id)}
+
+  input.addEventListener('input',()=>{cursor=0;render()});
+  overlay.addEventListener('keydown',ev=>{
+    const n=Math.max(1,items.length);
+    if(ev.key==='ArrowDown'){ev.preventDefault();cursor=(cursor+1)%n;render()}
+    else if(ev.key==='ArrowUp'){ev.preventDefault();cursor=(cursor-1+n)%n;render()}
+    else if(ev.key==='Enter'){ev.preventDefault();pick(cursor)}
+    else if(ev.key==='Escape'){ev.preventDefault();ev.stopPropagation();close()}
+    else if(ev.key==='Tab'){ev.preventDefault();input.focus()}
+  });
+  overlay.addEventListener('mousedown',ev=>{if(ev.target===overlay)close()});
+  trigger.addEventListener('click',open);
+
+  document.addEventListener('keydown',ev=>{
+    if(!pause.hidden){if(ev.key==='Escape'){ev.preventDefault();closePause()}return}
+    if(!overlay.hidden||titleOpen()||document.querySelector('dialog[open]'))return;
+    if(ev.key==='Escape'&&!typing(ev.target)){ev.preventDefault();openPause();return}
+    if((ev.metaKey||ev.ctrlKey)&&ev.key.toLowerCase()==='k'){ev.preventDefault();open();return}
+    if(typing(ev.target)||ev.metaKey||ev.ctrlKey||ev.altKey)return;
+    if(ev.key==='/'){ev.preventDefault();open();return}
+    const n=Number(ev.key);
+    if(n>=1&&n<=groupButtons().length)groupButtons()[n-1].click();
+  });
+
+  // ---- Esc pause menu ----
+  const pause=document.createElement('div');
+  pause.className='hud-pause';pause.hidden=true;
+  pause.innerHTML=`<div class="hud-pause-card" role="dialog" aria-modal="true" aria-labelledby="hudPauseTitle">
+    <span class="hud-eyebrow">TIMEOUT</span><strong id="hudPauseTitle" class="hud-pause-title">Front Office</strong>
+    <div class="hud-pause-meta"></div>
+    <nav class="hud-pause-menu" aria-label="Pause menu"></nav>
+    <small class="hud-pause-foot">Esc to resume</small></div>`;
+  document.body.append(pause);
+  const pauseMenu=pause.querySelector('nav');
+  const ACTIONS=[
+    ['Resume','▶',()=>{}],
+    ['Playbook','⌕',()=>setTimeout(open,30)],
+    ['Save Dynasty','💾',()=>document.querySelector('#saveBrowser')?.click(),'#saveBrowser'],
+    ['Load Save','⤓',()=>document.querySelector('#loadBrowser')?.click(),'#loadBrowser'],
+    ['Export Save','⇪',()=>document.querySelector('#exportSave')?.click(),'#exportSave'],
+    ['Title Screen','⏏',()=>document.querySelector('#newUniverse')?.click(),'#newUniverse']];
+  function openPause(){
+    returnFocus=document.activeElement;
+    const txt=sel=>document.querySelector(sel)?.textContent?.trim()||'';
+    pause.querySelector('.hud-pause-title').textContent=txt('#teamName')||'Front Office';
+    pause.querySelector('.hud-pause-meta').textContent=[txt('#recordBig'),txt('#rankLine'),txt('#weekLine')].filter(Boolean).join(' · ');
+    pauseMenu.replaceChildren(...ACTIONS.filter(a=>!a[3]||document.querySelector(a[3])).map(([label,icon,fn],i)=>{
+      const b=document.createElement('button');b.type='button';b.className='hud-pause-item';b.style.setProperty('--i',i);
+      b.innerHTML='<span aria-hidden="true"></span><strong></strong>';
+      b.firstChild.textContent=icon;b.lastChild.textContent=label;
+      b.addEventListener('click',()=>{closePause(false);fn()});
+      return b;
+    }));
+    pause.hidden=false;requestAnimationFrame(()=>{pause.classList.add('is-open');pauseMenu.firstChild?.focus()});
+  }
+  function closePause(restore=true){pause.classList.remove('is-open');pause.hidden=true;if(restore)returnFocus?.focus?.()}
+  pause.addEventListener('mousedown',ev=>{if(ev.target===pause)closePause()});
+  pause.addEventListener('keydown',ev=>{
+    const bs=[...pauseMenu.children],i=bs.indexOf(document.activeElement);
+    if(ev.key==='ArrowDown'||ev.key==='ArrowUp'){ev.preventDefault();bs[(i+(ev.key==='ArrowDown'?1:-1)+bs.length)%bs.length]?.focus()}
+    else if(ev.key==='Tab'){ev.preventDefault();bs[(i+(ev.shiftKey?-1:1)+bs.length)%bs.length]?.focus()}
+  });
+
+  // ---- Toasts mirroring the save-status line ----
+  const toasts=document.createElement('div');
+  toasts.className='hud-toasts';toasts.setAttribute('role','status');toasts.setAttribute('aria-live','polite');
+  document.body.append(toasts);
+  const statusLine=document.querySelector('#saveStatus');
+  let lastStatus=statusLine?.textContent?.trim()||'';
+  function toast(text){
+    const t=document.createElement('div');t.className='hud-toast';
+    const ok=/sav|load|export|import/i.test(text)&&!/fail|could not|error/i.test(text);
+    if(/fail|could not|error/i.test(text))t.classList.add('is-bad');else if(ok)t.classList.add('is-good');
+    t.innerHTML='<span aria-hidden="true"></span><p></p>';
+    t.firstChild.textContent=t.classList.contains('is-bad')?'!':ok?'✓':'•';t.lastChild.textContent=text;
+    toasts.append(t);while(toasts.children.length>3)toasts.firstChild.remove();
+    setTimeout(()=>t.classList.add('is-leaving'),3600);setTimeout(()=>t.remove(),4000);
+  }
+  if(statusLine)new MutationObserver(()=>{
+    const v=statusLine.textContent.trim();
+    if(v&&v!==lastStatus&&!titleOpen()){if(!splash(v))toast(v);tick(v)}
+    lastStatus=v;
+  }).observe(statusLine,{childList:true,characterData:true,subtree:true});
+
+  // ---- Result splash (week finals, new job) ----
+  const reduced=()=>document.body.classList.contains('motion-reduced')||!!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  function splash(text){
+    let m=text.match(/^Week (\d+) final: ([WL]) (\d+)-(\d+) (vs|at) (.+?)\.?$/),kind,big,sub;
+    if(m){kind=m[2]==='W'?'win':'loss';big=m[2]==='W'?'VICTORY':'FINAL';sub=`${m[3]}–${m[4]} ${m[5]} ${m[6]} · Week ${m[1]}`}
+    else if((m=text.match(/^Took the (.+?) job\./))){kind='job';big='NEW ERA';sub=`Welcome to ${m[1]}`}
+    else return false;
+    document.querySelector('.hud-splash')?.remove();
+    const el=document.createElement('div');
+    el.className='hud-splash is-'+kind;el.setAttribute('role','status');
+    el.innerHTML='<div class="hud-splash-band"><span class="hud-eyebrow"></span><strong></strong><small></small></div>';
+    el.querySelector('.hud-eyebrow').textContent=kind==='job'?'CAREER MOVE':(document.querySelector('#teamName')?.textContent?.trim()||'FINAL SCORE').toUpperCase();
+    el.querySelector('strong').textContent=big;el.querySelector('small').textContent=sub;
+    if(kind==='win'&&!reduced())for(let i=0;i<28;i++){const c=document.createElement('i');c.style.setProperty('--x',Math.random()*100+'%');c.style.setProperty('--d',(Math.random()*.6)+'s');c.style.setProperty('--r',(Math.random()*720-360)+'deg');el.append(c)}
+    document.body.append(el);
+    setTimeout(()=>el.classList.add('is-leaving'),2400);setTimeout(()=>el.remove(),2900);
+    return true;
+  }
+
+  // ---- Broadcast ticker of this session's headlines ----
+  const ticker=document.createElement('div');
+  ticker.className='hud-ticker';ticker.setAttribute('aria-label','Session headlines');
+  ticker.innerHTML='<span class="hud-ticker-tag">LIVE</span><div class="hud-ticker-track"><div class="hud-ticker-reel"></div></div>';
+  const reel=ticker.querySelector('.hud-ticker-reel');const feed=[];
+  function tick(text){
+    if(/^(Saved|Loaded|Exported)/.test(text))return;
+    feed.unshift(text);feed.length=Math.min(feed.length,8);
+    const top=document.querySelector('.topbar');if(top&&!ticker.isConnected)top.after(ticker);
+    reel.replaceChildren(...[...feed,...feed].map(t=>{const s=document.createElement('span');s.textContent=t;return s}));
+    reel.style.setProperty('--dur',Math.max(18,feed.join(' ').length/7)+'s');
+  }
+
+  // ---- Status bar: animated record/rank, rank movement, week flip ----
+  const rankNum=t=>{const m=String(t).match(/#(\d+)/);return m?Number(m[1]):null};
+  function flash(el,dir){el.classList.remove('hud-up','hud-down','hud-pulse');void el.offsetWidth;el.classList.add(dir>0?'hud-up':dir<0?'hud-down':'hud-pulse')}
+  function weekFlip(label){
+    const show=()=>{
+      document.querySelector('.hud-weekflip')?.remove();
+      const el=document.createElement('div');el.className='hud-weekflip';el.setAttribute('aria-hidden','true');
+      el.innerHTML='<div><small>NOW ENTERING</small><strong></strong></div>';el.querySelector('strong').textContent=label.toUpperCase();
+      document.body.append(el);setTimeout(()=>el.remove(),1500);
+    };
+    if(reduced()||document.querySelector('.hud-intro'))return;
+    document.querySelector('.hud-splash')?setTimeout(show,2900):show();
+  }
+  const watched=new WeakSet();
+  function watchStatus(){
+    const rec=document.querySelector('[data-client-record]'),rank=document.querySelector('[data-client-rank]'),week=document.querySelector('[data-client-week]');
+    if(rec&&!watched.has(rec)){watched.add(rec);let last=rec.textContent;new MutationObserver(()=>{const v=rec.textContent;if(v===last)return;
+      const w=a=>Number((a.match(/^(\d+)/)||[])[1]||0);flash(rec,w(v)>w(last)?1:w(v)===w(last)?-1:0);last=v}).observe(rec,{childList:true,characterData:true,subtree:true})}
+    if(rank&&!watched.has(rank)){watched.add(rank);let last=rank.textContent;
+      const badge=document.createElement('span');badge.className='hud-rank-move';badge.hidden=true;rank.after(badge);
+      new MutationObserver(()=>{const v=rank.textContent;if(v===last)return;const a=rankNum(last),b=rankNum(v);last=v;
+        if(a!=null&&b!=null&&a!==b){const up=b<a;badge.hidden=false;badge.className='hud-rank-move '+(up?'is-up':'is-down');badge.textContent=(up?'▲':'▼')+Math.abs(a-b);flash(rank,up?1:-1)}
+        else if(b==null)badge.hidden=true;
+      }).observe(rank,{childList:true,characterData:true,subtree:true})}
+    if(week&&!watched.has(week)){watched.add(week);let last=week.textContent;new MutationObserver(()=>{const v=week.textContent;if(v===last)return;
+      const m=v.match(/Week \d+|Bowl[^·]*|Playoff[^·]*|Offseason|Preseason/i);if(m&&!titleOpen()&&!last.includes(m[0]))weekFlip(m[0].trim());last=v}).observe(week,{childList:true,characterData:true,subtree:true})}
+  }
+  watchStatus();setTimeout(watchStatus,500);new MutationObserver(watchStatus).observe(document.body,{childList:true});
+
+  // ---- Game-day intro (first appearance of a live scoreboard) ----
+  const introduced=new Set();let armed=0;
+  document.addEventListener('click',ev=>{if(ev.target.closest?.('[data-v2-gameday-start]'))armed=Date.now()},true);
+  function maybeIntro(){
+    const board=document.querySelector('.v2-gameday-scoreboard');
+    if(!board||reduced())return;
+    const away=board.querySelector('.away'),home=board.querySelector('.home');
+    const names=[away,home].map(t=>t?.querySelector('span:not(.team-logo)')?.textContent?.trim()||'');
+    const key=names.join('|')+'|'+(document.querySelector('[data-client-week]')?.textContent||'');
+    if(!names[0]||introduced.has(key)||Date.now()-armed>4000)return;
+    introduced.add(key);
+    const el=document.createElement('div');el.className='hud-intro';el.setAttribute('role','status');
+    el.innerHTML='<div class="hud-intro-side away"></div><div class="hud-intro-vs">VS</div><div class="hud-intro-side home"></div><small class="hud-intro-tag">KICKOFF</small>';
+    [[away,'.away',names[0]],[home,'.home',names[1]]].forEach(([src,sel,name])=>{
+      const side=el.querySelector('.hud-intro-side'+sel);
+      const logo=src.querySelector('.team-logo, img, svg, [class*="logo"]');if(logo)side.append(logo.cloneNode(true));
+      const n=document.createElement('strong');n.textContent=name;side.append(n);
+    });
+    document.body.append(el);setTimeout(()=>el.classList.add('is-leaving'),1900);setTimeout(()=>el.remove(),2400);
+  }
+  new MutationObserver(maybeIntro).observe(document.querySelector('#app')||document.body,{childList:true,subtree:true});
+
+  // ---- Section entry transitions + indicator sync ----
+  let last=document.querySelector('.tab.active');
+  const obs=new MutationObserver(()=>{
+    moveBar();
+    const now=document.querySelector('.tab.active');
+    if(now&&now!==last){
+      last=now;
+      now.classList.remove('hud-enter');void now.offsetWidth;now.classList.add('hud-enter');
+    }
+  });
+  obs.observe(groupsNav,{subtree:true,attributes:true,attributeFilter:['class']});
+  document.querySelectorAll('.tab').forEach(t=>obs.observe(t,{attributes:true,attributeFilter:['class']}));
+  document.addEventListener('animationend',ev=>{if(ev.target.classList?.contains('hud-enter'))ev.target.classList.remove('hud-enter')});
+  window.addEventListener('resize',moveBar);
+  requestAnimationFrame(moveBar);
+  setTimeout(moveBar,400);
 })();
 </script></body></html>
