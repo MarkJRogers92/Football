@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.12.9 — Game HUD
+
+- Adds the Playbook (Cmd/Ctrl+K or /): one command menu for every screen, grouped by area, with number keys switching groups and a sliding indicator tracking the active group.
+- Adds a pause menu (Esc) showing program, record, rank and week, with Save, Load, Export and Title Screen actions and arrow-key navigation.
+- Toasts now mirror the save-status line with success and failure styling; week finals and newly taken jobs get a result splash, and a broadcast ticker carries the session's latest headlines.
+- Adds a kickoff intro card with both teams' logos and names on the first snap of a watched game, an animated record flash, a rank-movement badge (up/down with places gained or lost) and a "now entering" card on week change.
+- Presentation only: the HUD navigates existing tabs and never reads or writes save state. It honours reduced-motion preferences and keeps keyboard focus inside its menus.
+
 ## v0.12.8 — Range-aware recruit comparison
 
 - Recruit Compare now lines up the selected recruits' scouted attribute ranges in one table, so two prospects with similar verdicts are no longer presented as interchangeable.
