@@ -27,6 +27,23 @@ const ALLOWED_EXTERNAL = /^https:\/\/(github\.com\/MarkJRogers92\/Football|markj
 // The update check runs in the main process, not the renderer: a blocked request
 // must stay silent, and a renderer fetch would raise a console error the smoke
 // test (correctly) treats as a regression.
+// Desktop saves live in the app data folder, not in a browser origin, so the
+// renderer's navigator.storage estimate says nothing useful about them.
+function saveUsage() {
+  let bytes = 0;
+  const walk = dir => {
+    let entries;
+    try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
+    for (const entry of entries) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (entry.isFile()) { try { bytes += fs.statSync(full).size; } catch {} }
+    }
+  };
+  walk(path.join(app.getPath('userData'), 'Saves'));
+  return { bytes };
+}
+
 function latestRelease() {
   return new Promise(resolve => {
     let settled = false;
@@ -141,6 +158,10 @@ if (!ownsInstance) {
   app.whenReady().then(() => {
     const store = createDesktopStorage({rootDir: path.join(app.getPath('userData'), 'Saves')});
     registerStorageHandlers(store);
+    ipcMain.handle('dynasty-storage:usage', event => {
+      validateIpcSender(event);
+      return saveUsage();
+    });
     ipcMain.handle('dynasty-shell:latest-release', event => {
       validateIpcSender(event);
       return latestRelease();

@@ -16,5 +16,6 @@ contextBridge.exposeInMainWorld('DynastyDesktopShell', Object.freeze({
   isDesktop: true,
   platform: process.platform,
   latestRelease: () => invoke('dynasty-shell:latest-release'),
+  saveUsage: () => invoke('dynasty-storage:usage'),
   openExternal: url => invoke('dynasty-shell:open-external', {url}),
 }));

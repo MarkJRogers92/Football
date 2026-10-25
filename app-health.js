@@ -4,6 +4,7 @@
 (function(){
   'use strict';
   const fmt=n=>{if(!Number.isFinite(n)||n<=0)return '—';const mb=n/1048576;return mb>=1024?`${(mb/1024).toFixed(1)} GB`:`${mb>=10?mb.toFixed(0):mb.toFixed(1)} MB`};
+  const shell=globalThis.DynastyDesktopShell;
 
   // ---- Save storage usage, shown in Options ----
   async function paintStorage(){
@@ -17,6 +18,18 @@
       if(anchor)anchor.insertAdjacentElement('beforebegin',line);else panel.append(line);
     }
     line.textContent='Checking save storage…';
+    if(shell?.isDesktop){
+      const usage=await shell.saveUsage?.().catch(()=>null);
+      const bytes=usage?.bytes;
+      if(Number.isFinite(bytes)){
+        line.dataset.level=bytes>=2*1024*1024*1024?'warn':'ok';
+        line.textContent=`Dynasty saves on this computer use ${fmt(bytes)}.`
+          + (bytes>=2*1024*1024*1024?' Export a JSON backup — this install is getting large.':' Export a JSON backup before replacing the app.');
+        return;
+      }
+      line.textContent='Save storage estimate is not available in this build.';
+      return;
+    }
     try{
       const est=await navigator.storage?.estimate?.();
       if(!est||!Number.isFinite(est.usage)){line.textContent='Save storage estimate is not available in this build.';return}
@@ -32,7 +45,6 @@
   });
 
   // ---- Desktop update notice (Electron shell only) ----
-  const shell=globalThis.DynastyDesktopShell;
   if(!shell?.isDesktop)return;
   const parts=value=>String(value||'').replace(/^v/i,'').split('.').map(n=>parseInt(n,10)||0);
   const isNewer=(a,b)=>{for(let i=0;i<3;i++){if((a[i]||0)!==(b[i]||0))return (a[i]||0)>(b[i]||0)}return false};

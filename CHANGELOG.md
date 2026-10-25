@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.12.11 — Release hygiene
+
+- Options reports the desktop Alpha's actual save-folder size instead of a browser storage estimate that said nothing about native saves.
+- Adds `tests/docs-consistency.js`: `VERSION.txt`, `CHANGELOG.md`, `README.md`, the agent context and the roadmap must name the same release, and the roadmap's recorded commit must exist and sit behind HEAD.
+
 ## v0.12.10 — Search, storage honesty and release plumbing
 
 - The Playbook now searches programs, coaches and players as well as sections. Two characters list matching teams, staff members and players with their program, role or position, and the same Enter opens the program, the coach profile or the player dossier. It reads only collections the dynasty already holds and never loads a deferred archive.

@@ -2,7 +2,7 @@
 
 ## Version and branch
 
-Source is `0.12.10` on `claude/review-improvement-dwjemy`, tagged `v0.12.10` and
+Source is `0.12.11` on `claude/review-improvement-dwjemy`, tagged `v0.12.10` and
 released with macOS/Windows zips. Production publish for 0.12.10 is the
 `Publish Dynasty Lab` workflow run 40230030963.
 

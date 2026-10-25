@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.10</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.11</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -1911,7 +1911,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.10</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.11</b></span></footer>
   </div>
 </section>
 
@@ -1938,7 +1938,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.12.10</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.12.11</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -5042,7 +5042,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.12.10';
+const APP_VERSION='0.12.11';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -13859,6 +13859,7 @@ attach();setTimeout(attach,0);setTimeout(attach,150);
 (function(){
   'use strict';
   const fmt=n=>{if(!Number.isFinite(n)||n<=0)return '—';const mb=n/1048576;return mb>=1024?`${(mb/1024).toFixed(1)} GB`:`${mb>=10?mb.toFixed(0):mb.toFixed(1)} MB`};
+  const shell=globalThis.DynastyDesktopShell;
 
   // ---- Save storage usage, shown in Options ----
   async function paintStorage(){
@@ -13872,6 +13873,18 @@ attach();setTimeout(attach,0);setTimeout(attach,150);
       if(anchor)anchor.insertAdjacentElement('beforebegin',line);else panel.append(line);
     }
     line.textContent='Checking save storage…';
+    if(shell?.isDesktop){
+      const usage=await shell.saveUsage?.().catch(()=>null);
+      const bytes=usage?.bytes;
+      if(Number.isFinite(bytes)){
+        line.dataset.level=bytes>=2*1024*1024*1024?'warn':'ok';
+        line.textContent=`Dynasty saves on this computer use ${fmt(bytes)}.`
+          + (bytes>=2*1024*1024*1024?' Export a JSON backup — this install is getting large.':' Export a JSON backup before replacing the app.');
+        return;
+      }
+      line.textContent='Save storage estimate is not available in this build.';
+      return;
+    }
     try{
       const est=await navigator.storage?.estimate?.();
       if(!est||!Number.isFinite(est.usage)){line.textContent='Save storage estimate is not available in this build.';return}
@@ -13887,7 +13900,6 @@ attach();setTimeout(attach,0);setTimeout(attach,150);
   });
 
   // ---- Desktop update notice (Electron shell only) ----
-  const shell=globalThis.DynastyDesktopShell;
   if(!shell?.isDesktop)return;
   const parts=value=>String(value||'').replace(/^v/i,'').split('.').map(n=>parseInt(n,10)||0);
   const isNewer=(a,b)=>{for(let i=0;i<3;i++){if((a[i]||0)!==(b[i]||0))return (a[i]||0)>(b[i]||0)}return false};

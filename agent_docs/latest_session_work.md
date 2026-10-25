@@ -1,8 +1,9 @@
 # Latest Session Work
 
-2026-10-25: Shipped v0.12.10 — Playbook search over programs, coaches and players,
-save-storage reporting in Options, desktop update notice and error log, and the
-desktop packages for 0.12.8/0.12.9 which had reached the web only.
+2026-10-25: Shipped v0.12.11 (release hygiene: real desktop save-folder usage in
+Options, and a docs-consistency test) on top of v0.12.10 — Playbook search over
+programs, coaches and players, storage reporting, desktop update notice and error
+log, and the desktop packages for 0.12.8/0.12.9 which had reached the web only.
 
 ## Current state
 
