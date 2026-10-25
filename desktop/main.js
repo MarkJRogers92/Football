@@ -1,4 +1,5 @@
 const fs = require('fs');
+const https = require('https');
 const path = require('path');
 const {fileURLToPath, pathToFileURL} = require('url');
 const { app, BrowserWindow, ipcMain, session, shell } = require('electron');
@@ -22,6 +23,36 @@ function recordError(kind, detail) {
   } catch {}
 }
 const ALLOWED_EXTERNAL = /^https:\/\/(github\.com\/MarkJRogers92\/Football|markjrogers92\.github\.io\/Football)/i;
+
+// The update check runs in the main process, not the renderer: a blocked request
+// must stay silent, and a renderer fetch would raise a console error the smoke
+// test (correctly) treats as a regression.
+function latestRelease() {
+  return new Promise(resolve => {
+    let settled = false;
+    const done = value => { if (!settled) { settled = true; resolve(value); } };
+    const request = https.get({
+      host: 'api.github.com',
+      path: '/repos/MarkJRogers92/Football/releases/latest',
+      headers: { 'User-Agent': 'Dynasty-Lab', Accept: 'application/vnd.github+json' },
+      timeout: 4000,
+    }, response => {
+      if (response.statusCode !== 200) { response.resume(); return done(null); }
+      let body = '';
+      response.setEncoding('utf8');
+      response.on('data', chunk => { if (body.length < 200000) body += chunk; });
+      response.on('end', () => {
+        try {
+          const data = JSON.parse(body);
+          done(data.tag_name ? { tag: data.tag_name, url: data.html_url || null } : null);
+        } catch { done(null); }
+      });
+      response.on('error', () => done(null));
+    });
+    request.on('timeout', () => { request.destroy(); done(null); });
+    request.on('error', () => done(null));
+  });
+}
 
 function isGameEntryUrl(url) {
   try {
@@ -110,6 +141,10 @@ if (!ownsInstance) {
   app.whenReady().then(() => {
     const store = createDesktopStorage({rootDir: path.join(app.getPath('userData'), 'Saves')});
     registerStorageHandlers(store);
+    ipcMain.handle('dynasty-shell:latest-release', event => {
+      validateIpcSender(event);
+      return latestRelease();
+    });
     ipcMain.handle('dynasty-shell:open-external', (event, payload) => {
       validateIpcSender(event);
       const url = String(payload?.url || '');

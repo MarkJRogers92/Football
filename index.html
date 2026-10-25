@@ -13896,12 +13896,10 @@ attach();setTimeout(attach,0);setTimeout(attach,150);
     try{current=typeof APP_VERSION==='string'?APP_VERSION:(document.querySelector('[data-title-version]')?.textContent||'')}catch{}
     if(!/^\d+\./.test(String(current).replace(/^v/i,'')))return;
     try{
-      const controller=new AbortController();
-      const timer=setTimeout(()=>controller.abort(),4000);
-      const res=await fetch('https://api.github.com/repos/MarkJRogers92/Football/releases/latest',{headers:{Accept:'application/vnd.github+json'},signal:controller.signal});
-      clearTimeout(timer);
-      if(!res.ok)return;
-      const data=await res.json(),tag=data.tag_name;
+      // The shell performs the request in the main process; a blocked update check
+      // must never surface as a renderer console error.
+      const data=await shell.latestRelease?.().catch(()=>null);
+      const tag=data?.tag;
       if(!tag||!isNewer(parts(tag),parts(current)))return;
       const host=document.querySelector('#titleScreen');
       if(!host)return;
@@ -13915,7 +13913,7 @@ attach();setTimeout(attach,0);setTimeout(attach,150);
       const button=document.createElement('button');
       button.type='button';button.className='desktop-update-link';
       button.textContent=`Dynasty Lab ${tag} is available — download`;
-      button.addEventListener('click',()=>shell.openExternal(data.html_url||`https://github.com/MarkJRogers92/Football/releases/tag/${tag}`));
+      button.addEventListener('click',()=>shell.openExternal(data.url||`https://github.com/MarkJRogers92/Football/releases/tag/${tag}`));
       line.append(button);
     }catch{}
   }
