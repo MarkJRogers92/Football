@@ -79,8 +79,10 @@
     const q=input.value.trim().toLowerCase();
     const sectionItems=entries().filter(e=>!q||`${e.label} ${e.group} ${HINTS[e.id]||''}`.toLowerCase().includes(q)).map(e=>({...e,kind:'tab'}));
     // v0.12.10: the same box answers "who is this?", not only "where do I go?".
-    const entityRows=(q.length<2||typeof encyclopediaSearch!=='function')?[]:encyclopediaSearch(q,{limit:5});
-    items=sectionItems.concat(entityRows.map(r=>({kind:r.kind,id:r.id,label:r.name,meta:r.meta,group:'Result',row:r})));
+    const encyclopedia=globalThis.DynastyEncyclopedia;
+    const entityRows=(q.length<2||!encyclopedia)?[]:encyclopedia.search(q,{limit:5});
+    // A name beats a loose hint-text hit: typing a person or program should open them.
+    items=entityRows.map(r=>({kind:r.kind,id:r.id,label:r.name,meta:r.meta,group:'Result',row:r})).concat(sectionItems);
     cursor=Math.min(cursor,Math.max(0,items.length-1));
     const current=tabsNav.querySelector('button.active')?.dataset.tab||null;
     list.replaceChildren(...items.map((e,i)=>{
@@ -113,7 +115,7 @@
     overlay.classList.remove('is-open');overlay.hidden=true;
     returnFocus?.focus?.();
   }
-  function pick(i){const e=items[i];if(!e)return;close();if(e.kind==='tab')go(e.id);else encyclopediaOpen(e.row)}
+  function pick(i){const e=items[i];if(!e)return;close();if(e.kind==='tab')go(e.id);else globalThis.DynastyEncyclopedia?.open(e.row)}
 
   input.addEventListener('input',()=>{cursor=0;render()});
   overlay.addEventListener('keydown',ev=>{

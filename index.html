@@ -8581,6 +8581,8 @@ function encyclopediaOpen(row){
  }
  return false;
 }
+// App scope is not global by design; presentation modules reach search through this bridge.
+if(typeof globalThis!=='undefined')globalThis.DynastyEncyclopedia=Object.freeze({search:encyclopediaSearch,open:encyclopediaOpen});
 function renderArchiveSearch(){const q=($('#archiveSearch').value||'').trim().toLowerCase();if(q.length>=2&&archiveIsDeferred()){const current=universe;$('#archiveResults').textContent='Loading archived careers…';return ensureArchiveLoaded().then(()=>{if(universe===current)renderArchiveSearch()}).catch(e=>{if(universe===current)$('#archiveResults').textContent=e.message})}if(q.length<2){$('#archiveResults').innerHTML='<span class="muted">Type at least 2 letters.</span>';return}let results=[];for(const x of universe.transferPortal||[])if(x.p.name.toLowerCase().includes(q))results.push({p:x.p,team:'Transfer portal',status:'Awaiting a destination'});for(const t of universe.teams)for(const p of t.roster)if(p.name.toLowerCase().includes(q))results.push({p,team:t.name,status:'Active'});for(const p of universe.playerArchive||[])if(p.name.toLowerCase().includes(q))results.push({p,team:p.lastTeam||'—',status:p.exitReason||'Archived'});$('#archiveResults').innerHTML=results.slice(0,30).map(x=>`<div class="lineitem"><span><button class="player-button" data-player="${x.p.id}">${x.p.name}</button> · ${x.p.pos}</span><span>${x.team} · ${x.status}</span></div>`).join('')||'<span class="muted">No players found.</span>';attachPlayerLinks()}
 
 function renderRecords(){const u=selected(),final=universe.awards?.[universe.year],aw=final||projectedAwards();$('#awardsHeading').textContent=final?`${universe.year} Award Winners`:`${universe.year} Awards Watch`;$('#awardsBoard').innerHTML=aw.map(a=>`<div class="award-card"><div class="small muted">${a.name}</div><div><strong>${a.playerName}</strong> · ${a.team}${a.pos?` · ${a.pos}`:''}</div></div>`).join('')||'<span class="muted">No award data yet.</span>';let years=Object.keys(universe.draftHistory||{}).sort((a,b)=>b-a),draft=years.length?(universe.draftHistory[years[0]]||[]).filter(d=>d.status!=='College Career Complete'):[];$('#draftBoard').innerHTML=draft?.length?draft.slice().sort((a,b)=>(a.round||99)-(b.round||99)||(a.pick||99)-(b.pick||99)).slice(0,18).map(d=>`<div class="lineitem"><span><span class="draft-round">${d.round?'R'+d.round:'UDFA'}</span> ${d.playerName} · ${d.pos}</span><span>${d.school}</span></div>`).join(''):'<span class="muted">Draft results appear after the first offseason.</span>';let ns=universe.records?.nationalSeason||{},nc=universe.records?.nationalCareer||{};$('#nationalRecords').innerHTML=`<div class="record-group"><h4>Single Season</h4>${Object.entries(RECORD_CATS).map(([k,label])=>{let r=ns[k];return `<div class="lineitem"><span>${label}</span><span class="record-value">${r?`${r.value} · ${r.playerName} (${r.team}, ${r.year})`:'—'}</span></div>`}).join('')}</div><div class="record-group"><h4>Career</h4>${Object.entries(RECORD_CATS).map(([k,label])=>{let r=nc[k];return `<div class="lineitem"><span>${label}</span><span class="record-value">${r?`${r.value} · ${r.playerName} (${r.team})`:'—'}</span></div>`}).join('')}</div>`;$('#schoolRecordsHeading').textContent=`${u.name} Record Book`;$('#schoolRecords').innerHTML=Object.entries(RECORD_CATS).map(([k,label])=>{let r=u.records?.[k];return `<div class="lineitem"><span>${label}</span><span class="record-value">${r?`${r.value} · ${r.playerName} (${r.year})`:'—'}</span></div>`}).join('')}
@@ -13629,8 +13631,10 @@ attach();setTimeout(attach,0);setTimeout(attach,150);
     const q=input.value.trim().toLowerCase();
     const sectionItems=entries().filter(e=>!q||`${e.label} ${e.group} ${HINTS[e.id]||''}`.toLowerCase().includes(q)).map(e=>({...e,kind:'tab'}));
     // v0.12.10: the same box answers "who is this?", not only "where do I go?".
-    const entityRows=(q.length<2||typeof encyclopediaSearch!=='function')?[]:encyclopediaSearch(q,{limit:5});
-    items=sectionItems.concat(entityRows.map(r=>({kind:r.kind,id:r.id,label:r.name,meta:r.meta,group:'Result',row:r})));
+    const encyclopedia=globalThis.DynastyEncyclopedia;
+    const entityRows=(q.length<2||!encyclopedia)?[]:encyclopedia.search(q,{limit:5});
+    // A name beats a loose hint-text hit: typing a person or program should open them.
+    items=entityRows.map(r=>({kind:r.kind,id:r.id,label:r.name,meta:r.meta,group:'Result',row:r})).concat(sectionItems);
     cursor=Math.min(cursor,Math.max(0,items.length-1));
     const current=tabsNav.querySelector('button.active')?.dataset.tab||null;
     list.replaceChildren(...items.map((e,i)=>{
@@ -13663,7 +13667,7 @@ attach();setTimeout(attach,0);setTimeout(attach,150);
     overlay.classList.remove('is-open');overlay.hidden=true;
     returnFocus?.focus?.();
   }
-  function pick(i){const e=items[i];if(!e)return;close();if(e.kind==='tab')go(e.id);else encyclopediaOpen(e.row)}
+  function pick(i){const e=items[i];if(!e)return;close();if(e.kind==='tab')go(e.id);else globalThis.DynastyEncyclopedia?.open(e.row)}
 
   input.addEventListener('input',()=>{cursor=0;render()});
   overlay.addEventListener('keydown',ev=>{
