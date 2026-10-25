@@ -1,8 +1,9 @@
 # Roadmap execution status
 
-Last reconciled: 2026-10-25, source `89727e8` (`v0.12.9`) on
-`claude/review-improvement-dwjemy`. Production `gh-pages` serves the same
-version. The previous revision of this file described v0.11.7 and is obsolete.
+Last reconciled: 2026-10-25, source `5c160b1` (`v0.12.10`) on
+`claude/review-improvement-dwjemy`, tagged and released with desktop packages.
+Production publish: workflow run 40230030963. The previous revision of this file
+described v0.11.7 and is obsolete.
 
 | Packet | Status | Notes |
 | --- | --- | --- |
@@ -17,8 +18,8 @@ version. The previous revision of this file described v0.11.7 and is obsolete.
 | v0.11 program economy | SHIPPED | |
 | v0.11.8 audit maintenance | SHIPPED | source reconciliation + publish guard |
 | v0.12 premium client | SHIPPED | milestones A-J of docs/DYNASTY_LAB_PREMIUM_CLIENT_DESIGN_ROADMAP.md |
-| v0.12 encyclopedia | NOT STARTED | packet: `09-v012-encyclopedia.md` |
-| storage reduction | NOT STARTED | measured in docs/SAVE_SIZE_MEASUREMENT.md |
+| v0.12 encyclopedia | IN PROGRESS | Playbook search over programs/coaches/players shipped in v0.12.10; coach index, conference pages, timeline and Hall of Fame remain |
+| storage reduction | MEASURED, NOT STARTED | compaction shipped in v0.9.49; `playerArchive` (+4.1 MB/season) is now the first target |
 
 `SHIPPED` means the packet is in the released source and reachable from the
 default branch. The "v0.12" label in the encyclopedia packet is historical; the
@@ -27,16 +28,16 @@ should be sliced under a new version number.
 
 ## Next action
 
-Two bounded options, in the order they were reviewed on 2026-10-25:
+One bounded packet at a time, in this order:
 
-1. **History search slice** (from `09-v012-encyclopedia.md`): global search for
-   programs, players and coaches; coach index; conference and season pages;
-   national timeline; Hall of Fame. Start with search over archives that already
-   load lazily, keep stable IDs, and do not change save shape.
-2. **Storage reduction**: roll `gameArchive` play-level detail up to box-score
-   level after N seasons and roll up never-played retirees, then add a quota
-   meter. Re-measure at 10 seasons before claiming a win. Read
-   docs/SAVE_SIZE_MEASUREMENT.md and STORAGE.md first.
+1. **History surfaces** (`09-v012-encyclopedia.md` remainder): coach index,
+   conference and season pages, national timeline, Hall of Fame. Search already
+   ships; extend the same read-only pattern, keep stable IDs and change no save
+   shape.
+2. **playerArchive rollup**: retired players who never recorded a meaningful snap
+   keep a full `seasonHistory`. Collapse those to career totals while keeping
+   awards, draft result, last team and exit reason, then re-measure at ten
+   seasons. Read docs/SAVE_SIZE_MEASUREMENT.md and STORAGE.md first.
 
 Do not tune prestige or simulation balance from a single season; the five-season
 audit is stable.
