@@ -11,3 +11,9 @@ contextBridge.exposeInMainWorld('DynastyDesktopStorage', Object.freeze({
   listSlots: () => invoke('dynasty-storage:list-slots'),
   rename: payload => invoke('dynasty-storage:rename', payload),
 }));
+
+contextBridge.exposeInMainWorld('DynastyDesktopShell', Object.freeze({
+  isDesktop: true,
+  platform: process.platform,
+  openExternal: url => invoke('dynasty-shell:open-external', {url}),
+}));

@@ -63,6 +63,13 @@
   .title-about-facts>div:last-child{grid-column:1/-1}
 }
 
+/* v0.12.10 — storage usage (Options) and the desktop update notice. */
+.storage-usage{margin:0;padding:10px 12px;border:1px solid #2a3c51;border-radius:10px;background:rgba(10,18,27,.6);color:#9aabbf;font-size:12.5px;line-height:1.5}
+.storage-usage[data-level=warn]{border-color:#7a4a1f;background:rgba(60,32,10,.45);color:#f0c48a}
+.desktop-update{margin:0}
+.desktop-update-link{border:1px solid #3d6f9e;border-radius:9px;background:rgba(18,40,60,.7);color:#cfe3f6;font:inherit;font-size:12.5px;padding:8px 12px;cursor:pointer}
+.desktop-update-link:hover,.desktop-update-link:focus-visible{border-color:#6ea8d8;color:#fff}
+
 @media(prefers-reduced-motion:reduce){
   .title-setting-toggle input[type=checkbox],.title-setting-toggle input[type=checkbox]::after{transition:none}
 }

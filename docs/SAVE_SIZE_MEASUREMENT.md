@@ -150,3 +150,63 @@ payoff as before:
 
 Still no code changed here — this is measurement only, same discipline as
 before.
+
+---
+
+# Update — 2026-10-25 (measured on v0.12.9, source `89727e8`)
+
+The sections above stop at v0.9.38 and are kept for provenance. This update
+corrects two claims that no longer hold and replaces the ranking.
+
+## What changed since the last measurement
+
+**Tiered game-detail compaction shipped in v0.9.49** (`GAME_DETAIL_HORIZON = 3`)
+and does run in the offseason: games older than three seasons lose their
+non-leading per-game stat lines while scores, participants, team box, injuries,
+leaders, titles, bowls, the user's games and rivalry games are kept
+(`app.js`, `compactGameArchive`). The v0.9.38 note "still no code changed here"
+is therefore obsolete: code changed, and it changed the biggest component.
+
+## Measurement
+
+`SEASONS=6 node tools/save-size.js` (new in v0.12.10), seed 7, one universe,
+packed export shape — the same bytes the browser writes.
+
+| Season | Total | gameArchive | playerArchive | rosters | recruits | events | compacted games |
+|---|---|---|---|---|---|---|---|
+| 2028 | 28.1 MB | 6.1 | 1.8 | 23.8 | 2.0 | 0.4 | 0 |
+| 2029 | 41.2 MB | 12.3 | 5.9 | 24.9 | 2.0 | 0.7 | 0 |
+| 2030 | 54.5 MB | 18.2 | 10.6 | 26.0 | 2.0 | 1.0 | 0 |
+| 2031 | 62.2 MB | 20.4 | 11.8 | 29.8 | 2.0 | 1.4 | 649 |
+| 2032 | 71.0 MB | 22.7 | 17.1 | 29.1 | 2.0 | 1.8 | 1,298 |
+| 2033 | 79.2 MB | 25.0 | 21.2 | 29.8 | 2.0 | 2.2 | 1,947 |
+
+## What this changes
+
+- Growth is now **~6-7 MB/season in steady state**, not 11.5. Compaction cut
+  `gameArchive` growth from ~+5.8 MB/season to ~+2.3 MB/season once the horizon
+  starts to bite (season 4 onward). The earlier headline "188 MB by season 15"
+  overstates the current build.
+- **`playerArchive` is now the fastest-growing component**: +4.1 MB/season by
+  season 6 and still linear, because every retired player keeps a full career
+  record. It passed `gameArchive`'s growth rate at season 5.
+- **`rosters` is a flat ~30 MB tax**, not a growth driver: 120 teams carrying
+  85-105 players each, near the previous number, roughly a third of the save.
+- `events` remains a rounding error (2.2 MB at season 6), as measured before.
+
+## Revised ranking
+
+1. **`playerArchive` rollup.** Retired players who never recorded a meaningful
+   snap keep a full `seasonHistory`; collapsing those to career totals (keeping
+   awards, draft result, last team and exit reason) is the largest remaining
+   lever and does not touch a player anyone would look up.
+2. **`rosters` for AI programs.** The core save is large from season one. Before
+   compacting it, measure how much of an AI roster is ever read by a surface the
+   player opens; hidden development detail is a candidate, not the ratings.
+3. **`gameArchive`** is now second-order: extend the horizon only if a longer
+   window proves unnecessary. Play-level detail is already absent for routine
+   games.
+
+Still measurement plus the already-shipped compaction; no new size code in
+v0.12.10. Any rollup must keep same-seed box scores and every stable ID intact.
+

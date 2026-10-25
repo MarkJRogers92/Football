@@ -2,7 +2,7 @@
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.12.9';
+const APP_VERSION='0.12.10';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -3494,6 +3494,53 @@ function findPlayer(id){const pending=(universe.transferPortal||[]).find(x=>x.p.
 function statLine(s){if(!s)return 'No recorded statistics.';let a=[];if(s.passAtt||s.passYds){let pct=s.passAtt?Math.round((s.passComp||0)/s.passAtt*1000)/10:0;a.push(`${s.passComp||0}/${s.passAtt||0} (${pct}%) · ${s.passYds||0} pass yds · ${s.passTD||0} TD · ${s.int||0} INT`)}if(s.rushAtt||s.rushYds)a.push(`${s.rushAtt||0} car · ${s.rushYds||0} rush yds · ${s.rushTD||0} TD`);if(s.targets||s.recYds)a.push(`${s.receptions||0}/${s.targets||0} rec · ${s.recYds||0} yds · ${s.recTD||0} TD`);if(s.tackles||s.sacks||s.intDef)a.push(`${s.tackles||0} tackles · ${s.tfl||0} TFL · ${s.sacks||0} sacks · ${s.pressures||0} pressures · ${s.intDef||0} INT`);if(s.snaps&&!(s.passYds||s.rushYds||s.recYds||s.tackles))a.push(`${s.snaps} snaps · ${s.sacksAllowed||0} sacks allowed · ${s.pressuresAllowed||0} pressures allowed`);return a.join(' · ')||`${s.games||0} games`}
 function showPlayerProfile(id){let f=findPlayer(id);if(!f&&archiveIsDeferred()){const current=universe;return ensureArchiveLoaded().then(()=>{if(universe===current)showPlayerProfile(id)}).catch(e=>{if(universe===current)setStatus(e.message)})}if(!f)return;const p=f.p,t=f.team;{const ph=$('#playerDialogPortrait');if(ph){ph.innerHTML=portraitTag(p,192,'profile');}}
  $('#playerDialogName').textContent=p.name;$('#playerDialogMeta').textContent=`${p.pos} · ${eligibilityLabel(p)} · ${heightStr(p.height)} / ${p.weight} · ${p.style}${t?` · ${t.name}`:''}`;$('#playerDialogKicker').textContent=f.portal?'TRANSFER PORTAL':f.active?'ACTIVE PLAYER':'PLAYER ARCHIVE';if(f.active&&t)ensurePlayerDevelopment(p,t);let attrs=[['Current',f.active&&t?scoutRangeText(p,t,false):grade(p.perceived)],['Upside',f.active&&t?scoutRangeText(p,t,true):grade(p.perceivedUpside)],['Scout Confidence',f.active?`${Math.round(p.scoutConfidence||50)}%`:'Final'],['Health',p.health??100]];let injury=(p.injuryWeeks||0)>0?`<div class="injury-note"><strong>${p.injury}</strong> · expected ${p.injuryWeeks} more week${p.injuryWeeks===1?'':'s'}.</div>`:'';let hist=careerChronologyHTML(p),aw=(p.awards||[]).slice().reverse().map(a=>`<div class="lineitem"><span>${a.year}</span><strong>${a.name}</strong></div>`).join('')||'<div class="muted">No major awards.</div>',draft=p.draftResult?`<div class="lineitem"><span>${p.draftResult.year} Draft</span><strong>${p.draftResult.label}</strong></div>`:'';$('#playerDialogBody').innerHTML=`${injury}${f.active&&t?scoutingPanelHTML(p,t):''}<div class="profile-grid">${attrs.map(x=>`<div class="profile-stat"><div class="small muted">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('')}</div><div class="profile-sections"><section class="profile-section"><h3>Season</h3><div class="profile-callout"><span class="eyebrow">Production</span><strong>${statLine(p.stats)}</strong></div><div class="lineitem"><span>Eligibility</span><strong>${eligibilityLabel(p)}</strong></div><div class="lineitem"><span>Redshirt</span><strong>${p.redshirtUsed?`Used${p.redshirtSeason?' in '+p.redshirtSeason:''}`:p.redshirtActive?'Protected this year':'Available'}</strong></div><div class="lineitem"><span>Origin</span><strong>${p.origin||'—'}</strong></div></section><section class="profile-section"><h3>Development</h3><div class="lineitem"><span>Training focus</span><strong>${p.trainingFocus||'Balanced'}</strong></div><div class="lineitem"><span>Position familiarity</span><strong>${familiarity(p,p.pos)}%</strong></div><div class="lineitem"><span>Wear</span><strong>${p.wear||0}/100</strong></div><div class="profile-note">${f.active&&t?devStaffNote(p,t):'Career complete'}</div></section><section class="profile-section"><h3>Health</h3><div class="lineitem"><span>Status</span><strong>${f.active?healthText(p):(f.portal?'Awaiting a destination':p.exitReason||'Career complete')}</strong></div><div class="lineitem"><span>Injuries recorded</span><strong>${p.injuryHistory?.length||0}</strong></div><div class="lineitem"><span>Promise</span><strong>${p.promise||'None'}</strong></div></section><section class="profile-section"><h3>Career</h3><div class="lineitem"><span>Career production</span><strong>${statLine(p.career)}</strong></div>${draft}<div class="profile-subhead">Honors</div>${aw}</section></div>${scoutingHistoryHTML(p)}${promiseHTML(p)}${transferHistoryHTML(p)}<section class="profile-section profile-section--wide"><h3>Career Chronology</h3><div class="timeline">${hist}</div></section>`;let d=$('#playerDialog');if(d.showModal)d.showModal();else d.setAttribute('open','');paintPortraits(d)}
+// v0.12.10 — global search across the universe a dynasty already holds. Read-only:
+// it never loads a deferred archive and never mutates save state.
+function encyclopediaSearch(term,{limit=6}={}){
+ const q=String(term||'').trim().toLowerCase();
+ if(q.length<2)return [];
+ const kindRank={team:0,coach:1,player:2},out=[],seen=new Set();
+ const score=name=>{
+  const n=String(name||'').toLowerCase();
+  if(!n.includes(q))return -1;
+  if(n===q)return 0;
+  if(n.startsWith(q))return 1;
+  if(n.split(/[\s.'-]+/).some(w=>w.startsWith(q)))return 2;
+  return 3;
+ };
+ const push=(kind,id,label,meta)=>{
+  if(id==null||!label)return;
+  const key=kind+':'+id;
+  if(seen.has(key))return;
+  const s=score(label);
+  if(s<0)return;
+  seen.add(key);out.push({kind,id,name:String(label),meta:meta||'',score:s});
+ };
+ for(const t of universe.teams||[]){
+  push('team',t.id,t.name,`${t.conference||'Independent'} · ${t.w??0}–${t.l??0}`);
+  for(const c of Object.values(t.staff||{}))if(c?.id)push('coach',c.id,c.name,`${c.role||'Coach'} · ${t.name}`);
+ }
+ for(const c of universe.coachArchive||[])push('coach',c.id,c.name,c.status==='RETIRED'?'Retired':`Formerly ${c.schoolName||'—'}`);
+ for(const t of universe.teams||[])for(const p of t.roster||[])push('player',p.id,p.name,`${p.pos} · ${t.name}`);
+ for(const x of universe.transferPortal||[])if(x.p)push('player',x.p.id,x.p.name,'Transfer portal');
+ for(const p of universe.playerArchive||[])push('player',p.id,p.name,`${p.lastTeam||'Archived'} · ${p.exitReason||'Archived'}`);
+ out.sort((a,b)=>kindRank[a.kind]-kindRank[b.kind]||a.score-b.score||a.name.localeCompare(b.name));
+ const counts={team:0,coach:0,player:0},res=[];
+ for(const row of out){if(counts[row.kind]>=limit)continue;counts[row.kind]++;res.push(row)}
+ return res;
+}
+function encyclopediaOpen(row){
+ if(!row)return false;
+ if(row.kind==='player'){showPlayerProfile(row.id);return true}
+ if(row.kind==='coach'){showCoachProfile(row.id);return true}
+ if(row.kind==='team'){
+  const sel=$('#userTeam');
+  if(sel&&[...sel.options].some(o=>o.value===row.name)){sel.value=row.name;sel.dispatchEvent(new Event('change',{bubbles:true}))}
+  document.querySelector('.tabs button[data-tab="program"]')?.click();
+  return true;
+ }
+ return false;
+}
 function renderArchiveSearch(){const q=($('#archiveSearch').value||'').trim().toLowerCase();if(q.length>=2&&archiveIsDeferred()){const current=universe;$('#archiveResults').textContent='Loading archived careers…';return ensureArchiveLoaded().then(()=>{if(universe===current)renderArchiveSearch()}).catch(e=>{if(universe===current)$('#archiveResults').textContent=e.message})}if(q.length<2){$('#archiveResults').innerHTML='<span class="muted">Type at least 2 letters.</span>';return}let results=[];for(const x of universe.transferPortal||[])if(x.p.name.toLowerCase().includes(q))results.push({p:x.p,team:'Transfer portal',status:'Awaiting a destination'});for(const t of universe.teams)for(const p of t.roster)if(p.name.toLowerCase().includes(q))results.push({p,team:t.name,status:'Active'});for(const p of universe.playerArchive||[])if(p.name.toLowerCase().includes(q))results.push({p,team:p.lastTeam||'—',status:p.exitReason||'Archived'});$('#archiveResults').innerHTML=results.slice(0,30).map(x=>`<div class="lineitem"><span><button class="player-button" data-player="${x.p.id}">${x.p.name}</button> · ${x.p.pos}</span><span>${x.team} · ${x.status}</span></div>`).join('')||'<span class="muted">No players found.</span>';attachPlayerLinks()}
 
 function renderRecords(){const u=selected(),final=universe.awards?.[universe.year],aw=final||projectedAwards();$('#awardsHeading').textContent=final?`${universe.year} Award Winners`:`${universe.year} Awards Watch`;$('#awardsBoard').innerHTML=aw.map(a=>`<div class="award-card"><div class="small muted">${a.name}</div><div><strong>${a.playerName}</strong> · ${a.team}${a.pos?` · ${a.pos}`:''}</div></div>`).join('')||'<span class="muted">No award data yet.</span>';let years=Object.keys(universe.draftHistory||{}).sort((a,b)=>b-a),draft=years.length?(universe.draftHistory[years[0]]||[]).filter(d=>d.status!=='College Career Complete'):[];$('#draftBoard').innerHTML=draft?.length?draft.slice().sort((a,b)=>(a.round||99)-(b.round||99)||(a.pick||99)-(b.pick||99)).slice(0,18).map(d=>`<div class="lineitem"><span><span class="draft-round">${d.round?'R'+d.round:'UDFA'}</span> ${d.playerName} · ${d.pos}</span><span>${d.school}</span></div>`).join(''):'<span class="muted">Draft results appear after the first offseason.</span>';let ns=universe.records?.nationalSeason||{},nc=universe.records?.nationalCareer||{};$('#nationalRecords').innerHTML=`<div class="record-group"><h4>Single Season</h4>${Object.entries(RECORD_CATS).map(([k,label])=>{let r=ns[k];return `<div class="lineitem"><span>${label}</span><span class="record-value">${r?`${r.value} · ${r.playerName} (${r.team}, ${r.year})`:'—'}</span></div>`}).join('')}</div><div class="record-group"><h4>Career</h4>${Object.entries(RECORD_CATS).map(([k,label])=>{let r=nc[k];return `<div class="lineitem"><span>${label}</span><span class="record-value">${r?`${r.value} · ${r.playerName} (${r.team})`:'—'}</span></div>`}).join('')}</div>`;$('#schoolRecordsHeading').textContent=`${u.name} Record Book`;$('#schoolRecords').innerHTML=Object.entries(RECORD_CATS).map(([k,label])=>{let r=u.records?.[k];return `<div class="lineitem"><span>${label}</span><span class="record-value">${r?`${r.value} · ${r.playerName} (${r.year})`:'—'}</span></div>`}).join('')}

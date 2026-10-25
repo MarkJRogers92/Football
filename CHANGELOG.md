@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.12.10 — Search, storage honesty and release plumbing
+
+- The Playbook now searches programs, coaches and players as well as sections. Two characters list matching teams, staff members and players with their program, role or position, and the same Enter opens the program, the coach profile or the player dossier. It reads only collections the dynasty already holds and never loads a deferred archive.
+- Options now reports how much storage the dynasty's saves actually use, warns at 70% of the browser quota, and points at the JSON export.
+- The desktop Alpha shows a download link when a newer release exists, and records renderer crashes, preload failures and console errors in `dynasty-lab-errors.log` inside the app's data folder. External links from the desktop build are restricted to this project's GitHub page and releases.
+- Ships the desktop packages for the 0.12.8 range-aware recruit comparison and the 0.12.9 Game HUD, which had reached the web build only.
+- Adds `tools/save-size.js` (per-component save growth) and `tests/encyclopedia-search.js`; reconciles `agent_docs/` and `docs/roadmap/STATUS.md` with the shipped state.
+
 ## v0.12.9 — Game HUD
 
 - Adds the Playbook (Cmd/Ctrl+K or /): one command menu for every screen, grouped by area, with number keys switching groups and a sliding indicator tracking the active group.

@@ -67,7 +67,7 @@
   overlay.className='hud-playbook';overlay.hidden=true;
   overlay.innerHTML=`<div class="hud-playbook-card" role="dialog" aria-modal="true" aria-labelledby="hudPlaybookTitle">
     <header><span class="hud-eyebrow">PLAYBOOK</span><strong id="hudPlaybookTitle">Call your next play</strong></header>
-    <input type="search" class="hud-playbook-search" placeholder="Jump to a section…" aria-label="Search sections" autocomplete="off">
+    <input type="search" class="hud-playbook-search" placeholder="Search sections, programs, players, coaches…" aria-label="Search sections, programs, players and coaches" autocomplete="off">
     <ul class="hud-playbook-list" role="listbox" aria-label="Sections"></ul>
     <footer><span><kbd>↑</kbd><kbd>↓</kbd> move</span><span><kbd>Enter</kbd> run play</span><span><kbd>1</kbd>–<kbd>5</kbd> groups</span><span><kbd>Esc</kbd> close · pause</span></footer>
   </div>`;
@@ -77,24 +77,29 @@
 
   function render(){
     const q=input.value.trim().toLowerCase();
-    items=entries().filter(e=>!q||`${e.label} ${e.group} ${HINTS[e.id]||''}`.toLowerCase().includes(q));
+    const sectionItems=entries().filter(e=>!q||`${e.label} ${e.group} ${HINTS[e.id]||''}`.toLowerCase().includes(q)).map(e=>({...e,kind:'tab'}));
+    // v0.12.10: the same box answers "who is this?", not only "where do I go?".
+    const entityRows=(q.length<2||typeof encyclopediaSearch!=='function')?[]:encyclopediaSearch(q,{limit:5});
+    items=sectionItems.concat(entityRows.map(r=>({kind:r.kind,id:r.id,label:r.name,meta:r.meta,group:'Result',row:r})));
     cursor=Math.min(cursor,Math.max(0,items.length-1));
     const current=tabsNav.querySelector('button.active')?.dataset.tab||null;
     list.replaceChildren(...items.map((e,i)=>{
       const li=document.createElement('li');
-      li.setAttribute('role','option');li.id='hudOpt'+i;li.dataset.tab=e.id;
+      const isTab=e.kind==='tab';
+      li.setAttribute('role','option');li.id='hudOpt'+i;li.dataset.tab=isTab?e.id:'';
+      li.dataset.kind=e.kind;
       li.setAttribute('aria-selected',String(i===cursor));
-      li.className=(i===cursor?'is-cursor ':'')+(e.id===current?'is-current':'');
+      li.className=(i===cursor?'is-cursor ':'')+(isTab&&e.id===current?'is-current':'');
       li.innerHTML='<span class="hud-icon" aria-hidden="true"></span><span class="hud-copy"><strong></strong><small></small></span><span class="hud-chip"></span>';
-      li.querySelector('.hud-icon').textContent=ICONS[e.id]||'•';
+      li.querySelector('.hud-icon').textContent=isTab?(ICONS[e.id]||'•'):(e.kind==='team'?'⚑':e.kind==='coach'?'♟':'●');
       li.querySelector('strong').textContent=e.label;
-      li.querySelector('small').textContent=HINTS[e.id]||'';
-      li.querySelector('.hud-chip').textContent=e.id===current?'ON FIELD':e.group.toUpperCase();
+      li.querySelector('small').textContent=isTab?(HINTS[e.id]||''):(e.meta||'');
+      li.querySelector('.hud-chip').textContent=isTab?(e.id===current?'ON FIELD':e.group.toUpperCase()):e.kind.toUpperCase();
       li.addEventListener('mousemove',()=>{if(cursor!==i){cursor=i;render()}});
       li.addEventListener('click',()=>pick(i));
       return li;
     }));
-    if(!items.length){const li=document.createElement('li');li.className='hud-empty';li.textContent='No matching section.';list.append(li)}
+    if(!items.length){const li=document.createElement('li');li.className='hud-empty';li.textContent='Nothing matches that search.';list.append(li)}
     input.setAttribute('aria-activedescendant',items.length?'hudOpt'+cursor:'');
     list.querySelector('.is-cursor')?.scrollIntoView?.({block:'nearest'});
   }
@@ -108,7 +113,7 @@
     overlay.classList.remove('is-open');overlay.hidden=true;
     returnFocus?.focus?.();
   }
-  function pick(i){const e=items[i];if(!e)return;close();go(e.id)}
+  function pick(i){const e=items[i];if(!e)return;close();if(e.kind==='tab')go(e.id);else encyclopediaOpen(e.row)}
 
   input.addEventListener('input',()=>{cursor=0;render()});
   overlay.addEventListener('keydown',ev=>{
