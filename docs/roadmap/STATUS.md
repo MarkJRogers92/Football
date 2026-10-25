@@ -1,6 +1,6 @@
 # Roadmap execution status
 
-Last reconciled: 2026-10-25, source `88f6367` (`v0.12.12`) on
+Last reconciled: 2026-10-25, source `a7a5ac3` (`v0.12.12`) on
 `claude/review-improvement-dwjemy`. Search is read-only; the remaining history
 surfaces and the playerArchive rollup are the named packets. The previous
 revision of this file described v0.11.7 and is obsolete.
