@@ -1,9 +1,10 @@
 # Roadmap execution status
 
 Last reconciled: 2026-10-25, source `a7a5ac3` (`v0.12.12`) on
-`claude/review-improvement-dwjemy`. Search is read-only; the remaining history
-surfaces and the playerArchive rollup are the named packets. The previous
-revision of this file described v0.11.7 and is obsolete.
+`claude/review-improvement-dwjemy`. Search is read-only (0.12.12); the remaining
+history surfaces and the playerArchive rollup are the named packets. Publish for
+0.12.12: run 40234668492. The previous revision of this file described v0.11.7
+and is obsolete.
 
 | Packet | Status | Notes |
 | --- | --- | --- |
