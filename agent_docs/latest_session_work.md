@@ -7,17 +7,18 @@ log, and the desktop packages for 0.12.8/0.12.9 which had reached the web only.
 
 ## Current state
 
-- Version `0.12.10` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
+- Version `0.12.12` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
   generated `index.html`.
-- Default branch `claude/review-improvement-dwjemy`; released source `fc9ee84`.
-- [Release v0.12.10](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.10)
-  is published as a desktop Alpha prerelease with the macOS arm64 and Windows x64
-  zips from validation run 40229188911. The installed
-  `/Applications/Dynasty Lab.app` is 0.12.10; the prior 0.12.9 bundle is kept at
-  `~/Applications/Dynasty Lab 0.12.9.app`; the three existing save slots were
-  untouched.
-- Production publish for 0.12.10 runs through the `Publish Dynasty Lab` workflow
-  (run 40230030963).
+- Default branch `claude/review-improvement-dwjemy`; released source `5501ebf`
+  (`v0.12.11`).
+- [Release v0.12.11](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.11)
+  is the current desktop Alpha (macOS arm64 + Windows x64 from validation run
+  40232083893). The installed `/Applications/Dynasty Lab.app` is 0.12.11 and its
+  asar matches the released zip byte for byte; earlier bundles are kept at
+  `~/Applications/Dynasty Lab 0.12.9.app` and `0.12.10.app`; the three existing
+  save slots are untouched.
+- The previous release was [v0.12.10](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.10)
+  (run 40229188911, publish run 40230030963).
 - Premium client roadmap milestones A-J remain shipped. Do not re-run them.
 
 ## What this version adds
@@ -33,6 +34,9 @@ log, and the desktop packages for 0.12.8/0.12.9 which had reached the web only.
   against the latest GitHub release, renderer/preload/console errors appended to
   `dynasty-lab-errors.log` in the app's data folder, external links restricted to
   this project's GitHub pages/releases.
+- **Release hygiene (0.12.11)**: Options reads the packed app's real
+  `Saves` folder size over IPC, and `tests/docs-consistency.js` fails when the
+  version file, changelog, README, agent context or roadmap disagree.
 - **Measurement** (`tools/save-size.js`): per-component save growth; see the
   2026-10-25 update in docs/SAVE_SIZE_MEASUREMENT.md.
 

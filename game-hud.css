@@ -164,3 +164,11 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
 @keyframes hudSlam{from{transform:scale(4);opacity:0}}
 @media (max-width:700px){.hud-intro{grid-template-columns:1fr;grid-template-rows:1fr auto 1fr}.hud-intro-side.away,.hud-intro-side.home{clip-path:none}}
 .motion-reduced .hud-up,.motion-reduced .hud-down,.motion-reduced .hud-pulse,.motion-reduced .hud-rank-move{animation:none!important}
+
+/* v0.12.12 — read-only program peek opened from Playbook search. */
+.program-peek{max-width:min(520px,92vw);border:1px solid #2a3c51;border-radius:14px;background:#0b1119;color:#e8eef6;padding:18px 20px}
+.program-peek::backdrop{background:rgba(4,8,12,.72)}
+.program-peek-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.program-peek-head h2{margin:0;font-size:1.15rem}
+.program-peek-head p{margin:2px 0 0;font-size:12.5px}
+.program-peek form{margin-top:14px;display:flex;justify-content:flex-end}

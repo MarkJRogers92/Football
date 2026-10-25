@@ -42,6 +42,23 @@ const FILE = 'file://' + path.join(__dirname, '..', 'index.html');
       await page.waitForFunction(() => document.querySelector('.tabs button[data-tab="program"]')?.classList.contains('active'), { timeout: 10000 });
       await page.waitForFunction(() => document.querySelector('.hud-playbook').hidden, { timeout: 5000 });
 
+      // A different program opens a read-only peek and must never switch control.
+      const otherName = await page.evaluate(name => {
+        const options = [...document.querySelectorAll('#userTeam option')].map(option => option.value);
+        return options.find(value => value !== name) || null;
+      }, teamName);
+      assert.ok(otherName, `[${label}] the league has another program`);
+      await openPlaybook();
+      await page.waitForSelector('.hud-playbook:not([hidden])', { timeout: 10000 });
+      await page.fill('.hud-playbook-search', otherName);
+      await page.waitForSelector('.hud-playbook-list li[data-kind="team"]', { timeout: 5000 });
+      await page.locator('.hud-playbook-list li[data-kind="team"]').filter({ hasText: otherName }).first().click();
+      await page.waitForFunction(() => document.querySelector('#programPeek')?.open === true, { timeout: 5000 });
+      assert.equal(await page.evaluate(() => document.querySelector('#userTeam').value), teamName,
+        `[${label}] searching another program must not switch the controlled program`);
+      await page.evaluate(() => document.querySelector('#programPeek form button').click());
+      await page.waitForFunction(() => !document.querySelector('#programPeek')?.open, { timeout: 5000 });
+
       // A player from the roster is searchable and opens the dossier.
       await page.evaluate(() => document.querySelector('.tabs button[data-tab="roster"]').click());
       const playerName = await page.$eval('#rosterBody [data-player]', element => element.textContent.trim());

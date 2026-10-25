@@ -1,9 +1,9 @@
 # Roadmap execution status
 
-Last reconciled: 2026-10-25, source `88f6367` (`v0.12.11`) on
-`claude/review-improvement-dwjemy`, tagged and released with desktop packages.
-Production publish: workflow run 40230030963. The previous revision of this file
-described v0.11.7 and is obsolete.
+Last reconciled: 2026-10-25, source `88f6367` (`v0.12.12`) on
+`claude/review-improvement-dwjemy`. Search is read-only; the remaining history
+surfaces and the playerArchive rollup are the named packets. The previous
+revision of this file described v0.11.7 and is obsolete.
 
 | Packet | Status | Notes |
 | --- | --- | --- |

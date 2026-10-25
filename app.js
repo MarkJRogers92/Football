@@ -2,7 +2,7 @@
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.12.11';
+const APP_VERSION='0.12.12';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -3535,11 +3535,26 @@ function encyclopediaOpen(row){
  if(row.kind==='coach'){showCoachProfile(row.id);return true}
  if(row.kind==='team'){
   const sel=$('#userTeam');
-  if(sel&&[...sel.options].some(o=>o.value===row.name)){sel.value=row.name;sel.dispatchEvent(new Event('change',{bubbles:true}))}
-  document.querySelector('.tabs button[data-tab="program"]')?.click();
+  // Search is read-only: never write the controlled program. The selector is
+  // disabled in Dynasty Mode and switching would end the tenure as "stepped away".
+  if(sel&&sel.value===row.name){document.querySelector('.tabs button[data-tab="program"]')?.click();return true}
+  const team=T(row.name);
+  if(!team)return false;
+  let dialog=document.querySelector('#programPeek');
+  if(!dialog){dialog=document.createElement('dialog');dialog.id='programPeek';dialog.className='program-peek';document.body.append(dialog)}
+  dialog.innerHTML=programPeekHTML(team);
+  if(dialog.showModal)dialog.showModal();else dialog.setAttribute('open','');
   return true;
  }
  return false;
+}
+function programPeekHTML(t){
+ const rank=ranked().findIndex(x=>x.name===t.name)+1,coach=t.staff?.HC,controlled=$('#userTeam')?.value||null;
+ const facts=[['Record',`${t.w??0}–${t.l??0}${t.cw!=null?` · ${t.cw}–${t.cl} conference`:''}`],['Ranking',rank?`#${rank}`:'Unranked'],['Prestige',String(t.prestige??'—')],['Head coach',coach?`${coach.name} · ${coach.role}`:'—'],['Conference',t.conference||'Independent']];
+ return `<div class="program-peek-head">${teamLogoHTML(t.id,44)}<div><h2>${gameEscape(t.name)}</h2><p class="muted">${gameEscape(t.conference||'Independent')}</p></div></div>
+ <div class="profile-grid">${facts.map(([k,v])=>`<div class="profile-stat"><div class="small muted">${k}</div><div class="v">${gameEscape(String(v))}</div></div>`).join('')}</div>
+ <p class="muted">Read-only program view. You control ${gameEscape(controlled||'one program')}; change programs through career offers, or start a Commissioner-mode dynasty to switch freely.</p>
+ <form method="dialog"><button class="primary" type="submit">Close</button></form>`;
 }
 // App scope is not global by design; presentation modules reach search through this bridge.
 if(typeof globalThis!=='undefined')globalThis.DynastyEncyclopedia=Object.freeze({search:encyclopediaSearch,open:encyclopediaOpen});

@@ -22,25 +22,26 @@ function recordError(kind, detail) {
     fs.appendFileSync(file, `${new Date().toISOString()} ${kind} ${String(detail || '').slice(0, 2000)}\n`);
   } catch {}
 }
-const ALLOWED_EXTERNAL = /^https:\/\/(github\.com\/MarkJRogers92\/Football|markjrogers92\.github\.io\/Football)/i;
+const ALLOWED_EXTERNAL = /^https:\/\/(github\.com\/MarkJRogers92\/Football(?:\/|$)|markjrogers92\.github\.io\/Football(?:\/|$))/i;
 
 // The update check runs in the main process, not the renderer: a blocked request
 // must stay silent, and a renderer fetch would raise a console error the smoke
 // test (correctly) treats as a regression.
 // Desktop saves live in the app data folder, not in a browser origin, so the
 // renderer's navigator.storage estimate says nothing useful about them.
-function saveUsage() {
+async function saveUsage() {
   let bytes = 0;
-  const walk = dir => {
+  const walk = async dir => {
     let entries;
-    try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
+    try { entries = await fs.promises.readdir(dir, { withFileTypes: true }); } catch { return; }
     for (const entry of entries) {
       const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) walk(full);
-      else if (entry.isFile()) { try { bytes += fs.statSync(full).size; } catch {} }
+      if (entry.isDirectory()) await walk(full);
+      else if (entry.isFile()) { try { bytes += (await fs.promises.stat(full)).size; } catch {} }
     }
   };
-  walk(path.join(app.getPath('userData'), 'Saves'));
+  // Async so a long dynasty's save tree never blocks the window while Options opens.
+  await walk(path.join(app.getPath('userData'), 'Saves'));
   return { bytes };
 }
 

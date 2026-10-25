@@ -12,6 +12,7 @@ test('finds a program, its head coach and one of its players', async()=>{
  const teamRows=e.encyclopediaSearch(t.name);
  assert.equal(teamRows[0].kind,'team');
  assert.equal(teamRows[0].name,t.name);
+ assert.equal(teamRows[0].id,t.id,'the row carries the id the peek dialog needs');
  const coachRows=e.encyclopediaSearch(coach.name).filter(r=>r.kind==='coach'&&r.id===coach.id);
  assert.equal(coachRows.length,1,'the coach is found once');
  assert.ok(coachRows[0].meta.includes(t.name),'the row says which program he is at');
@@ -36,6 +37,14 @@ test('rows are unique and capped per kind', async()=>{
  for(const kind of ['team','coach','player']){
   assert.ok(rows.filter(r=>r.kind===kind).length<=2,`${kind} respects the cap`);
  }
+});
+
+test('searching never mutates the universe it reads', async()=>{
+ const e=await setup(9005),u=e.universe;
+ const snapshot=()=>JSON.stringify({teams:u.teams.map(t=>[t.name,t.w,t.l,t.prestige,t.roster.length]),archive:u.playerArchive.length,portal:(u.transferPortal||[]).length});
+ const before=snapshot();
+ for(const term of ['an','state','university','a','chicago'])e.encyclopediaSearch(term);
+ assert.equal(snapshot(),before,'search is read-only over the dynasty');
 });
 
 test('an archived career is searchable without loading the archive', async()=>{

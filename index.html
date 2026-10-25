@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.11</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.12</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -1857,6 +1857,14 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
 @keyframes hudSlam{from{transform:scale(4);opacity:0}}
 @media (max-width:700px){.hud-intro{grid-template-columns:1fr;grid-template-rows:1fr auto 1fr}.hud-intro-side.away,.hud-intro-side.home{clip-path:none}}
 .motion-reduced .hud-up,.motion-reduced .hud-down,.motion-reduced .hud-pulse,.motion-reduced .hud-rank-move{animation:none!important}
+
+/* v0.12.12 — read-only program peek opened from Playbook search. */
+.program-peek{max-width:min(520px,92vw);border:1px solid #2a3c51;border-radius:14px;background:#0b1119;color:#e8eef6;padding:18px 20px}
+.program-peek::backdrop{background:rgba(4,8,12,.72)}
+.program-peek-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.program-peek-head h2{margin:0;font-size:1.15rem}
+.program-peek-head p{margin:2px 0 0;font-size:12.5px}
+.program-peek form{margin-top:14px;display:flex;justify-content:flex-end}
 </style></head><body>
 <section id="titleScreen" class="title-screen" aria-labelledby="titleGameName">
   <div class="title-screen-art" aria-hidden="true"></div>
@@ -1911,7 +1919,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.11</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.12</b></span></footer>
   </div>
 </section>
 
@@ -1938,7 +1946,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.12.11</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.12.12</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -5042,7 +5050,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.12.11';
+const APP_VERSION='0.12.12';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -8575,11 +8583,26 @@ function encyclopediaOpen(row){
  if(row.kind==='coach'){showCoachProfile(row.id);return true}
  if(row.kind==='team'){
   const sel=$('#userTeam');
-  if(sel&&[...sel.options].some(o=>o.value===row.name)){sel.value=row.name;sel.dispatchEvent(new Event('change',{bubbles:true}))}
-  document.querySelector('.tabs button[data-tab="program"]')?.click();
+  // Search is read-only: never write the controlled program. The selector is
+  // disabled in Dynasty Mode and switching would end the tenure as "stepped away".
+  if(sel&&sel.value===row.name){document.querySelector('.tabs button[data-tab="program"]')?.click();return true}
+  const team=T(row.name);
+  if(!team)return false;
+  let dialog=document.querySelector('#programPeek');
+  if(!dialog){dialog=document.createElement('dialog');dialog.id='programPeek';dialog.className='program-peek';document.body.append(dialog)}
+  dialog.innerHTML=programPeekHTML(team);
+  if(dialog.showModal)dialog.showModal();else dialog.setAttribute('open','');
   return true;
  }
  return false;
+}
+function programPeekHTML(t){
+ const rank=ranked().findIndex(x=>x.name===t.name)+1,coach=t.staff?.HC,controlled=$('#userTeam')?.value||null;
+ const facts=[['Record',`${t.w??0}–${t.l??0}${t.cw!=null?` · ${t.cw}–${t.cl} conference`:''}`],['Ranking',rank?`#${rank}`:'Unranked'],['Prestige',String(t.prestige??'—')],['Head coach',coach?`${coach.name} · ${coach.role}`:'—'],['Conference',t.conference||'Independent']];
+ return `<div class="program-peek-head">${teamLogoHTML(t.id,44)}<div><h2>${gameEscape(t.name)}</h2><p class="muted">${gameEscape(t.conference||'Independent')}</p></div></div>
+ <div class="profile-grid">${facts.map(([k,v])=>`<div class="profile-stat"><div class="small muted">${k}</div><div class="v">${gameEscape(String(v))}</div></div>`).join('')}</div>
+ <p class="muted">Read-only program view. You control ${gameEscape(controlled||'one program')}; change programs through career offers, or start a Commissioner-mode dynasty to switch freely.</p>
+ <form method="dialog"><button class="primary" type="submit">Close</button></form>`;
 }
 // App scope is not global by design; presentation modules reach search through this bridge.
 if(typeof globalThis!=='undefined')globalThis.DynastyEncyclopedia=Object.freeze({search:encyclopediaSearch,open:encyclopediaOpen});
@@ -13625,14 +13648,15 @@ attach();setTimeout(attach,0);setTimeout(attach,150);
   </div>`;
   document.body.append(overlay);
   const input=overlay.querySelector('input'),list=overlay.querySelector('ul');
-  let items=[],cursor=0,returnFocus=null;
+  let items=[],cursor=0,returnFocus=null,searchCache={q:'',rows:[]};
 
   function render(){
     const q=input.value.trim().toLowerCase();
     const sectionItems=entries().filter(e=>!q||`${e.label} ${e.group} ${HINTS[e.id]||''}`.toLowerCase().includes(q)).map(e=>({...e,kind:'tab'}));
     // v0.12.10: the same box answers "who is this?", not only "where do I go?".
     const encyclopedia=globalThis.DynastyEncyclopedia;
-    const entityRows=(q.length<2||!encyclopedia)?[]:encyclopedia.search(q,{limit:5});
+    if(q!==searchCache.q){searchCache={q,rows:(q.length<2||!encyclopedia)?[]:encyclopedia.search(q,{limit:4}).slice(0,6)}}
+    const entityRows=searchCache.rows;
     // A name beats a loose hint-text hit: typing a person or program should open them.
     items=entityRows.map(r=>({kind:r.kind,id:r.id,label:r.name,meta:r.meta,group:'Result',row:r})).concat(sectionItems);
     cursor=Math.min(cursor,Math.max(0,items.length-1));
@@ -13660,7 +13684,7 @@ attach();setTimeout(attach,0);setTimeout(attach,150);
   function open(){
     if(titleOpen()||!overlay.hidden)return;
     returnFocus=document.activeElement;
-    overlay.hidden=false;input.value='';cursor=0;render();
+    overlay.hidden=false;input.value='';cursor=0;searchCache={q:'',rows:[]};render();
     requestAnimationFrame(()=>{overlay.classList.add('is-open');input.focus()});
   }
   function close(){
@@ -13877,6 +13901,7 @@ attach();setTimeout(attach,0);setTimeout(attach,150);
       const usage=await shell.saveUsage?.().catch(()=>null);
       const bytes=usage?.bytes;
       if(Number.isFinite(bytes)){
+        if(bytes<=0){line.dataset.level='ok';line.textContent='No dynasty is saved on this computer yet.';return}
         line.dataset.level=bytes>=2*1024*1024*1024?'warn':'ok';
         line.textContent=`Dynasty saves on this computer use ${fmt(bytes)}.`
           + (bytes>=2*1024*1024*1024?' Export a JSON backup — this install is getting large.':' Export a JSON backup before replacing the app.');

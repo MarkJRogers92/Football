@@ -73,14 +73,15 @@
   </div>`;
   document.body.append(overlay);
   const input=overlay.querySelector('input'),list=overlay.querySelector('ul');
-  let items=[],cursor=0,returnFocus=null;
+  let items=[],cursor=0,returnFocus=null,searchCache={q:'',rows:[]};
 
   function render(){
     const q=input.value.trim().toLowerCase();
     const sectionItems=entries().filter(e=>!q||`${e.label} ${e.group} ${HINTS[e.id]||''}`.toLowerCase().includes(q)).map(e=>({...e,kind:'tab'}));
     // v0.12.10: the same box answers "who is this?", not only "where do I go?".
     const encyclopedia=globalThis.DynastyEncyclopedia;
-    const entityRows=(q.length<2||!encyclopedia)?[]:encyclopedia.search(q,{limit:5});
+    if(q!==searchCache.q){searchCache={q,rows:(q.length<2||!encyclopedia)?[]:encyclopedia.search(q,{limit:4}).slice(0,6)}}
+    const entityRows=searchCache.rows;
     // A name beats a loose hint-text hit: typing a person or program should open them.
     items=entityRows.map(r=>({kind:r.kind,id:r.id,label:r.name,meta:r.meta,group:'Result',row:r})).concat(sectionItems);
     cursor=Math.min(cursor,Math.max(0,items.length-1));
@@ -108,7 +109,7 @@
   function open(){
     if(titleOpen()||!overlay.hidden)return;
     returnFocus=document.activeElement;
-    overlay.hidden=false;input.value='';cursor=0;render();
+    overlay.hidden=false;input.value='';cursor=0;searchCache={q:'',rows:[]};render();
     requestAnimationFrame(()=>{overlay.classList.add('is-open');input.focus()});
   }
   function close(){

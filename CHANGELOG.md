@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.12.12 — Search stays read-only
+
+- Playbook search no longer changes the controlled program. Opening another program shows a read-only program card (record, ranking, prestige, head coach) and leaves Dynasty Mode's program lock intact. The previous build could bypass the disabled selector and switch control, which a save records as "stepped away".
+- Entity results are capped at six across the whole list instead of five per kind, so a two-letter query no longer buries section navigation, and the scan is cached while the highlight moves.
+- Desktop: the save-usage walk runs asynchronously (opening Options no longer blocks on a long dynasty's save tree), a fresh install reports "No dynasty is saved on this computer yet" instead of a dash, and the external-link allowlist is anchored to exact paths.
+- Tests: the browser check now opens a second program and proves the controlled team does not change; a unit test proves search never mutates the universe.
+
 ## v0.12.11 — Release hygiene
 
 - Options reports the desktop Alpha's actual save-folder size instead of a browser storage estimate that said nothing about native saves.

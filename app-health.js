@@ -22,6 +22,7 @@
       const usage=await shell.saveUsage?.().catch(()=>null);
       const bytes=usage?.bytes;
       if(Number.isFinite(bytes)){
+        if(bytes<=0){line.dataset.level='ok';line.textContent='No dynasty is saved on this computer yet.';return}
         line.dataset.level=bytes>=2*1024*1024*1024?'warn':'ok';
         line.textContent=`Dynasty saves on this computer use ${fmt(bytes)}.`
           + (bytes>=2*1024*1024*1024?' Export a JSON backup — this install is getting large.':' Export a JSON backup before replacing the app.');
