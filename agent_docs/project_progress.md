@@ -1,19 +1,29 @@
 # Project Progress
 
-No active deployment plan.
+## Version and branch
 
-## Goal
+Source is `0.12.9` on `claude/review-improvement-dwjemy`, clean at `89727e8`
+(2026-10-21). Production and the installed desktop app run the same version.
 
-No workflow deployment goal is recorded. The documentation framework was initialized from the current repository state.
+## Overall progress
 
-## Overall Progress
+- Simulation: recruiting, scouting and development, transfer portal, coaching
+  careers, bowls and playoffs, NIL, hot seat, rivalries, academic eligibility,
+  guidance/first-season flow, Game Engine v2 (interactive, recorded,
+  postseason), 3D Game Cast replay.
+- Presentation: premium client shell and grouped navigation, recruiting
+  workspace, development visualisation, Game HUD, player identity, staff
+  organisation, world history, legacy museum.
+- Delivery: web production on `gh-pages` at v0.12.9; Electron Alpha installed
+  locally at 0.12.9; last published GitHub release with downloadable zips is
+  v0.12.7.
 
-Source version is `0.12.5` on `claude/modest-brown-0gpskn` (includes the merged v0.12.4 first-season flow). Recent work: weekly briefing label/status-line fix; ~3.4x faster season simulation (recruiting hot spots); unit suite ~16 min to ~7 min; CI gating for desktop packaging jobs.
+## Current position
 
-## Current Position
+No release in flight. Documentation matches 0.12.9. Two open work streams:
+history search (encyclopedia) and long-dynasty archive size.
 
-Six framework documents now contain baseline context. Publication, packaging, and release acceptance are not claimed by this installation.
+## Next milestone
 
-## Next Milestone
-
-None assigned. Before substantive work, inspect the current branch and the relevant roadmap or handoff, then define a bounded goal and verification plan.
+Named in `docs/roadmap/STATUS.md`. Do not infer a milestone from older root
+handoffs in `docs/archive/`.

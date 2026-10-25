@@ -1,6 +1,6 @@
 # Dynasty Lab implementation packets
 
-Baseline inspected: `dc3c76c` (`0.9.44`). These packets are planning artifacts;
+Baseline inspected: `89727e8` (`0.12.9`, 2026-10-25). These packets are planning artifacts;
 they do not authorize publishing, merging, or changing production.
 
 ## Execution rules

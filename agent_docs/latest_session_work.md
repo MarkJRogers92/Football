@@ -1,45 +1,57 @@
 # Latest Session Work
 
-2026-10-11: Merged, published, and installed v0.12.7 with the development/player-evidence improvements. The user authorized all three delivery actions.
+2026-10-25: Reconciled the documentation and release state to v0.12.9. This
+commit changes documents only; no gameplay, save or presentation behaviour.
 
-## Detailed Current State
+## Current state
 
-- Repository: Dynasty Lab, current/default branch `claude/review-improvement-dwjemy`.
-- Released source and tag `v0.12.7`: `f7e3c03aa5b40e5e8d196cca25a01bbb64831240` (`release: integrate development and player insights for v0.12.7`). The local default branch was fast-forwarded to this merge.
-- Player-evidence implementation checkpoint: `39193ee` (`feat: add scouting, career stories and production insights`).
-- The previously verified featured-plan results and camp coaching work remains in `0b97487`, with its prior handoff in `48c27f3`. This package began with a clean working tree and preserves that work.
-- Version is `0.12.7` in `VERSION.txt`, `APP_VERSION`, package metadata, the published page, and the installed desktop app. `app.js` and extensions are source; `tools/build.js` regenerates the standalone `index.html`.
-- Integration preserves the already released v0.12.6 first-season flow, Game Cast, 3D Watch, rendering composition, school data, simulation improvements, and release gates. The previously declined full-detail Sim Week path remains disabled.
-- Camp result recording still runs through the canonical completion path before autosave. Development rendering retains `extendRender`; the Stats evidence wrapper refreshes `TAB_RENDERERS.stats` so the active-tab renderer actually uses it.
+- Repository: Dynasty Lab, working/default branch `claude/review-improvement-dwjemy`,
+  clean at `89727e8` (2026-10-21).
+- Version `0.12.9` in `VERSION.txt`, `APP_VERSION`, `package.json`, the generated
+  `index.html`, production and the installed desktop app.
+- Production https://markjrogers92.github.io/Football/ serves v0.12.9
+  (pages run 39686344045). Latest validation run 39686491263 is green on `89727e8`.
+- Shipped since v0.12.7: v0.12.8 range-aware recruit comparison; v0.12.9 Game HUD
+  (Playbook, pause menu, toasts, result splash and live ticker, kickoff intro,
+  record flash, rank badges, week cards). Both are presentation-only.
+- Premium client roadmap (docs/DYNASTY_LAB_PREMIUM_CLIENT_DESIGN_ROADMAP.md)
+  milestones A-J are implemented: client rail shell, recruiting workspace,
+  development visualisation, command-centre guidance and first-season flow,
+  roster/depth studio, player identity, staff organisation, Game Day and season
+  presentation, world history and the legacy museum. Do not re-run them.
 
-## Session Changes
+## Known gaps (verified 2026-10-25)
 
-- `player-evidence-model.js` supplies pure scouting and statistics calculations; `player-evidence-adapter.js` connects the existing profiles, Stats, History, and event ledger. Build and runtime harness loading stay aligned.
-- Scouting history separates estimate/range and confidence movement from measured camp growth. Current coaches interpret the shared scouting ranges using evaluation skill and positional expertise; these are not independent hidden-rating grades. New accepted checkpoints preserve coach identities and perspectives when recorded. Existing history is not backfilled.
-- Accepted weekly personnel choices and Spring/Fall camp recommendations retain both players and the actual role/depth facts, timing, phase, and outcome. Held positions use truthful wording; replay does not duplicate milestones.
-- Actual recorded games can create one early-career breakout per player/season using the existing story score. Eligibility exhaustion records college completion; cuts and early declarations do not receive that event. Game transaction rollback restores the event ledger alongside game records.
-- Weekly cards show the latest recorded milestone. Selected-school History offers a season filter and player links, including saved names after transfers or deferred archive loading. Career chronology combines existing recruitment, seasons, honors, transfer/injury/draft history with recorded milestones, ordered newest first within each season. Same-week camps retain their recorded order and explicit phase labels.
-- Profiles compare archived/current seasons and recent versus prior retained same-position game lines. Stats adds program/national position groups using pooled numerators and denominators, participating players, and player-games. Missing denominators or historical positions remain unavailable; archived/current final-season totals are not duplicated.
-- Player archives now retain `campHistory`. Presentation helpers do not consume gameplay randomness or create gameplay decisions; repeated profile, Stats, and History reads preserve player/live-RNG state.
+- **Desktop download lag.** GitHub tags and releases stop at v0.12.7, so the
+  published Alpha zip is two releases behind the web build. Release artifacts
+  come from the `desktop-macos`/`desktop-windows` jobs in
+  `.github/workflows/validate.yml` (manual dispatch sets `desktop=true`).
+- **Long-dynasty save growth is unresolved.** Measured on v0.12.9 with
+  `SEASONS=6 node tools/longrun.js`: 36.3 MB after season 1, 87.2 MB after
+  season 6 (+10.7 MB/season, 13,308 archived players). This matches the v0.9.38
+  measurement; nothing has been rolled up since. docs/SAVE_SIZE_MEASUREMENT.md
+  owns the analysis and the recommendation (gameArchive first, then
+  playerArchive).
+- **Encyclopedia packet not built** (docs/roadmap/09-v012-encyclopedia.md): no
+  team/coach search, coach index, conference pages, national timeline or Hall of
+  Fame. Archive search matches player names only; the Playbook searches section
+  titles only.
+- **Desktop Alpha distribution is manual.** `forge.config.js` uses an ad-hoc
+  signature, there is no notarisation, no update check and no renderer error log.
 
-## Verification
+## Verification recorded this session
 
-- `npm run publish` completed successfully with the unchanged required `validate:full` gate: build, clean/reproducible release verification, 448/448 core tests, standard and extended browser suites, six browser persistence scenarios, and the five-season audit. The long core run completed without a five-minute cutoff.
-- Integrated focused suites passed 28/28, first-season pure tests passed 9/9, and desktop storage tests passed 14/14. Counts overlap the full suite and are not additive.
-- The parent feature flow passed at 1280x900 and 390x844 on the release build: actual personnel decisions, four recorded weeks, rollback, breakout deduplication, weighted statistics, career links, Spring/Fall camp acceptance and replay, phase order, saved coach perspectives, read purity, and layout/error checks. The fixture aligns both initial QB charts before the real promotion so independent random charts cannot change its participant.
-- Independent native Sol review accepted the integrated diff and separately verified both downloadable packages and the disposable-profile installed-app verifier.
-- [Source CI run 38111772628](https://github.com/MarkJRogers92/Football/actions/runs/38111772628) passed validation and both macOS/Windows packaging and native save/restart checks. Its fast cadence skipped browser/audit jobs; the required browser/audit checks ran in the local full publication gate.
-- The locally made Mac app passed native save/restart/replacement checks and strict signature verification. Its packaged HTML is byte-identical to the validated source. The Windows artifact comes from the exact-source CI run and matches the game source after platform newline normalization; its separate raw hash is recorded.
-- The actual `/Applications/Dynasty Lab.app` passed a fresh-profile launch with native storage, no Node exposure, the new player and statistics views, and no renderer errors. The regular user profile was then opened; its v0.12.7 title menu shows the existing Continue Dynasty and desktop save ready. No gameplay action was taken in that profile.
+- `npm run verify:release`: PASS — the committed build is reproducible from
+  source and the source is releasable.
+- `node tools/audit.js`: PASS through 2031. Prestige mean 66.4-66.5, sd ~16.8;
+  transfers 174-240 per season with 0 broken promises; ~10% of rosters injured
+  in-season; 39-41% of rosters appear in a game.
+- `SEASONS=6 node tools/longrun.js`: prestige mean 66.5, six different national
+  champions, 87.2 MB save at season 6.
+- `npm test` on this host is slow when season-length suites run concurrently;
+  CI remains the authoritative full-suite result for this commit.
 
-## Delivered Release
+## Next entry point
 
-- [Production](https://markjrogers92.github.io/Football/) serves the exact validated v0.12.7 HTML, SHA-256 `fdfdb53688fa0efaef664beb9e3b3e721c02c64f970d4a962e756a2b708a3033`. Pages commit: `0d9e36ca19bf91deb83a4f7f57ccc5885f5e3b39`. Both referenced external image assets returned HTTP 200.
-- [Release and downloads](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.7) are published as a desktop Alpha prerelease, with Mac arm64 and Windows x64 ZIPs. The tag resolves to released source `f7e3c03`; both uploaded asset sizes and GitHub SHA-256 digests match the verified local packages.
-- Installed version is v0.12.7, retaining bundle identity `com.electron.dynasty-lab` and the native save location. Its ASAR matches the verified Mac package. All 17 original native save files retained their exact checksums after replacement, fresh-profile verification, and normal user-profile startup.
-- Release evidence, package hashes, browser screenshots, publication log, installation checks, and before/after save manifests are under `/Users/markrogers/Documents/Codex/2026-10-10/dynasty-release-0.12.7/`. The `backups/` directory retains the prior v0.12.2 app and exact save backup. Earlier implementation evidence remains under `dynasty-player-insights/` and `dynasty-development-upgrade/` in the same date directory.
-- No blocker remains for this authorized release. Older saves may lack historical coach perspectives, positions, or retained game lines; the UI reports missing/partial evidence rather than backfilling it.
-
-## Next Entry Point
-
-The requested release is complete. Continue from the current default branch and inspect its actual state before new work. Player-evidence tests are registered in the standard suite and `test:development`, with `test:player-evidence` for focused iteration. Other framework documents contain older snapshots; this handoff is the release evidence for v0.12.7.
+docs/roadmap/STATUS.md "Next action" names the next bounded packet. Read this
+file, then `docs/roadmap/STATUS.md`, then only the packet named there.
