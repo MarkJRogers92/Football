@@ -38,3 +38,45 @@ test('the champion timeline maps archived seasons newest first', async()=>{
  assert.equal(rows[0].runnerUp,'Chicago Metropolitan');
  assert.equal(rows[0].record,'14-0');
 });
+
+test('a decorated retired player is inducted with visible reasons', async()=>{
+ const e=await setup(9201),u=e.universe;
+ u.playerArchive.push({id:'hof-qb',name:'Quincy Vale',pos:'QB',lastTeam:'Chicago Metropolitan',retiredYear:2031,
+  perceived:80,draftResult:{year:2031,round:1,label:'Round 1, Pick 3'},
+  awards:[{year:2030,name:'National Player of the Year'}],
+  career:{passYds:11200,passTD:88,int:24,rushYds:900,rushTD:9}});
+ const row=e.hallOfFame().find(r=>r.id==='hof-qb');
+ assert.ok(row,'a national player of the year is inducted');
+ assert.equal(row.kind,'player');
+ assert.ok(row.reasons.some(reason=>/National Player of the Year 2030/.test(reason)),'the award is named');
+ assert.ok(row.reasons.some(reason=>/First-round draft pick/.test(reason)),'the draft result is named');
+ assert.ok(row.reasons.some(reason=>/career passing yards/.test(reason)),'career production is named');
+});
+
+test('an ordinary or unfinished career stays out', async()=>{
+ const e=await setup(9202),u=e.universe;
+ u.playerArchive.push({id:'hof-none',name:'Ordinary Walk-On',pos:'LB',lastTeam:'Chicago Metropolitan',retiredYear:2030,
+  perceived:52,draftResult:null,awards:[],career:{tackles:12,sacks:1}});
+ assert.equal(e.hallOfFame().some(r=>r.id==='hof-none'),false);
+});
+
+test('a championship coach is inducted', async()=>{
+ const e=await setup(9203),u=e.universe,t=u.teams[0],hc=t.staff.HC;
+ hc.seasons=[{year:2030,schoolId:t.id,schoolName:t.name,role:'Head Coach',wins:13,losses:1,nationalTitle:true,conferenceTitle:true,coachOfYear:true}];
+ const row=e.hallOfFame().find(r=>r.kind==='coach'&&r.id===hc.id);
+ assert.ok(row,'a national-title coach is inducted');
+ assert.ok(row.reasons.some(reason=>/national title/.test(reason)));
+ assert.ok(row.reasons.some(reason=>/Coach of the Year/.test(reason)));
+});
+
+test('induction is deterministic and read-only', async()=>{
+ const e=await setup(9204),u=e.universe;
+ u.playerArchive.push({id:'hof-det',name:'Deterministic Career',pos:'RB',lastTeam:'Chicago Metropolitan',retiredYear:2031,
+  perceived:75,draftResult:{year:2031,round:2,label:'Round 2, Pick 9'},awards:[{year:2030,name:'Running Back of the Year'}],
+  career:{rushYds:5400,rushTD:52,recYds:900}});
+ const snapshot=()=>JSON.stringify({archive:u.playerArchive.map(p=>[p.id,p.awards.length]),teams:u.teams.map(t=>t.name)});
+ const before=snapshot();
+ const first=e.hallOfFame({limit:10}),second=e.hallOfFame({limit:10});
+ assert.deepEqual(second,first,'repeat calls return the same list');
+ assert.equal(snapshot(),before,'induction never mutates the universe');
+});

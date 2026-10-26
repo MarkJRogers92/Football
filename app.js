@@ -2,7 +2,7 @@
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.12.13';
+const APP_VERSION='0.12.14';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -3516,6 +3516,58 @@ function championTimeline({limit=25}={}){
 }
 // App scope is not global by design; the history module reaches these through this bridge.
 if(typeof globalThis!=='undefined')globalThis.DynastyHistoryIndex=Object.freeze({coaches:coachIndexRows,champions:championTimeline,openCoach:showCoachProfile});
+// v0.12.14 — Hall of Fame. Induction uses only recorded, player-visible facts:
+// awards, draft result, career production and coach titles. There is no hidden
+// rating and no new save field; inductees are derived every time from the archive.
+const HOF_MAJOR_AWARD=/^(National|Offensive|Defensive|Quarterback|Running Back|Receiver|Lineman) .*of the Year$/i;
+function hofPlayerPoints(p){
+ const awards=(p.awards||[]).filter(a=>HOF_MAJOR_AWARD.test(String(a.name||'')));
+ const round=p.draftResult?.round||null;
+ const production=productionRating(p);
+ const draft=round===1?25:round===2?15:round===3?8:round?4:0;
+ return {points:Math.round(awards.length*40+draft+Math.max(0,production-55)),awards,round,production};
+}
+function hofPlayerReasons(p,{awards,round}={}){
+ const reasons=awards.slice(0,3).map(a=>`${a.name} ${a.year}`);
+ if(round)reasons.push(round===1?'First-round draft pick':`Round ${round} draft pick`);
+ const c=p.career||{};
+ if((c.passYds||0)>0)reasons.push(`${Math.round(c.passYds).toLocaleString()} career passing yards`);
+ else if((c.rushYds||0)>0)reasons.push(`${Math.round(c.rushYds).toLocaleString()} career rushing yards`);
+ else if((c.recYds||0)>0)reasons.push(`${Math.round(c.recYds).toLocaleString()} career receiving yards`);
+ else if((c.tackles||0)>0)reasons.push(`${Math.round(c.tackles)} career tackles`);
+ else if((c.sacks||0)>0)reasons.push(`${Number(c.sacks).toFixed(1)} career sacks`);
+ return reasons.slice(0,4);
+}
+function hofCoachPoints(c){
+ const totals=coachCareerTotals(c);
+ return {totals,points:Math.round(totals.nationalTitles*50+totals.conferenceTitles*12+totals.coachAwards*20+totals.wins*.15)};
+}
+function hallOfFame({limit=24}={}){
+ if(!universe)return [];
+ const rows=[];
+ for(const p of universe.playerArchive||[]){
+  const facts=hofPlayerPoints(p);
+  const qualified=facts.awards.length>=1||(facts.round===1&&facts.production>=70);
+  if(!qualified||facts.points<55)continue;
+  rows.push({kind:'player',id:p.id,name:p.name,pos:p.pos,team:p.lastTeam||'—',year:p.retiredYear||null,
+   points:facts.points,reasons:hofPlayerReasons(p,facts)});
+ }
+ for(const c of allKnownCoaches()){
+  const {totals,points}=hofCoachPoints(c);
+  const qualified=totals.nationalTitles>=1||totals.conferenceTitles>=3||totals.coachAwards>=2;
+  if(!qualified||points<60)continue;
+  const reasons=[];
+  if(totals.nationalTitles)reasons.push(`${totals.nationalTitles} national title${totals.nationalTitles===1?'':'s'}`);
+  if(totals.conferenceTitles)reasons.push(`${totals.conferenceTitles} conference title${totals.conferenceTitles===1?'':'s'}`);
+  if(totals.coachAwards)reasons.push(`${totals.coachAwards} Coach of the Year`);
+  reasons.push(`${totals.wins}–${totals.losses} career`);
+  rows.push({kind:'coach',id:c.id,name:c.name,pos:'HC',team:c.schoolName||c.status||'—',year:null,points,reasons});
+ }
+ return rows.sort((a,b)=>b.points-a.points||a.name.localeCompare(b.name)).slice(0,limit);
+}
+if(typeof globalThis!=='undefined'&&globalThis.DynastyHistoryIndex)
+ globalThis.DynastyHistoryIndex=Object.freeze({...globalThis.DynastyHistoryIndex,hallOfFame,openPlayer:showPlayerProfile});
+
 
 // v0.12.10 — global search across the universe a dynasty already holds. Read-only:
 // it never loads a deferred archive and never mutates save state.

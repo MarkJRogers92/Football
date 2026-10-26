@@ -33,6 +33,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'index.html');
       await page.keyboard.press('Escape');
 
       assert.match(await page.textContent('#championTimeline'), /Champions appear once a season is archived/, `[${label}] champions explain their empty state`);
+      assert.match(await page.textContent('#hallOfFameList'), /No inductees yet/, `[${label}] Hall of Fame explains its empty state`);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, `[${label}] no horizontal overflow`);
       assert.deepEqual(errors, [], `[${label}] no console errors`);
       await page.close();

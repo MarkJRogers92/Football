@@ -126,7 +126,7 @@ globalThis.__ENGINE__ = {
   generateCoach, coachById, ensureCoachCareer, normalizeCoachState, recordCoachSeason, closeCoachStint, openCoachStint, archiveCoach, addCoachEvent, applyCoachRelationshipChange, coachFalloutHubItems, replaceStaffCoach, promoteCoachWithinTeam, moveCoach, retireCoach, coachCareerTotals, coachProfileHTML, chooseCoachMoveDestination, carousel, promiseHTML, applyDevelopmentPhase, resolveDevelopmentCoaching, ARCHIVE_FIELDS,
   teamStaffBudget, teamStaffSpend, candidateFitScore, generateCandidatePool, createOpening, interviewCandidate, candidateAcceptChance, extendOffer, hireCandidate, coachOpeningHubItems, COACH_SLOT_ROLES,
   captureRecruitment, transferFit, chooseTransferDestination, placeTransfer, familiarFaceItems, buildWeeklyHub, releasePlayerPromises, transferHistoryHTML, archivePlayerSeason,
-  saveBrowser, loadBrowser, exportSave, importSave, installSave, validateSave, validateSaveText, validateImportedSaveText, ensureArchiveLoaded, archiveIsDeferred, ensureGamesLoaded, gamesAreDeferred, renderRecruiting, applyProgramEdit, inheritRecruitTraits, encyclopediaSearch, encyclopediaOpen, coachIndexRows, championTimeline,
+  saveBrowser, loadBrowser, exportSave, importSave, installSave, validateSave, validateSaveText, validateImportedSaveText, ensureArchiveLoaded, archiveIsDeferred, ensureGamesLoaded, gamesAreDeferred, renderRecruiting, applyProgramEdit, inheritRecruitTraits, encyclopediaSearch, encyclopediaOpen, coachIndexRows, championTimeline, hallOfFame,
   POS, POS_COUNTS, ROLE_DEFS, OFF_SCHEMES, DEF_SCHEMES, GROWTH_CURVES, OFF_POS,
   render: () => {},
 };

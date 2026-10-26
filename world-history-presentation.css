@@ -11,3 +11,5 @@
 .history-record{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
 .history-record small{display:block;font-weight:400}
 @media(max-width:720px){.history-list{max-height:none}}
+
+.history-who .hof-why{color:#8fa3b8;font-size:11px;line-height:1.35}

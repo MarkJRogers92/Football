@@ -7,7 +7,7 @@ log, and the desktop packages for 0.12.8/0.12.9 which had reached the web only.
 
 ## Current state
 
-- Version `0.12.13` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
+- Version `0.12.14` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
   generated `index.html`.
 - Default branch `claude/review-improvement-dwjemy`; released source `628518b`
   (`v0.12.13`).
@@ -40,6 +40,10 @@ log, and the desktop packages for 0.12.8/0.12.9 which had reached the web only.
 - **Release hygiene (0.12.11)**: Options reads the packed app's real
   `Saves` folder size over IPC, and `tests/docs-consistency.js` fails when the
   version file, changelog, README, agent context or roadmap disagree.
+- **Hall of Fame (0.12.14)**: retired players qualify on major awards, a
+  first-round draft result and career production; coaches on national titles,
+  conference titles and Coach of the Year. Reasons are printed, induction is
+  derived per read from the archive, and no save field is added.
 - **History index (0.12.13)**: History lists every recorded coach (searchable by
   name, program or role; opens the coach profile) and the national champion
   timeline (opens the read-only program card). Both are read-only.

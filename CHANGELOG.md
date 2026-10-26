@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.12.14 — Hall of Fame
+
+- History adds a Hall of Fame. Retired players are inducted for major awards, a first-round draft result and career production; coaches for national titles, conference titles and Coach of the Year awards. Every inductee lists the reasons and opens the existing player or coach profile.
+- Induction is deterministic and derived on every read from the archive the dynasty already holds — no hidden rating, no new save field, no simulation change.
+- The list says plainly when nobody qualifies yet.
+
 ## v0.12.13 — History index
 
 - History now lists every coach the dynasty has recorded — role, program, career record and seasons tracked — with search by name, program or role and the existing coach profile behind each row.
