@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.16</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.17</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -1940,7 +1940,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.16</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.17</b></span></footer>
   </div>
 </section>
 
@@ -1967,7 +1967,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.12.16</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.12.17</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -5071,7 +5071,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.12.16';
+const APP_VERSION='0.12.17';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -8639,14 +8639,16 @@ function hallOfFame({limit=24}={}){
  const rows=[];
  for(const p of universe.playerArchive||[]){
   const facts=hofPlayerPoints(p);
-  const qualified=facts.awards.length>=1||(facts.round===1&&facts.production>=70);
-  if(!qualified||facts.points<55)continue;
+  // A single award season is common; induction needs a career argument. Measured
+  // on ten-season dynasties: the old rule produced ~25 inductees a season.
+  const qualified=facts.awards.length>=2||(facts.awards.length>=1&&facts.round===1)||(facts.round===1&&facts.production>=85);
+  if(!qualified||facts.points<90)continue;
   rows.push({kind:'player',id:p.id,name:p.name,pos:p.pos,team:p.lastTeam||'—',year:p.retiredYear||null,
    points:facts.points,reasons:hofPlayerReasons(p,facts)});
  }
  for(const c of allKnownCoaches()){
   const {totals,points}=hofCoachPoints(c);
-  const qualified=totals.nationalTitles>=1||totals.conferenceTitles>=3||totals.coachAwards>=2;
+  const qualified=totals.nationalTitles>=1||totals.conferenceTitles>=5||totals.coachAwards>=3;
   if(!qualified||points<60)continue;
   const reasons=[];
   if(totals.nationalTitles)reasons.push(`${totals.nationalTitles} national title${totals.nationalTitles===1?'':'s'}`);
