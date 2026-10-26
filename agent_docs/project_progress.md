@@ -3,8 +3,8 @@
 ## Version and branch
 
 Source is `0.12.13` on `claude/review-improvement-dwjemy`, tagged `v0.12.11` and
-released with macOS/Windows zips (run 40233735858). Production publish for
-0.12.12 is the `Publish Dynasty Lab` workflow run 40234668492.
+released with macOS/Windows zips (run 40250941307). Production publish for
+0.12.13 is the `Publish Dynasty Lab` workflow run 40251817638.
 
 ## Overall progress
 
