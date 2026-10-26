@@ -23,6 +23,21 @@ const {chromium}=require('playwright-core');const {chromiumPath}=require('./help
  await page.waitForFunction(()=>Array.from(document.querySelector('#conferenceSeason').options).some(x=>x.value==='2029'));
  await page.selectOption('#conferenceSeason','2029');await page.selectOption('#conferencePick',me.conference);
  assert.match(await page.locator('#conferenceTable').innerText(),/current membership|estimated/i);
+ // v0.12.19: 30 inductees exceed the first screen; every one must be reachable.
+ const hofSave=JSON.parse(JSON.stringify(save));
+ hofSave.universe.playerArchive=Array.from({length:30},(_,i)=>({id:'hof-'+i,name:'Hall Inductee '+i,pos:'WR',lastTeam:me.name,retiredYear:2031,perceived:80,
+  draftResult:{year:2031,round:1,pick:i+1,label:'Round 1'},
+  awards:[{year:2030,name:'Receiver of the Year'},{year:2029,name:'Offensive Player of the Year'}],career:{recYds:4200},seasonHistory:[]}));
+ await page.evaluate(s=>{window.__HISTORY_QA__.installSave(s);document.querySelector('.tabs button[data-tab="history"]').click()},hofSave);
+ await page.waitForSelector('#hallOfFameList [data-hof]',{timeout:5000});
+ assert.equal(await page.locator('#hallOfFameList [data-hof]').count(),24,'the first screen is capped');
+ assert.match(await page.locator('#hofCount').innerText(),/Showing 24 of 30/i);
+ await page.locator('[data-hof-more]').click();
+ assert.equal(await page.locator('#hallOfFameList [data-hof]').count(),30,'show all reveals every inductee');
+ assert.match(await page.locator('#hofCount').innerText(),/All 30 inductees/i);
+ await page.selectOption('#hofKind','coach');
+ assert.equal(await page.locator('#hallOfFameList [data-hof]').count(),0,'the category filter empties a category');
+ assert.match(await page.locator('#hallOfFameList').innerText(),/No coaches are inducted yet/);
  assert.deepEqual(errors,[]);await page.close();console.log(label+' history accuracy PASS');
  }}finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

@@ -19,6 +19,10 @@
   </section>
   <section class="card history-card">
    <div class="section-head"><div><h3>Hall of Fame</h3><div class="muted">Awards, draft results, titles and career production — nothing hidden.</div></div></div>
+   <div class="history-controls">
+    <label>Show <select id="hofKind" aria-label="Hall of Fame category"><option value="all">All inductees</option><option value="player">Players</option><option value="coach">Coaches</option></select></label>
+   </div>
+   <div id="hofCount" class="muted small" aria-live="polite"></div>
    <div id="hallOfFameList" class="history-list">Loading inductees…</div>
   </section>
   <section class="card history-card">
@@ -30,7 +34,10 @@
    <div id="conferenceTable" class="history-list">Loading standings…</div>
   </section>`;
  section.append(host);
- const input=host.querySelector('#coachIndexSearch'),list=host.querySelector('#coachIndexList'),champs=host.querySelector('#championTimeline'),hall=host.querySelector('#hallOfFameList'),confSel=host.querySelector('#conferencePick'),seasonSel=host.querySelector('#conferenceSeason'),confTable=host.querySelector('#conferenceTable');
+ const input=host.querySelector('#coachIndexSearch'),list=host.querySelector('#coachIndexList'),champs=host.querySelector('#championTimeline'),hall=host.querySelector('#hallOfFameList'),hofCount=host.querySelector('#hofCount'),hofKind=host.querySelector('#hofKind'),confSel=host.querySelector('#conferencePick'),seasonSel=host.querySelector('#conferenceSeason'),confTable=host.querySelector('#conferenceTable');
+
+ // v0.12.19: induction is stricter, but a long dynasty still passes 24 inductees.
+ let hofLimit=24,hofCategory='all';
 
  function renderCoaches(){
   const rows=api.coaches({query:input.value,limit:40});
@@ -49,13 +56,19 @@
   });
  }
  function renderHall(){
-  const rows=api.hallOfFame?.({limit:24})||[];
+  const all=api.hallOfFame?.({limit:1000})||[];
+  const filtered=all.filter(r=>hofCategory==='all'||r.kind===hofCategory);
+  const rows=filtered.slice(0,hofLimit);
+  hofCount.textContent=!all.length?'':rows.length<filtered.length?`Showing ${rows.length} of ${filtered.length} inductees`:`All ${filtered.length} inductee${filtered.length===1?'':'s'}`;
+  const more=rows.length<filtered.length?`<button type="button" class="history-row history-more" data-hof-more>Show all ${filtered.length} inductees</button>`:'';
   hall.innerHTML=rows.length
-   ?rows.map(r=>`<button type="button" class="history-row" data-hof="${esc(r.id)}" data-hof-kind="${r.kind}"><span class="history-who"><strong>${esc(r.name)}</strong><small>${esc(r.pos)} · ${esc(r.team)}${r.year?' · '+esc(r.year):''}</small><small class="hof-why">${r.reasons.map(esc).join(' · ')}</small></span><span class="history-record">${r.kind==='coach'?'COACH':'PLAYER'}<small>HALL OF FAME</small></span></button>`).join('')
+   ?rows.map(r=>`<button type="button" class="history-row" data-hof="${esc(r.id)}" data-hof-kind="${r.kind}"><span class="history-who"><strong>${esc(r.name)}</strong><small>${esc(r.pos)} · ${esc(r.team)}${r.year?' · '+esc(r.year):''}</small><small class="hof-why">${r.reasons.map(esc).join(' · ')}</small></span><span class="history-record">${r.kind==='coach'?'COACH':'PLAYER'}<small>HALL OF FAME</small></span></button>`).join('')+more
+   :all.length?`<span class="muted">No ${hofCategory==='coach'?'coaches':'players'} are inducted yet.</span>`
    :'<span class="muted">No inductees yet. Awards, draft results, titles and career production qualify a career.</span>';
   hall.querySelectorAll('[data-hof]').forEach(button=>{
    button.onclick=()=>button.dataset.hofKind==='coach'?api.openCoach(button.dataset.hof):api.openPlayer(button.dataset.hof);
   });
+  hall.querySelector('[data-hof-more]')?.addEventListener('click',()=>{hofLimit=filtered.length;renderHall()});
  }
  function renderConference(){
   const seasons=api.seasons?.()||[], conferences=api.conferences?.()||[];
@@ -81,6 +94,7 @@
  confSel.addEventListener('change',renderConference);
  seasonSel.addEventListener('change',renderConference);
  input.addEventListener('input',renderCoaches);
+ hofKind.addEventListener('change',()=>{hofCategory=hofKind.value;hofLimit=24;renderHall()});
  document.addEventListener('click',event=>{
   if(event.target.closest?.('[data-tab="history"],[data-client-tab="history"]'))setTimeout(()=>{renderCoaches();renderChampions();renderHall();renderConference()},0);
  });
