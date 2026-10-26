@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.13</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.14</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -758,6 +758,8 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 .history-record{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
 .history-record small{display:block;font-weight:400}
 @media(max-width:720px){.history-list{max-height:none}}
+
+.history-who .hof-why{color:#8fa3b8;font-size:11px;line-height:1.35}
 
 .v2-lab-card{border-color:#40506a;background:linear-gradient(180deg,#171e29,#141a22)}
 .v2-lab-head{align-items:center}.v2-shadow-score{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:14px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);margin-bottom:10px}.v2-shadow-score>div:first-child{text-align:left}.v2-shadow-score>div:last-child{text-align:right}.v2-shadow-score span{display:block;color:var(--muted);font-size:12px}.v2-shadow-score strong{font-size:32px;line-height:1}.v2-shadow-final{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--muted);text-align:center}.v2-shadow-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px}.v2-shadow-metrics>div{padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}.v2-shadow-metrics span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em}.v2-shadow-metrics strong{font-size:18px}.v2-shadow-safety{padding:9px 10px;border-left:3px solid var(--accent2);background:rgba(143,177,255,.06);font-size:12px;margin:10px 0}.v2-transaction-proof{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:10px 12px;margin:10px 0;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}.v2-transaction-proof>div:first-child{min-width:0}.v2-proof-records{display:flex;gap:7px;align-items:center;white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:750}.v2-leader-card{padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}.v2-event-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:14px 0 6px}.v2-event-feed{max-height:480px;overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}.v2-event-line{display:grid;grid-template-columns:76px minmax(0,1fr) 52px;gap:10px;align-items:start;padding:8px 10px;border-bottom:1px solid var(--line)}.v2-event-line:last-child{border-bottom:0}.v2-event-clock{font-variant-numeric:tabular-nums;font-size:11px;color:var(--muted);white-space:nowrap}.v2-event-copy{min-width:0;font-size:12px}.v2-event-copy strong,.v2-event-copy small{display:block}.v2-event-copy small{color:var(--muted);margin-top:2px}.v2-event-score{text-align:right;font-variant-numeric:tabular-nums;font-weight:750;font-size:12px}
@@ -1932,7 +1934,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.13</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.14</b></span></footer>
   </div>
 </section>
 
@@ -1959,7 +1961,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.12.13</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.12.14</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -5063,7 +5065,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.12.13';
+const APP_VERSION='0.12.14';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -8577,6 +8579,58 @@ function championTimeline({limit=25}={}){
 }
 // App scope is not global by design; the history module reaches these through this bridge.
 if(typeof globalThis!=='undefined')globalThis.DynastyHistoryIndex=Object.freeze({coaches:coachIndexRows,champions:championTimeline,openCoach:showCoachProfile});
+// v0.12.14 — Hall of Fame. Induction uses only recorded, player-visible facts:
+// awards, draft result, career production and coach titles. There is no hidden
+// rating and no new save field; inductees are derived every time from the archive.
+const HOF_MAJOR_AWARD=/^(National|Offensive|Defensive|Quarterback|Running Back|Receiver|Lineman) .*of the Year$/i;
+function hofPlayerPoints(p){
+ const awards=(p.awards||[]).filter(a=>HOF_MAJOR_AWARD.test(String(a.name||'')));
+ const round=p.draftResult?.round||null;
+ const production=productionRating(p);
+ const draft=round===1?25:round===2?15:round===3?8:round?4:0;
+ return {points:Math.round(awards.length*40+draft+Math.max(0,production-55)),awards,round,production};
+}
+function hofPlayerReasons(p,{awards,round}={}){
+ const reasons=awards.slice(0,3).map(a=>`${a.name} ${a.year}`);
+ if(round)reasons.push(round===1?'First-round draft pick':`Round ${round} draft pick`);
+ const c=p.career||{};
+ if((c.passYds||0)>0)reasons.push(`${Math.round(c.passYds).toLocaleString()} career passing yards`);
+ else if((c.rushYds||0)>0)reasons.push(`${Math.round(c.rushYds).toLocaleString()} career rushing yards`);
+ else if((c.recYds||0)>0)reasons.push(`${Math.round(c.recYds).toLocaleString()} career receiving yards`);
+ else if((c.tackles||0)>0)reasons.push(`${Math.round(c.tackles)} career tackles`);
+ else if((c.sacks||0)>0)reasons.push(`${Number(c.sacks).toFixed(1)} career sacks`);
+ return reasons.slice(0,4);
+}
+function hofCoachPoints(c){
+ const totals=coachCareerTotals(c);
+ return {totals,points:Math.round(totals.nationalTitles*50+totals.conferenceTitles*12+totals.coachAwards*20+totals.wins*.15)};
+}
+function hallOfFame({limit=24}={}){
+ if(!universe)return [];
+ const rows=[];
+ for(const p of universe.playerArchive||[]){
+  const facts=hofPlayerPoints(p);
+  const qualified=facts.awards.length>=1||(facts.round===1&&facts.production>=70);
+  if(!qualified||facts.points<55)continue;
+  rows.push({kind:'player',id:p.id,name:p.name,pos:p.pos,team:p.lastTeam||'—',year:p.retiredYear||null,
+   points:facts.points,reasons:hofPlayerReasons(p,facts)});
+ }
+ for(const c of allKnownCoaches()){
+  const {totals,points}=hofCoachPoints(c);
+  const qualified=totals.nationalTitles>=1||totals.conferenceTitles>=3||totals.coachAwards>=2;
+  if(!qualified||points<60)continue;
+  const reasons=[];
+  if(totals.nationalTitles)reasons.push(`${totals.nationalTitles} national title${totals.nationalTitles===1?'':'s'}`);
+  if(totals.conferenceTitles)reasons.push(`${totals.conferenceTitles} conference title${totals.conferenceTitles===1?'':'s'}`);
+  if(totals.coachAwards)reasons.push(`${totals.coachAwards} Coach of the Year`);
+  reasons.push(`${totals.wins}–${totals.losses} career`);
+  rows.push({kind:'coach',id:c.id,name:c.name,pos:'HC',team:c.schoolName||c.status||'—',year:null,points,reasons});
+ }
+ return rows.sort((a,b)=>b.points-a.points||a.name.localeCompare(b.name)).slice(0,limit);
+}
+if(typeof globalThis!=='undefined'&&globalThis.DynastyHistoryIndex)
+ globalThis.DynastyHistoryIndex=Object.freeze({...globalThis.DynastyHistoryIndex,hallOfFame,openPlayer:showPlayerProfile});
+
 
 // v0.12.10 — global search across the universe a dynasty already holds. Read-only:
 // it never loads a deferred archive and never mutates save state.
@@ -12973,9 +13027,13 @@ queue();
   <section class="card history-card">
    <div class="section-head"><div><h3>National champions</h3><div class="muted">Archived seasons in this dynasty.</div></div></div>
    <div id="championTimeline" class="history-list">Loading champions…</div>
+  </section>
+  <section class="card history-card">
+   <div class="section-head"><div><h3>Hall of Fame</h3><div class="muted">Awards, draft results, titles and career production — nothing hidden.</div></div></div>
+   <div id="hallOfFameList" class="history-list">Loading inductees…</div>
   </section>`;
  section.append(host);
- const input=host.querySelector('#coachIndexSearch'),list=host.querySelector('#coachIndexList'),champs=host.querySelector('#championTimeline');
+ const input=host.querySelector('#coachIndexSearch'),list=host.querySelector('#coachIndexList'),champs=host.querySelector('#championTimeline'),hall=host.querySelector('#hallOfFameList');
 
  function renderCoaches(){
   const rows=api.coaches({query:input.value,limit:40});
@@ -12993,11 +13051,20 @@ queue();
    button.onclick=()=>globalThis.DynastyEncyclopedia?.open({kind:'team',name:button.dataset.champ});
   });
  }
+ function renderHall(){
+  const rows=api.hallOfFame?.({limit:24})||[];
+  hall.innerHTML=rows.length
+   ?rows.map(r=>`<button type="button" class="history-row" data-hof="${esc(r.id)}" data-hof-kind="${r.kind}"><span class="history-who"><strong>${esc(r.name)}</strong><small>${esc(r.pos)} · ${esc(r.team)}${r.year?' · '+esc(r.year):''}</small><small class="hof-why">${r.reasons.map(esc).join(' · ')}</small></span><span class="history-record">${r.kind==='coach'?'COACH':'PLAYER'}<small>HALL OF FAME</small></span></button>`).join('')
+   :'<span class="muted">No inductees yet. Awards, draft results, titles and career production qualify a career.</span>';
+  hall.querySelectorAll('[data-hof]').forEach(button=>{
+   button.onclick=()=>button.dataset.hofKind==='coach'?api.openCoach(button.dataset.hof):api.openPlayer(button.dataset.hof);
+  });
+ }
  input.addEventListener('input',renderCoaches);
  document.addEventListener('click',event=>{
-  if(event.target.closest?.('[data-tab="history"],[data-client-tab="history"]'))setTimeout(()=>{renderCoaches();renderChampions()},0);
+  if(event.target.closest?.('[data-tab="history"],[data-client-tab="history"]'))setTimeout(()=>{renderCoaches();renderChampions();renderHall()},0);
  });
- renderCoaches();renderChampions();
+ renderCoaches();renderChampions();renderHall();
 })();
 
 (function(root,factory){
