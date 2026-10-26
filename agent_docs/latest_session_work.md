@@ -1,5 +1,15 @@
 # Latest Session Work
 
+## Current local implementation — history and offseason clarity (2026-10-26)
+
+Approved scope: history accuracy, roster-change explanations and an offseason recap.
+User subsequently authorized push, merge and install. Source is now v0.12.18;
+feature-branch integration, full CI and Mac installation are in progress. Installed
+app and live website remain v0.12.17 until verification. Production website
+publication and balance tuning are not included.
+Implementation and acceptance details: [history_offseason_handoff.md](history_offseason_handoff.md).
+
+
 2026-10-25: Shipped v0.12.11 (release hygiene: real desktop save-folder usage in
 Options, and a docs-consistency test) on top of v0.12.10 — Playbook search over
 programs, coaches and players, storage reporting, desktop update notice and error
@@ -7,8 +17,9 @@ log, and the desktop packages for 0.12.8/0.12.9 which had reached the web only.
 
 ## Current state
 
-- Version `0.12.17` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
-  generated `index.html`.- Default branch `claude/review-improvement-dwjemy`; released source `3da77ac`
+- Version `0.12.18` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
+  generated `index.html`.
+- Default branch `claude/review-improvement-dwjemy`; released source `3da77ac`
   (`v0.12.17`).
 - [Release v0.12.17](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.17)
   is the current desktop Alpha (macOS arm64 + Windows x64 from validation run

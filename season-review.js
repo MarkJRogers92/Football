@@ -86,3 +86,27 @@ function renderSeasonReview(){
 }
 extendRender('dashboard',renderSeasonReview);
 globalThis.DynastySeasonReview={model:seasonReviewModel};
+
+function renderOffseasonRecap(){
+ const dash=document.querySelector('#dashboard'),center=dash?.querySelector('.command-center');if(!center)return;
+ let host=document.querySelector('#offseasonRecap');const m=offseasonRecapModel();
+ if(!m&&universe.phase!=='complete'){if(host)host.hidden=true;return}
+ if(!host){host=document.createElement('section');host.id='offseasonRecap';host.className='card season-review offseason-recap';center.before(host)}
+ host.hidden=false;
+ if(!m){host.innerHTML='<h2>Offseason recap</h2><p class="muted">Roster accounting begins with season review. A starting roster was not recorded for an older offseason already in progress; its totals cannot be reconstructed reliably.</p>';return}
+ const labels={eligibility:'eligibility exhausted',earlyDraft:'early draft declarations',portalOut:'portal departures',signees:'enrolled signees',portalIn:'portal arrivals',walkOns:'walk-ons added',cuts:'roster cuts'};
+ const minus=new Set(['eligibility','earlyDraft','portalOut','cuts']);
+ const list=(rows,empty)=>rows.length?rows.map(p=>'<div class="lineitem"><span>'+esc(p.pos)+' '+esc(p.name)+'<small class="muted"> · '+esc(labels[p.kind])+'</small></span><strong>'+esc(p.rating)+'</strong></div>').join(''):'<p class="muted">'+empty+'</p>';
+ const os=universe.offseason,phase=os?.phase,phases={review:['Run season review','season'],departures:['Process departures','season'],signing:['Enroll signing class','season'],portal:['Resolve transfer portal','season'],spring:['Run spring development','development'],fall:['Run fall camp','development'],preseason:['Open new season','season']};
+ const next=m.complete?['Review opening-day depth chart','depth']:(universe.jobOffers||[]).length?['Choose your next coaching post','program']:phases[phase]||['Review roster','roster'];
+ host.innerHTML='<div class="section-head"><div><div class="eyebrow">'+esc(m.year)+' → '+esc(Number(m.year)+1)+' OFFSEASON RECAP</div><h2>'+esc(m.team)+'</h2><p class="muted">'+(m.complete?'Opening-day roster':'Running totals — later phases are still pending')+'</p></div></div>'
+  +'<h3>Roster accounting</h3><div class="recap-counts"><span><b>'+esc(m.start)+'</b> Starting roster</span>'+Object.keys(labels).map(key=>'<span><b>'+(minus.has(key)?'−':'+')+esc(m[key])+'</b> '+labels[key]+'</span>').join('')+'<span><b>= '+esc(m.current)+'</b> '+(m.complete?'Opening-day':'Current')+' roster</span></div>'
+  +(m.unexplained?'<p class="warn">'+(m.unexplained>0?'+':'')+esc(m.unexplained)+' roster change(s) outside the recorded offseason steps. The ledger does not explain these changes.</p>':'')
+  +'<div class="sr-grid"><section class="sr-block"><h3>Highest evaluated losses</h3><p class="small muted">Staff-estimated ratings at departure, not career rankings.</p>'+list(m.losses,'No departures recorded yet.')+'</section>'
+  +'<section class="sr-block"><h3>Highest evaluated additions</h3><p class="small muted">Staff-estimated ratings at arrival; walk-ons are counted above.</p>'+list(m.additions,'No signees or portal arrivals recorded yet.')+'</section>'
+  +'<section class="sr-block"><h3>Camp development & battles</h3><p class="small muted">Changes in staff estimates, not hidden ability.</p>'+(m.risers.map(p=>'<div class="lineitem"><span>'+esc(p.pos)+' '+esc(p.name)+'</span><strong>+'+esc(p.delta)+'</strong></div>').join('')||'<p class="muted">No positive camp evaluation changes recorded yet.</p>')
+  +m.battles.map(b=>'<p class="compact"><b>'+esc(b.label)+'</b>: '+esc(b.name)+' · '+(b.applied?'currently atop depth chart':'staff recommendation — review depth chart')+'</p>').join('')+'</section></div>'
+  +'<button type="button" data-recap-next>'+esc(next[0])+' →</button><p class="small muted">Opens the relevant screen; does not advance the calendar.</p>';
+ host.querySelector('[data-recap-next]').onclick=()=>document.querySelector('.tabs button[data-tab="'+next[1]+'"]')?.click();
+}
+extendRender('dashboard',renderOffseasonRecap);

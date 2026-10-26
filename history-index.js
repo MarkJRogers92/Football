@@ -22,7 +22,7 @@
    <div id="hallOfFameList" class="history-list">Loading inductees…</div>
   </section>
   <section class="card history-card">
-   <div class="section-head"><div><h3>Conferences</h3><div class="muted">Final standings by archived season. The conference title game is not archived; the best league record is shown first.</div></div></div>
+   <div class="section-head"><div><h3>Conferences</h3><div class="muted">Archived membership and final records. Ordered by conference wins/losses, overall wins/losses, then point differential; not an official title-game result.</div></div></div>
    <div class="history-controls">
     <label>Conference <select id="conferencePick" aria-label="Conference"></select></label>
     <label>Season <select id="conferenceSeason" aria-label="Archived season"></select></label>
@@ -42,10 +42,10 @@
  function renderChampions(){
   const rows=api.champions({limit:25});
   champs.innerHTML=rows.length
-   ?rows.map(r=>`<button type="button" class="history-row" data-champ="${esc(r.champion)}"><span class="history-who"><strong>${esc(r.champion)}</strong><small>${r.year}${r.record?' · '+esc(r.record):''}</small></span><span class="history-record">${r.runnerUp?esc(r.runnerUp):'—'}<small>${r.runnerUp?'runner-up':'no runner-up recorded'}</small></span></button>`).join('')
+   ?rows.map(r=>`<button type="button" class="history-row" data-champ="${esc(r.champion)}" data-school-id="${esc(r.championId??'')}"><span class="history-who"><strong>${esc(r.champion)}</strong><small>${r.year}${r.record?' · '+esc(r.record):''}</small></span><span class="history-record">${r.runnerUp?esc(r.runnerUp):'—'}<small>${r.runnerUp?'runner-up':'no runner-up recorded'}</small></span></button>`).join('')
    :'<span class="muted">Champions appear once a season is archived.</span>';
   champs.querySelectorAll('[data-champ]').forEach(button=>{
-   button.onclick=()=>globalThis.DynastyEncyclopedia?.open({kind:'team',name:button.dataset.champ});
+   button.onclick=()=>globalThis.DynastyEncyclopedia?.open({kind:'team',id:button.dataset.schoolId||undefined,name:button.dataset.champ});
   });
  }
  function renderHall(){
@@ -65,14 +65,17 @@
    return;
   }
   confSel.disabled=seasonSel.disabled=false;
-  if(!confSel.options.length)confSel.innerHTML=conferences.map(name=>`<option>${esc(name)}</option>`).join('');
-  if(!seasonSel.options.length)seasonSel.innerHTML=seasons.map(year=>`<option>${year}</option>`).join('');
+  const conference=confSel.value,year=seasonSel.value;
+  confSel.innerHTML=conferences.map(name=>`<option>${esc(name)}</option>`).join('');
+  seasonSel.innerHTML=seasons.map(year=>`<option>${year}</option>`).join('');
+  if(conferences.includes(conference))confSel.value=conference;
+  if(seasons.some(y=>String(y)===year))seasonSel.value=year;
   const view=api.standings({conference:confSel.value,year:Number(seasonSel.value)});
   if(!view){confTable.innerHTML='<span class="muted">No standings are stored for that season.</span>';return}
-  confTable.innerHTML=`<div class="history-row is-head" role="row"><span class="history-who"><strong>Team</strong></span><span class="history-record">Conf<small>Overall</small></span></div>`
-   +view.rows.map(row=>`<button type="button" class="history-row" data-conf-team="${esc(row.name)}" role="row"><span class="history-who"><strong>${row.place}. ${esc(row.name)}</strong><small>Prestige ${row.prestige} · ${row.pf}–${row.pa} points</small></span><span class="history-record">${row.cw}–${row.cl}<small>${row.w}–${row.l}</small></span></button>`).join('');
+  confTable.innerHTML=(view.membershipEstimated?'<p class="muted">Estimated membership: this older season did not store conferences. Current membership is used where historical data is missing.</p>':'')+`<div class="history-row is-head" role="row"><span class="history-who"><strong>Team</strong></span><span class="history-record">Conf<small>Overall</small></span></div>`
+   +view.rows.map(row=>`<button type="button" class="history-row" data-conf-team="${esc(row.name)}" data-school-id="${esc(row.schoolId??'')}" role="row"><span class="history-who"><strong>${row.place}. ${esc(row.name)}</strong><small>Prestige ${row.prestige} · ${row.pf}–${row.pa} points</small></span><span class="history-record">${row.cw}–${row.cl}<small>${row.w}–${row.l}</small></span></button>`).join('');
   confTable.querySelectorAll('[data-conf-team]').forEach(button=>{
-   button.onclick=()=>globalThis.DynastyEncyclopedia?.open({kind:'team',name:button.dataset.confTeam});
+   button.onclick=()=>globalThis.DynastyEncyclopedia?.open({kind:'team',id:button.dataset.schoolId||undefined,name:button.dataset.confTeam});
   });
  }
  confSel.addEventListener('change',renderConference);

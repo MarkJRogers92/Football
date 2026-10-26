@@ -246,7 +246,7 @@ Players with **no recorded games**: 6,925 of 22,737 (30.5%), holding **12.0 MB**
 (27.9% of the archive). Slimmed to identity + observed reads + draft + awards +
 career totals + exit reason they would hold 1.4 MB.
 
-## Decision — shipped in v0.12.16
+## Historical decision — shipped in v0.12.16 (revised by the local history fix below)
 
 Slimming never-played careers is worth **10.6 MB at season ten** (9.2% of the
 whole save) and it removes nothing that describes a game, because no game
@@ -274,5 +274,26 @@ still carry identity, observed reads and the promise trail (the shape-stabilisin
 keys cost the remaining ~1 MB). Growth per season fell from ~9.0 MB to ~8.0 MB.
 Only records written after v0.12.16 are affected — an existing save keeps its
 full archive until a career is written under the new rule.
+
+### Local history correction — 2026-10-26 (unreleased)
+
+No game appearance does not mean no career history. New summary records now retain
+nonempty recruitment memories, season/camp/evaluation rows, transfers, injuries and
+coach relationships. Identity, promises, awards and draft outcomes still survive as
+before. Existing compact records cannot recover fields already discarded; this is
+not a backfill or a change to simulation balance.
+
+Re-ran the same seed-7 ten-season command, advancing 2027 through 2036 and opening
+2037. Values below use the tool's binary-megabyte divisor (MiB), including the
+new historical membership snapshots and compact last-offseason receipts:
+
+| Measure | Previously measured v0.12.16/v0.12.17 | Local history + recap implementation |
+|---|---|---|
+| Portable save total | 108.2 MiB | 114.1 MiB (+5.9 MiB, about 5.5%) |
+| Player archive | 35.7 MiB | 41.5 MiB |
+| Game archive / rosters / events | 34.3 / 29.4 / 3.7 MiB | 34.3 / 29.4 / 3.7 MiB |
+
+This intentionally trades some archive savings for factual history preservation.
+It measures portable JSON, not a new native-save or IndexedDB benchmark.
 
 

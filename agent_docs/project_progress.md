@@ -2,9 +2,10 @@
 
 ## Version and branch
 
-Source is `0.12.17` on `claude/review-improvement-dwjemy`, tagged `v0.12.11` and
-released with macOS/Windows zips (run 40265266922). Production publish for
-0.12.17 is the `Publish Dynasty Lab` workflow run 40266222649.
+Source is `0.12.18`, integrating history accuracy and offseason clarity into
+`claude/review-improvement-dwjemy`. User authorized push, merge and Mac installation.
+CI verification and installation are pending. Last published desktop/web release:
+v0.12.17 (validation 40265266922; web publish 40266222649).
 
 ## Overall progress
 
