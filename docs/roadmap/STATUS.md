@@ -1,10 +1,10 @@
 # Roadmap execution status
 
 Last reconciled: 2026-10-25, source `e439224` (`v0.12.14`) on
-`claude/review-improvement-dwjemy`. History now carries the coach index and the
-national champion timeline; conference pages, the Hall of Fame and the
-playerArchive rollup are the named packets. Publish for 0.12.13: run 40251817638.
-The previous revision of this file described v0.11.7 and is obsolete.
+`claude/review-improvement-dwjemy`. History carries the coach index, the champion
+timeline and the Hall of Fame; conference pages and the playerArchive rollup are
+the named packets. Publish for 0.12.14: run 40254239373. The previous revision of
+this file described v0.11.7 and is obsolete.
 
 | Packet | Status | Notes |
 | --- | --- | --- |
