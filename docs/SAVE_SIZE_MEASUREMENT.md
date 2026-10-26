@@ -265,13 +265,14 @@ happened. It ships as a **write-time** summary record (`recordTier: 'summary'`):
 
 | | Baseline (v0.12.15) | Summary records (v0.12.16) | Change |
 |---|---|---|---|
-| Season 10 total | 115.4 MB | **107.3 MB** | **−8.1 MB (−7.0%)** |
-| playerArchive | 42.9 MB | 34.8 MB | −8.1 MB |
+| Season 10 total | 115.4 MB | **108.2 MB** | **−7.2 MB (−6.2%)** |
+| playerArchive | 42.9 MB | 35.7 MB | −7.2 MB |
 | gameArchive / rosters / events | 34.3 / 29.4 / 3.7 | 34.3 / 29.4 / 3.7 | unchanged |
 
-The estimate said 10.6 MB; the measured saving is 8.1 MB, because summary records
-still carry identity and observed reads. Growth per season also fell from ~9.0 MB
-to ~7.9 MB. Only records written after v0.12.16 are affected — an existing save
-keeps its full archive until a career is written under the new rule.
+The estimate said 10.6 MB; the measured saving is 7.2 MB, because summary records
+still carry identity, observed reads and the promise trail (the shape-stabilising
+keys cost the remaining ~1 MB). Growth per season fell from ~9.0 MB to ~8.0 MB.
+Only records written after v0.12.16 are affected — an existing save keeps its
+full archive until a career is written under the new rule.
 
 
