@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.12.13 — History index
+
+- History now lists every coach the dynasty has recorded — role, program, career record and seasons tracked — with search by name, program or role and the existing coach profile behind each row.
+- Adds the national champion timeline for archived seasons, with the runner-up where it was recorded; a champion opens the read-only program card.
+- Reads only what the dynasty already stores: no save shape, simulation or gameplay-RNG change.
+
 ## v0.12.12 — Search stays read-only
 
 - Playbook search no longer changes the controlled program. Opening another program shows a read-only program card (record, ranking, prestige, head coach) and leaves Dynasty Mode's program lock intact. The previous build could bypass the disabled selector and switch control, which a save records as "stepped away".

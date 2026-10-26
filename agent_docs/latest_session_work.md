@@ -7,7 +7,7 @@ log, and the desktop packages for 0.12.8/0.12.9 which had reached the web only.
 
 ## Current state
 
-- Version `0.12.12` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
+- Version `0.12.13` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
   generated `index.html`.
 - Default branch `claude/review-improvement-dwjemy`; released source `5501ebf`
   (`v0.12.11`).
