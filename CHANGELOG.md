@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.12.16 — Lean archive records
+
+- Measured the archive on a ten-season dynasty: careers with no games were 30.5% of archived players and 27.9% of the archive's bytes (10.6 MB at season ten), and their scouting trails, coach relationships and empty season rows described nothing that happened.
+- A career with no recorded games is now archived as a summary record — identity, observed reads, draft result, awards, career totals and exit reason. Played careers are archived exactly as before, and existing saves are untouched.
+- Adds `ANALYZE=1` archive composition to `tools/save-size.js` and `tests/archive-summary.js`.
+
 ## v0.12.15 — Conference history
 
 - History adds final conference standings for any archived season: league record, overall record and points for every member, ordered by league record (the conference title game result is not archived, and the panel says so).

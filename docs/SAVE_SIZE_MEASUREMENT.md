@@ -233,6 +233,34 @@ v0.12.10. Any rollup must keep same-seed box scores and every stable ID intact.
   target**, and any reduction should be measured at ten seasons against these
   numbers.
 
-Still no new size code; the rollup remains the open packet.
+## Where those bytes are — 2026-10-25 (`ANALYZE=1`, v0.12.15, ten seasons)
+
+| Group | Bytes | Share of archive |
+|---|---|---|
+| seasonHistory | 11.3 MB | 26.4% |
+| career totals | 0.9 MB | 2.1% |
+| awards | 0.0 MB | 0.1% |
+| everything else (identity, ratings, scouting trails, relationships, camp rows) | 30.7 MB | 71.4% |
+
+Players with **no recorded games**: 6,925 of 22,737 (30.5%), holding **12.0 MB**
+(27.9% of the archive). Slimmed to identity + observed reads + draft + awards +
+career totals + exit reason they would hold 1.4 MB.
+
+## Decision — shipped in v0.12.16
+
+Slimming never-played careers is worth **10.6 MB at season ten** (9.2% of the
+whole save) and it removes nothing that describes a game, because no game
+happened. It ships as a **write-time** summary record (`recordTier: 'summary'`):
+
+- New archives of careers with `career.games === 0` keep identity, perceived and
+  upside reads, portrait seed, draft result, awards, career totals and exit
+  reason. Scouting trails, coach relationships, camp rows and empty season rows
+  are not stored.
+- Played careers are archived exactly as before.
+- **Existing saves are untouched** — this is not a migration. Older dynasties keep
+  their full records and remain loadable; the profile of a summary record shows
+  no season rows rather than zeroed ones.
+- A future measurement should compare a *new* ten-season dynasty against the
+  115.4 MB baseline above; the pass only affects records written after v0.12.16.
 
 

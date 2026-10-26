@@ -7,7 +7,7 @@ log, and the desktop packages for 0.12.8/0.12.9 which had reached the web only.
 
 ## Current state
 
-- Version `0.12.15` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
+- Version `0.12.16` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
   generated `index.html`.
 - Default branch `claude/review-improvement-dwjemy`; released source `857768c`
   (`v0.12.15`).
@@ -41,6 +41,10 @@ log, and the desktop packages for 0.12.8/0.12.9 which had reached the web only.
 - **Release hygiene (0.12.11)**: Options reads the packed app's real
   `Saves` folder size over IPC, and `tests/docs-consistency.js` fails when the
   version file, changelog, README, agent context or roadmap disagree.
+- **Archived-career summary (0.12.16)**: careers with no recorded games are
+  archived as a summary record (identity, reads, draft, awards, career totals,
+  exit). Measured before changing anything: those careers were 27.9% of the
+  archive's bytes.
 - **Ten-season measurement**: 115.4 MB at season ten; `playerArchive` 42.9 MB
   and the only accelerating component — see docs/SAVE_SIZE_MEASUREMENT.md.
 - **Conference history (0.12.15)**: final standings for any archived season,
