@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.12.19 — Hall of Fame browsing and repository hygiene
+
+- The Hall of Fame shows a count (`Showing 24 of 64 inductees`), filters by players or coaches, and offers `Show all`. Stricter induction in v0.12.17 made dynasties longer than the 24-row cap, so most inductees were unreachable. Covered on desktop and mobile.
+- Local evidence runs (`.session-artifacts/`) are ignored instead of showing as untracked work, and the session handoff no longer opens with v0.12.11 notes.
+- No simulation, save-shape or induction-threshold changes.
+
 ## v0.12.18 — History accuracy and offseason clarity
 
 - Championship history records actual finalists and champion records, stable school IDs and season-specific conference membership. Historical links survive renames; standings compare both teams correctly. Missing legacy facts remain unknown or explicitly estimated.

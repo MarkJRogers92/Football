@@ -1,25 +1,20 @@
 # Latest Session Work
 
-## Current local implementation — history and offseason clarity (2026-10-26)
+## v0.12.19 — Hall of Fame browsing and repository hygiene (2026-10-26)
 
-Approved scope: history accuracy, roster-change explanations and an offseason recap.
-Completed: PR #13 merged as 4157493 after full CI 40297216363 passed. Tested
-PR merge and actual merge trees are identical. Mac v0.12.18 installed from CI;
-signature verifies and app.asar matches the ZIP exactly. All 17 save files are
-byte-identical. Backup: ~/Applications/Dynasty Lab 0.12.17.app. App left closed.
-Production website and published GitHub release remain v0.12.17; no production
-publication or balance tuning was performed.
-Implementation and acceptance details: [history_offseason_handoff.md](history_offseason_handoff.md).
-
-
-2026-10-25: Shipped v0.12.11 (release hygiene: real desktop save-folder usage in
-Options, and a docs-consistency test) on top of v0.12.10 — Playbook search over
-programs, coaches and players, storage reporting, desktop update notice and error
-log, and the desktop packages for 0.12.8/0.12.9 which had reached the web only.
+- Hall of Fame now shows a count ("Showing 24 of 64 inductees"), a Players/Coaches
+  category filter and a "Show all" control. Induction got stricter in v0.12.17, but
+  a long dynasty still passed the old 24-row cap, leaving most inductees unreachable.
+  Covered on desktop and 390px mobile in `tests/history-accuracy-browser.js`.
+- `.session-artifacts/` (local evidence runs) is ignored instead of appearing as
+  untracked work.
+- This handoff no longer opens with v0.12.11 release notes.
+- v0.12.18 history and offseason work shipped by PR #13 (merged 4157493, full CI
+  40297216363). Details: [history_offseason_handoff.md](history_offseason_handoff.md).
 
 ## Current state
 
-- Version `0.12.18` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
+- Version `0.12.19` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
   generated `index.html`.
 - Default branch `claude/review-improvement-dwjemy`; released source `3da77ac`
   (`v0.12.17`).
