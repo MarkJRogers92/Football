@@ -3,7 +3,7 @@
 Last reconciled: 2026-10-25, source `f614c84` (`v0.12.17`) on
 `claude/review-improvement-dwjemy`. History carries the coach index, the champion
 timeline and the Hall of Fame; conference pages and the playerArchive rollup are
-the named packets. Publish for 0.12.16: run 40259731404. The previous revision of
+the named packets. Publish for 0.12.17: run 40266222649. The previous revision of
 this file described v0.11.7 and is obsolete.
 
 | Packet | Status | Notes |

@@ -8,20 +8,19 @@ log, and the desktop packages for 0.12.8/0.12.9 which had reached the web only.
 ## Current state
 
 - Version `0.12.17` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
-  generated `index.html`.
-- Default branch `claude/review-improvement-dwjemy`; released source `c89d221`
-  (`v0.12.16`).
-- [Release v0.12.16](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.16)
+  generated `index.html`.- Default branch `claude/review-improvement-dwjemy`; released source `3da77ac`
+  (`v0.12.17`).
+- [Release v0.12.17](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.17)
   is the current desktop Alpha (macOS arm64 + Windows x64 from validation run
-  40259042984). The installed `/Applications/Dynasty Lab.app` is 0.12.16; earlier
-  bundles are kept at `~/Applications/Dynasty Lab 0.12.9.app` … `0.12.15.app`; the
+  40265266922). The installed `/Applications/Dynasty Lab.app` is 0.12.17; earlier
+  bundles are kept at `~/Applications/Dynasty Lab 0.12.9.app` … `0.12.16.app`; the
   three existing save slots are untouched.
-- Earlier releases: [v0.12.15](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.15)
+- Earlier releases: [v0.12.16](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.16)
+  (run 40259042984), [v0.12.15](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.15)
   (run 40256022466), [v0.12.14](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.14)
-  (run 40253412593), [v0.12.13](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.13)
-  (run 40250941307).
-- Production publish for 0.12.16 is the `Publish Dynasty Lab` workflow run
-  40259731404.
+  (run 40253412593).
+- Production publish for 0.12.17 is the `Publish Dynasty Lab` workflow run
+  40266222649.
 - Premium client roadmap milestones A-J remain shipped. Do not re-run them.
 
 ## What this version adds
