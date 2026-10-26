@@ -29,7 +29,12 @@ User requested push, merge and install. Source synchronized to v0.12.18.
 Plan: feature branch, full CI, merge into confirmed default branch
 claude/review-improvement-dwjemy, then install matching CI-built Mac app while
 keeping a v0.12.17 backup and all saves. No production web publication.
-Results pending.
+Completed: PR #13 merged as 4157493 after full CI 40297216363 passed.
+Tested PR merge tree 6a0c594 and actual merge tree 4157493 are identical.
+Mac v0.12.18 installed; signature verifies and app.asar matches the CI ZIP.
+All 17 save files are byte-identical. Backup: ~/Applications/Dynasty Lab 0.12.17.app.
+App left closed. No production web or GitHub release publication.
+Installation evidence: /var/folders/q6/wd0w60596vg_rnm736shphw00000gn/T/dynasty-v01218-r82nlimi/installation-verification.json.
 
 ## Deferred work Extended
 league-health metrics, Hall-of-Fame transparency, notarisation and balance tuning

@@ -3,10 +3,12 @@
 ## Current local implementation — history and offseason clarity (2026-10-26)
 
 Approved scope: history accuracy, roster-change explanations and an offseason recap.
-User subsequently authorized push, merge and install. Source is now v0.12.18;
-feature-branch integration, full CI and Mac installation are in progress. Installed
-app and live website remain v0.12.17 until verification. Production website
-publication and balance tuning are not included.
+Completed: PR #13 merged as 4157493 after full CI 40297216363 passed. Tested
+PR merge and actual merge trees are identical. Mac v0.12.18 installed from CI;
+signature verifies and app.asar matches the ZIP exactly. All 17 save files are
+byte-identical. Backup: ~/Applications/Dynasty Lab 0.12.17.app. App left closed.
+Production website and published GitHub release remain v0.12.17; no production
+publication or balance tuning was performed.
 Implementation and acceptance details: [history_offseason_handoff.md](history_offseason_handoff.md).
 
 
@@ -23,8 +25,8 @@ log, and the desktop packages for 0.12.8/0.12.9 which had reached the web only.
   (`v0.12.17`).
 - [Release v0.12.17](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.17)
   is the current desktop Alpha (macOS arm64 + Windows x64 from validation run
-  40265266922). The installed `/Applications/Dynasty Lab.app` is 0.12.17; earlier
-  bundles are kept at `~/Applications/Dynasty Lab 0.12.9.app` … `0.12.16.app`; the
+  40265266922). Installed `/Applications/Dynasty Lab.app` is CI-built v0.12.18;
+  backups are kept at `~/Applications/Dynasty Lab 0.12.9.app` … `0.12.17.app`; the
   three existing save slots are untouched.
 - Earlier releases: [v0.12.16](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.16)
   (run 40259042984), [v0.12.15](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.15)
