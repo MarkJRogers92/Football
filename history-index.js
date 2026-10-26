@@ -20,9 +20,17 @@
   <section class="card history-card">
    <div class="section-head"><div><h3>Hall of Fame</h3><div class="muted">Awards, draft results, titles and career production — nothing hidden.</div></div></div>
    <div id="hallOfFameList" class="history-list">Loading inductees…</div>
+  </section>
+  <section class="card history-card">
+   <div class="section-head"><div><h3>Conferences</h3><div class="muted">Final standings by archived season. The conference title game is not archived; the best league record is shown first.</div></div></div>
+   <div class="history-controls">
+    <label>Conference <select id="conferencePick" aria-label="Conference"></select></label>
+    <label>Season <select id="conferenceSeason" aria-label="Archived season"></select></label>
+   </div>
+   <div id="conferenceTable" class="history-list">Loading standings…</div>
   </section>`;
  section.append(host);
- const input=host.querySelector('#coachIndexSearch'),list=host.querySelector('#coachIndexList'),champs=host.querySelector('#championTimeline'),hall=host.querySelector('#hallOfFameList');
+ const input=host.querySelector('#coachIndexSearch'),list=host.querySelector('#coachIndexList'),champs=host.querySelector('#championTimeline'),hall=host.querySelector('#hallOfFameList'),confSel=host.querySelector('#conferencePick'),seasonSel=host.querySelector('#conferenceSeason'),confTable=host.querySelector('#conferenceTable');
 
  function renderCoaches(){
   const rows=api.coaches({query:input.value,limit:40});
@@ -49,9 +57,29 @@
    button.onclick=()=>button.dataset.hofKind==='coach'?api.openCoach(button.dataset.hof):api.openPlayer(button.dataset.hof);
   });
  }
+ function renderConference(){
+  const seasons=api.seasons?.()||[], conferences=api.conferences?.()||[];
+  if(!seasons.length){
+   confSel.disabled=seasonSel.disabled=true;
+   confTable.innerHTML='<span class="muted">Conference standings appear once a season is archived.</span>';
+   return;
+  }
+  confSel.disabled=seasonSel.disabled=false;
+  if(!confSel.options.length)confSel.innerHTML=conferences.map(name=>`<option>${esc(name)}</option>`).join('');
+  if(!seasonSel.options.length)seasonSel.innerHTML=seasons.map(year=>`<option>${year}</option>`).join('');
+  const view=api.standings({conference:confSel.value,year:Number(seasonSel.value)});
+  if(!view){confTable.innerHTML='<span class="muted">No standings are stored for that season.</span>';return}
+  confTable.innerHTML=`<div class="history-row is-head" role="row"><span class="history-who"><strong>Team</strong></span><span class="history-record">Conf<small>Overall</small></span></div>`
+   +view.rows.map(row=>`<button type="button" class="history-row" data-conf-team="${esc(row.name)}" role="row"><span class="history-who"><strong>${row.place}. ${esc(row.name)}</strong><small>Prestige ${row.prestige} · ${row.pf}–${row.pa} points</small></span><span class="history-record">${row.cw}–${row.cl}<small>${row.w}–${row.l}</small></span></button>`).join('');
+  confTable.querySelectorAll('[data-conf-team]').forEach(button=>{
+   button.onclick=()=>globalThis.DynastyEncyclopedia?.open({kind:'team',name:button.dataset.confTeam});
+  });
+ }
+ confSel.addEventListener('change',renderConference);
+ seasonSel.addEventListener('change',renderConference);
  input.addEventListener('input',renderCoaches);
  document.addEventListener('click',event=>{
-  if(event.target.closest?.('[data-tab="history"],[data-client-tab="history"]'))setTimeout(()=>{renderCoaches();renderChampions();renderHall()},0);
+  if(event.target.closest?.('[data-tab="history"],[data-client-tab="history"]'))setTimeout(()=>{renderCoaches();renderChampions();renderHall();renderConference()},0);
  });
- renderCoaches();renderChampions();renderHall();
+ renderCoaches();renderChampions();renderHall();renderConference();
 })();

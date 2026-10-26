@@ -1,6 +1,6 @@
 # Roadmap execution status
 
-Last reconciled: 2026-10-25, source `e439224` (`v0.12.14`) on
+Last reconciled: 2026-10-25, source `e439224` (`v0.12.15`) on
 `claude/review-improvement-dwjemy`. History carries the coach index, the champion
 timeline and the Hall of Fame; conference pages and the playerArchive rollup are
 the named packets. Publish for 0.12.14: run 40254239373. The previous revision of
@@ -19,7 +19,7 @@ this file described v0.11.7 and is obsolete.
 | v0.11 program economy | SHIPPED | |
 | v0.11.8 audit maintenance | SHIPPED | source reconciliation + publish guard |
 | v0.12 premium client | SHIPPED | milestones A-J of docs/DYNASTY_LAB_PREMIUM_CLIENT_DESIGN_ROADMAP.md |
-| v0.12 encyclopedia | IN PROGRESS | Playbook search (v0.12.10), coach index and champion timeline (v0.12.13), Hall of Fame (v0.12.14); conference pages remain |
+| v0.12 encyclopedia | SHIPPED | Playbook search (v0.12.10), coach index and champion timeline (v0.12.13), Hall of Fame (v0.12.14), conference standings (v0.12.15) |
 | storage reduction | MEASURED, NOT STARTED | compaction shipped in v0.9.49; `playerArchive` (+4.1 MB/season) is now the first target |
 
 `SHIPPED` means the packet is in the released source and reachable from the

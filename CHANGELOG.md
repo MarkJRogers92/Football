@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.12.15 — Conference history
+
+- History adds final conference standings for any archived season: league record, overall record and points for every member, ordered by league record (the conference title game result is not archived, and the panel says so).
+- Choosing a program opens the existing read-only program card.
+- Derived from the season records the save already keeps — no new save field, no simulation or RNG change.
+
 ## v0.12.14 — Hall of Fame
 
 - History adds a Hall of Fame. Retired players are inducted for major awards, a first-round draft result and career production; coaches for national titles, conference titles and Coach of the Year awards. Every inductee lists the reasons and opens the existing player or coach profile.

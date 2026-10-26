@@ -80,3 +80,31 @@ test('induction is deterministic and read-only', async()=>{
  assert.deepEqual(second,first,'repeat calls return the same list');
  assert.equal(snapshot(),before,'induction never mutates the universe');
 });
+
+test('conference standings filter by league and rank the league record', async()=>{
+ const e=await setup(9301),u=e.universe;
+ const conf=u.teams[0].conference, inConf=u.teams.filter(t=>t.conference===conf);
+ const records=u.teams.map(t=>({name:t.name,w:6,l:4,cw:3,cl:2,pf:300,pa:250,prestige:t.prestige}));
+ const top=records.find(r=>r.name===inConf[0].name); top.cw=9; top.cl=0; top.w=11;
+ const second=records.find(r=>r.name===inConf[1].name); second.cw=8; second.cl=1;
+ u.history.unshift({type:'season',year:2031,champion:'X',top10:[],records});
+ const view=e.conferenceStandings({conference:conf,year:2031});
+ assert.equal(view.year,2031);
+ assert.equal(view.conference,conf);
+ assert.ok(view.rows.length>=8,'a conference shows its members');
+ assert.ok(view.rows.every(r=>e.T(r.name).conference===conf),'only that conference is listed');
+ assert.equal(view.rows[0].place,1);
+ assert.equal(view.rows[0].cw,9,'the best league record leads');
+ for(let i=1;i<view.rows.length;i++){
+  const a=view.rows[i-1],b=view.rows[i];
+  assert.ok(a.cw>b.cw||(a.cw===b.cw&&a.cl<=b.cl),'league record orders the table');
+ }
+ assert.ok(e.conferenceNames().includes(conf));
+ assert.deepEqual(e.historySeasons(),[2031]);
+});
+
+test('a dynasty with no archived season has no conference standings', async()=>{
+ const e=await setup(9302);
+ assert.equal(e.conferenceStandings(),null);
+ assert.deepEqual(e.historySeasons(),[]);
+});

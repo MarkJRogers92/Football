@@ -7,7 +7,7 @@ log, and the desktop packages for 0.12.8/0.12.9 which had reached the web only.
 
 ## Current state
 
-- Version `0.12.14` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
+- Version `0.12.15` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
   generated `index.html`.
 - Default branch `claude/review-improvement-dwjemy`; released source `e439224`
   (`v0.12.14`).
@@ -41,6 +41,9 @@ log, and the desktop packages for 0.12.8/0.12.9 which had reached the web only.
 - **Release hygiene (0.12.11)**: Options reads the packed app's real
   `Saves` folder size over IPC, and `tests/docs-consistency.js` fails when the
   version file, changelog, README, agent context or roadmap disagree.
+- **Conference history (0.12.15)**: final standings for any archived season,
+  ordered by league record, with the program card behind each row. Derived from
+  the stored season records.
 - **Hall of Fame (0.12.14)**: retired players qualify on major awards, a
   first-round draft result and career production; coaches on national titles,
   conference titles and Coach of the Year. Reasons are printed, induction is

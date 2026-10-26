@@ -2,7 +2,7 @@
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.12.14';
+const APP_VERSION='0.12.15';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -3567,6 +3567,28 @@ function hallOfFame({limit=24}={}){
 }
 if(typeof globalThis!=='undefined'&&globalThis.DynastyHistoryIndex)
  globalThis.DynastyHistoryIndex=Object.freeze({...globalThis.DynastyHistoryIndex,hallOfFame,openPlayer:showPlayerProfile});
+// v0.12.15 — conference history from the season records the save already keeps.
+// Conference membership is static in this universe; the archive stores each team's
+// final records, so standings are derived, never stored twice.
+function historySeasons(){ return (universe?.history||[]).filter(h=>h.type==='season').map(h=>h.year); }
+function conferenceNames(){ return [...new Set((universe?.teams||[]).map(t=>t.conference).filter(Boolean))].sort(); }
+function conferenceStandings({conference,year}={}){
+ if(!universe)return null;
+ const seasons=(universe.history||[]).filter(h=>h.type==='season');
+ if(!seasons.length)return null;
+ const entry=(year!=null&&seasons.find(h=>h.year===year))||seasons[0];
+ const controlled=T($('#userTeam')?.value)?.conference;
+ const name=conference||controlled||conferenceNames()[0];
+ const rows=(entry.records||[])
+  .filter(r=>{const t=T(r.name);return t&&t.conference===name})
+  .map(r=>({name:r.name,w:r.w??0,l:r.l??0,cw:r.cw??0,cl:r.cl??0,pf:r.pf??0,pa:r.pa??0,prestige:r.prestige??0}))
+  .sort((a,b)=>b.cw-a.cw||a.cl-b.cl||b.w-b.l||(b.pf-b.pa)-(a.pf-a.pa));
+ return {year:entry.year,conference:name,rows:rows.map((row,index)=>({...row,place:index+1}))};
+}
+if(typeof globalThis!=='undefined'&&globalThis.DynastyHistoryIndex)
+ globalThis.DynastyHistoryIndex=Object.freeze({...globalThis.DynastyHistoryIndex,
+  seasons:historySeasons,conferences:conferenceNames,standings:conferenceStandings});
+
 
 
 // v0.12.10 — global search across the universe a dynasty already holds. Read-only:
