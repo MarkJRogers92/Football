@@ -17,9 +17,9 @@ test('a career with no games is archived as a summary record', async()=>{
  const row=u.playerArchive.find(x=>x.id==='summary-x');
  assert.ok(row,'the player is still archived and findable');
  assert.equal(row.recordTier,'summary');
- assert.equal(row.seasonHistory,undefined,'no empty season rows are kept');
+ assert.deepEqual(row.seasonHistory,[],'no empty season rows are stored, but the key stays shape-stable');
+ assert.deepEqual(row.coachRelationships,{},'relationship trails are not stored');
  assert.equal(row.scoutingDomains,undefined);
- assert.equal(row.coachRelationships,undefined);
  assert.equal(row.campHistory,undefined);
  assert.equal(row.name,'Slim Walker');
  assert.equal(row.pos,p.pos);

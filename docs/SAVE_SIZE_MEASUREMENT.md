@@ -252,15 +252,26 @@ Slimming never-played careers is worth **10.6 MB at season ten** (9.2% of the
 whole save) and it removes nothing that describes a game, because no game
 happened. It ships as a **write-time** summary record (`recordTier: 'summary'`):
 
-- New archives of careers with `career.games === 0` keep identity, perceived and
-  upside reads, portrait seed, draft result, awards, career totals and exit
-  reason. Scouting trails, coach relationships, camp rows and empty season rows
-  are not stored.
+- New archives of careers with no recorded games keep identity, perceived and
+  upside reads, portrait seed, draft result, awards, career totals, promise trail,
+  staff trust and exit reason. Scouting trails, coach relationships, camp rows and
+  season rows are not stored (the keys stay present and empty so a record survives
+  a save/load round trip unchanged).
 - Played careers are archived exactly as before.
 - **Existing saves are untouched** — this is not a migration. Older dynasties keep
   their full records and remain loadable; the profile of a summary record shows
   no season rows rather than zeroed ones.
-- A future measurement should compare a *new* ten-season dynasty against the
-  115.4 MB baseline above; the pass only affects records written after v0.12.16.
+### Measured result (same seed, ten seasons)
+
+| | Baseline (v0.12.15) | Summary records (v0.12.16) | Change |
+|---|---|---|---|
+| Season 10 total | 115.4 MB | **107.3 MB** | **−8.1 MB (−7.0%)** |
+| playerArchive | 42.9 MB | 34.8 MB | −8.1 MB |
+| gameArchive / rosters / events | 34.3 / 29.4 / 3.7 | 34.3 / 29.4 / 3.7 | unchanged |
+
+The estimate said 10.6 MB; the measured saving is 8.1 MB, because summary records
+still carry identity and observed reads. Growth per season also fell from ~9.0 MB
+to ~7.9 MB. Only records written after v0.12.16 are affected — an existing save
+keeps its full archive until a career is written under the new rule.
 
 

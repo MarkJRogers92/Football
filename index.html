@@ -5668,11 +5668,15 @@ const ARCHIVE_FIELDS=['id','name','pos','style','portraitSeed','portraitVersion'
 // and season rows exist but describe nothing that happened, so a career with no
 // games is archived as a summary record: identity, observed reads, draft, awards,
 // exit. Played careers are archived exactly as before.
-const ARCHIVE_SUMMARY_FIELDS=['id','name','pos','style','portraitSeed','portraitVersion','jerseyNumber','height','weight','year','eligibilityUsed','redshirtUsed','redshirtSeason','perceived','perceivedUpside','origin'];
+const ARCHIVE_SUMMARY_FIELDS=['id','name','pos','style','portraitSeed','portraitVersion','jerseyNumber','height','weight','year','eligibilityUsed','redshirtUsed','redshirtSeason','perceived','perceivedUpside','origin','promise','promises','staffTrust'];
 function archiveRecord(p,team,reason){
  const played=(p.career?.games||0)>0||(p.stats?.games||0)>0;
  if(!played){
-  const out={lastTeam:team.name,retiredYear:universe.year,exitReason:reason,redshirtActive:false,injury:null,injuryWeeks:0,stats:packStats(p.stats),career:packStats(p.career),recordTier:'summary'};
+  // Keep the keys normalizeUniverse fills in, so a summary record survives a
+  // save/load round trip byte-identical instead of growing defaults on load.
+  const out={lastTeam:team.name,retiredYear:universe.year,exitReason:reason,redshirtActive:false,redshirtUsed:!!p.redshirtUsed,
+   injury:null,injuryWeeks:0,stats:packStats(p.stats),career:packStats(p.career),recordTier:'summary',
+   awards:p.awards||[],seasonHistory:[],coachRelationships:{},primaryRecruiterCoachId:p.primaryRecruiterCoachId??null};
   for(const key of ARCHIVE_SUMMARY_FIELDS)if(p[key]!==undefined)out[key]=p[key];
   if(p.awards?.length)out.awards=p.awards;
   if(p.draftResult)out.draftResult={year:p.draftResult.year,label:p.draftResult.label,round:p.draftResult.round,pick:p.draftResult.pick};
