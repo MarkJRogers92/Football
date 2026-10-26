@@ -16,23 +16,27 @@
 
 - Version `0.12.19` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
   generated `index.html`.
-- Default branch `claude/review-improvement-dwjemy`; released source `3da77ac`
-  (`v0.12.17`).
-- [Release v0.12.17](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.17)
+- Default branch `claude/review-improvement-dwjemy`; released source `f03383b`
+  (`v0.12.19`).
+- [Release v0.12.19](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.19)
   is the current desktop Alpha (macOS arm64 + Windows x64 from validation run
-  40265266922). Installed `/Applications/Dynasty Lab.app` is CI-built v0.12.18;
-  backups are kept at `~/Applications/Dynasty Lab 0.12.9.app` … `0.12.17.app`; the
-  three existing save slots are untouched.
+  40419862749). Installed `/Applications/Dynasty Lab.app` is CI-built v0.12.19
+  (ZIP hash and signature verified, 17 save files untouched); backups are kept at
+  `~/Applications/Dynasty Lab 0.12.9.app` … `0.12.18.app`.
 - Earlier releases: [v0.12.16](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.16)
   (run 40259042984), [v0.12.15](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.15)
   (run 40256022466), [v0.12.14](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.14)
   (run 40253412593).
-- Production publish for 0.12.17 is the `Publish Dynasty Lab` workflow run
-  40266222649.
+- Production publish for 0.12.19 is the `Publish Dynasty Lab` workflow run
+  40421035607; the live site serves 0.12.19.
 - Premium client roadmap milestones A-J remain shipped. Do not re-run them.
 
 ## What this version adds
 
+- **Hall of Fame browsing (0.12.19)** (`history-index.js`): inductee count,
+  players/coaches filter and `Show all`. Induction got stricter in 0.12.17, but a
+  long dynasty still exceeded the old 24-row cap and the rest were unreachable.
+  Desktop + mobile coverage in `tests/history-accuracy-browser.js`.
 - **Playbook search** (`app.js` `encyclopediaSearch`/`encyclopediaOpen`,
   `globalThis.DynastyEncyclopedia` bridge, `game-hud.js`): two characters list
   matching programs, coaches and players above the section matches; Enter or a

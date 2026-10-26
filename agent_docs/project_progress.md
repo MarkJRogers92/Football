@@ -2,12 +2,13 @@
 
 ## Version and branch
 
-Source is `0.12.18`, integrating history accuracy and offseason clarity into
-`claude/review-improvement-dwjemy`. User authorized push, merge and Mac installation.
-PR #13 merged as 4157493 after full CI 40297216363 passed. Mac v0.12.18 is
-installed from its matching artifact; signature/ZIP hash verified, all 17 save
-files unchanged and v0.12.17 app backed up. Last published desktop/web release:
-v0.12.17 (validation 40265266922; web publish 40266222649).
+Source is `0.12.19` on `claude/review-improvement-dwjemy`. PR #14 merged as
+f03383b after full CI 40419862749 passed; v0.12.19 adds Hall of Fame browsing
+(count, players/coaches filter, show-all) and repository hygiene. Mac v0.12.19 is
+installed from its matching artifact (signature and ZIP hash verified, 17 save
+files untouched, v0.12.18 app backed up). Published desktop and web release is
+v0.12.19 (web publish 40421035607). v0.12.18 added history accuracy, off-field
+career preservation and the offseason recap (PR #13).
 
 ## Overall progress
 
