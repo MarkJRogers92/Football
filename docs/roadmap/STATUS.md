@@ -1,6 +1,6 @@
 # Roadmap execution status
 
-Last reconciled: 2026-10-25, source `e439224` (`v0.12.15`) on
+Last reconciled: 2026-10-25, source `857768c` (`v0.12.15`) on
 `claude/review-improvement-dwjemy`. History carries the coach index, the champion
 timeline and the Hall of Fame; conference pages and the playerArchive rollup are
 the named packets. Publish for 0.12.14: run 40254239373. The previous revision of
