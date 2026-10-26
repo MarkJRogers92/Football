@@ -9,20 +9,20 @@ log, and the desktop packages for 0.12.8/0.12.9 which had reached the web only.
 
 - Version `0.12.15` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
   generated `index.html`.
-- Default branch `claude/review-improvement-dwjemy`; released source `e439224`
-  (`v0.12.14`).
-- [Release v0.12.14](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.14)
+- Default branch `claude/review-improvement-dwjemy`; released source `857768c`
+  (`v0.12.15`).
+- [Release v0.12.15](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.15)
   is the current desktop Alpha (macOS arm64 + Windows x64 from validation run
-  40253412593). The installed `/Applications/Dynasty Lab.app` is 0.12.14; earlier
-  bundles are kept at `~/Applications/Dynasty Lab 0.12.9.app` … `0.12.13.app`; the
+  40256022466). The installed `/Applications/Dynasty Lab.app` is 0.12.15; earlier
+  bundles are kept at `~/Applications/Dynasty Lab 0.12.9.app` … `0.12.14.app`; the
   three existing save slots are untouched.
-- Earlier releases: [v0.12.13](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.13)
+- Earlier releases: [v0.12.14](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.14)
+  (run 40253412593), [v0.12.13](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.13)
   (run 40250941307), [v0.12.12](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.12)
   (run 40233735858), [v0.12.11](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.11)
-  (run 40232083893), [v0.12.10](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.10)
-  (run 40229188911).
-- Production publish for 0.12.14 is the `Publish Dynasty Lab` workflow run
-  40254239373.
+  (run 40232083893).
+- Production publish for 0.12.15 is the `Publish Dynasty Lab` workflow run
+  40256810129.
 - Premium client roadmap milestones A-J remain shipped. Do not re-run them.
 
 ## What this version adds
@@ -41,6 +41,8 @@ log, and the desktop packages for 0.12.8/0.12.9 which had reached the web only.
 - **Release hygiene (0.12.11)**: Options reads the packed app's real
   `Saves` folder size over IPC, and `tests/docs-consistency.js` fails when the
   version file, changelog, README, agent context or roadmap disagree.
+- **Ten-season measurement**: 115.4 MB at season ten; `playerArchive` 42.9 MB
+  and the only accelerating component — see docs/SAVE_SIZE_MEASUREMENT.md.
 - **Conference history (0.12.15)**: final standings for any archived season,
   ordered by league record, with the program card behind each row. Derived from
   the stored season records.

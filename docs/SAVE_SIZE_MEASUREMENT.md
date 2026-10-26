@@ -210,3 +210,29 @@ packed export shape — the same bytes the browser writes.
 Still measurement plus the already-shipped compaction; no new size code in
 v0.12.10. Any rollup must keep same-seed box scores and every stable ID intact.
 
+## Ten-season measurement — 2026-10-25 (v0.12.14, seed 7)
+
+`SEASONS=10 node tools/save-size.js`, same packed-export shape.
+
+| Season | Total | gameArchive | playerArchive | rosters | recruits | events | compacted games |
+|---|---|---|---|---|---|---|---|
+| 2033 | 79.2 MB | 25.0 | 21.2 | 29.8 | 2.0 | 2.2 | 1,947 |
+| 2034 | 88.7 MB | 27.4 | 27.6 | 29.0 | 2.0 | 2.5 | 2,596 |
+| 2035 | 98.2 MB | 29.6 | 33.8 | 28.6 | 2.0 | 2.9 | 3,245 |
+| 2036 | 106.4 MB | 31.9 | 37.7 | 29.5 | 2.0 | 3.3 | 3,894 |
+| 2037 | 115.4 MB | 34.3 | 42.9 | 29.4 | 2.0 | 3.7 | 4,543 |
+
+- A ten-season dynasty is **115 MB**, against an earlier extrapolation of
+  130-150 MB. Growth settles near **+9 MB/season**, not +6-7 as the six-season
+  window suggested.
+- **`playerArchive` is 37% of the save and the only component still accelerating**
+  (+5.1 MB in the last season, 42.9 MB total). `gameArchive` grows a steady
+  +2.3 MB with compaction doing its job; `rosters` is flat at ~29 MB; `events`
+  is still a rounding error at 3.7 MB.
+- This is the before-measurement for the rollup: **`playerArchive` is the
+  target**, and any reduction should be measured at ten seasons against these
+  numbers.
+
+Still no new size code; the rollup remains the open packet.
+
+
