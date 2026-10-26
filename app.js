@@ -2,7 +2,7 @@
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.12.16';
+const APP_VERSION='0.12.17';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -3570,14 +3570,16 @@ function hallOfFame({limit=24}={}){
  const rows=[];
  for(const p of universe.playerArchive||[]){
   const facts=hofPlayerPoints(p);
-  const qualified=facts.awards.length>=1||(facts.round===1&&facts.production>=70);
-  if(!qualified||facts.points<55)continue;
+  // A single award season is common; induction needs a career argument. Measured
+  // on ten-season dynasties: the old rule produced ~25 inductees a season.
+  const qualified=facts.awards.length>=2||(facts.awards.length>=1&&facts.round===1)||(facts.round===1&&facts.production>=85);
+  if(!qualified||facts.points<90)continue;
   rows.push({kind:'player',id:p.id,name:p.name,pos:p.pos,team:p.lastTeam||'—',year:p.retiredYear||null,
    points:facts.points,reasons:hofPlayerReasons(p,facts)});
  }
  for(const c of allKnownCoaches()){
   const {totals,points}=hofCoachPoints(c);
-  const qualified=totals.nationalTitles>=1||totals.conferenceTitles>=3||totals.coachAwards>=2;
+  const qualified=totals.nationalTitles>=1||totals.conferenceTitles>=5||totals.coachAwards>=3;
   if(!qualified||points<60)continue;
   const reasons=[];
   if(totals.nationalTitles)reasons.push(`${totals.nationalTitles} national title${totals.nationalTitles===1?'':'s'}`);

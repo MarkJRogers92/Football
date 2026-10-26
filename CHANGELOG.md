@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.12.17 — League health pass
+
+- Adds `tools/league-health.js`: ten seasons of title, conference, playoff, award, prestige, roster, class-size, injury and Hall-of-Fame output in one run, driving the interactive offseason the way the interface does.
+- Ten-season findings are recorded in `docs/LEAGUE_HEALTH_2026-10-25.md`. Titles, prestige, roster size, injuries and recruiting measured healthy on two independent seeds.
+- Hall of Fame induction tightened. Before: 254–268 inductees after ten seasons (about 25 a season). A single award season no longer qualifies a player — it takes two major awards, or one plus a first-round draft result, or a strong first-round career. Coaches need a national title, five conference titles or three Coach of the Year awards.
+
 ## v0.12.16 — Lean archive records
 
 - Measured the archive on a ten-season dynasty: careers with no games were 30.5% of archived players and 27.9% of the archive's bytes (10.6 MB at season ten), and their scouting trails, coach relationships and empty season rows described nothing that happened.

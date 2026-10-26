@@ -108,3 +108,18 @@ test('a dynasty with no archived season has no conference standings', async()=>{
  assert.equal(e.conferenceStandings(),null);
  assert.deepEqual(e.historySeasons(),[]);
 });
+
+test('one award season alone is not a hall of fame career', async()=>{
+ const e=await setup(9205),u=e.universe;
+ u.playerArchive.push({id:'hof-one',name:'One Good Year',pos:'WR',lastTeam:'Chicago Metropolitan',retiredYear:2031,
+  perceived:70,draftResult:null,awards:[{year:2030,name:'Receiver of the Year'}],career:{recYds:2600,recTD:22}});
+ assert.equal(e.hallOfFame().some(r=>r.id==='hof-one'),false,'a single award without a draft case is not enough');
+});
+
+test('two major awards carry a career without a draft result', async()=>{
+ const e=await setup(9206),u=e.universe;
+ u.playerArchive.push({id:'hof-two',name:'Twice Honored',pos:'LB',lastTeam:'Chicago Metropolitan',retiredYear:2031,
+  perceived:78,draftResult:null,awards:[{year:2029,name:'Defensive Player of the Year'},{year:2030,name:'National Player of the Year'}],
+  career:{tackles:410,sacks:38}});
+ assert.ok(e.hallOfFame().some(r=>r.id==='hof-two'),'two major awards are a career argument');
+});

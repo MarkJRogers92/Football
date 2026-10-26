@@ -7,9 +7,7 @@ log, and the desktop packages for 0.12.8/0.12.9 which had reached the web only.
 
 ## Current state
 
-- Version `0.12.16` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
-  generated `index.html`.
-- Version `0.12.16` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
+- Version `0.12.17` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
   generated `index.html`.
 - Default branch `claude/review-improvement-dwjemy`; released source `c89d221`
   (`v0.12.16`).
@@ -42,6 +40,10 @@ log, and the desktop packages for 0.12.8/0.12.9 which had reached the web only.
 - **Release hygiene (0.12.11)**: Options reads the packed app's real
   `Saves` folder size over IPC, and `tests/docs-consistency.js` fails when the
   version file, changelog, README, agent context or roadmap disagree.
+- **League health pass (0.12.17)**: `tools/league-health.js` reports ten-season
+  distributions; findings in docs/LEAGUE_HEALTH_2026-10-25.md. Titles, prestige,
+  rosters, injuries and recruiting measured healthy on two seeds. Hall of Fame
+  selectivity fixed (254 → 64 inductees after ten seasons).
 - **Archived-career summary (0.12.16)**: careers with no recorded games are
   archived as a summary record (identity, reads, draft, awards, career totals,
   exit). Measured before changing anything: those careers were 27.9% of the
