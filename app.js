@@ -2,7 +2,7 @@
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.12.17';
+const APP_VERSION='0.12.18';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -596,9 +596,9 @@ function ensurePortrait(p){if(!p)return p;p.portraitSeed??=portraitSeedFor();p.p
 const ARCHIVE_FIELDS=['id','name','pos','style','portraitSeed','portraitVersion','jerseyNumber','height','weight','year','eligibilityUsed','redshirtUsed','redshirtSeason','perceived','perceivedUpside','speed','power','technique','iq','health','wear','origin','recruitingMemory','primaryRecruiterCoachId','coachRelationships','coachDeparturePressure','transferHistory','promise','promises','staffTrust','currentSchoolId','trainingFocus','scoutConfidence','scoutingDomains','scoutingHistory','positionFamiliarity','requestedPositionChange','seasonHistory','campHistory','injuryHistory','awards'];
 // v0.12.16 — measured: players who never took a snap are 30.5% of the archive and
 // 27.9% of its bytes (10.6 MB at season ten). Their scouting trails, relationships
-// and season rows exist but describe nothing that happened, so a career with no
-// games is archived as a summary record: identity, observed reads, draft, awards,
-// exit. Played careers are archived exactly as before.
+// are compacted for careers with no games. Recorded off-field events still count
+// as history: keep recruitment, seasons, camps, transfers, injuries and evaluations.
+// Played careers are archived exactly as before.
 const ARCHIVE_SUMMARY_FIELDS=['id','name','pos','style','portraitSeed','portraitVersion','jerseyNumber','height','weight','year','eligibilityUsed','redshirtUsed','redshirtSeason','perceived','perceivedUpside','origin','promise','promises','staffTrust'];
 function archiveRecord(p,team,reason){
  const played=(p.career?.games||0)>0||(p.stats?.games||0)>0;
@@ -609,6 +609,10 @@ function archiveRecord(p,team,reason){
    injury:null,injuryWeeks:0,stats:packStats(p.stats),career:packStats(p.career),recordTier:'summary',
    awards:p.awards||[],seasonHistory:[],coachRelationships:{},primaryRecruiterCoachId:p.primaryRecruiterCoachId??null};
   for(const key of ARCHIVE_SUMMARY_FIELDS)if(p[key]!==undefined)out[key]=p[key];
+  for(const key of ['recruitingMemory','seasonHistory','campHistory','transferHistory','injuryHistory','scoutingHistory','coachRelationships','coachDeparturePressure']){
+   const value=p[key];
+   if(value&&Object.keys(value).length)out[key]=value;
+  }
   if(p.awards?.length)out.awards=p.awards;
   if(p.draftResult)out.draftResult={year:p.draftResult.year,label:p.draftResult.label,round:p.draftResult.round,pick:p.draftResult.pick};
   return out;
@@ -2471,7 +2475,24 @@ function confStand(c){return universe.teams.filter(t=>t.conference===c).map(t=>(
 function simConferenceChampionships(){if(universe.phase!=='confReady')return;universe.latest=[];universe.confChamps=[];universe.playoffFieldIds=[];universe.playoffFieldUnavailable=false;allConfs().forEach(c=>{let s=confStand(c);if(s.length<2)return;let r=gameSim(s[0],s[1],true,false,{week:13,label:c+' Championship'}),w=T(r.winner);w.champ=true;universe.confChamps.push(w.id);universe.latest.push({...r,label:c+' Championship'})});ranked();freezePlayoffField();universe.phase='bowlReady';buildWeeklyHub();autosaveAfter('postseason');render()}
 function seedField(){if(universe.playoffFieldUnavailable)return [];const frozen=playoffFieldFromIds();return frozen.length===16?frozen:selectPlayoffField()}
 function simPlayoff(){if(universe.phase==='bowlReady')simBowls();if(universe.phase!=='playoffReady')return;if(universe.playoffFieldUnavailable){setStatus('This older postseason save predates frozen playoff selections after its bowls. The original field is unavailable, so no playoff was simulated.');return}let field=seedField();if(field.length!==16){setStatus('The saved playoff field is incomplete, so no playoff was simulated.');return}field.forEach((t,i)=>t.seed=i+1);let logs=[];function round(arr,label){let out=[];for(let i=0;i<arr.length/2;i++){let a=arr[i],b=arr[arr.length-1-i],r=gameSim(a,b,true,false,{week:14+['Round of 16','Quarterfinal','Semifinal','National Championship'].indexOf(label),label});logs.push({...r,label});out.push(T(r.winner))}return out}let r16=round(field,'Round of 16'),q=round(r16,'Quarterfinal'),s=round(q,'Semifinal'),f=round(s,'National Championship');universe.champion=f[0].name;universe.phase='complete';universe.offseason=makeOffseasonState(universe.year,'review');universe.latest=logs;finalizeRecruiting();finalizeSeasonHonors();archiveSeason();ranked();buildWeeklyHub();autosaveAfter('postseason');render()}
-function archiveSeason(){if(universe.history.some(h=>h.year===universe.year&&h.type==='season'))return;let awards=universe.awards?.[universe.year]||projectedAwards();universe.history.unshift({type:'season',year:universe.year,champion:universe.champion,top10:ranked().slice(0,10).map(t=>({name:t.name,record:`${t.w}-${t.l}`})),records:universe.teams.map(t=>({name:t.name,w:t.w,l:t.l,cw:t.cw,cl:t.cl,pf:t.pf,pa:t.pa,prestige:t.prestige})),awards,userTeam:$('#userTeam').value})}
+function championshipOpponent(year,champion){
+ const game=(universe.gameArchive||[]).find(g=>g.season===year&&g.label==='National Championship'&&
+  ((g.home?.name===champion&&g.score?.home>g.score?.away)||(g.away?.name===champion&&g.score?.away>g.score?.home)));
+ if(game)return game.home.name===champion?game.away.name:game.home.name;
+ // Older saves may still have the final result even when detailed games are deferred.
+ const latest=year===universe.year&&(universe.latest||[]).find(g=>g.label==='National Championship'&&g.winner===champion);
+ return latest?(latest.home===champion?latest.away:latest.home):null;
+}
+function archiveSeason(){
+ if(universe.history.some(h=>h.year===universe.year&&h.type==='season'))return;
+ const champion=T(universe.champion),runnerUp=championshipOpponent(universe.year,universe.champion);
+ universe.history.unshift({type:'season',year:universe.year,champion:universe.champion,championId:champion?.id??null,
+  championRecord:champion?`${champion.w}-${champion.l}`: null,
+  runnerUp,runnerUpId:T(runnerUp)?.id??null,
+  top10:ranked().slice(0,10).map(t=>({name:t.name,schoolId:t.id,record:`${t.w}-${t.l}`})),
+  records:universe.teams.map(t=>({name:t.name,schoolId:t.id,conference:t.conference,w:t.w,l:t.l,cw:t.cw,cl:t.cl,pf:t.pf,pa:t.pa,prestige:t.prestige})),
+  awards:universe.awards?.[universe.year]||projectedAwards(),userTeam:$('#userTeam').value});
+}
 function recruitPitch(t,r){if(recruitBlocked(t,r))return -1e6;let v=t.prestige*.32+t.nil*.16+t.development*.15+t.academics*.06+t.facilities*.07+t.staff.RC.recruiting*.10+t.staff.HC.recruiting*.05+(t.w-t.l)*.7+pipelineStrength(t,r.homeRegion)*.10+distancePitch(t,r)+recruitCoachRelationshipBoost(t,r)+(nilDealActive(r,t)?nilDealActive(r,t).amount*3:0);switch(r.priority){case'Prestige':v+=t.prestige*.18;break;case'NIL':v+=t.nil*.20;break;case'Development':v+=t.development*.18;break;case'Early Role':v+=Math.max(0,90-unitCached(t,r.pos))*.20;break;case'Coaching':v+=(t.staff.HC.loyalty+t.staff.RC.recruiting)*.08;break;case'Academics':v+=t.academics*.18;break;case'Scheme Fit':v+=recruitSchemePriority(t,r);break;case'Winning':v+=(t.w/Math.max(1,t.w+t.l))*18;break;case'Stay Close':v+=Math.max(-12,12-recruitDistance(t,r)/80);break;case'Campus Life':v+=(t.fan_support+t.facilities)*.06;break}return v}
 function scheduleVisit(r){const u=selected();if(r.visitWeek){r.visitWeek=null;r.visit=false;return}let g=u.schedule.find(g=>!g.played&&g.home===u.name&&g.week>=universe.week+1);r.visitWeek=g?g.week:Math.min(12,universe.week+1);r.visit=true;firstRecruitEvaluation(r,u);refreshScoutingIntel(r,u,5,'VISIT',true)}
 function decommitRecruit(r,reason){if(!r.committed)return false;let from=r.committed,t=T(from);r.committed=null;r.commitWeek=null;r.flippedFrom=from;universe.recruitClassCounts[from]=Math.max(0,classCommitCount(from)-1);if(t?.commits)t.commits=t.commits.filter(x=>x.id!==r.id);universe.decommitLog??=[];universe.decommitLog.push({year:universe.year,week:universe.week,id:r.id,name:r.name,pos:r.pos,stars:r.stars,from,to:null,reason});if(universe.decommitLog.length>80)universe.decommitLog.splice(0,universe.decommitLog.length-80);return true}
@@ -2581,9 +2602,40 @@ function finishOffseasonPhase(phase,next,report={}){
  os.phase=next;
  return os;
 }
+// Receipts observe actual roster mutations; they never choose a player or consume RNG.
+function recordRosterMove(t,p,kind,receipt=universe.phase==='complete'&&universe.offseason?.year===universe.year?universe.offseason.reports?.roster?.[t.id]:null){
+ if(!receipt)return;
+ receipt[kind]++;
+ if(!['eligibility','earlyDraft','portalOut','signees','portalIn'].includes(kind))return;
+ const key=['signees','portalIn'].includes(kind)?'additions':'losses';
+ receipt[key].push({id:p.id,name:p.name,pos:p.pos,rating:Math.round(p.perceived||0),kind});
+ receipt[key].sort((a,b)=>b.rating-a.rating||a.name.localeCompare(b.name));receipt[key]=receipt[key].slice(0,3);
+}
+function offseasonReceiptView(t,r,year,complete=false){
+ const current=t.roster.length,accounted=r.start-r.eligibility-r.earlyDraft-r.portalOut+r.signees+r.portalIn+r.walkOns-r.cuts;
+ const ds=universe.developmentState,risers=new Map();
+ if(ds?.year===year)for(const row of [...(ds.springReport||[]),...(ds.fallReport||[])]){
+  if(!t.roster.some(p=>p.id===row.id))continue;
+  const prior=risers.get(row.id)||{id:row.id,name:row.name,pos:row.pos,delta:0};
+  prior.delta+=row.perceivedDelta||0;risers.set(row.id,prior);
+ }
+ const battles=(ds?.year===year?ds.battles||[]:[]).filter(b=>t.roster.some(p=>p.id===b.recommended)).slice(0,3)
+  .map(b=>({label:b.label,name:b.candidates?.find(p=>p.id===b.recommended)?.name||'Staff recommendation',applied:t.roleDepth?.[b.roleId]?.[0]===b.recommended}));
+ return {...r,year,teamId:t.id,team:t.name,current,unexplained:current-accounted,complete,
+  risers:[...risers.values()].filter(p=>p.delta>0).sort((a,b)=>b.delta-a.delta||a.name.localeCompare(b.name)).slice(0,3),battles};
+}
+function offseasonRecapModel(t=selected()){
+ if(!t)return null;
+ if(universe.phase==='complete'){
+  const os=universe.offseason,r=os?.year===universe.year&&os.reports?.roster?.[t.id];
+  return r?offseasonReceiptView(t,r,os.year):null;
+ }
+ return universe.lastOffseasonRecap?.teams?.[t.id]||null;
+}
 function offseasonReview(){
  const os=normalizeOffseasonState();
  if(offseasonPhaseDone('review')){if(os.phase==='review')os.phase='departures';return true}
+ os.reports.roster=Object.fromEntries(universe.teams.map(t=>[t.id,{start:t.roster.length,eligibility:0,earlyDraft:0,portalOut:0,signees:0,portalIn:0,walkOns:0,cuts:0,losses:[],additions:[]}]));
  auditPromises();finalizeSeasonHonors();archiveSeason();reviewControlledProgram(selected());creditCoachingTree(selected());
  for(const t of universe.teams)updateFanSupport(t);
  const carouselLog=carousel(),controlled=$('#userTeam').value;
@@ -2612,13 +2664,13 @@ function offseasonDepartures(){
    if(preserved){p.redshirtUsed=true;p.redshirtSeason=universe.year;p.redshirtActive=false}
    else{p.redshirtActive=false;p.eligibilityUsed=eligibilityBase(p)+1}
    const exhausted=p.eligibilityUsed>=4,early=!exhausted&&earlyDeclaration(p,t);
-   if(exhausted||early){const reason=early?'Declared early for draft':'Eligibility exhausted';draftPool.push({p,teamId:t.id,reason,score:draftProjection(p,t).score});exits.push(p)}
+   if(exhausted||early){const reason=early?'Declared early for draft':'Eligibility exhausted';draftPool.push({p,teamId:t.id,reason,score:draftProjection(p,t).score});exits.push(p);recordRosterMove(t,p,early?'earlyDraft':'eligibility')}
   }
   t.roster=t.roster.filter(p=>!exits.includes(p));
   const keep=[];
   for(const p of t.roster){
    const reason=transferPortalEntryReason(p);
-   if(reason)portal.push(ensurePortalEntry({p,from:t.name,fromSchoolId:t.id,reason,enteredSeason:universe.year,wasStarter:(p.stats?.starts||0)>=6}));
+   if(reason){portal.push(ensurePortalEntry({p,from:t.name,fromSchoolId:t.id,reason,enteredSeason:universe.year,wasStarter:(p.stats?.starts||0)>=6}));recordRosterMove(t,p,'portalOut')}
    else keep.push(p);
   }
   t.roster=keep;
@@ -2640,6 +2692,7 @@ function offseasonEnrollment(){
    const p=generatePlayer(t,r.pos,99);
    Object.assign(p,{name:r.name,style:r.style,trueNow:r.trueNow,upside:r.upside,perceived:r.scout,perceivedUpside:r.scoutUp,year:'FR',eligibilityUsed:0,redshirtUsed:false,redshirtActive:false,origin:`${r.stars}-star recruit from ${r.highSchool||r.homeRegion} (${r.homeCity||r.homeRegion}, ${r.homeState||''})${r.flippedFrom?` · flipped from ${r.flippedFrom}`:''}`,promise:r.promise&&r.promise!=='None'?r.promise:null,promiseBaseline:r.scout,portraitSeed:r.portraitSeed||p.portraitSeed,portraitVersion:r.portraitVersion||PORTRAIT_VERSION,scoutConfidence:r.scoutConfidence??p.scoutConfidence,scoutingDomains:r.scoutingDomains?JSON.parse(JSON.stringify(r.scoutingDomains)):undefined,scoutingHistory:r.scoutingHistory?JSON.parse(JSON.stringify(r.scoutingHistory)):[]});
    p.jerseyNumber=jerseyFor(p.pos,p.portraitSeed);signPlayerPromise(p,r,t);const developmentPromise=(p.promises||[]).find(q=>q.type==='DEVELOPMENT_PLAN'&&q.status==='ACTIVE');if(developmentPromise)p.trainingFocus=developmentPromise.expectedFocus;p.recruitingMemory=r.recruitingMemory;p.primaryRecruiterCoachId=r.primaryRecruiterCoachId||r.recruitingMemory?.primaryRecruiterCoachId||r.recruitingMemory?.recruiterCoachId||null;p.coachRelationships={...(r.coachRelationships||r.recruitingMemory?.coachRelationships||{})};p.coachDeparturePressure=r.coachDeparturePressure?{...r.coachDeparturePressure}:null;p.transferHistory=[];ensurePlayerDevelopment(p,t);t.roster.push(p);
+   recordRosterMove(t,p,'signees');
    const hs=(universe.highSchools||[]).find(h=>h.id===r.highSchoolId);if(hs)hs.d1Signees=(hs.d1Signees||0)+1;
    t.pipelines[r.homeRegion]=clamp(pipelineStrength(t,r.homeRegion)+gi(1,3),0,100);
   });
@@ -2677,7 +2730,8 @@ function offseasonPreseason(){
  const compacted=compactGameArchive();
  if(compacted.games&&currentArchiveState())currentArchiveState().gamesDirty=true;
  universe.year++;universe.week=0;resetNilSeason();universe.recoveredWeek=-1;universe.phase='regular';universe.latest=[];universe.confChamps=[];universe.playoffFieldIds=[];universe.playoffFieldUnavailable=false;universe.academicProgression={season:universe.year,week:0,teamIds:[]};universe.champion=null;universe.lastDetailedGame=null;universe.playLogs={};universe.recruits=generateRecruitPool(2800,universe.highSchools);universe.recruitClassCounts={};
- universe.teams.forEach(t=>{t.w=t.l=t.cw=t.cl=t.pf=t.pa=t.sos=0;t.rank=null;t.champ=false;t.commits=[];while(t.roster.length<85)t.roster.push(generateFreshman(t,pick(POS)));if(t.roster.length>105){const keep=t.roster.sort((a,b)=>b.trueNow-a.trueNow).slice(0,105),cut=t.roster.filter(p=>!keep.includes(p));for(const p of cut)addToArchive(p,t,'Roster cut');t.roster=keep}autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)});
+ universe.teams.forEach(t=>{t.w=t.l=t.cw=t.cl=t.pf=t.pa=t.sos=0;t.rank=null;t.champ=false;t.commits=[];while(t.roster.length<85){const p=generateFreshman(t,pick(POS));t.roster.push(p);recordRosterMove(t,p,'walkOns',os.reports.roster?.[t.id])}if(t.roster.length>105){const keep=t.roster.sort((a,b)=>b.trueNow-a.trueNow).slice(0,105),cut=t.roster.filter(p=>!keep.includes(p));for(const p of cut){addToArchive(p,t,'Roster cut');recordRosterMove(t,p,'cuts',os.reports.roster?.[t.id])}t.roster=keep}autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)});
+ if(os.reports.roster)universe.lastOffseasonRecap={year:os.year,teams:Object.fromEntries(universe.teams.filter(t=>os.reports.roster[t.id]).map(t=>[t.id,offseasonReceiptView(t,os.reports.roster[t.id],os.year,true)]))};
  normalizePromiseState();universe.developmentState={year:universe.year,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]};universe.offseasonDone=false;buildSchedule();ranked();buildPreseasonHub();autosaveAfter('preseason');
  return true;
 }
@@ -2993,7 +3047,8 @@ function placeTransfer(entry,forced=null){
  releasePlayerPromises(p,from,'Player left through the transfer portal; remaining obligation released.');
  const history={season:universe.year,fromSchoolId:from.id,toSchoolId:dest.id,fromSchool:from.name,toSchool:dest.name,reason,priorRelationship:match.relationship,coachId:match.coachId,recruiterCoachId:p.recruitingMemory?.recruiterCoachId||null,wasStarter:entry.wasStarter||false};
  p.transferHistory.push(history);p.currentSchoolId=dest.id;p.origin=`Transfer from ${from.name}`;p.morale=clamp(70+gi(-5,12),30,95);p.staffTrust=70;p.promise=null;p.stats=newStats();p.campGrade=null;p.year=CLASS_NAMES[Math.min(3,eligibilityBase(p))]||'SR';
- from.roster=from.roster.filter(x=>x.id!==p.id);dest.roster.push(p);
+ if(from.roster.some(x=>x.id===p.id))recordRosterMove(from,p,'portalOut');
+ from.roster=from.roster.filter(x=>x.id!==p.id);dest.roster.push(p);recordRosterMove(dest,p,'portalIn');
  promiseState();const order=universe.nextEventId++;
  universe.events.push({id:`EVT_${order}`,season:universe.year,week:universe.week,timestampOrder:order,type:'TRANSFER_COMPLETED',importance:reason==='BROKEN_PROMISE'?65:50,schoolIds:[from.id,dest.id],playerIds:[p.id],coachIds:[history.coachId,history.recruiterCoachId].filter(Boolean),recruitIds:[],gameIds:[],summary:`${p.name}: ${from.name} → ${dest.name}.`,metadata:history});
  return dest;
@@ -3534,8 +3589,12 @@ function coachIndexRows({query='',limit=40}={}){
  return rows.filter(match).sort((a,b)=>(b.active-a.active)||(b.wins-a.wins)||a.name.localeCompare(b.name)).slice(0,limit);
 }
 function championTimeline({limit=25}={}){
- return (universe?.history||[]).filter(h=>h.type==='season'&&h.champion).slice(0,limit).map(h=>({
-  year:h.year,champion:h.champion,runnerUp:h.top10?.[1]?.name||null,record:h.top10?.[0]?.record||null}));
+ return (universe?.history||[]).filter(h=>h.type==='season'&&h.champion).slice().sort((a,b)=>b.year-a.year).slice(0,limit).map(h=>{
+  const record=(h.records||[]).find(r=>h.championId!=null?r.schoolId===h.championId:r.name===h.champion);
+  return {year:h.year,champion:h.champion,championId:h.championId??null,
+   runnerUp:h.runnerUp||championshipOpponent(h.year,h.champion)||null,
+   record:h.championRecord||(record?`${record.w}-${record.l}`:h.top10?.find(r=>r.name===h.champion)?.record)||null};
+ });
 }
 // App scope is not global by design; the history module reaches these through this bridge.
 if(typeof globalThis!=='undefined')globalThis.DynastyHistoryIndex=Object.freeze({coaches:coachIndexRows,champions:championTimeline,openCoach:showCoachProfile});
@@ -3593,22 +3652,22 @@ function hallOfFame({limit=24}={}){
 if(typeof globalThis!=='undefined'&&globalThis.DynastyHistoryIndex)
  globalThis.DynastyHistoryIndex=Object.freeze({...globalThis.DynastyHistoryIndex,hallOfFame,openPlayer:showPlayerProfile});
 // v0.12.15 — conference history from the season records the save already keeps.
-// Conference membership is static in this universe; the archive stores each team's
-// final records, so standings are derived, never stored twice.
+// New archives freeze membership; old saves can only estimate it from today's teams.
 function historySeasons(){ return (universe?.history||[]).filter(h=>h.type==='season').map(h=>h.year); }
-function conferenceNames(){ return [...new Set((universe?.teams||[]).map(t=>t.conference).filter(Boolean))].sort(); }
+function conferenceNames(){ return [...new Set([...(universe?.teams||[]).map(t=>t.conference),...(universe?.history||[]).filter(h=>h.type==='season').flatMap(h=>(h.records||[]).map(r=>r.conference))].filter(Boolean))].sort(); }
 function conferenceStandings({conference,year}={}){
  if(!universe)return null;
  const seasons=(universe.history||[]).filter(h=>h.type==='season');
  if(!seasons.length)return null;
- const entry=(year!=null&&seasons.find(h=>h.year===year))||seasons[0];
+ const entry=year!=null?seasons.find(h=>h.year===year):seasons[0];
+ if(!entry)return null;
  const controlled=T($('#userTeam')?.value)?.conference;
  const name=conference||controlled||conferenceNames()[0];
  const rows=(entry.records||[])
-  .filter(r=>{const t=T(r.name);return t&&t.conference===name})
-  .map(r=>({name:r.name,w:r.w??0,l:r.l??0,cw:r.cw??0,cl:r.cl??0,pf:r.pf??0,pa:r.pa??0,prestige:r.prestige??0}))
-  .sort((a,b)=>b.cw-a.cw||a.cl-b.cl||b.w-b.l||(b.pf-b.pa)-(a.pf-a.pa));
- return {year:entry.year,conference:name,rows:rows.map((row,index)=>({...row,place:index+1}))};
+  .filter(r=>(r.conference??(r.schoolId!=null?teamById(r.schoolId):T(r.name))?.conference)===name)
+  .map(r=>({name:r.name,schoolId:r.schoolId??null,w:r.w??0,l:r.l??0,cw:r.cw??0,cl:r.cl??0,pf:r.pf??0,pa:r.pa??0,prestige:r.prestige??0}))
+  .sort((a,b)=>b.cw-a.cw||a.cl-b.cl||b.w-a.w||a.l-b.l||(b.pf-b.pa)-(a.pf-a.pa)||a.name.localeCompare(b.name));
+ return {year:entry.year,conference:name,membershipEstimated:(entry.records||[]).some(r=>r.conference==null),rows:rows.map((row,index)=>({...row,place:index+1}))};
 }
 if(typeof globalThis!=='undefined'&&globalThis.DynastyHistoryIndex)
  globalThis.DynastyHistoryIndex=Object.freeze({...globalThis.DynastyHistoryIndex,
@@ -3656,12 +3715,13 @@ function encyclopediaOpen(row){
  if(row.kind==='player'){showPlayerProfile(row.id);return true}
  if(row.kind==='coach'){showCoachProfile(row.id);return true}
  if(row.kind==='team'){
+  const resolved=row.id!=null?teamById(row.id):T(row.name);
+  if(!resolved)return false;
   const sel=$('#userTeam');
   // Search is read-only: never write the controlled program. The selector is
   // disabled in Dynasty Mode and switching would end the tenure as "stepped away".
-  if(sel&&sel.value===row.name){document.querySelector('.tabs button[data-tab="program"]')?.click();return true}
-  const team=T(row.name);
-  if(!team)return false;
+  if(sel&&sel.value===resolved.name){document.querySelector('.tabs button[data-tab="program"]')?.click();return true}
+  const team=resolved;
   let dialog=document.querySelector('#programPeek');
   if(!dialog){dialog=document.createElement('dialog');dialog.id='programPeek';dialog.className='program-peek';document.body.append(dialog)}
   dialog.innerHTML=programPeekHTML(team);

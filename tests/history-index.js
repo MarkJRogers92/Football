@@ -35,8 +35,49 @@ test('the champion timeline maps archived seasons newest first', async()=>{
  const rows=e.championTimeline();
  assert.deepEqual(rows.map(r=>r.year),[2033,2032]);
  assert.equal(rows[0].champion,'Great Lakes University');
- assert.equal(rows[0].runnerUp,'Chicago Metropolitan');
+ assert.equal(rows[0].runnerUp,null,'rank two is not evidence of a championship appearance');
  assert.equal(rows[0].record,'14-0');
+ assert.equal(rows[1].runnerUp,null);
+});
+
+test('champion records match the champion, not the first ranked team', async()=>{
+ const e=await setup(9404),u=e.universe;
+ u.history=[{type:'season',year:2030,champion:'Actual Champion',top10:[{name:'Rank One',record:'15-1'},{name:'Actual Champion',record:'13-3'}]}];
+ assert.equal(e.championTimeline()[0].record,'13-3');
+ assert.equal(e.championTimeline()[0].runnerUp,null);
+});
+
+test('new archives freeze the final opponent, school identity and conference', async()=>{
+ const e=await setup(9405),u=e.universe,t=u.teams[0],opponent=u.teams[1],oldName=t.name,oldConf=t.conference;
+ u.phase='complete';u.offseason=e.makeOffseasonState(u.year,'review');u.champion=t.name;t.w=14;t.l=2;
+ u.latest=[{label:'National Championship',home:t.name,away:opponent.name,winner:t.name,hp:31,ap:24}];
+ e.offseasonReview();
+ const archived=u.history.find(h=>h.type==='season'),record=archived.records.find(r=>r.name===oldName);
+ assert.equal(record.schoolId,t.id);assert.equal(record.conference,oldConf);
+ t.name='Renamed School';t.conference='New League';
+ const champion=e.championTimeline()[0];assert.equal(champion.champion,oldName);assert.equal(champion.runnerUp,opponent.name);assert.equal(champion.record,'14-2');
+ const table=e.conferenceStandings({conference:oldConf,year:archived.year});
+ assert.ok(table.rows.some(r=>r.name===oldName));assert.equal(table.membershipEstimated,false);
+ assert.ok(e.conferenceNames().includes(oldConf));
+});
+
+test('standings use overall wins to break equal conference records and reject missing seasons', async()=>{
+ const e=await setup(9406),u=e.universe,conf=u.teams[0].conference;
+ u.history=[{type:'season',year:2031,records:[
+  {name:'Low',conference:conf,w:7,l:5,cw:5,cl:3},
+  {name:'High',conference:conf,w:10,l:2,cw:5,cl:3},
+  {name:'Middle',conference:conf,w:9,l:3,cw:5,cl:3}]}];
+ assert.deepEqual(e.conferenceStandings({conference:conf,year:2031}).rows.map(r=>r.name),['High','Middle','Low']);
+ assert.equal(e.conferenceStandings({conference:conf,year:1999}),null);
+});
+
+test('legacy final games supply a runner-up, never another season or a ranking', async()=>{
+ const e=await setup(9407),u=e.universe;
+ u.history=[{type:'season',year:2030,champion:'Winner',top10:[]}];
+ u.gameArchive=[{season:2029,label:'National Championship',home:{name:'Winner'},away:{name:'Wrong year'},score:{home:30,away:10}}];
+ assert.equal(e.championTimeline()[0].runnerUp,null);
+ u.gameArchive.push({season:2030,label:'National Championship',home:{name:'Finalist'},away:{name:'Winner'},score:{home:21,away:28}});
+ assert.equal(e.championTimeline()[0].runnerUp,'Finalist');
 });
 
 test('a decorated retired player is inducted with visible reasons', async()=>{

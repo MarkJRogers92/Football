@@ -17,15 +17,26 @@ test('a career with no games is archived as a summary record', async()=>{
  const row=u.playerArchive.find(x=>x.id==='summary-x');
  assert.ok(row,'the player is still archived and findable');
  assert.equal(row.recordTier,'summary');
- assert.deepEqual(row.seasonHistory,[],'no empty season rows are stored, but the key stays shape-stable');
- assert.deepEqual(row.coachRelationships,{},'relationship trails are not stored');
+ assert.deepEqual(row.seasonHistory,p.seasonHistory,'recorded seasons survive even without game appearances');
+ assert.deepEqual(row.coachRelationships,{coach1:55},'recorded relationships survive');
  assert.equal(row.scoutingDomains,undefined);
- assert.equal(row.campHistory,undefined);
+ assert.deepEqual(row.campHistory,p.campHistory,'camp attendance is real off-field history');
  assert.equal(row.name,'Slim Walker');
  assert.equal(row.pos,p.pos);
  assert.equal(row.portraitSeed,12345,'identity survives');
  assert.equal(row.lastTeam,t.name);
  assert.equal(row.exitReason,'Roster cut');
+});
+
+test('never-played careers retain recruitment, transfers and injuries through reload', async()=>{
+ const e=await setup(9408),u=e.universe,t=u.teams[0],p={...t.roster[0],id:'off-field',career:career(0),stats:career(0),
+  recruitingMemory:{schoolId:t.id,season:2028,stars:3},
+  transferHistory:[{year:2029,from:'Prior School',to:t.name,fromSchoolId:2,toSchoolId:t.id}],
+  injuryHistory:[{year:2030,type:'Knee injury',weeks:8}],scoutingHistory:[{year:2029,reason:'SIGNING_DAY'}]};
+ e.addToArchive(p,t,'Eligibility exhausted');
+ const save=JSON.parse(JSON.stringify({userTeam:t.name,universe:e.packUniverse(u)}));e.installSave(save);
+ const row=e.universe.playerArchive.find(x=>x.id===p.id);
+ for(const key of ['recruitingMemory','transferHistory','injuryHistory','scoutingHistory'])assert.deepEqual(row[key],p[key],key);
 });
 
 test('a career with games keeps the full record', async()=>{

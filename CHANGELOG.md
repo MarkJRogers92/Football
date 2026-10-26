@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.12.18 — History accuracy and offseason clarity
+
+- Championship history records actual finalists and champion records, stable school IDs and season-specific conference membership. Historical links survive renames; standings compare both teams correctly. Missing legacy facts remain unknown or explicitly estimated.
+- Compact player archives preserve recorded recruitment, seasons, camps, evaluations, transfers, injuries and coaching relationships even without game appearances. Previously discarded history cannot be recovered.
+- Dashboard adds a running offseason roster ledger: eligibility exits, early draft declarations, portal out/in, signees, walk-ons and cuts. The completed recap survives the next season opening and highlights staff-evaluated losses/additions, camp risers, battles and the next screen.
+- Desktop/mobile regressions cover save/reload, replay protection, all-program roster balance, floor/cap accounting, renamed schools, legacy warnings and imported-field escaping.
+- Ten-season seed-7 portable save: 114.1 MiB versus 108.2 MiB previously (~5.5% larger), primarily to preserve factual off-field history. No simulation balance changes.
+
 ## v0.12.17 — League health pass
 
 - Adds `tools/league-health.js`: ten seasons of title, conference, playoff, award, prestige, roster, class-size, injury and Hall-of-Fame output in one run, driving the interactive offseason the way the interface does.
