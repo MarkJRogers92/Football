@@ -1,5 +1,19 @@
 # Latest Session Work
 
+## v0.12.23 — Dynasty persistence, first measured step (2026-10-26)
+
+- Baseline measured first: prestige held its ranking almost perfectly (top-10
+  retention 9.8/10), yet preseason top-10 programs won only 20% of titles (seed 7)
+  and 40% (seed 11) — standing was sticky but did not convert into results.
+- Change: recruit pitch weights prestige 0.32 → 0.42 (Prestige priority bonus
+  0.18 → 0.22). No new fields; prestige stays derived from existing state.
+- A/B, ten seasons: seed 7 blueblood titles **2/10 → 5/10**, back-to-back 1 → 2,
+  distinct champions 9 → 8. Seed 11: 4/10 unchanged, back-to-back 0 → 1, distinct
+  champions 9 → 8. Partial effect, reported as such.
+- `tools/league-health.js` now reports distinct champions, most titles by one
+  program, back-to-back titles, blueblood titles and top-10 prestige retention.
+- Archive policy unchanged: old seasons are kept in full.
+
 ## v0.12.22 — Portal outcomes, roster needs, long soak (2026-10-26)
 
 - **Portal realism.** A program needs two open slots at the position and a player
@@ -61,7 +75,7 @@
 
 ## Current state
 
-- Version `0.12.22` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
+- Version `0.12.23` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
   generated `index.html`.
 - Default branch `claude/review-improvement-dwjemy`; released source `f57e770`
   (`v0.12.21`), merged by PR #16 after full CI 40430159066.

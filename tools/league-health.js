@@ -35,6 +35,9 @@ const pad = (v, n) => String(v).padEnd(n);
   const decommits = [];
   const seasons = [];
   const careerMoves = [];
+  const titleYears = [];            // {year, teamId} of every champion
+  const prestigeTop10 = [];         // preseason top-10 prestige ids per season
+  let bluebloodTitles = 0;          // titles won by a preseason top-10 prestige program
   // New metric state, all populated from one pass over the existing driver.
   const portalReports = new Map();   // universe.offseason.reports.portal per season
   const portalRows = new Map();      // TRANSFER_COMPLETED events per season
@@ -53,8 +56,14 @@ const pad = (v, n) => String(v).padEnd(n);
     e.simSeason();
     e.simConferenceChampionships();
     for (const id of u.confChamps || []) bump(confTitles, nameOf(id));
+    // Prestige ranking before the season decides, to test whether bluebloods convert
+    // standing into titles — the dynasty-persistence question.
+    const preseasonTop = [...u.teams].sort((a, b) => b.prestige - a.prestige).slice(0, 10).map(t => t.id);
     e.simPlayoff();
     if (u.champion) bump(champions, u.champion);
+    const championTeam = u.teams.find(t => t.name === u.champion);
+    if (championTeam) { titleYears.push({ year: u.year, id: championTeam.id }); if (preseasonTop.includes(championTeam.id)) bluebloodTitles++; }
+    prestigeTop10.push(new Set(preseasonTop));
     for (const id of u.playoffFieldIds || []) bump(playoffApps, nameOf(id));
 
     // Roster as it finished the season (before the next class and walk-ons arrive).
@@ -179,6 +188,23 @@ const pad = (v, n) => String(v).padEnd(n);
   console.log('players: total', players.length, '· at ceiling', atCeiling, `(${share(atCeiling, players.length)})`, '· injured now', injured);
   console.log('classes:', Object.entries(byClass).map(([k, v]) => `${k}:${v}`).join(' '));
   console.log('archive: careers', (u.playerArchive || []).length, '· hall of fame', e.hallOfFame({ limit: 500 }).length);
+  // Dynasty persistence: do the same programs keep winning, and does standing predict it?
+  const titleCounts = new Map();
+  for (const row of titleYears) bump(titleCounts, row.id);
+  const maxTitles = Math.max(0, ...titleCounts.values());
+  let backToBack = 0;
+  for (let i = 1; i < titleYears.length; i++) if (titleYears[i].id === titleYears[i - 1].id) backToBack++;
+  const overlaps = [];
+  for (let i = 1; i < prestigeTop10.length; i++) {
+    let shared = 0;
+    for (const id of prestigeTop10[i]) if (prestigeTop10[i - 1].has(id)) shared++;
+    overlaps.push(shared);
+  }
+  console.log('\ndynasty persistence:');
+  console.log('distinct champions:', titleCounts.size, '· most titles by one program:', maxTitles, '· back-to-back titles:', backToBack);
+  console.log('titles won by a preseason top-10 prestige program:', bluebloodTitles, 'of', titleYears.length, '(' + share(bluebloodTitles, titleYears.length) + ')');
+  console.log('preseason top-10 prestige retention year to year:', mean(overlaps).toFixed(1), 'of 10');
+
   console.log('career changes for the user program:', careerMoves.length, careerMoves.map(m => `${m.year}→${m.to}`).join(' · '));
 
   // Entrants placed/unplaced: universe.offseason.reports.portal.placed/pending.

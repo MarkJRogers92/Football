@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.12.23 — Dynasty persistence, first measured step
+
+- Prestige now carries more weight in a recruit pitch (0.32 → 0.42 of program standing, priority bonus 0.18 → 0.22), so standing converts into talent instead of being decorative.
+- Measured over ten seasons, seed 7: titles won by a preseason top-10 prestige program rose from 2 of 10 to 5 of 10, back-to-back titles from 1 to 2, distinct champions 9 → 8. Seed 11 moved less (4 of 10 unchanged, back-to-back 0 → 1, distinct champions 9 → 8), so this is a partial shift, not a solved problem.
+- Adds dynasty-persistence reporting to `tools/league-health.js`: distinct champions, most titles by one program, back-to-back titles, titles by preseason top-10 prestige programs, and year-to-year top-10 prestige retention.
+- No save-shape change; prestige stays derived from existing fields.
+
 ## v0.12.22 — Portal failure modes, roster needs, long-dynasty soak
 
 - **Portal entrants can fail to find a home.** A program now needs two open slots at the position and a player competitive with its current room; a prior relationship can still open a door. Unplaced players return to their school (65%, morale and trust cost) or leave football (35%, archived as "No landing spot"). Measured 29.6% and 31.5% unplaced over three seasons on two seeds, matching the ~30% real-world D-I figure. Known limitation: the rate skews high in the first offseason.
