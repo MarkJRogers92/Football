@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dynasty Lab — Title Screen Mockup (Meshy assets)</title>
+<style>
+:root{--ink:#eef3f9;--mute:#8396ad;--gold:#e8c264;--line:#2a3c51}
+*{box-sizing:border-box}
+body{margin:0;background:#05080d;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.stage{position:relative;min-height:100vh;overflow:hidden;background:url(../../assets/title-stadium-v1.jpg) center/cover no-repeat}
+.shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,7,12,.92) 0%,rgba(4,7,12,.55) 42%,rgba(4,7,12,.05) 70%),linear-gradient(0deg,rgba(4,7,12,.7),transparent 35%)}
+.content{position:relative;z-index:2;display:grid;grid-template-columns:minmax(320px,430px) 1fr;gap:40px;min-height:100vh;padding:56px 7vw}
+.brand{display:flex;gap:14px;align-items:center;margin-bottom:34px}
+.crest{display:grid;place-items:center;width:56px;height:56px;border:1px solid #4b719c;border-radius:13px;background:linear-gradient(145deg,#1e3a5d,#111d2b);font-weight:900;letter-spacing:.12em}
+.rule{width:44px;height:3px;background:var(--gold);margin-bottom:8px}
+h1{margin:0;font-size:clamp(40px,5vw,64px);letter-spacing:-.03em;line-height:.95}
+h1 em{font-style:normal;color:var(--gold)}
+.tag{margin:8px 0 0;color:var(--mute);font-size:13px;letter-spacing:.04em}
+.menu{display:grid;gap:10px}
+.act{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:rgba(10,18,27,.72);backdrop-filter:blur(6px)}
+.act strong{display:block;font-size:15px}.act small{color:var(--mute);font-size:11.5px}
+.act.primary{border-color:#5c8fc8;background:linear-gradient(135deg,rgba(36,85,136,.55),rgba(10,18,27,.8))}
+.act i{font-style:normal;color:var(--mute);font-size:22px}
+.hero{position:relative}
+.glow{position:absolute;left:48%;top:44%;width:560px;height:560px;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(232,194,100,.32),rgba(232,194,100,0) 62%);filter:blur(6px)}
+.trophy{position:absolute;left:48%;top:46%;width:min(520px,38vw);transform:translate(-50%,-50%);filter:drop-shadow(0 30px 40px rgba(0,0,0,.65));animation:float 6s ease-in-out infinite}
+.floor{position:absolute;left:48%;top:calc(46% + min(250px,18vw));width:420px;height:50px;transform:translateX(-50%);background:radial-gradient(ellipse,rgba(232,194,100,.35),transparent 70%)}
+.helmet{position:absolute;right:2%;bottom:6%;width:min(230px,17vw);transform:rotate(4deg);opacity:.95;filter:drop-shadow(0 18px 24px rgba(0,0,0,.7))}
+.plate{position:absolute;right:3%;top:8%;text-align:right}
+.plate span{display:block;font-size:10px;letter-spacing:.16em;color:var(--mute);text-transform:uppercase}
+.plate strong{font-size:15px}
+.foot{position:absolute;left:7vw;bottom:22px;color:#5f7289;font-size:11px;z-index:2}
+@keyframes float{50%{transform:translate(-50%,-52%)}}
+@media(prefers-reduced-motion:reduce){.trophy{animation:none}}
+@media(max-width:900px){.content{grid-template-columns:1fr;padding:32px 20px}.hero{height:300px}.trophy{width:260px}.helmet{width:110px}.plate{display:none}}
+</style></head><body>
+<main class="stage">
+  <div class="shade"></div>
+  <div class="content">
+    <section>
+      <header class="brand"><div class="crest">DL</div><div><div class="rule"></div><h1>Dynasty <em>Lab</em></h1><p class="tag">Build a program. Earn a legacy.</p></div></header>
+      <nav class="menu">
+        <div class="act primary"><span><strong>Continue Dynasty</strong><small>2031 · Week 6 · Ranked #7</small></span><i>›</i></div>
+        <div class="act"><span><strong>New Dynasty</strong><small>Choose a program and begin in 2027</small></span><i>›</i></div>
+        <div class="act"><span><strong>Load Dynasty</strong><small>Saved dynasty or exported JSON</small></span><i>›</i></div>
+        <div class="act"><span><strong>Options</strong><small>Motion and broadcast playback</small></span><i>›</i></div>
+        <div class="act"><span><strong>How to Play</strong><small>Your first season in three steps</small></span><i>›</i></div>
+      </nav>
+    </section>
+    <section class="hero" aria-hidden="true">
+      <div class="glow"></div><div class="floor"></div>
+      <img class="trophy" src="../../assets/meshy-prototype/trophy_-35.png" alt="">
+      <img class="helmet" src="../../assets/meshy-prototype/helmet_-35.png" alt="">
+      <div class="plate"><span>Reigning champion</span><strong>2030 National Title</strong></div>
+    </section>
+  </div>
+  <div class="foot">Mockup · Meshy-generated trophy and helmet over the existing tunnel art</div>
+</main>
+</body></html>
