@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.21</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.22</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -1945,7 +1945,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.21</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.22</b></span></footer>
   </div>
 </section>
 
@@ -1972,7 +1972,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.12.21</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.12.22</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -5076,7 +5076,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.12.21';
+const APP_VERSION='0.12.22';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -7784,17 +7784,38 @@ function offseasonEnrollment(){
  autosaveAfter('signing'),finishOffseasonPhase('signing','portal',teams);
  return true;
 }
+// An entrant nobody wants either stays at his school or leaves football; leaving
+// the roster is the only way a portal class can shrink.
+const PORTAL_RETURN_CHANCE=.65;
+function resolveUnplacedPortal(entry){
+ const {p}=entry,from=universe.teams.find(t=>t.id===entry.fromSchoolId)||T(entry.from);
+ if(!from)return null;
+ if(gameplayRandom()<PORTAL_RETURN_CHANCE&&from.roster.length<105){
+  p.morale=clamp((p.morale??70)-8,20,99);p.staffTrust=clamp((p.staffTrust??70)-5,0,99);
+  return {outcome:'returned',team:from};
+ }
+ from.roster=from.roster.filter(x=>x.id!==p.id);
+ addToArchive(p,from,'No landing spot');
+ return {outcome:'exited',team:from};
+}
 function offseasonPortal(){
  const os=normalizeOffseasonState();
  if(offseasonPhaseDone('portal')){if(os.phase==='portal')os.phase='spring';return true}
  const controlled=$('#userTeam').value,movement=[...(os.reports.movement||[])];
  const draftPool=(os.reports.departures?.draftPool||[]).map(d=>({...d,t:universe.teams.find(x=>x.id===d.teamId)||d.t}));runDraft(draftPool);
  const portal=[...(universe.transferPortal||[])];universe.transferPortal=[];
- portal.forEach(x=>{x.p.stats=newStats();x.p.year=CLASS_NAMES[Math.min(3,eligibilityBase(x.p))]||'SR';const dest=placeTransfer(x);if(dest){if(x.from===controlled||dest.name===controlled)movement.push(`${x.p.pos} ${x.p.name}: ${x.from} → ${dest.name} (${transferReasonLabel(x.reason)})`)}else universe.transferPortal.push(x)});
+ let placedCount=0,returnedCount=0,exitedCount=0;
+ portal.forEach(x=>{x.p.stats=newStats();x.p.year=CLASS_NAMES[Math.min(3,eligibilityBase(x.p))]||'SR';const dest=placeTransfer(x);
+  if(dest){placedCount++;if(x.from===controlled||dest.name===controlled)movement.push(`${x.p.pos} ${x.p.name}: ${x.from} → ${dest.name} (${transferReasonLabel(x.reason)})`);return}
+  const outcome=resolveUnplacedPortal(x);
+  if(!outcome){universe.transferPortal.push(x);return}
+  if(outcome.outcome==='returned'){returnedCount++;if(x.from===controlled)movement.push(`${x.p.pos} ${x.p.name}: no landing spot, returned to ${x.from}`)}
+  else{exitedCount++;if(x.from===controlled)movement.push(`${x.p.pos} ${x.p.name}: no landing spot, left the program`)}
+ });
  updateCareerRecords();
  movement.push(...(os.reports.review?.carouselLog||[]).filter(x=>x.includes(controlled)));
  universe.movementLog=movement.slice(0,100);
- autosaveAfter('portal'),finishOffseasonPhase('portal','spring',{placed:portal.length-universe.transferPortal.length,pending:universe.transferPortal.length});
+ autosaveAfter('portal'),finishOffseasonPhase('portal','spring',{placed:placedCount,pending:universe.transferPortal.length,returned:returnedCount,exited:exitedCount});
  return true;
 }
 // v0.12.21: the yearly walk-on top-up repairs positional scarcity. Measured over
@@ -8131,11 +8152,23 @@ function transferFit(p,t,from,reason){
  const pipeline=pipelineStrength(t,m.homeRegion||from.conference);
  const follow=p.coachDeparturePressure?.toSchoolId===t.id?clamp(p.coachDeparturePressure.strength||0,0,70):0;
  const score=prior*.20+opportunity*(reason==='BROKEN_PROMISE'?.30:.25)+playerSchemeFit(p,t)*.15+relationship*.15+follow*.08+proximity*.10+t.prestige*(reason==='BROKEN_PROMISE'?.05:.10)+pipeline*.05;
- return {score,prior,opportunity,relationship,coachId,follow};
+ // need = how far the position group sits below the engine's designed shape; a
+ // program with a full room does not add a transfer there.
+ const need=(POS_COUNTS[p.pos]||4)-depth.length;
+ // A program only adds a player who can compete in that room; a deep room turns
+ // away a lesser transfer instead of collecting him.
+ const competitive=depth.length===0||p.trueNow>=best-8;
+ return {score,prior,opportunity,relationship,coachId,follow,need,competitive};
 }
+// v0.12.22: a program only takes a transfer it has room AND a reason for — need at
+// the position, a prior relationship, or a player better than its current depth.
+// Without this every entrant landed somewhere and the portal had no failure mode.
+function portalWanted(candidates){return candidates.filter(x=>x.prior>=55||(x.need>=2&&x.competitive&&x.opportunity>=40))}
 function chooseTransferDestination(p,from,reason){
  const candidates=universe.teams.filter(t=>t.id!==from.id&&t.roster.length<105).map(t=>({t,...transferFit(p,t,from,reason)}));
- if(!candidates.length)return null;
+ const wanted=portalWanted(candidates);
+ if(!wanted.length)return null;
+ candidates.length=0;candidates.push(...wanted);
  const best=Math.max(...candidates.map(x=>x.score));let total=0;
  for(const x of candidates){x.weight=Math.exp((x.score-best)/7);total+=x.weight}
  let roll=gameplayRandom()*total;for(const x of candidates){roll-=x.weight;if(roll<=0)return x}return candidates.at(-1);
@@ -8706,6 +8739,8 @@ function championTimeline({limit=25}={}){
 }
 // App scope is not global by design; the history module reaches these through this bridge.
 if(typeof globalThis!=='undefined')globalThis.DynastyHistoryIndex=Object.freeze({coaches:coachIndexRows,champions:championTimeline,openCoach:showCoachProfile});
+// Recruiting-needs bridge: only POS_COUNTS, roster positions/years and committed counts leave app scope.
+if(typeof globalThis!=='undefined')globalThis.DynastyRecruitingNeeds=Object.freeze({posCounts:POS_COUNTS,snapshot:()=>{if(!universe)return null;const t=selected();if(!t)return null;const committed={};for(const r of universe?.recruits||[])if(r.committed===t.name)committed[r.pos]=(committed[r.pos]||0)+1;return{team:t.name,players:(t.roster||[]).map(p=>({pos:p.pos,year:p.year})),committed}}});
 // v0.12.14 — Hall of Fame. Induction uses only recorded, player-visible facts:
 // awards, draft result, career production and coach titles. There is no hidden
 // rating and no new save field; inductees are derived every time from the archive.
@@ -12982,6 +13017,61 @@ function render(){
 let pending=false;function queue(){if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;render()})}
 new MutationObserver(queue).observe($('#recruitBody'),{childList:true,subtree:true});document.addEventListener('click',e=>{if(e.target.closest('[data-tab="recruiting"],[data-scout-action],[data-target]'))setTimeout(queue,0)});queue();
 })();
+// Roster needs — read-only Recruiting-tab card. Thin groups are derived from the
+// engine's designed roster shape (POS_COUNTS) against returning players plus
+// commitments. No save fields, simulation, or randomness: everything comes from
+// the existing DynastyRecruitingNeeds bridge.
+(()=>{
+ 'use strict';
+ const api=globalThis.DynastyRecruitingNeeds,tab=document.querySelector('#recruiting');
+ if(!api?.posCounts||!tab)return;
+ const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ let host=null,lastSig='',queued=false;
+ function ensureHost(){
+  if(host?.isConnected)return host;
+  host=tab.querySelector('#recruitingNeeds');
+  if(host)return host;
+  host=document.createElement('section');
+  host.id='recruitingNeeds';host.className='card recruiting-needs';host.hidden=true;
+  host.innerHTML='<div class="section-head"><div><div class="eyebrow">ROSTER SHAPE</div><h3>Roster needs</h3><div class="muted" id="recruitingNeedsCount" aria-live="polite"></div></div></div><div class="roster-need-strip" id="recruitingNeedsRows"></div><div class="small muted">Thin against the designed roster shape: returning players plus committed recruits, with seniors excluded because they leave before signing day.</div>';
+  const summary=tab.querySelector('#classSummary');
+  if(summary)summary.insertAdjacentElement('afterend',host);
+  else{const table=tab.querySelector(':scope > .table-wrap');if(table)table.insertAdjacentElement('beforebegin',host);else tab.append(host)}
+  return host;
+ }
+ function thinRows(snap){
+  const thin=[];
+  for(const [pos,target] of Object.entries(api.posCounts)){
+   const returning=(snap.players||[]).filter(p=>p.pos===pos&&p.year!=='SR').length;
+   const committed=snap.committed?.[pos]||0;
+   const have=returning+committed;
+   if(have<target)thin.push({pos,target,returning,committed,have,gap:target-have});
+  }
+  return thin;
+ }
+ function render(){
+  queued=false;
+  const snap=api.snapshot?.(),node=ensureHost();
+  if(!node)return;
+  if(!snap){node.hidden=true;lastSig='';return}
+  const thin=thinRows(snap),sig=[snap.team,...thin.map(x=>`${x.pos}:${x.have}:${x.target}:${x.committed}`)].join('|');
+  if(sig===lastSig&&!node.hidden)return;
+  lastSig=sig;node.hidden=false;
+  node.querySelector('#recruitingNeedsCount').textContent=thin.length
+   ?`${thin.length} position group${thin.length===1?'':'s'} thin for ${snap.team}`
+   :`No position group is thin for ${snap.team}`;
+  node.querySelector('#recruitingNeedsRows').innerHTML=thin.length
+   ?thin.map(x=>`<div class="roster-need${x.gap>=3?' urgent':''}" data-need-pos="${esc(x.pos)}" title="${esc(`${x.returning} returning + ${x.committed} committed against ${x.target} designed`)}"><strong>${esc(x.pos)}</strong><span>${x.have} of ${x.target}</span><small>${x.committed} committed</small></div>`).join('')
+   :'<span class="muted">Every position group projects at or above its designed depth.</span>';
+ }
+ function queue(){if(queued)return;queued=true;(window.requestAnimationFrame||setTimeout)(render,0)}
+ const summary=tab.querySelector('#classSummary');
+ if(summary&&window.MutationObserver)new MutationObserver(queue).observe(summary,{childList:true,subtree:true,characterData:true});
+ document.addEventListener('click',event=>{if(event.target.closest?.('[data-tab="recruiting"],[data-client-tab="recruiting"]'))setTimeout(queue,0)});
+ document.querySelector('#userTeam')?.addEventListener('change',()=>{lastSig='';setTimeout(queue,0)});
+ queue();
+})();
+
 (() => {
 'use strict';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
