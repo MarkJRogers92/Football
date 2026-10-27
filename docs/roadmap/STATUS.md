@@ -1,10 +1,12 @@
 # Roadmap execution status
 
-Last reconciled: 2026-10-26, source `f03383b` (`v0.12.20`) on
-`claude/review-improvement-dwjemy`. History now carries coach index, champion
+Last reconciled: 2026-10-26, source `6f649c4` (`v0.12.20`) on
+`claude/review-improvement-dwjemy`. History carries coach index, champion
 timeline, Hall of Fame with filtering and show-all, and conference standings.
-Publish for 0.12.19: run 40421035607. The next named packet is the playerArchive
-rollup, measured before and after as with v0.12.16.
+Publish for 0.12.20: run 40426594973. The playerArchive rollup was investigated and
+rejected on measurement (docs/SAVE_SIZE_MEASUREMENT.md). The next named packet is
+the kicker/punter availability gap found by the new health metrics
+(docs/LEAGUE_HEALTH_2026-10-25.md), measured before and after.
 
 | Packet | Status | Notes |
 | --- | --- | --- |

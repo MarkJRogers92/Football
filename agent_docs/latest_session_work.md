@@ -29,13 +29,13 @@
 
 - Version `0.12.20` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
   generated `index.html`.
-- Default branch `claude/review-improvement-dwjemy`; released source `f03383b`
-  (`v0.12.19`).
-- [Release v0.12.19](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.19)
+- Default branch `claude/review-improvement-dwjemy`; released source `6f649c4`
+  (`v0.12.20`), merged by PR #15 after full CI 40425813895.
+- [Release v0.12.20](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.20)
   is the current desktop Alpha (macOS arm64 + Windows x64 from validation run
-  40419862749). Installed `/Applications/Dynasty Lab.app` is CI-built v0.12.19
+  40425813895). Installed `/Applications/Dynasty Lab.app` is CI-built v0.12.20
   (ZIP hash and signature verified, 17 save files untouched); backups are kept at
-  `~/Applications/Dynasty Lab 0.12.9.app` … `0.12.18.app`.
+  `~/Applications/Dynasty Lab 0.12.9.app` … `0.12.19.app`.
 - Earlier releases: [v0.12.16](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.16)
   (run 40259042984), [v0.12.15](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.15)
   (run 40256022466), [v0.12.14](https://github.com/MarkJRogers92/Football/releases/tag/v0.12.14)

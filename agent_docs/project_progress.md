@@ -2,13 +2,14 @@
 
 ## Version and branch
 
-Source is `0.12.19` on `claude/review-improvement-dwjemy`. PR #14 merged as
-f03383b after full CI 40419862749 passed; v0.12.19 adds Hall of Fame browsing
-(count, players/coaches filter, show-all) and repository hygiene. Mac v0.12.19 is
+Source is `0.12.20` on `claude/review-improvement-dwjemy`. PR #15 merged as
+6f649c4 after full CI 40425813895 passed; v0.12.20 adds the four league-health
+metrics and the measured verdict against a playerArchive rollup. Mac v0.12.20 is
 installed from its matching artifact (signature and ZIP hash verified, 17 save
-files untouched, v0.12.18 app backed up). Published desktop and web release is
-v0.12.19 (web publish 40421035607). v0.12.18 added history accuracy, off-field
-career preservation and the offseason recap (PR #13).
+files untouched, v0.12.19 app backed up). Published desktop and web release is
+v0.12.20 (web publish 40426594973). v0.12.19 added Hall of Fame browsing (PR #14);
+v0.12.18 added history accuracy, off-field career preservation and the offseason
+recap (PR #13).
 
 ## Overall progress
 
