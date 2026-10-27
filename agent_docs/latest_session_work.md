@@ -1,5 +1,18 @@
 # Latest Session Work
 
+## v0.12.24 — Championship trophy and team helmets (2026-10-27)
+
+- Presentation-only release. Trophy and helmet were generated with Meshy
+  (text-to-3D preview + PBR refine), rendered to transparent sprites with three.js.
+- Title screen trophy (`polish.css`, `body.html`); Season Review champion trophy
+  (`season-review.js/css`); Game Lab hero helmets (`gameday-season-presentation.js/css`).
+- Helmet atlas: `tools/build-helmet-atlas.py <side-render.png>` recolors one helmet per team
+  (shell = primary, facemask = secondary) into a lossy WebP atlas. A 256-colour PNG was tried
+  first and posterized the shells; WebP fixed it. Logos are overlaid in CSS from the logo atlas.
+- The first Meshy helmet carried a brand-like mark and crackle texture; it was regenerated
+  with a plain-panel prompt. Known weakness: the lower shell shadows very dark on every team.
+- Meshy credits spent: about 150 across trophy and both helmets.
+
 ## v0.12.23 — Dynasty persistence, first measured step (2026-10-26)
 
 - Baseline measured first: prestige held its ranking almost perfectly (top-10

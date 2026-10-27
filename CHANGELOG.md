@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.12.24 — Championship trophy and team helmets
+
+- **Title screen.** A championship trophy (Meshy-generated 3D model rendered to a sprite) sits in the tunnel light beside the menu. It floats slowly, stops under reduced motion, and is hidden under 900px wide.
+- **Game Lab matchup.** Each team now appears as a helmet in its own colors with its real logo as the side decal; the home helmet is mirrored so the two face each other. The helmets come from `assets/team-helmets-meshy-atlas-128.webp` (120 cells, row-major by team id, like the logo atlas), built by `tools/build-helmet-atlas.py` from `team-colors.json`. The decal reuses the existing logo atlas.
+- **Season Review.** National champions see the trophy beside the header.
+- Presentation only: no simulation, save-shape or balance changes. New assets are `assets/title-trophy-v1.png` and the helmet atlas.
+- Tests: helmet and mirroring checks in the Game Day presentation browser suite; trophy-for-champions check in `tests/season-review.js`.
+
 ## v0.12.23 — Dynasty persistence, first measured step
 
 - Prestige now carries more weight in a recruit pitch (0.32 → 0.42 of program standing, priority bonus 0.18 → 0.22), so standing converts into talent instead of being decorative.
