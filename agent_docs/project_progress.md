@@ -2,8 +2,9 @@
 
 ## Version and branch
 
-Source is `0.12.23` on `claude/review-improvement-dwjemy`. PR #18 merged as
-a57d2ce after full CI 40442750049 passed; v0.12.23 makes program standing buy
+Source is `0.12.24` on `claude/review-improvement-dwjemy` (PR #19, merge 23d219c).
+v0.12.24 is presentation only: championship trophy and per-team helmets. It is
+installed and released (web run 40450856688). v0.12.23 makes program standing buy
 talent (prestige weight in a recruit pitch 0.32 → 0.42): blueblood titles went
 2/10 → 5/10 on seed 7 and stayed 4/10 on seed 11, so it is a partial step. Mac
 v0.12.23 is installed from its matching artifact (signature and ZIP hash verified,

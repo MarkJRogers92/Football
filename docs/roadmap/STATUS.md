@@ -3,7 +3,7 @@
 Last reconciled: 2026-10-26, source `d236e6e` (`v0.12.24`) on
 `claude/review-improvement-dwjemy`. History carries coach index, champion
 timeline, Hall of Fame with filtering and show-all, and conference standings.
-v0.12.24 adds the championship trophy and team helmets (presentation only). Publish for 0.12.23: run 40443754979. The playerArchive rollup was investigated and
+v0.12.24 adds the championship trophy and team helmets (presentation only). Published 0.12.24: web run 40450856688; Mac installed from artifact 12709339863 and release v0.12.24 created. The playerArchive rollup was investigated and
 rejected on measurement (docs/SAVE_SIZE_MEASUREMENT.md). The kicker/punter
 availability gap found by the health metrics is fixed and re-measured: thin K/P
 team-seasons 36/47 → 0/0 over three seasons on two seeds. The next named packet is
