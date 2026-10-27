@@ -137,11 +137,28 @@ const mean = a => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0);
     `min played ${Math.min(...v.teams.map(t => t.schedule.filter(g => g.played).length))}`);
 
   // --- multi-season stability --------------------------------------------
+  // The offseason is interactive: one call advances one phase, and a pending career
+  // choice or an unrun camp stops it. Drive it the way the interface does.
+  const finishOffseason = async () => {
+    let guard = 0;
+    while (e.universe.phase === 'complete' && guard++ < 24) {
+      if ((e.universe.jobOffers || []).length) {
+        const offer = e.universe.jobOffers[0];
+        if (!e.acceptPost(offer.schoolId).ok) break;
+        continue;
+      }
+      const phase = e.universe.offseason?.phase;
+      if (phase === 'spring') { e.runSpringCamp(); continue; }
+      if (phase === 'fall') { e.runFallCamp(); continue; }
+      if (!e.advanceOffseasonPhase()) break;
+    }
+    if (e.universe.phase === 'preseason') e.beginSeason();
+  };
   e.simConferenceChampionships(); e.simPlayoff();
-  e.runSpringCamp(); e.runFallCamp(); e.runOffseason();
+  e.runSpringCamp(); e.runFallCamp(); await finishOffseason();
   for (let i = 0; i < 6; i++) {
     e.simSeason(); e.simConferenceChampionships(); e.simPlayoff();
-    e.runSpringCamp(); e.runFallCamp(); e.runOffseason();
+    e.runSpringCamp(); e.runFallCamp(); await finishOffseason();
   }
   const w = e.universe;
   check('8 seasons complete without error', w.year === beforeYear + 8, `year ${w.year}`);

@@ -1,6 +1,19 @@
 # Latest Session Work
 
-## v0.12.20 — League-health metrics and the rollup verdict (2026-10-26)
+## v0.12.21 — Kicking-game repair (2026-10-26)
+
+- The health metrics found the defect: walk-on fill picked positions at random, so
+  thin kicker/punter depth grew 0 → 7 → 38 team-seasons and 11–22 programs a season
+  had no second kicker or punter.
+- `offseasonPreseason` now repairs critical depth (`CRITICAL_FLOOR` QB/K/P of 2)
+  before general need, swapping the weakest surplus player for a walk-on at the
+  missing position and recording the cut. Measured after: **K/P thin 36→0 (seed 7)
+  and 47→0 (seed 11)**; QB 7→9 and LB 5→10 soft-depth deficits remain and are not
+  unplayable.
+- `tests/roster-repair.js` covers a gutted kicking game, the whole league, and
+  determinism. Registered in `npm test`.
+
+## v0.12.20 — League-health metrics and the rollup verdict
 
 - `tools/league-health.js` reports portal churn, positional shortages, walk-on
   dependence and blue-chip concentration. Measured on three seasons of two seeds:
@@ -27,7 +40,7 @@
 
 ## Current state
 
-- Version `0.12.20` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
+- Version `0.12.21` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
   generated `index.html`.
 - Default branch `claude/review-improvement-dwjemy`; released source `6f649c4`
   (`v0.12.20`), merged by PR #15 after full CI 40425813895.

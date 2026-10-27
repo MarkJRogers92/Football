@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.12.21 — Kicking-game repair
+
+- Yearly roster top-up now repairs critical depth instead of picking positions at random. A program missing a kicker or punter swaps out a surplus walk-on and signs one; quarterbacks are held to a floor of two.
+- Measured over three seasons on two seeds: thin kicker/punter team-seasons fell from 36 and 47 to 0 and 0. The previous run left 11–22 programs a season without a second kicker or punter. Soft depth deficits (safety, linebacker) are unchanged by design — they are not unplayable.
+- Adds `tests/roster-repair.js`: a gutted kicking game is rebuilt, the whole league is repaired, and the result stays deterministic for a seed.
+- The smoke soak now drives the interactive offseason phase by phase (career choices, camps) instead of assuming one `runOffseason()` advances a year, which it does not when the calendar waits on a decision.
+- No tuning of recruit quality, transfer rates or awards.
+
 ## v0.12.20 — League-health metrics and the archive rollup verdict
 
 - `tools/league-health.js` now reports portal churn, positional shortages, walk-on dependence and blue-chip concentration on top of titles, prestige, rosters and Hall of Fame output.

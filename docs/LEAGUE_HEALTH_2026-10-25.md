@@ -135,3 +135,21 @@ Three findings worth acting on, none of them balance constants:
 The first is the only one that looks like a defect: a program can end up unable
 to field a kicker. Fixing it means making walk-on and portal fill respect
 positional need — a behaviour change that should be measured the same way.
+
+### Resolved in v0.12.21 — kicking-game repair
+
+Roster top-up now repairs critical depth (`CRITICAL_FLOOR`: QB, K and P at two)
+before general need: the weakest surplus player at an over-filled position is cut
+and a walk-on at the missing position is signed, recorded like any roster cut.
+
+| Three seasons, two seeds | Before | After |
+|---|---|---|
+| Thin kicker/punter team-seasons (seed 7) | 36 / 360 | **0 / 360** |
+| Thin kicker/punter team-seasons (seed 11) | 47 / 360 | **0 / 360** |
+| Thin quarterback team-seasons (7 / 11) | 7 / 8 | 9 / 8 |
+| Thin linebacker team-seasons (7 / 11) | 5 / 8 | 10 / 4 |
+
+The kicker/punter defect is gone on both seeds. Soft depth deficits at safety,
+linebacker and quarterback remain and are left alone deliberately: those are
+depth, not an unplayable roster. Portal placement behaviour and the class share
+of rosters are unchanged — they are design questions, not defects.
