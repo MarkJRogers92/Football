@@ -450,6 +450,13 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
 .title-screen-art{background:url("assets/title-stadium-v1.jpg") 64% center/cover no-repeat;animation:title-camera 24s ease-in-out infinite alternate;transform:scale(1.025)}
 .title-screen-shade{background:linear-gradient(90deg,rgba(3,7,12,.98) 0%,rgba(3,7,12,.92) 25%,rgba(3,7,12,.58) 49%,rgba(3,7,12,.12) 77%),linear-gradient(0deg,rgba(3,7,12,.92),transparent 35%,rgba(3,7,12,.22))}
 .title-screen-shade::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 52%,rgba(216,230,246,.11) 58%,transparent 65%);mix-blend-mode:screen;animation:title-light 9s ease-in-out infinite}
+/* Championship trophy: Meshy-generated model rendered to a sprite; sits in the tunnel light, right of the menu. */
+.title-trophy{position:fixed;z-index:0;right:clamp(28px,11vw,220px);top:50%;display:grid;place-items:center;width:min(38vw,440px);pointer-events:none;transform:translateY(-52%)}
+.title-trophy:before{content:"";position:absolute;inset:-14% -22%;background:radial-gradient(closest-side,rgba(232,190,92,.3),rgba(232,190,92,0) 70%)}
+.title-trophy img{position:relative;display:block;width:auto;max-width:100%;height:min(66vh,640px);object-fit:contain;filter:drop-shadow(0 34px 38px rgba(0,0,0,.7));animation:title-trophy-float 7s ease-in-out infinite}
+@keyframes title-trophy-float{50%{transform:translateY(-10px)}}
+.motion-reduced .title-trophy img{animation:none!important}
+@media(max-width:900px){.title-trophy{display:none}}
 .title-screen-content{position:relative;z-index:1;display:flex;min-height:100dvh;box-sizing:border-box;flex-direction:column;padding:clamp(28px,5vh,64px) clamp(26px,6vw,96px) 24px}
 .title-brand{display:flex;align-items:center;gap:20px;width:min(680px,100%);margin-bottom:clamp(22px,4vh,44px);text-transform:uppercase}
 .title-crest{display:grid;place-items:center;flex:0 0 auto;width:74px;height:82px;padding:2px;background:linear-gradient(145deg,#f4d57e,#a97116);clip-path:polygon(50% 0,94% 17%,88% 72%,50% 100%,12% 72%,6% 17%);filter:drop-shadow(0 9px 18px rgba(0,0,0,.35))}
@@ -506,7 +513,7 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
  .title-subpanel{padding:17px}.title-panel-head h2{font-size:21px}
  .title-footer{align-items:flex-end}.title-footer #titleStatus{max-width:68%;white-space:normal}
 }
-@media(prefers-reduced-motion:reduce){.title-screen-art,.title-screen-shade::after{animation:none!important}.title-action{transition:none}}
+@media(prefers-reduced-motion:reduce){.title-screen-art,.title-screen-shade::after,.title-trophy img{animation:none!important}.title-action{transition:none}}
 
 /* Team Branding v1 — staging 32px atlas. */
 .team-logo{display:inline-block;vertical-align:middle;background-repeat:no-repeat;flex:0 0 auto;border-radius:3px}

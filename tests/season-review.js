@@ -42,3 +42,15 @@ test('the review closes once departures change the roster', async () => {
   assert.notEqual(e.normalizeOffseasonState().phase, 'departures');
   assert.equal(globalThis.DynastySeasonReview.model(), null, 'hidden once departures are processed');
 });
+
+test('the championship trophy appears in the review header only for national champions', async () => {
+  const e = await completedSeason(41001);
+  const m = globalThis.DynastySeasonReview.model();
+  assert.equal(m.champion, e.universe.champion === e.T('Chicago Metropolitan').name);
+  assert.equal(m.champion, m.outcome === 'National champions');
+  const html = globalThis.DynastySeasonReview.html(m);
+  assert.equal(html.includes('sr-trophy'), m.champion);
+  const champ = globalThis.DynastySeasonReview.html({...m, champion: true, outcome: 'National champions'});
+  assert.match(champ, /<img class="sr-trophy" src="assets\/title-trophy-v1\.png"/);
+  assert.doesNotMatch(globalThis.DynastySeasonReview.html({...m, champion: false}), /sr-trophy/);
+});
