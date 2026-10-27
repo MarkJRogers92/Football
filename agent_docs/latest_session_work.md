@@ -1,6 +1,27 @@
 # Latest Session Work
 
-## v0.12.21 — Kicking-game repair (2026-10-26)
+## v0.12.22 — Portal outcomes, roster needs, long soak (2026-10-26)
+
+- **Portal realism.** A program needs two open slots at the position and a player
+  competitive with its room; a prior relationship still opens a door. Unplaced
+  entrants return to school (65%) or leave football (35%, archived "No landing
+  spot"). Measured 29.6% (seed 7) and 31.5% (seed 11) unplaced over three seasons,
+  matching the ~30% real-world D-I figure. First-offseason rate skews high — recorded
+  as a known limitation.
+- **Recruiting needs card** (`recruiting-needs.js`): thin position groups from
+  returning players + commitments against `POS_COUNTS`. Read-only bridge
+  `globalThis.DynastyRecruitingNeeds`; no save fields, simulation or randomness.
+- **Twenty-season soak**: `tools/save-size.js` now drives the interactive offseason,
+  throws if a season does not advance, and honours `SEED` (it previously hardcoded
+  seed 7). Seed 7 reaches 206.6 MB at season 20, with the player archive at 93.9 MB
+  and overtaking the game archive around season 13. Findings in
+  docs/SOAK_20_SEASONS.md.
+- **Notarisation blocked**: no Developer ID identity or App Store Connect key exists
+  on this machine; requirements and steps in docs/NOTARIZATION.md.
+- **Dynasty persistence is not started** — it changes simulation balance and needs
+  its own measured design using the soak data.
+
+## v0.12.21 — Kicking-game repair
 
 - The health metrics found the defect: walk-on fill picked positions at random, so
   thin kicker/punter depth grew 0 → 7 → 38 team-seasons and 11–22 programs a season
@@ -40,7 +61,7 @@
 
 ## Current state
 
-- Version `0.12.21` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
+- Version `0.12.22` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
   generated `index.html`.
 - Default branch `claude/review-improvement-dwjemy`; released source `f57e770`
   (`v0.12.21`), merged by PR #16 after full CI 40430159066.

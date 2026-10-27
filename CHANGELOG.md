@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.12.22 — Portal failure modes, roster needs, long-dynasty soak
+
+- **Portal entrants can fail to find a home.** A program now needs two open slots at the position and a player competitive with its current room; a prior relationship can still open a door. Unplaced players return to their school (65%, morale and trust cost) or leave football (35%, archived as "No landing spot"). Measured 29.6% and 31.5% unplaced over three seasons on two seeds, matching the ~30% real-world D-I figure. Known limitation: the rate skews high in the first offseason.
+- **Recruiting tab shows roster needs.** A read-only card compares returning players plus commitments against the engine roster shape, with no save fields, simulation or randomness.
+- **Twenty-season soak tool.** `tools/save-size.js` now drives the interactive offseason (career choices, camps) and fails loudly if a season does not advance; the old loop silently froze at season eleven.
+- **Notarisation documented, not shipped.** No Developer ID certificate or App Store Connect key exists on this machine, so signed/notarised builds are blocked on Apple account setup (docs/NOTARIZATION.md).
+
 ## v0.12.21 — Kicking-game repair
 
 - Yearly roster top-up now repairs critical depth instead of picking positions at random. A program missing a kicker or punter swaps out a surplus walk-on and signs one; quarterbacks are held to a floor of two.
