@@ -16,6 +16,8 @@ const start=page=>sharedStartNewDynasty(page);
   check('game day event hero is visible',await page.locator('#gamedayEventHero').isVisible());
   check('both real school identities are presented',await page.locator('#gamedayEventHero [data-event-team]').count()===2);
   check('both team logos use the existing atlas',await page.locator('#gamedayEventHero .event-team-logo[data-team-id]').count()===2);
+  check('both teams get a recolored helmet carrying their real logo decal',await page.locator('#gamedayEventHero .event-team-helmet .event-team-shell[data-team-id]').count()===2&&await page.locator('#gamedayEventHero .event-team-helmet .event-team-logo[data-team-id]').count()===2);
+  check('home helmet is mirrored to face the away helmet',await page.$eval('#gamedayEventHero .event-team.home .event-team-shell',el=>getComputedStyle(el).scale)==='-1 1');
   check('real week and stakes context are visible',event.includes('game day')&&event.includes('week')&&(event.includes('conference game')||event.includes('nonconference game')||event.includes('rivalry')));
   check('real plan context is visible',event.includes('active plan')&&event.includes('staff recommendation'));
   check('availability and opponent tendency are visible',event.includes('availability')&&event.includes('opponent tendency'));

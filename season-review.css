@@ -5,6 +5,9 @@
 .offseason-recap .lineitem{gap:8px;overflow-wrap:anywhere}
 .offseason-recap [data-recap-next]{margin-top:12px;max-width:100%;white-space:normal}
 .season-review h2{margin:2px 0 4px;font-size:1.45rem}
+.season-review .section-head:has(.sr-trophy){align-items:center}
+.sr-trophy{flex:0 0 auto;width:auto;height:96px;margin:-6px 6px -6px 0;filter:drop-shadow(0 0 18px rgba(232,190,92,.35)) drop-shadow(0 8px 10px rgba(0,0,0,.5))}
+@media(max-width:520px){.sr-trophy{height:64px}}
 .sr-strip{display:flex;gap:6px;overflow-x:auto;padding:4px 0 12px;margin-bottom:6px;border-bottom:1px solid var(--line)}
 .sr-game{flex:0 0 auto;display:grid;justify-items:center;gap:1px;min-width:58px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--text);cursor:pointer;font:inherit}
 .sr-game b{font-size:1rem}

@@ -49,7 +49,7 @@ function seasonReviewModel(t=selected()){
  const stars=signees.length?signees.reduce((s,r)=>s+(r.stars||0),0)/signees.length:0;
  return{
   year:universe.year,team:t.name,record:`${t.w||0}–${t.l||0}`,conference:`${t.cw||0}–${t.cl||0} ${t.conference}`,
-  rank:t.rank&&t.rank<=25?`#${t.rank}`:'Unranked',outcome:seasonReviewOutcome(t,games),
+  rank:t.rank&&t.rank<=25?`#${t.rank}`:'Unranked',outcome:seasonReviewOutcome(t,games),champion:universe.champion===t.name,
   games,moments:seasonReviewMoments(t,games),leaders:seasonReviewLeaders(t),
   awards:(universe.awards?.[universe.year]||[]).filter(a=>a.team===t.name).map(a=>({name:a.name,playerId:a.playerId,playerName:a.playerName,pos:a.pos})),
   goals:goals.results.map(g=>({label:g.label,weight:g.weight||g.tier,state:g.state,progress:g.progress})),
@@ -67,7 +67,7 @@ function seasonReviewHTML(m){
  const game=g=>`<button type="button" class="sr-game ${g.win?'win':'loss'}${g.postseason?' post':''}" data-game="${esc(g.id)}" title="${esc(`${g.label}: ${g.win?'W':'L'} ${g.us}–${g.them} ${g.loc} ${g.opp}`)}"><b>${g.win?'W':'L'}</b><span>${esc(seasonReviewChipLabel(g))}</span><small>${g.us}–${g.them}</small></button>`;
  const goalIcon={complete:'✓',failed:'✕',at_risk:'!'};
  const r=m.recruiting;
- return `<div class="section-head"><div><div class="eyebrow">${esc(m.year)} SEASON IN REVIEW</div><h2>${esc(m.outcome)}</h2><div class="muted">${esc(m.record)} · ${esc(m.conference)} · Final ranking ${esc(m.rank)}</div></div></div>
+ return `<div class="section-head"><div><div class="eyebrow">${esc(m.year)} SEASON IN REVIEW</div><h2>${esc(m.outcome)}</h2><div class="muted">${esc(m.record)} · ${esc(m.conference)} · Final ranking ${esc(m.rank)}</div></div>${m.champion?'<img class="sr-trophy" src="assets/title-trophy-v1.png" alt="National championship trophy" width="517" height="849" decoding="async">':''}</div>
  <div class="sr-strip" aria-label="Season results">${m.games.map(game).join('')}</div>
  <div class="sr-grid">
   <div class="sr-block"><div class="eyebrow">DEFINING MOMENTS</div>${m.moments.map(x=>`<button type="button" class="sr-moment ${x.kind}" data-game="${esc(x.gameId)}"><small>${esc(x.title)}</small><strong>${esc(x.text)}</strong><span>${esc(x.detail)}</span></button>`).join('')||'<p class="muted">No games recorded.</p>'}</div>
@@ -85,7 +85,7 @@ function renderSeasonReview(){
  host.hidden=false;host.innerHTML=seasonReviewHTML(m);attachPlayerLinks();
 }
 extendRender('dashboard',renderSeasonReview);
-globalThis.DynastySeasonReview={model:seasonReviewModel};
+globalThis.DynastySeasonReview={model:seasonReviewModel,html:seasonReviewHTML};
 
 function renderOffseasonRecap(){
  const dash=document.querySelector('#dashboard'),center=dash?.querySelector('.command-center');if(!center)return;
