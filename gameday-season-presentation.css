@@ -2,9 +2,9 @@
 /* Matchup helmets: the recolored Meshy helmet atlas with the team's real logo as the side decal. */
 .event-team-helmet{position:relative;flex:0 0 auto;width:112px;aspect-ratio:1;filter:drop-shadow(0 10px 14px rgba(0,0,0,.45))}
 .event-team-shell,.event-team-logo{position:absolute;background-repeat:no-repeat;background-size:1200% 1000%;background-position:calc(var(--col,0)*100%/11) calc(var(--row,0)*100%/9)}
-.event-team-shell{inset:0;background-image:url("assets/team-helmets-meshy-atlas-128.png")}
+.event-team-shell{inset:0;background-image:url("assets/team-helmets-meshy-atlas-128.webp")}
 /* The thin light outline keeps dark mascots legible on a dark shell, like a decal sticker. */
-.event-team-logo{left:17%;top:21%;width:29%;height:29%;background-image:url("assets/team-logos-atlas-32.png");filter:drop-shadow(0 0 .6px #fff) drop-shadow(0 0 .6px #fff) drop-shadow(0 1px 2px rgba(0,0,0,.5))}
+.event-team-logo{left:19%;top:31%;width:28%;height:28%;background-image:url("assets/team-logos-atlas-32.png");filter:drop-shadow(0 0 .6px #fff) drop-shadow(0 0 .6px #fff) drop-shadow(0 1px 2px rgba(0,0,0,.5))}
 .event-team.home .event-team-shell{scale:-1 1}
-.event-team.home .event-team-logo{left:auto;right:17%}
+.event-team.home .event-team-logo{left:auto;right:19%}
 @media(max-width:720px){.event-team-helmet{width:84px}}
