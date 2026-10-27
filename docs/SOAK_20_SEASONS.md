@@ -21,6 +21,14 @@ if a season does not advance.
 | 15 (2042) | 161.4 | 48.1 | 68.1 | 29.3 |
 | 20 (2047) | **206.6** | 60.8 | **93.9** | 29.3 |
 
+Second seed (11) at the same points, for confirmation: 115.4 MB at season ten and
+**205.4 MB at season twenty**, with the player archive at 93.4 MB. The two seeds
+agree within 1 MB, so this is shape, not luck.
+
+Note: the first attempt at this soak ran seed 7 twice, because the tool hardcoded
+`seed: 7` and ignored `SEED`. That is fixed, and the numbers above are from two
+genuinely different seeds.
+
 - Growth is steady at roughly **8–9 MB per season** and does not level off.
 - **The player archive becomes the dominant cost**: 1.7 → 93.9 MB, overtaking the
   game archive around season 13 and growing ~5 MB a season by the end.

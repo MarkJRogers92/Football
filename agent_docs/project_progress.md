@@ -2,14 +2,13 @@
 
 ## Version and branch
 
-Source is `0.12.21` on `claude/review-improvement-dwjemy`. PR #16 merged as
-f57e770 after full CI 40430159066 passed; v0.12.21 fixes the kicking-game defect
-found by the v0.12.20 metrics: critical depth (QB/K/P floor of two) is repaired
-before general need, and thin kicker/punter team-seasons fell from 36/47 to 0/0
-across the two measured seeds. Mac v0.12.21 is installed from its matching
-artifact (signature and ZIP hash verified, 17 save files untouched, v0.12.20 app
-backed up). Published desktop and web release is v0.12.21 (web publish
-40431220621). v0.12.20 added the four league-health metrics (PR #15); v0.12.19
+Source is `0.12.22` on `claude/review-improvement-dwjemy`. PR #17 merged as
+226d0d6 after full CI 40437226083 passed; v0.12.22 adds portal failure modes
+(29.6%/31.5% unplaced, return-or-exit outcomes), a read-only recruiting roster-needs
+card, and a corrected twenty-season soak (206.6/205.4 MB at season twenty). Mac
+v0.12.22 is installed from its matching artifact (signature and ZIP hash verified,
+17 save files untouched, v0.12.21 app backed up). Published desktop and web release
+is v0.12.22 (web publish 40438169125). v0.12.21 fixed kicker/punter depth (PR #16); v0.12.20 added the four league-health metrics (PR #15); v0.12.19
 Hall of Fame browsing (PR #14); v0.12.18 history accuracy, off-field career
 preservation and the offseason recap (PR #13).
 
