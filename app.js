@@ -2,7 +2,7 @@
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.12.20';
+const APP_VERSION='0.12.21';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -2723,6 +2723,40 @@ function offseasonPortal(){
  autosaveAfter('portal'),finishOffseasonPhase('portal','spring',{placed:portal.length-universe.transferPortal.length,pending:universe.transferPortal.length});
  return true;
 }
+// v0.12.21: the yearly walk-on top-up repairs positional scarcity. Measured over
+// three seasons, random fill left thin kicker/punter depth growing 0 -> 7 -> 38
+// team-seasons, and a program could end a season with no kicker at all.
+function scarcePosition(t){
+ const counts={};for(const p of t.roster)counts[p.pos]=(counts[p.pos]||0)+1;
+ let best=null,deficit=0;
+ for(const pos of POS){const gap=(POS_COUNTS[pos]||4)-(counts[pos]||0);if(gap>deficit){deficit=gap;best=pos}}
+ return best;
+}
+// Filling to 85 was never enough: a program sits at 85 with a skewed shape, so the
+// top-up never ran and kicker depth still decayed. Repair swaps a surplus walk-on
+// for the missing position, recording the cut like any other roster cut.
+// A missing kicker or punter is unplayable; general depth is not. Critical
+// positions are repaired first, so repair never spends its swaps on soft depth.
+const CRITICAL_FLOOR={QB:2,K:2,P:2};
+function criticalPosition(t){
+ const counts={};for(const p of t.roster)counts[p.pos]=(counts[p.pos]||0)+1;
+ for(const pos of Object.keys(CRITICAL_FLOOR))if((counts[pos]||0)<CRITICAL_FLOOR[pos])return pos;
+ return null;
+}
+function repairRosterShape(t,receipt){
+ const count=pos=>t.roster.filter(p=>p.pos===pos).length;
+ for(let guard=0;guard<6;guard++){
+  const need=criticalPosition(t);if(!need)break;
+  let donor=null,excess=0;
+  for(const pos of POS){const gap=count(pos)-(POS_COUNTS[pos]||4);if(pos!==need&&gap>excess){excess=gap;donor=pos}}
+  if(!donor||excess<1)break;
+  const victim=t.roster.filter(p=>p.pos===donor).sort((a,b)=>a.trueNow-b.trueNow)[0];
+  if(!victim)break;
+  t.roster=t.roster.filter(p=>p.id!==victim.id);
+  addToArchive(victim,t,'Roster cut');recordRosterMove(t,victim,'cuts',receipt);
+  const added=generateFreshman(t,need);t.roster.push(added);recordRosterMove(t,added,'walkOns',receipt);
+ }
+}
 function offseasonPreseason(){
  const os=normalizeOffseasonState(),ds=ensureDevelopmentState();
  if(!offseasonPhaseDone('spring')||!offseasonPhaseDone('fall')){setStatus('Complete spring development and fall camp first.');return false}
@@ -2730,7 +2764,7 @@ function offseasonPreseason(){
  const compacted=compactGameArchive();
  if(compacted.games&&currentArchiveState())currentArchiveState().gamesDirty=true;
  universe.year++;universe.week=0;resetNilSeason();universe.recoveredWeek=-1;universe.phase='regular';universe.latest=[];universe.confChamps=[];universe.playoffFieldIds=[];universe.playoffFieldUnavailable=false;universe.academicProgression={season:universe.year,week:0,teamIds:[]};universe.champion=null;universe.lastDetailedGame=null;universe.playLogs={};universe.recruits=generateRecruitPool(2800,universe.highSchools);universe.recruitClassCounts={};
- universe.teams.forEach(t=>{t.w=t.l=t.cw=t.cl=t.pf=t.pa=t.sos=0;t.rank=null;t.champ=false;t.commits=[];while(t.roster.length<85){const p=generateFreshman(t,pick(POS));t.roster.push(p);recordRosterMove(t,p,'walkOns',os.reports.roster?.[t.id])}if(t.roster.length>105){const keep=t.roster.sort((a,b)=>b.trueNow-a.trueNow).slice(0,105),cut=t.roster.filter(p=>!keep.includes(p));for(const p of cut){addToArchive(p,t,'Roster cut');recordRosterMove(t,p,'cuts',os.reports.roster?.[t.id])}t.roster=keep}autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)});
+ universe.teams.forEach(t=>{t.w=t.l=t.cw=t.cl=t.pf=t.pa=t.sos=0;t.rank=null;t.champ=false;t.commits=[];while(t.roster.length<85){const p=generateFreshman(t,criticalPosition(t)||scarcePosition(t)||pick(POS));t.roster.push(p);recordRosterMove(t,p,'walkOns',os.reports.roster?.[t.id])}repairRosterShape(t,os.reports.roster?.[t.id]);if(t.roster.length>105){const keep=t.roster.sort((a,b)=>b.trueNow-a.trueNow).slice(0,105),cut=t.roster.filter(p=>!keep.includes(p));for(const p of cut){addToArchive(p,t,'Roster cut');recordRosterMove(t,p,'cuts',os.reports.roster?.[t.id])}t.roster=keep}autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)});
  if(os.reports.roster)universe.lastOffseasonRecap={year:os.year,teams:Object.fromEntries(universe.teams.filter(t=>os.reports.roster[t.id]).map(t=>[t.id,offseasonReceiptView(t,os.reports.roster[t.id],os.year,true)]))};
  normalizePromiseState();universe.developmentState={year:universe.year,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]};universe.offseasonDone=false;buildSchedule();ranked();buildPreseasonHub();autosaveAfter('preseason');
  return true;
