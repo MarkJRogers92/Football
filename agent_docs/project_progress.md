@@ -2,14 +2,16 @@
 
 ## Version and branch
 
-Source is `0.12.20` on `claude/review-improvement-dwjemy`. PR #15 merged as
-6f649c4 after full CI 40425813895 passed; v0.12.20 adds the four league-health
-metrics and the measured verdict against a playerArchive rollup. Mac v0.12.20 is
-installed from its matching artifact (signature and ZIP hash verified, 17 save
-files untouched, v0.12.19 app backed up). Published desktop and web release is
-v0.12.20 (web publish 40426594973). v0.12.19 added Hall of Fame browsing (PR #14);
-v0.12.18 added history accuracy, off-field career preservation and the offseason
-recap (PR #13).
+Source is `0.12.21` on `claude/review-improvement-dwjemy`. PR #16 merged as
+f57e770 after full CI 40430159066 passed; v0.12.21 fixes the kicking-game defect
+found by the v0.12.20 metrics: critical depth (QB/K/P floor of two) is repaired
+before general need, and thin kicker/punter team-seasons fell from 36/47 to 0/0
+across the two measured seeds. Mac v0.12.21 is installed from its matching
+artifact (signature and ZIP hash verified, 17 save files untouched, v0.12.20 app
+backed up). Published desktop and web release is v0.12.21 (web publish
+40431220621). v0.12.20 added the four league-health metrics (PR #15); v0.12.19
+Hall of Fame browsing (PR #14); v0.12.18 history accuracy, off-field career
+preservation and the offseason recap (PR #13).
 
 ## Overall progress
 

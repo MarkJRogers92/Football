@@ -1,11 +1,13 @@
 # Roadmap execution status
 
-Last reconciled: 2026-10-26, source `6f649c4` (`v0.12.21`) on
+Last reconciled: 2026-10-26, source `f57e770` (`v0.12.21`) on
 `claude/review-improvement-dwjemy`. History carries coach index, champion
 timeline, Hall of Fame with filtering and show-all, and conference standings.
-Publish for 0.12.20: run 40426594973. The playerArchive rollup was investigated and
-rejected on measurement (docs/SAVE_SIZE_MEASUREMENT.md). The next named packet is
-the kicker/punter availability gap found by the new health metrics
+Publish for 0.12.21: run 40431220621. The playerArchive rollup was investigated and
+rejected on measurement (docs/SAVE_SIZE_MEASUREMENT.md). The kicker/punter
+availability gap found by the health metrics is fixed and re-measured: thin K/P
+team-seasons 36/47 → 0/0 over three seasons on two seeds. The next named packet is
+the portal's placement behaviour (no entrant is ever left unplaced)
 (docs/LEAGUE_HEALTH_2026-10-25.md), measured before and after.
 
 | Packet | Status | Notes |
