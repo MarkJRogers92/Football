@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.12.20 — League-health metrics and the archive rollup verdict
+
+- `tools/league-health.js` now reports portal churn, positional shortages, walk-on dependence and blue-chip concentration on top of titles, prestige, rosters and Hall of Fame output.
+- Three seasons on two seeds: 466 transfers, no unplaced portal entrants, 45–58 thin team-seasons (almost all kicker/punter), ~82% of rosters never signed through a class, and only ~16% of blue chips going to the ten strongest classes. Findings in docs/LEAGUE_HEALTH_2026-10-25.md.
+- `tools/save-size.js` reports archive bytes by field. Measured verdict on the playerArchive rollup: don't. Season rows run 3.8 per career with real per-season production, and only ~2.9 MB of 114 MB belongs to statless careers. Documented in docs/SAVE_SIZE_MEASUREMENT.md.
+- No simulation, save-shape or balance changes.
+
 ## v0.12.19 — Hall of Fame browsing and repository hygiene
 
 - The Hall of Fame shows a count (`Showing 24 of 64 inductees`), filters by players or coaches, and offers `Show all`. Stricter induction in v0.12.17 made dynasties longer than the 24-row cap, so most inductees were unreachable. Covered on desktop and mobile.

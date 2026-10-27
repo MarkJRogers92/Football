@@ -296,4 +296,35 @@ new historical membership snapshots and compact last-offseason receipts:
 This intentionally trades some archive savings for factual history preservation.
 It measures portable JSON, not a new native-save or IndexedDB benchmark.
 
+## playerArchive rollup — investigated, not shipped (2026-10-26)
+
+The named next packet was to collapse retired players' season rows into career
+totals. Measured first, with `ANALYZE=1 SEASONS=10` on seed 7, which now reports
+bytes by field as well as by component.
+
+| Archive field | Bytes at season ten |
+|---|---|
+| seasonHistory | 11.3 MB (27.3% of the archive) |
+| campHistory | 4.0 MB |
+| recruitingMemory | 3.0 MB |
+| draftResult | 1.5 MB |
+| career totals | 0.9 MB |
+| coachDeparturePressure | 0.9 MB |
+| origin | 0.8 MB |
+| injuryHistory | 0.6 MB |
+
+The archive holds 60,781 season rows across 15,812 played careers — about **3.8
+rows per career at 195 B each**, not a runaway trail. A sampled row is
+`{year, team, pos, style, eligibility, rating, games, starts, tackles}`: a real
+season's production, which is exactly what the v0.12.18 change set out to keep.
+
+Split by career: players who recorded games hold ~**74%** of season-row bytes;
+never-played careers hold ~26% (about 2.9 MB at season ten).
+
+**Decision: do not roll up.** Collapsing these rows deletes recorded production,
+and the statless share is ~2.9 MB — roughly 2.5% of a 114 MB save — which does not
+justify reversing a deliberate policy decision and its regression test. If
+twenty-season saves later become a problem, the growth to attack is `gameArchive`
+(34.3 MB, about +3 MB per season even after compaction), not this archive.
+
 

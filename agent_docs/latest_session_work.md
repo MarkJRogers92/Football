@@ -1,6 +1,19 @@
 # Latest Session Work
 
-## v0.12.19 — Hall of Fame browsing and repository hygiene (2026-10-26)
+## v0.12.20 — League-health metrics and the rollup verdict (2026-10-26)
+
+- `tools/league-health.js` reports portal churn, positional shortages, walk-on
+  dependence and blue-chip concentration. Measured on three seasons of two seeds:
+  466 transfers with no unplaced entrants, thin depth concentrated at kicker and
+  punter (45–58 team-seasons), ~82% of rosters never signed through a class, and
+  ~16% of blue chips reaching the ten strongest classes. Written up in
+  docs/LEAGUE_HEALTH_2026-10-25.md, including the kicker/punter repair gap.
+- `tools/save-size.js` now breaks the archive down by field. The playerArchive
+  rollup is **not worth doing**: 3.8 season rows per career carrying real
+  production, and only ~2.9 MB of 114 MB belongs to stateless careers. Verdict and
+  numbers in docs/SAVE_SIZE_MEASUREMENT.md. No save-shape change shipped.
+
+## v0.12.19 — Hall of Fame browsing and repository hygiene
 
 - Hall of Fame now shows a count ("Showing 24 of 64 inductees"), a Players/Coaches
   category filter and a "Show all" control. Induction got stricter in v0.12.17, but
@@ -14,7 +27,7 @@
 
 ## Current state
 
-- Version `0.12.19` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
+- Version `0.12.20` in `VERSION.txt`, `APP_VERSION`, `package.json` and the
   generated `index.html`.
 - Default branch `claude/review-improvement-dwjemy`; released source `f03383b`
   (`v0.12.19`).
