@@ -97,3 +97,41 @@ injuries or recruiting.** The one clear defect was Hall of Fame selectivity, and
 that is fixed. The two open questions — annual roster swing and freshman-heavy
 rosters — are design tuning, not breakage; both deserve a deliberate change with
 its own measurement rather than a quiet constant edit.
+
+## Follow-up: the four metrics this report left out (2026-10-26)
+
+The tool now also reports portal churn, positional shortages, walk-on dependence
+and blue-chip concentration. Three seasons on both seeds, same command:
+
+| Measure | Seed 7 | Seed 11 |
+|---|---|---|
+| Completed transfers (3 seasons) | 466 | 466 |
+| Portal entrants left unplaced | 0 | 0 |
+| Program-seasons losing 2+ players | 129 | 127 |
+| Thin team-seasons (of 360) | 45 | 58 |
+| — kicker/punter | 36 | 47 |
+| — quarterback | 7 | 8 |
+| — linebacker | 5 | 8 |
+| — OL / DL / secondary | 0 | 0 |
+| Walk-on share of rosters (mean) | 82.2% | 82.2% |
+| Blue chips signed by top-10 classes | 16.1% | 16.7% |
+
+Three findings worth acting on, none of them balance constants:
+
+1. **Kicker and punter depth collapses over time.** Thin team-seasons go 0 → 7 →
+   38 across three seasons, almost all at K/P (`POS_COUNTS` gives 2+2, the thin
+   line is 3). Walk-on fill picks positions at random rather than by need, so a
+   program that loses a kicker may never replace him. This is a roster-repair
+   gap, not a tuning preference.
+2. **Unplaced portal entrants are always zero.** Every player who enters is
+   placed, which means the portal never produces the "didn't find a home"
+   outcome the fiction implies — and no program is ever left holding a vacancy.
+3. **Recruiting classes explain only a minority of rosters.** Roughly four in
+   five rostered players never came through a class (season one is all
+   pre-generated, so later seasons read 60–86%). Blue chips are also widely
+   spread: only ~16% sign with the ten strongest classes, which matches the
+   ten-different-champions parity result.
+
+The first is the only one that looks like a defect: a program can end up unable
+to field a kicker. Fixing it means making walk-on and portal fill respect
+positional need — a behaviour change that should be measured the same way.

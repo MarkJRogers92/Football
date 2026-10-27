@@ -8,9 +8,21 @@ const SEED = Number(process.env.SEED || 7);
 const mean = list => list.reduce((a, b) => a + b, 0) / Math.max(1, list.length);
 const sd = list => { const m = mean(list); return Math.sqrt(mean(list.map(v => (v - m) ** 2))); };
 const share = (part, whole) => (whole ? (part / whole * 100).toFixed(1) : '0.0') + '%';
+// Position groups follow the engine's POS list; a group is thin when it holds fewer
+// players than 60% of its POS_COUNTS design (rounded up), i.e. it is not two-deep.
+const POS_GROUPS = [['QB', ['QB']], ['OL', ['OT', 'OG', 'C']], ['DL', ['EDGE', 'DT']], ['LB', ['LB']], ['DB', ['CB', 'S']], ['K/P', ['K', 'P']]];
+// Reason codes written onto TRANSFER_COMPLETED events by placeTransfer.
+const REASON_LABEL = { BROKEN_PROMISE: 'broken promise', PLAYING_TIME: 'playing time', FRESH_START: 'fresh start', ROSTER_RELEASE: 'roster release' };
+const pad = (v, n) => String(v).padEnd(n);
 
 (async () => {
   const e = loadEngine({ seed: SEED });
+  const groups = POS_GROUPS.map(([label, positions]) => ({
+    label, positions,
+    // POS_COUNTS is the engine's designed roster shape per position.
+    threshold: Math.ceil(positions.reduce((n, p) => n + (e.POS_COUNTS[p] || 0), 0) * 0.6),
+  }));
+  for (const g of groups) if (g.positions.some(p => !e.POS.includes(p))) throw new Error(`position group ${g.label} is not in the engine POS list`);
   e.setUserTeam('Chicago Metropolitan');
   await e.loadSchools();
   e.initUniverse();
@@ -23,6 +35,14 @@ const share = (part, whole) => (whole ? (part / whole * 100).toFixed(1) : '0.0')
   const decommits = [];
   const seasons = [];
   const careerMoves = [];
+  // New metric state, all populated from one pass over the existing driver.
+  const portalReports = new Map();   // universe.offseason.reports.portal per season
+  const portalRows = new Map();      // TRANSFER_COMPLETED events per season
+  const thinBySeason = [];           // per season: thin team-seasons, by group
+  const thinByGroup = Object.fromEntries(groups.map(g => [g.label, 0]));
+  const thinByTeam = new Map();      // program -> thin team-seasons by group
+  const walkOn = [];                 // per season: mean program share with no recruitingMemory
+  const blueChip = [];               // per cycle: 4/5-star signees and top-10 class share
 
   const bump = (map, key, by = 1) => map.set(key, (map.get(key) || 0) + by);
   const nameOf = id => u.teams.find(t => t.id === id)?.name || (Number.isInteger(id) ? 'Team ' + id : String(id));
@@ -36,6 +56,40 @@ const share = (part, whole) => (whole ? (part / whole * 100).toFixed(1) : '0.0')
     e.simPlayoff();
     if (u.champion) bump(champions, u.champion);
     for (const id of u.playoffFieldIds || []) bump(playoffApps, nameOf(id));
+
+    // Roster as it finished the season (before the next class and walk-ons arrive).
+    // Position counts come from p.pos on t.roster; walk-ons are players with no
+    // recruitingMemory (captureRecruitment is only written on a signed recruit).
+    const walkShares = [];
+    let teamSeasonThin = 0;
+    const thinCounts = Object.fromEntries(groups.map(g => [g.label, 0]));
+    for (const t of u.teams) {
+      const posCount = {};
+      let noMemory = 0;
+      for (const p of t.roster) { posCount[p.pos] = (posCount[p.pos] || 0) + 1; if (!p.recruitingMemory) noMemory++; }
+      const rec = thinByTeam.get(t.name) || { thin: 0, groups: {} };
+      let thin = 0;
+      for (const g of groups) {
+        const have = g.positions.reduce((n, p) => n + (posCount[p] || 0), 0);
+        if (have >= g.threshold) continue;
+        thin++; thinByGroup[g.label]++; thinCounts[g.label]++;
+        rec.groups[g.label] = (rec.groups[g.label] || 0) + 1;
+      }
+      if (thin) { teamSeasonThin++; rec.thin += thin; thinByTeam.set(t.name, rec); }
+      if (t.roster.length) walkShares.push(noMemory / t.roster.length * 100);
+    }
+    thinBySeason.push({ year: u.year, teamSeasons: teamSeasonThin, groups: thinCounts });
+    walkOn.push({ year: u.year, mean: mean(walkShares) });
+
+    // Class just finalized by finalizeRecruiting(): r.committed names the program,
+    // r.stars is the signee rating. Class success = sum of signee stars.
+    const commits = u.recruits.filter(r => r.committed);
+    const points = new Map();
+    for (const r of commits) points.set(r.committed, (points.get(r.committed) || 0) + (r.stars || 0));
+    const topTen = new Set([...points.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([name]) => name));
+    const blue = commits.filter(r => (r.stars || 0) >= 4);
+    blueChip.push({ year: u.year, blue: blue.length, elite: blue.filter(r => topTen.has(r.committed)).length, topTen: topTen.size });
+
     e.runSpringCamp();
     e.runFallCamp();
     // The offseason is interactive: a phase can wait on a career choice or a weekly
@@ -43,6 +97,8 @@ const share = (part, whole) => (whole ? (part / whole * 100).toFixed(1) : '0.0')
     const userTeam = () => u.teams.find(t => t.name === u.tenure?.school) || u.teams[0];
     let guard = 0;
     while (u.phase === 'complete' && guard++ < 30) {
+      // reports.portal is replaced when the calendar rolls, so keep the season's copy.
+      if (u.offseason?.year === u.year && u.offseason.reports?.portal) portalReports.set(u.year, { ...u.offseason.reports.portal });
       if ((u.jobOffers || []).length) {
         const offer = (u.jobOffers || [])[0];
         const accepted = offer && e.acceptPost(offer.schoolId);
@@ -82,6 +138,19 @@ const share = (part, whole) => (whole ? (part / whole * 100).toFixed(1) : '0.0')
     });
   }
 
+  // One pass over the event log: TRANSFER_COMPLETED carries metadata.reason and
+  // metadata.fromSchoolId (written by placeTransfer when a transfer completes).
+  for (const ev of u.events || []) {
+    if (ev.type !== 'TRANSFER_COMPLETED') continue;
+    const row = portalRows.get(ev.season) || { completed: 0, reasons: {}, from: new Map() };
+    row.completed++;
+    const reason = ev.metadata?.reason || 'UNKNOWN';
+    row.reasons[reason] = (row.reasons[reason] || 0) + 1;
+    const from = ev.metadata?.fromSchoolId;
+    if (from != null) row.from.set(from, (row.from.get(from) || 0) + 1);
+    portalRows.set(ev.season, row);
+  }
+
   const prestige = u.teams.map(t => t.prestige);
   const rosters = u.teams.map(t => t.roster.length);
   const players = u.teams.flatMap(t => t.roster);
@@ -92,6 +161,7 @@ const share = (part, whole) => (whole ? (part / whole * 100).toFixed(1) : '0.0')
 
   const top = map => [...map.entries()].sort((a, b) => b[1] - a[1]);
   const titles = top(champions), conf = top(confTitles), playoffs = top(playoffApps), awards = top(awardWins);
+  const seasonYears = thinBySeason.map(r => r.year);
 
   console.log(`league health — seed ${SEED}, ${SEASONS} seasons (through ${u.year - 1})`);
   console.log('\nseason  prestige mean/sd  roster min/mean/max  at-cap');
@@ -110,5 +180,39 @@ const share = (part, whole) => (whole ? (part / whole * 100).toFixed(1) : '0.0')
   console.log('classes:', Object.entries(byClass).map(([k, v]) => `${k}:${v}`).join(' '));
   console.log('archive: careers', (u.playerArchive || []).length, '· hall of fame', e.hallOfFame({ limit: 500 }).length);
   console.log('career changes for the user program:', careerMoves.length, careerMoves.map(m => `${m.year}→${m.to}`).join(' · '));
+
+  // Entrants placed/unplaced: universe.offseason.reports.portal.placed/pending.
+  console.log('\nportal churn by season (entrants = reports.portal placed+pending; completed = TRANSFER_COMPLETED events):');
+  console.log(pad('season', 8) + pad('entrants', 10) + pad('placed', 8) + pad('unplaced', 10) + pad('completed', 11) + 'programs losing 2+');
+  for (const y of seasonYears) {
+    const rep = portalReports.get(y);
+    const row = portalRows.get(y) || { completed: 0, reasons: {}, from: new Map() };
+    const entrants = rep ? rep.placed + rep.pending : row.completed;
+    console.log(pad(y, 8) + pad(entrants, 10) + pad(rep ? rep.placed : '?', 8) + pad(rep ? rep.pending : '?', 10) + pad(row.completed, 11) + [...row.from.values()].filter(n => n >= 2).length);
+    console.log('        reasons: ' + (Object.entries(row.reasons).map(([k, n]) => `${REASON_LABEL[k] || k} ${n}`).join(' · ') || 'none'));
+  }
+  const portalTotal = seasonYears.reduce((n, y) => n + (portalRows.get(y)?.completed || 0), 0);
+  const lostTotal = seasonYears.reduce((n, y) => n + [...(portalRows.get(y)?.from.values() || [])].filter(x => x >= 2).length, 0);
+  console.log('total completed transfers:', portalTotal, '· program-seasons losing 2+ players:', lostTotal);
+
+  // Counts per program from p.pos on t.roster; thresholds from engine POS_COUNTS.
+  console.log('\npositional shortages by season (thin = below 60% of POS_COUNTS design: ' + groups.map(g => `${g.label}<${g.threshold}`).join(', ') + '):');
+  console.log(pad('season', 8) + pad('team-seasons thin', 20) + groups.map(g => pad(g.label, 5)).join(''));
+  for (const row of thinBySeason) console.log(pad(row.year, 8) + pad(row.teamSeasons, 20) + groups.map(g => pad(row.groups[g.label], 5)).join(''));
+  console.log('thin team-seasons by group (of ' + seasonYears.length * u.teams.length + '): ' + groups.map(g => `${g.label} ${thinByGroup[g.label]}`).join(' · '));
+  const worst = [...thinByTeam.entries()].sort((a, b) => b[1].thin - a[1].thin).slice(0, 5);
+  console.log('worst offenders (thin team-seasons): ' + (worst.map(([name, r]) => `${name} ${r.thin} (${Object.entries(r.groups).map(([g, n]) => `${g} ${n}`).join(', ')})`).join(' · ') || 'none'));
+
+  // p.recruitingMemory exists only for players signed out of a recruiting class.
+  console.log('\nwalk-on dependence (share of rostered players with no recruitingMemory):');
+  for (const row of walkOn) console.log(`${row.year}  ${row.mean.toFixed(1)}% mean across ${u.teams.length} programs`);
+  console.log('mean across seasons:', mean(walkOn.map(r => r.mean)).toFixed(1) + '%');
+
+  // Signee program and rating: r.committed and r.stars on universe.recruits.
+  console.log('\nblue-chip concentration (4- and 5-star signees held by the top 10 classes by star points):');
+  console.log(pad('season', 8) + pad('blue-chip signees', 20) + pad('in top-10 classes', 20) + 'share');
+  for (const row of blueChip) console.log(pad(row.year, 8) + pad(row.blue, 20) + pad(row.elite, 20) + (row.blue ? (row.elite / row.blue * 100).toFixed(1) : '0.0') + '%');
+  console.log('mean top-10 share:', mean(blueChip.map(r => r.blue ? r.elite / r.blue * 100 : 0)).toFixed(1) + '%');
+
   console.log('\nseasons detail:', JSON.stringify(seasons));
 })();
