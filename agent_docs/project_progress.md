@@ -2,13 +2,14 @@
 
 ## Version and branch
 
-Source is `0.12.22` on `claude/review-improvement-dwjemy`. PR #17 merged as
-226d0d6 after full CI 40437226083 passed; v0.12.22 adds portal failure modes
-(29.6%/31.5% unplaced, return-or-exit outcomes), a read-only recruiting roster-needs
-card, and a corrected twenty-season soak (206.6/205.4 MB at season twenty). Mac
-v0.12.22 is installed from its matching artifact (signature and ZIP hash verified,
-17 save files untouched, v0.12.21 app backed up). Published desktop and web release
-is v0.12.22 (web publish 40438169125). v0.12.21 fixed kicker/punter depth (PR #16); v0.12.20 added the four league-health metrics (PR #15); v0.12.19
+Source is `0.12.23` on `claude/review-improvement-dwjemy`. PR #18 merged as
+a57d2ce after full CI 40442750049 passed; v0.12.23 makes program standing buy
+talent (prestige weight in a recruit pitch 0.32 → 0.42): blueblood titles went
+2/10 → 5/10 on seed 7 and stayed 4/10 on seed 11, so it is a partial step. Mac
+v0.12.23 is installed from its matching artifact (signature and ZIP hash verified,
+17 save files untouched, v0.12.22 app backed up). Published desktop and web release
+is v0.12.23 (web publish 40443754979). v0.12.22 added portal failure modes, the
+recruiting roster-needs card and the corrected twenty-season soak (PR #17); v0.12.21 fixed kicker/punter depth (PR #16); v0.12.20 added the four league-health metrics (PR #15); v0.12.19
 Hall of Fame browsing (PR #14); v0.12.18 history accuracy, off-field career
 preservation and the offseason recap (PR #13).
 
