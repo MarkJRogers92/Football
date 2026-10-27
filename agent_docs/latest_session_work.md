@@ -12,6 +12,8 @@
 - The first Meshy helmet carried a brand-like mark and crackle texture; it was regenerated
   with a plain-panel prompt. Known weakness: the lower shell shadows very dark on every team.
 - Meshy credits spent: about 150 across trophy and both helmets.
+- Validated before the PR: `npm test` 497/497 and `npm run test:browser` green (dev dependencies
+  installed with `npm ci --ignore-scripts` in the cloud container).
 
 ## v0.12.23 — Dynasty persistence, first measured step (2026-10-26)
 
