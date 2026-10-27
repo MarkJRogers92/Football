@@ -183,17 +183,23 @@ const pad = (v, n) => String(v).padEnd(n);
 
   // Entrants placed/unplaced: universe.offseason.reports.portal.placed/pending.
   console.log('\nportal churn by season (entrants = reports.portal placed+pending; completed = TRANSFER_COMPLETED events):');
-  console.log(pad('season', 8) + pad('entrants', 10) + pad('placed', 8) + pad('unplaced', 10) + pad('completed', 11) + 'programs losing 2+');
+  console.log(pad('season', 8) + pad('entrants', 10) + pad('placed', 8) + pad('returned', 10) + pad('exited', 8) + pad('unplaced', 10) + pad('completed', 11) + 'programs losing 2+');
+  const unplacedTotals = [];
   for (const y of seasonYears) {
     const rep = portalReports.get(y);
     const row = portalRows.get(y) || { completed: 0, reasons: {}, from: new Map() };
-    const entrants = rep ? rep.placed + rep.pending : row.completed;
-    console.log(pad(y, 8) + pad(entrants, 10) + pad(rep ? rep.placed : '?', 8) + pad(rep ? rep.pending : '?', 10) + pad(row.completed, 11) + [...row.from.values()].filter(n => n >= 2).length);
+    const returned = rep?.returned || 0, exited = rep?.exited || 0;
+    const entrants = rep ? rep.placed + returned + exited + rep.pending : row.completed;
+    if (entrants) unplacedTotals.push({ entrants, unplaced: returned + exited });
+    console.log(pad(y, 8) + pad(entrants, 10) + pad(rep ? rep.placed : '?', 8) + pad(returned, 10) + pad(exited, 8) + pad(returned + exited, 10) + pad(row.completed, 11) + [...row.from.values()].filter(n => n >= 2).length);
     console.log('        reasons: ' + (Object.entries(row.reasons).map(([k, n]) => `${REASON_LABEL[k] || k} ${n}`).join(' · ') || 'none'));
   }
   const portalTotal = seasonYears.reduce((n, y) => n + (portalRows.get(y)?.completed || 0), 0);
   const lostTotal = seasonYears.reduce((n, y) => n + [...(portalRows.get(y)?.from.values() || [])].filter(x => x >= 2).length, 0);
   console.log('total completed transfers:', portalTotal, '· program-seasons losing 2+ players:', lostTotal);
+  const entrantsAll = unplacedTotals.reduce((n, r) => n + r.entrants, 0);
+  const unplacedAll = unplacedTotals.reduce((n, r) => n + r.unplaced, 0);
+  console.log('unplaced entrants:', unplacedAll, 'of', entrantsAll, '(' + share(unplacedAll, entrantsAll) + ')');
 
   // Counts per program from p.pos on t.roster; thresholds from engine POS_COUNTS.
   console.log('\npositional shortages by season (thin = below 60% of POS_COUNTS design: ' + groups.map(g => `${g.label}<${g.threshold}`).join(', ') + '):');

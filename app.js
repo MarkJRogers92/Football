@@ -2,7 +2,7 @@
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.12.21';
+const APP_VERSION='0.12.22';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -2710,17 +2710,38 @@ function offseasonEnrollment(){
  autosaveAfter('signing'),finishOffseasonPhase('signing','portal',teams);
  return true;
 }
+// An entrant nobody wants either stays at his school or leaves football; leaving
+// the roster is the only way a portal class can shrink.
+const PORTAL_RETURN_CHANCE=.65;
+function resolveUnplacedPortal(entry){
+ const {p}=entry,from=universe.teams.find(t=>t.id===entry.fromSchoolId)||T(entry.from);
+ if(!from)return null;
+ if(gameplayRandom()<PORTAL_RETURN_CHANCE&&from.roster.length<105){
+  p.morale=clamp((p.morale??70)-8,20,99);p.staffTrust=clamp((p.staffTrust??70)-5,0,99);
+  return {outcome:'returned',team:from};
+ }
+ from.roster=from.roster.filter(x=>x.id!==p.id);
+ addToArchive(p,from,'No landing spot');
+ return {outcome:'exited',team:from};
+}
 function offseasonPortal(){
  const os=normalizeOffseasonState();
  if(offseasonPhaseDone('portal')){if(os.phase==='portal')os.phase='spring';return true}
  const controlled=$('#userTeam').value,movement=[...(os.reports.movement||[])];
  const draftPool=(os.reports.departures?.draftPool||[]).map(d=>({...d,t:universe.teams.find(x=>x.id===d.teamId)||d.t}));runDraft(draftPool);
  const portal=[...(universe.transferPortal||[])];universe.transferPortal=[];
- portal.forEach(x=>{x.p.stats=newStats();x.p.year=CLASS_NAMES[Math.min(3,eligibilityBase(x.p))]||'SR';const dest=placeTransfer(x);if(dest){if(x.from===controlled||dest.name===controlled)movement.push(`${x.p.pos} ${x.p.name}: ${x.from} → ${dest.name} (${transferReasonLabel(x.reason)})`)}else universe.transferPortal.push(x)});
+ let placedCount=0,returnedCount=0,exitedCount=0;
+ portal.forEach(x=>{x.p.stats=newStats();x.p.year=CLASS_NAMES[Math.min(3,eligibilityBase(x.p))]||'SR';const dest=placeTransfer(x);
+  if(dest){placedCount++;if(x.from===controlled||dest.name===controlled)movement.push(`${x.p.pos} ${x.p.name}: ${x.from} → ${dest.name} (${transferReasonLabel(x.reason)})`);return}
+  const outcome=resolveUnplacedPortal(x);
+  if(!outcome){universe.transferPortal.push(x);return}
+  if(outcome.outcome==='returned'){returnedCount++;if(x.from===controlled)movement.push(`${x.p.pos} ${x.p.name}: no landing spot, returned to ${x.from}`)}
+  else{exitedCount++;if(x.from===controlled)movement.push(`${x.p.pos} ${x.p.name}: no landing spot, left the program`)}
+ });
  updateCareerRecords();
  movement.push(...(os.reports.review?.carouselLog||[]).filter(x=>x.includes(controlled)));
  universe.movementLog=movement.slice(0,100);
- autosaveAfter('portal'),finishOffseasonPhase('portal','spring',{placed:portal.length-universe.transferPortal.length,pending:universe.transferPortal.length});
+ autosaveAfter('portal'),finishOffseasonPhase('portal','spring',{placed:placedCount,pending:universe.transferPortal.length,returned:returnedCount,exited:exitedCount});
  return true;
 }
 // v0.12.21: the yearly walk-on top-up repairs positional scarcity. Measured over
@@ -3057,11 +3078,23 @@ function transferFit(p,t,from,reason){
  const pipeline=pipelineStrength(t,m.homeRegion||from.conference);
  const follow=p.coachDeparturePressure?.toSchoolId===t.id?clamp(p.coachDeparturePressure.strength||0,0,70):0;
  const score=prior*.20+opportunity*(reason==='BROKEN_PROMISE'?.30:.25)+playerSchemeFit(p,t)*.15+relationship*.15+follow*.08+proximity*.10+t.prestige*(reason==='BROKEN_PROMISE'?.05:.10)+pipeline*.05;
- return {score,prior,opportunity,relationship,coachId,follow};
+ // need = how far the position group sits below the engine's designed shape; a
+ // program with a full room does not add a transfer there.
+ const need=(POS_COUNTS[p.pos]||4)-depth.length;
+ // A program only adds a player who can compete in that room; a deep room turns
+ // away a lesser transfer instead of collecting him.
+ const competitive=depth.length===0||p.trueNow>=best-8;
+ return {score,prior,opportunity,relationship,coachId,follow,need,competitive};
 }
+// v0.12.22: a program only takes a transfer it has room AND a reason for — need at
+// the position, a prior relationship, or a player better than its current depth.
+// Without this every entrant landed somewhere and the portal had no failure mode.
+function portalWanted(candidates){return candidates.filter(x=>x.prior>=55||(x.need>=2&&x.competitive&&x.opportunity>=40))}
 function chooseTransferDestination(p,from,reason){
  const candidates=universe.teams.filter(t=>t.id!==from.id&&t.roster.length<105).map(t=>({t,...transferFit(p,t,from,reason)}));
- if(!candidates.length)return null;
+ const wanted=portalWanted(candidates);
+ if(!wanted.length)return null;
+ candidates.length=0;candidates.push(...wanted);
  const best=Math.max(...candidates.map(x=>x.score));let total=0;
  for(const x of candidates){x.weight=Math.exp((x.score-best)/7);total+=x.weight}
  let roll=gameplayRandom()*total;for(const x of candidates){roll-=x.weight;if(roll<=0)return x}return candidates.at(-1);
@@ -3632,6 +3665,8 @@ function championTimeline({limit=25}={}){
 }
 // App scope is not global by design; the history module reaches these through this bridge.
 if(typeof globalThis!=='undefined')globalThis.DynastyHistoryIndex=Object.freeze({coaches:coachIndexRows,champions:championTimeline,openCoach:showCoachProfile});
+// Recruiting-needs bridge: only POS_COUNTS, roster positions/years and committed counts leave app scope.
+if(typeof globalThis!=='undefined')globalThis.DynastyRecruitingNeeds=Object.freeze({posCounts:POS_COUNTS,snapshot:()=>{if(!universe)return null;const t=selected();if(!t)return null;const committed={};for(const r of universe?.recruits||[])if(r.committed===t.name)committed[r.pos]=(committed[r.pos]||0)+1;return{team:t.name,players:(t.roster||[]).map(p=>({pos:p.pos,year:p.year})),committed}}});
 // v0.12.14 — Hall of Fame. Induction uses only recorded, player-visible facts:
 // awards, draft result, career production and coach titles. There is no hidden
 // rating and no new save field; inductees are derived every time from the archive.

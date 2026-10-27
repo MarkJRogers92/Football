@@ -1,25 +1,45 @@
 // Per-component save size at rest (v0.12.10). Measures the same packed shape the
 // export and browser save use, so the numbers answer "what is actually big".
-// Usage: SEASONS=6 node tools/save-size.js
+// Usage: SEED=7 SEASONS=6 node tools/save-size.js
 const { loadEngine } = require('./harness.js');
 const SEASONS = Number(process.env.SEASONS || 6);
 const bytes = value => Buffer.byteLength(JSON.stringify(value));
 const mb = value => (value / 1048576).toFixed(1);
 
 (async () => {
-  const e = loadEngine({ seed: 7 });
+  const e = loadEngine({ seed: Number(process.env.SEED || 7) });
   e.setUserTeam('Chicago Metropolitan');
   await e.loadSchools();
   e.initUniverse();
   const u = e.universe;
+  // The offseason is interactive: a phase can wait on a career choice or an unrun
+  // camp. Driving it here keeps a twenty-season run honest instead of freezing.
+  const finishOffseason = async () => {
+    let guard = 0;
+    while (u.phase === 'complete' && guard++ < 30) {
+      if ((u.jobOffers || []).length) {
+        const offer = u.jobOffers[0];
+        if (!e.acceptPost(offer.schoolId).ok) break;
+        continue;
+      }
+      const phase = u.offseason?.phase;
+      if (phase === 'spring') { e.runSpringCamp(); continue; }
+      if (phase === 'fall') { e.runFallCamp(); continue; }
+      if (!e.advanceOffseasonPhase()) break;
+    }
+    if (u.phase === 'preseason') e.beginSeason();
+  };
   console.log('year\ttotal\tgameArchive\tplayerArchive\trosters\trecruits\tevents\thistory\tcompactedGames');
   for (let i = 0; i < SEASONS; i++) {
+    const startedAt = u.year;
+    if (u.phase === 'preseason') e.beginSeason();
     e.simSeason();
     e.simConferenceChampionships();
     e.simPlayoff();
     e.runSpringCamp();
     e.runFallCamp();
-    e.runOffseason();
+    await finishOffseason();
+    if (u.year === startedAt) throw new Error(`season ${startedAt} did not advance (phase ${u.phase})`);
     const parts = {
       gameArchive: bytes(u.gameArchive),
       playerArchive: bytes(u.playerArchive),

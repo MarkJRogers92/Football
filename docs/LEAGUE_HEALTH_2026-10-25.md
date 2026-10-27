@@ -151,5 +151,33 @@ and a walk-on at the missing position is signed, recorded like any roster cut.
 
 The kicker/punter defect is gone on both seeds. Soft depth deficits at safety,
 linebacker and quarterback remain and are left alone deliberately: those are
-depth, not an unplayable roster. Portal placement behaviour and the class share
-of rosters are unchanged — they are design questions, not defects.
+depth, not an unplayable roster.
+
+### Portal realism — v0.12.22
+
+Every entrant used to land somewhere. A program now needs room **and** a reason:
+two open slots at the position, a player competitive with its current room (within
+eight points of the best there), and no prior relationship being required. An
+entrant nobody wants either returns to his school (65%, morale and trust cost) or
+leaves football (35%, archived with reason "No landing spot").
+
+| Three seasons, two seeds | Entrants | Unplaced | Rate |
+|---|---|---|---|
+| Seed 7 | 469 | 139 | **29.6%** |
+| Seed 11 | 464 | 146 | **31.5%** |
+
+That matches the real-world anchor — roughly 30% of Division I entrants do not
+find a new D-I program ([Medill](https://news.medill.northwestern.edu/chicago/about-30-of-ncaa-division-i-athletes-who-enter-the-transfer-portal-dont-find-a-new-d1-program-what-happens-when-you-get-stuck/)).
+
+**Known limitation:** the rate is uneven across seasons — about 62% unplaced in the
+first offseason (opening rosters are deep at 92 players) and single digits later
+once attrition opens rooms. The average is in band, the per-season experience is
+not yet stable; fixing it means making demand depend on player quality relative to
+the destination room rather than on designed position counts.
+
+### Roster needs on the recruiting board — v0.12.22
+
+The Recruiting tab now shows which position groups project below their designed
+depth (returning players plus commitments against `POS_COUNTS`). Read-only: no
+save fields, no simulation, no randomness. Covered on desktop and mobile in
+`tests/recruiting-needs-browser.js`.
