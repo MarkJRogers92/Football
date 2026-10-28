@@ -67,7 +67,7 @@ function seasonReviewHTML(m){
  const game=g=>`<button type="button" class="sr-game ${g.win?'win':'loss'}${g.postseason?' post':''}" data-game="${esc(g.id)}" title="${esc(`${g.label}: ${g.win?'W':'L'} ${g.us}–${g.them} ${g.loc} ${g.opp}`)}"><b>${g.win?'W':'L'}</b><span>${esc(seasonReviewChipLabel(g))}</span><small>${g.us}–${g.them}</small></button>`;
  const goalIcon={complete:'✓',failed:'✕',at_risk:'!'};
  const r=m.recruiting;
- return `<div class="section-head"><div><div class="eyebrow">${esc(m.year)} SEASON IN REVIEW</div><h2>${esc(m.outcome)}</h2><div class="muted">${esc(m.record)} · ${esc(m.conference)} · Final ranking ${esc(m.rank)}</div></div>${m.champion?'<img class="sr-trophy" src="assets/title-trophy-v1.png" alt="National championship trophy" width="517" height="849" decoding="async">':''}</div>
+ return `<div class="section-head"><div><div class="eyebrow">${esc(m.year)} SEASON IN REVIEW</div><h2>${esc(m.outcome)}</h2><div class="muted">${esc(m.record)} · ${esc(m.conference)} · Final ranking ${esc(m.rank)}</div></div>${m.champion?'<img class="sr-trophy" src="assets/trophy-still-v2.png" alt="National championship trophy" width="480" height="720" decoding="async">':''}</div>
  <div class="sr-strip" aria-label="Season results">${m.games.map(game).join('')}</div>
  <div class="sr-grid">
   <div class="sr-block"><div class="eyebrow">DEFINING MOMENTS</div>${m.moments.map(x=>`<button type="button" class="sr-moment ${x.kind}" data-game="${esc(x.gameId)}"><small>${esc(x.title)}</small><strong>${esc(x.text)}</strong><span>${esc(x.detail)}</span></button>`).join('')||'<p class="muted">No games recorded.</p>'}</div>

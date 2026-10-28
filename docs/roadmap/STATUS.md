@@ -1,6 +1,6 @@
 # Roadmap execution status
 
-Last reconciled: 2026-10-26, source `d236e6e` (`v0.12.24`) on
+Last reconciled: 2026-10-27, source `d236e6e` (`v0.12.25`) on
 `claude/review-improvement-dwjemy`. History carries coach index, champion
 timeline, Hall of Fame with filtering and show-all, and conference standings.
 v0.12.24 adds the championship trophy and team helmets (presentation only). Published 0.12.24: web run 40450856688; Mac installed from artifact 12709339863 and release v0.12.24 created. The playerArchive rollup was investigated and
