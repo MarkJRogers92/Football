@@ -1,9 +1,9 @@
 # Roadmap execution status
 
-Last reconciled: 2026-10-28, source `d1d2975` (`v0.12.26`) on
+Last reconciled: 2026-10-28, source `f60b821` (`v0.12.27`) on
 `claude/zealous-davinci-o8o4am`. History carries coach index, champion
 timeline, Hall of Fame with filtering and show-all, and conference standings.
-v0.12.24 adds the championship trophy and team helmets (presentation only); v0.12.26 swaps in the image-to-3D trophy as a slow 24s turntable. Published 0.12.24: web run 40450856688; Mac installed from artifact 12709339863 and release v0.12.24 created. The playerArchive rollup was investigated and
+v0.12.24 adds the championship trophy and team helmets (presentation only); v0.12.26 swaps in the image-to-3D trophy as a turntable; v0.12.27 makes the turn continuous (crossfaded, 30s). Published 0.12.24: web run 40450856688; Mac installed from artifact 12709339863 and release v0.12.24 created. The playerArchive rollup was investigated and
 rejected on measurement (docs/SAVE_SIZE_MEASUREMENT.md). The kicker/punter
 availability gap found by the health metrics is fixed and re-measured: thin K/P
 team-seasons 36/47 → 0/0 over three seasons on two seeds. The next named packet is

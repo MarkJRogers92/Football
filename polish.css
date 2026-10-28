@@ -453,16 +453,14 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
 /* Championship trophy: Meshy-generated model rendered to a sprite; sits in the tunnel light, right of the menu. */
 .title-trophy{position:fixed;z-index:0;right:clamp(28px,11vw,220px);top:50%;display:grid;place-items:center;width:min(38vw,440px);pointer-events:none;transform:translateY(-52%)}
 .title-trophy:before{content:"";position:absolute;inset:-14% -22%;background:radial-gradient(closest-side,rgba(232,190,92,.3),rgba(232,190,92,0) 70%)}
-/* 96-frame 360-degree turntable, pre-rendered from the Meshy model (tools/render-meshy-trophy.py) into a
-   12x8 sheet. The reel steps down a row every 3s while the sheet steps across its 12 columns, so the trophy
-   turns once every 24s; one transform per element keeps the turn and the float independent. */
-.title-trophy .trophy-turn{position:relative;display:block;width:min(38vh,380px);aspect-ratio:2/3;overflow:hidden;filter:drop-shadow(0 34px 38px rgba(0,0,0,.7));animation:title-trophy-float 7s ease-in-out infinite}
-.title-trophy .trophy-reel{display:block;height:800%;animation:title-trophy-rows 24s steps(8) infinite}
-.title-trophy .trophy-sheet{display:block;width:1200%;height:100%;background:url(assets/trophy-turn-v3.webp) 0 0/100% 100% no-repeat;animation:title-trophy-cols 3s steps(12) infinite}
-@keyframes title-trophy-rows{to{transform:translateY(-100%)}}
-@keyframes title-trophy-cols{to{transform:translateX(-100%)}}
+/* 192-frame 360-degree turntable, pre-rendered from the Meshy model (tools/render-meshy-trophy.py) into a
+   12x16 sheet. title-trophy.js picks the frame each animation frame and crossfades into the next one, so the
+   trophy turns continuously, once every 24s, instead of stepping. */
+.title-trophy .trophy-turn{position:relative;display:block;width:min(38vh,380px);aspect-ratio:2/3;filter:drop-shadow(0 34px 38px rgba(0,0,0,.7));animation:title-trophy-float 7s ease-in-out infinite}
+.title-trophy .trophy-frame{position:absolute;inset:0;background:url(assets/trophy-turn-v4.webp) 0 0/1200% 1600% no-repeat}
+.title-trophy .trophy-next{opacity:0}
 @keyframes title-trophy-float{50%{transform:translateY(-10px)}}
-.motion-reduced .title-trophy .trophy-turn,.motion-reduced .title-trophy .trophy-turn *{animation:none!important}
+.motion-reduced .title-trophy .trophy-turn{animation:none!important}
 @media(max-width:900px){.title-trophy{display:none}}
 .title-screen-content{position:relative;z-index:1;display:flex;min-height:100dvh;box-sizing:border-box;flex-direction:column;padding:clamp(28px,5vh,64px) clamp(26px,6vw,96px) 24px}
 .title-brand{display:flex;align-items:center;gap:20px;width:min(680px,100%);margin-bottom:clamp(22px,4vh,44px);text-transform:uppercase}
@@ -520,7 +518,7 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
  .title-subpanel{padding:17px}.title-panel-head h2{font-size:21px}
  .title-footer{align-items:flex-end}.title-footer #titleStatus{max-width:68%;white-space:normal}
 }
-@media(prefers-reduced-motion:reduce){.title-screen-art,.title-screen-shade::after,.title-trophy .trophy-turn,.title-trophy .trophy-turn *{animation:none!important}.title-action{transition:none}}
+@media(prefers-reduced-motion:reduce){.title-screen-art,.title-screen-shade::after,.title-trophy .trophy-turn{animation:none!important}.title-action{transition:none}}
 
 /* Team Branding v1 — staging 32px atlas. */
 .team-logo{display:inline-block;vertical-align:middle;background-repeat:no-repeat;flex:0 0 auto;border-radius:3px}
