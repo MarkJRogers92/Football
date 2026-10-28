@@ -1,5 +1,16 @@
 # Latest Session Work
 
+## v0.12.26 — New title trophy, slow turntable (2026-10-28)
+
+- Replaced the v0.12.25 model with the owner's Meshy image-to-3D trophy (task
+  `d180affe-…`, the same model as the Drive export `college_football_trophy_game_mesh`),
+  rendered with its shipped PBR textures (Cycles, CPU, `pip install bpy`).
+- 96-frame turntable in a 12x8 WebP sheet, 24s per turn, stepped by two nested
+  transforms in `polish.css` (`.trophy-reel` rows, `.trophy-sheet` columns). The old
+  single-strip `background-position` percentages drifted between frames; the transform
+  steps land exactly.
+- Season Review still regenerated from the same render (`trophy-still-v3.png`).
+
 ## v0.12.25 — Trophy turntable (2026-10-27)
 
 - The title trophy is a genuine 360-degree turntable now: a symmetric Meshy model

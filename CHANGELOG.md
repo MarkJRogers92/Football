@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.12.26 — New title trophy, slow turntable
+
+- The title-screen trophy is the new Meshy image-to-3D model (football cradled on gold arms over a black marble base with gold relief panels), rendered with its own PBR textures instead of being re-shaded.
+- It now turns slowly: 96 frames (3.75° apart) packed into a 12x8 sheet (`assets/trophy-turn-v3.webp`), one full turn every 24 seconds. Two stepped transforms (row reel + column sheet) keep every step on an exact frame; the float and reduced-motion stop are unchanged.
+- Season Review's champion trophy uses the matching still (`assets/trophy-still-v3.png`). Retires `trophy-turn-v2.webp` and `trophy-still-v2.png`.
+- Tooling: `tools/render-meshy-trophy.py` gains `--keep-materials`, `--engine CYCLES` (runs under the `bpy` pip module, no Blender install) and `--yaw`; new `tools/build-trophy-sheet.py` packs frames into the sheet.
+- `tests/trophy-turn-browser.js` now checks the 12x8 layout and that every sampled step lands on a whole frame.
+- Presentation only: no simulation, save-shape or balance changes.
+
 ## v0.12.25 — Trophy turntable
 
 - The title-screen trophy is now a **real 360-degree turntable**: a new symmetric Meshy model (football resting on a gold cup), re-shaded to gold metal, lit as a studio product shot in Blender and pre-rendered to 36 frames (`assets/trophy-turn-v2.webp`, 373 KB sprite strip). It spins once every 12 seconds, keeps the slow float, and stops under reduced motion.
