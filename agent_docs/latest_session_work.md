@@ -1,5 +1,17 @@
 # Latest Session Work
 
+## v0.12.25 — Trophy turntable (2026-10-27)
+
+- The title trophy is a genuine 360-degree turntable now: a symmetric Meshy model
+  (football on a gold cup) re-shaded to gold, lit in Blender and pre-rendered to 36
+  frames (`assets/trophy-turn-v2.webp`, 373 KB). It turns once every 12s, keeps the
+  float, and stops under reduced motion. Season Review uses a matching still.
+- Retired `assets/title-trophy-v1.png` and the asymmetric first model, whose football
+  sat in front of the cup and broke a full rotation.
+- `tools/render-meshy-trophy.py` re-shades the GLB (Meshy ships a grey material),
+  splits the plinth and renders stills or turntables. `tests/trophy-turn-browser.js`
+  covers sheet, size, spin and reduced motion on desktop and iPad widths.
+
 ## v0.12.24 — Championship trophy and team helmets (2026-10-27)
 
 - Presentation-only release. Trophy and helmet were generated with Meshy

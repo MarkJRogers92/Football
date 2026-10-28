@@ -51,6 +51,6 @@ test('the championship trophy appears in the review header only for national cha
   const html = globalThis.DynastySeasonReview.html(m);
   assert.equal(html.includes('sr-trophy'), m.champion);
   const champ = globalThis.DynastySeasonReview.html({...m, champion: true, outcome: 'National champions'});
-  assert.match(champ, /<img class="sr-trophy" src="assets\/title-trophy-v1\.png"/);
+  assert.match(champ, /<img class="sr-trophy" src="assets\/trophy-still-v2\.png"/);
   assert.doesNotMatch(globalThis.DynastySeasonReview.html({...m, champion: false}), /sr-trophy/);
 });
