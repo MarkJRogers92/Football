@@ -1,5 +1,11 @@
 # Latest Session Work
 
+## v0.12.27 — Smooth trophy turn (2026-10-28)
+
+- v0.12.26 stepped 96 frames at 4 fps and read as jerky on the installed Mac app. Now 192
+  frames (the original 96 plus 96 rendered half a step later with `--yaw 1.875`), driven by
+  `title-trophy.js` with a per-frame crossfade, 30s per turn.
+
 ## v0.12.26 — New title trophy, slow turntable (2026-10-28)
 
 - Replaced the v0.12.25 model with the owner's Meshy image-to-3D trophy (task

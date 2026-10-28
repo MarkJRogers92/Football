@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.12.27 — Smooth trophy turn
+
+- The title trophy now turns continuously instead of stepping: 192 frames (1.875° apart, `assets/trophy-turn-v4.webp`) and a small driver (`title-trophy.js`) that crossfades each frame into the next on every animation frame. One full turn every 30 seconds.
+- Off screen the turn pauses; under reduced motion it holds the front view and the float stops, as before.
+- Retires `assets/trophy-turn-v3.webp`. `tests/trophy-turn-browser.js` now checks the 12x16 layout, that both layers sit on whole frames, and that the turn crossfades rather than steps.
+- Presentation only.
+
 ## v0.12.26 — New title trophy, slow turntable
 
 - The title-screen trophy is the new Meshy image-to-3D model (football cradled on gold arms over a black marble base with gold relief panels), rendered with its own PBR textures instead of being re-shaded.
