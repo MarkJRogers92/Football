@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.25</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.26</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -1462,11 +1462,16 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
 /* Championship trophy: Meshy-generated model rendered to a sprite; sits in the tunnel light, right of the menu. */
 .title-trophy{position:fixed;z-index:0;right:clamp(28px,11vw,220px);top:50%;display:grid;place-items:center;width:min(38vw,440px);pointer-events:none;transform:translateY(-52%)}
 .title-trophy:before{content:"";position:absolute;inset:-14% -22%;background:radial-gradient(closest-side,rgba(232,190,92,.3),rgba(232,190,92,0) 70%)}
-/* 36-frame 360-degree turntable, pre-rendered from the Meshy model (tools/render-meshy-trophy.py). */
-.title-trophy .trophy-turn{position:relative;display:block;width:min(38vh,380px);aspect-ratio:2/3;background-image:url(assets/trophy-turn-v2.webp);background-repeat:no-repeat;background-size:3600% 100%;background-position-x:0;filter:drop-shadow(0 34px 38px rgba(0,0,0,.7));animation:title-trophy-turn 12s steps(36) infinite,title-trophy-float 7s ease-in-out infinite}
-@keyframes title-trophy-turn{from{background-position-x:0}to{background-position-x:100%}}
+/* 96-frame 360-degree turntable, pre-rendered from the Meshy model (tools/render-meshy-trophy.py) into a
+   12x8 sheet. The reel steps down a row every 3s while the sheet steps across its 12 columns, so the trophy
+   turns once every 24s; one transform per element keeps the turn and the float independent. */
+.title-trophy .trophy-turn{position:relative;display:block;width:min(38vh,380px);aspect-ratio:2/3;overflow:hidden;filter:drop-shadow(0 34px 38px rgba(0,0,0,.7));animation:title-trophy-float 7s ease-in-out infinite}
+.title-trophy .trophy-reel{display:block;height:800%;animation:title-trophy-rows 24s steps(8) infinite}
+.title-trophy .trophy-sheet{display:block;width:1200%;height:100%;background:url(assets/trophy-turn-v3.webp) 0 0/100% 100% no-repeat;animation:title-trophy-cols 3s steps(12) infinite}
+@keyframes title-trophy-rows{to{transform:translateY(-100%)}}
+@keyframes title-trophy-cols{to{transform:translateX(-100%)}}
 @keyframes title-trophy-float{50%{transform:translateY(-10px)}}
-.motion-reduced .title-trophy .trophy-turn{animation:none!important}
+.motion-reduced .title-trophy .trophy-turn,.motion-reduced .title-trophy .trophy-turn *{animation:none!important}
 @media(max-width:900px){.title-trophy{display:none}}
 .title-screen-content{position:relative;z-index:1;display:flex;min-height:100dvh;box-sizing:border-box;flex-direction:column;padding:clamp(28px,5vh,64px) clamp(26px,6vw,96px) 24px}
 .title-brand{display:flex;align-items:center;gap:20px;width:min(680px,100%);margin-bottom:clamp(22px,4vh,44px);text-transform:uppercase}
@@ -1524,7 +1529,7 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
  .title-subpanel{padding:17px}.title-panel-head h2{font-size:21px}
  .title-footer{align-items:flex-end}.title-footer #titleStatus{max-width:68%;white-space:normal}
 }
-@media(prefers-reduced-motion:reduce){.title-screen-art,.title-screen-shade::after,.title-trophy .trophy-turn{animation:none!important}.title-action{transition:none}}
+@media(prefers-reduced-motion:reduce){.title-screen-art,.title-screen-shade::after,.title-trophy .trophy-turn,.title-trophy .trophy-turn *{animation:none!important}.title-action{transition:none}}
 
 /* Team Branding v1 — staging 32px atlas. */
 .team-logo{display:inline-block;vertical-align:middle;background-repeat:no-repeat;flex:0 0 auto;border-radius:3px}
@@ -1916,7 +1921,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
 <section id="titleScreen" class="title-screen" aria-labelledby="titleGameName">
   <div class="title-screen-art" aria-hidden="true"></div>
   <div class="title-screen-shade" aria-hidden="true"></div>
-  <div class="title-trophy" aria-hidden="true"><span class="trophy-turn"></span></div>
+  <div class="title-trophy" aria-hidden="true"><span class="trophy-turn"><span class="trophy-reel"><span class="trophy-sheet"></span></span></span></div>
   <div class="title-screen-content">
     <header class="title-brand">
       <div class="title-crest" aria-hidden="true"><span>DL</span></div>
@@ -1967,7 +1972,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.25</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.26</b></span></footer>
   </div>
 </section>
 
@@ -1994,7 +1999,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.12.25</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.12.26</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -5098,7 +5103,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.12.25';
+const APP_VERSION='0.12.26';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -11570,7 +11575,7 @@ function seasonReviewHTML(m){
  const game=g=>`<button type="button" class="sr-game ${g.win?'win':'loss'}${g.postseason?' post':''}" data-game="${esc(g.id)}" title="${esc(`${g.label}: ${g.win?'W':'L'} ${g.us}–${g.them} ${g.loc} ${g.opp}`)}"><b>${g.win?'W':'L'}</b><span>${esc(seasonReviewChipLabel(g))}</span><small>${g.us}–${g.them}</small></button>`;
  const goalIcon={complete:'✓',failed:'✕',at_risk:'!'};
  const r=m.recruiting;
- return `<div class="section-head"><div><div class="eyebrow">${esc(m.year)} SEASON IN REVIEW</div><h2>${esc(m.outcome)}</h2><div class="muted">${esc(m.record)} · ${esc(m.conference)} · Final ranking ${esc(m.rank)}</div></div>${m.champion?'<img class="sr-trophy" src="assets/trophy-still-v2.png" alt="National championship trophy" width="480" height="720" decoding="async">':''}</div>
+ return `<div class="section-head"><div><div class="eyebrow">${esc(m.year)} SEASON IN REVIEW</div><h2>${esc(m.outcome)}</h2><div class="muted">${esc(m.record)} · ${esc(m.conference)} · Final ranking ${esc(m.rank)}</div></div>${m.champion?'<img class="sr-trophy" src="assets/trophy-still-v3.png" alt="National championship trophy" width="480" height="720" decoding="async">':''}</div>
  <div class="sr-strip" aria-label="Season results">${m.games.map(game).join('')}</div>
  <div class="sr-grid">
   <div class="sr-block"><div class="eyebrow">DEFINING MOMENTS</div>${m.moments.map(x=>`<button type="button" class="sr-moment ${x.kind}" data-game="${esc(x.gameId)}"><small>${esc(x.title)}</small><strong>${esc(x.text)}</strong><span>${esc(x.detail)}</span></button>`).join('')||'<p class="muted">No games recorded.</p>'}</div>
