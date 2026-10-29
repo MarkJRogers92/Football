@@ -1,5 +1,25 @@
 # Latest Session Work
 
+## v0.12.28 — Calmer Command Center (2026-10-29)
+
+- Review of the running game (screenshots at 1440 and 390 wide) found a 4,600px dashboard, three
+  stacked headers for one Game Lab matchup, and layered status messages. This pass fixes those.
+- `dashboard-views.js/.css`: classifies the dashboard's direct children (cards arrive from several
+  modules) into week / stories / league and shows one at a time. Nothing is moved or re-rendered.
+  Tests that need the stories cards call `DynastyDashboardViews.show('stories')` first.
+- Game Lab: `.gameday-event-hero:not([hidden]) ~ #nextGameCard{display:none}`. The card stays in the
+  DOM because `sports-presentation.js` reads its `.gameday-data`.
+- Root cause of the dim Game Day hero: `interaction-polish.js` `watch()` observed `class` on the
+  element it animates, so every replay re-triggered itself. Fixed by ignoring `dl-motion-*` changes.
+- `app.js` weekLine says "Opening week" at week 0 (the HUD only flips on `Week N`).
+- Recruiting Workspace cards gain portraits (`DynastyLabPortraits.paint`) and a confidence bar parsed from the Scout cell.
+- `game-settings.js`: `universe.settings` {boardPatience, injuryRate, recruitingEdge}; lookup `gameSetting()` and defaults live in
+  `app.js` because the engine reads them (extensions are absent from the non-full test harness). Neutral defaults = identical RNG stream.
+- `career-milestones.js`: derived from `tenure.seasons` + `careerHistory`; `tenureDigest()` in `app.js` is stored on closed posts.
+  `universe.milestones` maps id -> season first reached. Review records now include `champ`/`confChamp`.
+- Measured, not tuned: ten seasons on seed 7 gave 8 distinct champions, 2 back-to-back, 5 of 10 titles from preseason top-10 prestige and
+  9.4/10 top-10 retention, so no dynasty-persistence change was made.
+
 ## v0.12.27 — Smooth trophy turn (2026-10-28)
 
 - v0.12.26 stepped 96 frames at 4 fps and read as jerky on the installed Mac app. Now 192

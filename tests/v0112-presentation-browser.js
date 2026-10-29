@@ -20,7 +20,7 @@ async function run(browser,label,viewport){
   check(`[${label}] archived drive strip renders`,await page.locator('#gamedayEventHero .event-drive-strip i').count()>0);
   check(`[${label}] actual key performers render`,await page.locator('#gamedayEventHero .event-performers button').count()>0);
 
-  await goTab(page,'dashboard');await page.evaluate(()=>window.__DL_TEST__?.weeklyPlayerStoriesForceFixture?.());await goTab(page,'dashboard');await page.waitForSelector('#seasonStoryRail:not([hidden])',{timeout:10000});
+  await goTab(page,'dashboard');await page.evaluate(()=>window.__DL_TEST__?.weeklyPlayerStoriesForceFixture?.());await goTab(page,'dashboard');await page.evaluate(()=>window.DynastyDashboardViews?.show('stories'));await page.waitForSelector('#seasonStoryRail:not([hidden])',{timeout:10000});
   check(`[${label}] season story rail renders`,await page.locator('#seasonStoryRail .season-story-card').count()>0);
   check(`[${label}] story rail labels factual sources`,/SEASON STORIES/.test(await page.locator('#seasonStoryRail').innerText()));
   const playerStory=page.locator('#seasonStoryRail [data-story-player]').first();if(await playerStory.count()){await playerStory.click();await page.waitForSelector('#playerDialog[open]',{timeout:10000});check(`[${label}] player story delegates to canonical profile`,true);await page.evaluate(()=>document.querySelector('#playerDialog')?.close())}else check(`[${label}] player story delegates to canonical profile`,false,'no player story surfaced');

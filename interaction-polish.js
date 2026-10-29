@@ -14,7 +14,11 @@ function values(root){if(!root||reduced())return;for(const el of root.querySelec
 function watch(selector,childSelector,kind='surface',valueMotion=false){
  const host=document.querySelector(selector);if(!host||observed.has(host))return;observed.add(host);
  let queued=false;const run=()=>{queued=false;const target=childSelector?host.querySelector(childSelector):host;if(!target)return;replay(target,kind);if(valueMotion)values(target)};
- new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(run)}).observe(host,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['hidden','class']});
+ // replay() toggles a dl-motion-* class on the very element being watched. Without this filter that class
+  // change is itself a mutation, so the surface replays every frame and sits at its starting opacity.
+  const bare=value=>String(value||'').split(/\s+/).filter(name=>name&&!name.startsWith('dl-motion-')).join(' ');
+  const real=record=>record.type!=='attributes'||record.attributeName!=='class'||bare(record.oldValue)!==bare(record.target.getAttribute('class'));
+  new MutationObserver(records=>{if(queued||!records.some(real))return;queued=true;requestAnimationFrame(run)}).observe(host,{childList:true,subtree:true,characterData:true,attributes:true,attributeOldValue:true,attributeFilter:['hidden','class']});
  if(visible(host))requestAnimationFrame(run);
 }
 function attach(){

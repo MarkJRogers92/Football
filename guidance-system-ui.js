@@ -26,7 +26,7 @@
   const entity=item.affectedEntity?.label?`<span class="guidance-entity">${esc(item.affectedEntity.label)}</span>`:'';
   const action=item.meaning==='must_resolve'||item.meaning==='decision_due'?'Review decision':item.category==='staffing'?'Open Staff':item.category==='recruiting'||item.category==='roster_management'?'Open Recruiting':'Open item';
   const defer=['staff_recommendation','monitoring'].includes(item.meaning)?`<button type="button" class="guidance-text-action" data-guidance-defer="${esc(item.id)}">Snooze for now</button>`:'';
-  return `<article class="guidance-item guidance-${esc(item.meaning)}${item.deferred?' guidance-deferred':''}"><div class="guidance-item-top"><span class="guidance-meaning">${esc(meaningLabel[item.meaning]||'Guidance')}</span>${boundary}</div><h3>${esc(item.title)}</h3>${entity}${explanationHTML(item)}<div class="guidance-actions"><button type="button" class="guidance-open" data-guidance-item="${esc(item.id)}">${esc(action)} <span aria-hidden="true">›</span></button>${defer}</div></article>`;
+  return `<article class="guidance-item guidance-${esc(item.meaning)}${item.deferred?' guidance-deferred':''}${item.destination?.focus==='weekly-decision'?' guidance-linked':''}"><div class="guidance-item-top"><span class="guidance-meaning">${esc(meaningLabel[item.meaning]||'Guidance')}</span>${boundary}</div><h3>${esc(item.title)}</h3>${entity}${explanationHTML(item)}<div class="guidance-actions"><button type="button" class="guidance-open" data-guidance-item="${esc(item.id)}">${esc(action)} <span aria-hidden="true">›</span></button>${defer}</div></article>`;
  }
  function snoozedHTML(items){
   if(!items.length)return '';

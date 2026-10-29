@@ -1,7 +1,7 @@
 # Roadmap execution status
 
-Last reconciled: 2026-10-28, source `f60b821` (`v0.12.27`) on
-`claude/zealous-davinci-o8o4am`. History carries coach index, champion
+Last reconciled: 2026-10-28, source `90f43ef` (`v0.12.28`) on
+`claude/inspiring-ride-1a4m1b`. History carries coach index, champion
 timeline, Hall of Fame with filtering and show-all, and conference standings.
 v0.12.24 adds the championship trophy and team helmets (presentation only); v0.12.26 swaps in the image-to-3D trophy as a turntable; v0.12.27 makes the turn continuous (crossfaded, 30s). Published 0.12.24: web run 40450856688; Mac installed from artifact 12709339863 and release v0.12.24 created. The playerArchive rollup was investigated and
 rejected on measurement (docs/SAVE_SIZE_MEASUREMENT.md). The kicker/punter

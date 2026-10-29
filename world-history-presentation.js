@@ -16,23 +16,23 @@ function render(){
  const identity=add(hero,'div','legacy-identity');
  add(identity,'span','legacy-kicker','PROGRAM LEGACY');
  add(identity,'h3','legacy-name',model.teamName);
- add(identity,'small','legacy-meta',model.conference+' · tracked dynasty history');
+ add(identity,'small','legacy-meta',model.conference+(model.tracked.seasons?' · tracked dynasty history':' · your dynasty begins here'));
  const total=model.tracked.wins+model.tracked.losses,pct=total?Math.round(model.tracked.wins/total*1000)/10:'—';
  const record=add(hero,'div','legacy-record');
  add(record,'strong','',model.tracked.wins+'–'+model.tracked.losses);
- add(record,'span','',pct+'% tracked win rate · '+model.tracked.seasons+' seasons');
+ add(record,'span','',model.tracked.seasons?pct+'% tracked win rate · '+model.tracked.seasons+(model.tracked.seasons===1?' season':' seasons'):'Year one · the record starts at kickoff');
  const metrics=add(host,'div','legacy-metrics');
  for(const [label,value] of [['CONFERENCE TITLES',model.tracked.conferenceTitles],['NATIONAL TITLES',model.tracked.nationalTitles],['RECENT ARCHIVES',model.seasons.length]]){const box=add(metrics,'div');add(box,'span','',label);add(box,'strong','',value)}
  const grid=add(host,'div','legacy-grid');
  const trophy=add(grid,'section','legacy-panel');add(trophy,'span','legacy-kicker','TROPHY ROOM');add(trophy,'h4','','Championships');
  const chips=add(trophy,'div','legacy-chips');
- if(model.titleYears.length)for(const year of model.titleYears)add(chips,'span','legacy-chip',year+' NATIONAL TITLE');else add(chips,'div','legacy-empty','No archived national title yet.');
+ if(model.titleYears.length)for(const year of model.titleYears)add(chips,'span','legacy-chip',year+' NATIONAL TITLE');else add(chips,'div','legacy-empty',model.tracked.seasons?'No national title yet.':'The first banner is still up for grabs.');
  add(trophy,'span','legacy-kicker legacy-awards-kicker','PROGRAM HONORS');add(trophy,'h4','','Recent major awards');
  const awards=add(trophy,'div','legacy-awards');
- if(model.awardRows.length)for(const row of model.awardRows){const item=add(awards,'div','legacy-award');add(item,'span','',row.year+' · '+row.name);add(item,'strong','',row.playerName+(row.pos?' · '+row.pos:''))}else add(awards,'div','legacy-empty','Major award history will collect here as seasons are archived.');
+ if(model.awardRows.length)for(const row of model.awardRows){const item=add(awards,'div','legacy-award');add(item,'span','',row.year+' · '+row.name);add(item,'strong','',row.playerName+(row.pos?' · '+row.pos:''))}else add(awards,'div','legacy-empty','All-conference and national award winners will be listed here after the first season.');
  const timeline=add(grid,'section','legacy-panel');add(timeline,'span','legacy-kicker','DYNASTY TIMELINE');add(timeline,'h4','','Recent archived seasons');
  const seasons=add(timeline,'div','legacy-seasons');
- if(model.seasons.length)for(const row of model.seasons){const item=add(seasons,'article','legacy-season'+(row.champion?' is-title':''));add(item,'strong','',row.year+' · '+row.record);add(item,'span','',row.conferenceRecord+' conf · '+(row.rank?'#'+row.rank+' final':'NR'));add(item,'small','',row.champion?'National champion':row.awards.length?row.awards[0].name+' · '+row.awards[0].playerName:'Season archived')}else add(seasons,'div','legacy-empty','Complete a season to begin the program timeline.');
+ if(model.seasons.length)for(const row of model.seasons){const item=add(seasons,'article','legacy-season'+(row.champion?' is-title':''));add(item,'strong','',row.year+' · '+row.record);add(item,'span','',row.conferenceRecord+' conf · '+(row.rank?'#'+row.rank+' final':'NR'));add(item,'small','',row.champion?'National champion':row.awards.length?row.awards[0].name+' · '+row.awards[0].playerName:'Season archived')}else add(seasons,'div','legacy-empty','Finish your first season and it lands here with the record, final ranking and honors.');
  const brand=globalThis.DynastyProgramBranding?.brandFor?.(+model.teamId);
  if(brand){hero.style.setProperty('--legacy-primary-rgb',brand.primaryRgb);hero.style.setProperty('--legacy-secondary-rgb',brand.secondaryRgb);hero.style.setProperty('--legacy-secondary',brand.secondary)}
 }

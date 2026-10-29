@@ -226,7 +226,7 @@
   ticker.innerHTML='<span class="hud-ticker-tag">LIVE</span><div class="hud-ticker-track"><div class="hud-ticker-reel"></div></div>';
   const reel=ticker.querySelector('.hud-ticker-reel');const feed=[];
   function tick(text){
-    if(/^(Saved|Loaded|Exported)/.test(text))return;
+    if(/^(Saved|Loaded|Exported)/.test(text)||/^Season begun|accepted\. Your dynasty is saved/i.test(text)||feed.includes(text))return;
     feed.unshift(text);feed.length=Math.min(feed.length,8);
     const top=document.querySelector('.topbar');if(top&&!ticker.isConnected)top.after(ticker);
     reel.replaceChildren(...[...feed,...feed].map(t=>{const s=document.createElement('span');s.textContent=t;return s}));
