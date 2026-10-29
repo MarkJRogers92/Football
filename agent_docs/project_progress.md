@@ -2,7 +2,13 @@
 
 ## Version and branch
 
-Source is `0.12.24` on `claude/review-improvement-dwjemy` (PR #19, merge 23d219c).
+Source is `0.12.28` on `claude/review-improvement-dwjemy` (PR #23, merge 918e5e7).
+v0.12.28 adds dashboard views, a single Game Lab header, recruit-card portraits, per-dynasty
+game settings and career milestones. Web published (run 40822227655); desktop artifacts
+built (run 40822099911); GitHub Release and Mac install pending, see
+`agent_docs/HANDOFF_2026-10-29_v0.12.28.md`.
+
+Earlier: source `0.12.24` (PR #19, merge 23d219c).
 v0.12.24 is presentation only: championship trophy and per-team helmets. It is
 installed and released (web run 40450856688). v0.12.23 makes program standing buy
 talent (prestige weight in a recruit pitch 0.32 → 0.42): blueblood titles went

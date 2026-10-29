@@ -1,9 +1,9 @@
 # Roadmap execution status
 
-Last reconciled: 2026-10-28, source `90f43ef` (`v0.12.28`) on
-`claude/inspiring-ride-1a4m1b`. History carries coach index, champion
+Last reconciled: 2026-10-29, source `918e5e7` (`v0.12.28`) on
+`claude/review-improvement-dwjemy` (PR #23). History carries coach index, champion
 timeline, Hall of Fame with filtering and show-all, and conference standings.
-v0.12.24 adds the championship trophy and team helmets (presentation only); v0.12.26 swaps in the image-to-3D trophy as a turntable; v0.12.27 makes the turn continuous (crossfaded, 30s). Published 0.12.24: web run 40450856688; Mac installed from artifact 12709339863 and release v0.12.24 created. The playerArchive rollup was investigated and
+v0.12.24 adds the championship trophy and team helmets (presentation only); v0.12.26 swaps in the image-to-3D trophy as a turntable; v0.12.27 makes the turn continuous (crossfaded, 30s). Published 0.12.28: web run 40822227655, desktop artifacts from validate run 40822099911, GitHub Release pending (agent_docs/HANDOFF_2026-10-29_v0.12.28.md). Published 0.12.24: web run 40450856688; Mac installed from artifact 12709339863 and release v0.12.24 created. The playerArchive rollup was investigated and
 rejected on measurement (docs/SAVE_SIZE_MEASUREMENT.md). The kicker/punter
 availability gap found by the health metrics is fixed and re-measured: thin K/P
 team-seasons 36/47 → 0/0 over three seasons on two seeds. The next named packet is
