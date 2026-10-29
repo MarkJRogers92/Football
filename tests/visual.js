@@ -23,7 +23,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
   const dashboardProgram=await page.locator('#teamName').innerText();
   check(`[${label}] premium shell carries selected program identity`,shellProgram.trim()===dashboardProgram.trim(),`${shellProgram} / ${dashboardProgram}`);
   check(`[${label}] Top 15 keeps one real logo per ranked team`,await page.locator('#top15 .team-logo').count()===15&&await page.locator('#top15 .sports-mark').count()===0);
-  await goTab(page, 'gamelab');await page.waitForSelector('#nextGameCard .matchup-shell');
+  await goTab(page, 'gamelab');await page.waitForSelector('#nextGameCard .matchup-shell',{state:'attached'});
   await page.waitForFunction(()=>document.querySelectorAll('#nextGameCard .matchup-team .sports-mark.coverage-real-logo').length===2);
   check(`[${label}] Game Lab matchup card renders`,await page.locator('#nextGameCard .sports-mark').count()===2);
   check(`[${label}] Game Lab replaces both initials badges with real logos`,await page.locator('#nextGameCard .matchup-team .sports-mark.coverage-real-logo').count()===2);

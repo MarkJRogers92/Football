@@ -7,7 +7,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
 (async()=>{
   const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
   try{
-    await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);await page.waitForSelector('#v0102PlayerStories',{state:'visible',timeout:15000});
+    await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);await page.evaluate(()=>window.DynastyDashboardViews?.show('stories'));await page.waitForSelector('#v0102PlayerStories',{state:'visible',timeout:15000});
     let debug=await page.evaluate(()=>window.__DL_TEST__.weeklyPlayerStoriesDebug());assert.ok(debug.length>=3&&debug.length<=5,'dashboard should surface a bounded set of real player stories');assert.equal(new Set(debug.map(x=>String(x.playerId))).size,debug.length);
     const text=await page.locator('#v0102PlayerStories').textContent();assert.match(text,/PLAYERS TO WATCH/i);assert.match(text,/This week’s player stories/i);
     const fixture=await page.evaluate(()=>window.__DL_TEST__.weeklyPlayerStoriesForceFixture());assert.ok(fixture?.id);debug=await page.evaluate(()=>window.__DL_TEST__.weeklyPlayerStoriesDebug());const row=debug.find(x=>String(x.playerId)===String(fixture.id));assert.ok(row);assert.equal(row.type,'injury','forced injury should become the player’s highest-priority story');assert.equal(debug.filter(x=>String(x.playerId)===String(fixture.id)).length,1,'the same player must not occupy multiple story cards');
