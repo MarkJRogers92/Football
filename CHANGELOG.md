@@ -8,7 +8,10 @@
 - **Fix: surfaces stuck mid-animation.** `interaction-polish.js` replayed a surface's reveal whenever its own reveal class changed, so the Game Day hero, season pulse and other watched surfaces restarted every frame and sat near 55% opacity (dim team names). The class change is now ignored.
 - **Quieter status.** The opening week reads "Opening week" instead of "Week 0" and no longer fires a "NOW ENTERING WEEK 0" banner; the ticker skips routine confirmations and repeats.
 - **Copy.** New dynasties see a "Year one" History instead of empty zeros; two developer-facing messages ("v0.9.2 and later", "not backfilled") are in plain language.
-- Presentation only: no simulation, save-shape or balance changes.
+- **Recruiting cards.** The Workspace list shows each prospect's portrait and a staff-confidence bar, fixes the doubled `#1#1` rank and the run-together hometown, and opens on All Recruits when My Board is still empty.
+- **Game settings** (Program Lab, `game-settings.js`). Three per-dynasty dials, saved as `universe.settings`: administration patience (softens losing seasons only), injury rate (league-wide) and a recruiting edge for your program's pitch. Every default is neutral, so existing saves and Standard play exactly as before.
+- **Career milestones** (Program Lab, `career-milestones.js`). Thirteen milestones (first win, ten-win season, rival slayer, conference and national titles, back-to-back, 50/100/250 wins, a decade, three posts) read from the tenure record. Reaching one stores the season in `universe.milestones` and posts a hub item that season. Season reviews now carry `champ`/`confChamp`, and a closed post keeps a digest of its titles so milestones survive a job change.
+- Presentation plus the two additive features above; defaults leave simulation and balance unchanged (same seeds, same results).
 
 ## v0.12.27 — Smooth trophy turn
 

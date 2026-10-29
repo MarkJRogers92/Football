@@ -14,11 +14,11 @@
 
 .conference-banner{position:relative;display:flex;align-items:center;gap:13px;overflow:hidden;margin:-2px 0 12px;padding:12px 14px;border:1px solid color-mix(in srgb,var(--conf-secondary) 40%,#31455c);border-radius:11px;background:linear-gradient(105deg,rgba(var(--conf-primary-rgb),.32),rgba(var(--conf-primary-rgb),.08) 62%,rgba(var(--conf-accent-rgb),.05));box-shadow:inset 3px 0 var(--conf-secondary)}
 .conference-banner::after{content:"";position:absolute;width:130px;height:130px;right:-72px;top:-78px;border:1px solid rgba(var(--conf-secondary-rgb),.12);border-radius:50%;box-shadow:0 0 0 20px rgba(var(--conf-secondary-rgb),.025)}
-.conference-banner-copy{position:relative;z-index:1;min-width:0}.conference-banner-copy span{display:block;color:var(--conf-secondary);font-size:8px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}.conference-banner-copy strong{display:block;margin-top:2px;color:#f3f7fb;font-size:16px;letter-spacing:-.02em}.conference-banner-copy small{display:block;margin-top:2px;color:#8fa1b5;font-size:8px;font-weight:750;letter-spacing:.1em}
+.conference-banner-copy{position:relative;z-index:1;min-width:0}.conference-banner-copy span{display:block;color:var(--conf-secondary);font-size:10px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}.conference-banner-copy strong{display:block;margin-top:2px;color:#f3f7fb;font-size:16px;letter-spacing:-.02em}.conference-banner-copy small{display:block;margin-top:2px;color:#8fa1b5;font-size:10px;font-weight:750;letter-spacing:.1em}
 .team-conference-lockup{display:inline-flex;align-items:center;gap:6px;margin-right:7px}.team-conference-lockup .conference-crest{vertical-align:-8px}
 .conference-result-label{display:inline-flex!important;align-items:center;gap:5px;color:var(--conf-secondary)!important;font-weight:800}
 
-.gameday-conference{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 8px;color:#8da0b5;font-size:8px;font-weight:850;letter-spacing:.12em;text-transform:uppercase}.gameday-conference strong{color:var(--conf-secondary);font-size:8px;letter-spacing:.12em}
+.gameday-conference{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 8px;color:#8da0b5;font-size:10px;font-weight:850;letter-spacing:.12em;text-transform:uppercase}.gameday-conference strong{color:var(--conf-secondary);font-size:10px;letter-spacing:.12em}
 .gameday-conference.is-split .conference-crest+.conference-crest{margin-left:-13px}
 
 @media(max-width:560px){.conference-banner{padding:10px 11px}.conference-banner .conference-crest--lg{width:46px;height:53px}.conference-banner-copy strong{font-size:14px}}

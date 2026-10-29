@@ -12,7 +12,13 @@
 - Root cause of the dim Game Day hero: `interaction-polish.js` `watch()` observed `class` on the
   element it animates, so every replay re-triggered itself. Fixed by ignoring `dl-motion-*` changes.
 - `app.js` weekLine says "Opening week" at week 0 (the HUD only flips on `Week N`).
-- Presentation only. No save-shape or simulation changes.
+- Recruiting Workspace cards gain portraits (`DynastyLabPortraits.paint`) and a confidence bar parsed from the Scout cell.
+- `game-settings.js`: `universe.settings` {boardPatience, injuryRate, recruitingEdge}; lookup `gameSetting()` and defaults live in
+  `app.js` because the engine reads them (extensions are absent from the non-full test harness). Neutral defaults = identical RNG stream.
+- `career-milestones.js`: derived from `tenure.seasons` + `careerHistory`; `tenureDigest()` in `app.js` is stored on closed posts.
+  `universe.milestones` maps id -> season first reached. Review records now include `champ`/`confChamp`.
+- Measured, not tuned: ten seasons on seed 7 gave 8 distinct champions, 2 back-to-back, 5 of 10 titles from preseason top-10 prestige and
+  9.4/10 top-10 retention, so no dynasty-persistence change was made.
 
 ## v0.12.27 — Smooth trophy turn (2026-10-28)
 

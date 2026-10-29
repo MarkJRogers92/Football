@@ -32,3 +32,16 @@
 #recruiting.active>#signingClassFeature,#recruiting.active>#signingDay{order:3}
 #recruiting.active>#classSummary{order:4}
 #recruiting.active>#recruitMap{order:5}
+
+/* Program Lab game settings */
+.game-settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:12px}
+.game-setting{display:grid;gap:6px;align-content:start}
+.game-setting>span{font-weight:700}
+.game-setting small{line-height:1.4}
+
+/* Career milestones */
+.milestone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:12px}
+.milestone{display:grid;gap:4px;align-content:start;padding:12px;border:1px solid var(--line,#2a3a4d);border-radius:12px;background:rgba(255,255,255,.025)}
+.milestone strong{font-size:.92rem}.milestone span{font-size:.8rem;color:#9fb0c4;line-height:1.35}.milestone em{font-style:normal;font-size:.74rem;font-weight:700;color:#9fb0c4}
+.milestone.is-done{border-color:#7a6a2c;background:linear-gradient(180deg,rgba(232,191,74,.14),rgba(232,191,74,.04))}.milestone.is-done strong::before{content:"★ ";color:#e8bf4a}.milestone.is-done em{color:#e8bf4a}
+.milestone-bar{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:4px}.milestone-bar i{display:block;height:100%;background:#6fa3d8}
