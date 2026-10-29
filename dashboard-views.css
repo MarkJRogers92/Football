@@ -22,3 +22,13 @@
 /* The Game Lab matchup card repeats the Game Day hero above it; the hero carries every fact. */
 .gameday-event-hero:not([hidden])~#nextGameCard{display:none}
 .v2-matchup-head h3{margin:0}
+
+/* Recruiting: the board comes first; class summary, map and staff tools follow it. */
+#recruiting.active{display:flex;flex-direction:column}
+#recruiting.active>*{order:6}
+#recruiting.active>.section-head{order:0}
+#recruiting.active>#rwSwitch{order:1}
+#recruiting.active>#recruitWorkspace,#recruiting.active>.table-wrap{order:2}
+#recruiting.active>#signingClassFeature,#recruiting.active>#signingDay{order:3}
+#recruiting.active>#classSummary{order:4}
+#recruiting.active>#recruitMap{order:5}

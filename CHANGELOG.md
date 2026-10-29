@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.12.28 — Calmer Command Center
+
+- **Dashboard views.** The Command Center splits into *This week*, *Players & goals* and *League* (`dashboard-views.js`). The weekly view is about 40% shorter; the other cards are one click away rather than gone. Agenda rows that point at a decision panel just below collapse to one line each.
+- **Game Lab.** One matchup header instead of three. The Game Day hero carries the teams, ratings, plan and availability; the duplicate card behind it is hidden and "Game Day Intelligence" is now a matchup breakdown.
+- **Recruiting.** The board (Workspace or Table) now comes straight after the mode switch; class summary, map and staff tools follow it.
+- **Fix: surfaces stuck mid-animation.** `interaction-polish.js` replayed a surface's reveal whenever its own reveal class changed, so the Game Day hero, season pulse and other watched surfaces restarted every frame and sat near 55% opacity (dim team names). The class change is now ignored.
+- **Quieter status.** The opening week reads "Opening week" instead of "Week 0" and no longer fires a "NOW ENTERING WEEK 0" banner; the ticker skips routine confirmations and repeats.
+- **Copy.** New dynasties see a "Year one" History instead of empty zeros; two developer-facing messages ("v0.9.2 and later", "not backfilled") are in plain language.
+- Presentation only: no simulation, save-shape or balance changes.
+
 ## v0.12.27 — Smooth trophy turn
 
 - The title trophy now turns continuously instead of stepping: 192 frames (1.875° apart, `assets/trophy-turn-v4.webp`) and a small driver (`title-trophy.js`) that crossfades each frame into the next on every animation frame. One full turn every 30 seconds.

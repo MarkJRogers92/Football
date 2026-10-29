@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.27</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.12.28</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -1580,6 +1580,16 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
 .gameday-event-hero:not([hidden])~#nextGameCard{display:none}
 .v2-matchup-head h3{margin:0}
 
+/* Recruiting: the board comes first; class summary, map and staff tools follow it. */
+#recruiting.active{display:flex;flex-direction:column}
+#recruiting.active>*{order:6}
+#recruiting.active>.section-head{order:0}
+#recruiting.active>#rwSwitch{order:1}
+#recruiting.active>#recruitWorkspace,#recruiting.active>.table-wrap{order:2}
+#recruiting.active>#signingClassFeature,#recruiting.active>#signingDay{order:3}
+#recruiting.active>#classSummary{order:4}
+#recruiting.active>#recruitMap{order:5}
+
 /* Dynasty Lab Premium Client Shell — Milestone A
    Presentation/navigation layer only. Existing tab buttons and game actions remain canonical. */
 
@@ -1995,7 +2005,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.27</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.12.28</b></span></footer>
   </div>
 </section>
 
@@ -2022,7 +2032,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.12.27</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.12.28</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -5126,7 +5136,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.12.27';
+const APP_VERSION='0.12.28';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -13301,23 +13311,23 @@ function render(){
  const identity=add(hero,'div','legacy-identity');
  add(identity,'span','legacy-kicker','PROGRAM LEGACY');
  add(identity,'h3','legacy-name',model.teamName);
- add(identity,'small','legacy-meta',model.conference+' · tracked dynasty history');
+ add(identity,'small','legacy-meta',model.conference+(model.tracked.seasons?' · tracked dynasty history':' · your dynasty begins here'));
  const total=model.tracked.wins+model.tracked.losses,pct=total?Math.round(model.tracked.wins/total*1000)/10:'—';
  const record=add(hero,'div','legacy-record');
  add(record,'strong','',model.tracked.wins+'–'+model.tracked.losses);
- add(record,'span','',pct+'% tracked win rate · '+model.tracked.seasons+' seasons');
+ add(record,'span','',model.tracked.seasons?pct+'% tracked win rate · '+model.tracked.seasons+(model.tracked.seasons===1?' season':' seasons'):'Year one · the record starts at kickoff');
  const metrics=add(host,'div','legacy-metrics');
  for(const [label,value] of [['CONFERENCE TITLES',model.tracked.conferenceTitles],['NATIONAL TITLES',model.tracked.nationalTitles],['RECENT ARCHIVES',model.seasons.length]]){const box=add(metrics,'div');add(box,'span','',label);add(box,'strong','',value)}
  const grid=add(host,'div','legacy-grid');
  const trophy=add(grid,'section','legacy-panel');add(trophy,'span','legacy-kicker','TROPHY ROOM');add(trophy,'h4','','Championships');
  const chips=add(trophy,'div','legacy-chips');
- if(model.titleYears.length)for(const year of model.titleYears)add(chips,'span','legacy-chip',year+' NATIONAL TITLE');else add(chips,'div','legacy-empty','No archived national title yet.');
+ if(model.titleYears.length)for(const year of model.titleYears)add(chips,'span','legacy-chip',year+' NATIONAL TITLE');else add(chips,'div','legacy-empty',model.tracked.seasons?'No national title yet.':'The first banner is still up for grabs.');
  add(trophy,'span','legacy-kicker legacy-awards-kicker','PROGRAM HONORS');add(trophy,'h4','','Recent major awards');
  const awards=add(trophy,'div','legacy-awards');
- if(model.awardRows.length)for(const row of model.awardRows){const item=add(awards,'div','legacy-award');add(item,'span','',row.year+' · '+row.name);add(item,'strong','',row.playerName+(row.pos?' · '+row.pos:''))}else add(awards,'div','legacy-empty','Major award history will collect here as seasons are archived.');
+ if(model.awardRows.length)for(const row of model.awardRows){const item=add(awards,'div','legacy-award');add(item,'span','',row.year+' · '+row.name);add(item,'strong','',row.playerName+(row.pos?' · '+row.pos:''))}else add(awards,'div','legacy-empty','All-conference and national award winners will be listed here after the first season.');
  const timeline=add(grid,'section','legacy-panel');add(timeline,'span','legacy-kicker','DYNASTY TIMELINE');add(timeline,'h4','','Recent archived seasons');
  const seasons=add(timeline,'div','legacy-seasons');
- if(model.seasons.length)for(const row of model.seasons){const item=add(seasons,'article','legacy-season'+(row.champion?' is-title':''));add(item,'strong','',row.year+' · '+row.record);add(item,'span','',row.conferenceRecord+' conf · '+(row.rank?'#'+row.rank+' final':'NR'));add(item,'small','',row.champion?'National champion':row.awards.length?row.awards[0].name+' · '+row.awards[0].playerName:'Season archived')}else add(seasons,'div','legacy-empty','Complete a season to begin the program timeline.');
+ if(model.seasons.length)for(const row of model.seasons){const item=add(seasons,'article','legacy-season'+(row.champion?' is-title':''));add(item,'strong','',row.year+' · '+row.record);add(item,'span','',row.conferenceRecord+' conf · '+(row.rank?'#'+row.rank+' final':'NR'));add(item,'small','',row.champion?'National champion':row.awards.length?row.awards[0].name+' · '+row.awards[0].playerName:'Season archived')}else add(seasons,'div','legacy-empty','Finish your first season and it lands here with the record, final ranking and honors.');
  const brand=globalThis.DynastyProgramBranding?.brandFor?.(+model.teamId);
  if(brand){hero.style.setProperty('--legacy-primary-rgb',brand.primaryRgb);hero.style.setProperty('--legacy-secondary-rgb',brand.secondaryRgb);hero.style.setProperty('--legacy-secondary',brand.secondary)}
 }

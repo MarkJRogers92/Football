@@ -1,5 +1,19 @@
 # Latest Session Work
 
+## v0.12.28 — Calmer Command Center (2026-10-29)
+
+- Review of the running game (screenshots at 1440 and 390 wide) found a 4,600px dashboard, three
+  stacked headers for one Game Lab matchup, and layered status messages. This pass fixes those.
+- `dashboard-views.js/.css`: classifies the dashboard's direct children (cards arrive from several
+  modules) into week / stories / league and shows one at a time. Nothing is moved or re-rendered.
+  Tests that need the stories cards call `DynastyDashboardViews.show('stories')` first.
+- Game Lab: `.gameday-event-hero:not([hidden]) ~ #nextGameCard{display:none}`. The card stays in the
+  DOM because `sports-presentation.js` reads its `.gameday-data`.
+- Root cause of the dim Game Day hero: `interaction-polish.js` `watch()` observed `class` on the
+  element it animates, so every replay re-triggered itself. Fixed by ignoring `dl-motion-*` changes.
+- `app.js` weekLine says "Opening week" at week 0 (the HUD only flips on `Week N`).
+- Presentation only. No save-shape or simulation changes.
+
 ## v0.12.27 — Smooth trophy turn (2026-10-28)
 
 - v0.12.26 stepped 96 frames at 4 fps and read as jerky on the installed Mac app. Now 192
