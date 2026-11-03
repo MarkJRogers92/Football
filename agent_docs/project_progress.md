@@ -2,7 +2,8 @@
 
 ## Version and branch
 
-Source is `0.12.29` on `claude/zealous-tesla-m08xay` (not yet merged, published or released).
+Source is `0.12.29` on `claude/review-improvement-dwjemy` (PR #25, merge ab7e6cf). Web published
+(production run 41571572439); no GitHub Release, desktop build or Mac install yet.
 v0.12.29 adds specialist recruits, a late market for unsigned prospects, smoother class sizes and
 elite placement at signing day; see `CHANGELOG.md`.
 
