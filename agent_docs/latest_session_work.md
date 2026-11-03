@@ -1,5 +1,27 @@
 # Latest Session Work
 
+## v0.13.0 — Multi-year recruiting (2026-11-03)
+
+- Started from a game review (browser screenshots at 1440 and 390 wide plus the headless sim). Findings and what was done:
+  the Workspace's "220 prospects" was the display cap not the pool; the Workspace search only searched on-screen rows; a v0.12.28
+  CSS `order` rule had put the recruiting filter strip below the map; Season tab showed `regular · Week 0`; up to three toasts stacked
+  over phone content; the Roster page was 32,032px on a phone (the full table is one card per player).
+- Rising class: `generateRisingClass`, `toggleRisingWatch`, `rollRecruitClass` in `app.js` (constants `RECRUIT_POOL_SIZE`,
+  `RISING_CLASS_SIZE=600`, `WATCHLIST_LIMIT=15`, `WATCH_RELATIONSHIP=12`, `WATCH_INTEREST=8`); the new class is `rising + fresh.slice(600)`
+  so the distribution is unchanged. UI is `rising-class.js/.css` (engine extension, after `recruiting-filters.js`). No save migration was
+  written on purpose: the owner said current saves can be discarded; `normalizeUniverse` only defaults `risingClass` to `[]`.
+- Recruiting filters: `state` and `query` run before the 220-row cap; Workspace reads `data-total`/`data-matching` off `[data-recruit-pool]`
+  and drives the pool filter through `DynastyLabRecruitingFilters.setState`.
+- Roster page folding in `roster-depth-experience.js` (`applyRosterFolding`); any test that clicks `#rosterBody` must open the table first
+  (`[data-rd-table-toggle]`); browser.js, visual.js and player-identity-browser.js were updated.
+- Measured: prestige sd narrows on the v0.12.28 base too (16.8 -> 14.5-14.8 over 10 seasons, three seeds); v0.12.29 adds about 0.4. Not
+  changed. If a long game should keep dynasties alive, the lever is the prestige update in `offseasonReview`
+  (`target=meanWins+(prestige-meanPrestige)/9`, delta clamped to +-3) and `program_ceiling`.
+- The longrun "stall after 2034" was the hot seat: the user team went 3-9, confidence 0, `hasPendingCareerChoice()` true. Not an engine bug.
+- Pitfalls hit: `git add -A -- . ':!node_modules'` fails on an ignored path and silently skips the commit; `pgrep -f` inside a Monitor
+  matches the monitor's own command line; `verify:release` refuses a dirty tree, so commit before `validate:full`.
+
+
 ## v0.12.29 — Fuller recruiting classes (2026-11-03)
 
 - Prompted by "recruiting didn't seem like many recruits". Measured first (`tools/diag3.js`, plus ad-hoc cycle scripts): the pool is 2,800

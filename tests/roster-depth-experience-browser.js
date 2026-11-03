@@ -16,6 +16,15 @@ const start=page=>sharedStartNewDynasty(page);
   check('position groups show staff-visible player hierarchy',await page.locator('.rd-position-group .rd-player').count()>25);
   const staffRead=await page.locator('.rd-position-group .rd-player small').first().innerText();check('staff read renders as text without escaped HTML',/^[A-Z]+ · [A-F][+-]? · \d+–\d+$/.test(staffRead),staffRead);
   check('dense canonical roster table remains available',await page.locator('#rosterBody tr').count()>40);
+  // v0.12.30: the full table is folded away by default and a phone opens only the first group.
+  check('full roster table starts collapsed',!(await page.locator('#roster .table-wrap').isVisible()));
+  check('roster page is no longer enormous',await page.evaluate(()=>document.documentElement.scrollHeight)<(label==='iphone'?3200:3200),String(await page.evaluate(()=>document.documentElement.scrollHeight)));
+  const openGroups=await page.locator('.rd-position-group:not(.rd-collapsed)').count();
+  check(label==='iphone'?'phone opens only the first position group':'desktop keeps every position group open',label==='iphone'?openGroups===1:openGroups>=10,String(openGroups));
+  await page.click('[data-rd-table-toggle]');check('the toggle reveals the full roster table',await page.locator('#roster .table-wrap').isVisible()&&await page.locator('#rosterBody tr').first().isVisible());
+  check('the toggle states its new action',/Hide full roster table/.test(await page.locator('[data-rd-table-toggle]').innerText()));
+  await page.click('[data-rd-table-toggle]');check('the toggle folds the table again',!(await page.locator('#roster .table-wrap').isVisible()));
+  if(label==='iphone'){const second=page.locator('.rd-position-group').nth(1);await second.locator('header').click();check('tapping a group header opens it',!(await second.evaluate(e=>e.classList.contains('rd-collapsed'))));await second.locator('header').click();check('tapping again folds it',await second.evaluate(e=>e.classList.contains('rd-collapsed')))}
   await goTab(page,'depth');await page.waitForSelector('#depthFormationBoard',{timeout:10000});
   check('football formation view is visible',await page.locator('#depthFormationBoard').isVisible());
   check('offense maps canonical base roles onto field',await page.locator('.rd-offense [data-rd-formation-role]').count()>=10);

@@ -6,3 +6,7 @@
 .rw-conf>b{position:relative;display:block;padding:0 7px;font-size:.66rem;line-height:14px;font-weight:700;letter-spacing:.03em;color:#eef3fc}
 @media (max-width:700px){.recruit-workspace-card{grid-template-columns:28px 40px minmax(0,1fr) auto}.recruit-workspace-card .rw-portrait{width:40px;height:40px}}
 .rw-empty{padding:28px 18px;color:#9fb0c4;font-size:.9rem;line-height:1.5}
+.rw-more{width:100%;margin-top:8px;padding:10px;border:1px solid rgba(143,177,255,.28);border-radius:10px;background:rgba(143,177,255,.08);color:#cfe0ff;font-weight:700;cursor:pointer}
+.rw-more:hover{background:rgba(143,177,255,.16)}
+.rw-list-head strong{white-space:nowrap}
+.rw-list-head small{flex:1 1 180px;text-align:right}

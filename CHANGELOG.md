@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.13.0 — Multi-year recruiting
+
+- **Rising class.** Next year's best prospects now exist this year. Every season the game also generates the top 600 of the class that arrives after this one (`universe.risingClass`, about +460 KB on a 25 MB universe and ~75 ms per rollover). A new *Rising prospects* card on the Recruiting tab lists them read-only (stars, position, school, a rounded staff grade) with a position filter and a *Watching only* toggle.
+- **Watchlist.** Watch up to 15 rising prospects. When the class rolls over they join your board already targeted, with a relationship (+12) and interest (+8) head start, so a pitch can span two seasons. The other 2,200 of the new class are drawn from the bottom of a fresh sample, which keeps the star distribution of a normal class (covered by a test).
+- **Recruiting counts speak in pool terms.** The Workspace said "220 prospects" and "All Recruits 220", the display cap, not the 2,800-recruit pool. It now says "Showing 30 of 2,800 prospects" and "All Recruits 2,800", renders 30 cards with *Show more*, and explains how to reach the rest.
+- **State filter and pool-wide search.** Recruiting filters gain a home-state dropdown and a name/school/city search. Both run over the whole pool before the 220-row display cap, so a prospect outside the top 220 can be found (the Workspace search only ever searched the rows on screen).
+- **Fix: the filter strip was at the bottom of the page.** A v0.12.28 CSS `order` rule gave the Workspace and table `order:2` and everything else `order:6`, which pushed the board tabs and filters below the class summary and the map. They now sit above the board; the redundant board tabs are hidden in Workspace mode.
+- **Season tab copy.** "2027 · regular · Week 0" is now "2027 · Regular season · Opening week" in both the heading and the pulse card (`seasonStageLabel`); playoff phases read as copy as well.
+- **Quieter toasts.** One toast at a time (they used to stack up to three), 3 s instead of 4 s, no toast for the routine "Season begun. Week 1 is ready.", and on phones they sit above the nav bar instead of over the content.
+- **Shorter Roster page.** The full sortable table is folded behind a *Show full roster table* button and, on a phone, only the first position group starts open: the phone Roster page goes from 32,032 px to about 2,000 px, desktop from 9,112 px to about 2,200 px. The table stays in the DOM, so selection and search keep working.
+- **Correction to v0.12.29:** specialist recruits are capped at three stars (raw rating 71). Drawn from the ordinary distribution, a kicker could rank #2 nationally and count as a blue chip.
+- **Tooling.** `tools/longrun.js` takes a new post when the controlled coach is fired, so a long run no longer stalls the first time the hot seat ends a tenure (it stopped after 2034 on every seed that fired the user), and accepts `SEED`.
+- **Seeds change.** Class generation draws differently, so the same seed produces a different universe than v0.12.29.
+- **Measured, not changed.** Prestige spread narrows over a decade on the v0.12.28 base as well (sd 16.8 to 14.5-14.8 over 10 seasons on three seeds); v0.12.29 added about 0.4 more. Left alone; see `agent_docs/latest_session_work.md`.
+
 ## v0.12.29 — Fuller recruiting classes
 
 - **Late market.** About half of every recruit pool is never signed, and it is not the weak half (an unsigned class averages the same trueNow as the signed one, 5-stars included). The yearly walk-on top-up now draws on those named prospects first: best scouted grade at the needed position, with the controlled program's own board targets ahead of the rest. K and P still fall back to anonymous walk-ons because the pool never generates them. `universe.lateMarket` records `{year,pool,placed}`; late additions are flagged `lateAddition` and carry an "Unsigned N-star prospect from ... · late addition" origin. `recruitOriginLabel`, `playerFromRecruit` and `takeLatePlayer` share one recruit-to-player conversion with signing-day enrollment.

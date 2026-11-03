@@ -32,7 +32,7 @@ test('the pool recruits specialists, and a position with no prospect falls back 
  const e=await setup(9703),t=e.universe.teams[0],pool=e.generateRecruitPool(1000);
  const k=pool.filter(r=>r.pos==='K'),p=pool.filter(r=>r.pos==='P');
  assert.ok(k.length>=25&&p.length>=25,`one K and one P per 31 prospects, got ${k.length} K and ${p.length} P`);
- assert.ok(k.concat(p).every(r=>r.stars<=4),'no five-star kickers or punters');
+ assert.ok(k.concat(p).every(r=>r.stars<=3&&r.trueNow<=71),'specialists are three stars at most');
  const bare=pool.filter(r=>r.pos!=='K');
  assert.equal(e.takeLatePlayer(bare,t,'K','Nobody'),null,'no kicker left: the caller generates a walk-on');
  assert.equal(e.takeLatePlayer(pool,t,'K','Nobody').pos,'K','a kicker is available from a pool that has them');
