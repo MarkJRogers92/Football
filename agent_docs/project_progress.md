@@ -2,7 +2,11 @@
 
 ## Version and branch
 
-Source is `0.12.28` on `claude/review-improvement-dwjemy` (PR #23, merge 918e5e7).
+Source is `0.12.29` on `claude/zealous-tesla-m08xay` (not yet merged, published or released).
+v0.12.29 adds specialist recruits, a late market for unsigned prospects, smoother class sizes and
+elite placement at signing day; see `CHANGELOG.md`.
+
+Previous: source `0.12.28` on `claude/review-improvement-dwjemy` (PR #23, merge 918e5e7).
 v0.12.28 adds dashboard views, a single Game Lab header, recruit-card portraits, per-dynasty
 game settings and career milestones. Web published (run 40822227655); desktop artifacts
 built (run 40822099911); GitHub Release and Mac install pending, see
