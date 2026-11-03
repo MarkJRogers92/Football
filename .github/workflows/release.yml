@@ -62,11 +62,15 @@ jobs:
           target="$(git rev-parse "${target}^{commit}")"
           actual="$(git show "${target}:VERSION.txt" | tr -d '[:space:]')"
           [ "$actual" = "$VERSION" ] || { echo "VERSION.txt at $target is $actual, not $VERSION" >&2; exit 1; }
-          git branch -r --contains "$target" | grep -q . || { echo "$target is not on any remote branch" >&2; exit 1; }
+          # Capture instead of piping into grep -q: an early-closing reader makes the writer
+          # exit 141 (SIGPIPE), which pipefail turns into a failure.
+          branches="$(git branch -r --contains "$target")"
+          [ -n "$branches" ] || { echo "$target is not on any remote branch" >&2; exit 1; }
           if gh release view "v${VERSION}" >/dev/null 2>&1; then
             echo "release v${VERSION} already exists" >&2; exit 1
           fi
-          git show "${target}:CHANGELOG.md" | awk -v h="## v${VERSION}" 'index($0,h)==1{f=1;next} f&&/^## /{exit} f' > notes.md
+          # No `exit` in awk: it must read all of stdin, or `git show` dies of SIGPIPE under pipefail.
+          git show "${target}:CHANGELOG.md" | awk -v h="## v${VERSION}" 'index($0,h)==1{f=1;next} /^## /{f=0} f' > notes.md
           [ -s notes.md ] || { echo "no CHANGELOG.md section for v${VERSION}" >&2; exit 1; }
           if [ -n "$NOTE" ]; then printf '\n%s\n' "$NOTE" >> notes.md; fi
           args=(--target "$target" --title "Dynasty Lab v${VERSION} — ${TITLE}" --notes-file notes.md)
