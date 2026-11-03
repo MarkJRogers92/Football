@@ -723,8 +723,9 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 .recruiting-filter-toggle input{margin:0}
 .recruiting-filter-count{align-self:center;color:var(--muted);font-size:.78rem;white-space:nowrap}
 .recruiting-filter-count strong{color:var(--text)}
+.recruiting-pool-summary{align-self:center;color:var(--muted);font-size:.78rem;white-space:nowrap}
 .recruiting-filter-strip button{white-space:nowrap}
-@media(max-width:900px){.recruiting-board-view{align-items:flex-start;flex-direction:column}.recruiting-board-note{max-width:none}.recruiting-filter-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.recruiting-filter-count{white-space:normal}}
+@media(max-width:900px){.recruiting-board-view{align-items:flex-start;flex-direction:column}.recruiting-board-note{max-width:none}.recruiting-filter-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.recruiting-filter-count,.recruiting-pool-summary{white-space:normal}}
 @media(max-width:560px){.recruiting-board-tabs{display:grid;grid-template-columns:1fr 1fr;width:100%}.recruiting-board-tabs button{width:100%}.recruiting-filter-strip{grid-template-columns:1fr}.recruiting-filter-toggle{min-height:auto}.recruiting-filter-strip button{width:100%}}
 
 .recruit-compare-toggle{margin-top:5px;font-size:.72rem;padding:4px 7px}.recruit-compare-toggle.active{font-weight:700}.recruit-compare-tray{margin-top:10px;padding:10px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.recruit-compare-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}.recruit-compare-head>div{display:grid;gap:2px}.recruit-compare-head small{opacity:.68}.recruit-compare-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.recruit-compare-card{padding:9px;border:1px solid rgba(255,255,255,.1);border-radius:8px;display:grid;gap:5px}.recruit-compare-verdict{display:flex;align-items:center;justify-content:space-between;gap:8px}.recruit-compare-verdict b{font-size:1.15rem}@media(max-width:900px){.recruit-compare-grid{grid-template-columns:1fr}}.recruit-compare-attrs{margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.12);display:grid;gap:6px}.recruit-compare-attrs-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.recruit-compare-attrs-head small{opacity:.68}.recruit-compare-table{width:100%;border-collapse:collapse;font-size:.78rem}.recruit-compare-table th,.recruit-compare-table td{padding:4px 6px;text-align:center;border-bottom:1px solid rgba(255,255,255,.08)}.recruit-compare-table th.rc-attr{text-align:left;font-weight:600;opacity:.85}.recruit-compare-table td.rc-lead{font-weight:700;color:#8ef0b0;background:rgba(70,200,120,.12);border-radius:6px}.recruit-compare-table td.rc-overlap{opacity:.62}.recruit-compare-table td.rc-none{opacity:.32}
@@ -7868,6 +7869,22 @@ function offseasonDepartures(){
  finishOffseasonPhase('departures','signing',{draftPool,teams});
  return true;
 }
+// A recruit becomes a rostered player the same way at signing day and in the late market.
+function recruitOriginLabel(r){return `${r.stars}-star recruit from ${r.highSchool||r.homeRegion} (${r.homeCity||r.homeRegion}, ${r.homeState||''})${r.flippedFrom?` · flipped from ${r.flippedFrom}`:''}`}
+function playerFromRecruit(r,t,origin=recruitOriginLabel(r)){const p=generatePlayer(t,r.pos,99);Object.assign(p,{name:r.name,style:r.style,trueNow:r.trueNow,upside:r.upside,perceived:r.scout,perceivedUpside:r.scoutUp,year:'FR',eligibilityUsed:0,redshirtUsed:false,redshirtActive:false,origin,promise:r.promise&&r.promise!=='None'?r.promise:null,promiseBaseline:r.scout,portraitSeed:r.portraitSeed||p.portraitSeed,portraitVersion:r.portraitVersion||PORTRAIT_VERSION,scoutConfidence:r.scoutConfidence??p.scoutConfidence,scoutingDomains:r.scoutingDomains?JSON.parse(JSON.stringify(r.scoutingDomains)):undefined,scoutingHistory:r.scoutingHistory?JSON.parse(JSON.stringify(r.scoutingHistory)):[]});return p}
+// v0.12.29: roughly half the recruit pool is never signed, and it is not the weak half
+// (an unsigned class averages the same trueNow as the signed one, 5-stars included).
+// Walk-on top-ups draw from those named prospects first, best scouted grade at the
+// needed position, with the controlled program's own targets ahead of the rest.
+function takeLatePlayer(pool,t,pos,controlled){
+ const cand=pool.filter(r=>r.pos===pos);if(!cand.length)return null;
+ const mine=t.name===controlled;
+ cand.sort((a,b)=>((mine&&b.targeted?1:0)-(mine&&a.targeted?1:0))||b.scout-a.scout);
+ const r=mine&&cand[0].targeted?cand[0]:pick(cand.slice(0,3));pool.splice(pool.indexOf(r),1);
+ const p=playerFromRecruit(r,t,`Unsigned ${r.stars}-star prospect from ${r.highSchool||r.homeRegion} (${r.homeCity||r.homeRegion}, ${r.homeState||''}) · late addition`);
+ p.year='FR';p.jerseyNumber=jerseyFor(p.pos,p.portraitSeed);p.redshirtSeason=null;p.lateAddition=true;
+ return p;
+}
 function offseasonEnrollment(){
  const os=normalizeOffseasonState();
  if(offseasonPhaseDone('signing')){if(os.phase==='signing')os.phase='portal';return true}
@@ -7876,8 +7893,7 @@ function offseasonEnrollment(){
   const signed=universe.recruits.filter(r=>r.committed===t.name).slice(0,Math.max(0,105-t.roster.length));
   signed.forEach(r=>{
    if(t.name===controlled){firstRecruitEvaluation(r,t);snapshotScouting(r,t,'SIGNING_DAY','RECRUITING',true)}
-   const p=generatePlayer(t,r.pos,99);
-   Object.assign(p,{name:r.name,style:r.style,trueNow:r.trueNow,upside:r.upside,perceived:r.scout,perceivedUpside:r.scoutUp,year:'FR',eligibilityUsed:0,redshirtUsed:false,redshirtActive:false,origin:`${r.stars}-star recruit from ${r.highSchool||r.homeRegion} (${r.homeCity||r.homeRegion}, ${r.homeState||''})${r.flippedFrom?` · flipped from ${r.flippedFrom}`:''}`,promise:r.promise&&r.promise!=='None'?r.promise:null,promiseBaseline:r.scout,portraitSeed:r.portraitSeed||p.portraitSeed,portraitVersion:r.portraitVersion||PORTRAIT_VERSION,scoutConfidence:r.scoutConfidence??p.scoutConfidence,scoutingDomains:r.scoutingDomains?JSON.parse(JSON.stringify(r.scoutingDomains)):undefined,scoutingHistory:r.scoutingHistory?JSON.parse(JSON.stringify(r.scoutingHistory)):[]});
+   const p=playerFromRecruit(r,t);
    p.jerseyNumber=jerseyFor(p.pos,p.portraitSeed);signPlayerPromise(p,r,t);const developmentPromise=(p.promises||[]).find(q=>q.type==='DEVELOPMENT_PLAN'&&q.status==='ACTIVE');if(developmentPromise)p.trainingFocus=developmentPromise.expectedFocus;p.recruitingMemory=r.recruitingMemory;p.primaryRecruiterCoachId=r.primaryRecruiterCoachId||r.recruitingMemory?.primaryRecruiterCoachId||r.recruitingMemory?.recruiterCoachId||null;p.coachRelationships={...(r.coachRelationships||r.recruitingMemory?.coachRelationships||{})};p.coachDeparturePressure=r.coachDeparturePressure?{...r.coachDeparturePressure}:null;p.transferHistory=[];ensurePlayerDevelopment(p,t);t.roster.push(p);
    recordRosterMove(t,p,'signees');
    const hs=(universe.highSchools||[]).find(h=>h.id===r.highSchoolId);if(hs)hs.d1Signees=(hs.d1Signees||0)+1;
@@ -7971,9 +7987,11 @@ function offseasonPreseason(){
  universe.campHistory[universe.year]=JSON.parse(JSON.stringify(ds));
  const compacted=compactGameArchive();
  if(compacted.games&&currentArchiveState())currentArchiveState().gamesDirty=true;
+ const latePool=(universe.recruits||[]).filter(r=>!r.committed),lateControlled=$('#userTeam').value,latePoolSize=latePool.length;
  universe.year++;universe.week=0;resetNilSeason();universe.recoveredWeek=-1;universe.phase='regular';universe.latest=[];universe.confChamps=[];universe.playoffFieldIds=[];universe.playoffFieldUnavailable=false;universe.academicProgression={season:universe.year,week:0,teamIds:[]};universe.champion=null;universe.lastDetailedGame=null;universe.playLogs={};universe.recruits=generateRecruitPool(2800,universe.highSchools);universe.recruitClassCounts={};
- universe.teams.forEach(t=>{t.w=t.l=t.cw=t.cl=t.pf=t.pa=t.sos=0;t.rank=null;t.champ=false;t.commits=[];while(t.roster.length<85){const p=generateFreshman(t,criticalPosition(t)||scarcePosition(t)||pick(POS));t.roster.push(p);recordRosterMove(t,p,'walkOns',os.reports.roster?.[t.id])}repairRosterShape(t,os.reports.roster?.[t.id]);if(t.roster.length>105){const keep=t.roster.sort((a,b)=>b.trueNow-a.trueNow).slice(0,105),cut=t.roster.filter(p=>!keep.includes(p));for(const p of cut){addToArchive(p,t,'Roster cut');recordRosterMove(t,p,'cuts',os.reports.roster?.[t.id])}t.roster=keep}autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)});
+ universe.teams.forEach(t=>{t.w=t.l=t.cw=t.cl=t.pf=t.pa=t.sos=0;t.rank=null;t.champ=false;t.commits=[];while(t.roster.length<85){const need=criticalPosition(t)||scarcePosition(t)||pick(POS),p=takeLatePlayer(latePool,t,need,lateControlled)||generateFreshman(t,need);t.roster.push(p);recordRosterMove(t,p,'walkOns',os.reports.roster?.[t.id])}repairRosterShape(t,os.reports.roster?.[t.id]);if(t.roster.length>105){const keep=t.roster.sort((a,b)=>b.trueNow-a.trueNow).slice(0,105),cut=t.roster.filter(p=>!keep.includes(p));for(const p of cut){addToArchive(p,t,'Roster cut');recordRosterMove(t,p,'cuts',os.reports.roster?.[t.id])}t.roster=keep}autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)});
  if(os.reports.roster)universe.lastOffseasonRecap={year:os.year,teams:Object.fromEntries(universe.teams.filter(t=>os.reports.roster[t.id]).map(t=>[t.id,offseasonReceiptView(t,os.reports.roster[t.id],os.year,true)]))};
+ universe.lateMarket={year:universe.year,pool:latePoolSize,placed:latePoolSize-latePool.length};
  normalizePromiseState();universe.developmentState={year:universe.year,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]};universe.offseasonDone=false;buildSchedule();ranked();buildPreseasonHub();autosaveAfter('preseason');
  return true;
 }
@@ -9577,9 +9595,16 @@ if(typeof module==='object'&&module.exports){
   const note=s.targetedOnly?(count?`Your board has ${count} targeted recruit${count===1?'':'s'}. Use the filters below to narrow it further.`:'Your board is empty. Target a recruit from All Recruits and they will appear here automatically.'):'Browse the full recruiting pool, then add prospects to My Board as you identify priorities.';
   return `<div class="recruiting-board-view" data-recruiting-board-view><div class="recruiting-board-tabs" role="group" aria-label="Recruiting board view"><button type="button" data-recruit-view="all" class="${s.targetedOnly?'':'active'}" aria-pressed="${s.targetedOnly?'false':'true'}">All Recruits</button><button type="button" data-recruit-view="board" class="${s.targetedOnly?'active':''}" aria-pressed="${s.targetedOnly?'true':'false'}">My Board <span class="recruiting-board-count">${count}</span></button></div><div class="recruiting-board-note">${note}</div></div>`;
  }
+ // The board lists at most 220 rows but filters and sorting run over the whole pool; say so,
+ // and say how much of the pool is still open (after signing day, whoever is left is unsigned).
+ function recruitingPoolSummary(){
+  const rs=Array.isArray(universe?.recruits)?universe.recruits:[];if(!rs.length)return '';
+  const n=v=>v.toLocaleString('en-US'),committed=rs.filter(r=>r.committed).length,open=rs.length-committed,afterSigning=universe.recruitCycle?.year===universe.year;
+  return `<span class="recruiting-pool-summary" data-recruit-pool title="Filters and sorting search the whole pool; the table shows the first 220 matches.">Pool ${n(rs.length)} · ${n(committed)} committed · ${n(open)} ${afterSigning?'unsigned':'uncommitted'}</span>`;
+ }
  function recruitingFilterHTML(){
   const s=recruitingFilterSystem.normalize(recruitBoardFilters),displayed=Math.min(220,recruitFilterMatchCount),positions=[['ALL','All positions'],...POS.map(p=>[p,p])],stages=[['ALL','All evaluation stages'],['PRELIMINARY','Preliminary'],['QUICK_FILM','Film reviewed'],['FULL_EVALUATION','Full evaluation']],verdicts=[['ALL','All staff verdicts'],...recruitingFilterSystem.verdictLabels.map(v=>[v,v])];
-  return `<div class="recruiting-filter-strip" data-recruiting-filters><label>Position<select data-recruit-filter="pos">${filterOptions(positions,s.pos)}</select></label><label>Evaluation<select data-recruit-filter="stage">${filterOptions(stages,s.stage)}</select></label><label>Staff Verdict<select data-recruit-filter="verdict">${filterOptions(verdicts,s.verdict)}</select></label><label class="recruiting-filter-toggle"><input type="checkbox" data-recruit-filter="targetedOnly" ${s.targetedOnly?'checked':''}> Targeted only</label><span class="recruiting-filter-count"><strong>${displayed}</strong> shown · ${recruitFilterMatchCount} matching</span><button type="button" data-recruit-filter-reset ${s.pos==='ALL'&&s.stage==='ALL'&&s.verdict==='ALL'&&!s.targetedOnly?'disabled':''}>Reset</button></div>`;
+  return `<div class="recruiting-filter-strip" data-recruiting-filters><label>Position<select data-recruit-filter="pos">${filterOptions(positions,s.pos)}</select></label><label>Evaluation<select data-recruit-filter="stage">${filterOptions(stages,s.stage)}</select></label><label>Staff Verdict<select data-recruit-filter="verdict">${filterOptions(verdicts,s.verdict)}</select></label><label class="recruiting-filter-toggle"><input type="checkbox" data-recruit-filter="targetedOnly" ${s.targetedOnly?'checked':''}> Targeted only</label><span class="recruiting-filter-count"><strong>${displayed}</strong> shown · ${recruitFilterMatchCount} matching</span>${recruitingPoolSummary()}<button type="button" data-recruit-filter-reset ${s.pos==='ALL'&&s.stage==='ALL'&&s.verdict==='ALL'&&!s.targetedOnly?'disabled':''}>Reset</button></div>`;
  }
  function bindRecruitingFilters(){
   $$('[data-recruit-view]').forEach(el=>el.onclick=()=>{

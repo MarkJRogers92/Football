@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- **Late market.** About half of every recruit pool is never signed, and it is not the weak half (an unsigned class averages the same trueNow as the signed one, 5-stars included). The yearly walk-on top-up now draws on those named prospects first: best scouted grade at the needed position, with the controlled program's own board targets ahead of the rest. K and P still fall back to anonymous walk-ons because the pool never generates them. `universe.lateMarket` records `{year,pool,placed}`; late additions are flagged `lateAddition` and carry an "Unsigned N-star prospect from ... · late addition" origin. `recruitOriginLabel`, `playerFromRecruit` and `takeLatePlayer` share one recruit-to-player conversion with signing-day enrollment.
+- **Recruiting board.** The filter strip now says how big the pool is and how much of it is open: "Pool 2,800 · 1,559 committed · 1,241 uncommitted" (after signing day, "unsigned"). Filters and sorting always searched the whole pool; the table still shows the first 220 matches.
+- No save-shape changes beyond the additive `universe.lateMarket` and a `lateAddition` flag on affected players. Class sizes and signing-day behaviour are unchanged.
+
 ## v0.12.28 — Calmer Command Center
 
 - **Dashboard views.** The Command Center splits into *This week*, *Players & goals* and *League* (`dashboard-views.js`). The weekly view is about 40% shorter; the other cards are one click away rather than gone. Agenda rows that point at a decision panel just below collapse to one line each.

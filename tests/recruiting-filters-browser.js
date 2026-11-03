@@ -24,6 +24,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
  await page.click('[data-recruit-view="all"]');await page.waitForFunction(()=>!document.querySelector('[data-recruit-filter="targetedOnly"]')?.checked&&document.querySelector('[data-recruit-view="all"]')?.classList.contains('active'));
  await page.check('[data-recruit-filter="targetedOnly"]');await page.waitForFunction(()=>document.querySelector('[data-recruit-view="board"]')?.classList.contains('active'));
  const countText=await page.locator('.recruiting-filter-count').innerText();if(!/matching/.test(countText))throw new Error('matching-count summary missing');
+ const poolText=await page.locator('[data-recruit-pool]').innerText();if(!/^Pool [\d,]+ · [\d,]+ committed · [\d,]+ (uncommitted|unsigned)$/.test(poolText))throw new Error('pool summary missing or malformed: '+poolText);
  if(errors.length)throw new Error(errors.slice(0,3).join(' | '));
  await browser.close();console.log('recruiting My Board browser lifecycle passed');
 })().catch(e=>{console.error(e);process.exit(1)});
