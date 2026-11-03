@@ -1,0 +1,75 @@
+name: Create GitHub Release
+
+# Creates the tag and GitHub Release for a version that is already merged. Cloud coding sessions
+# cannot write releases (HTTP 403), so this runs with the repository's own Actions token. It
+# attaches no desktop builds: those come from a [release-ci] validate run and can be uploaded
+# to the release afterwards.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version without the v (must equal VERSION.txt at the target commit)
+        required: true
+        type: string
+      title:
+        description: Short release title, shown after "Dynasty Lab vX.Y.Z — "
+        required: true
+        type: string
+      target:
+        description: Commit SHA to tag (defaults to the commit this workflow was dispatched on)
+        required: false
+        type: string
+      prerelease:
+        description: Mark as a prerelease (desktop builds are alphas)
+        required: false
+        default: true
+        type: boolean
+      note:
+        description: Optional line appended to the release notes
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dynasty-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create tag and release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+          TITLE: ${{ inputs.title }}
+          TARGET: ${{ inputs.target }}
+          PRERELEASE: ${{ inputs.prerelease }}
+          NOTE: ${{ inputs.note }}
+        run: |
+          set -euo pipefail
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "version must look like 1.2.3" >&2; exit 1; }
+          target="${TARGET:-$GITHUB_SHA}"
+          git cat-file -e "${target}^{commit}" || { echo "unknown commit $target" >&2; exit 1; }
+          target="$(git rev-parse "${target}^{commit}")"
+          actual="$(git show "${target}:VERSION.txt" | tr -d '[:space:]')"
+          [ "$actual" = "$VERSION" ] || { echo "VERSION.txt at $target is $actual, not $VERSION" >&2; exit 1; }
+          git branch -r --contains "$target" | grep -q . || { echo "$target is not on any remote branch" >&2; exit 1; }
+          if gh release view "v${VERSION}" >/dev/null 2>&1; then
+            echo "release v${VERSION} already exists" >&2; exit 1
+          fi
+          git show "${target}:CHANGELOG.md" | awk -v h="## v${VERSION}" 'index($0,h)==1{f=1;next} f&&/^## /{exit} f' > notes.md
+          [ -s notes.md ] || { echo "no CHANGELOG.md section for v${VERSION}" >&2; exit 1; }
+          if [ -n "$NOTE" ]; then printf '\n%s\n' "$NOTE" >> notes.md; fi
+          args=(--target "$target" --title "Dynasty Lab v${VERSION} — ${TITLE}" --notes-file notes.md)
+          if [ "$PRERELEASE" = "true" ]; then args+=(--prerelease); fi
+          gh release create "v${VERSION}" "${args[@]}"
+          echo "Created v${VERSION} at ${target}" >> "$GITHUB_STEP_SUMMARY"
