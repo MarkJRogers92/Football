@@ -2,7 +2,10 @@
 
 ## Version and branch
 
-Source is `0.12.29` on `claude/review-improvement-dwjemy` (PR #25, merge ab7e6cf). Web published
+Source is `0.13.0` on `claude/zealous-tesla-m08xay` (PR open, not merged or published). v0.13.0 adds the rising class and
+watchlist, pool-wide recruiting counts, state filter and search, and shorter Roster/Season/toast presentation; see `CHANGELOG.md`.
+
+Previous: `0.12.29` on `claude/review-improvement-dwjemy` (PR #25, merge ab7e6cf). Web published
 (production run 41571572439); no GitHub Release, desktop build or Mac install yet.
 v0.12.29 adds specialist recruits, a late market for unsigned prospects, smoother class sizes and
 elite placement at signing day; see `CHANGELOG.md`.
