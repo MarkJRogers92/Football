@@ -735,6 +735,37 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 @media(max-width:560px){.recruiting-board-tabs{display:grid;grid-template-columns:1fr 1fr;width:100%}.recruiting-board-tabs button{width:100%}.recruiting-filter-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.recruiting-filter-strip .rf-search,.recruiting-filter-toggle{grid-column:1/-1}.recruiting-filter-toggle{min-height:auto}.recruiting-filter-strip button{width:100%}}
 #recruiting.rw-mode .rf-search,#recruiting.rw-mode>[data-recruiting-board-view]{display:none}
 
+.rising-class{display:grid;gap:12px}
+.rising-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.rising-head h3{margin:2px 0 6px}
+.rising-head p{margin:0;color:var(--muted);font-size:.84rem;line-height:1.45;max-width:640px}
+.rising-head .rising-carry{margin-top:8px;color:var(--accent2,#8fb1ff);font-weight:700}
+.rising-count{display:grid;justify-items:end;text-align:right;flex:none}
+.rising-count strong{font-size:1.7rem;line-height:1}
+.rising-count span{color:var(--muted);font-size:.75rem}
+.rising-controls{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:end}
+.rising-controls label{display:grid;gap:4px;font-size:.76rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.rising-controls .rising-toggle{display:flex;align-items:center;gap:7px;text-transform:none;letter-spacing:0;min-height:38px}
+.rising-meta{color:var(--muted);font-size:.78rem;margin-left:auto}
+.rising-notice{margin:0;color:#f2c14e;font-size:.84rem}
+.rising-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.rising-row{display:grid;grid-template-columns:48px minmax(0,1fr) auto 104px;gap:12px;align-items:center;padding:9px 12px;border:1px solid var(--line,#26323e);border-radius:10px;background:rgba(255,255,255,.02)}
+.rising-row.is-watched{border-color:rgba(143,177,255,.5);background:rgba(143,177,255,.08)}
+.rising-rank{color:var(--muted);font-variant-numeric:tabular-nums;font-weight:700}
+.rising-who{display:grid;min-width:0}
+.rising-who strong,.rising-who small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rising-who small{color:var(--muted);font-size:.78rem}
+.rising-grade{color:var(--muted);font-variant-numeric:tabular-nums;font-size:.82rem}
+.rising-watch,.rising-more{padding:8px 12px;border:1px solid rgba(143,177,255,.28);border-radius:9px;background:rgba(143,177,255,.08);color:#cfe0ff;font-weight:700;cursor:pointer}
+.rising-watch[aria-pressed="true"]{background:#2b4c86;border-color:#8fb1ff;color:#fff}
+.rising-more{justify-self:stretch}
+.rising-empty{padding:20px;color:var(--muted)}
+@media(max-width:700px){
+ .rising-head{flex-direction:column}.rising-count{justify-items:start;text-align:left}
+ .rising-row{grid-template-columns:40px minmax(0,1fr) 92px}.rising-grade{display:none}
+ .rising-meta{margin-left:0;flex-basis:100%}
+}
+
 .recruit-compare-toggle{margin-top:5px;font-size:.72rem;padding:4px 7px}.recruit-compare-toggle.active{font-weight:700}.recruit-compare-tray{margin-top:10px;padding:10px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.recruit-compare-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}.recruit-compare-head>div{display:grid;gap:2px}.recruit-compare-head small{opacity:.68}.recruit-compare-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.recruit-compare-card{padding:9px;border:1px solid rgba(255,255,255,.1);border-radius:8px;display:grid;gap:5px}.recruit-compare-verdict{display:flex;align-items:center;justify-content:space-between;gap:8px}.recruit-compare-verdict b{font-size:1.15rem}@media(max-width:900px){.recruit-compare-grid{grid-template-columns:1fr}}.recruit-compare-attrs{margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.12);display:grid;gap:6px}.recruit-compare-attrs-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.recruit-compare-attrs-head small{opacity:.68}.recruit-compare-table{width:100%;border-collapse:collapse;font-size:.78rem}.recruit-compare-table th,.recruit-compare-table td{padding:4px 6px;text-align:center;border-bottom:1px solid rgba(255,255,255,.08)}.recruit-compare-table th.rc-attr{text-align:left;font-weight:600;opacity:.85}.recruit-compare-table td.rc-lead{font-weight:700;color:#8ef0b0;background:rgba(70,200,120,.12);border-radius:6px}.recruit-compare-table td.rc-overlap{opacity:.62}.recruit-compare-table td.rc-none{opacity:.32}
 .roster-need-strip{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 12px}.roster-need{display:grid;gap:1px;min-width:105px;padding:7px 9px;border:1px solid rgba(255,255,255,.1);border-radius:8px}.roster-need strong{font-size:.82rem}.roster-need span{font-weight:700}.roster-need small{opacity:.65}.roster-need.urgent{border-width:2px}.staff-shortlist-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.staff-shortlist-card{position:relative;display:grid;grid-template-columns:22px 1fr;gap:5px 7px;padding:10px;border:1px solid rgba(255,255,255,.1);border-radius:9px}.staff-shortlist-card.targeted{border-width:2px}.staff-shortlist-rank{grid-row:1/6;font-size:.78rem;opacity:.55}.staff-shortlist-verdict{display:flex;align-items:center;justify-content:space-between;gap:8px}.staff-shortlist-verdict span{font-size:.75rem;opacity:.72}.staff-shortlist-reason,.staff-shortlist-actions,.staff-shortlist-card>.small{grid-column:2}.staff-shortlist-actions{display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap}.staff-shortlist-actions>.scouting-actions{margin-top:0}.staff-shortlist-actions button{font-size:.72rem;padding:4px 7px}@media(max-width:1150px){.staff-shortlist-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.staff-shortlist-grid{grid-template-columns:1fr}.roster-need{flex:1 1 90px}}
 
@@ -1611,6 +1642,7 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
 #recruiting.active>#rwSwitch{order:1}
 #recruiting.active>#recruitWorkspace,#recruiting.active>.table-wrap,#recruiting.active>[data-recruiting-board-view],#recruiting.active>[data-recruiting-filters]{order:2}
 #recruiting.active>#signingClassFeature,#recruiting.active>#signingDay{order:3}
+#recruiting.active>#risingClass{order:5}
 #recruiting.active>#classSummary{order:4}
 #recruiting.active>#recruitMap{order:5}
 
@@ -5906,7 +5938,37 @@ const SPECIALIST_EVERY=31;
 // and elite placement should be about skill-position talent.
 const SPECIALIST_MAX_RAW=71;
 function generateRecruitPool(n,hsPool=universe?.highSchools||generateHighSchools()){let out=[];for(let i=0;i<n;i++){let pos=i%SPECIALIST_EVERY===7?'K':i%SPECIALIST_EVERY===22?'P':pick(POS.filter(x=>!['K','P'].includes(x))),raw=clamp(Math.round(58+gauss()*12),38,['K','P'].includes(pos)?SPECIALIST_MAX_RAW:97),st=recruitStars(raw),up=clamp(Math.round(raw+rng(4,22)+gauss()*5),raw,99),h=weightedHighSchool(hsPool),traits=generatePositionAttributes(pos,raw),style=styleForTraits(pos,traits);out.push({id:uid(),name:`${pick(FIRST)} ${pick(LAST)}`,pos,stars:st,style,trueNow:raw,upside:up,...traits,scout:clamp(Math.round(raw+gauss()*6),35,99),scoutUp:clamp(Math.round(up+gauss()*8),40,99),highSchoolId:h.id,highSchool:h.name,homeCity:h.city,homeState:h.state,lat:h.lat,lon:h.lon,homeRegion:h.region,distanceImportance:gi(5,100),distanceTolerance:pick([100,150,250,400,600,900,1500,2500]),priority:pick(PRIORITIES),portraitSeed:portraitSeedFor(),portraitVersion:PORTRAIT_VERSION,targeted:false,interest:gi(5,45),prevInterest:0,trend:0,relationship:gi(0,20),leader:null,committed:null,commitWeek:null,visit:false,visitWeek:null,promise:'None',work:clamp(Math.round(65+gauss()*18),15,99),dev:clamp(Math.round(68+gauss()*18),15,99)});out.at(-1).prevInterest=out.at(-1).interest}return assignRecruitRanks(out)}
-function initUniverse(mode='dynasty',{startingPhase='regular',seed=null}={}){const phase=startingPhase==='preseason'?'preseason':'regular';IDX.teams=null;IDX.players=null;activateGameplayRng(seed??undefined);const os=Object.keys(OFF_SCHEMES),ds=Object.keys(DEF_SCHEMES),highSchools=generateHighSchools();const teams=schools.map(s=>({...s,nickname:'',staff:generateStaff(s),offScheme:pick(os),defScheme:pick(ds),roster:generateRoster(s),...schoolColors(s),w:0,l:0,cw:0,cl:0,pf:0,pa:0,sos:0,rank:null,champ:false,schedule:[],history:[],commits:[],records:{}}));for(const t of teams){t.schemeTransition={off:null,def:null};t.staff.OC.preferredScheme=t.offScheme;t.staff.DC.preferredScheme=t.defScheme;t.pipelines=makePipelines(t);autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)}universe={version:APP_VERSION,mode:mode==='commissioner'?'commissioner':'dynasty',year:2027,week:0,recoveredWeek:-1,phase,teams,highSchools,recruits:generateRecruitPool(2800,highSchools),history:[],playerArchive:[],awards:{},records:{nationalSeason:{},nationalCareer:{}},draftHistory:{},latest:[],weeklyHub:[],weeklyDecisions:[],bowls:[],confChamps:[],playoffFieldIds:[],playoffFieldUnavailable:false,academicProgression:{season:2027,week:0,teamIds:[]},champion:null,lastDetailedGame:null,movementLog:[],recruitClassCounts:{},campHistory:{},developmentState:{year:2027,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]},offseasonDone:false,openings:[],candidateMarket:{},guidanceState:{version:1,teams:{}}};guidanceReturnState=null;normalizeGuidanceState();gameplayRngUniverse=universe;for(const t of teams){ensureTeamDevelopment(t);for(const p of t.roster){ensurePlayerDevelopment(p,t);ensureAcademics(p,t)}}normalizePromiseState();buildSchedule();deriveRivalries();universe.teams.forEach(t=>{ensureAdminState(t);ensureNilState(t)});ranked();buildPreseasonHub();syncGameplayRng()}
+// --- v0.13.0: multi-year recruiting --------------------------------------------
+// Next year's best prospects exist now. The rising class is the top RISING_CLASS_SIZE of a
+// full class, generated at the start of every season. You can watch up to WATCHLIST_LIMIT of
+// them; when the class rolls over they join the board already targeted, with a relationship
+// and interest head start, so a recruiting pitch can span two seasons. The rest of the new
+// class is the bottom of a fresh sample, which keeps the star distribution of a normal class.
+const RECRUIT_POOL_SIZE=2800,RISING_CLASS_SIZE=600,WATCHLIST_LIMIT=15,WATCH_RELATIONSHIP=12,WATCH_INTEREST=8;
+function generateRisingClass(hsPool=universe?.highSchools){return generateRecruitPool(RECRUIT_POOL_SIZE,hsPool).slice(0,RISING_CLASS_SIZE).map(r=>({...r,rising:true,watch:false}))}
+function toggleRisingWatch(id){
+ const r=(universe.risingClass||[]).find(x=>x.id===id);if(!r)return{ok:false,reason:'not-found'};
+ if(r.watch){r.watch=false;return{ok:true,watching:false}}
+ if(universe.risingClass.filter(x=>x.watch).length>=WATCHLIST_LIMIT)return{ok:false,reason:'limit'};
+ r.watch=true;return{ok:true,watching:true};
+}
+function rollRecruitClass(){
+ const rising=(universe.risingClass||[]).map(r=>{const c={...r};delete c.rising;return c});
+ const fresh=generateRecruitPool(RECRUIT_POOL_SIZE,universe.highSchools);
+ universe.recruits=rising.length?assignRecruitRanks([...rising,...fresh.slice(rising.length)]):fresh;
+ let carried=0;const user=selected();
+ if(user)for(const r of universe.recruits){
+  if(!r.watch)continue;
+  r.watch=false;r.watchedHeadStart=true;r.targeted=true;
+  r.relationship=clamp((r.relationship||0)+WATCH_RELATIONSHIP,0,100);
+  r.interest=clamp((r.interest||0)+WATCH_INTEREST,0,100);r.prevInterest=r.interest;
+  firstRecruitEvaluation(r,user);carried++;
+ }
+ for(const r of universe.recruits)delete r.watch;
+ universe.risingClass=generateRisingClass(universe.highSchools);
+ universe.lastRisingCarry={year:universe.year,carried};
+}
+function initUniverse(mode='dynasty',{startingPhase='regular',seed=null}={}){const phase=startingPhase==='preseason'?'preseason':'regular';IDX.teams=null;IDX.players=null;activateGameplayRng(seed??undefined);const os=Object.keys(OFF_SCHEMES),ds=Object.keys(DEF_SCHEMES),highSchools=generateHighSchools();const teams=schools.map(s=>({...s,nickname:'',staff:generateStaff(s),offScheme:pick(os),defScheme:pick(ds),roster:generateRoster(s),...schoolColors(s),w:0,l:0,cw:0,cl:0,pf:0,pa:0,sos:0,rank:null,champ:false,schedule:[],history:[],commits:[],records:{}}));for(const t of teams){t.schemeTransition={off:null,def:null};t.staff.OC.preferredScheme=t.offScheme;t.staff.DC.preferredScheme=t.defScheme;t.pipelines=makePipelines(t);autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)}universe={version:APP_VERSION,mode:mode==='commissioner'?'commissioner':'dynasty',year:2027,week:0,recoveredWeek:-1,phase,teams,highSchools,recruits:generateRecruitPool(RECRUIT_POOL_SIZE,highSchools),risingClass:generateRisingClass(highSchools),history:[],playerArchive:[],awards:{},records:{nationalSeason:{},nationalCareer:{}},draftHistory:{},latest:[],weeklyHub:[],weeklyDecisions:[],bowls:[],confChamps:[],playoffFieldIds:[],playoffFieldUnavailable:false,academicProgression:{season:2027,week:0,teamIds:[]},champion:null,lastDetailedGame:null,movementLog:[],recruitClassCounts:{},campHistory:{},developmentState:{year:2027,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]},offseasonDone:false,openings:[],candidateMarket:{},guidanceState:{version:1,teams:{}}};guidanceReturnState=null;normalizeGuidanceState();gameplayRngUniverse=universe;for(const t of teams){ensureTeamDevelopment(t);for(const p of t.roster){ensurePlayerDevelopment(p,t);ensureAcademics(p,t)}}normalizePromiseState();buildSchedule();deriveRivalries();universe.teams.forEach(t=>{ensureAdminState(t);ensureNilState(t)});ranked();buildPreseasonHub();syncGameplayRng()}
 function createNewDynasty(mode='dynasty',options={}){return initUniverse(mode,{startingPhase:'preseason',seed:options.seed??null})}
 const IDX={teams:null,players:null,archive:null,archived:0,pop:-1,miss:null};
 function rosterPopulation(){let n=0;for(const t of universe.teams)n+=t.roster.length;return n}
@@ -8060,7 +8122,7 @@ function offseasonPreseason(){
  const compacted=compactGameArchive();
  if(compacted.games&&currentArchiveState())currentArchiveState().gamesDirty=true;
  const latePool=(universe.recruits||[]).filter(r=>!r.committed),lateControlled=$('#userTeam').value,latePoolSize=latePool.length;
- universe.year++;universe.week=0;resetNilSeason();universe.recoveredWeek=-1;universe.phase='regular';universe.latest=[];universe.confChamps=[];universe.playoffFieldIds=[];universe.playoffFieldUnavailable=false;universe.academicProgression={season:universe.year,week:0,teamIds:[]};universe.champion=null;universe.lastDetailedGame=null;universe.playLogs={};universe.recruits=generateRecruitPool(2800,universe.highSchools);universe.recruitClassCounts={};
+ universe.year++;universe.week=0;resetNilSeason();universe.recoveredWeek=-1;universe.phase='regular';universe.latest=[];universe.confChamps=[];universe.playoffFieldIds=[];universe.playoffFieldUnavailable=false;universe.academicProgression={season:universe.year,week:0,teamIds:[]};universe.champion=null;universe.lastDetailedGame=null;universe.playLogs={};rollRecruitClass();universe.recruitClassCounts={};
  universe.teams.forEach(t=>{t.w=t.l=t.cw=t.cl=t.pf=t.pa=t.sos=0;t.rank=null;t.champ=false;t.commits=[];while(t.roster.length<85){const need=criticalPosition(t)||scarcePosition(t)||pick(POS),p=takeLatePlayer(latePool,t,need,lateControlled)||generateFreshman(t,need);t.roster.push(p);recordRosterMove(t,p,'walkOns',os.reports.roster?.[t.id])}repairRosterShape(t,os.reports.roster?.[t.id]);if(t.roster.length>105){const keep=t.roster.sort((a,b)=>b.trueNow-a.trueNow).slice(0,105),cut=t.roster.filter(p=>!keep.includes(p));for(const p of cut){addToArchive(p,t,'Roster cut');recordRosterMove(t,p,'cuts',os.reports.roster?.[t.id])}t.roster=keep}autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)});
  if(os.reports.roster)universe.lastOffseasonRecap={year:os.year,teams:Object.fromEntries(universe.teams.filter(t=>os.reports.roster[t.id]).map(t=>[t.id,offseasonReceiptView(t,os.reports.roster[t.id],os.year,true)]))};
  universe.lateMarket={year:universe.year,pool:latePoolSize,placed:latePoolSize-latePool.length};
@@ -9092,7 +9154,7 @@ function renderRecords(){const u=selected(),final=universe.awards?.[universe.yea
 function renderHistory(){renderGameArchive();let items=[];for(const h of universe.history){if(h.type==='season'){let np=h.awards?.find(a=>a.name==='National Player of the Year');items.push(`<div class="card"><div class="historyrow champ"><span>${h.year} National Champion</span><strong>${h.champion}</strong></div>${np?`<div class="historyrow"><span>National Player of the Year</span><span>${np.playerName} · ${np.team}</span></div>`:''}${h.top10.slice(0,5).map((t,i)=>`<div class="historyrow"><span>#${i+1} ${t.name}</span><span>${t.record}</span></div>`).join('')}</div>`)}else items.push(`<div class="historyrow"><span>${h.year} ${h.event||''}</span><span>${h.detail||''}</span></div>`)}$('#historyLog').innerHTML=items.join('')||'<div class="card muted">No completed seasons yet.</div>'}
 function packPlayer(p){return {...p,stats:packStats(p.stats),career:packStats(p.career)}}
 function packUniverse(u,includeArchive=true){if(u===universe)syncGameplayRng(u);if(includeArchive&&u===universe&&archiveIsDeferred())throw new Error("Load archived careers before exporting.");const {playerArchive,...core}=u;const out={...core,confChamps:conferenceChampionIdsFor(u),playoffFieldIds:playoffFieldIdsFor(u),teams:u.teams.map(t=>({...t,roster:t.roster.map(packPlayer)}))};if(includeArchive)out.playerArchive=(playerArchive||[]).map(packPlayer);return out}
-function normalizeUniverse(){ensureGameplayRng();universe.phase??='regular';universe.playLogs??={};universe.gameArchive??=[];universe.gameArchiveVersion??=1;universe.gameCounter=universe.gameArchive.reduce((n,g)=>Math.max(n,Number(g.id.split('_').pop())||0),universe.gameCounter||0);universe.version=APP_VERSION;IDX.teams=null;IDX.players=null;universe.movementLog??=[];universe.lastDetailedGame??=null;normalizePortalState();ensureScheduleRotation();migrateProtectedRivals();universe.playerArchive??=[];universe.recoveredWeek??=-1;universe.weeklyHub??=[];universe.highSchools??=generateHighSchools();universe.awards??={};universe.records??={nationalSeason:{},nationalCareer:{}};universe.records.nationalSeason??={};universe.records.nationalCareer??={};universe.draftHistory??={};universe.recruitClassCounts??={};universe.campHistory??={};universe.developmentState??={year:universe.year,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]};if(!Object.keys(universe.recruitClassCounts).length)for(const r of universe.recruits||[])if(r.committed)universe.recruitClassCounts[r.committed]=(universe.recruitClassCounts[r.committed]||0)+1;universe.teams.forEach(t=>{let base=schools.find(s=>s.name===t.name);if(base){t.city??=base.city;t.state??=base.state;t.lat??=base.lat;t.lon??=base.lon}t.staff??=generateStaff(t);for(const c of Object.values(t.staff)){c.contractYears??=gi(1,4);c.salary??=1.2}t.offScheme??=pick(Object.keys(OFF_SCHEMES));t.defScheme??=pick(Object.keys(DEF_SCHEMES));t.nickname??='';t.commits??=[];t.pipelines??=makePipelines(t);t.records??={};ensureSchoolColors(t);ensureTeamDevelopment(t);t.roster.forEach(p=>{p.speed??=clamp(p.trueNow+gi(-8,8),25,99);p.power??=clamp(p.trueNow+gi(-8,8),25,99);p.technique??=clamp(p.trueNow+gi(-8,8),25,99);p.iq??=clamp(p.trueNow+gi(-10,10),20,99);p.composure??=65;p.durability??=70;p.versatility??=60;p.health??=100;p.wear??=0;p.injury??=null;p.injuryWeeks??=0;p.injuryHistory??=[];p.seasonHistory??=[];p.awards??=[];p.draftResult??=null;p.promise??=null;p.promiseBaseline??=p.perceived;p.eligibilityUsed??=({FR:0,SO:1,JR:2,SR:3}[p.year]??0);p.redshirtUsed??=false;p.redshirtActive??=false;p.redshirtSeason??=null;p.stats={...newStats(),...(p.stats||{})};p.career={...newStats(),...(p.career||{})};p.year=CLASS_NAMES[Math.min(3,eligibilityBase(p))]||'SR';ensurePlayerDevelopment(p,t)});ensureDepth(t);ensureRoleDepth(t)});universe.playerArchive.forEach(p=>{p.awards??=[];p.seasonHistory??=[];p.coachRelationships??={};p.primaryRecruiterCoachId??=p.recruitingMemory?.primaryRecruiterCoachId||p.recruitingMemory?.recruiterCoachId||null;p.career={...newStats(),...(p.career||{})};p.stats={...newStats(),...(p.stats||{})};p.eligibilityUsed??=3;p.redshirtUsed??=false;p.redshirtActive=false});if(Array.isArray(universe.schedule)){universe.teams.forEach(t=>t.schedule=[]);universe.schedule.flat().forEach(g=>{T(g.home)?.schedule.push(g);T(g.away)?.schedule.push(g)})}
+function normalizeUniverse(){ensureGameplayRng();universe.phase??='regular';universe.playLogs??={};universe.gameArchive??=[];universe.gameArchiveVersion??=1;universe.gameCounter=universe.gameArchive.reduce((n,g)=>Math.max(n,Number(g.id.split('_').pop())||0),universe.gameCounter||0);universe.version=APP_VERSION;IDX.teams=null;IDX.players=null;universe.movementLog??=[];universe.lastDetailedGame??=null;normalizePortalState();ensureScheduleRotation();migrateProtectedRivals();universe.playerArchive??=[];universe.recoveredWeek??=-1;universe.weeklyHub??=[];universe.highSchools??=generateHighSchools();universe.awards??={};universe.records??={nationalSeason:{},nationalCareer:{}};universe.records.nationalSeason??={};universe.records.nationalCareer??={};universe.draftHistory??={};universe.recruitClassCounts??={};universe.risingClass??=[];universe.campHistory??={};universe.developmentState??={year:universe.year,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]};if(!Object.keys(universe.recruitClassCounts).length)for(const r of universe.recruits||[])if(r.committed)universe.recruitClassCounts[r.committed]=(universe.recruitClassCounts[r.committed]||0)+1;universe.teams.forEach(t=>{let base=schools.find(s=>s.name===t.name);if(base){t.city??=base.city;t.state??=base.state;t.lat??=base.lat;t.lon??=base.lon}t.staff??=generateStaff(t);for(const c of Object.values(t.staff)){c.contractYears??=gi(1,4);c.salary??=1.2}t.offScheme??=pick(Object.keys(OFF_SCHEMES));t.defScheme??=pick(Object.keys(DEF_SCHEMES));t.nickname??='';t.commits??=[];t.pipelines??=makePipelines(t);t.records??={};ensureSchoolColors(t);ensureTeamDevelopment(t);t.roster.forEach(p=>{p.speed??=clamp(p.trueNow+gi(-8,8),25,99);p.power??=clamp(p.trueNow+gi(-8,8),25,99);p.technique??=clamp(p.trueNow+gi(-8,8),25,99);p.iq??=clamp(p.trueNow+gi(-10,10),20,99);p.composure??=65;p.durability??=70;p.versatility??=60;p.health??=100;p.wear??=0;p.injury??=null;p.injuryWeeks??=0;p.injuryHistory??=[];p.seasonHistory??=[];p.awards??=[];p.draftResult??=null;p.promise??=null;p.promiseBaseline??=p.perceived;p.eligibilityUsed??=({FR:0,SO:1,JR:2,SR:3}[p.year]??0);p.redshirtUsed??=false;p.redshirtActive??=false;p.redshirtSeason??=null;p.stats={...newStats(),...(p.stats||{})};p.career={...newStats(),...(p.career||{})};p.year=CLASS_NAMES[Math.min(3,eligibilityBase(p))]||'SR';ensurePlayerDevelopment(p,t)});ensureDepth(t);ensureRoleDepth(t)});universe.playerArchive.forEach(p=>{p.awards??=[];p.seasonHistory??=[];p.coachRelationships??={};p.primaryRecruiterCoachId??=p.recruitingMemory?.primaryRecruiterCoachId||p.recruitingMemory?.recruiterCoachId||null;p.career={...newStats(),...(p.career||{})};p.stats={...newStats(),...(p.stats||{})};p.eligibilityUsed??=3;p.redshirtUsed??=false;p.redshirtActive=false});if(Array.isArray(universe.schedule)){universe.teams.forEach(t=>t.schedule=[]);universe.schedule.flat().forEach(g=>{T(g.home)?.schedule.push(g);T(g.away)?.schedule.push(g)})}
  universe.weeklyDecisions??=[];if(!universe.teams.some(t=>t.rivalry))deriveRivalries();universe.careerHistory??=[];universe.jobOffers??=[];universe.bowls??=[];universe.signingDay??=null;normalizeConferenceChampions();normalizePlayoffField();if(!universe.academicProgression||universe.academicProgression.season!==universe.year||universe.academicProgression.week!==universe.week||!Array.isArray(universe.academicProgression.teamIds))universe.academicProgression={season:universe.year,week:universe.week,teamIds:[]};rebuildRecruitClassCounts();for(const t of universe.teams){t.fanBaseline??=t.fan_support??60;for(const p of t.roster)ensureAcademics(p,t)}for(const t of universe.teams){ensureAdminState(t);ensureNilState(t)}for(const d of universe.weeklyDecisions)d.source??='STAFF';normalizePromiseState();for(const r of universe.recruits||[])normalizeRecruitGeography(r,universe.highSchools);assignRecruitRanks(universe.recruits||[]);if(!universe.weeklyHub.length)buildPreseasonHub();rebuildIndexes()}
 function storageKind(){return DynastyStorage.kind==='desktop'?'desktop':'browser'}
 function storageLocation(){return storageKind()==='desktop'?'on this computer':'in this browser'}
@@ -9718,6 +9780,42 @@ if(typeof module==='object'&&module.exports){
   reset:()=>{recruitBoardFilters={...RECRUIT_FILTERS_CLEAR};renderRecruiting()}
  };
 }
+
+// v0.13.0: the rising class card. Next year's best prospects, read-only, with a watchlist whose
+// relationship head start carries across the class rollover (see rollRecruitClass in app.js).
+(function(){
+ 'use strict';
+ if(typeof extendRender!=='function')return;
+ const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const PAGE=20;
+ let shown=PAGE,position='ALL',watchingOnly=false,notice='';
+ function visibleRows(){
+  const rows=Array.isArray(universe?.risingClass)?universe.risingClass:[];
+  return rows.filter(r=>(position==='ALL'||r.pos===position)&&(!watchingOnly||r.watch));
+ }
+ function rowHTML(r){
+  const grade=Math.round((r.scout||0)/5)*5,where=[r.highSchool,r.homeState].filter(Boolean).join(', ');
+  return `<li class="rising-row${r.watch?' is-watched':''}" data-rising-row="${esc(r.id)}"><span class="rising-rank">#${esc(r.nationalRank)}</span><span class="rising-who"><strong>${esc(r.name)}</strong><small>${esc(r.pos)} · ${'★'.repeat(r.stars)} · ${esc(where)}</small></span><span class="rising-grade" title="Staff estimate, rounded">~${grade}</span><button type="button" class="rising-watch" data-rising-watch="${esc(r.id)}" aria-pressed="${r.watch?'true':'false'}">${r.watch?'Watching':'Watch'}</button></li>`;
+ }
+ function render(){
+  const tab=document.querySelector('#recruiting');if(!tab||!Array.isArray(universe?.risingClass))return;
+  let card=tab.querySelector('#risingClass');
+  if(!card){card=document.createElement('section');card.id='risingClass';card.className='card rising-class';tab.append(card)}
+  const all=universe.risingClass,watching=all.filter(r=>r.watch).length,rows=visibleRows(),page=rows.slice(0,shown);
+  const carry=universe.lastRisingCarry?.year===universe.year&&universe.lastRisingCarry.carried>0?`<p class="rising-carry">${universe.lastRisingCarry.carried} watched prospect${universe.lastRisingCarry.carried===1?'':'s'} joined your board this year with a head start.</p>`:'';
+  const positions=['ALL',...POS].map(p=>`<option value="${p}"${p===position?' selected':''}>${p==='ALL'?'All positions':p}</option>`).join('');
+  card.innerHTML=`<header class="rising-head"><div><span class="eyebrow">NEXT CLASS · ${universe.year+1}</span><h3>Rising prospects</h3><p>The ${all.length} best prospects of the class that arrives after this one. Watch up to ${WATCHLIST_LIMIT}: when the class rolls over they join your board already targeted, with a relationship and interest head start.</p>${carry}</div><div class="rising-count"><strong>${watching}</strong><span>of ${WATCHLIST_LIMIT} watching</span></div></header><div class="rising-controls"><label>Position<select data-rising-pos>${positions}</select></label><label class="rising-toggle"><input type="checkbox" data-rising-only ${watchingOnly?'checked':''}> Watching only</label><span class="rising-meta">${rows.length===all.length?`${all.length} prospects`:`${rows.length} of ${all.length} prospects`}</span></div>${notice?`<p class="rising-notice" role="status">${esc(notice)}</p>`:''}<ol class="rising-list">${page.map(rowHTML).join('')||'<li class="rising-empty">No prospects match.</li>'}</ol>${rows.length>shown?`<button type="button" class="rising-more" data-rising-more>Show ${Math.min(PAGE,rows.length-shown)} more</button>`:''}`;
+  card.querySelector('[data-rising-pos]').onchange=e=>{position=e.target.value;shown=PAGE;notice='';render()};
+  card.querySelector('[data-rising-only]').onchange=e=>{watchingOnly=!!e.target.checked;shown=PAGE;notice='';render()};
+  const more=card.querySelector('[data-rising-more]');if(more)more.onclick=()=>{shown+=PAGE;render()};
+  card.querySelectorAll('[data-rising-watch]').forEach(b=>b.onclick=()=>{
+   const out=toggleRisingWatch(b.dataset.risingWatch);
+   notice=out.ok?'':out.reason==='limit'?`Your watchlist is full (${WATCHLIST_LIMIT}). Unwatch someone to add another.`:'That prospect is no longer in the class.';
+   render();
+  });
+ }
+ extendRender('recruiting',render);
+})();
 
 function makeRecruitCompareSystem(env){
  'use strict';

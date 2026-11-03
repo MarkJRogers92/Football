@@ -34,7 +34,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
   if(label==='iphone'){const gameLabOverflow=await page.$eval('#nextGameCard',el=>el.scrollWidth-el.clientWidth);check(`[${label}] game-day card has no horizontal overflow`,gameLabOverflow<=1,`${gameLabOverflow}px`)}
   await goTab(page, 'season');await page.waitForSelector('#season .conference-banner');
   check(`[${label}] Season standings have the selected conference identity`,await page.locator('#season .conference-banner[data-conference-brand="Great Lakes"] .conference-crest').count()===1);
-  await goTab(page, 'roster');await page.click('#rosterBody .player-button');await page.waitForSelector('#playerDialog[open] .player-hero-rail');
+  await goTab(page, 'roster');if(await page.locator('#roster .table-wrap.rd-table-collapsed').count())await page.click('[data-rd-table-toggle]');await page.click('#rosterBody .player-button');await page.waitForSelector('#playerDialog[open] .player-hero-rail');
   check(`[${label}] player profile becomes hero card`,await page.locator('#playerDialog .player-hero-rating').count()===3);
   check(`[${label}] player hero keeps portrait`,await page.locator('#playerDialogPortrait canvas').count()===1);
   await page.waitForFunction(()=>document.querySelectorAll('#playerDialog .player-hero-team-mark .coverage-real-logo').length===1);
