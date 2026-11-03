@@ -2,8 +2,15 @@
 
 ## Version and branch
 
-Source is `0.13.0` on `claude/zealous-tesla-m08xay` (PR open, not merged or published). v0.13.0 adds the rising class and
-watchlist, pool-wide recruiting counts, state filter and search, and shorter Roster/Season/toast presentation; see `CHANGELOG.md`.
+Source is `0.13.0` on `claude/review-improvement-dwjemy` (PR #27, merge 69b39d4). Web published (production run 41584185384).
+GitHub Release `v0.13.0` (prerelease, tag on 69b39d4, no desktop assets) created by the release workflow (run 41610639932). No
+desktop build or Mac install yet. v0.13.0 adds the rising class and watchlist, pool-wide recruiting counts, state filter and
+search, and shorter Roster/Season/toast presentation; see `CHANGELOG.md`.
+
+Releases: cloud sessions cannot write releases (HTTP 403), so use `.github/workflows/release.yml` (manual dispatch: `version`,
+`title`, optional `target` SHA, `prerelease`, `note`). It refuses a version that does not match `VERSION.txt` at the target, a commit
+not on a remote branch, an existing release, or a missing CHANGELOG section. It attaches no desktop builds. v0.12.26 to v0.12.29 never
+got a release and can be created the same way with their merge commits as `target`.
 
 Previous: `0.12.29` on `claude/review-improvement-dwjemy` (PR #25, merge ab7e6cf). Web published
 (production run 41571572439); no GitHub Release, desktop build or Mac install yet.
