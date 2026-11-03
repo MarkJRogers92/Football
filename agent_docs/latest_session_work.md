@@ -1,5 +1,15 @@
 # Latest Session Work
 
+## v0.13.0 release record (2026-11-03)
+
+- Merged as PR #27 (69b39d4), web published (run 41584185384), GitHub Release v0.13.0 created (see below).
+- Added `.github/workflows/release.yml` (PRs #28, #29) because cloud sessions get 403 on release writes. The first run (41610456276) died
+  silently with exit 141: the script runs under `set -o pipefail` and the notes extraction was `git show | awk '...{exit}'`, so the
+  early-exiting awk can SIGPIPE `git show`. Not reproducible locally (timing), which is why the local test passed. Rule: under
+  pipefail never pipe into a reader that can exit early (`awk exit`, `grep -q`, `head`); capture output or let awk read everything. The fix
+  was tested by running the real `run:` step with `bash -e -o pipefail`, `gh` stubbed, against the real commit.
+- `get_job_logs` with `return_content` is how to read a failed Actions step from a cloud session.
+
 ## v0.13.0 — Multi-year recruiting (2026-11-03)
 
 - Started from a game review (browser screenshots at 1440 and 390 wide plus the headless sim). Findings and what was done:
