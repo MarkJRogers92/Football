@@ -239,7 +239,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
     // Player profile dialog.
     await goTab(page, 'roster');
     await page.waitForTimeout(80);
-    await page.click('#rosterBody .player-button');
+    await page.click('[data-rd-table-toggle]');await page.click('#rosterBody .player-button');
     await page.waitForTimeout(120);
     check(`[${label}] player profile opens`,
       await page.$eval('#playerDialog', el => el.hasAttribute('open')));

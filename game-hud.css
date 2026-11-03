@@ -172,3 +172,5 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
 .program-peek-head h2{margin:0;font-size:1.15rem}
 .program-peek-head p{margin:2px 0 0;font-size:12.5px}
 .program-peek form{margin-top:14px;display:flex;justify-content:flex-end}
+
+@media(max-width:700px){.hud-toasts{left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom,0px));max-width:none}}

@@ -186,18 +186,21 @@
   document.body.append(toasts);
   const statusLine=document.querySelector('#saveStatus');
   let lastStatus=statusLine?.textContent?.trim()||'';
+  // The header already says the season has begun; a toast on top of the content adds nothing.
+  const ROUTINE_STATUS=/^Season begun\. Week \d+ is ready\.?$/;
   function toast(text){
     const t=document.createElement('div');t.className='hud-toast';
     const ok=/sav|load|export|import/i.test(text)&&!/fail|could not|error/i.test(text);
     if(/fail|could not|error/i.test(text))t.classList.add('is-bad');else if(ok)t.classList.add('is-good');
     t.innerHTML='<span aria-hidden="true"></span><p></p>';
     t.firstChild.textContent=t.classList.contains('is-bad')?'!':ok?'✓':'•';t.lastChild.textContent=text;
-    toasts.append(t);while(toasts.children.length>3)toasts.firstChild.remove();
-    setTimeout(()=>t.classList.add('is-leaving'),3600);setTimeout(()=>t.remove(),4000);
+    // One toast at a time: a stack of routine confirmations covered the board on phones.
+    toasts.replaceChildren(t);
+    setTimeout(()=>t.classList.add('is-leaving'),2600);setTimeout(()=>t.remove(),3000);
   }
   if(statusLine)new MutationObserver(()=>{
     const v=statusLine.textContent.trim();
-    if(v&&v!==lastStatus&&!titleOpen()){if(!splash(v))toast(v);tick(v)}
+    if(v&&v!==lastStatus&&!titleOpen()){if(!splash(v)&&!ROUTINE_STATUS.test(v))toast(v);tick(v)}
     lastStatus=v;
   }).observe(statusLine,{childList:true,characterData:true,subtree:true});
 

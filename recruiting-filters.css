@@ -16,5 +16,5 @@
 .recruiting-filter-strip input[type=search]{min-width:0;width:100%}
 .recruiting-filter-strip button{white-space:nowrap}
 @media(max-width:900px){.recruiting-board-view{align-items:flex-start;flex-direction:column}.recruiting-board-note{max-width:none}.recruiting-filter-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.recruiting-filter-count{white-space:normal}.recruiting-filter-strip button[data-recruit-filter-reset]{grid-column:1/-1}}
-@media(max-width:560px){.recruiting-board-tabs{display:grid;grid-template-columns:1fr 1fr;width:100%}.recruiting-board-tabs button{width:100%}.recruiting-filter-strip{grid-template-columns:1fr}.recruiting-filter-toggle{min-height:auto}.recruiting-filter-strip button{width:100%}}
+@media(max-width:560px){.recruiting-board-tabs{display:grid;grid-template-columns:1fr 1fr;width:100%}.recruiting-board-tabs button{width:100%}.recruiting-filter-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.recruiting-filter-strip .rf-search,.recruiting-filter-toggle{grid-column:1/-1}.recruiting-filter-toggle{min-height:auto}.recruiting-filter-strip button{width:100%}}
 #recruiting.rw-mode .rf-search,#recruiting.rw-mode>[data-recruiting-board-view]{display:none}
