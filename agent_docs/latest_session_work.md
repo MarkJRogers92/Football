@@ -1,5 +1,22 @@
 # Latest Session Work
 
+## v0.12.29 — Fuller recruiting classes (2026-11-03)
+
+- Prompted by "recruiting didn't seem like many recruits". Measured first (`tools/diag3.js`, plus ad-hoc cycle scripts): the pool is 2,800
+  a year, only about 1,520 sign, class size is `scholarshipCapacity` and swung 12.7 / 22.7 / 23.0 / 12.4 / 18.7 / 15.5 / 21.4 across cycles
+  (cohort echo through `projectedReturning`), unsigned prospects were as good as signed ones (149 unsigned 4-5 stars in one cycle), and the
+  walk-on top-up was almost entirely K and P because `generateRecruitPool` excluded them.
+- `app.js`: `generateRecruitPool` adds K/P (`SPECIALIST_EVERY=31`, capped 86); `playerFromRecruit` / `recruitOriginLabel` shared by enrollment
+  and `takeLatePlayer`; `offseasonPreseason` captures `latePool` before the pool regenerates and fills walk-on gaps from it
+  (`universe.lateMarket`, `p.lateAddition`); `scholarshipCapacity` blends toward `CLASS_TARGET=20` (`CLASS_SMOOTHING=.5`, floor 14);
+  `placeUnsignedElites` runs inside `finalizeRecruiting` before the forced fill (`recruitCycle.elites`).
+- `recruiting-filters.js`: `recruitingPoolSummary()` adds the "Pool N · committed · uncommitted/unsigned" line (`data-recruit-pool`).
+- Measured after: 0 unsigned 4-5 stars over 8 cycles, classes 15.0-23.0, trueNow mean and save size tracked the base over a 7-season run. Prestige
+  sd narrowed slightly faster (14.7 vs 15.3, one seed): worth a second seed.
+- Known, pre-existing, not touched: `tools/longrun.js` (seed 7, Chicago Metropolitan) stops advancing after 2034 on the untouched v0.12.28
+  base as well. Likely a career gate on the controlled team in the headless run; not investigated.
+- Tooling note: `pgrep -f` inside a Monitor matches its own command line and never exits; poll the output file instead.
+
 ## v0.12.28 — Calmer Command Center (2026-10-29)
 
 - Review of the running game (screenshots at 1440 and 390 wide) found a 4,600px dashboard, three

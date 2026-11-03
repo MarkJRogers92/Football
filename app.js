@@ -2,7 +2,7 @@
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.12.28';
+const APP_VERSION='0.12.29';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -723,7 +723,11 @@ function packStats(o){if(!o)return{};let out={};for(const k in o)if(o[k])out[k]=
 function newStats(){return {games:0,starts:0,snaps:0,passAtt:0,passComp:0,passYds:0,passTD:0,int:0,sacksTaken:0,rushAtt:0,rushYds:0,rushTD:0,fumbles:0,targets:0,receptions:0,recYds:0,recTD:0,drops:0,yac:0,tackles:0,tfl:0,sacks:0,pressures:0,intDef:0,passBreakups:0,forcedFumbles:0,sacksAllowed:0,pressuresAllowed:0,penalties:0,fgMade:0,fgAtt:0,punts:0,puntYds:0}}
 function generateRoster(s){let r=[];Object.entries(POS_COUNTS).forEach(([p,n])=>{for(let i=0;i<n;i++)r.push(generatePlayer(s,p,i))});while(r.length<93)r.push(generatePlayer(s,pick(POS),99));return r}
 function generateFreshman(s,pos,origin='Walk-on / late addition'){let p=generatePlayer(s,pos,99);p.year='FR';p.eligibilityUsed=0;p.redshirtUsed=false;p.redshirtActive=false;p.redshirtSeason=null;p.origin=origin;return p}
-function generateRecruitPool(n,hsPool=universe?.highSchools||generateHighSchools()){let out=[];for(let i=0;i<n;i++){let pos=pick(POS.filter(x=>!['K','P'].includes(x))),raw=clamp(Math.round(58+gauss()*12),38,97),st=recruitStars(raw),up=clamp(Math.round(raw+rng(4,22)+gauss()*5),raw,99),h=weightedHighSchool(hsPool),traits=generatePositionAttributes(pos,raw),style=styleForTraits(pos,traits);out.push({id:uid(),name:`${pick(FIRST)} ${pick(LAST)}`,pos,stars:st,style,trueNow:raw,upside:up,...traits,scout:clamp(Math.round(raw+gauss()*6),35,99),scoutUp:clamp(Math.round(up+gauss()*8),40,99),highSchoolId:h.id,highSchool:h.name,homeCity:h.city,homeState:h.state,lat:h.lat,lon:h.lon,homeRegion:h.region,distanceImportance:gi(5,100),distanceTolerance:pick([100,150,250,400,600,900,1500,2500]),priority:pick(PRIORITIES),portraitSeed:portraitSeedFor(),portraitVersion:PORTRAIT_VERSION,targeted:false,interest:gi(5,45),prevInterest:0,trend:0,relationship:gi(0,20),leader:null,committed:null,commitWeek:null,visit:false,visitWeek:null,promise:'None',work:clamp(Math.round(65+gauss()*18),15,99),dev:clamp(Math.round(68+gauss()*18),15,99)});out.at(-1).prevInterest=out.at(-1).interest}return assignRecruitRanks(out)}
+// v0.12.29: specialists are recruited too. Before this the pool held no K or P at all, so
+// every kicker and punter on a roster came from the anonymous walk-on top-up.
+// One K and one P in every 31 prospects, interleaved so order never favours them.
+const SPECIALIST_EVERY=31;
+function generateRecruitPool(n,hsPool=universe?.highSchools||generateHighSchools()){let out=[];for(let i=0;i<n;i++){let pos=i%SPECIALIST_EVERY===7?'K':i%SPECIALIST_EVERY===22?'P':pick(POS.filter(x=>!['K','P'].includes(x))),raw=clamp(Math.round(58+gauss()*12),38,['K','P'].includes(pos)?86:97),st=recruitStars(raw),up=clamp(Math.round(raw+rng(4,22)+gauss()*5),raw,99),h=weightedHighSchool(hsPool),traits=generatePositionAttributes(pos,raw),style=styleForTraits(pos,traits);out.push({id:uid(),name:`${pick(FIRST)} ${pick(LAST)}`,pos,stars:st,style,trueNow:raw,upside:up,...traits,scout:clamp(Math.round(raw+gauss()*6),35,99),scoutUp:clamp(Math.round(up+gauss()*8),40,99),highSchoolId:h.id,highSchool:h.name,homeCity:h.city,homeState:h.state,lat:h.lat,lon:h.lon,homeRegion:h.region,distanceImportance:gi(5,100),distanceTolerance:pick([100,150,250,400,600,900,1500,2500]),priority:pick(PRIORITIES),portraitSeed:portraitSeedFor(),portraitVersion:PORTRAIT_VERSION,targeted:false,interest:gi(5,45),prevInterest:0,trend:0,relationship:gi(0,20),leader:null,committed:null,commitWeek:null,visit:false,visitWeek:null,promise:'None',work:clamp(Math.round(65+gauss()*18),15,99),dev:clamp(Math.round(68+gauss()*18),15,99)});out.at(-1).prevInterest=out.at(-1).interest}return assignRecruitRanks(out)}
 function initUniverse(mode='dynasty',{startingPhase='regular',seed=null}={}){const phase=startingPhase==='preseason'?'preseason':'regular';IDX.teams=null;IDX.players=null;activateGameplayRng(seed??undefined);const os=Object.keys(OFF_SCHEMES),ds=Object.keys(DEF_SCHEMES),highSchools=generateHighSchools();const teams=schools.map(s=>({...s,nickname:'',staff:generateStaff(s),offScheme:pick(os),defScheme:pick(ds),roster:generateRoster(s),...schoolColors(s),w:0,l:0,cw:0,cl:0,pf:0,pa:0,sos:0,rank:null,champ:false,schedule:[],history:[],commits:[],records:{}}));for(const t of teams){t.schemeTransition={off:null,def:null};t.staff.OC.preferredScheme=t.offScheme;t.staff.DC.preferredScheme=t.defScheme;t.pipelines=makePipelines(t);autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)}universe={version:APP_VERSION,mode:mode==='commissioner'?'commissioner':'dynasty',year:2027,week:0,recoveredWeek:-1,phase,teams,highSchools,recruits:generateRecruitPool(2800,highSchools),history:[],playerArchive:[],awards:{},records:{nationalSeason:{},nationalCareer:{}},draftHistory:{},latest:[],weeklyHub:[],weeklyDecisions:[],bowls:[],confChamps:[],playoffFieldIds:[],playoffFieldUnavailable:false,academicProgression:{season:2027,week:0,teamIds:[]},champion:null,lastDetailedGame:null,movementLog:[],recruitClassCounts:{},campHistory:{},developmentState:{year:2027,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]},offseasonDone:false,openings:[],candidateMarket:{},guidanceState:{version:1,teams:{}}};guidanceReturnState=null;normalizeGuidanceState();gameplayRngUniverse=universe;for(const t of teams){ensureTeamDevelopment(t);for(const p of t.roster){ensurePlayerDevelopment(p,t);ensureAcademics(p,t)}}normalizePromiseState();buildSchedule();deriveRivalries();universe.teams.forEach(t=>{ensureAdminState(t);ensureNilState(t)});ranked();buildPreseasonHub();syncGameplayRng()}
 function createNewDynasty(mode='dynasty',options={}){return initUniverse(mode,{startingPhase:'preseason',seed:options.seed??null})}
 const IDX={teams:null,players:null,archive:null,archived:0,pop:-1,miss:null};
@@ -2532,6 +2536,8 @@ function pressureCommit(r,u){if(universe.week<6||(r.commitWeek??0)+2>universe.we
 // A class is bounded by the room the roster actually leaves, so every offer
 // costs a spot and attrition becomes a recruiting resource.
 const SCHOLARSHIP_LIMIT=85;
+// Steady state is about a quarter of an 85-man roster leaving each year.
+const CLASS_TARGET=20,CLASS_SMOOTHING=.5,CLASS_FLOOR=14;
 function projectedDepartures(t){return (t.roster||[]).filter(p=>eligibilityBase(p)>=3).length}
 function projectedReturning(t){
  const roster=t.roster||[],departing=projectedDepartures(t);
@@ -2545,7 +2551,13 @@ function scholarshipCapacity(t){
  // senior class, and initial counters are capped besides. The floor keeps a
  // thin-attrition year from making recruiting pointless; the ceiling is what
  // stops a big graduating class from becoming a 38-man haul.
- return clamp(SCHOLARSHIP_LIMIT-projectedReturning(t),12,25);
+ // v0.12.29: the raw figure follows how many seniors a roster happens to hold, and
+ // cohorts echo: a 12-man class today is a thin senior class in four years, then a
+ // 23-man class, then thin again. Measured over seven cycles the league mean ran
+ // 12.7, 22.7, 23.0, 12.4, 18.7, 15.5, 21.4. Blending toward the steady-state class
+ // damps that echo so a thin or fat graduating class moves capacity halfway, not fully.
+ const raw=SCHOLARSHIP_LIMIT-projectedReturning(t);
+ return clamp(Math.round(raw*(1-CLASS_SMOOTHING)+CLASS_TARGET*CLASS_SMOOTHING),CLASS_FLOOR,25);
 }
 function scholarshipRoom(t){return t?clamp(scholarshipCapacity(t)-classCommitCount(t.name),0,40):0}
 function scholarshipSummary(t){
@@ -2609,7 +2621,39 @@ function oversignAppetite(t){
 function canTakeCommit(name){const t=T(name);return t?classCommitCount(name)<scholarshipCapacity(t)+oversignAppetite(t):false}
 function commitRecruit(r,name){if(r.committed||!canTakeCommit(name))return false;let t=T(name);if(recruitBlocked(t,r))return false;assignPrimaryRecruiter(r,t,t.name===selected()?.name?r.relationship:null);r.committed=name;r.commitWeek=universe.week;r.challenger=null;r.pressure=0;r.signedPromise=r.promiseOffer?.schoolId===t.id?{...r.promiseOffer}:null;universe.recruitClassCounts??={};universe.recruitClassCounts[name]=classCommitCount(name)+1;t.commits??=[];t.commits.push(r);r.recruitingMemory=captureRecruitment(r,t);return true}
 function advanceRecruiting(){const u=selected();clearUnitCache();universe.recruits.forEach(r=>{ensureRecruitRelationships(r);if(r.committed){pressureCommit(r,u);return}r.prevInterest=r.interest;let pool=sample(universe.teams,20).map(t=>({t,pitch:recruitPitch(t,r)})).sort((a,b)=>b.pitch-a.pitch).map(x=>x.t),top=pool.find(t=>canTakeCommit(t.name))||pool[0];r.leader=top.name;let promiseBoost=recruitPromiseBoost(r,u),visitBoost=0;if(r.visitWeek===universe.week){let g=u.schedule.find(g=>g.week===universe.week&&g.home===u.name);visitBoost=g&&g.played?(g.winner===u.name?13:5):7;r.visit=false}let us=recruitPitch(u,r)+(r.targeted?10:0)+r.relationship*.12+visitBoost+promiseBoost,ais=recruitPitch(top,r);if(r.targeted){firstRecruitEvaluation(r,u);refreshScoutingIntel(r,u,2+(visitBoost?4:0),'RECRUITING',true);let gain=gi(2,6);r.relationship=clamp(r.relationship+gain,0,100);growRecruiterRelationship(r,u,gain);r.interest=clamp(Math.round(r.interest+(us-ais)*.065+gi(1,5)+gauss()*2),1,100)}else r.interest=clamp(Math.round(r.interest+(us-ais)*.018+gauss()*2),1,100);r.trend=r.interest-r.prevInterest;if(universe.week>=5&&gameplayRandom()<.028+universe.week*.009){if(r.targeted&&r.interest>=72&&us>=ais-4&&canTakeCommit(u.name))commitRecruit(r,u.name);else{let dest=pool.find(t=>canTakeCommit(t.name));if(dest)commitRecruit(r,dest.name)}}})}
-function finalizeRecruiting(){const u=selected();clearUnitCache();buildSigningDay();universe.recruitCycle={year:universe.year,seasonCommits:universe.recruits.filter(r=>r.commitWeek).length,decommits:(universe.decommitLog||[]).filter(e=>e.year===universe.year).length,flips:(universe.decommitLog||[]).filter(e=>e.year===universe.year&&e.to).length};let remaining=universe.recruits.filter(r=>!r.committed);while(remaining.length){let needy=universe.teams.filter(t=>scholarshipRoom(t)>0&&classCommitCount(t.name)<15);if(!needy.length)break;let r=remaining.shift();if(r.targeted&&r.interest>=68&&canTakeCommit(u.name)&&classCommitCount(u.name)<15){commitRecruit(r,u.name);continue}let top=sample(needy,16).sort((a,b)=>recruitPitch(b,r)-recruitPitch(a,r))[0]||needy[0];commitRecruit(r,top.name)}for(const r of remaining){if(r.committed)continue;if(r.targeted&&r.interest>=68&&canTakeCommit(u.name)){let available=universe.teams.filter(t=>canTakeCommit(t.name)),top=sample(available,24).sort((a,b)=>recruitPitch(b,r)-recruitPitch(a,r))[0];if(!top||recruitPitch(u,r)+10+r.relationship*.12>=recruitPitch(top,r)-3){commitRecruit(r,u.name);continue}}let available=universe.teams.filter(t=>canTakeCommit(t.name));if(!available.length)break;let top=sample(available,28).sort((a,b)=>recruitPitch(b,r)-recruitPitch(a,r))[0]||available[0];commitRecruit(r,top.name)}enforceScholarshipLimits(new Set(universe.signingDay?.board?.map(b=>b.recruitId)||[]));universe.recruitCycle.signeesByTeam=Object.fromEntries(universe.teams.map(t=>[t.name,universe.recruits.filter(r=>r.committed===t.name).length]));}
+// v0.12.29: commitments fill first-come, so in a small-class year the room is gone before
+// the best prospects decide, and 4- and 5-stars were left unsigned (149 of them in one
+// measured cycle, as good as the ones who signed). Signing day places each unsigned elite
+// at a program that wants him, at the cost of that program's weakest commit, which must be
+// at least two stars lower. Class sizes are unchanged and the displaced prospect joins the
+// late market. The controlled program's commits, today's signing-day board and any
+// program already displaced three times are left alone.
+const ELITE_MIN_STARS=4,ELITE_DISPLACE_GAP=2,ELITE_DISPLACE_CAP=3;
+function placeUnsignedElites(){
+ const controlled=selected()?.name,protectedIds=new Set((universe.signingDay?.board||[]).map(b=>b.recruitId)),taken={};
+ const userRoom=controlled?canTakeCommit(controlled):false;
+ let placed=0,displaced=0;
+ const elites=universe.recruits.filter(r=>!r.committed&&r.stars>=ELITE_MIN_STARS).sort((a,b)=>(a.nationalRank||1e9)-(b.nationalRank||1e9));
+ for(const e of elites){
+  // A target the controlled program is winning is settled by the normal fill below.
+  if(userRoom&&e.targeted&&e.interest>=68)continue;
+  const open=universe.teams.filter(t=>t.name!==controlled&&canTakeCommit(t.name)&&!recruitBlocked(t,e));
+  let dest=null,removed=null;
+  if(open.length)dest=sample(open,24).sort((a,b)=>recruitPitch(b,e)-recruitPitch(a,e))[0];
+  else{
+   const cands=sample(universe.teams.filter(t=>t.name!==controlled&&!recruitBlocked(t,e)&&(taken[t.name]||0)<ELITE_DISPLACE_CAP),24).sort((a,b)=>recruitPitch(b,e)-recruitPitch(a,e));
+   for(const t of cands){
+    const weakest=universe.recruits.filter(r=>r.committed===t.name&&!protectedIds.has(r.id)&&r.stars<=e.stars-ELITE_DISPLACE_GAP).sort((a,b)=>(a.scoutUp+a.scout*.55)-(b.scoutUp+b.scout*.55))[0];
+    if(!weakest||!decommitRecruit(weakest,'DISPLACED_BY_ELITE'))continue;
+    removed=weakest;taken[t.name]=(taken[t.name]||0)+1;dest=t;break;
+   }
+  }
+  if(dest&&commitRecruit(e,dest.name)){placed++;if(removed)displaced++}
+  else if(removed)commitRecruit(removed,dest.name);
+ }
+ return {placed,displaced};
+}
+function finalizeRecruiting(){const u=selected();clearUnitCache();buildSigningDay();universe.recruitCycle={year:universe.year,seasonCommits:universe.recruits.filter(r=>r.commitWeek).length,decommits:(universe.decommitLog||[]).filter(e=>e.year===universe.year).length,flips:(universe.decommitLog||[]).filter(e=>e.year===universe.year&&e.to).length};Object.assign(universe.recruitCycle,{elites:placeUnsignedElites()});let remaining=universe.recruits.filter(r=>!r.committed);while(remaining.length){let needy=universe.teams.filter(t=>scholarshipRoom(t)>0&&classCommitCount(t.name)<15);if(!needy.length)break;let r=remaining.shift();if(r.targeted&&r.interest>=68&&canTakeCommit(u.name)&&classCommitCount(u.name)<15){commitRecruit(r,u.name);continue}let top=sample(needy,16).sort((a,b)=>recruitPitch(b,r)-recruitPitch(a,r))[0]||needy[0];commitRecruit(r,top.name)}for(const r of remaining){if(r.committed)continue;if(r.targeted&&r.interest>=68&&canTakeCommit(u.name)){let available=universe.teams.filter(t=>canTakeCommit(t.name)),top=sample(available,24).sort((a,b)=>recruitPitch(b,r)-recruitPitch(a,r))[0];if(!top||recruitPitch(u,r)+10+r.relationship*.12>=recruitPitch(top,r)-3){commitRecruit(r,u.name);continue}}let available=universe.teams.filter(t=>canTakeCommit(t.name));if(!available.length)break;let top=sample(available,28).sort((a,b)=>recruitPitch(b,r)-recruitPitch(a,r))[0]||available[0];commitRecruit(r,top.name)}enforceScholarshipLimits(new Set(universe.signingDay?.board?.map(b=>b.recruitId)||[]));universe.recruitCycle.signeesByTeam=Object.fromEntries(universe.teams.map(t=>[t.name,universe.recruits.filter(r=>r.committed===t.name).length]));}
 function autoTarget(){const u=selected();universe.recruits.forEach(r=>r.targeted=false);let needs={};POS.forEach(p=>needs[p]=(POS_COUNTS[p]||4)-u.roster.filter(x=>x.pos===p&&x.year!=='SR').length*.55);universe.recruits.filter(r=>!r.committed).sort((a,b)=>(b.scoutUp+(needs[b.pos]||0)*5)-(a.scoutUp+(needs[a.pos]||0)*5)).slice(0,20).forEach(r=>{r.targeted=true;firstRecruitEvaluation(r,u)});renderRecruiting()}
 function chooseCoachMoveDestination(c,from,slot,changed,moved){
  const user=selected()?.name,candidates=universe.teams.filter(t=>t.id!==from.id&&t.name!==user&&!changed.get(t.id)?.has(slot)&&!moved.has(t.staff?.[slot]?.id)&&t.prestige>=from.prestige-5);
@@ -2712,6 +2756,22 @@ function offseasonDepartures(){
  finishOffseasonPhase('departures','signing',{draftPool,teams});
  return true;
 }
+// A recruit becomes a rostered player the same way at signing day and in the late market.
+function recruitOriginLabel(r){return `${r.stars}-star recruit from ${r.highSchool||r.homeRegion} (${r.homeCity||r.homeRegion}, ${r.homeState||''})${r.flippedFrom?` · flipped from ${r.flippedFrom}`:''}`}
+function playerFromRecruit(r,t,origin=recruitOriginLabel(r)){const p=generatePlayer(t,r.pos,99);Object.assign(p,{name:r.name,style:r.style,trueNow:r.trueNow,upside:r.upside,perceived:r.scout,perceivedUpside:r.scoutUp,year:'FR',eligibilityUsed:0,redshirtUsed:false,redshirtActive:false,origin,promise:r.promise&&r.promise!=='None'?r.promise:null,promiseBaseline:r.scout,portraitSeed:r.portraitSeed||p.portraitSeed,portraitVersion:r.portraitVersion||PORTRAIT_VERSION,scoutConfidence:r.scoutConfidence??p.scoutConfidence,scoutingDomains:r.scoutingDomains?JSON.parse(JSON.stringify(r.scoutingDomains)):undefined,scoutingHistory:r.scoutingHistory?JSON.parse(JSON.stringify(r.scoutingHistory)):[]});return p}
+// v0.12.29: roughly half the recruit pool is never signed, and it is not the weak half
+// (an unsigned class averages the same trueNow as the signed one, 5-stars included).
+// Walk-on top-ups draw from those named prospects first, best scouted grade at the
+// needed position, with the controlled program's own targets ahead of the rest.
+function takeLatePlayer(pool,t,pos,controlled){
+ const cand=pool.filter(r=>r.pos===pos);if(!cand.length)return null;
+ const mine=t.name===controlled;
+ cand.sort((a,b)=>((mine&&b.targeted?1:0)-(mine&&a.targeted?1:0))||b.scout-a.scout);
+ const r=mine&&cand[0].targeted?cand[0]:pick(cand.slice(0,3));pool.splice(pool.indexOf(r),1);
+ const p=playerFromRecruit(r,t,`Unsigned ${r.stars}-star prospect from ${r.highSchool||r.homeRegion} (${r.homeCity||r.homeRegion}, ${r.homeState||''}) · late addition`);
+ p.year='FR';p.jerseyNumber=jerseyFor(p.pos,p.portraitSeed);p.redshirtSeason=null;p.lateAddition=true;
+ return p;
+}
 function offseasonEnrollment(){
  const os=normalizeOffseasonState();
  if(offseasonPhaseDone('signing')){if(os.phase==='signing')os.phase='portal';return true}
@@ -2720,8 +2780,7 @@ function offseasonEnrollment(){
   const signed=universe.recruits.filter(r=>r.committed===t.name).slice(0,Math.max(0,105-t.roster.length));
   signed.forEach(r=>{
    if(t.name===controlled){firstRecruitEvaluation(r,t);snapshotScouting(r,t,'SIGNING_DAY','RECRUITING',true)}
-   const p=generatePlayer(t,r.pos,99);
-   Object.assign(p,{name:r.name,style:r.style,trueNow:r.trueNow,upside:r.upside,perceived:r.scout,perceivedUpside:r.scoutUp,year:'FR',eligibilityUsed:0,redshirtUsed:false,redshirtActive:false,origin:`${r.stars}-star recruit from ${r.highSchool||r.homeRegion} (${r.homeCity||r.homeRegion}, ${r.homeState||''})${r.flippedFrom?` · flipped from ${r.flippedFrom}`:''}`,promise:r.promise&&r.promise!=='None'?r.promise:null,promiseBaseline:r.scout,portraitSeed:r.portraitSeed||p.portraitSeed,portraitVersion:r.portraitVersion||PORTRAIT_VERSION,scoutConfidence:r.scoutConfidence??p.scoutConfidence,scoutingDomains:r.scoutingDomains?JSON.parse(JSON.stringify(r.scoutingDomains)):undefined,scoutingHistory:r.scoutingHistory?JSON.parse(JSON.stringify(r.scoutingHistory)):[]});
+   const p=playerFromRecruit(r,t);
    p.jerseyNumber=jerseyFor(p.pos,p.portraitSeed);signPlayerPromise(p,r,t);const developmentPromise=(p.promises||[]).find(q=>q.type==='DEVELOPMENT_PLAN'&&q.status==='ACTIVE');if(developmentPromise)p.trainingFocus=developmentPromise.expectedFocus;p.recruitingMemory=r.recruitingMemory;p.primaryRecruiterCoachId=r.primaryRecruiterCoachId||r.recruitingMemory?.primaryRecruiterCoachId||r.recruitingMemory?.recruiterCoachId||null;p.coachRelationships={...(r.coachRelationships||r.recruitingMemory?.coachRelationships||{})};p.coachDeparturePressure=r.coachDeparturePressure?{...r.coachDeparturePressure}:null;p.transferHistory=[];ensurePlayerDevelopment(p,t);t.roster.push(p);
    recordRosterMove(t,p,'signees');
    const hs=(universe.highSchools||[]).find(h=>h.id===r.highSchoolId);if(hs)hs.d1Signees=(hs.d1Signees||0)+1;
@@ -2815,9 +2874,11 @@ function offseasonPreseason(){
  universe.campHistory[universe.year]=JSON.parse(JSON.stringify(ds));
  const compacted=compactGameArchive();
  if(compacted.games&&currentArchiveState())currentArchiveState().gamesDirty=true;
+ const latePool=(universe.recruits||[]).filter(r=>!r.committed),lateControlled=$('#userTeam').value,latePoolSize=latePool.length;
  universe.year++;universe.week=0;resetNilSeason();universe.recoveredWeek=-1;universe.phase='regular';universe.latest=[];universe.confChamps=[];universe.playoffFieldIds=[];universe.playoffFieldUnavailable=false;universe.academicProgression={season:universe.year,week:0,teamIds:[]};universe.champion=null;universe.lastDetailedGame=null;universe.playLogs={};universe.recruits=generateRecruitPool(2800,universe.highSchools);universe.recruitClassCounts={};
- universe.teams.forEach(t=>{t.w=t.l=t.cw=t.cl=t.pf=t.pa=t.sos=0;t.rank=null;t.champ=false;t.commits=[];while(t.roster.length<85){const p=generateFreshman(t,criticalPosition(t)||scarcePosition(t)||pick(POS));t.roster.push(p);recordRosterMove(t,p,'walkOns',os.reports.roster?.[t.id])}repairRosterShape(t,os.reports.roster?.[t.id]);if(t.roster.length>105){const keep=t.roster.sort((a,b)=>b.trueNow-a.trueNow).slice(0,105),cut=t.roster.filter(p=>!keep.includes(p));for(const p of cut){addToArchive(p,t,'Roster cut');recordRosterMove(t,p,'cuts',os.reports.roster?.[t.id])}t.roster=keep}autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)});
+ universe.teams.forEach(t=>{t.w=t.l=t.cw=t.cl=t.pf=t.pa=t.sos=0;t.rank=null;t.champ=false;t.commits=[];while(t.roster.length<85){const need=criticalPosition(t)||scarcePosition(t)||pick(POS),p=takeLatePlayer(latePool,t,need,lateControlled)||generateFreshman(t,need);t.roster.push(p);recordRosterMove(t,p,'walkOns',os.reports.roster?.[t.id])}repairRosterShape(t,os.reports.roster?.[t.id]);if(t.roster.length>105){const keep=t.roster.sort((a,b)=>b.trueNow-a.trueNow).slice(0,105),cut=t.roster.filter(p=>!keep.includes(p));for(const p of cut){addToArchive(p,t,'Roster cut');recordRosterMove(t,p,'cuts',os.reports.roster?.[t.id])}t.roster=keep}autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)});
  if(os.reports.roster)universe.lastOffseasonRecap={year:os.year,teams:Object.fromEntries(universe.teams.filter(t=>os.reports.roster[t.id]).map(t=>[t.id,offseasonReceiptView(t,os.reports.roster[t.id],os.year,true)]))};
+ universe.lateMarket={year:universe.year,pool:latePoolSize,placed:latePoolSize-latePool.length};
  normalizePromiseState();universe.developmentState={year:universe.year,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]};universe.offseasonDone=false;buildSchedule();ranked();buildPreseasonHub();autosaveAfter('preseason');
  return true;
 }
