@@ -746,13 +746,15 @@ function toggleRisingWatch(id){
  r.watch=true;return{ok:true,watching:true};
 }
 function rollRecruitClass(){
- const rising=(universe.risingClass||[]).map(r=>{const c={...r};delete c.rising;return c});
+ const rising=(universe.risingClass||[]).map(r=>{const c={...r};delete c.rising;c.fromRisingClass=true;return c});
  const fresh=generateRecruitPool(RECRUIT_POOL_SIZE,universe.highSchools);
  universe.recruits=rising.length?assignRecruitRanks([...rising,...fresh.slice(rising.length)]):fresh;
  let carried=0;const user=selected();
  if(user)for(const r of universe.recruits){
   if(!r.watch)continue;
   r.watch=false;r.watchedHeadStart=true;r.targeted=true;
+  // "Film reviewed" / "Full evaluation" are season-scoped; the intel itself carries, so carry the flags too.
+  const scouted=r.manualScouting?.[String(user.id)];if(scouted)scouted.season=universe.year;
   r.relationship=clamp((r.relationship||0)+WATCH_RELATIONSHIP,0,100);
   r.interest=clamp((r.interest||0)+WATCH_INTEREST,0,100);r.prevInterest=r.interest;
   firstRecruitEvaluation(r,user);carried++;
@@ -760,6 +762,34 @@ function rollRecruitClass(){
  for(const r of universe.recruits)delete r.watch;
  universe.risingClass=generateRisingClass(universe.highSchools);
  universe.lastRisingCarry={year:universe.year,carried};
+}
+// Scouting actions and the rising card address a prospect in either class.
+function findRecruitAnyClass(id){const key=String(id);return(universe.recruits||[]).find(x=>String(x.id)===key)||(universe.risingClass||[]).find(x=>String(x.id)===key)||null}
+// The rivals do not wait for the season. Before it starts, a few of the best rising prospects can
+// commit to their best rival: 5-stars most often. A prospect you watched is mostly protected, but
+// only while your projected pitch (a target's +10 and the relationship head start included) is
+// within 4 of the leading rival; a watched prospect you are trailing is as exposed as any other.
+const EARLY_COMMIT_POOL=150,EARLY_COMMIT_CHANCE={5:.35,4:.22,3:.08},EARLY_COMMIT_PROTECTED=.25,EARLY_COMMIT_MARGIN=4;
+function applyEarlyCommitments(){
+ const user=selected(),log={year:universe.year,total:0,watched:0,kept:0,lost:[]};
+ clearUnitCache();
+ const candidates=universe.recruits.filter(r=>r.fromRisingClass&&!r.committed).sort((a,b)=>(a.nationalRank||1e9)-(b.nationalRank||1e9)).slice(0,EARLY_COMMIT_POOL);
+ for(const r of candidates){
+  const chance=EARLY_COMMIT_CHANCE[r.stars];if(!chance)continue;
+  const rivals=sample(universe.teams.filter(t=>t.name!==user?.name),20).map(t=>({t,pitch:recruitPitch(t,r)})).sort((a,b)=>b.pitch-a.pitch);
+  const dest=rivals.find(x=>canTakeCommit(x.t.name));
+  const watched=!!r.watchedHeadStart;if(watched)log.watched++;
+  if(!dest)continue;
+  let p=chance;
+  if(watched&&user&&recruitPitch(user,r)+10+r.relationship*.12>=dest.pitch-EARLY_COMMIT_MARGIN)p*=EARLY_COMMIT_PROTECTED;
+  if(gameplayRandom()<p&&commitRecruit(r,dest.t.name)){
+   r.earlyCommit=true;log.total++;
+   if(watched)log.lost.push({id:r.id,name:r.name,pos:r.pos,stars:r.stars,to:dest.t.name});
+  }
+ }
+ log.kept=log.watched-log.lost.length;
+ universe.earlyCommitLog=log;
+ return log;
 }
 function initUniverse(mode='dynasty',{startingPhase='regular',seed=null}={}){const phase=startingPhase==='preseason'?'preseason':'regular';IDX.teams=null;IDX.players=null;activateGameplayRng(seed??undefined);const os=Object.keys(OFF_SCHEMES),ds=Object.keys(DEF_SCHEMES),highSchools=generateHighSchools();const teams=schools.map(s=>({...s,nickname:'',staff:generateStaff(s),offScheme:pick(os),defScheme:pick(ds),roster:generateRoster(s),...schoolColors(s),w:0,l:0,cw:0,cl:0,pf:0,pa:0,sos:0,rank:null,champ:false,schedule:[],history:[],commits:[],records:{}}));for(const t of teams){t.schemeTransition={off:null,def:null};t.staff.OC.preferredScheme=t.offScheme;t.staff.DC.preferredScheme=t.defScheme;t.pipelines=makePipelines(t);autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)}universe={version:APP_VERSION,mode:mode==='commissioner'?'commissioner':'dynasty',year:2027,week:0,recoveredWeek:-1,phase,teams,highSchools,recruits:generateRecruitPool(RECRUIT_POOL_SIZE,highSchools),risingClass:generateRisingClass(highSchools),history:[],playerArchive:[],awards:{},records:{nationalSeason:{},nationalCareer:{}},draftHistory:{},latest:[],weeklyHub:[],weeklyDecisions:[],bowls:[],confChamps:[],playoffFieldIds:[],playoffFieldUnavailable:false,academicProgression:{season:2027,week:0,teamIds:[]},champion:null,lastDetailedGame:null,movementLog:[],recruitClassCounts:{},campHistory:{},developmentState:{year:2027,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]},offseasonDone:false,openings:[],candidateMarket:{},guidanceState:{version:1,teams:{}}};guidanceReturnState=null;normalizeGuidanceState();gameplayRngUniverse=universe;for(const t of teams){ensureTeamDevelopment(t);for(const p of t.roster){ensurePlayerDevelopment(p,t);ensureAcademics(p,t)}}normalizePromiseState();buildSchedule();deriveRivalries();universe.teams.forEach(t=>{ensureAdminState(t);ensureNilState(t)});ranked();buildPreseasonHub();syncGameplayRng()}
 function createNewDynasty(mode='dynasty',options={}){return initUniverse(mode,{startingPhase:'preseason',seed:options.seed??null})}
@@ -2934,7 +2964,7 @@ function offseasonPreseason(){
  if(compacted.games&&currentArchiveState())currentArchiveState().gamesDirty=true;
  const latePool=(universe.recruits||[]).filter(r=>!r.committed),lateControlled=$('#userTeam').value,latePoolSize=latePool.length;
  universe.year++;universe.week=0;resetNilSeason();universe.recoveredWeek=-1;universe.phase='regular';universe.latest=[];universe.confChamps=[];universe.playoffFieldIds=[];universe.playoffFieldUnavailable=false;universe.academicProgression={season:universe.year,week:0,teamIds:[]};universe.champion=null;universe.lastDetailedGame=null;universe.playLogs={};rollRecruitClass();universe.recruitClassCounts={};
- universe.teams.forEach(t=>{t.w=t.l=t.cw=t.cl=t.pf=t.pa=t.sos=0;t.rank=null;t.champ=false;t.commits=[];while(t.roster.length<85){const need=criticalPosition(t)||scarcePosition(t)||pick(POS),p=takeLatePlayer(latePool,t,need,lateControlled)||generateFreshman(t,need);t.roster.push(p);recordRosterMove(t,p,'walkOns',os.reports.roster?.[t.id])}repairRosterShape(t,os.reports.roster?.[t.id]);if(t.roster.length>105){const keep=t.roster.sort((a,b)=>b.trueNow-a.trueNow).slice(0,105),cut=t.roster.filter(p=>!keep.includes(p));for(const p of cut){addToArchive(p,t,'Roster cut');recordRosterMove(t,p,'cuts',os.reports.roster?.[t.id])}t.roster=keep}autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)});
+ universe.teams.forEach(t=>{t.w=t.l=t.cw=t.cl=t.pf=t.pa=t.sos=0;t.rank=null;t.champ=false;t.commits=[];while(t.roster.length<85){const need=criticalPosition(t)||scarcePosition(t)||pick(POS),p=takeLatePlayer(latePool,t,need,lateControlled)||generateFreshman(t,need);t.roster.push(p);recordRosterMove(t,p,'walkOns',os.reports.roster?.[t.id])}repairRosterShape(t,os.reports.roster?.[t.id]);if(t.roster.length>105){const keep=t.roster.sort((a,b)=>b.trueNow-a.trueNow).slice(0,105),cut=t.roster.filter(p=>!keep.includes(p));for(const p of cut){addToArchive(p,t,'Roster cut');recordRosterMove(t,p,'cuts',os.reports.roster?.[t.id])}t.roster=keep}autoRedshirts(t);autoDepthTeam(t,false);autoRoleDepth(t,false)});applyEarlyCommitments();
  if(os.reports.roster)universe.lastOffseasonRecap={year:os.year,teams:Object.fromEntries(universe.teams.filter(t=>os.reports.roster[t.id]).map(t=>[t.id,offseasonReceiptView(t,os.reports.roster[t.id],os.year,true)]))};
  universe.lateMarket={year:universe.year,pool:latePoolSize,placed:latePoolSize-latePool.length};
  normalizePromiseState();universe.developmentState={year:universe.year,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]};universe.offseasonDone=false;buildSchedule();ranked();buildPreseasonHub();autosaveAfter('preseason');
