@@ -2,9 +2,11 @@
 
 ## Version and branch
 
-Source is `0.14.1` on `claude/zealous-tesla-m08xay` (PR #33, draft: not merged or published). v0.14.0 makes the rising class contested
-(scouting for watched prospects, AI early commitments); v0.14.1 is a visual pass (Game Center layout, dashboard gate note, read-only
-Program Lab attributes with a season chart, nav icons, folds and fixes); see `CHANGELOG.md`.
+Source is `0.14.1` on `claude/review-improvement-dwjemy` (PR #33, merge 07d5ca8). Web published (production run 41775769252). GitHub
+Release `v0.14.1` (prerelease, tag on 07d5ca8, no desktop assets; release workflow run 41851458748). No desktop build or Mac install yet.
+v0.14.0 makes the rising class contested (scouting for watched prospects, AI early commitments); v0.14.1 is a visual pass (Game Center
+layout, dashboard gate note, read-only Program Lab attributes with a season chart, nav icons, folds and fixes); see `CHANGELOG.md`.
+v0.14.0 has no separate release or tag; it shipped in the same merge and the v0.14.1 release notes say so.
 
 Previous: `0.13.1` on `claude/review-improvement-dwjemy` (PR #31, merge 7b35d0d). Web published (production run 41764427559).
 No GitHub Release or desktop build for 0.13.1. v0.13.1 is playthrough polish: Game Lab explains its gate, the Development training
