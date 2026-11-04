@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.13.1 — Playthrough polish
+
+Found by playing six weeks in a browser and sweeping every tab at desktop and phone width.
+
+- **Game Lab says why it is locked.** *Watch My Next Game* and *Sim Instantly* are disabled until the week's Coach's Desk decisions are made, which is true at the start of every week, and nothing said so. A note now reads "Resolve the Coach's Desk decisions before playing this week." with a *Go to decisions* button, and the disabled buttons carry the reason as a tooltip. The page intro is plain language instead of "the richer roster-driven drive/play engine while the rest of the country fast-sims".
+- **Shorter Development page.** The Individual Training Plans table (one row per player) was about 80% of the page. `table-folding.js` shows the first 12 rows and folds the rest behind *Show all N players*; every row stays in the DOM and every focus control stays reachable. Desktop 10,586 px to 3,597 px, phone 22,459 px to 6,447 px.
+- **No version labels in the UI.** "V0.10.1 Interactive Game Day", "V0.10.2 Weekly Coaching" and "the v0.10.1 kickoff profile" were showing to players; they are gone, and a browser test fails if a `vN.N.N` label appears in the Game Lab or Command Center text again.
+- **Quieter ticker.** Routine "Decision recorded: …" confirmations no longer scroll as headlines.
+- **Tooling.** `tests/review-polish-browser.js` (desktop and phone) covers all of the above.
+- No simulation, balance or save-shape changes: same seeds give the same results as v0.13.0.
+- **Known, not fixed:** in a phone training-plan row the *Current read* bar overlaps its text.
+
 ## v0.13.0 — Multi-year recruiting
 
 - **Rising class.** Next year's best prospects now exist this year. Every season the game also generates the top 600 of the class that arrives after this one (`universe.risingClass`, about +460 KB on a 25 MB universe and ~75 ms per rollover). A new *Rising prospects* card on the Recruiting tab lists them read-only (stars, position, school, a rounded staff grade) with a position filter and a *Watching only* toggle.

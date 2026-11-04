@@ -53,7 +53,7 @@ function renderV2InteractiveGameDay(){
   if(v2InteractiveGameDay&&v2InteractiveGameDay.key!==ctx?.key)v2InteractiveGameDay=null;
   if(!ctx||!api){host.innerHTML=`<div class="muted">${typeof openingPreseason==='function'&&openingPreseason()?'Begin Season from the Command Center to make the first matchup playable.':'Interactive Game Day becomes available when your program has an unsimulated game.'}</div>`;return}
   if(!v2InteractiveGameDay){
-    host.innerHTML=`<div class="section-head"><div><div class="eyebrow">V0.10.1 INTERACTIVE GAME DAY</div><h3>Coach the next game</h3><div class="muted">Play the matchup through Game Engine 2, make fourth-down decisions, then make the final result official. Nothing changes in the dynasty until you record the completed game.</div></div><button type="button" data-v2-gameday-start>Start Game Day</button></div>`;
+    host.innerHTML=`<div class="section-head"><div><div class="eyebrow">INTERACTIVE GAME DAY</div><h3>Coach the next game</h3><div class="muted">Play the matchup through Game Engine 2, make fourth-down decisions, then make the final result official. Nothing changes in the dynasty until you record the completed game.</div></div><button type="button" data-v2-gameday-start>Start Game Day</button></div>`;
     host.querySelector('[data-v2-gameday-start]').onclick=()=>{try{v2GameDayUIPrepare()}catch(err){console.error(err);setStatus(`Interactive Game Day stopped: ${err.message||err}`)}};return
   }
   const session=v2InteractiveGameDay.session,d=api.pendingDecision(session),final=session.state.status==='final';

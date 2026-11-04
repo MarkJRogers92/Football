@@ -1,7 +1,7 @@
 # Roadmap execution status
 
-Last reconciled: 2026-11-03, source `b8c31db` (`v0.13.0`) on
-`claude/review-improvement-dwjemy` (PR #27). History carries coach index, champion
+Last reconciled: 2026-11-04, source `f9b3e21` (`v0.13.1`) on
+`claude/zealous-tesla-m08xay` (unmerged; v0.13.0 shipped as PR #27). History carries coach index, champion
 timeline, Hall of Fame with filtering and show-all, and conference standings.
 v0.12.24 adds the championship trophy and team helmets (presentation only); v0.12.26 swaps in the image-to-3D trophy as a turntable; v0.12.27 makes the turn continuous (crossfaded, 30s). Published 0.13.0: web run 41584185384, GitHub Release v0.13.0 (prerelease, no desktop assets; release workflow run 41610639932). Published 0.12.29: web run 41571572439 (no GitHub Release, desktop build or Mac install yet). Published 0.12.28: web run 40822227655, desktop artifacts from validate run 40822099911, GitHub Release pending (agent_docs/HANDOFF_2026-10-29_v0.12.28.md). Published 0.12.24: web run 40450856688; Mac installed from artifact 12709339863 and release v0.12.24 created. The playerArchive rollup was investigated and
 rejected on measurement (docs/SAVE_SIZE_MEASUREMENT.md). The kicker/punter
