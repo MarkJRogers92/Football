@@ -22,7 +22,24 @@ const tab = (page, id) => page.evaluate(t => document.querySelector(`.tabs butto
       await startNewDynasty(page);
 
       // 1. Game Lab explains its dead buttons and offers the jump.
-      await tab(page, 'gamelab');
+      // A week is gated only by Coach's Desk decisions other than the weekly game plan, and about
+      // a third of fresh dynasties open without one. The note must be visible exactly when the week
+      // is gated; if this universe opens ungated, sim forward until a gated week so the gated path
+      // is always exercised.
+      let gated = false;
+      for (let hop = 0; hop < 8; hop++) {
+        await tab(page, 'dashboard');
+        gated = await page.$eval('#simWeek', el => el.disabled);
+        await tab(page, 'gamelab');
+        await page.waitForFunction(g => document.querySelector('#detailedGateNote')?.hidden === !g, gated, { timeout: 10000 });
+        assert.equal(await page.locator('#watchDetailedGame').isDisabled(), gated, `[${label}] week ${hop}: Watch is disabled exactly when the week is gated`);
+        if (gated) break;
+        await tab(page, 'dashboard');
+        const before = await page.evaluate(() => document.querySelector('#weekLine')?.textContent);
+        await page.click('#simWeek');
+        await page.waitForFunction(w => document.querySelector('#weekLine')?.textContent !== w, before, { timeout: 60000 });
+      }
+      assert.ok(gated, `[${label}] reached a gated week within eight weeks`);
       await page.waitForSelector('#detailedGateNote:not([hidden])', { timeout: 10000 });
       assert.match(await page.locator('#detailedGateNote').innerText(), /Resolve the Coach’s Desk decisions before playing this week\./, `[${label}] the gate states its reason`);
       assert.equal(await page.locator('#watchDetailedGame').isDisabled(), true, `[${label}] watch is gated`);

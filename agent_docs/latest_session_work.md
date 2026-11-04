@@ -8,6 +8,10 @@
 - Findings fixed: Game Lab actions gated with no explanation (`renderDetailedGateNote` in `app.js` uses the existing
   `guidanceActionEligibility('detailed-game')` blocker message); the Development training table (`#trainingBody`) was 80% of that page
   (`table-folding.js`, extend `FOLDS` to fold other long tables); internal milestone labels leaking into Game Lab copy; ticker clutter.
+- Test pitfall (cost one failed gate): about 30% of fresh dynasties open with no required Coach's Desk decision (only the weekly game
+  plan, `hasPendingWeeklyDecisions` ignores `WEEKLY_GAMEPLAN`), so `#simWeek` is enabled and Game Lab is not gated. Any browser test that
+  needs a gated week must sim forward until `#simWeek` is disabled; assert the invariant (note visible iff gated) instead of assuming.
+  Twelve lucky passes in a row is not evidence: measure the rate (`flake2.js`-style loop over fresh dynasties).
 - False alarms worth knowing: the word "regular" in Program/Game Lab text is ordinary prose; the ticker showing an item twice is the
   intentional doubled reel for a seamless marquee loop, not a duplicate.
 - Not fixed: the phone training-plan row has the *Current read* bar overlapping its text. Other long pages that could fold the same way:
