@@ -1,5 +1,19 @@
 # Latest Session Work
 
+## v0.13.1 — Playthrough polish (2026-11-04)
+
+- Method that worked: a scripted browser playthrough (`new dynasty -> resolve weekly decisions -> #simWeek` six times) then a sweep of
+  every tab at 1440 and 390 recording page height, horizontal overflow, console errors and leaked placeholders. `#simWeek` is disabled
+  until `[data-decision][data-choice]` buttons are clicked; copy that loop from `tests/browser.js`.
+- Findings fixed: Game Lab actions gated with no explanation (`renderDetailedGateNote` in `app.js` uses the existing
+  `guidanceActionEligibility('detailed-game')` blocker message); the Development training table (`#trainingBody`) was 80% of that page
+  (`table-folding.js`, extend `FOLDS` to fold other long tables); internal milestone labels leaking into Game Lab copy; ticker clutter.
+- False alarms worth knowing: the word "regular" in Program/Game Lab text is ordinary prose; the ticker showing an item twice is the
+  intentional doubled reel for a seamless marquee loop, not a duplicate.
+- Not fixed: the phone training-plan row has the *Current read* bar overlapping its text. Other long pages that could fold the same way:
+  Depth (4,000px desktop, 10,000px phone), Recruiting (7,000px), History and Program on a phone (about 5,300px).
+
+
 ## v0.13.0 release record (2026-11-03)
 
 - Merged as PR #27 (69b39d4), web published (run 41584185384), GitHub Release v0.13.0 created (see below).
