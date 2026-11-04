@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.14.1 — Visual pass
+
+From a review of the Game Day screens and a second look at every tab. Presentation only: no simulation, balance or save-shape changes.
+
+- **Game Center.** The Watch view needed 998 px inside an 810 px dialog (630 px on a 700 px laptop), which put the playback controls below the fold; they now stay pinned to the bottom of the dialog, the field follows the viewport height on short screens, and the Watch tab drops a meta line that repeated the header. On a phone the scoreboard went from about 330 px to about 110 px (two columns, no stacked cards), the tab strip is one scrolling row instead of two uneven ones, and the Watch title takes two lines. The scoreboard no longer repeats the home team in the venue line ("Regular season · Chicago Metropolitan · Chicago" is now "Regular season · Chicago"). The recap limits read as plain language ("Quarter-by-quarter scores, attendance and the game clock are not recorded for this game"). Quarter scores themselves need the engine to record the quarter per scoring drive; the Watch view's clock labels are reconstructed, so they were not used.
+- **Dashboard says why Sim Week is locked.** The hero showed a dimmed *Sim Week* with the reason only in a tooltip and the *Resolve required decision* button far below the fold. It now shows the reason, the *Sim Regular Season and your staff will decide* alternative, and a *Go to decisions* button (the same note Game Lab got in v0.13.1, now one shared renderer).
+- **Program Lab.** In Dynasty Mode the edit form is hidden (it showed editable-looking fields above a disabled *Apply Program Changes*); the attributes are six read-only tiles, and the form appears only in Commissioner Mode. A new *Season by season* chart draws wins against the administration's expectation with confidence as a line, from the tenure records the game already keeps. Two leftover version labels are gone ("Conference (fixed in v0.4)", "Tracking began at v0.9.33"); the browser test now checks every tab for a `vN.N.N` label.
+- **Navigation icons** in the sidebar and the phone bottom bar.
+- **Staff tab text** is no longer 7 to 9 px (labels and metadata are 10 to 11 px).
+- **Phone ticker** is one still headline instead of a scrolling marquee, and pauses for keyboard focus too (hover pause and reduced-motion handling already existed).
+- **Roles & Depth on a phone** folds the dense role cards (7,700 px) behind *Show all N role controls*; desktop is unchanged.
+- **Phone training rows** no longer wrap their *Current read* cells into overlapping boxes (checked programmatically: 22 overlaps before, none after).
+- **Tooling.** `tests/ui-upgrades.js` (trend chart) and `tests/ui-upgrades-browser.js` (desktop and phone, including a 700 px-tall viewport for the pinned controls).
+- **Not done:** real quarter scores, and History's index on a phone (about 3,700 px).
+
 ## v0.14.0 — A contested rising class
 
 v0.13.0 added next year's top prospects as a read-only list. They are now something you scout and something rivals can take.

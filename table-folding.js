@@ -25,4 +25,33 @@
   toggle.textContent=open?`Show fewer ${fold.noun}`:`Show all ${rows.length} ${fold.noun}`;
  }
  for(const fold of FOLDS)extendRender(fold.view,()=>apply(fold));
+
+ // Whole blocks fold on a phone only. The Roles & Depth page repeats every role as a dense card
+ // (7,700px on a phone) after the formation view, which already covers the main roles; the cards
+ // stay for the extra roles, one tap away.
+ const BLOCKS=[{view:'depth',el:'#depthGrid',noun:'role controls',count:el=>el.querySelectorAll('select[data-role]').length}];
+ const phone=()=>!!window.matchMedia?.('(max-width:700px)').matches;
+ const blocksOpen=new Set();
+ function applyBlock(block){
+  const el=document.querySelector(block.el);if(!el||!el.parentElement)return;
+  let toggle=el.parentElement.querySelector(`[data-fold-toggle="${block.el}"]`);
+  if(!phone()){el.classList.remove('fold-block-collapsed');toggle?.remove();return}
+  const open=blocksOpen.has(block.el),n=block.count(el);
+  el.classList.toggle('fold-block-collapsed',!open);
+  if(!toggle){
+   toggle=document.createElement('button');toggle.type='button';toggle.className='fold-toggle';toggle.dataset.foldToggle=block.el;
+   el.before(toggle);
+   toggle.onclick=()=>{if(blocksOpen.has(block.el))blocksOpen.delete(block.el);else blocksOpen.add(block.el);applyBlock(block)};
+  }
+  toggle.setAttribute('aria-expanded',open?'true':'false');
+  toggle.textContent=open?`Hide ${block.noun}`:`Show all ${n} ${block.noun}`;
+ }
+ // Some views (Roles & Depth) have no extension render steps; wrap their tab renderer instead.
+ for(const block of BLOCKS){
+  if(typeof TAB_RENDERERS==='object'&&TAB_RENDERERS&&typeof TAB_RENDERERS[block.view]==='function'){
+   const base=TAB_RENDERERS[block.view];
+   TAB_RENDERERS[block.view]=function(){const out=base.apply(this,arguments);applyBlock(block);return out};
+  }else extendRender(block.view,()=>applyBlock(block));
+ }
+ window.matchMedia?.('(max-width:700px)').addEventListener?.('change',()=>BLOCKS.forEach(applyBlock));
 })();

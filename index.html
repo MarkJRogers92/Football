@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.14.0</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.14.1</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -125,6 +125,28 @@ th.sortable{cursor:pointer;user-select:none;white-space:nowrap}th.sortable:hover
 .program-attr strong+*{display:none}
 #programEditor[hidden],#programAttributes[hidden]{display:none}
 @media(max-width:900px){.program-attrs{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+.trend-chart{width:100%;max-width:760px;height:auto;display:block;margin:8px 0 4px}
+.trend-bar{fill:rgba(143,177,255,.38)}
+.trend-bar.is-conf,.trend-bar.is-champ{fill:#f2c14e}
+.trend-exp{stroke:#e8eef7;stroke-width:2;stroke-linecap:round;opacity:.85}
+.trend-line{fill:none;stroke:#7ee0a0;stroke-width:2;stroke-linejoin:round}
+.trend-dot{fill:#7ee0a0}
+.trend-label,.trend-val{fill:var(--muted);font-size:10px}
+.trend-val{fill:var(--text);font-weight:700}
+.trend-key{display:flex;flex-wrap:wrap;gap:6px 16px;color:var(--muted);font-size:.76rem}
+.trend-key i{display:inline-block;vertical-align:middle;margin-right:6px}
+.trend-key .k-bar{width:10px;height:10px;border-radius:2px;background:rgba(143,177,255,.5)}
+.trend-key .k-exp{width:14px;height:2px;background:#e8eef7}
+.trend-key .k-line{width:14px;height:2px;background:#7ee0a0}
+.trend-key .k-champ{width:10px;height:10px;border-radius:2px;background:#f2c14e}
+
+/* v0.14.1: on a phone the training-row read cells wrapped their contents into overlapping boxes */
+@media(max-width:700px){
+ #trainingBody td[data-label="Current Read"],#trainingBody td[data-label="Potential Read"]{flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:2px 10px;text-align:right}
+ #trainingBody .scout-range{display:inline-flex;gap:6px;align-items:baseline}
+ #trainingBody td[data-label] .small.muted{flex-basis:100%;display:flex;justify-content:flex-end}
+}
 
 /* Dynasty Lab visual identity layer
    Presentation-only overrides. Keep simulation, save state, and game logic out of this file. */
@@ -792,6 +814,7 @@ tr[hidden]{display:none!important}
 .fold-toggle{margin:10px 0 2px;padding:10px 16px;border:1px solid rgba(143,177,255,.28);border-radius:10px;background:rgba(143,177,255,.08);color:#cfe0ff;font-weight:700;cursor:pointer}
 .fold-toggle:hover{background:rgba(143,177,255,.16)}
 @media(max-width:700px){.fold-toggle{width:100%}}
+.fold-block-collapsed{display:none!important}
 
 .recruit-compare-toggle{margin-top:5px;font-size:.72rem;padding:4px 7px}.recruit-compare-toggle.active{font-weight:700}.recruit-compare-tray{margin-top:10px;padding:10px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.recruit-compare-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}.recruit-compare-head>div{display:grid;gap:2px}.recruit-compare-head small{opacity:.68}.recruit-compare-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.recruit-compare-card{padding:9px;border:1px solid rgba(255,255,255,.1);border-radius:8px;display:grid;gap:5px}.recruit-compare-verdict{display:flex;align-items:center;justify-content:space-between;gap:8px}.recruit-compare-verdict b{font-size:1.15rem}@media(max-width:900px){.recruit-compare-grid{grid-template-columns:1fr}}.recruit-compare-attrs{margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.12);display:grid;gap:6px}.recruit-compare-attrs-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.recruit-compare-attrs-head small{opacity:.68}.recruit-compare-table{width:100%;border-collapse:collapse;font-size:.78rem}.recruit-compare-table th,.recruit-compare-table td{padding:4px 6px;text-align:center;border-bottom:1px solid rgba(255,255,255,.08)}.recruit-compare-table th.rc-attr{text-align:left;font-weight:600;opacity:.85}.recruit-compare-table td.rc-lead{font-weight:700;color:#8ef0b0;background:rgba(70,200,120,.12);border-radius:6px}.recruit-compare-table td.rc-overlap{opacity:.62}.recruit-compare-table td.rc-none{opacity:.32}
 .roster-need-strip{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 12px}.roster-need{display:grid;gap:1px;min-width:105px;padding:7px 9px;border:1px solid rgba(255,255,255,.1);border-radius:8px}.roster-need strong{font-size:.82rem}.roster-need span{font-weight:700}.roster-need small{opacity:.65}.roster-need.urgent{border-width:2px}.staff-shortlist-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.staff-shortlist-card{position:relative;display:grid;grid-template-columns:22px 1fr;gap:5px 7px;padding:10px;border:1px solid rgba(255,255,255,.1);border-radius:9px}.staff-shortlist-card.targeted{border-width:2px}.staff-shortlist-rank{grid-row:1/6;font-size:.78rem;opacity:.55}.staff-shortlist-verdict{display:flex;align-items:center;justify-content:space-between;gap:8px}.staff-shortlist-verdict span{font-size:.75rem;opacity:.72}.staff-shortlist-reason,.staff-shortlist-actions,.staff-shortlist-card>.small{grid-column:2}.staff-shortlist-actions{display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap}.staff-shortlist-actions>.scouting-actions{margin-top:0}.staff-shortlist-actions button{font-size:.72rem;padding:4px 7px}@media(max-width:1150px){.staff-shortlist-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.staff-shortlist-grid{grid-template-columns:1fr}.roster-need{flex:1 1 90px}}
@@ -1054,6 +1077,14 @@ tr[hidden]{display:none!important}
 .gc-watch-foot{margin:0}
 .gc-watch-cta{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
 @media(max-width:560px){.gcf-bug{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:'away home' 'sit sit';font-size:.76rem;padding:6px 8px;gap:4px 10px}.gcf-team.away{grid-area:away}.gcf-team.home{grid-area:home}.gcf-situation{grid-area:sit;grid-auto-flow:column;justify-content:center;gap:8px}.gcf-team strong{font-size:1.1rem}.gcf-controls{grid-template-columns:minmax(0,1fr)}.gcf-transport{justify-content:center}.gcf-options{justify-content:stretch}.gcf-options select{flex:1 1 140px}}
+
+/* v0.14.1: the Watch view was 998px tall inside an 810px dialog (630px on a 700px laptop), which put
+   the playback controls below the fold. The controls now stay pinned to the bottom of the dialog while
+   the field scrolls, the field follows the viewport height on short screens, and the Watch tab drops the
+   meta line that repeats what the header already says. */
+.gcf-stage canvas{max-height:max(260px,calc(100vh - 480px));object-fit:contain}
+.gcf-controls{position:sticky;bottom:0;z-index:3;background:var(--panel);padding:8px 0 10px;border-top:1px solid var(--line)}
+.game-dialog[data-game-tab="Watch"] #gameDialogMeta{display:none}
 
 /* Recruiting map. Status colours are a validated trio on the dark surface (blue / orange / aqua);
    targets are diamonds and open recruits are small grey dots, so shape backs up colour. */
@@ -1637,6 +1668,29 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
   .portal-filters select{max-width:none;width:100%}
 }
 
+/* v0.14.1: Game Center on a phone. The tab strip wrapped into two uneven rows and the scoreboard
+   stacked two full-width cards (about 330px before the first tab); the Watch title wrapped to three
+   lines. One scrolling row of tabs, a two-column scoreboard, no title logos. */
+@media(max-width:720px){
+  #gameTabs{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  #gameTabs::-webkit-scrollbar{display:none}
+  #gameTabs button{flex:0 0 auto}
+  .sports-game-dialog .scoreboard{grid-template-columns:1fr 1fr;gap:8px}
+  .sports-game-dialog .sb-mid{grid-column:1/-1;order:3;padding-top:2px}
+  .sports-game-dialog .sb-team{grid-template-columns:minmax(0,1fr) auto;padding:8px 10px}
+  .sports-game-dialog .sb-team .sports-mark{display:none}
+  .sports-game-dialog .sb-team strong{font-size:13px}
+  .sports-game-dialog .sb-score{font-size:28px}
+  #gameDialogName{font-size:1.05rem;line-height:1.3}
+  #gameDialogName .team-logo{display:none}
+}
+@media(max-width:720px){
+  .sports-game-dialog .sb-team{gap:6px;padding:8px}
+  .sports-game-dialog .sb-team strong{font-size:12px}
+  .sports-game-dialog .sb-score{font-size:26px;min-width:30px}
+  .sports-game-dialog .sb-team.winner .sb-score::after{display:none}
+}
+
 /* Dashboard view switcher: one job per screen instead of a 4,600px scroll. */
 .dash-views{display:flex;gap:6px;margin:0 0 14px;padding:4px;border:1px solid var(--line,#2a3a4d);border-radius:12px;background:rgba(10,16,24,.7);width:max-content;max-width:100%;overflow-x:auto}
 .dash-views button{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border:0;border-radius:9px;background:transparent;color:#9fb0c4;font-weight:700;font-size:.88rem;letter-spacing:.01em;cursor:pointer;white-space:nowrap}
@@ -2124,7 +2178,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.14.0</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.14.1</b></span></footer>
   </div>
 </section>
 
@@ -2151,7 +2205,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.14.0</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.14.1</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -2349,6 +2403,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
     <section id="program" class="panel tab">
       <div class="section-head"><div><h2>Program Lab</h2><div class="muted">Track the job, the board, the season and the institutional identity behind your dynasty.</div></div></div><div class="card"><div class="eyebrow">PROGRAM OVERVIEW</div><div id="programOverview"></div></div>
       <div class="card" id="programAttributes"></div>
+      <div class="card" id="programTrends"></div>
       <div id="programEditNotice" class="card muted"></div>
       <div class="card editor-grid" id="programEditor">
         <label>School name<input id="editName" type="text"></label>
@@ -5260,7 +5315,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.14.0';
+const APP_VERSION='0.14.1';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -6620,7 +6675,7 @@ function gameBoxHTML(g){
  const compactNote=g.compacted?`<p class="muted">Individual lines for this game were compacted to its leaders and scorers to keep long dynasties small. Team statistics, the score and injuries are unchanged.</p>`:'';
  const groups=[['Passing',['Cmp','Att','Yds','TD','INT','Sacks'],['passComp','passAtt','passYds','passTD','int','sacksTaken'],'passAtt',4],['Rushing',['Car','Yds','Avg','TD'],['rushAtt','rushYds','rushAvg','rushTD'],'rushAtt',3],['Receiving',['Rec','Targets','Yds','Avg','TD'],['receptions','targets','recYds','recAvg','recTD'],'targets',4],['Defense',['Tkl','TFL','Sack','INT','PD','Pressures'],['tackles','tfl','sacks','intDef','passBreakups','pressures'],'tackles',2],['Kicking',['FGM','FGA'],['fgMade','fgAtt'],'fgAtt',2],['Punting',['Punts','Yds','Avg'],['punts','puntYds','puntAvg'],'punts',3]];
  const filters=`<div class="game-box-controls" aria-label="Box score filters"><label>Player team<select data-game-box-team><option value="all">Both teams</option><option value="away">${gameEscape(g.away.name)}</option><option value="home">${gameEscape(g.home.name)}</option></select></label><label>Category<select data-game-box-category><option value="all">All categories</option>${groups.map(([title])=>`<option value="${title.toLowerCase()}">${title}</option>`).join('')}</select></label><output data-game-box-status aria-live="polite">Showing both teams · all categories</output></div>`;
- let html=compactNote+filters+'<h3>Team statistics</h3>'+gameTable(['Statistic',g.away.name,g.home.name],rows)+'<p class="muted">Quarter scores, possession, third/fourth downs, penalties and long gains are not tracked. Player totals are allocated by the simulation from team production.</p><div class="game-player-stats">';
+ let html=compactNote+filters+'<h3>Team statistics</h3>'+gameTable(['Statistic',g.away.name,g.home.name],rows)+'<p class="muted">The game does not record quarter scores, possession time, third and fourth downs, penalties or long gains. Player stat lines are distributed from each team’s production.</p><div class="game-player-stats">';
  for(const side of ['away','home']){html+=`<section class="game-stat-team" data-game-stat-team="${side}"><h3>${gameEscape(g[side].name)}</h3>`;for(const [title,cols,keys,filter,defaultSort] of groups){const list=g.playerStats[side].filter(p=>p.stats[filter]||keys.some(k=>p.stats[k]));if(!list.length)continue;const category=title.toLowerCase();html+=`<section class="game-stat-group" data-game-stat-category="${category}"><h4>${title}</h4>`+gameTable(['Player','Pos',...cols],list.map(p=>[p.name,p.pos,...keys.map(k=>{const s=p.stats;if(k==='rushAvg')return s.rushAtt?((s.rushYds||0)/s.rushAtt).toFixed(1):'—';if(k==='recAvg')return s.receptions?((s.recYds||0)/s.receptions).toFixed(1):'—';if(k==='puntAvg')return s.punts?((s.puntYds||0)/s.punts).toFixed(1):'—';return s[k]||0})]),{sortable:true,defaultSort})+'</section>'}html+='</section>'}
  html+='</div>';
  return html;
@@ -6715,7 +6770,7 @@ function compactGameArchive({horizon=GAME_DETAIL_HORIZON}={}){
 
 function gameSummaryHTML(g){
  const winner=g.score.home>g.score.away?g.home:g.away;
- let html=`<p class="recap">${gameRecap(g).body}</p><p><strong>${gameEscape(winner.name)} wins by ${Math.abs(g.score.home-g.score.away)}.</strong> Total offense: ${gameEscape(g.away.name)} ${g.teamStats.away.passYds+g.teamStats.away.rushYds} yards; ${gameEscape(g.home.name)} ${g.teamStats.home.passYds+g.teamStats.home.rushYds} yards.</p><p class="muted">The recap above is written from this box score. Quarter-by-quarter scores, attendance and game clock are unavailable.</p>${coachingReportHTML(g)}<h3>Game leaders</h3>`;
+ let html=`<p class="recap">${gameRecap(g).body}</p><p><strong>${gameEscape(winner.name)} wins by ${Math.abs(g.score.home-g.score.away)}.</strong> Total offense: ${gameEscape(g.away.name)} ${g.teamStats.away.passYds+g.teamStats.away.rushYds} yards; ${gameEscape(g.home.name)} ${g.teamStats.home.passYds+g.teamStats.home.rushYds} yards.</p><p class="muted">The recap above is written from this box score. Quarter-by-quarter scores, attendance and the game clock are not recorded for this game.</p>${coachingReportHTML(g)}<h3>Game leaders</h3>`;
  for(const side of ['away','home']){html+=`<h4>${gameEscape(g[side].name)}</h4>`;for(const [label,key] of [['Passing','passYds'],['Rushing','rushYds'],['Receiving','recYds'],['Tackles','tackles']]){const p=g.playerStats[side].slice().sort((a,b)=>(b.stats[key]||0)-(a.stats[key]||0))[0];if(p?.stats[key])html+=`<div class="lineitem"><span>${label} · ${gameEscape(p.name)}</span><strong>${p.stats[key]}${key==='tackles'?'':' yds'}</strong></div>`}}
  html+='<h3>Scoring summary</h3>';const scoring=(g.drives||[]).filter(d=>d.points);html+=scoring.length?scoring.map(d=>`<div class="lineitem"><span>${gameEscape(d.label)} · ${gameEscape(g[d.side].name)}</span><strong>${gameEscape(d.result)} +${d.points}</strong></div>`).join(''):'<p class="muted">Individual scoring plays were not retained for this simulation.</p>';
  for(const s of ['away','home'])if(g.scoreAdjustment?.[s])html+=`<p class="muted">${gameEscape(g[s].name)}: ${g.scoreAdjustment[s]} additional simulation points (home-field/tiebreak adjustment; no scoring play recorded).</p>`;
@@ -6750,7 +6805,7 @@ function showGameCenter(id,tab='Summary'){
  $('#gamePregame').textContent=`Pregame: ${g.away.name} ${g.away.record} (#${g.away.rank??'—'}) · ${g.home.name} ${g.home.record} (#${g.home.rank??'—'})`;
  $$('#gameTabs button').forEach(b=>{b.classList.toggle('active',b.dataset.gameTab===tab);b.setAttribute('aria-pressed',String(b.dataset.gameTab===tab));if(b.dataset.gameTab==='Game Cast')b.hidden=!g.drives?.length});
  let html;if(tab==='Game Cast')html=gameCastHTML(g);else if(tab==='Watch')html=(typeof gameCastWatchHTML==='function'&&gameCastWatchHTML(g))||gameWatchHTML(g);else if(tab==='Box Score')html=gameBoxHTML(g);else if(tab==='Drives')html=gameDrivesHTML(g);else if(tab==='Play-by-Play'){const archived=(g.drives||[]).flatMap(d=>(d.playByPlay||[]).map(x=>`${d.label}: ${x}`)),d=universe.lastDetailedGame,lines=archived.length?archived:(d?.gameId===id?d.log||[]:[]);html=lines.length?`<p class="muted">${archived.length?'Archived generated play log.':'Temporary simulation log (last 160 entries).'} The drive model names primary players; box scores allocate production across the rotation. Clock and exact field position are unavailable.</p>`+lines.map(x=>`<div class="playline">${gameEscape(x)}</div>`).join(''):'<p>Play-by-play is unavailable for this archived game. Box scores and recorded drive summaries remain permanent.</p>'}else html=gameSummaryHTML(g);
- $('#gameDialogBody').innerHTML=html;if(tab==='Box Score')bindGameBoxControls();if(tab==='Game Cast')bindGameCast();const dialog=$('#gameDialog');if(!dialog.open)dialog.showModal();if(tab==='Watch'&&typeof bindGameCastWatch==='function')bindGameCastWatch();
+ $('#gameDialog').dataset.gameTab=tab;$('#gameDialogBody').innerHTML=html;if(tab==='Box Score')bindGameBoxControls();if(tab==='Game Cast')bindGameCast();const dialog=$('#gameDialog');if(!dialog.open)dialog.showModal();if(tab==='Watch'&&typeof bindGameCastWatch==='function')bindGameCastWatch();
 }
 function renderGameArchive(){
  if(gamesAreDeferred())return storageOperation(async()=>{await ensureGamesLoaded();renderGameArchive()});
@@ -7578,7 +7633,7 @@ function programHistoryHTML(t){
  const lineage=programCoachingLineage(t).slice(0,12).map(s=>
   `<div class="lineitem"><span>${s.name}<div class="small muted">${s.role}</div></span><strong>${s.startSeason}${s.endSeason&&s.endSeason!==s.startSeason?`–${s.endSeason}`:s.endSeason?'':'–present'}${s.reasonEnded?`<div class="small muted">${s.reasonEnded}</div>`:''}</strong></div>`
  ).join('');
- return `<div class="muted" style="margin-bottom:8px">${r.w}-${r.l} (${pct}%) over ${r.seasons} tracked season${r.seasons===1?'':'s'} · ${r.confTitles} conference title${r.confTitles===1?'':'s'} · ${r.natTitles} national title${r.natTitles===1?'':'s'}. Tracking began at v0.9.33; earlier seasons are not included.</div>${lineage||'<div class="muted">No coaching stints on record yet.</div>'}`;
+ return `<div class="muted" style="margin-bottom:8px">${r.w}-${r.l} (${pct}%) over ${r.seasons} tracked season${r.seasons===1?'':'s'} · ${r.confTitles} conference title${r.confTitles===1?'':'s'} · ${r.natTitles} national title${r.natTitles===1?'':'s'}. Seasons before tracking began are not included.</div>${lineage||'<div class="muted">No coaching stints on record yet.</div>'}`;
 }
 // One opponent, one week. Old full-scout saves still work; new plans expose
 // component tradeoffs used by both quick simulation and the drive model.
@@ -8982,7 +9037,22 @@ function renderProgramAttributes(u){
  const rows=[['Prestige',u.prestige],['Resources',u.resources],['NIL',u.nil],['Development',u.development],['Facilities',u.facilities],['Academics',u.academics]];
  host.innerHTML=`<div class="eyebrow">PROGRAM ATTRIBUTES</div><div class="program-attrs">${rows.map(([k,v])=>`<div class="program-attr"><span>${k}</span><strong>${v}</strong></div>`).join('')}</div>`;
 }
-function renderProgram(){const u=selected();renderProgramAttributes(u);ensureSeasonGoals(u);$('#programOverview')&&($('#programOverview').innerHTML=programOverviewHTML(u));$('#programGoals')&&($('#programGoals').innerHTML=seasonGoalsHTML(u));$('#editName').value=u.name;$('#editConference').value=u.conference;$('#editPrestige').value=u.prestige;$('#editResources').value=u.resources;$('#editNil').value=u.nil;$('#editDevelopment').value=u.development;$('#editFacilities').value=u.facilities;$('#editAcademics').value=u.academics;$('#careerHistory')&&($('#careerHistory').innerHTML=careerHistoryHTML());renderCareerPost();$('#programHistory')&&($('#programHistory').innerHTML=programHistoryHTML(selected()));$('#programDNA').innerHTML=[['Prestige',u.prestige],['Resources',u.resources],['NIL',u.nil],['Development',u.development],['Facilities',u.facilities],['Academics',u.academics],['Fan Support',u.fan_support],['Admin Patience',u.admin_patience],['Program Ceiling',u.program_ceiling],['Rivalry',u.rivalry?(rivalOf(u)?.name||'—'):'—'],['Trophy',u.rivalry?.trophy||'—'],['All-time series',rivalrySeriesText(u)||'—'],['Season expectation',seasonExpectation(u)+' wins'],['Admin confidence',(u.adminConfidence??'—')+' · '+adminConfidenceLabel(u.adminConfidence??50)],['Mandate',u.mandate?u.mandate.text:'None'],['NIL budget',nilSummaryText(u)],['Career',careerSummaryText()]].map(x=>`<div class="lineitem"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join('')}
+// Wins against what the administration expected, with its confidence as a line: direction at a
+// glance, from the tenure records the game already keeps (no extra save data).
+function programTrendsHTML(){
+ const rows=(universe.tenure?.seasons||[]).slice(-10);
+ const head='<div class="eyebrow">THIS TENURE</div><h3>Season by season</h3>';
+ if(rows.length<2)return `${head}<div class="muted">Complete two seasons to see the trend.</div>`;
+ const W=Math.max(320,rows.length*56+48),H=130,top=14,base=H-24,step=(W-40)/rows.length,barW=Math.min(30,step*.56);
+ const y=v=>base-(base-top)*Math.min(12,Math.max(0,v))/12,yc=v=>base-(base-top)*Math.min(100,Math.max(0,v))/100;
+ const x=i=>20+step*i+step/2;
+ const bars=rows.map((r,i)=>`<rect class="trend-bar${r.champ?' is-champ':r.confChamp?' is-conf':''}" x="${(x(i)-barW/2).toFixed(1)}" y="${y(r.w).toFixed(1)}" width="${barW.toFixed(1)}" height="${(base-y(r.w)).toFixed(1)}" rx="3"><title>${r.year}: ${r.w}-${r.l}, expected ${r.expected} wins</title></rect><line class="trend-exp" x1="${(x(i)-barW/2-3).toFixed(1)}" x2="${(x(i)+barW/2+3).toFixed(1)}" y1="${y(r.expected).toFixed(1)}" y2="${y(r.expected).toFixed(1)}"/><text class="trend-label" x="${x(i).toFixed(1)}" y="${H-8}" text-anchor="middle">${String(r.year).slice(2)}</text><text class="trend-val" x="${x(i).toFixed(1)}" y="${(y(r.w)-4).toFixed(1)}" text-anchor="middle">${r.w}</text>`).join('');
+ const line=rows.map((r,i)=>`${i?'L':'M'}${x(i).toFixed(1)} ${yc(r.after).toFixed(1)}`).join(' ');
+ const dots=rows.map((r,i)=>`<circle class="trend-dot" cx="${x(i).toFixed(1)}" cy="${yc(r.after).toFixed(1)}" r="3"><title>${r.year}: administration confidence ${r.after}</title></circle>`).join('');
+ const summary=`Wins by season: ${rows.map(r=>`${r.year} ${r.w} (expected ${r.expected})`).join(', ')}.`;
+ return `${head}<svg class="trend-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${summary}" preserveAspectRatio="xMinYMid meet">${bars}<path class="trend-line" d="${line}"/>${dots}</svg><div class="trend-key"><span><i class="k-bar"></i>Wins</span><span><i class="k-exp"></i>Expected</span><span><i class="k-line"></i>Administration confidence</span><span><i class="k-champ"></i>Conference or national title</span></div>`;
+}
+function renderProgram(){const u=selected();renderProgramAttributes(u);if($('#programTrends'))$('#programTrends').innerHTML=programTrendsHTML();ensureSeasonGoals(u);$('#programOverview')&&($('#programOverview').innerHTML=programOverviewHTML(u));$('#programGoals')&&($('#programGoals').innerHTML=seasonGoalsHTML(u));$('#editName').value=u.name;$('#editConference').value=u.conference;$('#editPrestige').value=u.prestige;$('#editResources').value=u.resources;$('#editNil').value=u.nil;$('#editDevelopment').value=u.development;$('#editFacilities').value=u.facilities;$('#editAcademics').value=u.academics;$('#careerHistory')&&($('#careerHistory').innerHTML=careerHistoryHTML());renderCareerPost();$('#programHistory')&&($('#programHistory').innerHTML=programHistoryHTML(selected()));$('#programDNA').innerHTML=[['Prestige',u.prestige],['Resources',u.resources],['NIL',u.nil],['Development',u.development],['Facilities',u.facilities],['Academics',u.academics],['Fan Support',u.fan_support],['Admin Patience',u.admin_patience],['Program Ceiling',u.program_ceiling],['Rivalry',u.rivalry?(rivalOf(u)?.name||'—'):'—'],['Trophy',u.rivalry?.trophy||'—'],['All-time series',rivalrySeriesText(u)||'—'],['Season expectation',seasonExpectation(u)+' wins'],['Admin confidence',(u.adminConfidence??'—')+' · '+adminConfidenceLabel(u.adminConfidence??50)],['Mandate',u.mandate?u.mandate.text:'None'],['NIL budget',nilSummaryText(u)],['Career',careerSummaryText()]].map(x=>`<div class="lineitem"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join('')}
 function applyProgramEdit(){const u=selected(),old=u.name,newName=$('#editName').value.trim()||old;if(/[<>"]/.test(newName)){alert('Program names cannot contain HTML markup or double quotes.');return}if(newName!==old&&T(newName)){alert('A program already uses that name.');return}u.name=newName;for(const [id,key] of [['editPrestige','prestige'],['editResources','resources'],['editNil','nil'],['editDevelopment','development'],['editFacilities','facilities'],['editAcademics','academics']])u[key]=clamp(parseInt($('#'+id).value||u[key],10),1,100);if(newName!==old){universe.schedule.flat().forEach(g=>{if(g.home===old)g.home=newName;if(g.away===old)g.away=newName});universe.teams.forEach(t=>t.schedule.forEach(g=>{if(g.home===old)g.home=newName;if(g.away===old)g.away=newName}));universe.recruits.forEach(r=>{if(r.leader===old)r.leader=newName;if(r.committed===old)r.committed=newName});for(const row of universe.signingDay?.board||[]){if(row.from===old)row.from=newName;if(row.challenger===old)row.challenger=newName}if(universe.recruitCycle?.signeesByTeam?.[old]!==undefined){universe.recruitCycle.signeesByTeam[newName]=universe.recruitCycle.signeesByTeam[old];delete universe.recruitCycle.signeesByTeam[old]}rebuildRecruitClassCounts();let opt=[...$('#userTeam').options].find(o=>o.value===old);if(opt){opt.value=newName;opt.textContent=newName}$('#userTeam').value=newName;rebuildIndexes()}ranked();render();setStatus('Program changes applied. Conference schedule will fully rebalance next season.')}
 function renderDevelopmentResults(u,ds){const available={SPRING:ds.springReport||[],FALL:ds.fallReport||[]};if(!available[developmentResultsPhase]?.length)developmentResultsPhase=available.FALL.length?'FALL':available.SPRING.length?'SPRING':'';const report=available[developmentResultsPhase]||[];$('#developmentResults').innerHTML=developmentResultsHTML(report,u,developmentResultsFilter,developmentResultsSort);$$('[data-development-phase]').forEach(b=>{b.disabled=!available[b.dataset.developmentPhase]?.length;b.classList.toggle('active',b.dataset.developmentPhase===developmentResultsPhase);b.onclick=()=>{developmentResultsPhase=b.dataset.developmentPhase;developmentResultsFilter='ALL';renderDevelopment()}});$$('[data-development-filter]').forEach(b=>b.onclick=()=>{developmentResultsFilter=b.dataset.developmentFilter;renderDevelopment()});const sort=$('#developmentResultsSort');if(sort)sort.onchange=()=>{developmentResultsSort=sort.value;renderDevelopment()};$$('[data-development-result]').forEach(b=>b.onclick=()=>{const x=report.find(x=>x.id===b.dataset.developmentResult),p=u.roster.find(p=>p.id===b.dataset.developmentResult);$('#developmentResultDetail').innerHTML=developmentResultDetailHTML(x,p)})}
 function renderDevelopmentBoard(){const u=selected(),ds=ensureDevelopmentState();ensureTeamDevelopment(u);for(const p of u.roster)ensurePlayerDevelopment(p,u);let focus=$('#teamTrainingFocus');if(focus){if(!focus.options.length)Object.keys(TEAM_TRAINING).forEach(x=>focus.add(new Option(x,x)));focus.value=u.trainingFocus;$('#trainingImpact').textContent=TEAM_TRAINING[u.trainingFocus]?.desc||''}let complete=universe.phase==='complete',os=normalizeOffseasonState();$('#runSpringCamp').disabled=!complete||os.phase!=='spring'||os.completed.includes('spring');$('#runFallCamp').disabled=!complete||os.phase!=='fall'||os.completed.includes('fall');$('#applyCampWinners').disabled=!ds.battles?.length;$('#campPhaseCard').innerHTML=complete?`<strong>${universe.year} offseason</strong><div class="compact muted">Spring development: ${ds.springRun?'complete':'not run'} · Fall camp: ${ds.fallRun?'complete':'not run'}</div>`:openingPreseason()?'<strong>Preseason setup</strong><div class="compact muted">Development priorities are editable now; camp actions unlock after the national championship.</div>':'<strong>In season</strong><div class="compact muted">Development planning is visible now; camp actions unlock after the national championship.</div>';let avgConf=Math.round(avg(u.roster.map(p=>{ensurePlayerDevelopment(p,u);return p.scoutConfidence}))),transition=u.roster.filter(p=>familiarity(p,p.pos)<80).length,young=u.roster.filter(p=>eligibilityBase(p)<=1).length;$('#developmentSummary').innerHTML=`<div class="lineitem"><span>Average scouting confidence</span><strong>${avgConf}%</strong></div><div class="lineitem"><span>Freshmen / sophomores</span><strong>${young}</strong></div><div class="lineitem"><span>Position-transition projects</span><strong>${transition}</strong></div><div class="lineitem"><span>Program development</span><strong>${grade(u.development)}</strong></div>`;renderDevelopmentResults(u,ds);
@@ -9979,6 +10049,35 @@ if(typeof module==='object'&&module.exports){
   toggle.textContent=open?`Show fewer ${fold.noun}`:`Show all ${rows.length} ${fold.noun}`;
  }
  for(const fold of FOLDS)extendRender(fold.view,()=>apply(fold));
+
+ // Whole blocks fold on a phone only. The Roles & Depth page repeats every role as a dense card
+ // (7,700px on a phone) after the formation view, which already covers the main roles; the cards
+ // stay for the extra roles, one tap away.
+ const BLOCKS=[{view:'depth',el:'#depthGrid',noun:'role controls',count:el=>el.querySelectorAll('select[data-role]').length}];
+ const phone=()=>!!window.matchMedia?.('(max-width:700px)').matches;
+ const blocksOpen=new Set();
+ function applyBlock(block){
+  const el=document.querySelector(block.el);if(!el||!el.parentElement)return;
+  let toggle=el.parentElement.querySelector(`[data-fold-toggle="${block.el}"]`);
+  if(!phone()){el.classList.remove('fold-block-collapsed');toggle?.remove();return}
+  const open=blocksOpen.has(block.el),n=block.count(el);
+  el.classList.toggle('fold-block-collapsed',!open);
+  if(!toggle){
+   toggle=document.createElement('button');toggle.type='button';toggle.className='fold-toggle';toggle.dataset.foldToggle=block.el;
+   el.before(toggle);
+   toggle.onclick=()=>{if(blocksOpen.has(block.el))blocksOpen.delete(block.el);else blocksOpen.add(block.el);applyBlock(block)};
+  }
+  toggle.setAttribute('aria-expanded',open?'true':'false');
+  toggle.textContent=open?`Hide ${block.noun}`:`Show all ${n} ${block.noun}`;
+ }
+ // Some views (Roles & Depth) have no extension render steps; wrap their tab renderer instead.
+ for(const block of BLOCKS){
+  if(typeof TAB_RENDERERS==='object'&&TAB_RENDERERS&&typeof TAB_RENDERERS[block.view]==='function'){
+   const base=TAB_RENDERERS[block.view];
+   TAB_RENDERERS[block.view]=function(){const out=base.apply(this,arguments);applyBlock(block);return out};
+  }else extendRender(block.view,()=>applyBlock(block));
+ }
+ window.matchMedia?.('(max-width:700px)').addEventListener?.('change',()=>BLOCKS.forEach(applyBlock));
 })();
 
 function makeRecruitCompareSystem(env){
@@ -13450,7 +13549,7 @@ function gamecenter(){
  const logos=[...h.querySelectorAll('.team-logo')],eventConference=CONF?.names.find(x=>(meta[3]||'').startsWith(x+' Championship'));
  let sb=head.querySelector('.scoreboard');if(!sb){sb=document.createElement('div');sb.className='scoreboard';h.after(sb)}
  const side=(name,score,win,role,logo)=>`<div class="sb-team${win?' winner':''}">${logo?`<div class="sports-mark large has-logo" style="${esc(logo.getAttribute('style')||'')}" aria-hidden="true"></div>`:mark(name,'large')}<div class="sb-copy"><span class="sb-role">${role}</span><strong>${esc(name)}</strong><small>${esc(rec(name))}</small></div><b class="sb-score">${esc(score)}</b></div>`;
- sb.innerHTML=side(away,as,aw,'AWAY',logos[0])+`<div class="sb-mid"${eventConference?` data-conference-brand="${esc(eventConference)}"`:''}>${eventConference?conferenceMark(eventConference,'sm'):''}<span class="sb-status">${esc(meta[0]||'FINAL')}</span><span>${esc(meta.slice(1,3).join(' · '))}</span><span>${esc(meta.slice(3).join(' · '))}</span></div>`+side(home,hs,hw,'HOME',logos[1]);
+ sb.innerHTML=side(away,as,aw,'AWAY',logos[0])+`<div class="sb-mid"${eventConference?` data-conference-brand="${esc(eventConference)}"`:''}>${eventConference?conferenceMark(eventConference,'sm'):''}<span class="sb-status">${esc(meta[0]||'FINAL')}</span><span>${esc(meta.slice(1,3).join(' · '))}</span><span>${esc(meta.slice(3).filter(x=>x!==home).join(' · '))}</span></div>`+side(home,hs,hw,'HOME',logos[1]);
  applyConferenceVars(sb);
  sb.classList.remove('scoreboard-enter');void sb.offsetWidth;sb.classList.add('scoreboard-enter');const scores=sb.querySelectorAll('.sb-score');animateNumber(scores[0],+as);animateNumber(scores[1],+hs);
  if(!dlg.dataset.motionCloseBound){dlg.dataset.motionCloseBound='1';dlg.addEventListener('close',()=>{delete dlg.dataset.sportsScoreKey;head.querySelector('.scoreboard')?.remove()})}
