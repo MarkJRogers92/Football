@@ -143,6 +143,7 @@
           <button id="simWeek">Sim Week</button>
           <button id="simSeason">Sim Regular Season</button>
         </div>
+        <p id="weekGateNote" class="gate-note" role="status" hidden></p>
       </div>
       <div class="card command-center">
         <div class="section-head"><div><div class="eyebrow">WEEKLY COMMAND CENTER</div><h2 id="hubTitle">Preseason Briefing</h2></div><button id="hubAdvance">Advance Week</button></div>
@@ -275,10 +276,12 @@
 
     <section id="program" class="panel tab">
       <div class="section-head"><div><h2>Program Lab</h2><div class="muted">Track the job, the board, the season and the institutional identity behind your dynasty.</div></div></div><div class="card"><div class="eyebrow">PROGRAM OVERVIEW</div><div id="programOverview"></div></div>
+      <div class="card" id="programAttributes"></div>
+      <div class="card" id="programTrends"></div>
       <div id="programEditNotice" class="card muted"></div>
-      <div class="card editor-grid">
+      <div class="card editor-grid" id="programEditor">
         <label>School name<input id="editName" type="text"></label>
-        <label>Conference (fixed in v0.4)<select id="editConference" disabled></select></label>
+        <label>Conference (fixed)<select id="editConference" disabled></select></label>
         <label>Prestige<input id="editPrestige" type="number" min="1" max="100"></label>
         <label>Resources<input id="editResources" type="number" min="1" max="100"></label>
         <label>NIL<input id="editNil" type="number" min="1" max="100"></label>

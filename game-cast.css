@@ -96,3 +96,11 @@
 .gc-watch-foot{margin:0}
 .gc-watch-cta{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
 @media(max-width:560px){.gcf-bug{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:'away home' 'sit sit';font-size:.76rem;padding:6px 8px;gap:4px 10px}.gcf-team.away{grid-area:away}.gcf-team.home{grid-area:home}.gcf-situation{grid-area:sit;grid-auto-flow:column;justify-content:center;gap:8px}.gcf-team strong{font-size:1.1rem}.gcf-controls{grid-template-columns:minmax(0,1fr)}.gcf-transport{justify-content:center}.gcf-options{justify-content:stretch}.gcf-options select{flex:1 1 140px}}
+
+/* v0.14.1: the Watch view was 998px tall inside an 810px dialog (630px on a 700px laptop), which put
+   the playback controls below the fold. The controls now stay pinned to the bottom of the dialog while
+   the field scrolls, the field follows the viewport height on short screens, and the Watch tab drops the
+   meta line that repeats what the header already says. */
+.gcf-stage canvas{max-height:max(260px,calc(100vh - 480px));object-fit:contain}
+.gcf-controls{position:sticky;bottom:0;z-index:3;background:var(--panel);padding:8px 0 10px;border-top:1px solid var(--line)}
+.game-dialog[data-game-tab="Watch"] #gameDialogMeta{display:none}

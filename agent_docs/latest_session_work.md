@@ -1,5 +1,41 @@
 # Latest Session Work
 
+## v0.14.1 — Visual pass (2026-11-04)
+
+- Game Day review method: script `watch -> skip to end -> every tab` at 1440 and 390 wide; measured dialog content height against dialog
+  height, controls' bounding boxes against the dialog's, unlabeled controls, leaked placeholders and version labels. Game Day is the
+  strongest screen; findings were layout (phone header, Watch view fit), not bugs.
+- `game-cast.css`: `.gcf-controls` is `position:sticky;bottom:0` inside the dialog scroller; `app.js` sets `dialog.dataset.gameTab` so CSS can
+  hide `#gameDialogMeta` in Watch. The scoreboard is built in `sports-presentation.js` from the dialog meta line (venue is
+  "<home team> · <city>", filtered against the home name). Phone rules are at the end of `polish.css`.
+- `renderGateNote` in `app.js` is the shared "why is this locked" renderer (Game Lab and dashboard hero).
+- `table-folding.js` now also folds whole blocks on phones (`BLOCKS`); Roles & Depth has no extension render steps, so it wraps
+  `TAB_RENDERERS.depth` instead of `extendRender`.
+- Do not fabricate quarter scores: archived drives store points and result but not the quarter, and the Watch clock labels are reconstructed
+  by `game-cast-field.js` `timeline()`. Real quarter scores need the engine to record the quarter per scoring drive.
+- An overlap detector (leaf elements' bounding boxes intersecting inside one cell) found 22 overlaps in the old phone training rows and 0 after
+  the fix; run it against `git show HEAD:index.html` to prove a detector can fail before trusting it.
+- Corrected earlier claim: the ticker already paused on hover and respected reduced motion.
+- Working agreement from the owner: skip the full local gate for UI batches; run targeted suites for what changed plus the PR's CI.
+
+
+## v0.14.0 — A contested rising class (2026-11-04)
+
+- `app.js`: `applyEarlyCommitments` (constants `EARLY_COMMIT_POOL=150`, `EARLY_COMMIT_CHANCE`, `EARLY_COMMIT_PROTECTED=.25`,
+  `EARLY_COMMIT_MARGIN=4`) runs inside `offseasonPreseason` AFTER `rollRecruitClass(); recruitClassCounts={}` and after the per-team
+  `t.commits=[]` reset, because `commitRecruit` writes both. Calling it earlier silently loses the counts. `rollRecruitClass` tags
+  promoted prospects `fromRisingClass` and moves a watched prospect's `manualScouting[userId].season` to the new year so Film Reviewed
+  survives (the record is season-scoped; `scoutingDomains` itself already carried).
+- `scouting-actions.js`: the button handler uses `findRecruitAnyClass` (current class then `risingClass`) and exports `scoutingHoursInfo`.
+  `rising-class.js` renders the verdict, evidence level, rival standing (`standingFor`, cached per prospect and week) and the scouting
+  buttons for watched rows.
+- Harness: extension variables (`recruitScoutingRecord`, `scoutingHoursInfo`, `recruitStaffVerdict`) exist only with
+  `loadEngine({ fullRuntime: true })`; export them behind `typeof x === 'undefined'` or the default harness throws at load.
+- Measured, not assumed: about 33 early commits per rollover; protection depends on the user's program (prestige 92: 9% watched vs 28%
+  unwatched locked early; a weak program: 29% vs 28%). 10-season runs on three seeds match v0.13.1 on prestige spread, talent and save size.
+- Open: no in-season AI pursuit of the rising class, no visit action for rising prospects, and the rising list is only top 600.
+
+
 ## v0.13.1 — Playthrough polish (2026-11-04)
 
 - Method that worked: a scripted browser playthrough (`new dynasty -> resolve weekly decisions -> #simWeek` six times) then a sweep of

@@ -116,3 +116,33 @@ th.sortable{cursor:pointer;user-select:none;white-space:nowrap}th.sortable:hover
 .tab-groups button{background:transparent;border:1px solid transparent;border-radius:999px;padding:6px 13px;font-weight:700;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
 .tab-groups button:hover{color:var(--text)}
 .tab-groups button.active{background:var(--panel2);border-color:var(--line);color:var(--text)}
+
+.program-attrs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-top:10px}
+.program-attr{display:grid;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.02)}
+.program-attr span{color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.program-attr strong{font-size:1.35rem;font-variant-numeric:tabular-nums}
+.program-attr strong+*{display:none}
+#programEditor[hidden],#programAttributes[hidden]{display:none}
+@media(max-width:900px){.program-attrs{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+.trend-chart{width:100%;max-width:760px;height:auto;display:block;margin:8px 0 4px}
+.trend-bar{fill:rgba(143,177,255,.38)}
+.trend-bar.is-conf,.trend-bar.is-champ{fill:#f2c14e}
+.trend-exp{stroke:#e8eef7;stroke-width:2;stroke-linecap:round;opacity:.85}
+.trend-line{fill:none;stroke:#7ee0a0;stroke-width:2;stroke-linejoin:round}
+.trend-dot{fill:#7ee0a0}
+.trend-label,.trend-val{fill:var(--muted);font-size:10px}
+.trend-val{fill:var(--text);font-weight:700}
+.trend-key{display:flex;flex-wrap:wrap;gap:6px 16px;color:var(--muted);font-size:.76rem}
+.trend-key i{display:inline-block;vertical-align:middle;margin-right:6px}
+.trend-key .k-bar{width:10px;height:10px;border-radius:2px;background:rgba(143,177,255,.5)}
+.trend-key .k-exp{width:14px;height:2px;background:#e8eef7}
+.trend-key .k-line{width:14px;height:2px;background:#7ee0a0}
+.trend-key .k-champ{width:10px;height:10px;border-radius:2px;background:#f2c14e}
+
+/* v0.14.1: on a phone the training-row read cells wrapped their contents into overlapping boxes */
+@media(max-width:700px){
+ #trainingBody td[data-label="Current Read"],#trainingBody td[data-label="Potential Read"]{flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:2px 10px;text-align:right}
+ #trainingBody .scout-range{display:inline-flex;gap:6px;align-items:baseline}
+ #trainingBody td[data-label] .small.muted{flex-basis:100%;display:flex;justify-content:flex-end}
+}

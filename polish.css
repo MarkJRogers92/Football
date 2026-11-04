@@ -545,3 +545,26 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
   .portal-filters label{flex:1 1 140px}
   .portal-filters select{max-width:none;width:100%}
 }
+
+/* v0.14.1: Game Center on a phone. The tab strip wrapped into two uneven rows and the scoreboard
+   stacked two full-width cards (about 330px before the first tab); the Watch title wrapped to three
+   lines. One scrolling row of tabs, a two-column scoreboard, no title logos. */
+@media(max-width:720px){
+  #gameTabs{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  #gameTabs::-webkit-scrollbar{display:none}
+  #gameTabs button{flex:0 0 auto}
+  .sports-game-dialog .scoreboard{grid-template-columns:1fr 1fr;gap:8px}
+  .sports-game-dialog .sb-mid{grid-column:1/-1;order:3;padding-top:2px}
+  .sports-game-dialog .sb-team{grid-template-columns:minmax(0,1fr) auto;padding:8px 10px}
+  .sports-game-dialog .sb-team .sports-mark{display:none}
+  .sports-game-dialog .sb-team strong{font-size:13px}
+  .sports-game-dialog .sb-score{font-size:28px}
+  #gameDialogName{font-size:1.05rem;line-height:1.3}
+  #gameDialogName .team-logo{display:none}
+}
+@media(max-width:720px){
+  .sports-game-dialog .sb-team{gap:6px;padding:8px}
+  .sports-game-dialog .sb-team strong{font-size:12px}
+  .sports-game-dialog .sb-score{font-size:26px;min-width:30px}
+  .sports-game-dialog .sb-team.winner .sb-score::after{display:none}
+}

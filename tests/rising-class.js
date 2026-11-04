@@ -79,3 +79,85 @@ test('a full offseason carries a watched prospect onto the next board',async()=>
  assert.equal(r.targeted,true);assert.equal(r.watchedHeadStart,true);
  assert.equal(u.risingClass.length,e.RISING_CLASS_SIZE);
 });
+
+// --- v0.14.0: scouting and early commitments make the rising class contested -------------------
+
+// Mirrors what the offseason does before it calls applyEarlyCommitments().
+function rollAndPursue(e){
+ const u=e.universe;
+ e.rollRecruitClass();u.recruitClassCounts={};u.teams.forEach(t=>{t.commits=[]});
+ return e.applyEarlyCommitments();
+}
+
+test('scouting a watched rising prospect works and its completion carries across the rollover',async()=>{
+ const e=loadEngine({seed:9911,fullRuntime:true});e.setUserTeam('Chicago Metropolitan');await e.loadSchools();e.initUniverse();
+ const u=e.universe,t=u.teams.find(x=>x.name==='Chicago Metropolitan');
+ const prospect=u.risingClass[3];e.toggleRisingWatch(prospect.id);
+ assert.equal(e.findRecruitAnyClass(prospect.id),prospect,'the lookup finds a rising prospect');
+ assert.ok(e.findRecruitAnyClass(u.recruits[0].id),'and a current-class recruit');
+ assert.equal(e.findRecruitAnyClass('nobody'),null);
+ const before=e.scoutingHoursInfo(t);
+ // Mark film as reviewed the way performScoutingAction records it.
+ const rec=e.recruitScoutingRecord(prospect,t,true);rec.quick=true;
+ assert.equal(e.recruitScoutingRecord(prospect,t,false).quick,true);
+ e.rollRecruitClass();
+ const promoted=u.recruits.find(r=>r.id===prospect.id);
+ assert.equal(e.recruitScoutingRecord(promoted,t,false).quick,true,'Film Reviewed survives the season change');
+ assert.ok(before.budget>=8&&before.left<=before.budget);
+});
+
+test('early commitments: only rising prospects, only to rivals, within the pool, counts consistent',async()=>{
+ const e=await setup(9912),u=e.universe,user='Chicago Metropolitan';
+ for(const r of u.risingClass.slice(0,6))e.toggleRisingWatch(r.id);
+ const log=rollAndPursue(e);
+ const early=u.recruits.filter(r=>r.earlyCommit);
+ assert.equal(log.total,early.length);
+ assert.ok(early.length>0&&early.length<=e.EARLY_COMMIT_POOL,`some, never more than the pool (${early.length})`);
+ assert.ok(early.every(r=>r.fromRisingClass&&r.committed&&r.committed!==user&&r.commitWeek===0),'rising prospects commit to rivals at week 0');
+ assert.ok(early.every(r=>r.nationalRank<=u.recruits.filter(x=>x.fromRisingClass).length),'drawn from the rising class');
+ const top=new Set(u.recruits.filter(r=>r.fromRisingClass).sort((a,b)=>a.nationalRank-b.nationalRank).slice(0,e.EARLY_COMMIT_POOL).map(r=>r.id));
+ assert.ok(early.every(r=>top.has(r.id)),'only the top of the class is eligible');
+ assert.ok(early.every(r=>r.stars>=3),'only 3-star and better lock early');
+ assert.ok(u.recruits.filter(r=>!r.fromRisingClass).every(r=>!r.committed),'the rest of the class is untouched');
+ for(const t of u.teams){
+  const n=u.recruits.filter(r=>r.committed===t.name).length;
+  assert.equal(e.classCommitCount(t.name),n,`${t.name} class count matches its commits`);
+  assert.equal(t.commits.length,n);
+  assert.ok(n<=e.scholarshipCapacity(t)+3,`${t.name} stays within its scholarship room`);
+ }
+ assert.equal(log.watched,6);assert.equal(log.kept+log.lost.length,log.watched);
+ assert.ok(log.lost.every(x=>u.recruits.find(r=>r.id===x.id).committed===x.to&&x.to!==user));
+ assert.deepEqual(u.earlyCommitLog,log);
+});
+
+test('watching a prospect protects him from an early commitment',async()=>{
+ const e=await setup(9913),u=e.universe;
+ let watchedEarly=0,watchedN=0,openEarly=0,openN=0;
+ for(let cycle=0;cycle<36;cycle++){
+  const top=u.risingClass.slice().sort((a,b)=>a.nationalRank-b.nationalRank).slice(0,15),watching=cycle%2===0;
+  if(watching)for(const r of top)e.toggleRisingWatch(r.id);
+  const ids=new Set(top.map(r=>r.id));
+  rollAndPursue(e);
+  for(const r of u.recruits)if(ids.has(r.id)){
+   if(watching){watchedN++;if(r.earlyCommit)watchedEarly++}else{openN++;if(r.earlyCommit)openEarly++}
+  }
+ }
+ const watched=watchedEarly/watchedN,open=openEarly/openN;
+ assert.ok(open>.12,`unwatched top prospects are often locked early (${(open*100).toFixed(0)}%)`);
+ assert.ok(watched<open*.7,`watched ones are protected: ${(watched*100).toFixed(0)}% vs ${(open*100).toFixed(0)}% locked early`);
+ assert.ok(watched>0,'protection is not absolute: a watched prospect can still be lost');
+});
+
+test('early commitments do not distort the class or the season that follows',async()=>{
+ const e=await setup(9914),u=e.universe;
+ for(let i=0;i<3;i++){
+  const before=u.recruits.length;
+  const log=rollAndPursue(e);
+  assert.equal(u.recruits.length,2800);assert.ok(log.total<60,`a modest number lock early (${log.total})`);
+ }
+ // A real offseason still reaches the next season and the class fills normally.
+ e.simSeason();e.simConferenceChampionships();e.simPlayoff();e.runSpringCamp();e.runFallCamp();e.runOffseason();
+ const sizes=u.teams.map(t=>u.recruits.filter(r=>r.committed===t.name).length);
+ assert.equal(u.year,2028);assert.ok(Math.max(...sizes)<=28&&Math.min(...sizes)>=0);
+ assert.ok(u.earlyCommitLog&&u.earlyCommitLog.year===2028,'the offseason ran the early-commit step');
+});

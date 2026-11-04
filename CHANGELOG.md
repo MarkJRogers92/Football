@@ -1,5 +1,32 @@
 # Changelog
 
+## v0.14.1 — Visual pass
+
+From a review of the Game Day screens and a second look at every tab. Presentation only: no simulation, balance or save-shape changes.
+
+- **Game Center.** The Watch view needed 998 px inside an 810 px dialog (630 px on a 700 px laptop), which put the playback controls below the fold; they now stay pinned to the bottom of the dialog, the field follows the viewport height on short screens, and the Watch tab drops a meta line that repeated the header. On a phone the scoreboard went from about 330 px to about 110 px (two columns, no stacked cards), the tab strip is one scrolling row instead of two uneven ones, and the Watch title takes two lines. The scoreboard no longer repeats the home team in the venue line ("Regular season · Chicago Metropolitan · Chicago" is now "Regular season · Chicago"). The recap limits read as plain language ("Quarter-by-quarter scores, attendance and the game clock are not recorded for this game"). Quarter scores themselves need the engine to record the quarter per scoring drive; the Watch view's clock labels are reconstructed, so they were not used.
+- **Dashboard says why Sim Week is locked.** The hero showed a dimmed *Sim Week* with the reason only in a tooltip and the *Resolve required decision* button far below the fold. It now shows the reason, the *Sim Regular Season and your staff will decide* alternative, and a *Go to decisions* button (the same note Game Lab got in v0.13.1, now one shared renderer).
+- **Program Lab.** In Dynasty Mode the edit form is hidden (it showed editable-looking fields above a disabled *Apply Program Changes*); the attributes are six read-only tiles, and the form appears only in Commissioner Mode. A new *Season by season* chart draws wins against the administration's expectation with confidence as a line, from the tenure records the game already keeps. Two leftover version labels are gone ("Conference (fixed in v0.4)", "Tracking began at v0.9.33"); the browser test now checks every tab for a `vN.N.N` label.
+- **Navigation icons** in the sidebar and the phone bottom bar.
+- **Staff tab text** is no longer 7 to 9 px (labels and metadata are 10 to 11 px).
+- **Phone ticker** is one still headline instead of a scrolling marquee, and pauses for keyboard focus too (hover pause and reduced-motion handling already existed).
+- **Roles & Depth on a phone** folds the dense role cards (7,700 px) behind *Show all N role controls*; desktop is unchanged.
+- **Phone training rows** no longer wrap their *Current read* cells into overlapping boxes (checked programmatically: 22 overlaps before, none after).
+- **Tooling.** `tests/ui-upgrades.js` (trend chart) and `tests/ui-upgrades-browser.js` (desktop and phone, including a 700 px-tall viewport for the pinned controls).
+- **Not done:** real quarter scores, and History's index on a phone (about 3,700 px).
+
+## v0.14.0 — A contested rising class
+
+v0.13.0 added next year's top prospects as a read-only list. They are now something you scout and something rivals can take.
+
+- **Scout watched prospects.** A watched rising prospect shows the staff verdict with its evidence level (Preliminary, Film reviewed, Full evaluation) and the same *Quick Film · 1h* and *Full Evaluation · 3h* actions as the current class. They spend the weekly evaluation hours, which are shared with your current class, so scouting a junior costs scouting a senior. Film Reviewed / Full Evaluation completion carries across the class rollover (those flags are season-scoped; the intel itself already carried).
+- **Rivals pursue them early.** At rollover, the top 150 rising prospects (3-star and up) can commit to their best rival before the season starts: 5-stars 35%, 4-stars 22%, 3-stars 8% (`applyEarlyCommitments`). About 33 prospects lock early per rollover, 1.2% of the class. They commit at week 0 like any other commitment, count against the rival's scholarship room, and can still be flipped later by the existing in-season race.
+- **Watching protects you, if you can compete.** A watched prospect is mostly protected (chance x0.25) only while your projected pitch (a target's +10 and the relationship head start included) is within 4 of the leading rival. A watched prospect you are trailing is as exposed as an unwatched one. Measured over 40 rollovers: for a prestige-92 program, watched top-15 prospects were locked early 9% of the time against 28% unwatched; for a weak program watching barely helped (29%), because it cannot out-pitch the leaders.
+- **The card tells you where you stand.** Each watched row shows the leading rival and *Holding* (green) or *Trailing* (amber) with the gap, the shared evaluation hours, and, after a rollover, how many watched prospects are still available and which ones went elsewhere.
+- **Balance.** Over 10 seasons on three seeds, prestige spread, talent and save size match v0.13.1 (prestige sd 14.5 / 14.6 / 14.4, trueNow 65.5 / 65.7 / 65.8, save about 125 MB at season 10). Same seeds give different universes than v0.13.1 (the offseason draws extra random numbers).
+- **Tooling.** `tests/rising-class.js` grows to nine tests (protection is checked statistically, plus pool bounds, class counts and a full offseason); the browser test covers scouting, hours and standings on desktop and phone. The harness exports the scouting helpers when `loadEngine({ fullRuntime: true })`.
+- **Not done:** AI programs still do not pursue the rising class during the season (only at rollover), and there is no visit action for rising prospects.
+
 ## v0.13.1 — Playthrough polish
 
 Found by playing six weeks in a browser and sweeping every tab at desktop and phone width.

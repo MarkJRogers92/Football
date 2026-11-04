@@ -81,7 +81,7 @@ function makeScoutingActionSystem(env){
 // Shared with later browser-only recruiting extensions in the same app closure.
 // `var` is intentional: block-scoped declarations in this branch are invisible
 // to sibling extension blocks when the standalone page runs in strict mode.
-var recruitScoutingRecord,recruitStaffVerdict,scoutingActionButtonsHTML,bindScoutingActionButtons;
+var recruitScoutingRecord,recruitStaffVerdict,scoutingActionButtonsHTML,bindScoutingActionButtons,scoutingHoursInfo;
 if(typeof module==='object'&&module.exports){
  module.exports={makeScoutingActionSystem};
 }else{
@@ -93,6 +93,7 @@ if(typeof module==='object'&&module.exports){
  const scoutingHoursLeft=recruitScoutingActions.scoutingHoursLeft;
  recruitScoutingRecord=recruitScoutingActions.recruitScoutingRecord;
  const scoutingActionAvailability=recruitScoutingActions.actionAvailability;
+ scoutingHoursInfo=t=>{const w=ensureScoutingWeek(t);return{left:scoutingHoursLeft(t),budget:w.budget}};
  recruitStaffVerdict=recruitScoutingActions.staffVerdict;
  const performRecruitScoutingAction=recruitScoutingActions.performScoutingAction;
  function scoutingVerdictHTML(r,t,compact=false){
@@ -106,7 +107,8 @@ if(typeof module==='object'&&module.exports){
  };
  bindScoutingActionButtons=function(){
   $$('[data-scout-action]').forEach(b=>b.onclick=()=>{
-   const r=universe.recruits.find(x=>String(x.id)===String(b.dataset.scoutRecruit)),t=selected(),dialog=b.closest?.('#recruitDialog');
+   const r=findRecruitAnyClass(b.dataset.scoutRecruit),t=selected(),dialog=b.closest?.('#recruitDialog');
+   if(!r||!t)return;
    const res=performRecruitScoutingAction(r,t,b.dataset.scoutAction);
    setStatus(res.ok?`${res.label}: ${r.name}. Staff verdict: ${res.verdict.label}. ${res.remaining} evaluation hour${res.remaining===1?'':'s'} left this week.`:res.reason);
    renderRecruiting();

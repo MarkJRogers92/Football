@@ -45,7 +45,7 @@ const tab = (page, id) => page.evaluate(t => document.querySelector(`.tabs butto
       assert.equal(await page.locator('#watchDetailedGame').isDisabled(), true, `[${label}] watch is gated`);
       assert.match(await page.locator('#watchDetailedGame').getAttribute('title'), /Coach’s Desk/, `[${label}] the disabled button carries the reason as a tooltip`);
       assert.doesNotMatch(await page.locator('#gamelab .section-head').first().innerText(), /drive\/play engine|fast-sims/, `[${label}] intro is plain language`);
-      await page.click('.gate-note-go');
+      await page.click('#detailedGateNote .gate-note-go');
       await page.waitForFunction(() => document.querySelector('#dashboard')?.classList.contains('active'));
       for (let guard = 0; guard < 12 && await page.$eval('#simWeek', el => el.disabled); guard++) {
         const resolved = await page.evaluate(() => {
