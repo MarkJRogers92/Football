@@ -118,6 +118,14 @@ th.sortable{cursor:pointer;user-select:none;white-space:nowrap}th.sortable:hover
 .tab-groups button:hover{color:var(--text)}
 .tab-groups button.active{background:var(--panel2);border-color:var(--line);color:var(--text)}
 
+.program-attrs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-top:10px}
+.program-attr{display:grid;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.02)}
+.program-attr span{color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.program-attr strong{font-size:1.35rem;font-variant-numeric:tabular-nums}
+.program-attr strong+*{display:none}
+#programEditor[hidden],#programAttributes[hidden]{display:none}
+@media(max-width:900px){.program-attrs{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
 /* Dynasty Lab visual identity layer
    Presentation-only overrides. Keep simulation, save state, and game logic out of this file. */
 
@@ -813,7 +821,7 @@ tr[hidden]{display:none!important}
 .rd-position-group.rd-collapsed>header[aria-expanded]::after{transform:rotate(-90deg)}
 @media(max-width:700px){.rd-table-toggle{justify-self:stretch}}
 
-.staff-organization-board{display:grid;gap:14px;margin:0 0 18px}.so-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;padding:17px 18px;border:1px solid var(--line,#26323e);border-radius:14px;background:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,.012))}.so-head h2{margin:3px 0 4px;font-size:25px}.so-head p{margin:0;max-width:760px;color:var(--muted,#8e9aa6)}.so-summary{display:flex;align-items:stretch;gap:7px;flex-wrap:wrap;justify-content:flex-end}.so-summary>div{display:grid;gap:2px;min-width:105px;padding:8px 10px;border-left:1px solid rgba(255,255,255,.09)}.so-summary span{font-size:8px;letter-spacing:.09em;color:var(--muted,#8e9aa6)}.so-summary strong{font-size:12px}.staff-org-chart{display:grid;justify-items:center;position:relative;padding:2px 0}.staff-org-node{min-width:0;border:1px solid var(--line,#26323e);border-radius:13px;background:rgba(7,12,18,.82);overflow:hidden}.staff-org-hc{width:min(620px,100%);border-color:color-mix(in srgb,var(--accent,#a8b5c2) 42%,var(--line,#26323e));box-shadow:inset 0 3px 0 var(--accent,#a8b5c2)}.staff-org-spine{width:1px;height:24px;background:linear-gradient(var(--accent,#a8b5c2),rgba(255,255,255,.11))}.staff-org-departments{position:relative;width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.staff-org-departments:before{content:"";position:absolute;left:12.5%;right:12.5%;top:-1px;height:1px;background:rgba(255,255,255,.13)}.staff-org-department{position:relative}.staff-org-department:before{content:"";position:absolute;left:50%;top:-10px;width:1px;height:10px;background:rgba(255,255,255,.13)}.so-node-lane{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.06);font-size:8px;font-weight:800;letter-spacing:.11em;color:var(--muted,#8e9aa6);background:rgba(255,255,255,.024)}.so-node-title{display:flex;align-items:center;gap:6px;padding:11px 11px 1px}.so-coach-name{min-width:0;padding:0;border:0;background:transparent;font-size:16px;font-weight:850;color:var(--text,#e7edf3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.staff-org-hc .so-coach-name{font-size:22px}.so-coach-name:hover{text-decoration:underline}.so-node-role{padding:0 11px;font-size:10px;color:var(--muted,#8e9aa6)}.so-node-meta{padding:5px 11px 8px;font-size:9px;color:var(--muted,#8e9aa6)}.so-node-focus{display:grid;gap:2px;margin:0 10px 9px;padding:8px 9px;border-left:2px solid var(--accent,#a8b5c2);background:rgba(255,255,255,.025)}.so-node-focus b{font-size:11px}.so-node-focus span{font-size:9px;color:var(--muted,#8e9aa6)}.so-metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;padding:0 9px 9px}.so-metric{display:grid;justify-items:center;gap:2px;padding:5px 2px;border:1px solid rgba(255,255,255,.055);border-radius:7px;background:rgba(255,255,255,.02)}.so-metric b{font-size:7px;font-weight:600;color:var(--muted,#8e9aa6)}.so-metric strong{font-size:11px}.so-node-foot{display:grid;gap:2px;padding:8px 10px;border-top:1px solid rgba(255,255,255,.055);font-size:9px}.so-node-foot span:nth-child(2),.so-node-foot small{color:var(--muted,#8e9aa6)}.so-note{padding:0 4px;font-size:10px;color:var(--muted,#8e9aa6)}@media(max-width:1180px){.staff-org-departments{grid-template-columns:repeat(2,minmax(0,1fr));}.staff-org-departments:before,.staff-org-department:before{display:none}.staff-org-spine{height:12px}}@media(max-width:700px){.so-head{display:grid;align-items:start;padding:14px}.so-summary{justify-content:flex-start;display:grid;grid-template-columns:1fr 1fr;width:100%}.so-summary>div{border-left:0;border-top:1px solid rgba(255,255,255,.07);padding-left:0}.staff-org-hc{width:100%}.staff-org-departments{grid-template-columns:1fr}.staff-org-spine{height:10px}.so-metrics{grid-template-columns:repeat(5,minmax(42px,1fr));overflow-x:auto}.so-node-title{align-items:flex-start}.so-coach-name{white-space:normal;text-align:left}}@media(prefers-reduced-motion:reduce){.staff-organization-board *{transition:none!important;scroll-behavior:auto!important}}
+.staff-organization-board{display:grid;gap:14px;margin:0 0 18px}.so-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;padding:17px 18px;border:1px solid var(--line,#26323e);border-radius:14px;background:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,.012))}.so-head h2{margin:3px 0 4px;font-size:25px}.so-head p{margin:0;max-width:760px;color:var(--muted,#8e9aa6)}.so-summary{display:flex;align-items:stretch;gap:7px;flex-wrap:wrap;justify-content:flex-end}.so-summary>div{display:grid;gap:2px;min-width:105px;padding:8px 10px;border-left:1px solid rgba(255,255,255,.09)}.so-summary span{font-size:10px;letter-spacing:.09em;color:var(--muted,#8e9aa6)}.so-summary strong{font-size:12px}.staff-org-chart{display:grid;justify-items:center;position:relative;padding:2px 0}.staff-org-node{min-width:0;border:1px solid var(--line,#26323e);border-radius:13px;background:rgba(7,12,18,.82);overflow:hidden}.staff-org-hc{width:min(620px,100%);border-color:color-mix(in srgb,var(--accent,#a8b5c2) 42%,var(--line,#26323e));box-shadow:inset 0 3px 0 var(--accent,#a8b5c2)}.staff-org-spine{width:1px;height:24px;background:linear-gradient(var(--accent,#a8b5c2),rgba(255,255,255,.11))}.staff-org-departments{position:relative;width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.staff-org-departments:before{content:"";position:absolute;left:12.5%;right:12.5%;top:-1px;height:1px;background:rgba(255,255,255,.13)}.staff-org-department{position:relative}.staff-org-department:before{content:"";position:absolute;left:50%;top:-10px;width:1px;height:10px;background:rgba(255,255,255,.13)}.so-node-lane{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.06);font-size:10px;font-weight:800;letter-spacing:.11em;color:var(--muted,#8e9aa6);background:rgba(255,255,255,.024)}.so-node-title{display:flex;align-items:center;gap:6px;padding:11px 11px 1px}.so-coach-name{min-width:0;padding:0;border:0;background:transparent;font-size:16px;font-weight:850;color:var(--text,#e7edf3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.staff-org-hc .so-coach-name{font-size:22px}.so-coach-name:hover{text-decoration:underline}.so-node-role{padding:0 11px;font-size:11px;color:var(--muted,#8e9aa6)}.so-node-meta{padding:5px 11px 8px;font-size:11px;color:var(--muted,#8e9aa6)}.so-node-focus{display:grid;gap:2px;margin:0 10px 9px;padding:8px 9px;border-left:2px solid var(--accent,#a8b5c2);background:rgba(255,255,255,.025)}.so-node-focus b{font-size:11px}.so-node-focus span{font-size:11px;color:var(--muted,#8e9aa6)}.so-metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;padding:0 9px 9px}.so-metric{display:grid;justify-items:center;gap:2px;padding:5px 2px;border:1px solid rgba(255,255,255,.055);border-radius:7px;background:rgba(255,255,255,.02)}.so-metric b{font-size:10px;font-weight:600;color:var(--muted,#8e9aa6)}.so-metric strong{font-size:11px}.so-node-foot{display:grid;gap:2px;padding:8px 10px;border-top:1px solid rgba(255,255,255,.055);font-size:11px}.so-node-foot span:nth-child(2),.so-node-foot small{color:var(--muted,#8e9aa6)}.so-note{padding:0 4px;font-size:11px;color:var(--muted,#8e9aa6)}@media(max-width:1180px){.staff-org-departments{grid-template-columns:repeat(2,minmax(0,1fr));}.staff-org-departments:before,.staff-org-department:before{display:none}.staff-org-spine{height:12px}}@media(max-width:700px){.so-head{display:grid;align-items:start;padding:14px}.so-summary{justify-content:flex-start;display:grid;grid-template-columns:1fr 1fr;width:100%}.so-summary>div{border-left:0;border-top:1px solid rgba(255,255,255,.07);padding-left:0}.staff-org-hc{width:100%}.staff-org-departments{grid-template-columns:1fr}.staff-org-spine{height:10px}.so-metrics{grid-template-columns:repeat(5,minmax(42px,1fr));overflow-x:auto}.so-node-title{align-items:flex-start}.so-coach-name{white-space:normal;text-align:left}}@media(prefers-reduced-motion:reduce){.staff-organization-board *{transition:none!important;scroll-behavior:auto!important}}
 
 #playerDialog.player-identity-enhanced{width:min(1020px,calc(100% - 28px));--pi-primary-rgb:var(--program-primary-rgb,35,72,117);--pi-secondary-rgb:var(--program-secondary-rgb,115,168,255)}#playerDialog.player-identity-enhanced .dialog-head{position:relative;isolation:isolate;min-height:154px;padding:22px 24px 20px;overflow:hidden;background:radial-gradient(circle at 13% 22%,rgba(var(--program-secondary-rgb,115,168,255),.21),transparent 22rem),linear-gradient(105deg,rgba(var(--program-primary-rgb,35,72,117),.72),rgba(12,18,26,.96) 54%,rgba(var(--program-secondary-rgb,115,168,255),.09))}#playerDialog.player-identity-enhanced .dialog-head:before{content:"#" attr(data-player-number);position:absolute;right:74px;bottom:-22px;z-index:-1;font-size:118px;line-height:1;font-weight:950;letter-spacing:-.08em;color:rgba(255,255,255,.045);pointer-events:none}#playerDialog.player-identity-enhanced .dialog-head:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:linear-gradient(90deg,var(--program-secondary,#73a8ff),var(--program-accent,#d6b45e),transparent 72%)}#playerDialog.player-identity-enhanced .dialog-identity{align-items:center;gap:18px}#playerDialog.player-identity-enhanced .dialog-portrait{width:126px;height:126px;flex-basis:126px;border-radius:15px;border-color:rgba(var(--program-secondary-rgb,115,168,255),.7);background:linear-gradient(145deg,rgba(var(--program-primary-rgb,35,72,117),.68),#0e151e);box-shadow:0 18px 38px rgba(0,0,0,.36),inset 0 1px rgba(255,255,255,.06)}#playerDialog.player-identity-enhanced .dialog-head h2{font-size:34px;line-height:1.02;margin:4px 0 6px;letter-spacing:-.045em}#playerDialog.player-identity-enhanced #playerDialogKicker{color:rgba(255,255,255,.68)}#playerDialog.player-identity-enhanced #playerDialogMeta{font-size:12px;max-width:620px;color:rgba(235,242,250,.72)}.player-identity-hero{display:grid;gap:11px;margin:-2px 0 18px}.pi-teamline{display:flex;justify-content:space-between;gap:12px;padding:0 2px;font-size:9px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--muted,#8e9aa6)}.pi-teamline span:first-child{color:var(--program-secondary,#73a8ff)}.pi-chips{display:flex;flex-wrap:wrap;gap:5px}.pi-chip{display:inline-flex;align-items:center;min-height:24px;padding:4px 8px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(255,255,255,.035);font-size:9px;font-weight:750;color:#cbd6e2}.pi-chip-role{border-color:rgba(var(--program-secondary-rgb,115,168,255),.36);background:rgba(var(--program-secondary-rgb,115,168,255),.09);color:#edf6ff}.pi-chip-style{color:var(--program-accent,#d6b45e)}.pi-grid{display:grid;grid-template-columns:1.05fr 1.2fr 1.45fr;gap:8px}.pi-role-card,.pi-evaluation,.pi-production{min-width:0;min-height:126px;padding:12px 13px;border:1px solid var(--line,#26323e);border-radius:12px;background:linear-gradient(180deg,rgba(20,29,40,.94),rgba(13,20,28,.96));box-shadow:inset 0 1px rgba(255,255,255,.025)}.pi-role-card{border-top-color:rgba(var(--program-secondary-rgb,115,168,255),.55)}.pi-role-card>strong{display:block;margin:6px 0 9px;font-size:18px;line-height:1.12}.pi-role-card>div{display:flex;align-items:baseline;gap:7px}.pi-role-card>div b{font-size:15px}.pi-role-card>div span,.pi-role-card>small,.pi-evaluation>small,.pi-production>small{font-size:9px;color:var(--muted,#8e9aa6)}.pi-role-card>small{display:block;margin-top:8px}.pi-role-card>small b{color:#dfe9f4}.pi-eval-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:7px 0 8px}.pi-stat{display:grid;gap:2px;padding:8px 7px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.055)}.pi-stat span{font-size:7px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted,#8e9aa6)}.pi-stat strong{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pi-production{display:grid;align-content:start}.pi-production>strong{margin:7px 0 9px;font-size:13px;line-height:1.38}.pi-devline{display:grid;grid-template-columns:minmax(0,2.8fr) repeat(3,minmax(80px,.65fr));gap:1px;overflow:hidden;border:1px solid var(--line,#26323e);border-radius:11px;background:var(--line,#26323e)}.pi-devline>div{display:grid;gap:3px;min-width:0;padding:9px 11px;background:#111923}.pi-devline span{font-size:7px;letter-spacing:.09em;color:var(--muted,#8e9aa6)}.pi-devline strong{font-size:10px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pi-devline>div:first-child strong{white-space:normal}@media(max-width:800px){#playerDialog.player-identity-enhanced .dialog-head{min-height:132px}#playerDialog.player-identity-enhanced .dialog-portrait{width:104px;height:104px;flex-basis:104px}#playerDialog.player-identity-enhanced .dialog-head h2{font-size:28px}.pi-grid{grid-template-columns:1fr 1fr}.pi-production{grid-column:1/-1;min-height:0}.pi-devline{grid-template-columns:1fr 1fr}.pi-devline>div:first-child{grid-column:1/-1}}@media(max-width:520px){#playerDialog.player-identity-enhanced{width:calc(100% - 10px);max-height:94vh}#playerDialog.player-identity-enhanced .dialog-head{min-height:112px;padding:14px 14px 13px}#playerDialog.player-identity-enhanced .dialog-head:before{right:48px;font-size:82px}#playerDialog.player-identity-enhanced .dialog-identity{gap:11px;align-items:center}#playerDialog.player-identity-enhanced .dialog-portrait{width:86px;height:86px;flex-basis:86px;border-radius:12px}#playerDialog.player-identity-enhanced .dialog-head h2{font-size:23px}#playerDialog.player-identity-enhanced #playerDialogMeta{font-size:10px;line-height:1.3}.pi-teamline{display:grid;gap:2px}.pi-grid{grid-template-columns:1fr}.pi-production{grid-column:auto}.pi-role-card,.pi-evaluation,.pi-production{min-height:0}.pi-devline{grid-template-columns:1fr 1fr}.pi-eval-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.pi-stat strong{font-size:12px}.pi-chip{font-size:8px}.player-identity-hero{margin-bottom:14px}}@media(prefers-reduced-motion:reduce){.player-identity-hero *{transition:none!important;scroll-behavior:auto!important}}
 
@@ -1718,6 +1726,13 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
 
 @media(prefers-reduced-motion:reduce){.client-rail{transition:none}}
 
+/* v0.14.1: nav icons */
+.client-nav-icon{width:15px;height:15px;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.8}
+.client-rail .client-nav-item{display:flex;align-items:center;gap:10px}
+.client-nav-item.active .client-nav-icon,.client-nav-item:hover .client-nav-icon{opacity:1}
+.client-mobile-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.client-mobile-item .client-nav-icon{width:17px;height:17px}
+
 /* Dynasty Lab title-menu polish — Options and About only.
    Presentation layer: no simulation or save-format rules live here. */
 
@@ -2044,6 +2059,16 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
 .gate-note{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0 0 14px;padding:10px 14px;border:1px solid rgba(242,193,78,.4);border-radius:10px;background:rgba(242,193,78,.08);color:#f2d68a;font-size:.88rem}
 .gate-note[hidden]{display:none}
 .gate-note-go{padding:6px 12px;border:1px solid rgba(242,193,78,.5);border-radius:8px;background:rgba(242,193,78,.14);color:#ffe9b0;font-weight:700;cursor:pointer}
+
+/* v0.14.1: the ticker pauses for keyboard focus too, and on a phone it is one still headline. */
+.hud-ticker:focus-within .hud-ticker-reel{animation-play-state:paused}
+@media(max-width:700px){
+ .hud-ticker-track{mask-image:none}
+ .hud-ticker-reel{animation:none;display:flex;width:100%}
+ .hud-ticker-reel span{display:none;padding:0 .8rem;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+ .hud-ticker-reel span:first-child{display:block}
+ .hud-ticker-reel span::before{margin-right:.7rem}
+}
 </style></head><body>
 <section id="titleScreen" class="title-screen" aria-labelledby="titleGameName">
   <div class="title-screen-art" aria-hidden="true"></div>
@@ -2190,6 +2215,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
           <button id="simWeek">Sim Week</button>
           <button id="simSeason">Sim Regular Season</button>
         </div>
+        <p id="weekGateNote" class="gate-note" role="status" hidden></p>
       </div>
       <div class="card command-center">
         <div class="section-head"><div><div class="eyebrow">WEEKLY COMMAND CENTER</div><h2 id="hubTitle">Preseason Briefing</h2></div><button id="hubAdvance">Advance Week</button></div>
@@ -2322,10 +2348,11 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
 
     <section id="program" class="panel tab">
       <div class="section-head"><div><h2>Program Lab</h2><div class="muted">Track the job, the board, the season and the institutional identity behind your dynasty.</div></div></div><div class="card"><div class="eyebrow">PROGRAM OVERVIEW</div><div id="programOverview"></div></div>
+      <div class="card" id="programAttributes"></div>
       <div id="programEditNotice" class="card muted"></div>
-      <div class="card editor-grid">
+      <div class="card editor-grid" id="programEditor">
         <label>School name<input id="editName" type="text"></label>
-        <label>Conference (fixed in v0.4)<select id="editConference" disabled></select></label>
+        <label>Conference (fixed)<select id="editConference" disabled></select></label>
         <label>Prestige<input id="editPrestige" type="number" min="1" max="100"></label>
         <label>Resources<input id="editResources" type="number" min="1" max="100"></label>
         <label>NIL<input id="editNil" type="number" min="1" max="100"></label>
@@ -7716,24 +7743,23 @@ function guidanceActionEligibility(action,t=selected()){
  }[action]===true,blockers=phaseAllowed?guidanceActionBlockers(action,t):[];
  return {action,phaseAllowed,allowed:phaseAllowed&&!blockers.length,blockers};
 }
-// The Game Lab actions are dead until the week's Coach's Desk decisions are made; say so, and
-// offer the jump, instead of leaving two greyed buttons with no reason.
-function renderDetailedGateNote(gate){
- const note=$('#detailedGateNote'),buttons=[$('#simDetailedGame'),$('#watchDetailedGame')];
- if(!note)return;
- const blocker=!gate.allowed&&gate.phaseAllowed?gate.blockers[0]:null;
+// A gated action says why, and offers the jump, instead of leaving greyed buttons with no reason.
+function renderGateNote(noteSel,gate,buttonSels,{extra='',scrollTo=null}={}){
+ const note=$(noteSel);if(!note)return;
+ const blocker=!gate.allowed&&gate.phaseAllowed?gate.blockers[0]:null,buttons=buttonSels.map(x=>$(x)).filter(Boolean);
  note.replaceChildren();note.hidden=!blocker;
- buttons.forEach(b=>{if(!b)return;if(blocker)b.title=blocker.message;else b.removeAttribute('title')});
+ buttons.forEach(b=>{if(blocker&&b.dataset.gateTitle!=='off')b.title=blocker.message;else if(!blocker&&b.dataset.gateTitle!=='off')b.removeAttribute('title')});
  if(!blocker)return;
- const text=document.createElement('span');text.textContent=blocker.message;
+ const text=document.createElement('span');text.textContent=blocker.message+(extra?' '+extra:'');
  const go=document.createElement('button');go.type='button';go.className='gate-note-go';
  go.textContent=blocker.destination?.focus==='career-post'?'Choose your next job':'Go to decisions';
  go.onclick=()=>{
   goToTab(blocker.destination?.tab||'dashboard');
-  requestAnimationFrame(()=>{const target=$(blocker.destination?.focus==='career-post'?'#careerPost':'#weeklyDecisions');target?.scrollIntoView?.({behavior:'smooth',block:'center'})});
+  requestAnimationFrame(()=>{const target=$(blocker.destination?.focus==='career-post'?'#careerPost':scrollTo||'#weeklyDecisions');target?.scrollIntoView?.({behavior:'smooth',block:'center'})});
  };
  note.append(text,go);
 }
+function renderDetailedGateNote(gate){renderGateNote('#detailedGateNote',gate,['#simDetailedGame','#watchDetailedGame'])}
 function guidanceOffseasonPhase(){const os=universe?.offseason;return OFFSEASON_PHASES.includes(os?.phase)?os.phase:'review'}
 function guidanceNextBoundary(t=selected()){
  const phase=universe?.phase,week=universe?.week??0,os=guidanceOffseasonPhase();
@@ -8639,6 +8665,8 @@ function renderControlMode(){
  if(selector){selector.disabled=!commissioner;selector.title=commissioner?'Commissioner Mode: switch controlled program':'Dynasty Mode: change programs only through career offers'}
  if(banner){banner.hidden=!commissioner;banner.textContent='COMMISSIONER MODE · Program switching and direct institutional editing are enabled.'}
  for(const id of ['editName','editConference','editPrestige','editResources','editNil','editDevelopment','editFacilities','editAcademics','applyProgramEdit'])if($('#'+id))$('#'+id).disabled=!commissioner;
+ if($('#programEditor'))$('#programEditor').hidden=!commissioner;
+ if($('#programAttributes'))$('#programAttributes').hidden=commissioner;
  const note=$('#programEditNotice');if(note)note.textContent=commissioner?'Commissioner controls are active. Changes alter the live universe.':'Dynasty Mode locks institutional editing. Build the program through results, staff and future investments.';
 }
 function teamLogoHTML(teamId,size=24,extraClass=''){
@@ -8653,6 +8681,7 @@ function renderProgressionControls(){
  // Explain the split state: a blocked week can still be simmed through by delegating to staff.
  const weekBlocked=regular&&!weekGate.allowed,weekHint=weekBlocked?`${weekGate.blockers[0]?.message||'Resolve this week’s decisions first.'}${seasonGate.allowed?' Sim Regular Season lets your staff decide instead.':''}`:'';
  for(const id of ['#simWeek','#seasonWeek']){$(id).disabled=!regular||!weekGate.allowed;$(id).title=weekHint}
+ renderGateNote('#weekGateNote',weekGate,[],{extra:seasonGate.allowed?'Or use Sim Regular Season and your staff will decide.':''});
  $('#simSeason').disabled=!regular||!seasonGate.allowed;$('#simSeason').title=weekBlocked&&seasonGate.allowed?'Your staff will make the pending decisions each week.':'';
  const hub=$('#hubAdvance');hub.dataset.openingPreseason=preseason?'true':'false';hub.__beginSeason=beginSeason;
  if(preseason){hub.textContent='Begin Season';hub.disabled=false;hub.classList.add('recommended')}
@@ -8946,7 +8975,14 @@ function renderRecruitingBoard(){renderSigningDay();const u=selected(),rank=recr
  $$('[data-pull]').forEach(b=>b.onclick=()=>{const r=universe.recruits.find(x=>x.id===b.dataset.pull);if(!r)return;
   if(!confirm(`Pull the offer to ${r.name}?\n\nHe reopens his recruitment, will not consider ${u.name} again, and the ${r.homeRegion||'local'} pipeline takes a hit.`))return;
   if(pullOffer(r,u.name,'Pulled by the staff')){setStatus(`Offer pulled: ${r.name} is no longer committed.`);render()}});$$('[data-promise]').forEach(s=>s.onchange=()=>{let r=universe.recruits.find(x=>x.id===s.dataset.promise);setRecruitPromise(r,s.value,u)});attachRecruitLinks()}
-function renderProgram(){const u=selected();ensureSeasonGoals(u);$('#programOverview')&&($('#programOverview').innerHTML=programOverviewHTML(u));$('#programGoals')&&($('#programGoals').innerHTML=seasonGoalsHTML(u));$('#editName').value=u.name;$('#editConference').value=u.conference;$('#editPrestige').value=u.prestige;$('#editResources').value=u.resources;$('#editNil').value=u.nil;$('#editDevelopment').value=u.development;$('#editFacilities').value=u.facilities;$('#editAcademics').value=u.academics;$('#careerHistory')&&($('#careerHistory').innerHTML=careerHistoryHTML());renderCareerPost();$('#programHistory')&&($('#programHistory').innerHTML=programHistoryHTML(selected()));$('#programDNA').innerHTML=[['Prestige',u.prestige],['Resources',u.resources],['NIL',u.nil],['Development',u.development],['Facilities',u.facilities],['Academics',u.academics],['Fan Support',u.fan_support],['Admin Patience',u.admin_patience],['Program Ceiling',u.program_ceiling],['Rivalry',u.rivalry?(rivalOf(u)?.name||'—'):'—'],['Trophy',u.rivalry?.trophy||'—'],['All-time series',rivalrySeriesText(u)||'—'],['Season expectation',seasonExpectation(u)+' wins'],['Admin confidence',(u.adminConfidence??'—')+' · '+adminConfidenceLabel(u.adminConfidence??50)],['Mandate',u.mandate?u.mandate.text:'None'],['NIL budget',nilSummaryText(u)],['Career',careerSummaryText()]].map(x=>`<div class="lineitem"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join('')}
+// Dynasty Mode locks institutional editing, so show the attributes as facts; the editable form is
+// for Commissioner Mode only.
+function renderProgramAttributes(u){
+ const host=$('#programAttributes');if(!host)return;
+ const rows=[['Prestige',u.prestige],['Resources',u.resources],['NIL',u.nil],['Development',u.development],['Facilities',u.facilities],['Academics',u.academics]];
+ host.innerHTML=`<div class="eyebrow">PROGRAM ATTRIBUTES</div><div class="program-attrs">${rows.map(([k,v])=>`<div class="program-attr"><span>${k}</span><strong>${v}</strong></div>`).join('')}</div>`;
+}
+function renderProgram(){const u=selected();renderProgramAttributes(u);ensureSeasonGoals(u);$('#programOverview')&&($('#programOverview').innerHTML=programOverviewHTML(u));$('#programGoals')&&($('#programGoals').innerHTML=seasonGoalsHTML(u));$('#editName').value=u.name;$('#editConference').value=u.conference;$('#editPrestige').value=u.prestige;$('#editResources').value=u.resources;$('#editNil').value=u.nil;$('#editDevelopment').value=u.development;$('#editFacilities').value=u.facilities;$('#editAcademics').value=u.academics;$('#careerHistory')&&($('#careerHistory').innerHTML=careerHistoryHTML());renderCareerPost();$('#programHistory')&&($('#programHistory').innerHTML=programHistoryHTML(selected()));$('#programDNA').innerHTML=[['Prestige',u.prestige],['Resources',u.resources],['NIL',u.nil],['Development',u.development],['Facilities',u.facilities],['Academics',u.academics],['Fan Support',u.fan_support],['Admin Patience',u.admin_patience],['Program Ceiling',u.program_ceiling],['Rivalry',u.rivalry?(rivalOf(u)?.name||'—'):'—'],['Trophy',u.rivalry?.trophy||'—'],['All-time series',rivalrySeriesText(u)||'—'],['Season expectation',seasonExpectation(u)+' wins'],['Admin confidence',(u.adminConfidence??'—')+' · '+adminConfidenceLabel(u.adminConfidence??50)],['Mandate',u.mandate?u.mandate.text:'None'],['NIL budget',nilSummaryText(u)],['Career',careerSummaryText()]].map(x=>`<div class="lineitem"><span>${x[0]}</span><strong>${x[1]}</strong></div>`).join('')}
 function applyProgramEdit(){const u=selected(),old=u.name,newName=$('#editName').value.trim()||old;if(/[<>"]/.test(newName)){alert('Program names cannot contain HTML markup or double quotes.');return}if(newName!==old&&T(newName)){alert('A program already uses that name.');return}u.name=newName;for(const [id,key] of [['editPrestige','prestige'],['editResources','resources'],['editNil','nil'],['editDevelopment','development'],['editFacilities','facilities'],['editAcademics','academics']])u[key]=clamp(parseInt($('#'+id).value||u[key],10),1,100);if(newName!==old){universe.schedule.flat().forEach(g=>{if(g.home===old)g.home=newName;if(g.away===old)g.away=newName});universe.teams.forEach(t=>t.schedule.forEach(g=>{if(g.home===old)g.home=newName;if(g.away===old)g.away=newName}));universe.recruits.forEach(r=>{if(r.leader===old)r.leader=newName;if(r.committed===old)r.committed=newName});for(const row of universe.signingDay?.board||[]){if(row.from===old)row.from=newName;if(row.challenger===old)row.challenger=newName}if(universe.recruitCycle?.signeesByTeam?.[old]!==undefined){universe.recruitCycle.signeesByTeam[newName]=universe.recruitCycle.signeesByTeam[old];delete universe.recruitCycle.signeesByTeam[old]}rebuildRecruitClassCounts();let opt=[...$('#userTeam').options].find(o=>o.value===old);if(opt){opt.value=newName;opt.textContent=newName}$('#userTeam').value=newName;rebuildIndexes()}ranked();render();setStatus('Program changes applied. Conference schedule will fully rebalance next season.')}
 function renderDevelopmentResults(u,ds){const available={SPRING:ds.springReport||[],FALL:ds.fallReport||[]};if(!available[developmentResultsPhase]?.length)developmentResultsPhase=available.FALL.length?'FALL':available.SPRING.length?'SPRING':'';const report=available[developmentResultsPhase]||[];$('#developmentResults').innerHTML=developmentResultsHTML(report,u,developmentResultsFilter,developmentResultsSort);$$('[data-development-phase]').forEach(b=>{b.disabled=!available[b.dataset.developmentPhase]?.length;b.classList.toggle('active',b.dataset.developmentPhase===developmentResultsPhase);b.onclick=()=>{developmentResultsPhase=b.dataset.developmentPhase;developmentResultsFilter='ALL';renderDevelopment()}});$$('[data-development-filter]').forEach(b=>b.onclick=()=>{developmentResultsFilter=b.dataset.developmentFilter;renderDevelopment()});const sort=$('#developmentResultsSort');if(sort)sort.onchange=()=>{developmentResultsSort=sort.value;renderDevelopment()};$$('[data-development-result]').forEach(b=>b.onclick=()=>{const x=report.find(x=>x.id===b.dataset.developmentResult),p=u.roster.find(p=>p.id===b.dataset.developmentResult);$('#developmentResultDetail').innerHTML=developmentResultDetailHTML(x,p)})}
 function renderDevelopmentBoard(){const u=selected(),ds=ensureDevelopmentState();ensureTeamDevelopment(u);for(const p of u.roster)ensurePlayerDevelopment(p,u);let focus=$('#teamTrainingFocus');if(focus){if(!focus.options.length)Object.keys(TEAM_TRAINING).forEach(x=>focus.add(new Option(x,x)));focus.value=u.trainingFocus;$('#trainingImpact').textContent=TEAM_TRAINING[u.trainingFocus]?.desc||''}let complete=universe.phase==='complete',os=normalizeOffseasonState();$('#runSpringCamp').disabled=!complete||os.phase!=='spring'||os.completed.includes('spring');$('#runFallCamp').disabled=!complete||os.phase!=='fall'||os.completed.includes('fall');$('#applyCampWinners').disabled=!ds.battles?.length;$('#campPhaseCard').innerHTML=complete?`<strong>${universe.year} offseason</strong><div class="compact muted">Spring development: ${ds.springRun?'complete':'not run'} · Fall camp: ${ds.fallRun?'complete':'not run'}</div>`:openingPreseason()?'<strong>Preseason setup</strong><div class="compact muted">Development priorities are editable now; camp actions unlock after the national championship.</div>':'<strong>In season</strong><div class="compact muted">Development planning is visible now; camp actions unlock after the national championship.</div>';let avgConf=Math.round(avg(u.roster.map(p=>{ensurePlayerDevelopment(p,u);return p.scoutConfidence}))),transition=u.roster.filter(p=>familiarity(p,p.pos)<80).length,young=u.roster.filter(p=>eligibilityBase(p)<=1).length;$('#developmentSummary').innerHTML=`<div class="lineitem"><span>Average scouting confidence</span><strong>${avgConf}%</strong></div><div class="lineitem"><span>Freshmen / sophomores</span><strong>${young}</strong></div><div class="lineitem"><span>Position-transition projects</span><strong>${transition}</strong></div><div class="lineitem"><span>Program development</span><strong>${grade(u.development)}</strong></div>`;renderDevelopmentResults(u,ds);
@@ -14366,13 +14402,33 @@ queue();
     {label:'World',items:[['history','History'],['records','Awards & Records']]}
   ];
 
+  // Outline icons (16x16, stroke = currentColor) so the nav can be scanned, not just read.
+  const NAV_ICONS={
+    dashboard:'<rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/>',
+    newsletter:'<rect x="2" y="3.5" width="12" height="9" rx="1.5"/><path d="M2.5 4.5 8 9l5.5-4.5"/>',
+    program:'<path d="M2 13h12M3.5 13V7.5M6.5 13V7.5M9.5 13V7.5M12.5 13V7.5M2 6.5 8 3l6 3.5z"/>',
+    roster:'<circle cx="6" cy="5.5" r="2.2"/><path d="M2 13c0-2.4 1.8-4 4-4s4 1.6 4 4"/><circle cx="11.5" cy="6" r="1.7"/><path d="M11 9.2c2 .2 3.2 1.5 3.2 3.8"/>',
+    depth:'<path d="M8 2 14 5.5 8 9 2 5.5z"/><path d="M2 8.5 8 12l6-3.5"/>',
+    development:'<path d="M2 12 6 8l2.5 2.5L14 4.5M10.5 4.5H14V8"/>',
+    staff:'<rect x="2" y="5" width="12" height="8" rx="1.5"/><path d="M6 5V3.5h4V5M2 8.5h12"/>',
+    offseason:'<rect x="2" y="3.5" width="12" height="10" rx="1.5"/><path d="M2 7h12M5.5 2v3M10.5 2v3"/>',
+    recruiting:'<circle cx="8" cy="8" r="5.5"/><circle cx="8" cy="8" r="2.5"/><path d="M8 1.5V4M8 12v2.5M1.5 8H4M12 8h2.5"/>',
+    gamelab:'<ellipse cx="8" cy="8" rx="6.2" ry="3.7" transform="rotate(-35 8 8)"/><path d="M6.2 9.8 9.8 6.2M7 6.8l.9.9M8.2 8.1l.9.9"/>',
+    season:'<path d="M5 4h9M5 8h9M5 12h9"/><circle cx="2.5" cy="4" r=".7"/><circle cx="2.5" cy="8" r=".7"/><circle cx="2.5" cy="12" r=".7"/>',
+    stats:'<path d="M3.5 13V8.5M7.5 13V4M11.5 13V6.5M2 13.5h12"/>',
+    history:'<circle cx="8" cy="8" r="5.5"/><path d="M8 4.8V8l2.2 1.4"/>',
+    records:'<path d="M5 2.5h6v3.5a3 3 0 0 1-6 0zM5 4H2.5c0 2 1 3 2.5 3M11 4h2.5c0 2-1 3-2.5 3M8 9v2.5M5.5 13.5h5"/>',
+    more:'<circle cx="3.5" cy="8" r="1"/><circle cx="8" cy="8" r="1"/><circle cx="12.5" cy="8" r="1"/>'
+  };
+  const navIcon=tab=>NAV_ICONS[tab]?`<svg class="client-nav-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">${NAV_ICONS[tab]}</svg>`:'';
+
   const app=document.querySelector('#app');
   const topbar=app?.querySelector('.topbar');
   const tabsShell=app?.querySelector('.tabs-shell');
   if(!app||!topbar||!tabsShell||document.querySelector('#clientRail'))return;
 
   function navButton(tab,label,extra=''){
-    return `<button type="button" class="client-nav-item ${extra}" data-client-tab="${tab}"><span>${label}</span></button>`;
+    return `<button type="button" class="client-nav-item ${extra}" data-client-tab="${tab}">${navIcon(tab)}<span>${label}</span></button>`;
   }
 
   const rail=document.createElement('aside');
@@ -14414,7 +14470,7 @@ queue();
   const mobile=document.createElement('nav');
   mobile.className='client-mobile-nav';
   mobile.setAttribute('aria-label','Quick navigation');
-  mobile.innerHTML=`${navButton('dashboard','Home','client-mobile-item')}${navButton('roster','Program','client-mobile-item')}${navButton('recruiting','Recruit','client-mobile-item')}${navButton('gamelab','Season','client-mobile-item')}<button type="button" class="client-mobile-item" data-client-more>More</button>`;
+  mobile.innerHTML=`${navButton('dashboard','Home','client-mobile-item')}${navButton('roster','Program','client-mobile-item')}${navButton('recruiting','Recruit','client-mobile-item')}${navButton('gamelab','Season','client-mobile-item')}<button type="button" class="client-mobile-item" data-client-more>${navIcon('more')}<span>More</span></button>`;
   app.appendChild(mobile);
 
   function currentTab(){return app.querySelector('.tabs button.active[data-tab]')?.dataset.tab||'dashboard'}
