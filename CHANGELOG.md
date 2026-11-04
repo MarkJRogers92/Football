@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.14.0 — A contested rising class
+
+v0.13.0 added next year's top prospects as a read-only list. They are now something you scout and something rivals can take.
+
+- **Scout watched prospects.** A watched rising prospect shows the staff verdict with its evidence level (Preliminary, Film reviewed, Full evaluation) and the same *Quick Film · 1h* and *Full Evaluation · 3h* actions as the current class. They spend the weekly evaluation hours, which are shared with your current class, so scouting a junior costs scouting a senior. Film Reviewed / Full Evaluation completion carries across the class rollover (those flags are season-scoped; the intel itself already carried).
+- **Rivals pursue them early.** At rollover, the top 150 rising prospects (3-star and up) can commit to their best rival before the season starts: 5-stars 35%, 4-stars 22%, 3-stars 8% (`applyEarlyCommitments`). About 33 prospects lock early per rollover, 1.2% of the class. They commit at week 0 like any other commitment, count against the rival's scholarship room, and can still be flipped later by the existing in-season race.
+- **Watching protects you, if you can compete.** A watched prospect is mostly protected (chance x0.25) only while your projected pitch (a target's +10 and the relationship head start included) is within 4 of the leading rival. A watched prospect you are trailing is as exposed as an unwatched one. Measured over 40 rollovers: for a prestige-92 program, watched top-15 prospects were locked early 9% of the time against 28% unwatched; for a weak program watching barely helped (29%), because it cannot out-pitch the leaders.
+- **The card tells you where you stand.** Each watched row shows the leading rival and *Holding* (green) or *Trailing* (amber) with the gap, the shared evaluation hours, and, after a rollover, how many watched prospects are still available and which ones went elsewhere.
+- **Balance.** Over 10 seasons on three seeds, prestige spread, talent and save size match v0.13.1 (prestige sd 14.5 / 14.6 / 14.4, trueNow 65.5 / 65.7 / 65.8, save about 125 MB at season 10). Same seeds give different universes than v0.13.1 (the offseason draws extra random numbers).
+- **Tooling.** `tests/rising-class.js` grows to nine tests (protection is checked statistically, plus pool bounds, class counts and a full offseason); the browser test covers scouting, hours and standings on desktop and phone. The harness exports the scouting helpers when `loadEngine({ fullRuntime: true })`.
+- **Not done:** AI programs still do not pursue the rising class during the season (only at rollover), and there is no visit action for rising prospects.
+
 ## v0.13.1 — Playthrough polish
 
 Found by playing six weeks in a browser and sweeping every tab at desktop and phone width.

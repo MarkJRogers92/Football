@@ -1,5 +1,22 @@
 # Latest Session Work
 
+## v0.14.0 — A contested rising class (2026-11-04)
+
+- `app.js`: `applyEarlyCommitments` (constants `EARLY_COMMIT_POOL=150`, `EARLY_COMMIT_CHANCE`, `EARLY_COMMIT_PROTECTED=.25`,
+  `EARLY_COMMIT_MARGIN=4`) runs inside `offseasonPreseason` AFTER `rollRecruitClass(); recruitClassCounts={}` and after the per-team
+  `t.commits=[]` reset, because `commitRecruit` writes both. Calling it earlier silently loses the counts. `rollRecruitClass` tags
+  promoted prospects `fromRisingClass` and moves a watched prospect's `manualScouting[userId].season` to the new year so Film Reviewed
+  survives (the record is season-scoped; `scoutingDomains` itself already carried).
+- `scouting-actions.js`: the button handler uses `findRecruitAnyClass` (current class then `risingClass`) and exports `scoutingHoursInfo`.
+  `rising-class.js` renders the verdict, evidence level, rival standing (`standingFor`, cached per prospect and week) and the scouting
+  buttons for watched rows.
+- Harness: extension variables (`recruitScoutingRecord`, `scoutingHoursInfo`, `recruitStaffVerdict`) exist only with
+  `loadEngine({ fullRuntime: true })`; export them behind `typeof x === 'undefined'` or the default harness throws at load.
+- Measured, not assumed: about 33 early commits per rollover; protection depends on the user's program (prestige 92: 9% watched vs 28%
+  unwatched locked early; a weak program: 29% vs 28%). 10-season runs on three seeds match v0.13.1 on prestige spread, talent and save size.
+- Open: no in-season AI pursuit of the rising class, no visit action for rising prospects, and the rising list is only top 600.
+
+
 ## v0.13.1 — Playthrough polish (2026-11-04)
 
 - Method that worked: a scripted browser playthrough (`new dynasty -> resolve weekly decisions -> #simWeek` six times) then a sweep of
