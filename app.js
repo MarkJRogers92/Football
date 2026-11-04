@@ -2455,6 +2455,24 @@ function guidanceActionEligibility(action,t=selected()){
  }[action]===true,blockers=phaseAllowed?guidanceActionBlockers(action,t):[];
  return {action,phaseAllowed,allowed:phaseAllowed&&!blockers.length,blockers};
 }
+// The Game Lab actions are dead until the week's Coach's Desk decisions are made; say so, and
+// offer the jump, instead of leaving two greyed buttons with no reason.
+function renderDetailedGateNote(gate){
+ const note=$('#detailedGateNote'),buttons=[$('#simDetailedGame'),$('#watchDetailedGame')];
+ if(!note)return;
+ const blocker=!gate.allowed&&gate.phaseAllowed?gate.blockers[0]:null;
+ note.replaceChildren();note.hidden=!blocker;
+ buttons.forEach(b=>{if(!b)return;if(blocker)b.title=blocker.message;else b.removeAttribute('title')});
+ if(!blocker)return;
+ const text=document.createElement('span');text.textContent=blocker.message;
+ const go=document.createElement('button');go.type='button';go.className='gate-note-go';
+ go.textContent=blocker.destination?.focus==='career-post'?'Choose your next job':'Go to decisions';
+ go.onclick=()=>{
+  goToTab(blocker.destination?.tab||'dashboard');
+  requestAnimationFrame(()=>{const target=$(blocker.destination?.focus==='career-post'?'#careerPost':'#weeklyDecisions');target?.scrollIntoView?.({behavior:'smooth',block:'center'})});
+ };
+ note.append(text,go);
+}
 function guidanceOffseasonPhase(){const os=universe?.offseason;return OFFSEASON_PHASES.includes(os?.phase)?os.phase:'review'}
 function guidanceNextBoundary(t=selected()){
  const phase=universe?.phase,week=universe?.week??0,os=guidanceOffseasonPhase();
@@ -3389,7 +3407,7 @@ function render(){
  const leaders=u.roster.slice().sort((a,b)=>b.perceived-a.perceived).slice(0,5);$('#snapshot').innerHTML=`<div class="lineitem"><span>Roster</span><strong>${u.roster.length}</strong></div><div class="lineitem"><span>Protected redshirts</span><strong>${u.roster.filter(p=>p.redshirtActive).length}</strong></div><div class="lineitem"><span>Commits</span><strong>${u.commits.length}</strong></div><div class="lineitem"><span>Head Coach</span><strong>${u.staff.HC.name}</strong></div><div class="lineitem"><span>PF / PA</span><strong>${u.pf} / ${u.pa}</strong></div>`+leaders.map(x=>`<div class="lineitem compact"><span>${x.pos} ${x.name}</span><span>${playerGrade(x)} · ${x.style}</span></div>`).join('');
  renderWeeklyDecisions();if(typeof renderGuidanceSystem==='function')renderGuidanceSystem();renderWeeklyHub();renderActiveTab();$('#simConf').disabled=universe.phase!=='confReady';$('#simBowls').disabled=universe.phase!=='bowlReady';$('#simPlayoff').disabled=universe.phase!=='playoffReady';
  let devState=ensureDevelopmentState(),offseason=normalizeOffseasonState(),advance=$('#runOffseason');if(advance){const labels={review:'Run Season Review',departures:'Process Departures',signing:'Enroll Signing Class',portal:'Resolve Transfer Portal',preseason:'Open New Season'},gate=guidanceActionEligibility('offseason-phase',u);advance.disabled=universe.phase!=='complete'||['spring','fall'].includes(offseason.phase)||!gate.allowed;advance.textContent=labels[offseason.phase]||'Advance Offseason Phase'}
- const detailedGate=guidanceActionEligibility('detailed-game',u);$('#simDetailedGame').disabled=!detailedGate.allowed;$('#watchDetailedGame').disabled=!detailedGate.allowed;renderProgressionControls()
+ const detailedGate=guidanceActionEligibility('detailed-game',u);$('#simDetailedGame').disabled=!detailedGate.allowed;$('#watchDetailedGame').disabled=!detailedGate.allowed;renderDetailedGateNote(detailedGate);renderProgressionControls()
 }
 function attachPlayerLinks(){$$('[data-player]').forEach(b=>b.onclick=()=>showPlayerProfile(b.dataset.player));paintPortraits()}
 function showArchetypeGuide(style){const meta=archetypeMeta(style),pos=archetypePosition(style),traitNames={speed:'Speed',power:'Power',technique:'Technique',iq:'Processing',composure:'Composure',durability:'Durability',versatility:'Versatility'};$('#archetypeDialogName').textContent=meta.display;$('#archetypeDialogMeta').textContent=`${pos||'Player'} archetype · internal identity preserved as ${style}`;$('#archetypeDialogBody').innerHTML=`<div class="archetype-guide"><p class="archetype-guide-lead">${meta.short}</p><section><div class="eyebrow">WINS WITH</div><div class="archetype-strengths">${meta.strengths.map(x=>`<span class="pill">${traitNames[x]||x}</span>`).join('')}</div></section><section><div class="eyebrow">SIMULATION ROLE</div><p>${styleDescription({style,pos})}</p></section></div>`;const d=$('#archetypeDialog');if(d.showModal)d.showModal();else d.setAttribute('open','')}
