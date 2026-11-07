@@ -287,7 +287,8 @@ async function runPackaged(smokeRoot, profile, pageErrors, consoleErrors) {
     assert.deepEqual(consoleErrors, [], `renderer console errors: ${consoleErrors.join(' | ')}`);
     console.log(`PASS ${packaged ? `made ${process.platform === 'win32' ? 'Windows' : 'macOS'} Alpha` : 'desktop shell'} uses native storage, saves, replaces/restarts, restores, and closes cleanly`);
   } finally {
-    fs.rmSync(smokeRoot, {recursive: true, force: true});
+    // Apply the same bounded Windows handle-release retries as bundle replacement.
+    fs.rmSync(smokeRoot, {recursive: true, force: true, maxRetries: 20, retryDelay: 250});
   }
 })().catch(error => {
   console.error(error);

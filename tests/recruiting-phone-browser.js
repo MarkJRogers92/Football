@@ -8,11 +8,18 @@ const {startNewDynasty}=require('./helpers/start-new-dynasty');
  const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});
  const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'}),errors=[];
  page.on('pageerror',e=>errors.push(String(e)));
+ page.on('console',message=>{if(message.type()==='error')errors.push(message.text())});
  try{
   await page.goto('file://'+path.join(__dirname,'..','index.html'));
   await startNewDynasty(page);
   await page.evaluate(()=>{document.querySelector('.tabs [data-tab="recruiting"]').click();window.scrollTo(0,0)});
-  await page.waitForSelector('.recruit-workspace-card');
+  try{await page.waitForSelector('.recruit-workspace-card')}catch(error){
+   console.error('Initial recruiting phone diagnostic:',JSON.stringify({errors,state:await page.evaluate(()=>{
+    const describe=node=>{if(!node)return null;const style=getComputedStyle(node),rect=node.getBoundingClientRect();return{tag:node.tagName,id:node.id,classes:node.className,hidden:node.hidden,dataset:{...node.dataset},display:style.display,visibility:style.visibility,opacity:style.opacity,rect:{x:rect.x,y:rect.y,width:rect.width,height:rect.height},rects:node.getClientRects().length}};
+    const first=document.querySelector('.recruit-workspace-card'),ancestors=[];for(let node=first;node&&ancestors.length<10;node=node.parentElement)ancestors.push(describe(node));
+    return{viewport:{width:innerWidth,height:innerHeight,scrollY,visibility:document.visibilityState},workspace:window.DynastyRecruitingWorkspaceView?.read?.(),classView:window.DynastyRecruitingClasses?.current?.(),filters:window.DynastyLabRecruitingFilters?.getState?.(),save:window.DynastySessionStatus?.read?.(),setup:window.__DL_TEST__?.setupDebug?.(),world:window.__DL_TEST__?.preseasonDebug?.(),activeTabs:[...document.querySelectorAll('.tabs button.active')].map(node=>node.dataset.tab),activePanels:[...document.querySelectorAll('.tab.active')].map(node=>node.id),counts:{cards:document.querySelectorAll('.recruit-workspace-card').length,rows:document.querySelectorAll('#recruitBody tr').length,targets:document.querySelectorAll('#recruitBody tr.target').length},hosts:Object.fromEntries(['#app','#recruiting','#recruitWorkspace','.recruit-workspace-list','.recruit-workspace-dossier','#rwSwitch','#recruitClassViews'].map(selector=>[selector,describe(document.querySelector(selector))])),ancestors,pool:{...document.querySelector('[data-recruit-pool]')?.dataset},listText:document.querySelector('.rw-card-list')?.textContent?.slice(0,700),status:document.querySelector('#saveStatus')?.textContent};
+   })}));throw error;
+  }
   const screenshotDir=process.env.DYNASTY_RECRUIT_SCREENSHOT_DIR;
   if(screenshotDir){require('node:fs').mkdirSync(screenshotDir,{recursive:true});await page.screenshot({path:path.join(screenshotDir,'recruiting-phone-list.png')})}
   const first=await page.locator('.recruit-workspace-card .rw-main strong').first().boundingBox();
