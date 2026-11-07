@@ -41,7 +41,7 @@ function pressureLines(snap){
  if(!lines.length)lines.push({fact:`${a.name} · ${r.team.name}`,quote:a.key==='development'?'Check back in November.':a.key==='evaluation'?'Keep chasing the stars. We will take the players.':'See you on the trail.'});
  return lines.slice(0,2);
 }
-function meter(label,v){v=Math.max(0,Math.min(100,Number(v)||0));return`<div class="rw-meter"><span>${esc(label)}</span><i style="--v:${v}%"></i><b>${v}</b></div>`}
+function meter(label,v){v=Math.max(0,Math.min(100,Number(v)||0));return`<div class="rvw-meter"><span>${esc(label)}</span><i style="--v:${v}%"></i><b>${v}</b></div>`}
 function helmet(id,cls=''){return globalThis.DynastyBrandVisuals?.helmetHTML?.(id,cls)||''}
 function cardHTML(snap){
  const r=snap?.rival;if(!r?.coach||!r.team)return'';
@@ -50,12 +50,12 @@ function cardHTML(snap){
  const meet=r.lastMeeting?`${r.lastMeeting.won?'W':'L'} ${r.lastMeeting.us}-${r.lastMeeting.them}`:r.meeting?`Week ${r.meeting.week} · ${r.meeting.home?'home':'away'}`:'Not scheduled';
  const others=(snap.recruiters||[]).filter(x=>x.team.id!==r.team.id).slice(0,2);
  return`<section id="rivalWatch" class="card rival-watch" aria-label="Rival watch">`+
-  `<div class="rw-head"><span class="eyebrow">RIVAL WATCH</span>${r.trophy?`<span class="rw-trophy">${esc(r.trophy)}</span>`:''}</div>`+
-  `<div class="rw-main">${helmet(r.team.id,'rw-helmet is-away')}<div class="rw-id"><strong>${esc(r.coach.name)}</strong><span>Head coach · ${esc(r.team.rank?`#${r.team.rank} `:'')}${esc(r.team.name)} (${r.team.w}-${r.team.l})</span><div class="rw-tags"><b class="rw-arch">${esc(a.name)}</b>${tr.map(t=>`<i>${esc(t)}</i>`).join('')}</div><p>${esc(a.blurb)}</p></div>`+
-  `<div class="rw-meters">${meter('Recruiting',r.coach.recruiting)}${meter('Play calling',r.coach.playCall)}${meter('Development',r.coach.development)}${meter('Evaluation',r.coach.evaluation)}</div></div>`+
-  `<div class="rw-facts"><div><span>Series</span><b>${esc(series)}</b></div><div><span>${r.lastMeeting?'This year':'Next meeting'}</span><b>${esc(meet)}</b></div><div><span>Your targets they lead</span><b>${r.racesLed?.length||0}</b></div></div>`+
-  (lines.length?`<div class="rw-quotes">${lines.map(l=>`<blockquote><p>“${esc(l.quote)}”</p><footer>${esc(r.coach.name)} · <span>${esc(l.fact)}</span></footer></blockquote>`).join('')}</div>`:'')+
-  (others.length?`<div class="rw-others"><span class="eyebrow">ALSO CHASING YOUR TARGETS</span>${others.map(o=>{const oa=archetype(o.coach),race=o.races[0];return`<div class="rw-other">${helmet(o.team.id,'rw-helmet-sm')}<div><strong>${esc(o.coach.name)}</strong><span>${esc(o.team.name)} · ${esc(oa.name)}</span></div><small>Leads for ${esc(race.recruit)} · ${esc(race.pos)} ${stars(race.stars)}</small></div>`}).join('')}</div>`:'')+
+  `<div class="rvw-head"><span class="eyebrow">RIVAL WATCH</span>${r.trophy?`<span class="rvw-trophy">${esc(r.trophy)}</span>`:''}</div>`+
+  `<div class="rvw-main">${helmet(r.team.id,'rvw-helmet is-away')}<div class="rvw-id"><strong>${esc(r.coach.name)}</strong><span>Head coach · ${esc(r.team.rank?`#${r.team.rank} `:'')}${esc(r.team.name)} (${r.team.w}-${r.team.l})</span><div class="rvw-tags"><b class="rvw-arch">${esc(a.name)}</b>${tr.map(t=>`<i>${esc(t)}</i>`).join('')}</div><p>${esc(a.blurb)}</p></div>`+
+  `<div class="rvw-meters">${meter('Recruiting',r.coach.recruiting)}${meter('Play calling',r.coach.playCall)}${meter('Development',r.coach.development)}${meter('Evaluation',r.coach.evaluation)}</div></div>`+
+  `<div class="rvw-facts"><div><span>Series</span><b>${esc(series)}</b></div><div><span>${r.lastMeeting?'This year':'Next meeting'}</span><b>${esc(meet)}</b></div><div><span>Your targets they lead</span><b>${r.racesLed?.length||0}</b></div></div>`+
+  (lines.length?`<div class="rvw-quotes">${lines.map(l=>`<blockquote><p>“${esc(l.quote)}”</p><footer>${esc(r.coach.name)} · <span>${esc(l.fact)}</span></footer></blockquote>`).join('')}</div>`:'')+
+  (others.length?`<div class="rvw-others"><span class="eyebrow">ALSO CHASING YOUR TARGETS</span>${others.map(o=>{const oa=archetype(o.coach),race=o.races[0];return`<div class="rvw-other">${helmet(o.team.id,'rvw-helmet-sm')}<div><strong>${esc(o.coach.name)}</strong><span>${esc(o.team.name)} · ${esc(oa.name)}</span></div><small>Leads for ${esc(race.recruit)} · ${esc(race.pos)} ${stars(race.stars)}</small></div>`}).join('')}</div>`:'')+
   `</section>`;
 }
 let sig='',queued=false;

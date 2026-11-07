@@ -7,6 +7,7 @@
 - Small source changes outside the new files: `app.js` stat leader rows carry `--lead` and zero-stat defenders are no longer listed; `roster-depth-experience.js` cards show the v1 portrait and an estimate-range bar; `tools/build.js` wires the new files; `package.json` registers `tests/brand-visuals.js` and `tests/brand-identity-browser.js`.
 - Version unchanged at 0.14.1; CHANGELOG has an *Unreleased* section. No release, publish, packaging or install.
 - Follow-up (same day): one navigation map (tab groups = sidebar sections; tests' group helpers and `tests/browser.js` membership check updated to the new map), face chips, hidden duplicate status line, plain subtitles, in-place keys, Coach It Live win chance, Rival Watch and Ceremonies. See `VISUAL_IDENTITY.md` › Cohesion and fun pass. Not yet exercised end to end: Signing Day and Draft Night ceremonies (covered by unit tests only).
+- Third pass (same day): synthesized sound, evidence-based storylines + award race, Legacy (achievements/records/hall of fame/challenges in localStorage, outside saves), Rivalry Week ribbon + rivalry trophy ceremony, last-game highlights, printable yearbook. Fixed a `rw-` class collision (Rival Watch now `rvw-`) that broke `recruiting-tools-browser`, restored the formation note that `roster-depth-experience-browser` protects, and fixed a ceremony baseline race during long synchronous sims. Difficulty settings deliberately deferred.
 
 ## Final handoff for Claude (2026-11-06)
 

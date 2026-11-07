@@ -12,7 +12,7 @@
 
   function classify(node){
     if(node.matches('.program-masthead,.dash-views'))return'all';
-    if(node.matches('#v0102PlayerStories,#seasonStoryRail')||node.querySelector?.('#seasonGoalsDashboard'))return'stories';
+    if(node.matches('#v0102PlayerStories,#seasonStoryRail,#storylinesCard')||node.querySelector?.('#seasonGoalsDashboard'))return'stories';
     if(node.querySelector?.('#top15,#snapshot'))return'league';
     return'week';
   }

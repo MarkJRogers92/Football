@@ -70,7 +70,7 @@ const {chromium}=require('playwright-core'),{chromiumPath}=require('./helpers/ch
    await page.evaluate(s=>document.querySelector(s).click(),id);await page.waitForTimeout(1500);
   }
   await page.waitForFunction(()=>document.querySelector('#simPlayoff').disabled,{timeout:60000});await page.waitForTimeout(1500);
-  const milestones=await page.evaluate(()=>window.DynastyCeremonySnapshot.read().milestones.filter(m=>['conference','bowl','national'].includes(m.kind)).map(m=>m.key).sort());
+  const milestones=await page.evaluate(()=>window.DynastyCeremonySnapshot.read().milestones.filter(m=>['conference','bowl','national','rivalry'].includes(m.kind)).map(m=>m.key).sort());
   const shown=await page.evaluate(()=>window.__shown.slice().sort());
   assert.deepEqual(shown,milestones,'a ceremony plays for each real postseason milestone and no others');
   await page.reload();await page.waitForSelector('#titleNew');

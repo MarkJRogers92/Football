@@ -3399,7 +3399,7 @@ const TAB_GROUPS=[
  {id:'program',label:'Program',tabs:['program','roster','depth','development','staff','offseason']},
  {id:'recruiting',label:'Recruiting',tabs:['recruiting']},
  {id:'season',label:'Season',tabs:['gamelab','season','stats']},
- {id:'world',label:'World',tabs:['history','records']}];
+ {id:'world',label:'World',tabs:['history','records','legacy']}];
 function groupOf(tab){return TAB_GROUPS.find(g=>g.tabs.includes(tab))||TAB_GROUPS[0]}
 // Selecting a group reveals its tabs and nothing else. A single-tab group is just that tab.
 function showTabGroup(id,{activate=true}={}){

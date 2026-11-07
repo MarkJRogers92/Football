@@ -11,9 +11,9 @@
   if(!groupsNav||!tabsNav)return;
 
   // Mirrors TAB_GROUPS in app.js (app scope is not global).
-  const GROUP_TABS={home:['dashboard','newsletter'],program:['program','roster','depth','development','staff','offseason'],recruiting:['recruiting'],season:['gamelab','season','stats'],world:['history','records']};
-  const ICONS={dashboard:'◆',program:'⚑',history:'⌛',roster:'☰',depth:'⇅',development:'▲',recruiting:'★',gamelab:'⚙',season:'▦',stats:'∑',newsletter:'✉',staff:'♟',offseason:'↻',records:'♛'};
-  const HINTS={dashboard:'Weekly command center',program:'Identity, budget & facilities',history:'Archive & program legacy',roster:'Full player list',depth:'Roles and depth chart',development:'Training plans & camp',recruiting:'Board, scouting & signing class',gamelab:'Game plan & matchup',season:'Schedule & standings',stats:'Leaders & team stats',newsletter:'Weekly headlines',staff:'Coordinators & schemes',offseason:'Transitions & portal',records:'Awards & record book'};
+  const GROUP_TABS={home:['dashboard','newsletter'],program:['program','roster','depth','development','staff','offseason'],recruiting:['recruiting'],season:['gamelab','season','stats'],world:['history','records','legacy']};
+  const ICONS={dashboard:'◆',program:'⚑',history:'⌛',roster:'☰',depth:'⇅',development:'▲',recruiting:'★',gamelab:'⚙',season:'▦',stats:'∑',newsletter:'✉',staff:'♟',offseason:'↻',records:'♛',legacy:'✦'};
+  const HINTS={dashboard:'Weekly command center',program:'Identity, budget & facilities',history:'Archive & program legacy',roster:'Full player list',depth:'Roles and depth chart',development:'Training plans & camp',recruiting:'Board, scouting & signing class',gamelab:'Game plan & matchup',season:'Schedule & standings',stats:'Leaders & team stats',newsletter:'Weekly headlines',staff:'Coordinators & schemes',offseason:'Transitions & portal',records:'Awards & record book',legacy:'Achievements, records & hall of fame'};
   const titleOpen=()=>{const t=document.querySelector('#titleScreen');return !!t&&!t.hidden&&getComputedStyle(t).display!=='none'};
   const typing=el=>!!el&&(el.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName));
   const groupButtons=()=>[...groupsNav.querySelectorAll('button[data-group]')];

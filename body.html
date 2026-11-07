@@ -42,6 +42,8 @@
       <section id="titleOptionsPanel" class="title-subpanel" aria-labelledby="titleOptionsHeading" hidden>
         <div class="title-panel-head"><div><span>OPTIONS</span><h2 id="titleOptionsHeading">Presentation</h2></div><button type="button" data-title-back aria-label="Back to main menu">Back</button></div>
         <label class="title-toggle"><span><strong>Title &amp; Watch motion</strong><small>Atmosphere and broadcast animation</small></span><input id="titleMotion" type="checkbox" checked></label>
+        <label class="title-toggle"><span><strong>Sound</strong><small>Crowd, whistle, fight-song sting and ceremonies</small></span><input id="titleSound" type="checkbox" checked></label>
+        <label class="title-field">Sound volume<input id="titleVolume" type="range" min="0" max="100" step="5" value="60"></label>
         <label class="title-field">Default Watch Mode speed<select id="titleWatchSpeed"><option value="1400">Slow</option><option value="850">Normal</option><option value="400">Fast</option></select></label>
         <button id="titleSaveOptions" class="title-panel-primary" type="button">Save Options</button>
       </section>
@@ -118,6 +120,7 @@
     <button data-tab="stats" hidden>Stats</button>
     <button data-tab="history" hidden>History</button>
     <button data-tab="records" hidden>Awards &amp; Records</button>
+    <button data-tab="legacy" hidden>Legacy</button>
   </nav>
   </div>
 
@@ -399,6 +402,10 @@
       </div>
     </section>
 
+    <section id="legacy" class="panel tab">
+      <div class="section-head"><div><h2>Legacy</h2><div class="muted">Achievements, records and a hall of fame that carry across every dynasty on this device.</div></div></div>
+      <div id="legacyBoard"></div>
+    </section>
     <section id="history" class="panel tab">
       <div class="section-head"><div><h2>History</h2><div class="muted">Every season, champion and milestone of your dynasty.</div></div></div>
       <div class="card">

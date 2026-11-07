@@ -45,9 +45,17 @@ Section entrance (cards rise in once per tab change), radar/gauge/bar draw-ins, 
 - **Rival Watch:** `rival-snapshot-adapter.js` (read-only) + `rival-watch.js`; archetypes and lines are deterministic functions of real ratings and facts.
 - **Ceremonies:** `ceremony-snapshot-adapter.js` (read-only) + `ceremonies.js`. A ceremony plays when a milestone key appears that was not in the previous snapshot for the same program and season; loading or switching programs resets the baseline. They stay off under browser automation unless a test sets `DynastyCeremonies.autoplay=true`.
 
+## Feel and long-term goals
+
+- **Sound:** `sound.js` synthesizes every cue with Web Audio (deterministic noise, no files). Preferences live in `localStorage` (`dynastyLabSound`); automated browsers stay silent unless a test calls `DynastySound.enableForTests()`. `renderWav(cue)` renders a cue offline for review.
+- **Storylines:** `storyline-snapshot-adapter.js` (read-only, cached per game week) builds plain player records; `storylines.js` detects arcs (`detect`) and picks a varied set (`select`). Tested in `tests/storylines.js`.
+- **Legacy:** `legacy-snapshot-adapter.js` + `legacy.js`; the store is `localStorage.dynastyLabLegacy`, never the save. Tested in `tests/legacy.js`.
+- **Season moments:** `season-moments-adapter.js` + `season-moments.js` (highlights, Rivalry Week, yearbook); the rivalry trophy ceremony is part of `ceremonies.js`.
+- Class prefixes: Rival Watch uses `rvw-` because `rw-` belongs to the recruiting workspace.
+
 ## Files
 
-`brand-identity.css` (last in the cascade), `brand-visuals.js`, `brand-snapshot-adapter.js`, `gameday-momentum.js`, `rival-snapshot-adapter.js`, `rival-watch.js`, `ceremony-snapshot-adapter.js`, `ceremonies.js`, `assets/fonts/*`. Tests: `tests/brand-visuals.js`, `tests/gameday-momentum.js`, `tests/rival-ceremonies.js`, `tests/brand-identity-browser.js`, `tests/fun-features-browser.js`.
+`brand-identity.css` (last in the cascade), `brand-visuals.js`, `brand-snapshot-adapter.js`, `gameday-momentum.js`, `rival-snapshot-adapter.js`, `rival-watch.js`, `ceremony-snapshot-adapter.js`, `ceremonies.js`, `sound.js`, `storyline-snapshot-adapter.js`, `storylines.js`, `legacy-snapshot-adapter.js`, `legacy.js`, `season-moments-adapter.js`, `season-moments.js`, `assets/fonts/*`. Tests: `tests/brand-visuals.js`, `tests/gameday-momentum.js`, `tests/rival-ceremonies.js`, `tests/storylines.js`, `tests/legacy.js`, `tests/brand-identity-browser.js`, `tests/fun-features-browser.js`, `tests/season-features-browser.js`.
 
 ---
 
