@@ -116,3 +116,13 @@ test('a finished season counts toward the tracked header until the offseason rev
  assert.deepEqual(JSON.parse(JSON.stringify(make({year:2027,completed:[]}))),{wins:36,losses:5,seasons:3,conferenceTitles:2,nationalTitles:1});
  assert.deepEqual(JSON.parse(JSON.stringify(make({year:2027,completed:['review']}))),{wins:20,losses:4,seasons:2,conferenceTitles:1,nationalTitles:0},'after review the stored totals already include it');
 });
+
+test('the dynasty arc lists every archived season oldest first with numeric records',()=>{
+ const season=(year,w,l,extra={})=>({type:'season',year,champion:extra.champion?'Home':'Other',records:[{name:'Home',schoolId:1,w,l,cw:0,cl:0}],top10:extra.rank?Array.from({length:extra.rank},(_,i)=>i===extra.rank-1?{name:'Home',schoolId:1}:{name:'X'+i}):[],awards:[]});
+ const out=model.snapshot(raw({year:2034,history:[season(2033,13,1,{champion:true,rank:1}),season(2032,6,6),season(2031,9,3,{rank:8}),{type:'season',year:2030,records:[]}]}));
+ assert.deepEqual(JSON.parse(JSON.stringify(out.arc)),[
+  {year:2031,wins:9,losses:3,rank:8,champion:false},
+  {year:2032,wins:6,losses:6,rank:null,champion:false},
+  {year:2033,wins:13,losses:1,rank:1,champion:true}]);
+ assert.equal(out.seasons.length,3,'the recent-season list is unchanged');
+});

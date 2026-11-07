@@ -34,6 +34,24 @@ function personalHistory(host,model,open){
   for(const g of row.meetings){const item=add(list,'article','legacy-meeting');const button=add(item,'button','game-link',g.year+' · '+g.result+' '+g.us+'–'+g.them);button.type='button';button.dataset.game=String(g.id);button.dataset.gameTab='Summary';add(item,'small','legacy-note',(g.week!=null?'Week '+g.week+' · ':'')+g.label+' · '+(g.venue==='neutral'?'Neutral site':g.venue==='away'?'Away':'Home'))}
  }else add(rival,'p','legacy-empty','No rivalry is recorded for this program.');
 }
+// Season-by-season win share as a bar strip: bar height is the season's win percentage, gold bars
+// are national titles, and top-10 finishes carry their final rank. Built from archived seasons only.
+function dynastyArc(host,arc){
+ const panel=add(host,'section','legacy-arc');
+ const head=add(panel,'div','legacy-arc-head');const titles=add(head,'div');add(titles,'span','legacy-kicker','DYNASTY ARC');add(titles,'h4','','Season by season');
+ const wins=arc.reduce((n,s)=>n+s.wins,0),losses=arc.reduce((n,s)=>n+s.losses,0),best=arc.reduce((a,s)=>s.wins-s.losses>a.wins-a.losses?s:a,arc[0]),titles10=arc.filter(s=>s.rank!=null).length;
+ add(head,'small','legacy-arc-summary',arc.length+' seasons · '+wins+'–'+losses+' · best '+best.year+' ('+best.wins+'–'+best.losses+') · '+titles10+' top-10 finish'+(titles10===1?'':'es'));
+ const list=add(panel,'ol','legacy-arc-bars');list.setAttribute('aria-label','Archived seasons, oldest first');
+ const labelEvery=arc.length<=14?1:arc.length<=30?2:5;
+ arc.forEach((s,i)=>{const games=s.wins+s.losses,pct=games?s.wins/games:0,tier=s.champion?'title':pct>=.75?'great':pct>=.5?'good':'poor';
+  const li=add(list,'li','legacy-arc-bar is-'+tier);li.title=s.year+': '+s.wins+'–'+s.losses+(s.rank?' · #'+s.rank+' final':'')+(s.champion?' · National champion':'');
+  const col=add(li,'span','legacy-arc-col');const fill=add(col,'i');fill.style.height=Math.max(4,Math.round(pct*100))+'%';
+  if(s.rank)add(col,'b','legacy-arc-rank',s.champion?'★':'#'+s.rank);
+  add(li,'span','legacy-arc-year',(i%labelEvery===0||i===arc.length-1)?"'"+String(s.year).slice(-2):'');
+  add(li,'span','bi-sr legacy-arc-sr',li.title)});
+ // Long dynasties scroll; open on the most recent seasons.
+ requestAnimationFrame?.(()=>{list.scrollLeft=list.scrollWidth});
+}
 function render(){
  const section=document.querySelector('#history');
  if(!section?.classList.contains('active'))return;
@@ -60,6 +78,7 @@ function render(){
  const metrics=add(host,'div','legacy-metrics');
  for(const [label,value] of [['CONFERENCE TITLES',model.tracked.conferenceTitles],['NATIONAL TITLES',model.tracked.nationalTitles],['RECENT ARCHIVES',model.seasons.length]]){const box=add(metrics,'div');add(box,'span','',label);add(box,'strong','',value)}
  }
+ if(model.arc?.length>=2)dynastyArc(host,model.arc);
  const grid=hasHistory?add(host,'div','legacy-grid'):host;
  if(hasHistory){
  const trophy=add(grid,'section','legacy-panel');add(trophy,'span','legacy-kicker','TROPHY ROOM');add(trophy,'h4','','Championships');

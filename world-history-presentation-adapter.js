@@ -75,6 +75,8 @@ function makeWorldHistoryPresentationModel(){
    titleYears,
    awardRows,
    seasons:seasons.slice(0,6),
+   // Every archived season with a numeric record, oldest first, for the season-by-season arc.
+   arc:seasons.map(s=>{const m=/^(\d+)-(\d+)$/.exec(String(s.record||''));return m?{year:s.year,wins:Number(m[1]),losses:Number(m[2]),rank:s.rank,champion:s.champion}:null}).filter(Boolean).slice(0,60).reverse(),
    ...people(raw),
    rivalry:rivalry(raw),
    archives:{playersDeferred:!!raw.playersDeferred,gamesDeferred:!!raw.gamesDeferred}

@@ -40,3 +40,22 @@
 .legacy-meeting .game-link{max-width:100%;min-height:32px;height:auto;white-space:normal;overflow-wrap:anywhere;text-align:left;font-variant-numeric:tabular-nums}
 @media(max-width:1000px){.legacy-memory-grid{grid-template-columns:1fr 1fr}.legacy-memory-section:first-child{grid-column:1/-1}}
 @media(max-width:560px){.legacy-memory-grid{grid-template-columns:1fr;gap:12px}.legacy-memory-section:first-child{grid-column:auto}.legacy-memory-summary>span{display:block;margin-top:2px}.dynasty-museum .legacy-person,.dynasty-museum .legacy-program,.legacy-meeting .game-link{min-height:40px}}
+
+/* Dynasty arc: season-by-season win share. */
+.legacy-arc{display:grid;gap:10px;padding:12px 13px 10px;border:1px solid #28384b;border-radius:11px;background:linear-gradient(180deg,rgba(var(--legacy-primary-rgb,35,72,117),.16),#111923 70%)}
+.legacy-arc-head{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap}.legacy-arc-head h4{margin:2px 0 0}
+.legacy-arc-summary{font-size:12px;color:#9dafc1}
+.legacy-arc-bars{display:flex;align-items:stretch;gap:4px;margin:0;padding:0 0 2px;list-style:none;overflow-x:auto;scrollbar-width:thin}
+.legacy-arc-bar{position:relative;flex:1 0 14px;max-width:56px;display:grid;grid-template-rows:96px auto;gap:4px}
+.legacy-arc-col{position:relative;display:flex;align-items:flex-end;border-radius:5px;background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 24px),rgba(255,255,255,.025)}
+.legacy-arc-col i{display:block;width:100%;border-radius:5px 5px 3px 3px;background:#5d7189;transition:height .4s ease}
+.legacy-arc-bar.is-good .legacy-arc-col i{background:linear-gradient(180deg,#7fb2ef,#3f6ea8)}
+.legacy-arc-bar.is-great .legacy-arc-col i{background:linear-gradient(180deg,#7fe0ad,#2f8f62)}
+.legacy-arc-bar.is-poor .legacy-arc-col i{background:linear-gradient(180deg,#f0959b,#9b3c45)}
+.legacy-arc-bar.is-title .legacy-arc-col i{background:linear-gradient(180deg,#ffe7a8,#c9962e);box-shadow:0 0 14px rgba(230,184,106,.35)}
+.legacy-arc-rank{position:absolute;left:0;right:0;top:3px;text-align:center;font-size:10px;font-weight:850;color:#e7edf3;text-shadow:0 1px 2px rgba(0,0,0,.7)}
+.legacy-arc-bar.is-title .legacy-arc-rank{top:-1px;font-size:13px;color:#ffd77a;text-shadow:0 0 8px rgba(230,184,106,.6)}
+.legacy-arc-year{min-height:12px;text-align:center;font-size:10px;letter-spacing:.04em;color:var(--muted,#8e9aa6)}
+.legacy-arc-bar:hover .legacy-arc-col{outline:1px solid rgba(255,255,255,.18)}
+@media(max-width:520px){.legacy-arc-bar{grid-template-rows:72px auto;flex-basis:12px}.legacy-arc-head{display:grid;gap:2px}.legacy-arc-bar:not(.is-title) .legacy-arc-rank{display:none}}
+@media(prefers-reduced-motion:reduce){.legacy-arc-col i{transition:none}}
