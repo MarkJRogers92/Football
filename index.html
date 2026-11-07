@@ -2248,13 +2248,13 @@ html.bi-brand :focus-visible{outline:2px solid var(--bi-gold);outline-offset:2px
 
 /* ---------- Type: condensed display for headlines, numbers and labels ---------- */
 html.bi-brand main h2,html.bi-brand .rd-roster-head h2,html.bi-brand .rd-depth-head h2,html.bi-brand #hubTitle,html.bi-brand #teamName{
- font-family:var(--bi-display);font-weight:800;text-transform:uppercase;letter-spacing:.01em;line-height:.98
+ font-family:var(--bi-display);font-weight:800;letter-spacing:.01em;line-height:.98
 }
 html.bi-brand main .section-head h2{font-size:34px;display:flex;align-items:center;gap:12px}
 html.bi-brand main .section-head h2::before{content:"";flex:0 0 auto;width:6px;height:.8em;border-radius:2px;background:linear-gradient(180deg,var(--bi-gold-hi),var(--bi-gold-deep));box-shadow:0 0 18px rgba(var(--bi-gold-rgb),.45)}
-html.bi-brand main h3{font-family:var(--bi-display);font-weight:800;letter-spacing:.01em;font-size:21px;text-transform:uppercase}
-html.bi-brand .eyebrow,html.bi-brand .hub-kicker,html.bi-brand .client-nav-label,html.bi-brand th,html.bi-brand .decision-kicker,html.bi-brand .weekly-desk-status{
- font-family:var(--bi-display);font-weight:800;letter-spacing:.16em;text-transform:uppercase
+html.bi-brand main h3{font-family:var(--bi-display);font-weight:800;letter-spacing:.01em;font-size:21px}
+html.bi-brand .eyebrow,html.bi-brand .hub-kicker,html.bi-brand .client-nav-label,html.bi-brand th,html.bi-brand .decision-kicker{
+ font-family:var(--bi-display);font-weight:800;letter-spacing:.16em
 }
 html.bi-brand main .eyebrow{color:color-mix(in srgb,var(--bi-gold) 62%,#8c9bb0);font-size:12.5px}
 html.bi-brand #recordBig,html.bi-brand .big,html.bi-brand .metric .v,html.bi-brand .program-attr strong,html.bi-brand .profile-stat .v,
@@ -2296,7 +2296,7 @@ html.bi-brand .client-nav-item.active .client-nav-icon{color:var(--bi-gold-hi)}
 
 /* ---------- Top bar as a broadcast scorebug ---------- */
 html.bi-brand .client-shell-ready .topbar{background:rgba(6,10,15,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom-color:#141f2c}
-html.bi-brand .client-status-program strong{font:800 21px/1 var(--bi-display);text-transform:uppercase;letter-spacing:.02em}
+html.bi-brand .client-status-program strong{font:800 21px/1 var(--bi-display);letter-spacing:.02em}
 html.bi-brand .client-status-facts [data-client-record]{font-size:24px;line-height:1;color:#fff}
 html.bi-brand .client-status-facts [data-client-rank]{color:var(--bi-gold-hi);font-weight:700}
 
@@ -2304,7 +2304,7 @@ html.bi-brand .client-status-facts [data-client-rank]{color:var(--bi-gold-hi);fo
 html.bi-brand .client-shell-ready .tabs-shell{background:rgba(7,11,17,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom-color:#141f2c}
 html.bi-brand .client-shell-ready .tabs button{
  position:relative;border:0;border-radius:0;background:transparent;padding:10px 12px;
- font:800 14px/1 var(--bi-display);letter-spacing:.09em;text-transform:uppercase;color:#7c8ca1
+ font:800 14px/1 var(--bi-display);letter-spacing:.09em;color:#7c8ca1
 }
 html.bi-brand .client-shell-ready .tabs button:hover{color:#e8eef6;background:transparent}
 html.bi-brand .client-shell-ready .tabs button.active{color:#fff;background:transparent}
@@ -2318,7 +2318,7 @@ html.bi-brand .dash-views,html.bi-brand .recruit-class-views,html.bi-brand .recr
 html.bi-brand .dash-views::-webkit-scrollbar,html.bi-brand .recruit-class-views::-webkit-scrollbar{display:none}
 html.bi-brand .dash-views button,html.bi-brand .recruit-class-views button,html.bi-brand .recruit-mode-buttons button{
  flex:0 0 auto;min-height:36px;padding:8px 14px;border:0;border-radius:9px;background:transparent;color:#91a1b6;
- font:800 14px/1 var(--bi-display);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;box-shadow:none;
+ font:800 14px/1 var(--bi-display);letter-spacing:.07em;white-space:nowrap;box-shadow:none;
  transition:background .2s var(--bi-ease),color .2s
 }
 html.bi-brand .dash-views button:hover,html.bi-brand .recruit-class-views button:hover,html.bi-brand .recruit-mode-buttons button:hover{color:#fff;background:rgba(255,255,255,.06)}
@@ -2332,7 +2332,7 @@ html.bi-brand .recruit-mode-buttons .rw-budget{align-self:center;padding:0 8px;f
 html.bi-brand :is(#simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason):not(:disabled){
  position:relative;overflow:hidden;border:1px solid #f0c768;color:#160f02;
  background:linear-gradient(180deg,var(--bi-gold-hi),var(--bi-gold) 55%,#cf9a35);
- font:800 15px/1 var(--bi-display);letter-spacing:.08em;text-transform:uppercase;
+ font:800 15px/1 var(--bi-display);letter-spacing:.08em;
  box-shadow:0 8px 22px rgba(var(--bi-gold-rgb),.28),inset 0 1px 0 rgba(255,255,255,.55);transition:transform .15s var(--bi-ease),box-shadow .2s
 }
 html.bi-brand :is(#simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason):not(:disabled)::after{
@@ -2393,7 +2393,7 @@ html.bi-brand .weekly-desk-focus[data-status="ready"],html.bi-brand .weekly-desk
 html.bi-brand .command-center:has(#weeklyDecisions .decision-card:not(.decision-resolved)) .weekly-desk-focus[data-status="blocked"] h3{font-size:17px;margin:3px 0 2px;text-transform:none;font-family:inherit;font-weight:750}
 html.bi-brand .decision-card{border-radius:12px;border-color:rgba(var(--bi-gold-rgb),.38);background:linear-gradient(180deg,rgba(var(--bi-gold-rgb),.06),rgba(var(--bi-gold-rgb),.015)),var(--bi-panel)}
 html.bi-brand .decision-card .decision-kicker{color:var(--bi-gold)}
-html.bi-brand .decision-title{font:800 22px/1.05 var(--bi-display);text-transform:uppercase;letter-spacing:.01em}
+html.bi-brand .decision-title{font:800 22px/1.05 var(--bi-display);letter-spacing:.01em}
 html.bi-brand .decision-option{border-color:var(--bi-line-2);background:rgba(255,255,255,.025);transition:border-color .18s,background .18s,transform .15s var(--bi-ease)}
 html.bi-brand .decision-option:hover:not(:disabled){border-color:rgba(var(--bi-gold-rgb),.7);background:rgba(var(--bi-gold-rgb),.08);transform:translateY(-1px)}
 
@@ -2501,7 +2501,7 @@ html.bi-brand #dashboard .program-masthead .bi-strip-host{grid-area:strip}
 .bi-helmet--matchup{width:84px;filter:drop-shadow(0 10px 14px rgba(0,0,0,.5))}
 html.bi-brand .broadcast-feature-main{border-color:var(--bi-line);background:linear-gradient(100deg,rgba(var(--team-primary-rgb,35,72,117),.28),transparent 40%),linear-gradient(180deg,#111a25,#0b1119)}
 html.bi-brand .broadcast-versus b{font:800 40px/1 var(--bi-display);color:var(--bi-gold-hi);text-shadow:0 0 22px rgba(var(--bi-gold-rgb),.45)}
-html.bi-brand .broadcast-team strong{font:800 22px/1.02 var(--bi-display);text-transform:uppercase;letter-spacing:.01em}
+html.bi-brand .broadcast-team strong{font:800 22px/1.02 var(--bi-display);letter-spacing:.01em}
 html.bi-brand .broadcast-kicker{font-family:var(--bi-display);font-weight:800;letter-spacing:.16em;color:color-mix(in srgb,var(--bi-gold) 62%,#8c9bb0)}
 @media(max-width:720px){.bi-helmet--matchup{width:60px}.broadcast-team.bi-has-helmet{grid-template-columns:auto minmax(0,1fr)}}
 /* Recruiting: the mode toggle is a control, not a headline — the explainer steps aside. */
@@ -2517,10 +2517,10 @@ body.motion-reduced .rw-conf>i{animation:none!important}
 .season-pulse-main.bi-has-helmet>.season-pulse-logo,.season-next.bi-has-helmet>.season-next-logo{display:none}
 .bi-helmet--pulse{width:76px;filter:drop-shadow(0 10px 14px rgba(0,0,0,.5))}
 .bi-helmet--pulse-next{width:52px}
-html.bi-brand .season-pulse-identity strong{font:800 28px/1 var(--bi-display);text-transform:uppercase;letter-spacing:.01em}
-html.bi-brand .season-next strong,html.bi-brand .season-result strong{font-family:var(--bi-display);font-weight:800;font-size:20px;text-transform:uppercase;letter-spacing:.01em}
+html.bi-brand .season-pulse-identity strong{font:800 28px/1 var(--bi-display);letter-spacing:.01em}
+html.bi-brand .season-next strong,html.bi-brand .season-result strong{font-family:var(--bi-display);font-weight:800;font-size:20px;letter-spacing:.01em}
 html.bi-brand .event-center b{font-size:44px;font-family:var(--bi-display);font-weight:800;color:var(--bi-gold-hi);text-shadow:0 0 22px rgba(var(--bi-gold-rgb),.4)}
-html.bi-brand .event-team-copy strong{font-family:var(--bi-display);font-weight:800;text-transform:uppercase;letter-spacing:.01em;font-size:28px}
+html.bi-brand .event-team-copy strong{font-family:var(--bi-display);font-weight:800;letter-spacing:.01em;font-size:28px}
 @media(max-width:720px){.bi-helmet--pulse{width:56px}.bi-helmet--pulse-next{width:40px}html.bi-brand .event-team-copy strong{font-size:22px}}
 </style></head><body>
 <section id="titleScreen" class="title-screen" aria-labelledby="titleGameName">
