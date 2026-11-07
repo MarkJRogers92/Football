@@ -39,7 +39,7 @@ const {chromium}=require('playwright-core'),{chromiumPath}=require('./helpers/ch
   assert.equal(await page.locator('#recruitDialogName').innerText(),expectedName,'map marks open the canonical recruit profile');
   await page.evaluate(()=>document.querySelector('#recruitDialog').close());
   await page.locator('[data-recruit-class=\"'+'shortlist'+'\"]').click();
-  const quick=page.locator('#staffRecruitShortlist [data-scout-action="quick"]:not([disabled])').first(),scoutId=await quick.getAttribute('data-scout-recruit'),spent=await page.evaluate(()=>window.__DL_TEST__.selected().scoutingWeek.spent);
+  const quick=page.locator('#staffRecruitShortlist [data-scout-action="quick"]:not([disabled])').first(),scoutId=await quick.getAttribute('data-scout-recruit'),spent=await page.evaluate(()=>window.__DL_TEST__.selected().scoutingWeek?.spent??0);
   await quick.click();await page.waitForFunction(id=>window.DynastyRecruitingWorkspaceIntel.forId(id).stage==='Film reviewed',scoutId);
   assert.equal(await page.evaluate(()=>window.__DL_TEST__.selected().scoutingWeek.spent),spent+1,'shortlist scouting spends exactly one hour');
   assert.equal(await page.locator('#staffRecruitShortlist').isVisible(),true,'refresh stays in the shortlist view');
