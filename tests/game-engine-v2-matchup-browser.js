@@ -17,7 +17,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
     for(const phrase of ['GAME DAY INTELLIGENCE','Where the game tilts','Opponent identity','Staff recommendation','Your key players','Players to know'])assert.match(pre.matchup.text,new RegExp(phrase,'i'));
     assert.match(pre.matchup.text,/% pass/i);assert.match(pre.matchup.text,/Active plan/i);
     await page.waitForSelector('[data-v2-gameday-start]',{timeout:10000});await page.click('[data-v2-gameday-start]');await page.click('[data-v2-gameday-delegate]');
-    await page.waitForFunction(()=>window.__DL_TEST__.v2GameDayPreviewState()?.state?.status==='final',{timeout:60000});await page.click('[data-v2-gameday-record]');
+    /* the live game records itself at the final whistle */
     await page.waitForFunction(()=>/GAME PLAN REVIEW/i.test(window.__DL_TEST__.v2MatchupSummary()?.receipt||''),{timeout:30000});const post=await page.evaluate(()=>window.__DL_TEST__.v2MatchupSummary());
     assert.match(post.receipt,/GAME PLAN REVIEW/i);assert.match(post.receipt,/Standard week/i);assert.match(post.receipt,/Baseline/i);assert.match(post.receipt,/other factors also affect the outcome/i);
     assert.deepEqual(errors,[],`matchup intelligence browser emitted errors: ${errors.join('\n')}`);console.log('PASS v0.10.2 matchup intelligence: weekly blockers resolved before Game Day; pregame intelligence and archived postgame receipt remain intact');
