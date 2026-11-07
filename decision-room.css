@@ -28,3 +28,6 @@
 .decision-room footer{display:flex;justify-content:flex-end}
 .decision-room-link{justify-self:start;margin:6px 0 2px;padding:6px 12px;border:1px solid rgba(230,184,106,.5);border-radius:8px;background:rgba(230,184,106,.1);color:#ffe7b0;font-weight:800;cursor:pointer}
 @media(max-width:520px){.decision-room{width:100vw;max-width:100vw;max-height:100vh;height:100%;border-radius:0;margin:0}.decision-room-shell{padding:14px}.decision-room header h2{font-size:20px}}
+/* On the weekly desk a required card stays short; the Decision Room carries the detail. */
+#weeklyDecisions .decision-card .decision-option small{display:none}
+#weeklyDecisions .decision-card .decision-summary{font-size:14px}

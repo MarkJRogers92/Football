@@ -37,7 +37,7 @@
   const blockers=window.DynastyNextAction?.blockingItems(model)||[],next=blockers[0];
   const label=f.key==='none'?'No advance available':statusLabel[f.status]||'Next boundary';
   const title=next?.title||f.title||f.label;
-  const detail=next?`${blockers.length} required decision${blockers.length===1?'':'s'} before the next advance. ${f.title}.`:f.status==='caution'?'You can advance with the current plan. Review open choices in the full briefing if you want to change it.':f.key==='begin-season'?'Opens your first matchup without simulating a game.':f.key==='none'?'Review your program for the next available action.':'Your current plan is ready. The full briefing explains what happens next.';
+  const detail=next?`${blockers.length>1?`${blockers.length} decisions needed`:'Needed'} before ${String(f.title||'the next advance').replace(/^Complete /,'')}.`:f.status==='caution'?'You can advance with the current plan. Review open choices in the full briefing if you want to change it.':f.key==='begin-season'?'Opens your first matchup without simulating a game.':f.key==='none'?'Review your program for the next available action.':'Your current plan is ready. The full briefing explains what happens next.';
   host.dataset.status=f.status;
   host.innerHTML=`<span class="weekly-desk-status">${esc(label)}</span><h3>${esc(title)}</h3><p>${esc(detail)}</p>`;
  }
