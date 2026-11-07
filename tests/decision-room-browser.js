@@ -11,7 +11,10 @@ const {startNewDynasty}=require('./helpers/start-new-dynasty');
   const page=await browser.newPage({viewport,reducedMotion:'reduce'}),errors=[];
   page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
   await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);
-  await page.waitForFunction(()=>window.DynastyNextAction.blockingItems(window.getDynastyGuidance()).length>0);
+  // Required decisions do not appear every week: play weeks with the staff deciding until one does.
+  const blocked=()=>page.evaluate(()=>window.DynastyNextAction.blockingItems(window.getDynastyGuidance()).length>0);
+  for(let i=0;i<8&&!(await blocked());i++){const w=await page.evaluate(()=>window.__DL_TEST__.preseasonDebug().week);await page.evaluate(()=>document.querySelector('#simWeek').click());await page.waitForFunction(x=>window.__DL_TEST__.preseasonDebug().week>x,w,{timeout:60000})}
+  assert.ok(await blocked(),'a required decision appeared within eight weeks');
   const id=await page.evaluate(()=>window.DynastyNextAction.blockingItems(window.getDynastyGuidance())[0].destination.decisionId),week=await page.evaluate(()=>window.__DL_TEST__.preseasonDebug().week);
   await page.click(`[data-decision-room="${id}"]`);await page.waitForSelector('#decisionRoom[open]');
   const people=await page.evaluate(i=>window.DynastyDecisionRoom.people(i),id);

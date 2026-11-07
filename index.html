@@ -3056,6 +3056,29 @@ button.lw-follow[aria-pressed="true"]{color:var(--text);border-color:var(--team-
 /* On the weekly desk a required card stays short; the Decision Room carries the detail. */
 #weeklyDecisions .decision-card .decision-option small{display:none}
 #weeklyDecisions .decision-card .decision-summary{font-size:14px}
+
+/* Calm layout: fewer boxes inside boxes. Loaded last so it wins over feature styles. */
+
+/* Inner sections sit on the card itself: separated by space and a hairline, not their own boxes. */
+.v2-matchup-grid>section,.v0102-weekly-grid section{background:none;border:0;border-radius:0;padding:0}
+.v2-matchup-grid,.v0102-weekly-grid{gap:20px 28px}
+.v2-matchup-plan{background:none;border:0;border-top:1px solid var(--line);border-radius:0;padding:12px 0 0}
+.v2-matchup-tendency{background:none;padding:0}
+.v0102-staff-card{background:none;border:0;border-left:2px solid var(--line);border-radius:0;padding:4px 0 4px 12px}
+
+/* Preparation choices: compact chips; the full description shows on the chosen ones only. */
+.v0102-prep-focus{min-height:0;padding:9px 12px}
+.v0102-prep-focus small{display:none}
+.v0102-prep-focus.active small,.v0102-prep-focus[aria-pressed="true"] small{display:block}
+
+/* A single required decision reads as the body of the weekly focus, not a second headline. */
+#weeklyDecisions .decision-card:only-child .decision-kicker,#weeklyDecisions .decision-card:only-child .decision-title{display:none}
+#weeklyDecisions .decision-card:only-child{margin-top:6px}
+
+/* Game Day hero without data grids: the matchup is the picture. */
+.gameday-event-hero:not(:has(.event-recent)){gap:0}
+/* Around your program only takes space when it has something to say. */
+#weeklyWorldBriefing:not(:has(.lw-brief)) .lw-heading{display:none}
 </style></head><body>
 <section id="titleScreen" class="title-screen" aria-labelledby="titleGameName">
   <div class="title-screen-art" aria-hidden="true"></div>
@@ -13064,7 +13087,7 @@ if(globalThis.__DL_TEST__){
  // They are optional: Set up opens the place to act, Later snoozes until the calendar moves.
  function renderSetupNudges(model){
   const focus=target('#weeklyDeskFocus');if(!focus)return;let host=target('#weeklySetupNudges');
-  if(!host){host=document.createElement('section');host.id='weeklySetupNudges';host.className='weekly-setup-nudges';host.setAttribute('aria-label','Program setup');focus.insertAdjacentElement('afterend',host)}
+  if(!host){host=document.createElement('section');host.id='weeklySetupNudges';host.className='weekly-setup-nudges';host.setAttribute('aria-label','Program setup');(target('#weeklyDecisions')||focus).insertAdjacentElement('afterend',host)}
   const items=(model.items||[]).filter(x=>!x.deferred&&x.meaning==='staff_recommendation'&&['recruiting','development'].includes(x.category)).slice(0,3);
   host.hidden=!items.length;if(!items.length){host.innerHTML='';return}
   host.innerHTML=`<span class="weekly-setup-label">Worth doing this week</span>${items.map(x=>`<div class="weekly-setup-row" data-setup-category="${esc(x.category)}"><span class="weekly-setup-icon" aria-hidden="true">${x.category==='recruiting'?'◎':'↗'}</span><div><strong>${esc(x.title)}</strong><small>${esc(x.cause)}</small></div><button type="button" class="weekly-setup-go" data-setup-open="${esc(x.id)}">${x.category==='recruiting'?'Recruit':'Develop'}</button><button type="button" class="guidance-text-action" data-setup-later="${esc(x.id)}">Later</button></div>`).join('')}`;
@@ -16528,7 +16551,8 @@ function renderGameDay(){
  if(!d){host.hidden=true;gameSig='';return}const isHome=!!d.isHome,user=d.user,opp=d.opponent,away=isHome?opp:user,home=isHome?user:opp,last=d.lastShowcase,sig=[d.postgame?'post':'pre',d.week,user?.id,opp?.id,user?.record,opp?.record,d.activePlan,d.recommendedPlan,d.userOut,d.opponentOut,last?.id,last?.userScore,last?.oppScore].join('|'),quickRow=document.querySelector('#detailedBox')?.closest('.two-col');if(last?.id&&quickRow?.querySelector('[data-game]'))host.insertAdjacentElement('afterend',quickRow);if(sig===gameSig&&!host.hidden)return;gameSig=sig;host.hidden=false;host.dataset.stakes=d.stakesTone||'standard';
  const kicker=d.postgame?`<div class="event-kicker"><span>POSTGAME REVIEW · WEEK ${esc(d.week)}</span><strong>${esc(d.stakes)}</strong></div>`:`<div class="event-kicker"><span>GAME DAY · WEEK ${esc(d.week)}</span><strong>${esc(d.stakes)}</strong></div>`;
  const center=`<div class="event-center"><span>${esc(d.venue)}</span><b>${d.postgame?'FINAL':isHome?'VS':'AT'}</b><small>${esc(d.homeEdge)}</small></div>`;
- const pregame=d.postgame?'':`<div class="event-showcase-band"><div><span>YOUR EDGE</span><strong>OFF ${esc(user.offense)} · DEF ${esc(user.defense)}</strong></div><div><span>OPPONENT</span><strong>OFF ${esc(opp.offense)} · DEF ${esc(opp.defense)}</strong></div><div><span>OPPONENT TENDENCY</span><strong>${esc(d.opponentPassMix)}% pass</strong></div></div><div class="event-prep"><div><span>ACTIVE PLAN</span><strong>${esc(d.activePlan)}</strong></div><div><span>STAFF RECOMMENDATION</span><strong>${esc(d.recommendedPlan)}</strong><small>${esc(d.recommendation)}</small></div><div><span>AVAILABILITY</span><strong>${esc(d.userOut)} out · ${esc(d.opponentOut)} opponent</strong><small>${esc(d.homeEdge)}</small></div></div>`;
+ // The hero is the matchup itself; plan, edges and tendency live once, in the Matchup breakdown.
+ const pregame='';
  host.innerHTML=`${kicker}<div class="event-matchup">${teamCard('away',away)}${center}${teamCard('home',home)}</div>${pregame}${recentShowcase(last)}`;
  for(const el of host.querySelectorAll('[data-event-team]')){brand(el,el.dataset.eventTeam);helmet(el.querySelector('.event-team-shell'),el.dataset.eventTeam);helmet(el.querySelector('.event-team-logo'),el.dataset.eventTeam)}host.querySelectorAll('[data-event-player]').forEach(b=>b.onclick=()=>document.querySelector(`[data-player="${CSS.escape(b.dataset.eventPlayer)}"]`)?.click());
 }
@@ -17969,7 +17993,7 @@ function reconcile(store,snap){
 }
 function briefing(snap,store){
  const items=[],add=item=>{if(items.length<3&&!items.some(x=>item.key?x.key===item.key:x.title===item.title))items.push(item)};
- const g=snap.nextGame;if(g){const o=g.opponent;add({kind:'matchup',title:`${g.rival?'Rivalry week · ':''}${g.home?'vs':'at'} ${o.rank?`#${o.rank} `:''}${o.name}`,detail:`Week ${g.week} · ${o.w}–${o.l}${g.rival?' · Your primary rival':''}`})}
+ const g=snap.nextGame;if(g?.rival){const o=g.opponent;add({kind:'matchup',title:`${g.rival?'Rivalry week · ':''}${g.home?'vs':'at'} ${o.rank?`#${o.rank} `:''}${o.name}`,detail:`Week ${g.week} · ${o.w}–${o.l}${g.rival?' · Your primary rival':''}`})}
  for(const c of (snap.callbacks||[]).slice(0,1))add({...c,kind:'callback'});
  for(const f of followed(store,snap))if(f.update?.stamp===snap.stamp)add({...f.update,kind:'following'});
  const news=snap.news||[],mine=news.find(x=>x.mine),league=news.find(x=>!x.mine);
@@ -17981,7 +18005,7 @@ function html(snap,store){
  const b=briefing(snap,store),rows=followed(store,snap),keys=new Set(rows.map(x=>x.key));
  const personRow=(p,on)=>`<li><span><button type="button" class="lw-person" data-lw-open="${esc(p.key)}">${esc(p.name)}</button><small>${esc(p.detail||'History not currently loaded')}</small></span>${followButton(p,on)}</li>`;
  return`<div class="lw-heading"><span class="eyebrow">AROUND YOUR PROGRAM</span><small>Optional reading</small></div>`+
-  (b.items.length?`<ul class="lw-brief">${b.items.map(x=>`<li><span class="lw-tag">${esc({matchup:'Next game',callback:'Familiar face',following:'Following',team:'Your team',league:'League'}[x.kind])}</span><div>${x.key?`<button type="button" class="lw-person" data-lw-open="${esc(x.key)}">${esc(x.title)}</button>`:`<strong>${esc(x.title)}</strong>`}${x.detail?`<p>${esc(x.detail)}</p>`:''}</div></li>`).join('')}</ul>`:'<p class="lw-quiet">No major updates. Your current plan can carry on.</p>')+
+  (b.items.length?`<ul class="lw-brief">${b.items.map(x=>`<li><span class="lw-tag">${esc({matchup:'Next game',callback:'Familiar face',following:'Following',team:'Your team',league:'League'}[x.kind])}</span><div>${x.key?`<button type="button" class="lw-person" data-lw-open="${esc(x.key)}">${esc(x.title)}</button>`:`<strong>${esc(x.title)}</strong>`}${x.detail?`<p>${esc(x.detail)}</p>`:''}</div></li>`).join('')}</ul>`:'')+
   `<details class="lw-cast"><summary>People you follow${rows.length?` · ${rows.length}`:''}</summary><p class="muted small">Follow players and coaches for updates when their situation changes. Saved on this device; no effect on your coaching decisions.</p>`+
   (rows.length?`<ul>${rows.map(f=>{const p=snap.people.find(p=>p.key===f.key)||f;return personRow({...p,detail:f.update?.stamp===snap.stamp?`${f.update.title}. ${p.detail||''}`:p.detail},true)}).join('')}</ul>`:'<p class="muted small">Nobody followed yet.</p>')+
   (rows.length<LIMIT?`<div class="eyebrow">From your football world</div><ul>${(snap.suggestions||[]).filter(k=>!keys.has(k)).slice(0,4).map(k=>snap.people.find(p=>p.key===k)).filter(Boolean).map(p=>personRow(p,false)).join('')}</ul>`:'<p class="muted small">Following 24 people. Unfollow someone to make room.</p>')+`</details>`;

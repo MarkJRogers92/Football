@@ -12,9 +12,9 @@ async function run(browser,label,viewport){
  try{
   await startNewDynasty(page);
   await page.evaluate(()=>window.__DL_TEST__?.v2PrepareDetailedGame?.());await goTab(page,'gamelab');await page.waitForSelector('#gamedayEventHero:not([hidden])',{timeout:10000});
-  check(`[${label}] Game Day showcase renders`,await page.locator('#gamedayEventHero .event-showcase-band').count()===1);
+  check(`[${label}] Game Day hero is a clean matchup (no repeated data grids)`,await page.locator('#gamedayEventHero .event-showcase-band, #gamedayEventHero .event-prep').count()===0);
   check(`[${label}] Game Day retains real matchup teams`,await page.locator('#gamedayEventHero [data-event-team]').count()===2);
-  const prep=await page.locator('#gamedayEventHero').innerText();check(`[${label}] Game Day carries prep context`,/ACTIVE PLAN/.test(prep)&&/STAFF RECOMMENDATION/.test(prep));
+  const prep=(await page.locator('#v2MatchupIntelligence').innerText()).toUpperCase();check(`[${label}] Game Day carries prep context once, in the matchup breakdown`,/ACTIVE PLAN/.test(prep)&&/STAFF RECOMMENDATION/.test(prep));
   await page.evaluate(()=>window.DynastyGameEngineV2LabBridge.recordCurrent());await page.waitForFunction(()=>window.DynastyGameEngineV2LabBridge.debug().lastArchive?.engine==='v2',{timeout:30000});await goTab(page,'gamelab');await page.waitForSelector('#gamedayEventHero .event-recent',{timeout:10000});
   check(`[${label}] last-game FINAL treatment renders`,/FINAL/.test(await page.locator('#gamedayEventHero .event-recent').innerText()));
   check(`[${label}] archived drive strip renders`,await page.locator('#gamedayEventHero .event-drive-strip i').count()>0);

@@ -37,7 +37,7 @@ function reconcile(store,snap){
 }
 function briefing(snap,store){
  const items=[],add=item=>{if(items.length<3&&!items.some(x=>item.key?x.key===item.key:x.title===item.title))items.push(item)};
- const g=snap.nextGame;if(g){const o=g.opponent;add({kind:'matchup',title:`${g.rival?'Rivalry week · ':''}${g.home?'vs':'at'} ${o.rank?`#${o.rank} `:''}${o.name}`,detail:`Week ${g.week} · ${o.w}–${o.l}${g.rival?' · Your primary rival':''}`})}
+ const g=snap.nextGame;if(g?.rival){const o=g.opponent;add({kind:'matchup',title:`${g.rival?'Rivalry week · ':''}${g.home?'vs':'at'} ${o.rank?`#${o.rank} `:''}${o.name}`,detail:`Week ${g.week} · ${o.w}–${o.l}${g.rival?' · Your primary rival':''}`})}
  for(const c of (snap.callbacks||[]).slice(0,1))add({...c,kind:'callback'});
  for(const f of followed(store,snap))if(f.update?.stamp===snap.stamp)add({...f.update,kind:'following'});
  const news=snap.news||[],mine=news.find(x=>x.mine),league=news.find(x=>!x.mine);
@@ -49,7 +49,7 @@ function html(snap,store){
  const b=briefing(snap,store),rows=followed(store,snap),keys=new Set(rows.map(x=>x.key));
  const personRow=(p,on)=>`<li><span><button type="button" class="lw-person" data-lw-open="${esc(p.key)}">${esc(p.name)}</button><small>${esc(p.detail||'History not currently loaded')}</small></span>${followButton(p,on)}</li>`;
  return`<div class="lw-heading"><span class="eyebrow">AROUND YOUR PROGRAM</span><small>Optional reading</small></div>`+
-  (b.items.length?`<ul class="lw-brief">${b.items.map(x=>`<li><span class="lw-tag">${esc({matchup:'Next game',callback:'Familiar face',following:'Following',team:'Your team',league:'League'}[x.kind])}</span><div>${x.key?`<button type="button" class="lw-person" data-lw-open="${esc(x.key)}">${esc(x.title)}</button>`:`<strong>${esc(x.title)}</strong>`}${x.detail?`<p>${esc(x.detail)}</p>`:''}</div></li>`).join('')}</ul>`:'<p class="lw-quiet">No major updates. Your current plan can carry on.</p>')+
+  (b.items.length?`<ul class="lw-brief">${b.items.map(x=>`<li><span class="lw-tag">${esc({matchup:'Next game',callback:'Familiar face',following:'Following',team:'Your team',league:'League'}[x.kind])}</span><div>${x.key?`<button type="button" class="lw-person" data-lw-open="${esc(x.key)}">${esc(x.title)}</button>`:`<strong>${esc(x.title)}</strong>`}${x.detail?`<p>${esc(x.detail)}</p>`:''}</div></li>`).join('')}</ul>`:'')+
   `<details class="lw-cast"><summary>People you follow${rows.length?` · ${rows.length}`:''}</summary><p class="muted small">Follow players and coaches for updates when their situation changes. Saved on this device; no effect on your coaching decisions.</p>`+
   (rows.length?`<ul>${rows.map(f=>{const p=snap.people.find(p=>p.key===f.key)||f;return personRow({...p,detail:f.update?.stamp===snap.stamp?`${f.update.title}. ${p.detail||''}`:p.detail},true)}).join('')}</ul>`:'<p class="muted small">Nobody followed yet.</p>')+
   (rows.length<LIMIT?`<div class="eyebrow">From your football world</div><ul>${(snap.suggestions||[]).filter(k=>!keys.has(k)).slice(0,4).map(k=>snap.people.find(p=>p.key===k)).filter(Boolean).map(p=>personRow(p,false)).join('')}</ul>`:'<p class="muted small">Following 24 people. Unfollow someone to make room.</p>')+`</details>`;

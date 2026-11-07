@@ -45,7 +45,7 @@
  // They are optional: Set up opens the place to act, Later snoozes until the calendar moves.
  function renderSetupNudges(model){
   const focus=target('#weeklyDeskFocus');if(!focus)return;let host=target('#weeklySetupNudges');
-  if(!host){host=document.createElement('section');host.id='weeklySetupNudges';host.className='weekly-setup-nudges';host.setAttribute('aria-label','Program setup');focus.insertAdjacentElement('afterend',host)}
+  if(!host){host=document.createElement('section');host.id='weeklySetupNudges';host.className='weekly-setup-nudges';host.setAttribute('aria-label','Program setup');(target('#weeklyDecisions')||focus).insertAdjacentElement('afterend',host)}
   const items=(model.items||[]).filter(x=>!x.deferred&&x.meaning==='staff_recommendation'&&['recruiting','development'].includes(x.category)).slice(0,3);
   host.hidden=!items.length;if(!items.length){host.innerHTML='';return}
   host.innerHTML=`<span class="weekly-setup-label">Worth doing this week</span>${items.map(x=>`<div class="weekly-setup-row" data-setup-category="${esc(x.category)}"><span class="weekly-setup-icon" aria-hidden="true">${x.category==='recruiting'?'◎':'↗'}</span><div><strong>${esc(x.title)}</strong><small>${esc(x.cause)}</small></div><button type="button" class="weekly-setup-go" data-setup-open="${esc(x.id)}">${x.category==='recruiting'?'Recruit':'Develop'}</button><button type="button" class="guidance-text-action" data-setup-later="${esc(x.id)}">Later</button></div>`).join('')}`;
