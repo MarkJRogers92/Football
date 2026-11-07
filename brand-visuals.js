@@ -105,8 +105,10 @@ function paintMasthead(team){
  const sig=JSON.stringify(team.schedule.map(g=>[g.week,g.post,g.played,g.us,g.them,g.opponent.id,g.opponent.rank]));
  if(!strip){strip=document.createElement('div');strip.className='bi-strip-host';const details=mast.querySelector('#programDetails');details?mast.insertBefore(strip,details):mast.append(strip);sigs.delete('strip')}
  if(!same('strip',team.id+sig))strip.innerHTML=stripHTML(team);
- const next=strip.querySelector('.bi-chip.is-next');
- if(next&&strip.scrollWidth>strip.clientWidth){const list=strip.querySelector('.bi-strip');if(list)list.scrollLeft=Math.max(0,next.offsetLeft-list.clientWidth/2+next.clientWidth/2)}
+ // Centre the next game; once nothing is next (postseason, season complete) centre the latest result.
+ const next=strip.querySelector('.bi-chip.is-next')||[...strip.querySelectorAll('.bi-chip.is-win,.bi-chip.is-loss')].pop();
+ const list=strip.querySelector('.bi-strip');
+ if(next&&list&&list.scrollWidth>list.clientWidth){const a=next.getBoundingClientRect(),b=list.getBoundingClientRect();list.scrollLeft=Math.max(0,list.scrollLeft+(a.left-b.left)-list.clientWidth/2+a.width/2)}
 }
 function paintProgram(team){
  const host=document.querySelector('#programAttributes');if(!host||!team||host.hidden)return;
