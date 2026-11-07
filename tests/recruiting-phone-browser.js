@@ -66,7 +66,10 @@ const {startNewDynasty}=require('./helpers/start-new-dynasty');
   await page.click('[data-rwf="board"]');await page.waitForSelector('.recruit-workspace-card');
   await page.locator('.recruit-workspace-card').first().click();await page.click('[data-rwa="target"]');
   await page.waitForFunction(()=>document.querySelector('.recruit-workspace-list').getClientRects().length>0);
-  assert.equal(await page.locator('#rwSearch').evaluate(e=>e===document.activeElement),true,'removal returns focus to a safe list control');
+  // The list becomes visible a frame or two before the render that moves focus, so wait for the
+  // focus move itself; any other destination (another prospect's Remove action) still fails.
+  const focusedSearch=await page.waitForFunction(()=>document.activeElement?.id==='rwSearch',null,{timeout:5000}).then(()=>true,()=>false);
+  assert.equal(focusedSearch,true,'removal returns focus to a safe list control');
   assert.equal(await page.locator('.recruit-workspace-dossier').isVisible(),false);
   await page.click('[data-rwf="all"]');
   await page.locator('.recruit-workspace-card').first().click();
