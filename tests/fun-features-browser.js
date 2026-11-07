@@ -32,8 +32,9 @@ const {chromium}=require('playwright-core'),{chromiumPath}=require('./helpers/ch
     await legend.locator('summary').click();assert.ok((await legend.locator('dt').count())>=3,`[${label}] ${tab} key explains its numbers`);
    }
 
-   // Rival Watch reflects the real rival and its head coach.
+   // Detailed coverage is optional; opening it still exposes the real rival and head coach.
    await page.evaluate(()=>document.querySelector('.tabs button[data-tab="dashboard"]').click());
+   await page.locator('#weeklyDeskDetails > summary').click();
    const rival=await page.evaluate(()=>window.DynastyRivalSnapshot.read()?.rival);
    if(rival){
     await page.waitForSelector('#rivalWatch');

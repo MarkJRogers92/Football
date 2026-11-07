@@ -7,8 +7,8 @@ globalThis.DynastyLegacySnapshot=Object.freeze({
    if(!universe?.teams)return null;const u=selected();if(!u)return null;
    const tenure=universe.tenure||{startYear:universe.year,school:u.name,seasons:[]};
    const coach=u.staff?.HC?.name||'Head coach';
-   const seasons=(tenure.seasons||[]).map(s=>({year:s.year,w:s.w||0,l:s.l||0,champ:!!s.champ,confChamp:!!s.confChamp}));
-   const finalPhase=['bowlReady','playoffReady','offseason','preseason'].includes(universe.phase)||universe.champion!=null;
+   const seasons=(tenure.seasons||[]).map(s=>({year:s.year,w:s.w||0,l:s.l||0,champ:(universe.history||[]).some(h=>h.type==='season'&&h.year===s.year&&(h.championId!=null?h.championId===u.id:h.champion===u.name)),confChamp:!!s.confChamp}));
+   const finalPhase=universe.phase==='complete'||(universe.history||[]).some(h=>h.type==='season'&&h.year===universe.year);
    const awards=[];for(const [year,list] of Object.entries(universe.awards||{}))for(const a of list||[])if(a.team===u.name&&a.playerId)awards.push({year:Number(year),award:a.name,playerId:a.playerId,name:a.playerName,pos:a.pos});
    const picks=[];for(const [year,list] of Object.entries(universe.draftHistory||{}))for(const d of list||[])if(d.school===u.name&&d.status==='Drafted')picks.push({year:Number(year),playerId:d.playerId,name:d.playerName,pos:d.pos,round:d.round,pick:d.pick});
    const s=u.rivalry?.series||null,rival=rivalOf(u);

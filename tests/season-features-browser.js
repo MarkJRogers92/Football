@@ -24,6 +24,7 @@ const simWeek=async page=>{for(let i=0;i<12;i++){const before=await page.evaluat
 
   const before=await page.evaluate(()=>window.__DL_TEST__.preseasonDebug());
   // Highlights: the last game with box-score performers that are the user's own players.
+  await page.locator('#weeklyDeskDetails > summary').click();
   await page.waitForSelector('#highlightsCard');
   const h=await page.evaluate(()=>window.DynastySeasonMoments.highlights());
   assert.match(await page.locator('#highlightsCard').innerText(),new RegExp(`${h.us}–${h.them}`),`[${label}] highlights show the real final score`);

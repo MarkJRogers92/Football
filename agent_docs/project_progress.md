@@ -1,6 +1,6 @@
 # Project Progress
 
-Current continuation packet: `agent_docs/CLAUDE_HANDOFF_2026-11-06_DYNASTY_LAB.md`. Work remains local, uncommitted and unreleased; the original checkout is preserved.
+Current continuation: `agent_docs/latest_session_work.md` (v0.14.2 integration candidate). Mark authorized integrating the reviewed changes and producing a playable build. Three affected browser suites passed in his normal Mac Terminal. Fresh candidate validation, remote integration and packaging are in progress; no new installation or public web publication yet.
 
 ## Recruiting continuation — 2026-11-06
 

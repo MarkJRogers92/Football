@@ -1,8 +1,11 @@
 # Changelog
 
-## Unreleased — Midnight & Brass (visual identity v2)
+## v0.14.2 — Living world and Midnight & Brass
 
 Presentation only: no simulation, balance, save-shape or randomness changes. See `VISUAL_IDENTITY.md`.
+
+- **Living world, first pass.** A short optional weekly briefing, follow controls for players/coaches, meaningful situation updates and familiar faces on the next opponent. Detailed Rival Watch and highlights sit in the existing weekly disclosure. Following is stored on this device and never blocks advancement.
+- **History accuracy.** National titles use recorded championship history; completed seasons count once; old bowl results cannot become new-year milestones. Earlier unreliable Legacy totals are retained separately while accurate totals are rebuilt. Briefing profile links use the correct player identity.
 
 - **Recruiting desk package** from the 2026-11-06 handoff: pitch explanation parity, a shorter weekly desk, win-bar and Game Cast accuracy repairs, recruiting search/count clarity, the phone dossier, peer class views, roster outlook and the flat Current / Rising / Outlook / Map / Shortlist / Class summary / History strip.
 - **A visual identity.** The title screen's brass carried through the game: condensed athletic display type (bundled, works offline), brass for "what matters now", team colour for "who you are", a chalk play diagram behind the program banner.

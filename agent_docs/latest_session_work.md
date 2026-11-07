@@ -1,5 +1,15 @@
 # Latest Session Work
 
+## v0.14.2 integration candidate — 2026-11-06
+
+- Goal: integrate the reviewed Midnight & Brass, recruiting-desk and living-world work into the current game branch and produce a playable Mac build. No difficulty or simulation-balance changes.
+- GitHub default branch remains `252a784`; Claude branch remains `eee7195`. Compared all 483 baseline files by Git blob SHA: the only difference from local reconstructed baseline `fe69239` was Claude's final handoff test-results update, now preserved. Remote integration will use Claude's actual commit as parent, preserving its history.
+- Source version is 0.14.2. Short optional briefing, persistent player/coach following, next-opponent callbacks and history corrections are included with Claude's existing presentation changes. Following remains device-local, scoped by world seed; save schema and gameplay RNG are unchanged.
+- Mark supplied successful Mac Terminal output for `test:living-world-browser`, `test:fun-features-browser`, and `test:season-features-browser` against implementation `5e27f24`. This clears the earlier browser launch blocker for those checks; it is not a packaged-app or manual visual pass.
+- Existing verification before version preparation: 53 smoke checks and 581 Node tests passed; the later profile regression and 26 focused tests passed. Fresh candidate tests, remote CI, merge and desktop packaging are pending.
+- Known upstream issue: recruiting-phone focus assertion intermittently fails late in extended browser runs; it passed three isolated reruns in Claude's handoff. Preserve the assertion and investigate if reproduced.
+- Original checkout's trophy-rendering edit and other worktrees remain untouched. Previous reviewed implementation is retained at `5e27f24`.
+
 ## Visual identity v2 "Midnight & Brass" (Claude, 2026-11-07)
 
 - Restored the 2026-11-06 handoff bundle onto base `252a784` (all 46 manifest hashes matched), rebuilt (`index.html` byte-identical), ran `npm test` (541 pass) and the three focused recruiting browser suites (pass), then committed it on `claude/gracious-rubin-mfi574`.

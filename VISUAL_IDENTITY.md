@@ -2,6 +2,12 @@
 
 Unreleased (source still v0.14.1). Presentation only: no simulation, balance, save-shape or RNG changes.
 
+## Living world first pass
+
+The Command Center now has a compact optional briefing below the existing advance and required-decision controls, with no more than three factual items. Players and coaches can be followed from their profiles or story cards; the followed cast is inside an optional disclosure. Updates describe meaningful changes, not routine statistical increments. Prior players, recruits whose recorded top five included the program, and former coaches may reappear in next-opponent coverage. Rival Watch and highlights move into the existing detailed weekly disclosure.
+
+`living-world-adapter.js` reads canonical history without modifying the universe; `living-world.js` owns device preferences, selection and mounting; `living-world.css` uses the established palette and typography without additional animation. Follow state is scoped by world seed, so same-seed save copies share it. Visual browser validation remains pending because Chrome aborts before page load in the current session; see `agent_docs/latest_session_work.md` for verified checks.
+
 ## The idea
 
 The title screen already had an identity (brass, stadium light, the trophy); the game behind it was a generic dark dashboard. V2 carries the title screen into every tab:

@@ -8,7 +8,7 @@ globalThis.DynastyCeremonySnapshot=Object.freeze({
    const team={id:u.id,name:u.name,conference:u.conference||'',w:u.w||0,l:u.l||0,rank:u.rank&&u.rank<=25?u.rank:null};
    if((universe.confChamps||[]).includes(u.id))out.push({key:`${year}:conference`,kind:'conference',year,team});
    const bowl=(universe.bowls||[]).find(b=>b.winner===u.name||b.loser===u.name);
-   if(bowl&&bowl.winner===u.name){const opp=T(bowl.loser);out.push({key:`${year}:bowl`,kind:'bowl',year,team,label:bowl.label,score:[...(bowl.score||[])].sort((a,b)=>b-a),opponent:{id:opp?.id??null,name:bowl.loser}})}
+   if(bowl&&bowl.winner===u.name&&((universe.gameArchive||[]).find(g=>g.id===bowl.gameId)?.season??u.bowlResult?.year)===year){const opp=T(bowl.loser);out.push({key:`${year}:bowl`,kind:'bowl',year,team,label:bowl.label,score:[...(bowl.score||[])].sort((a,b)=>b-a),opponent:{id:opp?.id??null,name:bowl.loser}})}
    if(universe.champion===u.name&&(universe.history||[]).some(h=>h.type==='season'&&h.year===year&&h.championId===u.id))out.push({key:`${year}:national`,kind:'national',year,team});
    const rival=rivalOf(u),meet=rival&&(u.schedule||[]).find(g=>g.played&&(g.home===rival.name||g.away===rival.name));
    if(meet&&meet.winner===u.name){const home=meet.home===u.name,sc=meet.score||[0,0],streak=u.rivalry?.series?.streak||1;out.push({key:`${year}:rivalry`,kind:'rivalry',year,team,trophy:u.rivalry?.trophy||null,opponent:{id:rival.id,name:rival.name},score:[Number(sc[home?1:0])||0,Number(sc[home?0:1])||0],streak})}

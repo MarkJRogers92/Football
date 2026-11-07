@@ -1,0 +1,31 @@
+/* A quiet sports briefing. The existing advance control remains the only primary action. */
+.lw-world{margin:14px 0;border-top:1px solid var(--line);padding-top:12px;min-width:0}
+.lw-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.lw-heading>small{font-size:11px;color:var(--muted)}
+.lw-brief{list-style:none;padding:0;margin:10px 0;display:grid;gap:10px}
+.lw-brief>li{display:grid;grid-template-columns:90px minmax(0,1fr);gap:12px;align-items:start}
+.lw-tag{font-size:10px;letter-spacing:.04em;color:var(--muted);padding-top:3px}
+.lw-brief strong,.lw-person{font-size:13px;font-weight:650;line-height:1.4;overflow-wrap:anywhere}
+.lw-brief p{margin:3px 0 0;font-size:12px;line-height:1.4;color:var(--muted)}
+.lw-world .lw-person{display:inline;text-align:left;padding:0;border:0;background:none;color:var(--text);box-shadow:none;min-height:0;text-transform:none}
+.lw-world .lw-person:hover{text-decoration:underline;text-underline-offset:3px}
+.lw-quiet{font-size:12px;color:var(--muted);margin:10px 0}
+.lw-cast{padding-top:8px}
+.lw-cast>summary{cursor:pointer;font-size:12px;color:var(--muted);padding:5px 0}
+.lw-cast ul{list-style:none;padding:0;margin:10px 0}
+.lw-cast li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+.lw-cast li>span{min-width:0}
+.lw-cast li small{display:block;font-size:11px;color:var(--muted);line-height:1.4;overflow-wrap:anywhere;margin-top:2px}
+button.lw-follow{font-size:11px;padding:6px 10px;min-height:32px;flex-shrink:0;text-transform:none;letter-spacing:0;background:transparent;border:1px solid var(--line);color:var(--muted);box-shadow:none}
+button.lw-follow[aria-pressed="true"]{color:var(--text);border-color:var(--team-primary,var(--line))}
+.lw-world button:focus-visible,.lw-cast>summary:focus-visible,.lw-profile-follow button:focus-visible{outline:2px solid var(--bi-gold,#c5a66b);outline-offset:3px}
+.sl-card>.lw-follow{justify-self:start;margin-top:5px}
+.lw-profile-follow{margin:8px 0 12px}
+#weeklyDeskDetails>#rivalWatch,#weeklyDeskDetails>#highlightsCard{margin:14px 0 0}
+@media(max-width:700px){
+ .lw-brief>li{grid-template-columns:minmax(0,1fr);gap:3px}
+ .lw-brief{gap:12px}
+ .lw-brief strong,.lw-world .lw-person{font-size:13px}
+ button.lw-follow{min-height:44px;padding:8px 12px}
+ .lw-cast>summary{min-height:36px;padding:8px 0}
+}
