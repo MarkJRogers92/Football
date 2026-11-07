@@ -41,6 +41,17 @@
   host.dataset.status=f.status;
   host.innerHTML=`<span class="weekly-desk-status">${esc(label)}</span><h3>${esc(title)}</h3><p>${esc(detail)}</p>`;
  }
+ // Setup reminders stay visible on the weekly desk instead of only inside the full briefing.
+ // They are optional: Set up opens the place to act, Later snoozes until the calendar moves.
+ function renderSetupNudges(model){
+  const focus=target('#weeklyDeskFocus');if(!focus)return;let host=target('#weeklySetupNudges');
+  if(!host){host=document.createElement('section');host.id='weeklySetupNudges';host.className='weekly-setup-nudges';host.setAttribute('aria-label','Program setup');focus.insertAdjacentElement('afterend',host)}
+  const items=(model.items||[]).filter(x=>!x.deferred&&x.meaning==='staff_recommendation'&&['recruiting','development'].includes(x.category)).slice(0,3);
+  host.hidden=!items.length;if(!items.length){host.innerHTML='';return}
+  host.innerHTML=`<span class="weekly-setup-label">Worth doing this week</span>${items.map(x=>`<div class="weekly-setup-row" data-setup-category="${esc(x.category)}"><span class="weekly-setup-icon" aria-hidden="true">${x.category==='recruiting'?'◎':'↗'}</span><div><strong>${esc(x.title)}</strong><small>${esc(x.cause)}</small></div><button type="button" class="weekly-setup-go" data-setup-open="${esc(x.id)}">${x.category==='recruiting'?'Recruit':'Develop'}</button><button type="button" class="guidance-text-action" data-setup-later="${esc(x.id)}">Later</button></div>`).join('')}`;
+  host.querySelectorAll('[data-setup-open]').forEach(b=>b.addEventListener('click',()=>openGuidanceItem(b.dataset.setupOpen)));
+  host.querySelectorAll('[data-setup-later]').forEach(b=>b.addEventListener('click',()=>{callGuidance('guidanceDeferItem',b.dataset.setupLater);renderGuidanceSystem()}));
+ }
  function revealDetails(el){if(el?.closest('#dashboard'))window.DynastyDashboardViews?.show('week');for(let parent=el?.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true}
  function renderAgenda(model){
   const host=target('#coachingAgenda');if(!host)return;
@@ -133,6 +144,8 @@
    el=[...document.querySelectorAll('[data-decision]')].find(button=>button.dataset.decision===String(destination.decisionId))?.closest('.decision-card')||target('#weeklyDecisions');
   }else if(focus==='career-post')el=target('#careerPost');
   else if(focus==='coach-opening')el=target('#coachMarket');
+  else if(focus==='training-focus')el=target('#teamTrainingFocus')?.closest('section,.card,div')||target('#teamTrainingFocus');
+  else if(focus==='featured-plans')el=target('.development-plan-board')||target('#development');
   else if(focus==='scholarship-summary')el=target('#classSummary');
   else if(focus==='recruiting-board'){const workspace=target('#recruitWorkspace');if(workspace&&!workspace.hidden){target('[data-rwm="workspace"]')?.click();el=workspace}else el=target('#recruitBody')||target('#classSummary')}
   if(el){revealDetails(el);el.classList.add('guidance-focus-target');el.tabIndex=-1;el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>el?.focus?.({preventScroll:true}),250);return true}
@@ -172,7 +185,7 @@
   host.querySelectorAll('[data-guidance-restore]').forEach(button=>button.addEventListener('click',()=>{callGuidance('guidanceRestoreItem',button.dataset.guidanceRestore);renderGuidanceSystem()}));
  }
  function bindReturnSummary(){target('#guidanceReturnSummary')?.querySelector('[data-guidance-dismiss-return]')?.addEventListener('click',()=>{if(typeof dismissGuidanceReturnSummary==='function')dismissGuidanceReturnSummary();renderGuidanceSystem()})}
- function renderGuidanceSystem(){syncSessionView();renderSessionStatus();const model=currentModel();if(!model)return;renderDeskFocus(model);renderReturnSummary();renderAgenda(model);renderForecast(model);renderPlan(model);bindAgenda();bindReturnSummary()}
+ function renderGuidanceSystem(){syncSessionView();renderSessionStatus();const model=currentModel();if(!model)return;renderDeskFocus(model);renderSetupNudges(model);renderReturnSummary();renderAgenda(model);renderForecast(model);renderPlan(model);bindAgenda();bindReturnSummary()}
  window.renderGuidanceSystem=renderGuidanceSystem;
  window.getDynastyGuidance=currentModel;
  window.openGuidanceItem=openGuidanceItem;
