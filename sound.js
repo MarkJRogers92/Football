@@ -97,7 +97,7 @@ function mount(){
   sync();
   // Week finals (the same status line the result splash reads).
   const status=document.querySelector('#saveStatus');let last=status?.textContent||'';
-  if(status)new MutationObserver(()=>{const v=status.textContent.trim();if(v===last)return;last=v;const m=v.match(/^Week \d+ final: ([WL]) /);if(m)play(m[1]==='W'?'winSting':'lossTone');else if(/^Game Day recorded/.test(v))bed(false)}).observe(status,{childList:true,subtree:true,characterData:true});
+  if(status)new MutationObserver(()=>{const v=status.textContent.trim();if(v===last)return;last=v;const m=v.match(/^(?:Week \d+|[A-Z][^:]{2,60}?) final: ([WL]) /);if(m)play(m[1]==='W'?'winSting':'lossTone');else if(/^Game Day recorded/.test(v))bed(false)}).observe(status,{childList:true,subtree:true,characterData:true});
   // Live Game Day: whistle on each head-coach decision, crowd on your scores, groan on theirs.
   let gd={decision:null,score:null,live:false};
   const watchGameDay=()=>{const host=document.querySelector('#v2InteractiveGameDay');if(!host)return;

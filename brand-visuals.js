@@ -81,7 +81,8 @@ function stripHTML(team){
   const state=g.played?(g.result==='W'?'is-win':'is-loss'):g.next?'is-next':'is-future';
   const opp=`${g.home?'vs':'at'} ${g.opponent.rank?`#${g.opponent.rank} `:''}${g.opponent.name}`;
   const res=g.played?`${g.result==='W'?'Won':'Lost'} ${g.us}-${g.them}`:g.next?'Next game':'Upcoming';
-  return`<li class="bi-chip ${state}${g.conf?' is-conf':''}" title="Week ${g.week}: ${esc(opp)} · ${esc(res)}"><span class="bi-chip-wk">W${g.week}</span>${helmetHTML(g.opponent.id,'bi-helmet--chip'+(g.home?'':' is-away'))}<b>${esc(g.label)}</b><span class="bi-sr">Week ${g.week}, ${esc(opp)}, ${esc(res)}</span></li>`;
+  const when=g.post?esc(g.postLabel||g.post):`Week ${g.week}`;
+  return`<li class="bi-chip ${state}${g.conf?' is-conf':''}${g.post?' is-post':''}${g.post==='TITLE'&&g.result==='W'?' is-title':''}" title="${when}: ${esc(opp)} · ${esc(res)}"><span class="bi-chip-wk">${g.post?esc(g.post):`W${g.week}`}</span>${helmetHTML(g.opponent.id,'bi-helmet--chip'+(g.home?'':' is-away'))}<b>${esc(g.label)}</b><span class="bi-sr">${when}, ${esc(opp)}, ${esc(res)}</span></li>`;
  }).join('');
  return`<ol class="bi-strip" aria-label="${esc(team.name)} season schedule">${chips}</ol>`;
 }
@@ -101,11 +102,13 @@ function paintMasthead(team){
   mast.classList.add('bi-has-helmet');
  }
  let strip=mast.querySelector(':scope > .bi-strip-host');
- const sig=JSON.stringify(team.schedule.map(g=>[g.week,g.played,g.us,g.them,g.opponent.id,g.opponent.rank]));
+ const sig=JSON.stringify(team.schedule.map(g=>[g.week,g.post,g.played,g.us,g.them,g.opponent.id,g.opponent.rank]));
  if(!strip){strip=document.createElement('div');strip.className='bi-strip-host';const details=mast.querySelector('#programDetails');details?mast.insertBefore(strip,details):mast.append(strip);sigs.delete('strip')}
  if(!same('strip',team.id+sig))strip.innerHTML=stripHTML(team);
- const next=strip.querySelector('.bi-chip.is-next');
- if(next&&strip.scrollWidth>strip.clientWidth){const list=strip.querySelector('.bi-strip');if(list)list.scrollLeft=Math.max(0,next.offsetLeft-list.clientWidth/2+next.clientWidth/2)}
+ // Centre the next game; once nothing is next (postseason, season complete) centre the latest result.
+ const next=strip.querySelector('.bi-chip.is-next')||[...strip.querySelectorAll('.bi-chip.is-win,.bi-chip.is-loss')].pop();
+ const list=strip.querySelector('.bi-strip');
+ if(next&&list&&list.scrollWidth>list.clientWidth){const a=next.getBoundingClientRect(),b=list.getBoundingClientRect();list.scrollLeft=Math.max(0,list.scrollLeft+(a.left-b.left)-list.clientWidth/2+a.width/2)}
 }
 function paintProgram(team){
  const host=document.querySelector('#programAttributes');if(!host||!team||host.hidden)return;

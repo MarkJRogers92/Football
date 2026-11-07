@@ -165,6 +165,10 @@ html.bi-brand #dashboard .masthead-identity{gap:18px}
 .bi-chip.is-next{border-color:rgba(var(--bi-gold-rgb),.75);background:linear-gradient(180deg,rgba(var(--bi-gold-rgb),.2),rgba(5,8,12,.6))}
 .bi-chip.is-next b{color:var(--bi-gold-hi)}.bi-chip.is-next .bi-chip-wk{color:var(--bi-gold)}
 .bi-chip.is-conf .bi-chip-wk::after{content:" •";color:var(--team-secondary,#73a8ff)}
+.bi-chip.is-post{border-color:rgba(var(--bi-gold-rgb),.32);background:linear-gradient(180deg,rgba(var(--bi-gold-rgb),.08),rgba(5,8,12,.6))}
+.bi-chip.is-post .bi-chip-wk{color:var(--bi-gold)}
+.bi-chip.is-title{border-color:rgba(var(--bi-gold-rgb),.85);background:radial-gradient(120% 90% at 50% 0%,rgba(var(--bi-gold-rgb),.34),rgba(5,8,12,.6) 72%);box-shadow:0 0 18px rgba(var(--bi-gold-rgb),.22)}
+.bi-chip.is-title b,.bi-chip.is-title .bi-chip-wk{color:var(--bi-gold-hi)}.bi-chip.is-title::after{background:var(--bi-gold)}
 .bi-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* Required decision: the focus line reads as a status header, not a second copy of the card below. */

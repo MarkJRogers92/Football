@@ -37,6 +37,19 @@ test('season strip orders weeks, labels results and marks only the first unplaye
  assert.equal(V.seasonStrip([]).length,0);
 });
 
+test('postseason games extend the strip with their round tags and a gold title chip',()=>{
+ const html=V.stripHTML({name:'Home',schedule:[
+  {week:12,home:true,played:true,result:'W',us:20,them:17,opponent:{id:1,name:'A'}},
+  {week:13,home:true,played:true,result:'W',us:31,them:10,post:'CCG',postLabel:'Great Lakes Championship',opponent:{id:2,name:'B'}},
+  {week:17,home:false,played:true,result:'W',us:9,them:7,post:'TITLE',postLabel:'National Championship',opponent:{id:3,name:'C'}}
+ ]});
+ assert.match(html,/>W12</);assert.match(html,/>CCG</);assert.match(html,/>TITLE</);
+ assert.equal((html.match(/is-post/g)||[]).length,2);
+ assert.match(html,/class="bi-chip is-win is-post is-title"/);
+ assert.match(html,/National Championship, at C, Won 9-7/);
+ assert.doesNotMatch(html,/W13|W17/,'postseason chips use round tags, not week numbers');
+});
+
 test('SVG builders expose the values to assistive technology and escape names',()=>{
  const radar=V.radarSVG([{label:'Prestige',value:92},{label:'NIL',value:86},{label:'A<b>',value:1}]);
  assert.match(radar,/aria-label="Program attributes: Prestige 92, NIL 86, A&lt;b&gt; 1"/);

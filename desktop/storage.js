@@ -11,6 +11,7 @@ const BACKUP_LIMIT = 5;
 const MAX_JSON_BYTES = 256 * 1024 * 1024;
 const MAX_CHUNKS = 4096;
 const MAX_ROWS = CHUNK_SIZE * MAX_CHUNKS;
+const TOO_LARGE_ERROR = 'This dynasty has grown past the 256 MB desktop save limit. Your previous save is safe; export a JSON backup to keep this progress.';
 const STORAGE_ERROR = 'This desktop save is damaged. Use another slot or import a complete JSON backup.';
 const SLOT_DIRS = Object.freeze({
   main: 'Dynasty 1',
@@ -89,12 +90,11 @@ function validateSnapshot(snapshot) {
     || typeof snapshot.userTeam !== 'string' || typeof snapshot.version !== 'string'
     || typeof snapshot.savedAt !== 'string')
     invalid('Saved dynasty data is missing or damaged.');
-  try {
-    const bytes = byteSize(snapshot);
-    if (bytes > MAX_JSON_BYTES) invalid('This dynasty save is too large for desktop storage.');
-  } catch (error) {
-    invalid(`Saved dynasty data is not valid JSON: ${error.message}`);
-  }
+  let bytes;
+  try { bytes = byteSize(snapshot); }
+  catch (error) { invalid(`Saved dynasty data is not valid JSON: ${error.message}`); }
+  // Reported on its own: the save is valid, it has simply outgrown the desktop limit (soak D3).
+  if (bytes > MAX_JSON_BYTES) invalid(TOO_LARGE_ERROR);
   return snapshot;
 }
 
@@ -122,7 +122,7 @@ function sameRef(a, b) {
 function jsonText(value) {
   let text;
   try { text = JSON.stringify(value); } catch (error) { invalid(`Saved dynasty data is not valid JSON: ${error.message}`); }
-  if (Buffer.byteLength(text) > MAX_JSON_BYTES) invalid('This dynasty save is too large for desktop storage.');
+  if (Buffer.byteLength(text) > MAX_JSON_BYTES) invalid(TOO_LARGE_ERROR);
   return text;
 }
 
@@ -303,9 +303,56 @@ function createDesktopStorage({rootDir, fsModule = fs, cryptoModule = crypto, no
     }
   }
 
+  // Backup names carry the chunk generations they reference, so pruning can tell which archive
+  // directories a recoverable backup still needs without parsing a large backup file.
+  const BACKUP_REFS = /\.g-([A-Za-z0-9_-]{1,200})\.a-([A-Za-z0-9_-]{1,200})\.json$/;
+  function backupName(wrapper) {
+    const base = `backup-${now()}-${backupSequence++}-${makeToken()}`;
+    const g = wrapper?.core?.gameRef?.id, a = wrapper?.core?.archiveRef?.id;
+    const safe = id => typeof id === 'string' && /^[A-Za-z0-9_-]{1,200}$/.test(id);
+    return safe(g) && safe(a) ? `${base}.g-${g}.a-${a}.json` : `${base}.json`;
+  }
+
+  async function listDirs(dir) {
+    try { return (await io.readdir(dir, {withFileTypes: true})).filter(e => e.isDirectory()).map(e => e.name); }
+    catch (error) { if (error.code === 'ENOENT') return []; throw error; }
+  }
+
+  // Each save that starts a new game- or career-archive generation (the season compaction rewrite,
+  // a replacement dynasty) used to leave the previous generation on disk forever: 65% of the game
+  // chunk bytes at season 20 were unreachable (soak D2). After a commit, remove every generation
+  // that neither the committed save nor a retained backup references. Best effort: a failure here
+  // never fails the save that has already been committed.
+  async function pruneGenerations(info, committed) {
+    try {
+      const keep = {games: new Set([committed.gameRef?.id]), history: new Set([committed.archiveRef?.id])};
+      const dirs = {games: await listDirs(info.games), history: await listDirs(info.history)};
+      const stray = kind => dirs[kind].filter(id => !keep[kind].has(id));
+      if (!stray('games').length && !stray('history').length) return;
+      let entries = [];
+      try { entries = await io.readdir(info.backups, {withFileTypes: true}); } catch {}
+      for (const entry of entries) {
+        if (!entry.isFile() || !/^backup-.+\.json$/.test(entry.name)) continue;
+        const named = BACKUP_REFS.exec(entry.name);
+        if (named) { keep.games.add(named[1]); keep.history.add(named[2]); continue; }
+        // A backup written before refs were named: read it once to learn what it needs. If it
+        // cannot be read, keep everything this round rather than risk breaking a recovery path.
+        const wrapper = await readJson(path.join(info.backups, entry.name));
+        if (wrapper === null) return;
+        if (wrapper?.core?.gameRef?.id) keep.games.add(wrapper.core.gameRef.id);
+        if (wrapper?.core?.archiveRef?.id) keep.history.add(wrapper.core.archiveRef.id);
+      }
+      for (const kind of ['games', 'history']) {
+        for (const id of stray(kind)) {
+          try { await io.rm(path.join(info[kind], id), {recursive: true, force: true}); } catch {}
+        }
+      }
+    } catch {}
+  }
+
   async function backUp(info, wrapper) {
     if (!wrapper) return;
-    const name = `backup-${now()}-${backupSequence++}-${makeToken()}.json`;
+    const name = backupName(wrapper);
     await writeNewJson(path.join(info.backups, name), wrapper);
     let entries;
     try { entries = await io.readdir(info.backups, {withFileTypes: true}); }
@@ -404,6 +451,7 @@ function createDesktopStorage({rootDir, fsModule = fs, cryptoModule = crypto, no
       await atomicWrite(info.dynasty, wrapper);
       await atomicWrite(info.slotMeta, {formatVersion: FORMAT_VERSION, slot,
         label: meta.label, empty: false});
+      await pruneGenerations(info, core);
       return {revision, archiveRef: nextArchiveRef, gameRef: nextGameRef, meta};
     });
   }

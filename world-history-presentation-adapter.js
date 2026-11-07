@@ -75,6 +75,8 @@ function makeWorldHistoryPresentationModel(){
    titleYears,
    awardRows,
    seasons:seasons.slice(0,6),
+   // Every archived season with a numeric record, oldest first, for the season-by-season arc.
+   arc:seasons.map(s=>{const m=/^(\d+)-(\d+)$/.exec(String(s.record||''));return m?{year:s.year,wins:Number(m[1]),losses:Number(m[2]),rank:s.rank,champion:s.champion}:null}).filter(Boolean).slice(0,60).reverse(),
    ...people(raw),
    rivalry:rivalry(raw),
    archives:{playersDeferred:!!raw.playersDeferred,gamesDeferred:!!raw.gamesDeferred}
@@ -91,6 +93,10 @@ else{
   for(const team of universe.teams)for(const p of team.roster||[])if(team.id===t.id||String(p.recruitingMemory?.schoolId??p.recruitingMemory?.scoutingReceipt?.schoolId)===String(t.id))players.push({p,schoolId:team.id,schoolName:team.name,status:'active'});
   for(const entry of universe.transferPortal||[])if(entry.p)players.push({p:entry.p,schoolName:'Transfer portal',status:'portal'});
   for(const p of universe.playerArchive||[])if(String(p.recruitingMemory?.schoolId??p.recruitingMemory?.scoutingReceipt?.schoolId)===String(t.id))players.push({p,schoolName:p.lastTeam||'',status:'archived'});
-  return worldHistoryPresentationModel.snapshot({teamId:t.id,teamName:t.name,conference:t.conference,year:universe.year,week:universe.week,phase:universe.phase,tracked:t.allTimeRecord||{},history:universe.history||[],players,rival:universe.teams.find(team=>String(team.id)===String(t.rivalry?.rivalId))||null,rivalry:t.rivalry,games:universe.gameArchive||[],playersDeferred:typeof archiveIsDeferred==='function'&&archiveIsDeferred(),gamesDeferred:typeof gamesAreDeferred==='function'&&gamesAreDeferred()});
+  // All-time totals are written by the offseason review, but a finished season is archived (and
+  // shown in the timeline) as soon as the postseason ends. Count that season here until the review
+  // records it, so the header never reads 0-0 beside a completed season.
+  function trackedWithFinishedSeason(team){const base={w:0,l:0,confTitles:0,natTitles:0,seasons:0,...(team.allTimeRecord||{})};const pending=universe.phase==='complete'&&!(universe.offseason?.year===universe.year&&(universe.offseason.completed||[]).includes('review'))&&(universe.history||[]).some(h=>Number(h?.year)===Number(universe.year));if(!pending)return base;const conf=typeof conferenceChampionIdsFor==='function'&&conferenceChampionIdsFor().includes(team.id);return{...base,w:base.w+(team.w||0),l:base.l+(team.l||0),seasons:base.seasons+1,confTitles:base.confTitles+(conf?1:0),natTitles:base.natTitles+(universe.champion===team.name?1:0)}}
+  return worldHistoryPresentationModel.snapshot({teamId:t.id,teamName:t.name,conference:t.conference,year:universe.year,week:universe.week,phase:universe.phase,tracked:trackedWithFinishedSeason(t),history:universe.history||[],players,rival:universe.teams.find(team=>String(team.id)===String(t.rivalry?.rivalId))||null,rivalry:t.rivalry,games:universe.gameArchive||[],playersDeferred:typeof archiveIsDeferred==='function'&&archiveIsDeferred(),gamesDeferred:typeof gamesAreDeferred==='function'&&gamesAreDeferred()});
  },note:'Read-only recorded seasons, signing receipts, player season histories, rivalry box scores and tracked program totals. Deferred archives are not loaded by this view.'};
 }

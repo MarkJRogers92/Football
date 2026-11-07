@@ -1,5 +1,13 @@
 # Latest Session Work
 
+## v0.14.4 candidate (unpublished) — 2026-11-07
+
+- Branch `claude/eager-albattani-agpo72` from `84a7770`. Canonical handoff: `agent_docs/HANDOFF_2026-11-07_v0.14.4.md`. Nothing published or installed; no real saves touched.
+- Fixed soak defects D1 (load-time academic defaults no longer draw gameplay RNG), D2 (desktop storage prunes unreferenced chunk generations, keeping everything retained backups need), D3 (oversized-save message), H1 (recruiting search test asserts the real match count) and P1 (incremental story-ID index replaces full event-log scans).
+- D1 verified with the soak drivers (seed 7, 2 seasons, `CHECKPOINTS=2 HOLD_WEEKS=3`, then `fork-check.js` from the native save): all three held weeks are identical between the uninterrupted and reloaded sessions, including RNG position. Remaining state differences are only defaults a load fills in (AI-team academic fields, `portalCycle`, `careerHistory`, `jobOffers`, `setup`, `setupCompleted`) plus the version string, matching the soak report's prefill control.
+- Presentation: postseason on the Season card, week strip and ticker; stage names in the status bar; rank arrow reset per season; History counts a finished season before review and adds a Dynasty Arc chart; transfer portal paging.
+- Validation in a Linux cloud container (Node 22, Chromium 1243): `npm test` 644/644 at the soak-fix commit and 650/650 at the final candidate; 20 affected browser suites passed. Packaged desktop, Windows, Safari and the full CI matrix were not run here.
+
 ## v0.14.3 published — 2026-11-07
 
 - Goal completed for the approved seven-part experience pass: all changes and the earlier living-world/recruiting/Midnight & Brass integration are merged through PR #35. Product source is `e104abdc02afc8edc28802fc2a1d29e79f6afa95` on `claude/review-improvement-dwjemy`; its tree exactly matches tested head `2dbf1d7b05829d3333c32ebd8f959759c073ef1f` (`000bf88cb5b73d4b4735796bfe1df4906c728626`).

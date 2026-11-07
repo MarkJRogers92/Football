@@ -119,3 +119,17 @@ test('profile and History/Stats evidence reads leave saved state and RNG untouch
  try{e.scoutingHistoryHTML(p);global.__DL_TEST__.playerEvidenceTrend(p,t);global.__DL_TEST__.playerEvidencePerspectives('QB',[{key:'arm',low:60,high:78,confidence:60}],t);global.__DL_TEST__.renderPositionGroupComparison();global.__DL_TEST__.renderSelectedSchoolStories()}finally{Math.random=random}
  assert.equal(JSON.stringify(u),before,'displaying the added evidence must not mutate the saved dynasty');
 });
+
+// Soak P1: the duplicate-story guard now uses an incremental index instead of scanning the whole
+// event log per player. It must still see appended events, metadata-only story IDs, a replaced log
+// and an in-place truncation (Game Day rollback), exactly like the old full scan.
+test('the story-ID index follows appends, replacement and rollback truncation',async()=>{
+ global.__DL_TEST__={};const e=loadEngine({seed:9301,fullRuntime:true});e.setUserTeam('Chicago Metropolitan');await e.loadSchools();e.initUniverse();
+ const seen=global.__DL_TEST__.playerEvidenceStoryRecorded;assert.equal(typeof seen,'function');
+ e.universe.events=[{storyId:'a'},{metadata:{storyId:'b'}}];
+ assert.ok(seen('a'));assert.ok(seen('b'));assert.ok(!seen('c'));
+ e.universe.events.push({storyId:'c'});assert.ok(seen('c'),'appended events are indexed');
+ e.universe.events.length=1;assert.ok(!seen('c'),'a truncated event is forgotten');assert.ok(!seen('b'));
+ e.universe.events.push({storyId:'d'},{storyId:'e'});assert.ok(seen('d')&&seen('e')&&!seen('c'),'truncate then append rebuilds');
+ e.universe.events=[{storyId:'z'}];assert.ok(seen('z')&&!seen('a'),'a replaced log is rebuilt');
+});
