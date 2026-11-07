@@ -336,8 +336,9 @@ test('postseason rollback restores the whole world after the preceding checkpoin
  await e.yieldToUserAction();
 });
 
-test('a fresh scope shows prospects while an explicit saved My Board view remains restorable',async t=>{
+test('startup view capture before recruits render stays browseable and explicit My Board preferences restore',async t=>{
  const {e,privateApi}=await fixture(8333,{fullRuntime:true}),vm=require('node:vm'),frames=[];
+ let rowsReady=false;
  // Run the actual workspace bridge/render with two real recruits and a small DOM.
  const classes={toggle(){}},rows=e.universe.recruits.slice(0,2).map(r=>({
   classList:{toggle(){},contains:key=>key==='target'&&r.targeted},
@@ -346,19 +347,26 @@ test('a fresh scope shows prospects while an explicit saved My Board view remain
  const shell={innerHTML:'',dataset:{},querySelector:()=>null,querySelectorAll:()=>[]};
  const elements={'#rwSwitch':{},'#rwFilters':{firstElementChild:{}},'#recruitWorkspace':shell,'.rw-card-list':{scrollTop:0},'[data-rw-budget]':{},'#rwSearch':{},
   '#recruiting':{classList:classes,querySelector:selector=>selector===':scope > .section-head'?{}:selector===':scope > .table-wrap'?{classList:classes}:null}};
- const context={document:{querySelector:selector=>elements[selector]||null,querySelectorAll:selector=>selector==='#recruitBody tr'?rows:[],activeElement:{dataset:{}},addEventListener(){}},
+ const context={document:{querySelector:selector=>elements[selector]||null,querySelectorAll:selector=>selector==='#recruitBody tr'&&rowsReady?rows:[],activeElement:{dataset:{}},addEventListener(){}},
   matchMedia:()=>({matches:true,addEventListener(){}}),MutationObserver:class{observe(){}},requestAnimationFrame:fn=>frames.push(fn),setTimeout:fn=>frames.push(fn),clearTimeout(){},window:{scrollY:0}};
  vm.runInNewContext(fs.readFileSync(require.resolve('../recruiting-workspace.js'),'utf8'),context);
  const workspace=context.DynastyRecruitingWorkspaceView,cards=()=>[...shell.innerHTML.matchAll(/\bdata-rwid="/g)].length;
  global.DynastyRecruitingWorkspaceView=workspace;t.after(()=>delete global.DynastyRecruitingWorkspaceView);
- privateApi.setNavigator(()=>{});while(frames.length)frames.shift()();
- global.renderGuidanceSystem();
+ privateApi.setNavigator(()=>{});
+ // Setup saves before entering the app, so it can capture this bridge before
+ // any canonical recruit rows or the first deferred workspace paint exist.
+ await e.saveBrowser();
+ assert.equal(privateApi.readView().recruitingWorkspace.filter,'all','the opening checkpoint must not capture a provisional empty My Board');
+ rowsReady=true;global.renderGuidanceSystem();while(frames.length)frames.shift()();
  assert.equal(workspace.read().filter,'all','a fresh scope preserves the original browseable default');
  assert.equal(cards(),2,'a new dynasty with no targets still renders real prospects');
- await e.saveBrowser();privateApi.setTab('recruiting');
+ privateApi.setTab('recruiting');
  workspace.restore({mode:'workspace',filter:'board',selectedId:'',shown:30});privateApi.capture();
  assert.equal(cards(),0,'an explicitly selected empty My Board remains empty');
  await e.loadBrowser();global.renderGuidanceSystem();
  assert.equal(workspace.read().filter,'board','a matching saved My Board preference outranks the fresh-scope default');
  assert.equal(cards(),0);
+ e.setUserTeam(e.universe.teams.find(team=>team.name!=='Chicago Metropolitan').name);global.renderGuidanceSystem();
+ assert.equal(workspace.read().filter,'all','a program with no matching view starts with All Recruits');
+ assert.equal(cards(),2);
 });

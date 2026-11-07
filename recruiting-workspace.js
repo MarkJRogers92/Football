@@ -1,6 +1,6 @@
 (()=>{'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-let mode='workspace',filter='board',sel='',boardSeen=false,shown=30,searchTimer=0,phoneDetail=false,listScroll=0,pageScroll=0,returnId='';const phoneQuery=matchMedia('(max-width:700px)'),phone=()=>phoneQuery.matches;const PAGE=30,fmt=n=>Number(n).toLocaleString('en-US'),poolFilters=()=>globalThis.DynastyLabRecruitingFilters;const stateCache=new Map(),flashUntil=new Map();
+let mode='workspace',filter='all',sel='',boardSeen=false,shown=30,searchTimer=0,phoneDetail=false,listScroll=0,pageScroll=0,returnId='';const phoneQuery=matchMedia('(max-width:700px)'),phone=()=>phoneQuery.matches;const PAGE=30,fmt=n=>Number(n).toLocaleString('en-US'),poolFilters=()=>globalThis.DynastyLabRecruitingFilters;const stateCache=new Map(),flashUntil=new Map();
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function cell(r,l){return r?.querySelector('[data-label="'+l+'"]')}
 function parts(r,l){const c=cell(r,l);return c?[...c.children].map(n=>n.textContent.replace(/\s+/g,' ').trim()).filter(Boolean):[]}
