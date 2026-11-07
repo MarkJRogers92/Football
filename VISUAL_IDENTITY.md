@@ -1,3 +1,47 @@
+# Dynasty Lab — Visual Identity V2 "Midnight & Brass"
+
+Unreleased (source still v0.14.1). Presentation only: no simulation, balance, save-shape or RNG changes.
+
+## The idea
+
+The title screen already had an identity (brass, stadium light, the trophy); the game behind it was a generic dark dashboard. V2 carries the title screen into every tab:
+
+- **Brass means "what matters now".** One accent (`--bi-gold`) for the active page, the active view, primary actions, the next game and required decisions. Nothing else is gold.
+- **Team colour means "who you are".** Banner gradients, estimate bars and glows use the controlled program's `--team-*` variables.
+- **Condensed athletic type.** Barlow Condensed (SIL OFL, vendored in `assets/fonts/`, loaded locally so the desktop app works offline) for headlines, numbers, labels and menus; Inter/system stays for reading text.
+- **Chalk and helmets instead of paragraphs.** A chalk play diagram (inline SVG) behind the program banner, the existing Meshy helmet atlas for your program, every opponent and the matchup card, and the frozen v1 portraits on roster cards.
+- **One menu language.** Page tabs are an underline; in-page views (dashboard This week / Players & goals / League, the recruiting class views, Workspace/Table) are one brass segmented track.
+
+## What draws what
+
+| Visual | Where | Source of truth |
+|---|---|---|
+| Hero helmet + season strip (every game, W/L and score, next game pulses) | Dashboard banner | `DynastyBrandSnapshot.team().schedule` |
+| Helmet face-off | Dashboard next matchup | same snapshot, matched by team name |
+| Program radar (six attributes) | Program Lab | `team().attributes`; replaces the duplicate tile row visually (tiles stay in the DOM) |
+| Admin confidence gauge, season goals ring, win pace | Program Lab | `team().confidence`, `goals`, `w` vs `expectedWins` |
+| Leader bars (share of the category leader) | Stats | `--lead` set by `statLeaderRows` in `app.js` |
+| Estimate range bar (40–99 scale) | Roster cards | the staff range already in each card's label |
+| Recruit confidence bars | Recruiting desk | unchanged values, brand colours |
+
+`brand-snapshot-adapter.js` is an engine extension (shares `app.js`'s closure) and only copies values out. `brand-visuals.js` is the DOM layer: pure geometry is exported for `tests/brand-visuals.js`, mounting happens in the browser only, and repaints are signature-guarded so they never loop with the app's own renders.
+
+## Motion
+
+Section entrance (cards rise in once per tab change), radar/gauge/bar draw-ins, a light sweep on brass buttons, a soft pulse on the next game. All of it stops under `prefers-reduced-motion` and the in-game *Reduce motion* option (`body.motion-reduced`).
+
+## Decluttering in the same pass
+
+- Stats no longer lists eight "0 SCK · 0 INT" defenders before any game; it says *No defensive statistics yet*.
+- The required-decision focus line reads as a slim status header instead of a second copy of the decision card below it.
+- The recruiting *Recruiting mode* explainer card became just its toggle (and shares the class-view row on wide screens).
+
+## Files
+
+`brand-identity.css` (last in the cascade), `brand-visuals.js`, `brand-snapshot-adapter.js`, `assets/fonts/*`, `tests/brand-visuals.js`, `tests/brand-identity-browser.js` (`npm run test:brand-identity-browser`).
+
+---
+
 # Dynasty Lab — Visual Identity V1
 
 Branch: `codex/v097-visual-identity`

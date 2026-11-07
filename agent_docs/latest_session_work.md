@@ -1,5 +1,12 @@
 # Latest Session Work
 
+## Visual identity v2 "Midnight & Brass" (Claude, 2026-11-07)
+
+- Restored the 2026-11-06 handoff bundle onto base `252a784` (all 46 manifest hashes matched), rebuilt (`index.html` byte-identical), ran `npm test` (541 pass) and the three focused recruiting browser suites (pass), then committed it on `claude/gracious-rubin-mfi574`.
+- Added a presentation-only identity layer: `brand-identity.css` (last in the cascade), `brand-visuals.js` (DOM + pure geometry), `brand-snapshot-adapter.js` (read-only engine extension), vendored Barlow Condensed in `assets/fonts/`. Details and the source-of-truth table are in `VISUAL_IDENTITY.md`.
+- Small source changes outside the new files: `app.js` stat leader rows carry `--lead` and zero-stat defenders are no longer listed; `roster-depth-experience.js` cards show the v1 portrait and an estimate-range bar; `tools/build.js` wires the new files; `package.json` registers `tests/brand-visuals.js` and `tests/brand-identity-browser.js`.
+- Version unchanged at 0.14.1; CHANGELOG has an *Unreleased* section. No release, publish, packaging or install.
+
 ## Final handoff for Claude (2026-11-06)
 
 - Start with `agent_docs/CLAUDE_HANDOFF_2026-11-06_DYNASTY_LAB.md`, the consolidated current continuation packet. It supersedes older handoff summaries; the detailed session entries below remain supporting evidence.

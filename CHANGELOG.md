@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased — Midnight & Brass (visual identity v2)
+
+Presentation only: no simulation, balance, save-shape or randomness changes. See `VISUAL_IDENTITY.md`.
+
+- **Recruiting desk package** from the 2026-11-06 handoff: pitch explanation parity, a shorter weekly desk, win-bar and Game Cast accuracy repairs, recruiting search/count clarity, the phone dossier, peer class views, roster outlook and the flat Current / Rising / Outlook / Map / Shortlist / Class summary / History strip.
+- **A visual identity.** The title screen's brass carried through the game: condensed athletic display type (bundled, works offline), brass for "what matters now", team colour for "who you are", a chalk play diagram behind the program banner.
+- **Pictures and graphs.** Your helmet and a season strip with every opponent's helmet, result and score on the dashboard; a helmet face-off for the next matchup; a program radar, confidence gauge, goals ring and win pace in Program Lab; leader bars in Stats; player portraits and estimate-range bars on roster cards.
+- **One menu language.** Underlined page tabs; one brass segmented track for every in-page view switcher.
+- **Motion** that respects reduced-motion: tab entrances, chart draw-ins, a sweep on primary buttons, a pulse on the next game.
+- **Less clutter.** No zero-stat defensive leaders, a slimmer required-decision header, and the recruiting mode explainer reduced to its toggle.
+
 ## v0.14.1 — Visual pass
 
 From a review of the Game Day screens and a second look at every tab. Presentation only: no simulation, balance or save-shape changes.

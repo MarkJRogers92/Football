@@ -1,0 +1,306 @@
+/* Dynasty Lab — Brand Identity v2 "Midnight & Brass"
+   The title screen's brass-and-stadium identity carried into the whole game: condensed athletic
+   display type, a single brass accent for "what matters now", team colour for "who you are",
+   chalk play-diagram textures, helmets and charts in place of paragraphs. Loaded last; presentation only. */
+
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:600;font-display:swap;src:url("assets/fonts/barlow-condensed-600.woff2") format("woff2")}
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:800;font-display:swap;src:url("assets/fonts/barlow-condensed-800.woff2") format("woff2")}
+
+:root{
+ --bi-display:"Barlow Condensed","Arial Narrow","Roboto Condensed",Inter,ui-sans-serif,system-ui,sans-serif;
+ --bi-gold:#e3b04b;--bi-gold-hi:#f7d47c;--bi-gold-deep:#a5772b;--bi-gold-rgb:227,176,75;
+ --bi-ink:#05080c;--bi-ink-2:#0a1018;--bi-panel:#0f161f;--bi-panel-2:#141d28;--bi-line:#1e2b3a;--bi-line-2:#2a3b4f;
+ --bi-chalk:#eef2f7;--bi-mute:#8c9bb0;--bi-win:#5fd39a;--bi-loss:#ef7d84;
+ --bi-radius:14px;--bi-ease:cubic-bezier(.2,.8,.2,1);
+ --bi-chalk-play:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 240' fill='none' stroke='%23ffffff' stroke-width='2.2' stroke-linecap='round'%3E%3Cg opacity='.9'%3E%3Ccircle cx='150' cy='190' r='9'/%3E%3Ccircle cx='180' cy='190' r='9'/%3E%3Ccircle cx='210' cy='190' r='9'/%3E%3Ccircle cx='240' cy='190' r='9'/%3E%3Ccircle cx='270' cy='190' r='9'/%3E%3Ccircle cx='210' cy='222' r='9'/%3E%3Ccircle cx='70' cy='192' r='9'/%3E%3Ccircle cx='360' cy='192' r='9'/%3E%3Cpath d='M138 60l14 14m0-14l-14 14M196 44l14 14m0-14l-14 14M262 60l14 14m0-14l-14 14M64 70l14 14m0-14l-14 14M346 70l14 14m0-14l-14 14'/%3E%3Cpath d='M70 180V110q0-24 26-34l60-18' stroke-dasharray='7 7'/%3E%3Cpath d='M360 180v-60q0-30-40-46' stroke-dasharray='7 7'/%3E%3Cpath d='M210 210q40-10 70-60t40-80'/%3E%3Cpath d='M152 66l6 -14 8 12'/%3E%3Cpath d='M314 74l8 -12 4 14'/%3E%3Cpath d='M312 76l8-10 4 12'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ---------- Canvas: deep ink field with a faint yard grid and a brass horizon ---------- */
+html.bi-brand,html.bi-brand body{background:var(--bi-ink)}
+html.bi-brand body{
+ background:
+  radial-gradient(1200px 520px at 70% -180px,rgba(var(--team-primary-rgb,35,72,117),.32),transparent 70%),
+  radial-gradient(900px 420px at 0% 0%,rgba(var(--bi-gold-rgb),.06),transparent 65%),
+  repeating-linear-gradient(90deg,transparent 0 119px,rgba(255,255,255,.018) 119px 120px),
+  var(--bi-ink);
+ background-attachment:fixed;
+}
+html.bi-brand ::selection{background:rgba(var(--bi-gold-rgb),.35);color:#fff}
+html.bi-brand :focus-visible{outline:2px solid var(--bi-gold);outline-offset:2px}
+
+/* ---------- Type: condensed display for headlines, numbers and labels ---------- */
+html.bi-brand main h2,html.bi-brand .rd-roster-head h2,html.bi-brand .rd-depth-head h2,html.bi-brand #hubTitle,html.bi-brand #teamName{
+ font-family:var(--bi-display);font-weight:800;text-transform:uppercase;letter-spacing:.01em;line-height:.98
+}
+html.bi-brand main .section-head h2{font-size:34px;display:flex;align-items:center;gap:12px}
+html.bi-brand main .section-head h2::before{content:"";flex:0 0 auto;width:6px;height:.8em;border-radius:2px;background:linear-gradient(180deg,var(--bi-gold-hi),var(--bi-gold-deep));box-shadow:0 0 18px rgba(var(--bi-gold-rgb),.45)}
+html.bi-brand main h3{font-family:var(--bi-display);font-weight:800;letter-spacing:.01em;font-size:21px;text-transform:uppercase}
+html.bi-brand .eyebrow,html.bi-brand .hub-kicker,html.bi-brand .client-nav-label,html.bi-brand th,html.bi-brand .decision-kicker,html.bi-brand .weekly-desk-status{
+ font-family:var(--bi-display);font-weight:800;letter-spacing:.16em;text-transform:uppercase
+}
+html.bi-brand main .eyebrow{color:color-mix(in srgb,var(--bi-gold) 62%,#8c9bb0);font-size:12.5px}
+html.bi-brand #recordBig,html.bi-brand .big,html.bi-brand .metric .v,html.bi-brand .program-attr strong,html.bi-brand .profile-stat .v,
+html.bi-brand .leader-val,html.bi-brand .rd-roster-head>div:last-child strong,html.bi-brand .client-status-facts [data-client-record]{
+ font-family:var(--bi-display);font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:0
+}
+html.bi-brand #recordBig{font-size:64px;line-height:.9;background:linear-gradient(180deg,#fff 30%,#c9d4e2);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ---------- Surfaces ---------- */
+html.bi-brand main .card,html.bi-brand .rd-position-group,html.bi-brand .rd-roster-head{
+ border-color:var(--bi-line);border-radius:var(--bi-radius);
+ background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,0) 120px),var(--bi-panel);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 14px 34px rgba(0,0,0,.28)
+}
+html.bi-brand .metric,html.bi-brand .program-attr,html.bi-brand .profile-stat{
+ border:1px solid var(--bi-line);border-radius:11px;background:linear-gradient(180deg,var(--bi-panel-2),var(--bi-panel))
+}
+html.bi-brand .lineitem{border-bottom-color:var(--bi-line)}
+
+/* ---------- Navigation rail: one brass accent for "you are here" ---------- */
+html.bi-brand .client-rail{background:linear-gradient(180deg,#070b11,#05080c);border-right-color:#141f2c}
+html.bi-brand .client-rail-brand{position:relative;padding-left:48px}
+html.bi-brand .client-rail-brand::before{
+ content:"DL";position:absolute;left:6px;top:2px;width:34px;height:38px;display:grid;place-items:center;
+ font:800 13px/1 var(--bi-display);letter-spacing:.04em;color:var(--bi-gold-hi);
+ clip-path:polygon(50% 0,100% 18%,100% 62%,50% 100%,0 62%,0 18%);
+ background:linear-gradient(160deg,rgba(var(--bi-gold-rgb),.28),rgba(var(--bi-gold-rgb),.06));
+ box-shadow:inset 0 0 0 2px rgba(var(--bi-gold-rgb),.75)
+}
+html.bi-brand .client-rail-brand strong{font:800 20px/1 var(--bi-display);letter-spacing:.06em;background:linear-gradient(90deg,#fff 0 58%,var(--bi-gold-hi) 58%);-webkit-background-clip:text;background-clip:text;color:transparent}
+html.bi-brand .client-rail-brand span{color:var(--bi-gold-deep)}
+html.bi-brand .client-nav-label{color:#4f6177;font-size:11px}
+html.bi-brand .client-nav-item{font-weight:600;transition:background .18s var(--bi-ease),color .18s}
+html.bi-brand .client-nav-item.active{
+ background:linear-gradient(90deg,rgba(var(--bi-gold-rgb),.16),rgba(var(--bi-gold-rgb),0) 85%);color:#fff;
+ box-shadow:inset 3px 0 var(--bi-gold)
+}
+html.bi-brand .client-nav-item.active .client-nav-icon{color:var(--bi-gold-hi)}
+
+/* ---------- Top bar as a broadcast scorebug ---------- */
+html.bi-brand .client-shell-ready .topbar{background:rgba(6,10,15,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom-color:#141f2c}
+html.bi-brand .client-status-program strong{font:800 21px/1 var(--bi-display);text-transform:uppercase;letter-spacing:.02em}
+html.bi-brand .client-status-facts [data-client-record]{font-size:24px;line-height:1;color:#fff}
+html.bi-brand .client-status-facts [data-client-rank]{color:var(--bi-gold-hi);font-weight:700}
+
+/* ---------- One menu language. Page tabs: underline. In-page views: brass segmented track. ---------- */
+html.bi-brand .client-shell-ready .tabs-shell{background:rgba(7,11,17,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom-color:#141f2c}
+html.bi-brand .client-shell-ready .tabs button{
+ position:relative;border:0;border-radius:0;background:transparent;padding:10px 12px;
+ font:800 14px/1 var(--bi-display);letter-spacing:.09em;text-transform:uppercase;color:#7c8ca1
+}
+html.bi-brand .client-shell-ready .tabs button:hover{color:#e8eef6;background:transparent}
+html.bi-brand .client-shell-ready .tabs button.active{color:#fff;background:transparent}
+html.bi-brand .client-shell-ready .tabs button::after{content:"";position:absolute;left:12px;right:12px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--bi-gold);transform:scaleX(0);transition:transform .22s var(--bi-ease)}
+html.bi-brand .client-shell-ready .tabs button.active::after{transform:scaleX(1);box-shadow:0 0 12px rgba(var(--bi-gold-rgb),.6)}
+
+html.bi-brand .dash-views,html.bi-brand .recruit-class-views,html.bi-brand .recruit-mode-buttons{
+ display:flex;gap:2px;padding:4px;border:1px solid var(--bi-line-2);border-radius:12px;background:rgba(4,7,11,.75);
+ box-shadow:inset 0 1px 3px rgba(0,0,0,.5);width:max-content;max-width:100%;overflow-x:auto;scrollbar-width:none
+}
+html.bi-brand .dash-views::-webkit-scrollbar,html.bi-brand .recruit-class-views::-webkit-scrollbar{display:none}
+html.bi-brand .dash-views button,html.bi-brand .recruit-class-views button,html.bi-brand .recruit-mode-buttons button{
+ flex:0 0 auto;min-height:36px;padding:8px 14px;border:0;border-radius:9px;background:transparent;color:#91a1b6;
+ font:800 14px/1 var(--bi-display);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;box-shadow:none;
+ transition:background .2s var(--bi-ease),color .2s
+}
+html.bi-brand .dash-views button:hover,html.bi-brand .recruit-class-views button:hover,html.bi-brand .recruit-mode-buttons button:hover{color:#fff;background:rgba(255,255,255,.06)}
+html.bi-brand .dash-views button.active,html.bi-brand #recruitClassViews.recruit-class-views button[aria-pressed="true"],html.bi-brand .recruit-mode-buttons button.active{
+ color:#140e02;background:linear-gradient(180deg,var(--bi-gold-hi),var(--bi-gold));box-shadow:0 4px 14px rgba(var(--bi-gold-rgb),.35),inset 0 1px 0 rgba(255,255,255,.45)
+}
+html.bi-brand .recruit-mode-buttons{padding:3px}
+html.bi-brand .recruit-mode-buttons .rw-budget{align-self:center;padding:0 8px;font:800 13px/1 var(--bi-display);letter-spacing:.06em;color:var(--bi-gold-hi);background:none;box-shadow:none}
+
+/* ---------- Primary actions: brass, with a light sweep on hover ---------- */
+html.bi-brand :is(#simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason):not(:disabled){
+ position:relative;overflow:hidden;border:1px solid #f0c768;color:#160f02;
+ background:linear-gradient(180deg,var(--bi-gold-hi),var(--bi-gold) 55%,#cf9a35);
+ font:800 15px/1 var(--bi-display);letter-spacing:.08em;text-transform:uppercase;
+ box-shadow:0 8px 22px rgba(var(--bi-gold-rgb),.28),inset 0 1px 0 rgba(255,255,255,.55);transition:transform .15s var(--bi-ease),box-shadow .2s
+}
+html.bi-brand :is(#simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason):not(:disabled)::after{
+ content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);transform:translateX(-120%);pointer-events:none
+}
+html.bi-brand :is(#simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason):not(:disabled):hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(var(--bi-gold-rgb),.38),inset 0 1px 0 rgba(255,255,255,.6);border-color:#ffe09a;background:linear-gradient(180deg,#ffe29a,var(--bi-gold-hi) 55%,var(--bi-gold))}
+html.bi-brand :is(#simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason):not(:disabled):hover::after{transform:translateX(120%);transition:transform .7s var(--bi-ease)}
+html.bi-brand :is(#simWeek,#simSeason):not(:disabled){background:transparent;color:var(--bi-gold-hi);border-color:rgba(var(--bi-gold-rgb),.55);box-shadow:none}
+html.bi-brand :is(#simWeek,#simSeason):not(:disabled):hover{background:rgba(var(--bi-gold-rgb),.12);color:#fff}
+
+/* ---------- Dashboard masthead: a team-coloured banner with the helmet and the season strip ---------- */
+html.bi-brand #dashboard .program-masthead{
+ position:relative;overflow:hidden;isolation:isolate;
+ background:
+  linear-gradient(100deg,rgba(var(--team-primary-rgb,35,72,117),.55),rgba(var(--team-primary-rgb,35,72,117),.12) 45%,rgba(9,13,19,0) 75%),
+  linear-gradient(180deg,#111a25,#0b1119);
+ border-color:color-mix(in srgb,var(--team-secondary,#73a8ff) 26%,var(--bi-line))
+}
+html.bi-brand #dashboard .program-masthead::after{
+ content:"";position:absolute;z-index:-1;right:-30px;top:-20px;width:460px;height:260px;opacity:.07;
+ background:var(--bi-chalk-play) center/contain no-repeat;pointer-events:none
+}
+html.bi-brand #dashboard .program-masthead::before{
+ content:"";display:block!important;position:absolute;z-index:-1;left:0;right:0;top:0;height:3px;
+ background:linear-gradient(90deg,var(--team-secondary,#73a8ff),var(--bi-gold) 60%,transparent)
+}
+html.bi-brand #dashboard .program-masthead.bi-has-helmet .masthead-mark{display:none}
+html.bi-brand #teamName{font-size:44px}
+html.bi-brand #dashboard .masthead-identity{gap:18px}
+.bi-strip-host{min-width:0;margin:2px 0 0;padding-top:12px;border-top:1px solid rgba(255,255,255,.07)}
+
+/* Helmets from the shared Meshy atlas (12 × 10), addressed by --col/--row. */
+.bi-helmet{position:relative;display:inline-block;flex:0 0 auto;width:40px;aspect-ratio:1}
+.bi-helmet-shell,.bi-helmet-logo{position:absolute;background-repeat:no-repeat;background-size:1200% 1000%;background-position:calc(var(--col,0)*100%/11) calc(var(--row,0)*100%/9)}
+.bi-helmet-shell{inset:0;background-image:url("assets/team-helmets-meshy-atlas-128.webp")}
+.bi-helmet-logo{left:19%;top:31%;width:28%;height:28%;background-image:url("assets/team-logos-atlas-32.png");filter:drop-shadow(0 0 .5px #fff) drop-shadow(0 0 .5px #fff)}
+.bi-helmet.is-away .bi-helmet-shell{scale:-1 1}.bi-helmet.is-away .bi-helmet-logo{left:auto;right:19%}
+.bi-helmet--none{border-radius:50%;background:radial-gradient(circle at 40% 35%,#2b3a4d,#121a24)}
+.bi-helmet--hero{width:112px;filter:drop-shadow(0 14px 18px rgba(0,0,0,.55)) drop-shadow(0 0 26px rgba(var(--team-secondary-rgb,115,168,255),.25));animation:bi-helmet-in .7s var(--bi-ease) both}
+
+.bi-strip{display:flex;gap:6px;margin:0;padding:2px 2px 6px;list-style:none;overflow-x:auto;scrollbar-width:thin;scroll-behavior:smooth}
+.bi-chip{position:relative;flex:0 0 auto;display:grid;justify-items:center;gap:1px;width:62px;padding:6px 4px 7px;border:1px solid var(--bi-line);border-radius:10px;background:rgba(5,8,12,.55)}
+.bi-chip::after{content:"";position:absolute;left:10px;right:10px;bottom:-1px;height:3px;border-radius:3px 3px 0 0;background:transparent}
+.bi-chip-wk{font:800 11px/1 var(--bi-display);letter-spacing:.1em;color:#6c7d93}
+.bi-chip .bi-helmet--chip{width:34px}
+.bi-chip b{font:800 13px/1.05 var(--bi-display);letter-spacing:.03em;color:#9fb0c4;white-space:nowrap}
+.bi-chip.is-win b{color:var(--bi-win)}.bi-chip.is-win::after{background:var(--bi-win)}
+.bi-chip.is-loss b{color:var(--bi-loss)}.bi-chip.is-loss::after{background:var(--bi-loss)}
+.bi-chip.is-future{opacity:.85}.bi-chip.is-future b{color:#6c7d93}
+.bi-chip.is-next{border-color:rgba(var(--bi-gold-rgb),.75);background:linear-gradient(180deg,rgba(var(--bi-gold-rgb),.2),rgba(5,8,12,.6));animation:bi-pulse 2.6s ease-in-out infinite}
+.bi-chip.is-next b{color:var(--bi-gold-hi)}.bi-chip.is-next .bi-chip-wk{color:var(--bi-gold)}
+.bi-chip.is-conf .bi-chip-wk::after{content:" •";color:var(--team-secondary,#73a8ff)}
+.bi-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* Required decision: the focus line reads as a status header, not a second copy of the card below. */
+html.bi-brand .weekly-desk-focus{border-left-width:4px;border-radius:0 10px 10px 0;padding:8px 14px 9px;background:linear-gradient(90deg,rgba(var(--bi-gold-rgb),.09),transparent 70%)}
+html.bi-brand .weekly-desk-focus[data-status="ready"],html.bi-brand .weekly-desk-focus[data-status="clear"]{background:linear-gradient(90deg,rgba(95,211,154,.08),transparent 70%)}
+html.bi-brand .command-center:has(#weeklyDecisions .decision-card:not(.decision-resolved)) .weekly-desk-focus[data-status="blocked"] h3{font-size:17px;margin:3px 0 2px;text-transform:none;font-family:inherit;font-weight:750}
+html.bi-brand .decision-card{border-radius:12px;border-color:rgba(var(--bi-gold-rgb),.38);background:linear-gradient(180deg,rgba(var(--bi-gold-rgb),.06),rgba(var(--bi-gold-rgb),.015)),var(--bi-panel)}
+html.bi-brand .decision-card .decision-kicker{color:var(--bi-gold)}
+html.bi-brand .decision-title{font:800 22px/1.05 var(--bi-display);text-transform:uppercase;letter-spacing:.01em}
+html.bi-brand .decision-option{border-color:var(--bi-line-2);background:rgba(255,255,255,.025);transition:border-color .18s,background .18s,transform .15s var(--bi-ease)}
+html.bi-brand .decision-option:hover:not(:disabled){border-color:rgba(var(--bi-gold-rgb),.7);background:rgba(var(--bi-gold-rgb),.08);transform:translateY(-1px)}
+
+/* ---------- Program Lab: profile radar, confidence gauge, goals ring, win pace ---------- */
+.bi-program-visual{display:grid;grid-template-columns:minmax(220px,1.3fr) repeat(3,minmax(0,1fr));gap:12px;align-items:stretch;margin:10px 0 14px}
+.bi-figure{margin:0;display:grid;justify-items:center;align-content:center;gap:6px;padding:12px;border:1px solid var(--bi-line);border-radius:12px;background:radial-gradient(120% 90% at 50% 0%,rgba(var(--bi-gold-rgb),.06),transparent 60%),rgba(5,8,12,.45)}
+.bi-figure figcaption{display:grid;justify-items:center;gap:2px;font:800 12px/1 var(--bi-display);letter-spacing:.14em;text-transform:uppercase;color:var(--bi-mute)}
+.bi-figure figcaption b{font:600 14px/1.1 var(--bi-display);letter-spacing:.04em;color:var(--bi-chalk)}
+.bi-figure--radar{grid-row:span 1}
+.bi-radar{width:100%;max-width:260px;height:auto;overflow:visible}
+.bi-radar-ring{fill:none;stroke:rgba(255,255,255,.08)}.bi-radar-ring:first-child{stroke:rgba(255,255,255,.14)}
+.bi-radar-axis{stroke:rgba(255,255,255,.07)}
+.bi-radar-shape{fill:url(#biRadarFill);stroke:var(--bi-gold);stroke-width:2;stroke-linejoin:round;filter:drop-shadow(0 0 8px rgba(var(--bi-gold-rgb),.35));transform-origin:50% 50%;animation:bi-grow .8s var(--bi-ease) both}
+.bi-radar-dot{fill:var(--bi-gold-hi)}
+.bi-radar-label{font:800 9.5px var(--bi-display);letter-spacing:.12em;fill:#7f90a6}
+.bi-radar-value{font:800 13px var(--bi-display);fill:#fff}
+.bi-gauge{width:100%;max-width:190px;height:auto}
+.bi-gauge-band{fill:none;stroke-width:6;stroke-linecap:round;opacity:.5}
+.bi-gauge-band.is-bad{stroke:#d65a63}.bi-gauge-band.is-warn{stroke:#e4904f}.bi-gauge-band.is-mid{stroke:#d7b85a}.bi-gauge-band.is-good{stroke:#6cc49a}.bi-gauge-band.is-great{stroke:#5fb6e8}
+.bi-gauge-fill{fill:none;stroke:var(--bi-gold);stroke-width:10;stroke-linecap:round;filter:drop-shadow(0 0 6px rgba(var(--bi-gold-rgb),.45));stroke-dasharray:400;stroke-dashoffset:0;animation:bi-draw 1s var(--bi-ease) both}
+.bi-gauge-value{font:800 40px var(--bi-display);fill:#fff}
+.bi-ring{width:104px;height:104px}
+.bi-ring-track{fill:none;stroke:rgba(255,255,255,.09);stroke-width:8}
+.bi-ring-fill{fill:none;stroke:var(--bi-win);stroke-width:8;stroke-linecap:round}
+.bi-ring-value{font:800 19px var(--bi-display);fill:#fff}
+.bi-pace{display:grid;gap:10px;width:100%;max-width:200px}
+.bi-pace-track{position:relative;height:12px;border-radius:999px;background:rgba(255,255,255,.07);overflow:visible}
+.bi-pace-track i{position:absolute;inset:0 auto 0 0;border-radius:inherit;background:linear-gradient(90deg,var(--team-secondary,#73a8ff),var(--bi-gold));animation:bi-fill .9s var(--bi-ease) both;transform-origin:left}
+.bi-pace-track s{position:absolute;top:-5px;bottom:-5px;width:2px;margin-left:-1px;background:#fff;text-decoration:none;box-shadow:0 0 6px rgba(255,255,255,.6)}
+.bi-pace-copy{display:flex;align-items:baseline;gap:8px;justify-content:center}
+.bi-pace-copy strong{font:800 40px/1 var(--bi-display);color:#fff}.bi-pace-copy span{font-size:12px;color:var(--bi-mute)}
+/* The radar carries the exact six values, so the duplicate tile row steps aside. */
+html.bi-brand #programAttributes.bi-has-visual:has(.bi-program-visual) .program-attrs{display:none}
+html.bi-brand .program-attr span{font:800 11.5px/1 var(--bi-display);letter-spacing:.14em;text-transform:uppercase;color:var(--bi-mute)}
+html.bi-brand .program-attr strong{font-size:30px}
+
+/* ---------- Stats: leader rows draw their share of the category leader ---------- */
+html.bi-brand .leader-row{position:relative;isolation:isolate;border-bottom-color:var(--bi-line);border-left:0!important}
+html.bi-brand .leader-row::before{content:"";position:absolute;z-index:-1;left:0;top:5px;bottom:5px;width:var(--lead,0%);border-radius:0 8px 8px 0;background:linear-gradient(90deg,rgba(var(--bi-gold-rgb),.04),rgba(var(--bi-gold-rgb),.17));box-shadow:inset -2px 0 rgba(var(--bi-gold-rgb),.65);transform-origin:left;animation:bi-fill .8s var(--bi-ease) both}
+html.bi-brand .leader-row:first-child::before{background:linear-gradient(90deg,rgba(var(--bi-gold-rgb),.08),rgba(var(--bi-gold-rgb),.3))}
+html.bi-brand .leader-row>span:first-child{font:800 18px/1 var(--bi-display);color:#6c7d93;text-align:center}
+html.bi-brand .leader-row:first-child>span:first-child{color:var(--bi-gold-hi)}
+html.bi-brand .leader-val{font-size:18px}
+
+/* ---------- Roster: faces and estimate-range bars ---------- */
+.rd-player.rd-player--face{grid-template-columns:48px minmax(0,1fr);gap:12px;align-items:center}
+.rd-face{position:relative;flex:0 0 auto;width:46px;height:46px;border-radius:12px;overflow:visible}
+.rd-face canvas.portrait{width:46px;height:46px;border-radius:12px;background:radial-gradient(circle at 50% 30%,rgba(var(--team-secondary-rgb,115,168,255),.25),#0d141d 70%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.rd-face .rd-jersey{position:absolute;right:-6px;bottom:-5px;min-width:0;width:auto;height:auto;padding:2px 4px;border-radius:6px;font:800 10.5px/1 var(--bi-display);background:#05080c;border:1px solid var(--bi-line-2);color:var(--bi-gold-hi)}
+.rd-estimate{position:relative;display:block;height:4px;margin-top:5px;max-width:150px;border-radius:999px;background:rgba(255,255,255,.07)}
+.rd-estimate::after{content:"";position:absolute;top:0;bottom:0;left:var(--lo);right:calc(100% - var(--hi));min-width:4px;border-radius:inherit;background:linear-gradient(90deg,var(--team-secondary,#73a8ff),var(--bi-gold))}
+html.bi-brand .rd-position-group header span{font:800 26px/1 var(--bi-display);letter-spacing:.02em}
+
+/* ---------- Recruiting desk: the same brass and condensed numbers ---------- */
+html.bi-brand .recruit-workspace-switcher{border-color:var(--bi-line);background:linear-gradient(90deg,rgba(var(--bi-gold-rgb),.05),transparent 60%),var(--bi-panel)}
+
+/* ---------- Motion ---------- */
+@keyframes bi-rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes bi-fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes bi-grow{from{transform:scale(.2);opacity:0}to{transform:none;opacity:1}}
+@keyframes bi-draw{from{stroke-dashoffset:400}to{stroke-dashoffset:0}}
+@keyframes bi-pulse{0%,100%{box-shadow:0 0 0 0 rgba(var(--bi-gold-rgb),.0)}50%{box-shadow:0 0 0 4px rgba(var(--bi-gold-rgb),.18)}}
+@keyframes bi-helmet-in{from{opacity:0;transform:translateX(-14px) rotate(-6deg)}to{opacity:1;transform:none}}
+main section.tab.bi-enter>*{animation:bi-rise .45s var(--bi-ease) both}
+main section.tab.bi-enter>*:nth-child(2){animation-delay:.05s}
+main section.tab.bi-enter>*:nth-child(3){animation-delay:.1s}
+main section.tab.bi-enter>*:nth-child(4){animation-delay:.15s}
+main section.tab.bi-enter>*:nth-child(n+5){animation-delay:.2s}
+html.bi-brand main .card,html.bi-brand .rd-position-group{transition:border-color .2s,box-shadow .25s}
+html.bi-brand .rd-position-group:hover,html.bi-brand .hub-item.hub-link:hover{border-color:var(--bi-line-2);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 18px 40px rgba(0,0,0,.35)}
+
+@media (prefers-reduced-motion:reduce){
+ main section.tab.bi-enter>*,.bi-helmet--hero,.bi-radar-shape,.bi-gauge-fill,.bi-pace-track i,html.bi-brand .leader-row::before,.bi-chip.is-next{animation:none!important}
+ html.bi-brand :is(#hubAdvance,#autoTarget)::after{display:none}
+}
+body.motion-reduced main section.tab.bi-enter>*,body.motion-reduced .bi-helmet--hero,body.motion-reduced .bi-radar-shape,body.motion-reduced .bi-gauge-fill,body.motion-reduced .bi-pace-track i,body.motion-reduced .leader-row::before,body.motion-reduced .bi-chip.is-next{animation:none!important}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1100px){.bi-program-visual{grid-template-columns:repeat(2,minmax(0,1fr))}.bi-figure--radar{grid-row:span 2}}
+@media (max-width:860px){
+ html.bi-brand main .section-head h2{font-size:28px}
+ html.bi-brand #teamName{font-size:30px}
+ html.bi-brand #recordBig{font-size:46px}
+ .bi-helmet--hero{width:70px}
+ html.bi-brand #dashboard .program-masthead::after{width:300px;height:170px;right:-80px}
+ html.bi-brand .client-status-program strong{font-size:17px}
+ html.bi-brand .client-status-facts [data-client-record]{font-size:18px}
+ html.bi-brand .client-shell-ready .tabs button{font-size:12.5px;padding:9px 9px}
+ html.bi-brand .client-shell-ready .tabs button::after{left:9px;right:9px}
+ html.bi-brand .dash-views button,html.bi-brand .recruit-class-views button,html.bi-brand .recruit-mode-buttons button{font-size:13px;padding:8px 11px;min-height:34px}
+}
+@media (max-width:560px){
+ .bi-program-visual{grid-template-columns:1fr 1fr;gap:8px}.bi-figure--radar{grid-column:1/-1;grid-row:auto}
+ .bi-chip{width:54px}.bi-chip .bi-helmet--chip{width:28px}.bi-chip b{font-size:12px}
+ .bi-strip-host{padding-top:8px}
+}
+.bi-gauge-tip{fill:#fff;stroke:var(--bi-gold);stroke-width:2}
+/* Dashboard: details summary sits under the season strip. */
+html.bi-brand #dashboard .program-masthead{grid-template-areas:"identity status" "strip strip" "details details"}
+html.bi-brand #dashboard .program-masthead .bi-strip-host{grid-area:strip}
+@media(max-width:860px){html.bi-brand #dashboard .program-masthead{grid-template-areas:"identity" "status" "strip" "details"}}
+/* Next matchup: helmets face off; the flat marks step aside. */
+.broadcast-team.bi-has-helmet{grid-template-columns:auto minmax(0,1fr)}
+.broadcast-team.bi-has-helmet>.sports-mark,.broadcast-team.bi-has-helmet>.team-logo{display:none}
+.bi-helmet--matchup{width:84px;filter:drop-shadow(0 10px 14px rgba(0,0,0,.5))}
+html.bi-brand .broadcast-feature-main{border-color:var(--bi-line);background:linear-gradient(100deg,rgba(var(--team-primary-rgb,35,72,117),.28),transparent 40%),linear-gradient(180deg,#111a25,#0b1119)}
+html.bi-brand .broadcast-versus b{font:800 40px/1 var(--bi-display);color:var(--bi-gold-hi);text-shadow:0 0 22px rgba(var(--bi-gold-rgb),.45)}
+html.bi-brand .broadcast-team strong{font:800 22px/1.02 var(--bi-display);text-transform:uppercase;letter-spacing:.01em}
+html.bi-brand .broadcast-kicker{font-family:var(--bi-display);font-weight:800;letter-spacing:.16em;color:color-mix(in srgb,var(--bi-gold) 62%,#8c9bb0)}
+@media(max-width:720px){.bi-helmet--matchup{width:60px}.broadcast-team.bi-has-helmet{grid-template-columns:auto minmax(0,1fr)}}
+/* Recruiting: the mode toggle is a control, not a headline — the explainer steps aside. */
+html.bi-brand .recruit-workspace-switcher{padding:0;border:0;background:none;box-shadow:none;justify-content:flex-end;margin:-6px 0 12px}
+html.bi-brand .recruit-workspace-switcher>div:first-child{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+html.bi-brand .rw-conf>i{background:linear-gradient(90deg,rgba(var(--team-secondary-rgb,115,168,255),.55),var(--bi-gold));transform-origin:left;animation:bi-fill .7s var(--bi-ease) both}
+html.bi-brand .rw-conf>b{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.8);font-family:var(--bi-display);font-size:12px;letter-spacing:.06em}
+body.motion-reduced .rw-conf>i{animation:none!important}
+@media(prefers-reduced-motion:reduce){html.bi-brand .rw-conf>i{animation:none!important}}
+/* Wide screens: the mode toggle shares the row with the class views instead of taking its own. */
+@media(min-width:1380px){html.bi-brand #recruitClassViews+.recruit-workspace-switcher{width:max-content;margin:-54px 0 18px auto}}
+/* Season pulse: helmets and display numbers. */
+.season-pulse-main.bi-has-helmet>.season-pulse-logo,.season-next.bi-has-helmet>.season-next-logo{display:none}
+.bi-helmet--pulse{width:76px;filter:drop-shadow(0 10px 14px rgba(0,0,0,.5))}
+.bi-helmet--pulse-next{width:52px}
+html.bi-brand .season-pulse-identity strong{font:800 28px/1 var(--bi-display);text-transform:uppercase;letter-spacing:.01em}
+html.bi-brand .season-next strong,html.bi-brand .season-result strong{font-family:var(--bi-display);font-weight:800;font-size:20px;text-transform:uppercase;letter-spacing:.01em}
+html.bi-brand .event-center b{font-size:44px;font-family:var(--bi-display);font-weight:800;color:var(--bi-gold-hi);text-shadow:0 0 22px rgba(var(--bi-gold-rgb),.4)}
+html.bi-brand .event-team-copy strong{font-family:var(--bi-display);font-weight:800;text-transform:uppercase;letter-spacing:.01em;font-size:28px}
+@media(max-width:720px){.bi-helmet--pulse{width:56px}.bi-helmet--pulse-next{width:40px}html.bi-brand .event-team-copy strong{font-size:22px}}
