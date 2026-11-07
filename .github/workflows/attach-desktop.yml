@@ -1,0 +1,85 @@
+name: Attach desktop builds to release
+
+# Copies the macOS arm64 and Windows x64 ZIPs from a passed Validate run onto an existing GitHub
+# Release, with SHA256SUMS. Cloud coding sessions cannot write release assets (HTTP 403), so this
+# runs with the repository's own Actions token. The Validate run must be for the release's commit.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version without the v (the release must already exist)
+        required: true
+        type: string
+      run_id:
+        description: ID of a passed Validate Dynasty Lab run whose desktop artifacts to attach
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: dynasty-release
+  cancel-in-progress: false
+
+jobs:
+  attach:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Download, check and attach
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ inputs.version }}
+          RUN_ID: ${{ inputs.run_id }}
+        run: |
+          set -euo pipefail
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "version must look like 1.2.3" >&2; exit 1; }
+          [[ "$RUN_ID" =~ ^[0-9]+$ ]] || { echo "run_id must be numeric" >&2; exit 1; }
+          tag="v${VERSION}"
+          target="$(gh release view "$tag" --json targetCommitish -q .targetCommitish)"
+          tag_sha="$(gh api "repos/${GH_REPO}/commits/${tag}" -q .sha)"
+          run_sha="$(gh run view "$RUN_ID" --json headSha -q .headSha)"
+          conclusion="$(gh run view "$RUN_ID" --json conclusion -q .conclusion)"
+          echo "release $tag at $tag_sha (target $target); run $RUN_ID at $run_sha ($conclusion)"
+          [ "$run_sha" = "$tag_sha" ] || { echo "run $RUN_ID is for $run_sha, not the release commit $tag_sha" >&2; exit 1; }
+          # The desktop jobs must have passed even if an unrelated job in the run did not.
+          for job in desktop-macos desktop-windows; do
+            state="$(gh run view "$RUN_ID" --json jobs -q ".jobs[] | select(.name==\"$job\") | .conclusion")"
+            [ "$state" = "success" ] || { echo "$job did not pass in run $RUN_ID ($state)" >&2; exit 1; }
+          done
+          mkdir -p dl out
+          gh run download "$RUN_ID" --dir dl --pattern "dynasty-lab-desktop-alpha-*-${run_sha}"
+          mac="$(find dl -name 'Dynasty-Lab-Desktop-Alpha-macOS-arm64.zip' | head -1)"
+          win="$(find dl -name 'Dynasty-Lab-Desktop-Alpha-Windows-x64.zip' | head -1)"
+          [ -n "$mac" ] && [ -n "$win" ] || { echo "desktop ZIPs missing from run $RUN_ID" >&2; ls -R dl; exit 1; }
+          # The macOS ZIP keeps the .app bundle's symlinks and modes, so it is attached unchanged.
+          cp "$mac" "out/Dynasty-Lab-v${VERSION}-macOS-arm64.zip"
+          # The Windows ZIP is built on Windows; rewrite any backslash entry names as portable paths.
+          python3 - "$win" "out/Dynasty-Lab-v${VERSION}-Windows-x64.zip" <<'PY'
+          import sys, zipfile
+          src, dst = sys.argv[1], sys.argv[2]
+          with zipfile.ZipFile(src) as zin, zipfile.ZipFile(dst, 'w', zipfile.ZIP_DEFLATED) as zout:
+              for info in zin.infolist():
+                  data = zin.read(info.filename)
+                  info.filename = info.filename.replace('\\', '/')
+                  zout.writestr(info, data)
+          PY
+          for z in out/*.zip; do unzip -tq "$z"; done
+          # Capture listings instead of piping into grep -q, which would SIGPIPE unzip under pipefail.
+          mac_list="$(unzip -l "out/Dynasty-Lab-v${VERSION}-macOS-arm64.zip")"
+          win_list="$(unzip -l "out/Dynasty-Lab-v${VERSION}-Windows-x64.zip")"
+          grep -q 'Dynasty Lab.app/' <<<"$mac_list" || { echo "macOS ZIP has no app bundle" >&2; exit 1; }
+          grep -qi 'Dynasty Lab.exe' <<<"$win_list" || { echo "Windows ZIP has no executable" >&2; exit 1; }
+          (cd out && sha256sum *.zip > SHA256SUMS && cat SHA256SUMS)
+          gh release upload "$tag" out/*.zip out/SHA256SUMS --clobber
+          {
+            echo "Attached to ${tag} from run ${RUN_ID}:"
+            echo '```'
+            cat out/SHA256SUMS
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
