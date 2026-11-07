@@ -104,3 +104,15 @@ test('old and partial saves present empty evidence without inventing signings or
  assert.equal(out.rivalry,null);
  assert.deepEqual(out.archives,{playersDeferred:false,gamesDeferred:false});
 });
+
+// The archive timeline shows a season as soon as the postseason ends, but the all-time totals are
+// only written by the offseason review. The header must not read 0-0 beside that season.
+test('a finished season counts toward the tracked header until the offseason review records it',()=>{
+ const home={id:1,name:'Home',conference:'Lakes',w:16,l:1,roster:[],allTimeRecord:{w:20,l:4,confTitles:1,natTitles:0,seasons:2}};
+ const make=offseason=>{const universe={year:2027,week:12,phase:'complete',champion:'Home',offseason,teams:[home],history:[{year:2027,champion:'Home'}],playerArchive:[],gameArchive:[]};
+  const ctx={universe,selected:()=>home,conferenceChampionIdsFor:()=>[1],Math:Object.create(Math)};
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'..','world-history-presentation-adapter.js'),'utf8'),ctx);
+  const before=JSON.stringify(universe),out=ctx.DynastyLabWorldHistoryPresentation.snapshot();assert.equal(JSON.stringify(universe),before);return out.tracked};
+ assert.deepEqual(JSON.parse(JSON.stringify(make({year:2027,completed:[]}))),{wins:36,losses:5,seasons:3,conferenceTitles:2,nationalTitles:1});
+ assert.deepEqual(JSON.parse(JSON.stringify(make({year:2027,completed:['review']}))),{wins:20,losses:4,seasons:2,conferenceTitles:1,nationalTitles:0},'after review the stored totals already include it');
+});

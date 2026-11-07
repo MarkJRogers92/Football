@@ -81,7 +81,8 @@ function stripHTML(team){
   const state=g.played?(g.result==='W'?'is-win':'is-loss'):g.next?'is-next':'is-future';
   const opp=`${g.home?'vs':'at'} ${g.opponent.rank?`#${g.opponent.rank} `:''}${g.opponent.name}`;
   const res=g.played?`${g.result==='W'?'Won':'Lost'} ${g.us}-${g.them}`:g.next?'Next game':'Upcoming';
-  return`<li class="bi-chip ${state}${g.conf?' is-conf':''}" title="Week ${g.week}: ${esc(opp)} · ${esc(res)}"><span class="bi-chip-wk">W${g.week}</span>${helmetHTML(g.opponent.id,'bi-helmet--chip'+(g.home?'':' is-away'))}<b>${esc(g.label)}</b><span class="bi-sr">Week ${g.week}, ${esc(opp)}, ${esc(res)}</span></li>`;
+  const when=g.post?esc(g.postLabel||g.post):`Week ${g.week}`;
+  return`<li class="bi-chip ${state}${g.conf?' is-conf':''}${g.post?' is-post':''}${g.post==='TITLE'&&g.result==='W'?' is-title':''}" title="${when}: ${esc(opp)} · ${esc(res)}"><span class="bi-chip-wk">${g.post?esc(g.post):`W${g.week}`}</span>${helmetHTML(g.opponent.id,'bi-helmet--chip'+(g.home?'':' is-away'))}<b>${esc(g.label)}</b><span class="bi-sr">${when}, ${esc(opp)}, ${esc(res)}</span></li>`;
  }).join('');
  return`<ol class="bi-strip" aria-label="${esc(team.name)} season schedule">${chips}</ol>`;
 }
@@ -101,7 +102,7 @@ function paintMasthead(team){
   mast.classList.add('bi-has-helmet');
  }
  let strip=mast.querySelector(':scope > .bi-strip-host');
- const sig=JSON.stringify(team.schedule.map(g=>[g.week,g.played,g.us,g.them,g.opponent.id,g.opponent.rank]));
+ const sig=JSON.stringify(team.schedule.map(g=>[g.week,g.post,g.played,g.us,g.them,g.opponent.id,g.opponent.rank]));
  if(!strip){strip=document.createElement('div');strip.className='bi-strip-host';const details=mast.querySelector('#programDetails');details?mast.insertBefore(strip,details):mast.append(strip);sigs.delete('strip')}
  if(!same('strip',team.id+sig))strip.innerHTML=stripHTML(team);
  const next=strip.querySelector('.bi-chip.is-next');
