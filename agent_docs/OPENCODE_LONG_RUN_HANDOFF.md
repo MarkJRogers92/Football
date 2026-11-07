@@ -1,6 +1,6 @@
 # OpenCode handoff — Dynasty Lab long-dynasty and save testing
 
-Prepared November 6, 2026 (Chicago time). Source version: **0.14.2**.
+Updated November 7, 2026. Baseline source version: **0.14.3**. Read `HANDOFF_2026-11-07_v0.14.3.md` for the exact released commit, publication and current verification evidence.
 
 ## Assignment
 
@@ -11,16 +11,12 @@ You may add test drivers, instrumentation and regression tests in an isolated br
 ## Get the exact code
 
 - Repository: https://github.com/MarkJRogers92/Football
-- Integration PR: https://github.com/MarkJRogers92/Football/pull/35
-- Candidate branch: `claude/gracious-rubin-mfi574`.
-- Product-code candidate: `2dc70dfe868998da967643f468ffd637523e0544`.
-- Candidate plus ticker-test setup correction: `21389d5712f1893d63c18c7d8a9f62faa419b6db`.
-- The source packet includes `Football.bundle` and `SOURCE_MANIFEST.json`. The manifest identifies the actual bundled local commit, its tree and bundle hash. Local reconstruction commits differ from GitHub commit IDs; this is intentional and documented. The bundle contains full source, assets, tests and reachable Git history, but no installed dependencies or personal saves.
-
-Preferred portable start, after unzipping the packet into a new directory:
+- Current release: https://github.com/MarkJRogers92/Football/releases/tag/v0.14.3
+- Current handoff: `agent_docs/HANDOFF_2026-11-07_v0.14.3.md`.
+- Use the released `v0.14.3` tag as the repeatable baseline, then create a separate testing branch.
 
 ```sh
-git clone -b codex/opencode-soak-handoff Football.bundle Football-soak
+git clone --branch v0.14.3 https://github.com/MarkJRogers92/Football.git Football-soak
 cd Football-soak
 git switch -c opencode/long-dynasty-audit
 npm ci
@@ -28,21 +24,15 @@ npm run build
 git diff --exit-code -- index.html
 ```
 
-Use Node 24, matching CI. Verify `git rev-parse HEAD` against the packet manifest before creating your branch. Never overlay the packet onto a dirty checkout. Alternatively clone GitHub, check out the exact candidate SHA above, then create your own testing branch. Check PR #35 for later fixes; do not silently substitute an older default-branch version.
+Use Node 24, matching CI. Record `git rev-parse HEAD` in every report and confirm `VERSION.txt` is 0.14.3. Never overlay a packet onto a dirty checkout. Older portable packets and `codex/opencode-soak-handoff` bundles contain 0.14.2; they do not include the complete current experience pass.
 
-On Mark's Mac, the working implementation is at `/Users/markrogers/.copilot/repos/Football/.session-artifacts/living-world`. The outer checkout is older and has an unrelated trophy-rendering edit. Do not reset either checkout. The implementation's dependency directory is a machine-local symlink; a new clone needs `npm ci`.
+On Mark's Mac, release work is at `/Users/markrogers/.copilot/repos/Football/.session-artifacts/living-world`. The outer checkout is older and has an unrelated trophy-rendering edit. Do not reset either checkout. The release checkout's dependency directory is a machine-local symlink; a new clone needs `npm ci`.
 
-## Verification status at packet creation
+## Current evidence and limits
 
-Read `agent_docs/latest_session_work.md` and the packet manifest for final integration/CI status. Do not infer that a built ZIP means the branch is merged or the website is updated.
+Read `HANDOFF_2026-11-07_v0.14.3.md` for the exact product commit, full passing CI, publication and artifact evidence. Both browser matrices, real storage and packaged Mac/Windows smoke passed for the released source. The staged long-dynasty campaign below remains outstanding; release validation is not proof of a bug-free 20-season save.
 
-- Product candidate passed a fresh local run of **582 Node tests and 53 smoke checks**, with zero failures; clean-source reproducible-build verification passed.
-- Mark ran `test:living-world-browser`, `test:fun-features-browser`, and `test:season-features-browser` successfully in his normal Mac Terminal.
-- GitHub PR run `42342382087` passed every job, including both browser matrices, storage, simulation audit, and Mac/Windows packaged-app smoke tests. Mac smoke exercised native saving, replacement/restart, restore and clean shutdown.
-- Duplicate push run `42342377233` timed out at `tests/ui-upgrades-browser.js:109`, waiting for a ticker. Investigation confirmed startup and decision confirmations are intentionally filtered out; the test did not arrange an eligible headline. Commit `21389d5` adds two status-line fixtures before the existing phone-layout checks. It changes no product code, assertion or timeout.
-- The next PR run `42343226831` encountered a **separate unresolved timeout** at `tests/recruiting-filters-browser.js:28`, searching for a generated punter outside the initial 220 displayed rows. Capture query text, filter state, matching names/counts and console errors if it recurs. Do not assume it is harmless load sensitivity or weaken the assertion. Later results, if any, belong in the final status note.
-- Claude's earlier handoff also reported intermittent phone focus failure at `tests/recruiting-phone-browser.js:62` after removing a prospect from My Board. It passed isolated reruns. Preserve that check and investigate rerender/focus behavior if reproduced.
-- Long-dynasty results below are **historical measurements**, not a new 0.14.2 soak. Actual-device Safari/iPhone and a complete manual visual playthrough are not verified.
+Older 0.14.2 packets are historical and lack the complete current experience pass. Prior recruiting-search and phone-focus failures are covered by the current regressions; if they recur, capture the seed, exact state and minimal reproducer instead of treating a retry as a fix or weakening assertions. Use disposable profiles and preserve real saves.
 
 ## Architecture and useful entry points
 

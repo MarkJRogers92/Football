@@ -2,6 +2,9 @@
 
 ## v0.14.3 — One More Saturday
 
+- Fresh save scopes open All Recruits so an empty target board cannot hide the prospect pool; matching saved My Board preferences still restore.
+- Includes the previously unreleased v0.14.2 living-world, recruiting-desk and Midnight & Brass integration below.
+- Scouting budget displays no longer rewrite weekly scouting data after rollback; actual evaluations still reset and spend the current week’s hours.
 - Distinct weekly desk, recruiting sheet, Game Day scoreboard and history almanac; tighter headers and quieter routine motion. Earned milestone ceremonies remain.
 - Natural football labels, including This Week, Game Day, Player Development and Finish Game. Routine finals use the persistent recap rather than a full-screen splash.
 - Compact factual postgame payoff: one standout, recorded consequence, next opponent and stopping point. Secondary highlights remain optional; no extra advancement gate.

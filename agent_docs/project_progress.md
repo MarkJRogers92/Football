@@ -1,23 +1,13 @@
 # Project Progress
 
-## Current goal and source
-
-Complete the approved One More Saturday experience pass: distinctive football screens, plain language, a clear weekly rhythm, factual postgame stopping points, truthful persistence/re-entry, personal dynasty history and restrained routine motion.
-
-The implementation is in `/Users/markrogers/.copilot/repos/Football/.session-artifacts/living-world` on `codex/one-more-saturday`, based on `07abb2c`. The unreleased candidate remains v0.14.2. Canonical implementation and validation evidence is in `latest_session_work.md`; accepted scope is in `ONE_MORE_SATURDAY_PLAN.md`.
-
 ## Current position
 
-All seven product changes are implemented. Independent review’s false Saved finding has been fixed and rechecked using actual storage. Safari desktop/phone preview and cold re-entry checks are complete. Final full verification passed 638 Node tests and 53 smoke checks after a deterministic test-clock correction. The Mac playtest package matches final source and passed deep/strict signature and ZIP checks.
+The seven-part One More Saturday pass and earlier living-world/recruiting/Midnight & Brass integration are published as **v0.14.3**. GitHub PR #35 is merged into `claude/review-improvement-dwjemy`; product source is `e104abdc02afc8edc28802fc2a1d29e79f6afa95`.
 
-No public deployment, merge, installed-game replacement, real-user save modification, gameplay balance change, or save-format migration occurred. Automated Chrome testing remains blocked at browser startup; Safari checks are supplemental manual evidence, not an automated browser-matrix pass.
+Full PR validation and the production publisher passed: 642 Node tests, 53 smoke checks, both browser matrices, storage, audit and packaged Mac/Windows smoke. Pages deployment passed, published HTML exactly matches source, and the live v0.14.3 title/new-dynasty save/recruiting pool were verified in private Safari. Canonical evidence and artifact checksums are in `latest_session_work.md`.
 
-## Existing systems
+## Handoff and next milestone
 
-- Simulation: recruiting, scouting/development, transfer portal, coaching careers, bowls/playoffs, NIL, rivalries, eligibility, guidance and Game Engine 2.
-- Presentation: recruiting workspace and peer views, player/staff identity, replay, history, living-world follows, yearbook and earned milestones.
-- Persistence: native/IndexedDB storage through DynastyStorage, complete portable JSON and deferred archives.
+Use `HANDOFF_2026-11-07_v0.14.3.md` and release tag `v0.14.3`. The release resources include Mac/Windows/source ZIPs, a plain-text handoff and checksums. Continue the separate bounded long-save campaign in `OPENCODE_LONG_RUN_HANDOFF.md`; that campaign remains outstanding.
 
-## Next continuation
-
-Use the completed local Mac playtest package, then use this branch for the separate seeded long-save campaign described in `OPENCODE_LONG_RUN_HANDOFF.md`. Preserve the existing integration/release history; this pass does not imply publication. Historical release details remain in the changelog and earlier session entries.
+The current release checkout is `/Users/markrogers/.copilot/repos/Football/.session-artifacts/living-world` on `codex/merged-v0143`, tracking the GitHub default branch. Preserve the outer older checkout and its unrelated edits. Existing installed applications and real saves were preserved.
