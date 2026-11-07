@@ -313,3 +313,23 @@ test('the debounce starts a real checkpoint at 900ms and reports saved only afte
  const saved=await store.load();assert.equal(saved.universe.year,e.universe.year);assert.equal(saved.universe.week,0);
  assert.deepEqual(f.events.filter(event=>event.type==='dynasty:save-status').map(event=>event.detail.state),['pending','saving','saved']);
 });
+
+test('postseason rollback restores the whole world after the preceding checkpoint has settled',async t=>{
+ const f=await fixture(8332,{fullRuntime:true}),{e,store}=f,api=assertApi(f),errors=[];
+ t.mock.method(console,'error',error=>errors.push(String(error)));
+ e.autosaveAfter('week');await e.runAutosave();assert.equal(e.universe.lastCheckpoint.week,0);
+ e.simSeason();assert.equal(e.universe.phase,'confReady');
+ const release=f.hold(),saving=e.runAutosave();assert.equal(api.read().state,'saving');
+ const unsettled=global.__DL_TEST__.v2PostseasonStateDigest();
+ release();assert.equal(await saving,true);
+ assert.equal(api.read().state,'saved');assert.equal((await store.load()).universe.week,12);
+ assert.equal(e.universe.lastCheckpoint.week,12);
+ assert.notEqual(global.__DL_TEST__.v2PostseasonStateDigest(),unsettled,'the real checkpoint updates the world even without a postseason action');
+ global.__DL_TEST__.v2PostseasonPrepare('conference');
+ const before=global.__DL_TEST__.v2PostseasonStateDigest();
+ global.__DL_TEST__.v2PostseasonInjectFault('afterArchive');e.simConferenceChampionships();
+ assert.equal(global.__DL_TEST__.v2PostseasonStateDigest(),before,'rollback restores the complete dynasty');
+ assert.equal(e.universe.phase,'confReady');assert.equal(global.__DL_TEST__.v2PostseasonAudit().totalPostseason,0);
+ assert.equal(errors.length,1);assert.match(errors[0],/Injected postseason v2 rollback fault after archive write/);
+ await e.yieldToUserAction();
+});
