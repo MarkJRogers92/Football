@@ -66,6 +66,7 @@ async function resolveChoices(page){
    await page.click('#autoTarget');await saved(page);
    const targets=await page.evaluate(()=>window.__DL_TEST__.preseasonDebug().targeted);assert.ok(targets>0,'management action updates the real board');
    const prospects=page.locator('#recruitWorkspace [data-rwid]');
+   await page.waitForFunction(()=>document.querySelectorAll('#recruitWorkspace [data-rwid]').length>1);
    assert.ok(await prospects.count()>1,'the saved board has selectable prospects');
    await prospects.nth(1).click();
    const selection=await page.evaluate(()=>window.DynastyRecruitingWorkspaceView.read().selectedId);
