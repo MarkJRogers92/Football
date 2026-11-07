@@ -2,7 +2,7 @@ const assert=require('node:assert/strict');
 const path=require('path');
 const {chromium}=require('playwright-core');
 const {chromiumPath}=require('./helpers/chromium-path');
-const TAB_GROUP={dashboard:'program',program:'program',history:'program',roster:'team',depth:'team',development:'team',recruiting:'recruiting',gamelab:'games',season:'games',stats:'games',newsletter:'games',staff:'staff',offseason:'staff',records:'staff'};
+const TAB_GROUP={dashboard:'home',program:'program',history:'world',roster:'program',depth:'program',development:'program',recruiting:'recruiting',gamelab:'season',season:'season',stats:'season',newsletter:'home',staff:'program',offseason:'program',records:'world'};
 const goTab=async(page,id)=>page.evaluate(({id,group})=>{const g=document.querySelector(`.tab-groups button[data-group="${group}"]`);if(g&&!g.classList.contains("active"))g.click();document.querySelector(`.tabs button[data-tab="${id}"]`)?.click()},{id,group:TAB_GROUP[id]});
 const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
 const startNewDynasty=page=>sharedStartNewDynasty(page);
@@ -25,7 +25,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
     await page.click('[data-v2-gameday-delegate]');await page.waitForFunction(()=>window.__DL_TEST__.v2GameDayPreviewState()?.state?.status==='final',{timeout:60000});
     state=await page.evaluate(()=>window.__DL_TEST__.v2GameDayPreviewState());assert.equal(state.status,'final');assert.ok(state.state.events.some(e=>e.type==='coaching_decision'));assert.ok(state.state.events.length>50);
     assert.equal(await page.evaluate(()=>window.__DL_TEST__.v2GameDayPreviewDigest()),before,'a staged final must leave schedule, records, stats and archive untouched');
-    assert.match(await page.locator('#v2InteractiveGameDay').textContent(),/Final is staged until you make it official/);assert.equal(await page.locator('[data-v2-gameday-record]').count(),1,'staged final should expose the official-record button');
+    assert.match(await page.locator('#v2InteractiveGameDay').textContent(),/Final whistle\. Finish Game records this result in your dynasty\./);assert.equal(await page.locator('[data-v2-gameday-record]').count(),1,'staged final should expose the official-record button');assert.equal(await page.locator('[data-v2-gameday-record]').innerText(),'Finish Game');
     assert.deepEqual(errors,[],`interactive Game Day preview emitted browser errors: ${errors.join('\n')}`);
     console.log('PASS v0.10.1 interactive Game Day: live scoreboard, fourth-down decision UI, deterministic staged final, zero mutation before official record');
   }finally{await browser.close()}

@@ -19,6 +19,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'index.html');
       await page.goto(FILE);
       await startNewDynasty(page);
       await page.evaluate(() => document.querySelector('.tabs button[data-tab="recruiting"]').click());
+      await page.click('[data-recruit-class="outlook"]');
       await page.waitForSelector('#recruitingNeeds [data-need-pos]', { timeout: 10000 });
 
       assert.equal(await page.locator('#recruitingNeeds').isVisible(), true, `[${label}] the roster needs card is visible`);
@@ -26,7 +27,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'index.html');
       assert.match(await page.textContent('#recruitingNeedsCount'), /\d+ position group/, `[${label}] the card states a count`);
       const first = await page.locator('#recruitingNeeds [data-need-pos]').first().innerText();
       assert.match(first, /\d+ of \d+/, `[${label}] the row carries counts`);
-      assert.match(first, /committed/, `[${label}] the row explains commitments`);
+      assert.match(first, /committed/i, `[${label}] the row explains commitments`);
 
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, `[${label}] no horizontal overflow`);
       assert.deepEqual(errors, [], `[${label}] no console errors`);

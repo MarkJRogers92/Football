@@ -5,7 +5,20 @@ const {chromiumPath}=require('./helpers/chromium-path');
 const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
 const startNewDynasty=async page=>{await page.goto('file://'+path.join(__dirname,'..','index.html'));return sharedStartNewDynasty(page)};
 async function reachPostseason(page){
+  if(!await page.locator('#simSeason').isVisible())await page.click('#programDetails > summary');
   await page.click('#simSeason');await page.waitForFunction(()=>window.DynastyGameEngineV2LabBridge.cutoverDebug().phase==='confReady',{timeout:60000});
+  // A completed season can still have its final checkpoint writing. Let that
+  // real save finish before taking a whole-world transaction baseline.
+  const checkpoint=await page.evaluate(()=>{
+    const {world,slot,programId}=window.DynastySessionStatus.read(),{year,week}=window.DynastyGameEngineV2LabBridge.cutoverDebug();
+    return {world,slot,programId,year,week};
+  });
+  await page.waitForFunction(expected=>{
+    const status=window.DynastySessionStatus.read();
+    return status.state==='failed'||status.state==='saved'&&Object.entries(expected).every(([key,value])=>status[key]===value);
+  },checkpoint,{timeout:60000});
+  const saved=await page.evaluate(()=>window.DynastySessionStatus.read());
+  assert.equal(saved.state,'saved',`regular-season checkpoint must finish before postseason setup: ${saved.message}`);
 }
 function checkDurable(row,label){
   assert.equal(row.engine,'v2',`${label} should retain v2 identity`);assert.ok(row.drives>0,`${label} should retain drives`);assert.ok(row.playLines>10,`${label} should retain archived play-by-play`);assert.ok(row.playerLines>0,`${label} should retain real-player stat lines`);

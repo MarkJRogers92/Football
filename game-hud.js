@@ -11,9 +11,9 @@
   if(!groupsNav||!tabsNav)return;
 
   // Mirrors TAB_GROUPS in app.js (app scope is not global).
-  const GROUP_TABS={program:['dashboard','program','history'],team:['roster','depth','development'],recruiting:['recruiting'],games:['gamelab','season','stats','newsletter'],staff:['staff','offseason','records']};
-  const ICONS={dashboard:'◆',program:'⚑',history:'⌛',roster:'☰',depth:'⇅',development:'▲',recruiting:'★',gamelab:'⚙',season:'▦',stats:'∑',newsletter:'✉',staff:'♟',offseason:'↻',records:'♛'};
-  const HINTS={dashboard:'Weekly command center',program:'Identity, budget & facilities',history:'Archive & program legacy',roster:'Full player list',depth:'Roles and depth chart',development:'Training plans & camp',recruiting:'Board, scouting & signing class',gamelab:'Game plan & matchup',season:'Schedule & standings',stats:'Leaders & team stats',newsletter:'Weekly headlines',staff:'Coordinators & schemes',offseason:'Transitions & portal',records:'Awards & record book'};
+  const GROUP_TABS={home:['dashboard','newsletter'],program:['program','roster','depth','development','staff','offseason'],recruiting:['recruiting'],season:['gamelab','season','stats'],world:['history','records','legacy']};
+  const ICONS={dashboard:'◆',program:'⚑',history:'⌛',roster:'☰',depth:'⇅',development:'▲',recruiting:'★',gamelab:'⚙',season:'▦',stats:'∑',newsletter:'✉',staff:'♟',offseason:'↻',records:'♛',legacy:'✦'};
+  const HINTS={dashboard:'This week’s opponent, choices & news',program:'Identity, budget & facilities',history:'Archive & program legacy',roster:'Full player list',depth:'Roles and depth chart',development:'Training plans & camp',recruiting:'Board, scouting & signing class',gamelab:'Game plan & matchup',season:'Schedule & standings',stats:'Leaders & team stats',newsletter:'Weekly headlines',staff:'Coordinators & schemes',offseason:'Transitions & portal',records:'Awards & record book',legacy:'Achievements, records & hall of fame'};
   const titleOpen=()=>{const t=document.querySelector('#titleScreen');return !!t&&!t.hidden&&getComputedStyle(t).display!=='none'};
   const typing=el=>!!el&&(el.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName));
   const groupButtons=()=>[...groupsNav.querySelectorAll('button[data-group]')];
@@ -200,24 +200,21 @@
   }
   if(statusLine)new MutationObserver(()=>{
     const v=statusLine.textContent.trim();
-    if(v&&v!==lastStatus&&!titleOpen()){if(!splash(v)&&!ROUTINE_STATUS.test(v))toast(v);tick(v)}
+    if(v&&v!==lastStatus&&!titleOpen()){if(!/^Week \d+ final: /.test(v)&&!splash(v)&&!ROUTINE_STATUS.test(v))toast(v);tick(v)}
     lastStatus=v;
   }).observe(statusLine,{childList:true,characterData:true,subtree:true});
 
-  // ---- Result splash (week finals, new job) ----
+  // ---- Career splash. Routine finals stay in the weekly recap. ----
   const reduced=()=>document.body.classList.contains('motion-reduced')||!!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   function splash(text){
-    let m=text.match(/^Week (\d+) final: ([WL]) (\d+)-(\d+) (vs|at) (.+?)\.?$/),kind,big,sub;
-    if(m){kind=m[2]==='W'?'win':'loss';big=m[2]==='W'?'VICTORY':'FINAL';sub=`${m[3]}–${m[4]} ${m[5]} ${m[6]} · Week ${m[1]}`}
-    else if((m=text.match(/^Took the (.+?) job\./))){kind='job';big='NEW ERA';sub=`Welcome to ${m[1]}`}
-    else return false;
+    const m=text.match(/^Took the (.+?) job\./);if(!m)return false;
+    const kind='job',big='NEW ERA',sub=`Welcome to ${m[1]}`;
     document.querySelector('.hud-splash')?.remove();
     const el=document.createElement('div');
     el.className='hud-splash is-'+kind;el.setAttribute('role','status');
     el.innerHTML='<div class="hud-splash-band"><span class="hud-eyebrow"></span><strong></strong><small></small></div>';
     el.querySelector('.hud-eyebrow').textContent=kind==='job'?'CAREER MOVE':(document.querySelector('#teamName')?.textContent?.trim()||'FINAL SCORE').toUpperCase();
     el.querySelector('strong').textContent=big;el.querySelector('small').textContent=sub;
-    if(kind==='win'&&!reduced())for(let i=0;i<28;i++){const c=document.createElement('i');c.style.setProperty('--x',Math.random()*100+'%');c.style.setProperty('--d',(Math.random()*.6)+'s');c.style.setProperty('--r',(Math.random()*720-360)+'deg');el.append(c)}
     document.body.append(el);
     setTimeout(()=>el.classList.add('is-leaving'),2400);setTimeout(()=>el.remove(),2900);
     return true;

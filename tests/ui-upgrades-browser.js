@@ -93,10 +93,12 @@ const resolveDecisions = async page => {
         await page.waitForFunction(g => document.querySelector('#weekGateNote')?.hidden === !g, gated, { timeout: 10000 });
         if (gated) break;
         const before = await page.evaluate(() => document.querySelector('#weekLine')?.textContent);
+        if(!await page.locator('#simWeek').isVisible())await page.click('#programDetails > summary');
         await page.click('#simWeek');
         await page.waitForFunction(w => document.querySelector('#weekLine')?.textContent !== w, before, { timeout: 60000 });
       }
       assert.ok(gated, `[${label}] reached a gated week`);
+      if(!await page.locator('#simWeek').isVisible())await page.click('#programDetails > summary');
       assert.match(await page.locator('#weekGateNote').innerText(), /Resolve the Coach’s Desk decisions before advancing the week\. Or use Sim Regular Season and your staff will decide\./, `[${label}] the hero states why and offers the alternative`);
       assert.equal(await page.locator('#weekGateNote .gate-note-go').innerText(), 'Go to decisions', `[${label}] and offers the jump`);
       await resolveDecisions(page);
@@ -104,6 +106,14 @@ const resolveDecisions = async page => {
 
       // The phone ticker is one still headline.
       if (phone) {
+        // A fresh dynasty can reach its first required decision without playing a game.
+        // Setup/decision confirmations are deliberately excluded from the ticker, so
+        // arrange two eligible headlines through its normal status-line input rather
+        // than depending on a randomly generated starting week to have produced one.
+        for (const headline of ['Scouting update: phone ticker fixture one', 'Scouting update: phone ticker fixture two']) {
+          await page.evaluate(text => { document.querySelector('#saveStatus').textContent = text; }, headline);
+          await page.waitForFunction(text => [...document.querySelectorAll('.hud-ticker-reel span')].some(s => s.textContent === text), headline, { timeout: 10000 });
+        }
         await page.waitForSelector('.hud-ticker', { state: 'attached', timeout: 10000 });
         const shown = await page.evaluate(() => [...document.querySelectorAll('.hud-ticker-reel span')].filter(s => getComputedStyle(s).display !== 'none').length);
         assert.equal(shown, 1, `[${label}] one headline shows on a phone`);

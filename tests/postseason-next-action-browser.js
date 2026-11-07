@@ -11,6 +11,8 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
   try{
     await page.goto('file://'+path.join(__dirname,'..','index.html'));
     await startNewDynasty(page);
+    await page.click('#programDetails > summary');
+    await page.click('#weeklyDeskDetails > summary');
     await page.click('#simSeason');
     await page.waitForFunction(()=>!document.querySelector('#simConf').disabled,{timeout:60000});
     assert.match(await page.locator('#hubAdvance').innerText(),/conference championships/i);

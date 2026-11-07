@@ -92,8 +92,9 @@ if(typeof module==='object'&&module.exports){
   }
  }
  function renderRecruitingReceiptRecap(){
-  const t=selected(),host=$('#classSummary');if(!t||!host||host.querySelector?.('.scouting-receipt-recap'))return;
-  const summary=scoutingReceiptSystem.summarizePlayers(receiptPlayers(t),universe.year,t.id);if(!summary.tracked)return;
+  const t=selected(),host=$('#recruitingHistory');if(!t||!host)return;
+  host.innerHTML='<h3>Recruiting history</h3>';
+  const summary=scoutingReceiptSystem.summarizePlayers(receiptPlayers(t),universe.year,t.id);if(!summary.tracked){host.insertAdjacentHTML?.('beforeend','<p class="muted">No signing-day scouting records yet. Signed classes will appear here as evidence is recorded.</p>');return}
   const count=code=>summary.counts[code]||0,top=summary.notable.map(({p,result})=>`<div class="scouting-receipt-row"><span><strong>${receiptEscape(p.pos)} ${receiptEscape(p.name)}</strong><small>${receiptEscape(result.snapshot.verdictLabel)} at signing · ${result.games} games / ${result.starts} starts</small></span><b class="scouting-receipt-${result.tone}">${receiptEscape(result.label)} · ${result.delta>=0?'+':''}${result.delta}</b></div>`).join('');
   host.insertAdjacentHTML?.('beforeend',`<div class="scouting-receipt-recap"><div class="scouting-receipt-head"><div><strong>Scouting Receipts</strong><small>What the staff believed at signing versus what has actually been observed later.</small></div><span>${summary.final} settled · ${summary.watch} developing</span></div><div class="scouting-receipt-kpis"><span><b>${count('DIAMOND')}</b> Diamonds</span><span><b>${count('HIT')}</b> Hits</span><span><b>${count('BUST')}</b> Busts</span><span><b>${count('MISS')}</b> Misses</span><span><b>${summary.costly}</b> Costly misreads</span></div>${top?`<div class="scouting-receipt-list">${top}</div>`:''}<small class="scouting-receipt-note">Watch labels are provisional. Final labels require at least two seasons, 12 games and strong staff confidence. Hidden true ratings are never used.</small></div>`);
  }

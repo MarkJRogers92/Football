@@ -1,5 +1,41 @@
 # Changelog
 
+## v0.14.3 — One More Saturday
+
+- Distinct weekly desk, recruiting sheet, Game Day scoreboard and history almanac; tighter headers and quieter routine motion. Earned milestone ceremonies remain.
+- Natural football labels, including This Week, Game Day, Player Development and Finish Game. Routine finals use the persistent recap rather than a full-screen splash.
+- Compact factual postgame payoff: one standout, recorded consequence, next opponent and stopping point. Secondary highlights remain optional; no extra advancement gate.
+- Separate truthful persistence status and retry, management/completed-game checkpoints, scoped view/filter/prospect recovery, and a shorter welcome-back threshold. No save-format or simulation-balance change; unfinished live games are not persisted.
+- Optional personal history within History: recorded signing classes, returning players and recent rivalry meetings, with canonical links and explicit deferred/partial records.
+
+## v0.14.2 — Living world and Midnight & Brass
+
+Presentation only: no simulation, balance, save-shape or randomness changes. See `VISUAL_IDENTITY.md`.
+
+- **Living world, first pass.** A short optional weekly briefing, follow controls for players/coaches, meaningful situation updates and familiar faces on the next opponent. Detailed Rival Watch and highlights sit in the existing weekly disclosure. Following is stored on this device and never blocks advancement.
+- **History accuracy.** National titles use recorded championship history; completed seasons count once; old bowl results cannot become new-year milestones. Earlier unreliable Legacy totals are retained separately while accurate totals are rebuilt. Briefing profile links use the correct player identity.
+
+- **Recruiting desk package** from the 2026-11-06 handoff: pitch explanation parity, a shorter weekly desk, win-bar and Game Cast accuracy repairs, recruiting search/count clarity, the phone dossier, peer class views, roster outlook and the flat Current / Rising / Outlook / Map / Shortlist / Class summary / History strip.
+- **A visual identity.** The title screen's brass carried through the game: condensed athletic display type (bundled, works offline), brass for "what matters now", team colour for "who you are", a chalk play diagram behind the program banner.
+- **Pictures and graphs.** Your helmet and a season strip with every opponent's helmet, result and score on the dashboard; a helmet face-off for the next matchup; a program radar, confidence gauge, goals ring and win pace in Program Lab; leader bars in Stats; player portraits and estimate-range bars on roster cards.
+- **One menu language.** Underlined page tabs; one brass segmented track for every in-page view switcher.
+- **Motion** that respects reduced-motion: tab entrances, chart draw-ins, a sweep on primary buttons, a pulse on the next game.
+- **Less clutter.** No zero-stat defensive leaders, a slimmer required-decision header, and the recruiting mode explainer reduced to its toggle.
+- **One navigation map.** The page tabs now use the sidebar's five sections (Home, Program, Recruiting, Season, World) and the phone bar's order; the strip names its section and tab labels match the sidebar.
+- **Faces everywhere.** Decision cards show the players involved (starter vs challenger), and stat leaders show portraits.
+- **One news channel.** The save-status line no longer repeats what the ticker and toast already say.
+- **Plain-language subtitles** replace developer notes under each page title.
+- **"How to read this" keys** in Roster, Recruiting and Program explain grade ranges, interest, "% sure", evaluation hours and admin confidence bands where they appear.
+- **Coach It Live.** The interactive Game Day (fourth downs, two-point tries, halftime, late-game tempo) is now the headline action on the dashboard and in Game Lab, with a live win-chance estimate and graph that marks your calls and every score. The estimate is presentation only.
+- **Rival Watch.** Your rival's head coach as a character: an archetype from the coach's strongest rating (The Closer, The Schemer, The Builder, The Talent Scout), traits from ambition, loyalty and age, the series, the next meeting, and pressure lines tied to real facts (which of your targets they lead, the last result, streaks). Other coaches leading your recruiting races are listed too.
+- **Ceremonies.** National title, conference title and bowl wins get a trophy or helmet presentation with confetti; a completed Signing Day shows the class; Draft Night lists your players going pro. They play only for milestones earned while playing, never on load.
+- **Sound.** Every cue is synthesized in code (no audio files, works offline): a fight-song sting on wins, a muted tone on losses, a whistle on each live Game Day decision, a crowd swell or groan on scores, a crowd bed during live games, a drumline on Signing Day and a fanfare for ceremonies. Sound on/off sits in the top bar; volume is in Options.
+- **Storylines.** "Players to follow" picks arcs from evidence, never at random: school record chases, award contenders, low-star recruits who lead their position room, redshirt payoffs, per-game breakouts, injury comebacks, transfers making an impact, big development climbs, national leaders by position and freshmen leading their room. Each card shows its proof and, for your players, a season-by-season timeline. "Around the league" does the same for every other program, and the award race tracks the top five with week-over-week movement.
+- **Legacy.** A new World › Legacy page keeps achievements (16), records across saves, a hall of fame (award winners and first-round picks) and opt-in challenges (Turn It Around, Win Now, Own the Rivalry, Perfect Season) with progress and deadlines. It is stored on this device outside any save, so it carries across dynasties.
+- **Rivalry Week.** When your rival is next, the program banner gets a Rivalry Week ribbon and Rival Watch turns up; winning the game plays a trophy ceremony ("stays with" or "comes home to").
+- **Highlights.** A last-game card with the player of the game and top performers from the box score, the biggest plays when a replay exists, and a Watch highlights button that opens the replay in key-plays mode.
+- **Season Yearbook.** A printable season summary (record, conference finish, rank, bowl, rivalry, top performers, honors, signing class, draft) once the season is complete.
+
 ## v0.14.1 — Visual pass
 
 From a review of the Game Day screens and a second look at every tab. Presentation only: no simulation, balance or save-shape changes.

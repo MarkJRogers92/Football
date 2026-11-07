@@ -46,6 +46,7 @@ function recordInteractiveV2GameDay(session,options={}){
     universe.lastDetailedGame={...result,season:universe.year,week:g.week,engine:'v2',transactionVersion:tx.VERSION,gameDayVersion:gameday.VERSION};universe.latest=[result];
     const validation=v2RecordValidate(candidate,record,home,away,rollback,g);if(!validation.ok)throw new Error(`Interactive Game Day failed post-commit validation: ${validation.errors.join('; ')}`);
     ranked();if(options.testFault==='afterRank')throw new Error('Injected Interactive Game Day rollback fault after rankings.');syncGameplayRng();
+    autosaveAfter('game');
     return{ok:true,result,record,candidate,validation,transactionProof,coachingDecisions:record.coachingDecisions}
   }catch(err){v2RecordRestore(rollback,g,home,away);throw err}
 }

@@ -2,7 +2,7 @@ const assert=require('node:assert/strict');
 const path=require('path');
 const {chromium}=require('playwright-core');
 const {chromiumPath}=require('./helpers/chromium-path');
-const TAB_GROUP={dashboard:'program',program:'program',history:'program',roster:'team',depth:'team',development:'team',recruiting:'recruiting',gamelab:'games',season:'games',stats:'games',newsletter:'games',staff:'staff',offseason:'staff',records:'staff'};
+const TAB_GROUP={dashboard:'home',program:'program',history:'world',roster:'program',depth:'program',development:'program',recruiting:'recruiting',gamelab:'season',season:'season',stats:'season',newsletter:'home',staff:'program',offseason:'program',records:'world'};
 const goTab=async(page,id)=>page.evaluate(({id,group})=>{const g=document.querySelector(`.tab-groups button[data-group="${group}"]`);if(g&&!g.classList.contains("active"))g.click();document.querySelector(`.tabs button[data-tab="${id}"]`)?.click()},{id,group:TAB_GROUP[id]});
 const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
 const startNewDynasty=page=>sharedStartNewDynasty(page);

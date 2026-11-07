@@ -4,7 +4,7 @@ const { chromium } = require('playwright-core');
 const {chromiumPath}=require('./helpers/chromium-path');
 const path = require('path');
 // Tabs live inside groups since v0.9.26; selecting the group is part of navigating to a tab.
-const TAB_GROUP={"dashboard": "program", "program": "program", "history": "program", "roster": "team", "depth": "team", "development": "team", "recruiting": "recruiting", "gamelab": "games", "season": "games", "stats": "games", "newsletter": "games", "staff": "staff", "offseason": "staff", "records": "staff"};
+const TAB_GROUP={"dashboard": "home", "program": "program", "history": "world", "roster": "program", "depth": "program", "development": "program", "recruiting": "recruiting", "gamelab": "season", "season": "season", "stats": "season", "newsletter": "home", "staff": "program", "offseason": "program", "records": "world"};
 const goTab=async(page,id)=>page.evaluate(({id,group})=>{const g=document.querySelector(`.tab-groups button[data-group="${group}"]`);if(g&&!g.classList.contains("active"))g.click();document.querySelector(`.tabs button[data-tab="${id}"]`)?.click()},{id,group:TAB_GROUP[id]});
 
 
@@ -79,6 +79,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
     check(`[${label}] weekly decision gate clears before sim`, simReady);
     if (!simReady) throw new Error(`[${label}] Sim Week remained disabled after resolving visible weekly decisions`);
     const t0 = Date.now();
+    if(!await page.locator('#simWeek').isVisible())await page.click('#programDetails > summary');
     await page.click('#simWeek');
     await page.waitForFunction(() => /Week 1/.test(document.querySelector('#weekLine').textContent), { timeout: 60000 });
     const simMs = Date.now() - t0;
@@ -96,6 +97,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
 
     // Weekly hub items link to the tab they describe.
     const hubTab = await page.$eval('#weeklyHub .hub-link', el => el.dataset.tab);
+    await page.click('#weeklyDeskDetails > summary');
     await page.click('#weeklyHub .hub-link');
     await page.waitForTimeout(120);
     check(`[${label}] hub item opens its tab (${hubTab})`,
@@ -265,21 +267,21 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
       check(`[${label}] no horizontal page overflow`, overflow <= 1, `${overflow}px`);
     }
 
-    // Tab groups (v0.9.26): five groups, and only the active group's tabs are reachable.
+    // Tab groups: five groups that match the sidebar sections and phone bar; only the active group's tabs are reachable.
     const visibleTabs=()=>page.$$eval('.tabs button',els=>els.filter(e=>!e.hidden).map(e=>e.dataset.tab));
     check(`[${label}] five tab groups`, (await page.$$('.tab-groups button')).length===5);
-    await page.$eval('.tab-groups button[data-group="games"]', el => el.click());
+    await page.$eval('.tab-groups button[data-group="season"]', el => el.click());
     const gamesTabs=await visibleTabs();
     // Membership is the property under test; the order is body.html's business, not the group's.
     check(`[${label}] a group shows only its own tabs`,
-      JSON.stringify([...gamesTabs].sort())===JSON.stringify(['gamelab','newsletter','season','stats']),
+      JSON.stringify([...gamesTabs].sort())===JSON.stringify(['gamelab','season','stats']),
       JSON.stringify(gamesTabs));
     check(`[${label}] selecting a group opens its first tab`,
       await page.$eval('.tab.active',el=>el.id)==='gamelab');
     // A programmatic jump (hub tile, weekly plan, go()) must bring its group with it.
     await page.evaluate(()=>document.querySelector('.tabs button[data-tab="records"]').click());
     check(`[${label}] a jump into another group switches the group`,
-      await page.$eval('.tab-groups button.active',el=>el.dataset.group)==='staff'
+      await page.$eval('.tab-groups button.active',el=>el.dataset.group)==='world'
       && await page.$eval('.tab.active',el=>el.id)==='records');
     check(`[${label}] the tab strip no longer scrolls sideways`,
       await page.evaluate(()=>{const n=document.querySelector('.tabs');return n.scrollWidth-n.clientWidth;})===0);

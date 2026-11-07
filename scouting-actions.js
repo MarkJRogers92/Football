@@ -9,13 +9,18 @@ function makeScoutingActionSystem(env){
   const rc=t?.staff?.RC||{},hc=t?.staff?.HC||{};
   return env.clamp(Math.round(5+(rc.evaluation||60)/18+(rc.recruiting||60)/32+(hc.evaluation||60)/55),8,14);
  }
- function ensureScoutingWeek(t){
+ function scoutingWeekInfo(t){
   const u=universe(),budget=scoutingBudgetFor(t),old=t.scoutingWeek;
-  if(!old||old.year!==u.year||old.week!==u.week)t.scoutingWeek={year:u.year,week:u.week,budget,spent:0};
-  else{old.budget=budget;old.spent=env.clamp(Math.round(old.spent||0),0,budget)}
+  const spent=old?.year===u.year&&old.week===u.week?env.clamp(Math.round(old.spent||0),0,budget):0;
+  return{year:u.year,week:u.week,budget,spent};
+ }
+ function ensureScoutingWeek(t){
+  const current=scoutingWeekInfo(t),old=t.scoutingWeek;
+  if(!old||old.year!==current.year||old.week!==current.week)t.scoutingWeek=current;
+  else Object.assign(old,current);
   return t.scoutingWeek;
  }
- function scoutingHoursLeft(t){const s=ensureScoutingWeek(t);return Math.max(0,s.budget-s.spent)}
+ function scoutingHoursLeft(t){const s=scoutingWeekInfo(t);return Math.max(0,s.budget-s.spent)}
  function evaluationWorkload(recruits=[],t){
   const active=(recruits||[]).filter(r=>r?.targeted&&!r.committed);let untouched=0,film=0,full=0;
   for(const r of active){const rec=recruitScoutingRecord(r,t,false);if(rec.full)full++;else if(rec.quick)film++;else untouched++}
@@ -75,7 +80,7 @@ function makeScoutingActionSystem(env){
   rec.receipts.push(receipt);if(rec.receipts.length>8)rec.receipts.splice(0,rec.receipts.length-8);
   return{ok:true,label:labelFor(kind),cost:check.cost,remaining:scoutingHoursLeft(t),receipt,verdict:afterVerdict};
  }
- return{COSTS,scoutingBudgetFor,ensureScoutingWeek,scoutingHoursLeft,evaluationWorkload,recruitScoutingRecord,actionAvailability,staffVerdict,performScoutingAction};
+ return{COSTS,scoutingBudgetFor,scoutingWeekInfo,ensureScoutingWeek,scoutingHoursLeft,evaluationWorkload,recruitScoutingRecord,actionAvailability,staffVerdict,performScoutingAction};
 }
 
 // Shared with later browser-only recruiting extensions in the same app closure.
@@ -89,11 +94,11 @@ if(typeof module==='object'&&module.exports){
   getUniverse:()=>universe,clamp,avg,scoutingDomainView,firstRecruitEvaluation,refreshScoutingIntel,snapshotScouting,staffEval,staffBias:(r,t)=>scoutHash(r,'staff_verdict',String(t.id))*12,hasDetailedScouting:r=>!!(r?.scoutingDomains&&Object.keys(r.scoutingDomains).length)
  });
  const scoutingBudgetFor=recruitScoutingActions.scoutingBudgetFor;
- const ensureScoutingWeek=recruitScoutingActions.ensureScoutingWeek;
+ const scoutingWeekInfo=recruitScoutingActions.scoutingWeekInfo;
  const scoutingHoursLeft=recruitScoutingActions.scoutingHoursLeft;
  recruitScoutingRecord=recruitScoutingActions.recruitScoutingRecord;
  const scoutingActionAvailability=recruitScoutingActions.actionAvailability;
- scoutingHoursInfo=t=>{const w=ensureScoutingWeek(t);return{left:scoutingHoursLeft(t),budget:w.budget}};
+ scoutingHoursInfo=t=>{const w=scoutingWeekInfo(t);return{left:scoutingHoursLeft(t),budget:w.budget}};
  recruitStaffVerdict=recruitScoutingActions.staffVerdict;
  const performRecruitScoutingAction=recruitScoutingActions.performScoutingAction;
  function scoutingVerdictHTML(r,t,compact=false){
@@ -117,7 +122,7 @@ if(typeof module==='object'&&module.exports){
  };
  function renderScoutingActionUI(){
   const t=selected(),summary=$('#classSummary');if(!t||!summary)return;
-  const week=ensureScoutingWeek(t),left=scoutingHoursLeft(t),work=recruitScoutingActions.evaluationWorkload(universe.recruits,t),strip=`<div class="scouting-budget-strip"><strong>Evaluation Hours</strong><span>${left} / ${week.budget} left this week</span><small>${work.targets} active target${work.targets===1?'':'s'} · ${work.untouched} untouched · ${work.film} film-reviewed · ${work.full} fully evaluated</small><small>Remaining hours can cover ${work.quickCapacity} new Quick Film${work.quickCapacity===1?'':'s'} or ${work.fullCapacity} Full Evaluation${work.fullCapacity===1?'':'s'}. Quick Film costs 1 · Full Evaluation costs 3 · unused hours do not roll over.</small></div>`;
+  const week=scoutingWeekInfo(t),left=scoutingHoursLeft(t),work=recruitScoutingActions.evaluationWorkload(universe.recruits,t),strip=`<div class="scouting-budget-strip"><strong>Evaluation Hours</strong><span>${left} / ${week.budget} left this week</span><small>${work.targets} active target${work.targets===1?'':'s'} · ${work.untouched} untouched · ${work.film} film-reviewed · ${work.full} fully evaluated</small><small>Remaining hours can cover ${work.quickCapacity} new Quick Film${work.quickCapacity===1?'':'s'} or ${work.fullCapacity} Full Evaluation${work.fullCapacity===1?'':'s'}. Quick Film costs 1 · Full Evaluation costs 3 · unused hours do not roll over.</small></div>`;
   summary.insertAdjacentHTML?.('beforeend',strip);
   $$('[data-recruit]').forEach(link=>{
    const r=universe.recruits.find(x=>String(x.id)===String(link.dataset.recruit)),row=link.closest?.('tr'),cell=row?.querySelector?.('td[data-label="Scout"]');
@@ -132,7 +137,7 @@ if(typeof module==='object'&&module.exports){
   showRecruitProfileBeforeScoutingActions(id);
   const r=universe.recruits.find(x=>String(x.id)===String(id)),t=selected(),body=$('#recruitDialogBody');
   if(r&&t&&body&&!body.querySelector?.('.scouting-profile-actions')){
-   const week=ensureScoutingWeek(t);body.insertAdjacentHTML?.('afterbegin',`<div class="scouting-profile-actions"><div><strong>Evaluation room</strong><span>${scoutingHoursLeft(t)} of ${week.budget} hours left this week</span></div>${scoutingActionButtonsHTML(r,t)}</div>${scoutingVerdictHTML(r,t,false)}`);
+   const week=scoutingWeekInfo(t);body.insertAdjacentHTML?.('afterbegin',`<div class="scouting-profile-actions"><div><strong>Evaluation room</strong><span>${scoutingHoursLeft(t)} of ${week.budget} hours left this week</span></div>${scoutingActionButtonsHTML(r,t)}</div>${scoutingVerdictHTML(r,t,false)}`);
    bindScoutingActionButtons();
   }
  };

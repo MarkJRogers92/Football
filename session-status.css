@@ -1,0 +1,10 @@
+/* Quiet persistence feedback, separate from the news and action status channel. */
+.dynasty-session-status{display:flex;align-items:center;justify-content:flex-end;gap:10px;min-width:0;padding:5px 18px;font-size:11px;line-height:1.4;color:var(--muted);border-bottom:1px solid var(--line);background:var(--bg)}
+.dynasty-session-status>span{min-width:0;overflow-wrap:anywhere}
+.dynasty-session-status[data-state="failed"]{color:var(--bad)}
+.dynasty-session-status button{flex:0 0 auto;margin:0;padding:3px 7px;font-size:11px;background:transparent;color:inherit;border-color:currentColor}
+.dynasty-session-status button[hidden]{display:none}
+.guidance-welcome-result,.guidance-welcome-priority,.guidance-welcome-choice{margin:5px 0;font-size:12px;line-height:1.45;overflow-wrap:anywhere}
+.guidance-welcome .guidance-welcome-result strong,.guidance-welcome .guidance-welcome-priority strong,.guidance-welcome .guidance-welcome-choice strong{display:inline;margin:0}
+.guidance-welcome-result>span{color:var(--muted)}
+@media(max-width:700px){.dynasty-session-status{padding:5px 10px;justify-content:space-between}}

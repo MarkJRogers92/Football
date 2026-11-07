@@ -4,7 +4,7 @@ const { chromium } = require('playwright-core');
 const {chromiumPath}=require('./helpers/chromium-path');
 const path = require('path');
 // Tabs live inside groups since v0.9.26; selecting the group is part of navigating to a tab.
-const TAB_GROUP={"dashboard": "program", "program": "program", "history": "program", "roster": "team", "depth": "team", "development": "team", "recruiting": "recruiting", "gamelab": "games", "season": "games", "stats": "games", "newsletter": "games", "staff": "staff", "offseason": "staff", "records": "staff"};
+const TAB_GROUP={"dashboard": "home", "program": "program", "history": "world", "roster": "program", "depth": "program", "development": "program", "recruiting": "recruiting", "gamelab": "season", "season": "season", "stats": "season", "newsletter": "home", "staff": "program", "offseason": "program", "records": "world"};
 const goTab=async(page,id)=>page.evaluate(({id,group})=>{const g=document.querySelector(`.tab-groups button[data-group="${group}"]`);if(g&&!g.classList.contains("active"))g.click();document.querySelector(`.tabs button[data-tab="${id}"]`)?.click()},{id,group:TAB_GROUP[id]});
 
 
@@ -50,6 +50,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
   const visualSimReady=await page.$eval('#simWeek',el=>!el.disabled);
   check(`[${label}] visual weekly decision gate clears before sim`,visualSimReady);
   if(!visualSimReady)throw new Error(`[${label}] Sim Week remained disabled in visual regression after resolving visible weekly decisions`);
+  if(!await page.locator('#simWeek').isVisible())await page.click('#programDetails > summary');
   await page.click('#simWeek');await page.waitForFunction(()=>/Week 1/.test(document.querySelector('#weekLine')?.textContent),{timeout:60000});await page.waitForSelector('#broadcastFeature .broadcast-matchup');
   await page.waitForFunction(()=>document.querySelectorAll('#broadcastFeature .sports-mark.coverage-real-logo').length>=2,undefined,{timeout:60000}).catch(async err=>{
    const state=await page.$eval('#broadcastFeature',el=>({logos:el.querySelectorAll('.sports-mark.coverage-real-logo').length,text:el.textContent.trim().slice(0,240)}));

@@ -32,6 +32,16 @@
   if(!items.length)return '';
   return `<details class="guidance-snoozed"><summary>Snoozed for now <span>${items.length}</span></summary><p class="muted small">These are out of the active agenda only. Restoring one does not advance time.</p><div class="guidance-snoozed-list">${items.map(item=>`<div><span><strong>${esc(item.title)}</strong><small>${esc(meaningLabel[item.meaning]||'Guidance')} · ${esc(item.affectedEntity?.label||'Program')}</small></span><button type="button" data-guidance-restore="${esc(item.id)}">Restore</button></div>`).join('')}</div></details>`;
  }
+ function renderDeskFocus(model){
+  const host=target('#weeklyDeskFocus'),f=model.forecast;if(!host||!f)return;
+  const blockers=window.DynastyNextAction?.blockingItems(model)||[],next=blockers[0];
+  const label=f.key==='none'?'No advance available':statusLabel[f.status]||'Next boundary';
+  const title=next?.title||f.title||f.label;
+  const detail=next?`${blockers.length} required decision${blockers.length===1?'':'s'} before the next advance. ${f.title}.`:f.status==='caution'?'You can advance with the current plan. Review open choices in the full briefing if you want to change it.':f.key==='begin-season'?'Opens your first matchup without simulating a game.':f.key==='none'?'Review your program for the next available action.':'Your current plan is ready. The full briefing explains what happens next.';
+  host.dataset.status=f.status;
+  host.innerHTML=`<span class="weekly-desk-status">${esc(label)}</span><h3>${esc(title)}</h3><p>${esc(detail)}</p>`;
+ }
+ function revealDetails(el){if(el?.closest('#dashboard'))window.DynastyDashboardViews?.show('week');for(let parent=el?.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true}
  function renderAgenda(model){
   const host=target('#coachingAgenda');if(!host)return;
   const visible=model.visible||model,leading=visible.leading||model.leading||[],remaining=visible.remaining||model.remaining||[],snoozed=model.snoozed||[];
@@ -56,6 +66,51 @@
   if(counts&&typeof counts==='object')return Object.entries(counts).filter(([,value])=>Number.isFinite(Number(value))).map(([label,value])=>`${label.charAt(0).toUpperCase()+label.slice(1)}: ${value}`);
   return [['Required',summary?.required],['Due',summary?.due],['In view',summary?.visibleCount??summary?.visible]].filter(([,value])=>Number.isFinite(Number(value))).map(([label,value])=>`${label}: ${value}`);
  }
+ // A separate quiet status line leaves the existing news/action channel intact.
+ function renderSessionStatus(){
+  const status=window.DynastySessionStatus?.read?.();if(!status)return;
+  let host=target('#dynastySessionSaveStatus');
+  if(!host){
+   const topbar=target('#app .topbar');if(!topbar?.insertAdjacentElement)return;
+   host=document.createElement('div');host.id='dynastySessionSaveStatus';host.className='dynasty-session-status';
+   const text=document.createElement('span');text.dataset.sessionSaveMessage='';text.setAttribute('role','status');text.setAttribute('aria-live','polite');text.setAttribute('aria-atomic','true');
+   const retry=document.createElement('button');retry.type='button';retry.textContent='Retry Save';retry.dataset.sessionSaveRetry='';retry.addEventListener('click',()=>{if(typeof saveBrowser==='function')saveBrowser()});
+   host.append(text,retry);topbar.insertAdjacentElement('afterend',host);
+  }
+  host.dataset.state=status.state;
+  const text=host.querySelector('[data-session-save-message]');if(text&&text.textContent!==status.message)text.textContent=status.message;
+  const retry=host.querySelector('[data-session-save-retry]');if(retry)retry.hidden=status.state!=='failed';
+ }
+ function syncSessionView(){
+  if(!universe)return;
+  const programId=selected()?.id,previous=sessionViewRestoredFor;
+  if(previous?.target===universe&&previous.slot===activeSaveSlot&&previous.programId===programId)return;
+  sessionViewRestoredFor={target:universe,slot:activeSaveSlot,programId};
+  if(restoreSessionViewContext())return;
+  // Unmatched worlds and programs begin at a neutral view, never an old person's
+  // dialog, an advancement button, or the other program's recruiting filters.
+  window.DynastyDashboardViews?.show?.('week');window.DynastyRecruitingClasses?.show?.('current');
+  window.DynastyLabRecruitingFilters?.reset?.();
+  window.DynastyRecruitingWorkspaceView?.restore?.({mode:'workspace',filter:'all',selectedId:'',shown:30});
+  for(const [id,value] of [['positionFilter','ALL'],['statsScope','national']]){const control=target('#'+id);if(control)control.value=value}
+  if(previous)goToTab('dashboard');
+ }
+ const rememberViewAfterEvent=()=>{
+  if(sessionViewRestoring)return;
+  const targetUniverse=universe,slot=activeSaveSlot;
+  const remember=()=>{if(universe===targetUniverse&&slot===activeSaveSlot)rememberSessionViewContext()};
+  if(typeof queueMicrotask==='function')queueMicrotask(remember);else setTimeout(remember,0);
+ };
+ document.addEventListener('click',event=>{
+  if(event.target?.closest?.('.tabs button,.tab-groups button,[data-client-tab],[data-dash-view],[data-recruit-class],[data-recruit-view],[data-recruit-filter-reset],[data-rwid],[data-rwm],[data-rwf]'))rememberViewAfterEvent();
+ });
+ document.addEventListener('change',event=>{
+  if(SESSION_VIEW_SELECTS.includes(event.target?.id)||event.target?.matches?.('[data-recruit-filter]'))rememberViewAfterEvent();
+ });
+ document.addEventListener('input',event=>{if(event.target?.id==='rwSearch')rememberViewAfterEvent()});
+ window.addEventListener?.('pagehide',rememberSessionViewContext);
+ document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')rememberSessionViewContext()});
+ window.addEventListener?.('dynasty:save-status',renderSessionStatus);
  function renderReturnSummary(){
   const host=target('#guidanceReturnSummary');if(!host)return;
   const summary=typeof guidanceReturnSummary==='function'?guidanceReturnSummary():null;
@@ -64,18 +119,23 @@
   const boundary=summary.boundary?.title||summary.boundary?.label||summary.boundary||summary.forecast?.title||summary.title||'Current coaching boundary';
   const counts=summaryCounts(summary);
   const context=summary.currentLabel?`${summary.currentLabel} · Next: ${boundary}`:boundary;
-  host.innerHTML=`<div class="guidance-welcome"><div><div class="eyebrow">WELCOME BACK</div><strong>${esc(context)}</strong>${counts.length?`<span class="guidance-welcome-counts">${counts.map(esc).join(' · ')}</span>`:''}<small>No simulation occurred while you were away.</small></div><button type="button" data-guidance-dismiss-return>Dismiss</button></div>`;
+  const result=summary.lastResult;
+  const resultLine=result?`<p class="guidance-welcome-result"><strong>Last result:</strong> ${esc(result.outcome)} ${esc(result.userPts)}–${esc(result.oppPts)} vs ${esc(result.opponent)} <span>· ${esc(result.label)}</span></p>`:summary.resultUnavailable?'<p class="guidance-welcome-result">Postseason result details are available in History.</p>':'';
+  const priority=summary.priority?.title?`<p class="guidance-welcome-priority"><strong>Current priority:</strong> ${esc(summary.priority.title)}</p>`:'';
+  const choice=summary.pendingChoice?.title?`<p class="guidance-welcome-choice"><strong>${summary.pendingChoice.meaning==='must_resolve'?'Required choice':'Open choice'}:</strong> ${esc(summary.pendingChoice.title)}</p>`:'<p class="guidance-welcome-choice">No pending coaching choice.</p>';
+  host.innerHTML=`<div class="guidance-welcome"><div><div class="eyebrow">WELCOME BACK</div><strong>${esc(context)}</strong>${resultLine}${priority}${choice}${counts.length?`<span class="guidance-welcome-counts">${counts.map(esc).join(' · ')}</span>`:''}<small>No simulation occurred while you were away.</small></div><button type="button" data-guidance-dismiss-return>Dismiss</button></div>`;
  }
  function focusDestination(item){
   const destination=item.destination||{},focus=destination.focus;
+  if(['scholarship-summary','recruiting-board'].includes(focus))window.DynastyRecruitingClasses?.show(focus==='scholarship-summary'?'summary':'current');
   let el=null;
   if(focus==='weekly-decision'&&destination.decisionId){
    el=[...document.querySelectorAll('[data-decision]')].find(button=>button.dataset.decision===String(destination.decisionId))?.closest('.decision-card')||target('#weeklyDecisions');
   }else if(focus==='career-post')el=target('#careerPost');
   else if(focus==='coach-opening')el=target('#coachMarket');
   else if(focus==='scholarship-summary')el=target('#classSummary');
-  else if(focus==='recruiting-board')el=target('#recruitBody')||target('#classSummary');
-  if(el){el.classList.add('guidance-focus-target');el.tabIndex=-1;el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>el?.focus?.({preventScroll:true}),250);return true}
+  else if(focus==='recruiting-board'){const workspace=target('#recruitWorkspace');if(workspace&&!workspace.hidden){target('[data-rwm="workspace"]')?.click();el=workspace}else el=target('#recruitBody')||target('#classSummary')}
+  if(el){revealDetails(el);el.classList.add('guidance-focus-target');el.tabIndex=-1;el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>el?.focus?.({preventScroll:true}),250);return true}
   return false;
  }
  function addReturnControl(item){
@@ -89,7 +149,7 @@
  function returnToAgenda(){
   document.querySelectorAll('.guidance-return-context').forEach(context=>context.remove());
   if(typeof goToTab==='function')goToTab('dashboard');
-  requestAnimationFrame(()=>{const host=target('#coachingAgenda');host?.scrollIntoView({behavior:'smooth',block:'start'});const opener=agendaContext?.itemId?agendaButton(agendaContext.itemId):null;opener?.focus?.({preventScroll:true});agendaContext=null;});
+  requestAnimationFrame(()=>{const host=target('#coachingAgenda');revealDetails(host);host?.scrollIntoView({behavior:'smooth',block:'start'});const opener=agendaContext?.itemId?agendaButton(agendaContext.itemId):null;opener?.focus?.({preventScroll:true});agendaContext=null;});
  }
  function openGuidanceItem(id){
   const model=currentModel(),item=model?.items?.find(x=>x.id===id);if(!item){if(typeof setStatus==='function')setStatus('That agenda item is no longer active.');renderGuidanceSystem();return}
@@ -112,7 +172,7 @@
   host.querySelectorAll('[data-guidance-restore]').forEach(button=>button.addEventListener('click',()=>{callGuidance('guidanceRestoreItem',button.dataset.guidanceRestore);renderGuidanceSystem()}));
  }
  function bindReturnSummary(){target('#guidanceReturnSummary')?.querySelector('[data-guidance-dismiss-return]')?.addEventListener('click',()=>{if(typeof dismissGuidanceReturnSummary==='function')dismissGuidanceReturnSummary();renderGuidanceSystem()})}
- function renderGuidanceSystem(){const model=currentModel();if(!model)return;renderReturnSummary();renderAgenda(model);renderForecast(model);renderPlan(model);bindAgenda();bindReturnSummary()}
+ function renderGuidanceSystem(){syncSessionView();renderSessionStatus();const model=currentModel();if(!model)return;renderDeskFocus(model);renderReturnSummary();renderAgenda(model);renderForecast(model);renderPlan(model);bindAgenda();bindReturnSummary()}
  window.renderGuidanceSystem=renderGuidanceSystem;
  window.getDynastyGuidance=currentModel;
  window.openGuidanceItem=openGuidanceItem;

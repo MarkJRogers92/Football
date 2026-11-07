@@ -28,3 +28,18 @@ test('regular-season labels only map when they identify a numbered week',()=>{
 test('clear state never invents work',()=>{
  assert.deepEqual(api.model({items:[{done:true,label:'Review'}]}),{kind:'clear',label:'All caught up'});
 });
+
+
+test('compact desk and advance control share only blockers for the current boundary',()=>{
+ const career={id:'career',meaning:'must_resolve',category:'career'};
+ const weekly={id:'weekly',meaning:'must_resolve',category:'coach_desk'};
+ const optional={id:'prep',meaning:'staff_recommendation',category:'coach_desk'};
+ const model={items:[career,weekly,optional],forecast:{eligibility:{blockers:[]}}};
+ assert.deepEqual(api.blockingItems(model),[],'deferred career choices and optional prep do not invent gates');
+ model.forecast.eligibility.blockers=[{kind:'weekly_decisions'}];
+ assert.deepEqual(api.blockingItems(model),[weekly]);
+ model.forecast.eligibility.blockers=[{kind:'career_choice'}];
+ assert.deepEqual(api.blockingItems(model),[career]);
+ model.forecast.eligibility.blockers=[{kind:'career_choice'},{kind:'weekly_decisions'}];
+ assert.deepEqual(api.blockingItems(model),[career,weekly],'the first item is the same one opened by the primary action');
+});

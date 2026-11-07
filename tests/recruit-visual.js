@@ -3,7 +3,7 @@ const { chromium } = require('playwright-core');
 const {chromiumPath}=require('./helpers/chromium-path');
 const path = require('path');
 // Tabs live inside groups since v0.9.26; selecting the group is part of navigating to a tab.
-const TAB_GROUP={"dashboard": "program", "program": "program", "history": "program", "roster": "team", "depth": "team", "development": "team", "recruiting": "recruiting", "gamelab": "games", "season": "games", "stats": "games", "newsletter": "games", "staff": "staff", "offseason": "staff", "records": "staff"};
+const TAB_GROUP={"dashboard": "home", "program": "program", "history": "world", "roster": "program", "depth": "program", "development": "program", "recruiting": "recruiting", "gamelab": "season", "season": "season", "stats": "season", "newsletter": "home", "staff": "program", "offseason": "program", "records": "world"};
 const goTab=async(page,id)=>page.evaluate(({id,group})=>{const g=document.querySelector(`.tab-groups button[data-group="${group}"]`);if(g&&!g.classList.contains("active"))g.click();document.querySelector(`.tabs button[data-tab="${id}"]`)?.click()},{id,group:TAB_GROUP[id]});
 const useTableView=async page=>{await page.waitForSelector('#rwSwitch');await page.click('#rwSwitch [data-rwm="table"]');await page.waitForFunction(()=>!document.querySelector('#recruiting > .table-wrap')?.classList.contains('recruit-table-hidden'))};
 
@@ -16,14 +16,16 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
  for(const [label,viewport] of [['desktop',{width:1280,height:900}],['iphone',{width:390,height:844}]]){
   const page=await browser.newPage({viewport}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
   await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);
-  await goTab(page, 'recruiting');await useTableView(page);await page.waitForSelector('#recruitBody tr');await page.waitForSelector('#signingClassFeature .signing-class-board');
+  await goTab(page, 'recruiting');await useTableView(page);await page.waitForSelector('#recruitBody tr');await page.click('[data-recruit-class="summary"]');await page.waitForSelector('#signingClassFeature .signing-class-board');
   check(`[${label}] signing-class board renders`,/SIGNING CLASS/.test(await page.locator('#signingClassFeature').innerText()));
   check(`[${label}] signing-class meter renders`,await page.locator('#signingClassFeature .signing-meter').count()===1);
+  await page.click('[data-recruit-class="current"]');
   check(`[${label}] recruiting list has portrait canvases`,await page.locator('#recruitBody canvas[data-portrait-kind="recruit"]').count()>0);
   const firstPortrait=page.locator('#recruitBody canvas[data-portrait-kind="recruit"]').first();await firstPortrait.scrollIntoViewIfNeeded();await page.waitForFunction(()=>document.querySelector('#recruitBody canvas[data-portrait-kind="recruit"]')?.dataset.portraitPainted==='1',{timeout:10000});
   check(`[${label}] visible recruit portrait paints`,await firstPortrait.getAttribute('data-portrait-painted')==='1');
   // Presentation is DOM-driven. Mark one rendered row committed to verify the card path without altering game state.
   await page.evaluate(()=>{const row=document.querySelector('#recruitBody tr');const interest=row?.querySelector('[data-label="Interest"]');if(interest)interest.textContent='COMMITTED'});
+  await page.click('[data-recruit-class="summary"]');
   await page.waitForSelector('#signingClassFeature .signing-card');
   check(`[${label}] committed recruit becomes signing card`,await page.locator('#signingClassFeature .signing-card').count()>=1);
   await page.waitForFunction(()=>document.querySelector('#signingClassFeature .signing-card canvas[data-portrait-kind="recruit"]')?.dataset.portraitPainted==='1',{timeout:10000});

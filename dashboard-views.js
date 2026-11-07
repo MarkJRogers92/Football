@@ -3,8 +3,8 @@
 
   // The Command Center stacks every dashboard card in one long scroll. This splits the cards that
   // arrive from several modules into three views without changing any of them: the week's work
-  // (default), stories and goals, and the league picture. Cards are classified, never moved.
-  const VIEWS=[['week','This week'],['stories','Players & goals'],['league','League']];
+  // (default), stories and goals, and the league picture. Cards are classified; the weekly action stays ahead of supporting coverage.
+  const VIEWS=[['week','Briefing'],['stories','Players & goals'],['league','League']];
   const dash=document.querySelector('#dashboard');
   if(!dash||dash.querySelector('.dash-views'))return;
 
@@ -12,7 +12,7 @@
 
   function classify(node){
     if(node.matches('.program-masthead,.dash-views'))return'all';
-    if(node.matches('#v0102PlayerStories,#seasonStoryRail')||node.querySelector?.('#seasonGoalsDashboard'))return'stories';
+    if(node.matches('#v0102PlayerStories,#seasonStoryRail,#storylinesCard')||node.querySelector?.('#seasonGoalsDashboard'))return'stories';
     if(node.querySelector?.('#top15,#snapshot'))return'league';
     return'week';
   }
@@ -20,6 +20,8 @@
     // Other modules insert their strips right after the masthead; keep the switcher first so it never jumps between views.
     const bar=dash.querySelector('.dash-views'),masthead=dash.querySelector('.program-masthead');
     if(bar&&masthead&&masthead.nextElementSibling!==bar)masthead.insertAdjacentElement('afterend',bar);
+    const desk=dash.querySelector('.command-center');
+    if(bar&&desk&&bar.nextElementSibling!==desk)bar.insertAdjacentElement('afterend',desk);
     for(const node of dash.children)node.dataset.dview=classify(node);
     dash.dataset.view=view;
   }
@@ -42,7 +44,7 @@
   }
   function mount(){
     const bar=document.createElement('div');
-    bar.className='dash-views';bar.setAttribute('role','tablist');bar.setAttribute('aria-label','Dashboard view');
+    bar.className='dash-views';bar.setAttribute('role','tablist');bar.setAttribute('aria-label','This Week view');
     bar.innerHTML=VIEWS.map(([key,label])=>`<button type="button" role="tab" data-dash-view="${key}">${label}<i></i></button>`).join('');
     bar.addEventListener('click',event=>{const button=event.target.closest('[data-dash-view]');if(button)show(button.dataset.dashView)});
     bar.addEventListener('keydown',event=>{

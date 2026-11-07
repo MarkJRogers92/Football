@@ -18,6 +18,7 @@ const FILE = 'file://' + path.join(__dirname, '..', 'index.html');
       await page.goto(FILE);
       await startNewDynasty(page);
       await page.evaluate(() => document.querySelector('.tabs button[data-tab="recruiting"]').click());
+      await page.click('[data-recruit-class="rising"]');
       await page.waitForSelector('#risingClass .rising-row', { timeout: 10000 });
 
       assert.equal(await page.locator('#risingClass').isVisible(), true, `[${label}] the rising class card is visible`);

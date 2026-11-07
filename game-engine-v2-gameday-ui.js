@@ -6,9 +6,9 @@ function v2GameDayUILiveContext(){
   return{g,home,away,key:v2GameDayUIKey(g)}
 }
 function v2GameDayUIDigest(ctx=v2GameDayUILiveContext()){return ctx?v2LabIntegrity(ctx.g,ctx.home,ctx.away):null}
-function v2GameDayUIAssertUnchanged(before,ctx){const after=v2GameDayUIDigest(ctx);if(before!==after)throw new Error('Interactive Game Day preview mutated live dynasty state.')}
+function v2GameDayUIAssertUnchanged(before,ctx){const after=v2GameDayUIDigest(ctx);if(before!==after)throw new Error('Game Day preview mutated live dynasty state.')}
 function v2GameDayUIPrepare(){
-  const ctx=v2GameDayUILiveContext(),api=globalThis.DynastyGameEngineV2GameDay;if(!ctx||!api)throw new Error('No upcoming game is available for Interactive Game Day.');
+  const ctx=v2GameDayUILiveContext(),api=globalThis.DynastyGameEngineV2GameDay;if(!ctx||!api)throw new Error('No upcoming game is available for Game Day.');
   const before=v2GameDayUIDigest(ctx),hc=v2LabClone(ctx.home),ac=v2LabClone(ctx.away);
   applyGameplanWear(hc,ac.name);applyGameplanWear(ac,hc.name);
   const homeProfile=gameProfiles(hc,ac.name),awayProfile=gameProfiles(ac,hc.name);
@@ -17,11 +17,11 @@ function v2GameDayUIPrepare(){
   v2InteractiveGameDay={key:ctx.key,session,integrity:before};renderV2InteractiveGameDay();return session
 }
 function v2GameDayUIRun(action){
-  const ctx=v2GameDayUILiveContext(),api=globalThis.DynastyGameEngineV2GameDay;if(!ctx||!api||!v2InteractiveGameDay)throw new Error('Interactive Game Day session is unavailable.');
+  const ctx=v2GameDayUILiveContext(),api=globalThis.DynastyGameEngineV2GameDay;if(!ctx||!api||!v2InteractiveGameDay)throw new Error('Game Day session is unavailable.');
   const before=v2GameDayUIDigest(ctx);action(api,v2InteractiveGameDay.session);v2GameDayUIAssertUnchanged(before,ctx);renderV2InteractiveGameDay()
 }
 function v2GameDayUIRecord(options={}){
-  if(!v2InteractiveGameDay)throw new Error('No Interactive Game Day session is available to record.');
+  if(!v2InteractiveGameDay)throw new Error('No Game Day session is available to record.');
   const out=recordInteractiveV2GameDay(v2InteractiveGameDay.session,{...options,expectedIntegrity:v2InteractiveGameDay.integrity});
   v2InteractiveGameDay=null;setStatus(`Game Day recorded: ${out.result.away} ${out.result.ap} – ${out.result.hp} ${out.result.home}.`);render();return out
 }
@@ -36,9 +36,13 @@ function v2GameDayUIScoreboard(session){
   const s=session.state,lab=globalThis.DynastyGameEngineV2Lab,context=s.status==='final'?'Final':`${lab?.clockLabel(s)||''}${lab?.downLabel(s)?` · ${lab.downLabel(s)}`:''}`;
   return`<div class="v2-gameday-scoreboard"><div class="v2-gameday-team away">${teamLogoHTML(s.away?.id,42,'team-logo--inline')}<span>${gameEscape(session.names.away)}</span><b>${s.score.away}</b></div><div class="v2-gameday-center"><strong>${gameEscape(context)}</strong><small>${s.possession?`${gameEscape(session.names[s.possession])} ball · ${s.timeouts.away} TO / ${s.timeouts.home} TO`:''}</small></div><div class="v2-gameday-team home"><b>${s.score.home}</b><span>${gameEscape(session.names.home)}</span>${teamLogoHTML(s.home?.id,42,'team-logo--inline')}</div></div>`
 }
+// Which side the coach is on, and the live win-chance estimate from that side (presentation only).
+function v2GameDayUIUserSide(session){return selected()?.name===session.names.home?'home':'away'}
+function v2GameDayUIWinChance(session){const m=globalThis.DynastyGameDayMomentum;return m?Math.round(m.winChance(session.state,v2GameDayUIUserSide(session),{homeEdge:Number(session.homeFieldRating)||0})*100):null}
+function v2GameDayUIMomentum(session){return globalThis.DynastyGameDayMomentum?.panelHTML(session,v2GameDayUIUserSide(session),{homeEdge:Number(session.homeFieldRating)||0})||''}
 function v2GameDayUIDecision(session){
   const d=globalThis.DynastyGameEngineV2GameDay?.pendingDecision(session);if(!d)return'';
-  return`<div class="v2-gameday-decision"><div class="eyebrow">HEAD COACH DECISION</div><h3>${gameEscape(d.situation)}</h3><div class="muted">Staff recommendation: <strong>${gameEscape(d.staffRecommendation.replaceAll('_',' '))}</strong></div><div class="button-row">${d.options.map(o=>`<button type="button" data-v2-gameday-choice="${gameEscape(o.id)}" ${o.id===d.staffRecommendation?'class="recommended"':''}>${gameEscape(o.label)}</button>`).join('')}</div></div>`
+  return`<div class="v2-gameday-decision"><div class="eyebrow">HEAD COACH DECISION</div><h3>${gameEscape(d.situation)}</h3><div class="muted">Staff recommendation: <strong>${gameEscape(d.staffRecommendation.replaceAll('_',' '))}</strong>${v2GameDayUIWinChance(session)!=null?` · Win chance now <strong>${v2GameDayUIWinChance(session)}%</strong>`:''}</div><div class="button-row">${d.options.map(o=>`<button type="button" data-v2-gameday-choice="${gameEscape(o.id)}" ${o.id===d.staffRecommendation?'class="recommended"':''}>${gameEscape(o.label)}</button>`).join('')}</div></div>`
 }
 function v2GameDayUIFeed(session){
   const rows=(session.state.events||[]).slice(-18).reverse();if(!rows.length)return'<div class="muted">Kickoff is next.</div>';
@@ -51,22 +55,29 @@ function ensureV2InteractiveGameDayHost(){
 function renderV2InteractiveGameDay(){
   const host=ensureV2InteractiveGameDayHost();if(!host)return;const ctx=v2GameDayUILiveContext(),api=globalThis.DynastyGameEngineV2GameDay;
   if(v2InteractiveGameDay&&v2InteractiveGameDay.key!==ctx?.key)v2InteractiveGameDay=null;
-  if(!ctx||!api){host.innerHTML=`<div class="muted">${typeof openingPreseason==='function'&&openingPreseason()?'Begin Season from the Command Center to make the first matchup playable.':'Interactive Game Day becomes available when your program has an unsimulated game.'}</div>`;return}
+  if(!ctx||!api){host.innerHTML=`<div class="muted">${typeof openingPreseason==='function'&&openingPreseason()?'Choose Begin Season in This Week to open your first matchup.':'Your next scheduled game will appear here.'}</div>`;return}
   if(!v2InteractiveGameDay){
-    host.innerHTML=`<div class="section-head"><div><div class="eyebrow">INTERACTIVE GAME DAY</div><h3>Coach the next game</h3><div class="muted">Play the matchup through Game Engine 2, make fourth-down decisions, then make the final result official. Nothing changes in the dynasty until you record the completed game.</div></div><button type="button" data-v2-gameday-start>Start Game Day</button></div>`;
-    host.querySelector('[data-v2-gameday-start]').onclick=()=>{try{v2GameDayUIPrepare()}catch(err){console.error(err);setStatus(`Interactive Game Day stopped: ${err.message||err}`)}};return
+    host.innerHTML=`<div class="section-head"><div><div class="eyebrow">LIVE GAME DAY</div><h3>Coach the next game live</h3><div class="muted">Call the key moments yourself or let your staff finish. Choose Finish Game at the final whistle to record the result.</div></div><button type="button" data-v2-gameday-start class="bi-primary">Coach It Live</button></div>`;
+    host.querySelector('[data-v2-gameday-start]').onclick=()=>{try{v2GameDayUIPrepare()}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}};return
   }
   const session=v2InteractiveGameDay.session,d=api.pendingDecision(session),final=session.state.status==='final';
-  host.innerHTML=`<div class="v2-gameday-head"><div><div class="eyebrow">INTERACTIVE GAME DAY${final?' · FINAL':''}</div><h3>${gameEscape(session.names.away)} at ${gameEscape(session.names.home)}</h3></div><button type="button" data-v2-gameday-reset>Reset Game</button></div>${v2GameDayUIScoreboard(session)}${v2GameDayUIDecision(session)}<div class="v2-gameday-controls button-row">${!final&&!d?'<button type="button" data-v2-gameday-next>Next Play</button><button type="button" data-v2-gameday-decision>Advance to Next Decision</button>':''}${!final?'<button type="button" data-v2-gameday-delegate>Delegate Rest</button>':''}${final?'<button type="button" data-v2-gameday-record class="recommended">Make Result Official</button><strong>Final is staged until you make it official.</strong>':''}</div><div class="v2-gameday-feed"><div class="v2-gameday-feed-head"><strong>Game feed</strong><span class="muted">Newest first</span></div>${v2GameDayUIFeed(session)}</div><div class="v2-shadow-safety"><strong>${final?'Final staged':'Game in progress'}.</strong> Live dynasty records, player stats, schedule and archive remain unchanged until “Make Result Official.”</div>`;
+  host.innerHTML=`<div class="v2-gameday-head"><div><div class="eyebrow">LIVE GAME DAY${final?' · FINAL':''}</div><h3>${gameEscape(session.names.away)} at ${gameEscape(session.names.home)}</h3></div><button type="button" data-v2-gameday-reset>Restart Game</button></div>${v2GameDayUIScoreboard(session)}${v2GameDayUIMomentum(session)}${v2GameDayUIDecision(session)}<div class="v2-gameday-controls button-row">${!final&&!d?'<button type="button" data-v2-gameday-next>Next Play</button><button type="button" data-v2-gameday-decision>Advance to Next Decision</button>':''}${!final?'<button type="button" data-v2-gameday-delegate>Delegate Rest</button>':''}${final?'<button type="button" data-v2-gameday-record class="recommended">Finish Game</button><span class="muted">Record the final score and player stats.</span>':''}</div><div class="v2-gameday-feed"><div class="v2-gameday-feed-head"><strong>Game feed</strong><span class="muted">Newest first</span></div>${v2GameDayUIFeed(session)}</div><div class="v2-shadow-safety"><strong>${final?'Final whistle':'Live game in progress'}.</strong> ${final?'Finish Game records this result in your dynasty.':'Unfinished live games are not saved. Finish the game to keep the result.'}</div>`;
   host.querySelector('[data-v2-gameday-reset]')?.addEventListener('click',()=>{v2InteractiveGameDay=null;renderV2InteractiveGameDay()});
-  host.querySelector('[data-v2-gameday-next]')?.addEventListener('click',()=>{try{v2GameDayUIRun((x,s)=>x.advanceOne(s))}catch(err){console.error(err);setStatus(`Interactive Game Day stopped: ${err.message||err}`)}});
-  host.querySelector('[data-v2-gameday-decision]')?.addEventListener('click',()=>{try{v2GameDayUIRun((x,s)=>x.advance(s))}catch(err){console.error(err);setStatus(`Interactive Game Day stopped: ${err.message||err}`)}});
-  host.querySelector('[data-v2-gameday-delegate]')?.addEventListener('click',()=>{try{v2GameDayUIRun((x,s)=>x.simulate(s,()=> 'delegate'))}catch(err){console.error(err);setStatus(`Interactive Game Day stopped: ${err.message||err}`)}});
-  host.querySelector('[data-v2-gameday-record]')?.addEventListener('click',()=>{try{v2GameDayUIRecord()}catch(err){console.error(err);setStatus(`Interactive Game Day rolled back: ${err.message||err}`)}});
-  host.querySelectorAll('[data-v2-gameday-choice]').forEach(button=>button.addEventListener('click',()=>{try{v2GameDayUIRun((x,s)=>x.resolve(s,button.dataset.v2GamedayChoice))}catch(err){console.error(err);setStatus(`Interactive Game Day stopped: ${err.message||err}`)}}))
+  host.querySelector('[data-v2-gameday-next]')?.addEventListener('click',()=>{try{v2GameDayUIRun((x,s)=>x.advanceOne(s))}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}});
+  host.querySelector('[data-v2-gameday-decision]')?.addEventListener('click',()=>{try{v2GameDayUIRun((x,s)=>x.advance(s))}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}});
+  host.querySelector('[data-v2-gameday-delegate]')?.addEventListener('click',()=>{try{v2GameDayUIRun((x,s)=>x.simulate(s,()=> 'delegate'))}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}});
+  host.querySelector('[data-v2-gameday-record]')?.addEventListener('click',()=>{try{v2GameDayUIRecord()}catch(err){console.error(err);setStatus(`Game Day rolled back: ${err.message||err}`)}});
+  host.querySelectorAll('[data-v2-gameday-choice]').forEach(button=>button.addEventListener('click',()=>{try{v2GameDayUIRun((x,s)=>x.resolve(s,button.dataset.v2GamedayChoice))}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}}))
 }
 extendRender('gamelab',()=>renderV2InteractiveGameDay());
-globalThis.DynastyGameEngineV2LabBridge.interactive={start:v2GameDayUIPrepare,render:renderV2InteractiveGameDay,getSession:()=>v2InteractiveGameDay?.session||null,record:v2GameDayUIRecord,reset:()=>{v2InteractiveGameDay=null;renderV2InteractiveGameDay()}};
+// "Coach it live" from anywhere: open Game Day, start the live session if none is running, and bring it into view.
+function v2GameDayUICoachLive(){
+  const tab=document.querySelector('.tabs button[data-tab="gamelab"]');if(tab&&!tab.classList.contains('active'))tab.click();
+  try{if(!v2InteractiveGameDay&&v2GameDayUILiveContext())v2GameDayUIPrepare();else renderV2InteractiveGameDay()}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}
+  document.querySelector('#v2InteractiveGameDay')?.scrollIntoView({behavior:'smooth',block:'start'})
+}
+document.addEventListener('click',e=>{if(e.target.closest('[data-coach-live]'))v2GameDayUICoachLive()});
+globalThis.DynastyGameEngineV2LabBridge.interactive={coachLive:v2GameDayUICoachLive,start:v2GameDayUIPrepare,render:renderV2InteractiveGameDay,getSession:()=>v2InteractiveGameDay?.session||null,record:v2GameDayUIRecord,reset:()=>{v2InteractiveGameDay=null;renderV2InteractiveGameDay()}};
 if(globalThis.__DL_TEST__){
   globalThis.__DL_TEST__.v2GameDayPreviewDigest=()=>v2GameDayUIDigest();
   globalThis.__DL_TEST__.v2GameDayPreviewState=()=>v2InteractiveGameDay?v2LabClone(v2InteractiveGameDay.session):null;

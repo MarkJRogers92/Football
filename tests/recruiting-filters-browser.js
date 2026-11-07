@@ -25,7 +25,12 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
  if(!hidden)throw new Error('expected a punter outside the default 220 rows');
  await page.click('[data-recruit-filter-reset]');await page.waitForFunction(()=>document.querySelector('[data-recruit-filter="pos"]')?.value==='ALL');
  await page.fill('[data-recruit-filter="query"]',hidden);await page.press('[data-recruit-filter="query"]','Enter');
- await page.waitForFunction(n=>{const a=[...document.querySelectorAll('#recruitBody tr [data-recruit]')];return a.length>=1&&a.length<=5&&a.some(x=>x.textContent.trim()===n)},hidden);
+ try{
+  await page.waitForFunction(n=>{const a=[...document.querySelectorAll('#recruitBody tr [data-recruit]')];return a.length>=1&&a.length<=5&&a.some(x=>x.textContent.trim()===n)},hidden);
+ }catch(error){
+  console.error('Full-pool search diagnostic',JSON.stringify({hidden,errors,state:await page.evaluate(()=>({filters:window.DynastyLabRecruitingFilters?.getState(),query:document.querySelector('[data-recruit-filter="query"]')?.value,pool:document.querySelector('[data-recruit-pool]')?.dataset,names:[...document.querySelectorAll('#recruitBody tr [data-recruit]')].map(a=>a.textContent.trim())}))}));
+  throw error;
+ }
  await page.click('[data-recruit-filter-reset]');await page.waitForFunction(()=>document.querySelector('[data-recruit-filter="query"]')?.value==='');
  await page.selectOption('[data-recruit-filter="state"]',{index:1});
  await page.waitForFunction(t=>{const m=Number(document.querySelector('[data-recruit-pool]')?.getAttribute('data-matching'));return m>0&&m<t},poolTotal);
@@ -35,9 +40,28 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
  await page.click('#rwSwitch [data-rwm="workspace"]');await page.click('.recruit-workspace-nav [data-rwf="all"]');
  await page.waitForFunction(()=>/^Showing \d+ of [\d,]+ prospects$/.test(document.querySelector('.rw-list-head strong')?.textContent||''));
  const allCount=(await page.locator('.recruit-workspace-nav [data-rwf="all"] b').innerText()).replace(/,/g,'');if(Number(allCount)!==poolTotal)throw new Error(`All Recruits says ${allCount}, pool is ${poolTotal}`);
+ if(await page.locator('.recruiting-filter-count').isVisible())throw new Error('workspace must not show the hidden table count alongside its own result count');
  const cards=await page.locator('.rw-card-list [data-rwid]').count();if(cards>30)throw new Error(`workspace rendered ${cards} cards before Show more`);
  await page.click('[data-rw-more]');await page.waitForFunction(c=>document.querySelectorAll('.rw-card-list [data-rwid]').length>c,cards);
+ // Search the full pool through Workspace, including a prospect outside the table cap.
+ await page.fill('#rwSearch',hidden);
+ await page.waitForFunction(n=>{const cards=[...document.querySelectorAll('.recruit-workspace-card')];return cards.length>0&&cards.length<=5&&cards.some(c=>c.querySelector('.rw-main strong')?.textContent===n)&&document.querySelector('.rw-list-head strong')?.textContent===`${cards.length} prospects`},hidden);
+ const queryMatches=await page.locator('.recruit-workspace-card').count();
+ await page.click('#rwSwitch [data-rwm="table"]');
+ if(!await page.locator('.recruiting-filter-count').isVisible())throw new Error('Table must restore its own visible row count');
+ if(await page.locator('.recruiting-filter-count strong').innerText()!==String(queryMatches))throw new Error('Table count must follow full-pool search');
+ await page.click('[data-recruit-filter-reset]');
+ await page.click('#rwSwitch [data-rwm="workspace"]');
+ await page.waitForFunction(()=>document.querySelector('#rwSearch')?.value==='');
+ await page.waitForFunction(()=>document.querySelectorAll('.recruit-workspace-card').length===30);
+ await page.fill('#rwSearch','__no_matching_prospect__');
+ await page.waitForFunction(()=>document.querySelector('.rw-list-head strong')?.textContent==='0 prospects');
+ if(await page.locator('.recruit-workspace-card').count())throw new Error('empty search must not leave stale cards');
  await useTableView(page);
+ if(await page.locator('.recruiting-filter-count strong').innerText()!=='0')throw new Error('Table count must show zero for empty search');
+ await page.click('[data-recruit-filter-reset]');
+ await page.waitForFunction(()=>document.querySelectorAll('#recruitBody tr').length===220);
+ if(await page.locator('.recruiting-filter-count strong').innerText()!=='220')throw new Error('Table count must reflect its 220-row cap after reset');
  await page.locator('#recruitBody [data-target]').first().click();await page.waitForSelector('#recruitBody tr.target');
  await page.click('[data-recruit-view="board"]');
  await page.waitForFunction(()=>{const rows=[...document.querySelectorAll('#recruitBody tr')],box=document.querySelector('[data-recruit-filter="targetedOnly"]'),btn=document.querySelector('[data-recruit-view="board"]');return rows.length>0&&rows.every(r=>r.classList.contains('target'))&&box?.checked&&btn?.classList.contains('active')});

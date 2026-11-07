@@ -29,6 +29,11 @@
   const items=nodes.map((el,index)=>({index,done:el.classList?.contains('plan-done'),label:el.querySelector?.('.plan-label')?.textContent?.trim()||'',tab:el.dataset?.tab||null,node:el}));
   return{decisions,items,next:model({decisionCount:decisions.length,items})};
  }
+ // Shared by the compact desk and the action controller: only the current boundary's gates count.
+ function blockingItems(guidance){
+  const gates=guidance?.forecast?.eligibility?.blockers||[];
+  return (guidance?.items||[]).filter(item=>item.meaning==='must_resolve'&&gates.some(gate=>(gate.kind==='career_choice'&&item.category==='career')||(gate.kind==='weekly_decisions'&&item.category==='coach_desk')));
+ }
  function readGuidance(root){try{return root.getDynastyGuidance?.()||null}catch{return null}}
  function install(doc){
   if(!doc?.querySelector)return false;
@@ -41,7 +46,7 @@
     button.textContent='Begin Season';button.disabled=false;button.title='Open Week 1 without simulating a game.';return {guidance};
    }
    if(guidance?.forecast){
-    const f=guidance.forecast,gateBlockers=f.eligibility?.blockers||[],blockers=(guidance.items||[]).filter(x=>x.meaning==='must_resolve'&&gateBlockers.some(b=>(b.kind==='career_choice'&&x.category==='career')||(b.kind==='weekly_decisions'&&x.category==='coach_desk')));
+    const f=guidance.forecast,blockers=blockingItems(guidance);
     button.dataset.guidanceAction=f.key||'none';
     if(blockers.length){button.textContent=blockers.length===1?'Resolve required decision':`Resolve ${blockers.length} required decisions`;button.disabled=false;button.title='Open the highest-priority blocking item in the Coaching Agenda.'}
     else{button.textContent=f.key==='none'?'No advance available':`Next: ${f.label}`;button.disabled=f.key==='none';button.title=f.status==='caution'?'This action is allowed, with a consequential decision still open.':f.title||f.label}
@@ -83,5 +88,5 @@
   refresh();
   return true;
  }
- return{model,readState,install,actionSelector};
+ return{model,readState,install,actionSelector,blockingItems};
 });

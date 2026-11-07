@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const path = require('path');
 
 const TAB_GROUP = {
-  dashboard: 'program', depth: 'team', recruiting: 'recruiting', gamelab: 'games',
+  dashboard: 'home', depth: 'program', recruiting: 'recruiting', gamelab: 'season',
 };
 const goTab = (page, id) => page.evaluate(({id, group}) => {
   document.querySelector(`.tab-groups button[data-group="${group}"]`)?.click();
@@ -57,6 +57,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page,{beginSeason:false});
       `${label}: no Game Day action is exposed during preseason`);
 
     await goTab(page, 'dashboard');
+    await page.click('#weeklyDeskDetails > summary');
     await page.locator('#weeklyHub .hub-item[data-tab="depth"]').click();
     await page.locator('#depth.active').waitFor({state: 'visible'});
     await goTab(page, 'dashboard');
@@ -79,6 +80,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page,{beginSeason:false});
     assert.equal((await debug(page)).targeted, targeted,
       `${label}: preseason recruiting setup survives save and reload`);
     await goTab(page, 'recruiting');
+    await page.click('[data-recruit-class="summary"]');
     assert.match(await page.locator('#classSummary').innerText(), new RegExp(`${targeted} active targets?`),
       `${label}: the restored recruiting edit remains visible`);
 

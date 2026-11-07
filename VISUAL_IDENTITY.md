@@ -1,3 +1,80 @@
+# Dynasty Lab — Visual Identity V2 "Midnight & Brass"
+
+Unreleased (source still v0.14.1). Presentation only: no simulation, balance, save-shape or RNG changes.
+
+## One More Saturday experience pass
+
+The shared Midnight & Brass palette now supports distinct compositions: an open weekly desk and compact program nameplate, a ruled recruiting sheet, a field/scoreboard focus on Game Day, and an almanac in History. Routine card entrances, chart draw-ins, button sweeps, next-game pulses, ticker movement and weekly flips are quiet. State-change feedback and earned ceremonies remain.
+
+The existing highlights card becomes the visible postgame stopping point: final score, one standout, one supported consequence, and the next known opponent. More contributors, recorded plays and replay stay in a closed disclosure. No card appears before a final, and no acknowledgement is required. `season-moments.css` supplies its component layout.
+
+A separate `#dynastySessionSaveStatus` reports real persistence completion, pending writes and failures; `session-status.css` styles it. Returning after a meaningful absence adds last result, priority and pending choice to the existing welcome-back summary. Safe local view preferences are scoped to slot, seed, archive identity and program; they never restore gameplay actions or unfinished live games.
+
+History’s existing museum adds a closed “People, classes & rivalry” disclosure. It uses retained signing receipts and school-season records, never infers a signing from a roster spot, and labels deferred or partial archives. Full source and verification evidence belong in `agent_docs/latest_session_work.md`.
+
+## Living world first pass
+
+The Command Center now has a compact optional briefing below the existing advance and required-decision controls, with no more than three factual items. Players and coaches can be followed from their profiles or story cards; the followed cast is inside an optional disclosure. Updates describe meaningful changes, not routine statistical increments. Prior players, recruits whose recorded top five included the program, and former coaches may reappear in next-opponent coverage. Rival Watch and highlights move into the existing detailed weekly disclosure.
+
+`living-world-adapter.js` reads canonical history without modifying the universe; `living-world.js` owns device preferences, selection and mounting; `living-world.css` uses the established palette and typography without additional animation. Follow state is scoped by world seed, so same-seed save copies share it. Visual browser validation remains pending because Chrome aborts before page load in the current session; see `agent_docs/latest_session_work.md` for verified checks.
+
+## The idea
+
+The title screen already had an identity (brass, stadium light, the trophy); the game behind it was a generic dark dashboard. V2 carries the title screen into every tab:
+
+- **Brass means "what matters now".** One accent (`--bi-gold`) for the active page, the active view, primary actions, the next game and required decisions. Nothing else is gold.
+- **Team colour means "who you are".** Banner gradients, estimate bars and glows use the controlled program's `--team-*` variables.
+- **Condensed athletic type.** Barlow Condensed (SIL OFL, vendored in `assets/fonts/`, loaded locally so the desktop app works offline) for headlines, numbers, labels and menus; Inter/system stays for reading text.
+- **Chalk and helmets instead of paragraphs.** A chalk play diagram (inline SVG) behind the program banner, the existing Meshy helmet atlas for your program, every opponent and the matchup card, and the frozen v1 portraits on roster cards.
+- **One menu language.** Page tabs are an underline; in-page views (dashboard This week / Players & goals / League, the recruiting class views, Workspace/Table) are one brass segmented track.
+
+## What draws what
+
+| Visual | Where | Source of truth |
+|---|---|---|
+| Hero helmet + season strip (every game, W/L and score, next game pulses) | Dashboard banner | `DynastyBrandSnapshot.team().schedule` |
+| Helmet face-off | Dashboard next matchup | same snapshot, matched by team name |
+| Program radar (six attributes) | Program Lab | `team().attributes`; replaces the duplicate tile row visually (tiles stay in the DOM) |
+| Admin confidence gauge, season goals ring, win pace | Program Lab | `team().confidence`, `goals`, `w` vs `expectedWins` |
+| Leader bars (share of the category leader) | Stats | `--lead` set by `statLeaderRows` in `app.js` |
+| Estimate range bar (25–99 scale) | Roster cards | the staff range already in each card's label |
+| Recruit confidence bars | Recruiting desk | unchanged values, brand colours |
+
+`brand-snapshot-adapter.js` is an engine extension (shares `app.js`'s closure) and only copies values out. `brand-visuals.js` is the DOM layer: pure geometry is exported for `tests/brand-visuals.js`, mounting happens in the browser only, and repaints are signature-guarded so they never loop with the app's own renders.
+
+## Motion
+
+Section entrance (cards rise in once per tab change), radar/gauge/bar draw-ins, a light sweep on brass buttons, a soft pulse on the next game. All of it stops under `prefers-reduced-motion` and the in-game *Reduce motion* option (`body.motion-reduced`).
+
+## Decluttering in the same pass
+
+- Stats no longer lists eight "0 SCK · 0 INT" defenders before any game; it says *No defensive statistics yet*.
+- The required-decision focus line reads as a slim status header instead of a second copy of the decision card below it.
+- The recruiting *Recruiting mode* explainer card became just its toggle (and shares the class-view row on wide screens).
+
+## Cohesion and fun pass
+
+- **Navigation:** `TAB_GROUPS` in `app.js` (and the copies in `client-shell.js`, `game-hud.js`) are the sidebar's five sections. `brand-visuals.js` writes the active section onto the tab strip (`data-section`).
+- **Faces:** `playerFaceChip` / `decisionFacesHTML` in `app.js`; stat leaders use `portraitTag`.
+- **Keys:** `LEGENDS` in `brand-visuals.js`, mounted into each section header once.
+- **Coach It Live:** `gameday-momentum.js` (pure, tested in `tests/gameday-momentum.js`) estimates win chance from score, time left, possession, field position and home field; `game-engine-v2-gameday-ui.js` renders it and exposes `[data-coach-live]`. Nothing feeds back into the simulation.
+- **Rival Watch:** `rival-snapshot-adapter.js` (read-only) + `rival-watch.js`; archetypes and lines are deterministic functions of real ratings and facts.
+- **Ceremonies:** `ceremony-snapshot-adapter.js` (read-only) + `ceremonies.js`. A ceremony plays when a milestone key appears that was not in the previous snapshot for the same program and season; loading or switching programs resets the baseline. They stay off under browser automation unless a test sets `DynastyCeremonies.autoplay=true`.
+
+## Feel and long-term goals
+
+- **Sound:** `sound.js` synthesizes every cue with Web Audio (deterministic noise, no files). Preferences live in `localStorage` (`dynastyLabSound`); automated browsers stay silent unless a test calls `DynastySound.enableForTests()`. `renderWav(cue)` renders a cue offline for review.
+- **Storylines:** `storyline-snapshot-adapter.js` (read-only, cached per game week) builds plain player records; `storylines.js` detects arcs (`detect`) and picks a varied set (`select`). Tested in `tests/storylines.js`.
+- **Legacy:** `legacy-snapshot-adapter.js` + `legacy.js`; the store is `localStorage.dynastyLabLegacy`, never the save. Tested in `tests/legacy.js`.
+- **Season moments:** `season-moments-adapter.js` + `season-moments.js` (highlights, Rivalry Week, yearbook); the rivalry trophy ceremony is part of `ceremonies.js`.
+- Class prefixes: Rival Watch uses `rvw-` because `rw-` belongs to the recruiting workspace.
+
+## Files
+
+`brand-identity.css` (last in the cascade), `brand-visuals.js`, `brand-snapshot-adapter.js`, `gameday-momentum.js`, `rival-snapshot-adapter.js`, `rival-watch.js`, `ceremony-snapshot-adapter.js`, `ceremonies.js`, `sound.js`, `storyline-snapshot-adapter.js`, `storylines.js`, `legacy-snapshot-adapter.js`, `legacy.js`, `season-moments-adapter.js`, `season-moments.js`, `assets/fonts/*`. Tests: `tests/brand-visuals.js`, `tests/gameday-momentum.js`, `tests/rival-ceremonies.js`, `tests/storylines.js`, `tests/legacy.js`, `tests/brand-identity-browser.js`, `tests/fun-features-browser.js`, `tests/season-features-browser.js`.
+
+---
+
 # Dynasty Lab — Visual Identity V1
 
 Branch: `codex/v097-visual-identity`

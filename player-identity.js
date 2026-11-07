@@ -5,8 +5,10 @@ let lastPlayerId=null,lastSig='';
 function chips(snap){return (snap.chips||[]).map(c=>`<span class="pi-chip pi-chip-${esc(c.kind)}">${esc(c.label)}</span>`).join('')}
 function stat(label,value,detail=''){return `<div class="pi-stat"><span>${esc(label)}</span><strong>${esc(value||'—')}</strong>${detail?`<small>${esc(detail)}</small>`:''}</div>`}
 function render(){
- const dialog=document.querySelector('#playerDialog'),api=globalThis.DynastyLabPlayerIdentity;if(!dialog?.open||!api?.snapshot||!lastPlayerId)return;
- const snap=api.snapshot(lastPlayerId);if(!snap?.player)return;const p=snap.player,h=snap.headline;
+ const dialog=document.querySelector('#playerDialog'),api=globalThis.DynastyLabPlayerIdentity;
+ const playerId=dialog?.dataset.lwEntity?.startsWith('player:')?dialog.dataset.lwEntity.slice(7):lastPlayerId;
+ if(!dialog?.open||!api?.snapshot||!playerId)return;
+ const snap=api.snapshot(playerId);if(!snap?.player)return;const p=snap.player,h=snap.headline;
  const sig=[p.id,p.teamId,p.status,h.role,h.scheme,h.current,h.upside,h.confidence,p.healthLabel,p.seasonProduction,p.developmentNote,p.roles.join('|')].join('::');if(sig===lastSig&&document.querySelector('#playerIdentityHero'))return;lastSig=sig;
  dialog.classList.add('player-identity-enhanced');dialog.dataset.playerIdentity=String(p.id);dialog.dataset.playerNumber=String(p.jerseyNumber??0);if(globalThis.DynastyProgramBranding?.applyVars&&p.teamId)globalThis.DynastyProgramBranding.applyVars(dialog,p.teamId);
  let root=document.querySelector('#playerIdentityHero');if(!root){root=document.createElement('section');root.id='playerIdentityHero';root.className='player-identity-hero';document.querySelector('#playerDialogBody')?.insertAdjacentElement('beforebegin',root)}if(!root)return;

@@ -1,0 +1,90 @@
+'use strict';
+const assert=require('node:assert/strict');
+const path=require('node:path');
+const {chromium}=require('playwright-core');
+const {chromiumPath}=require('./helpers/chromium-path');
+const {startNewDynasty}=require('./helpers/start-new-dynasty');
+(async()=>{
+ const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});
+ const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'}),errors=[];
+ page.on('pageerror',e=>errors.push(String(e)));
+ page.on('console',message=>{if(message.type()==='error')errors.push(message.text())});
+ try{
+  await page.goto('file://'+path.join(__dirname,'..','index.html'));
+  await startNewDynasty(page);
+  await page.evaluate(()=>{document.querySelector('.tabs [data-tab="recruiting"]').click();window.scrollTo(0,0)});
+  try{await page.waitForSelector('.recruit-workspace-card')}catch(error){
+   console.error('Initial recruiting phone diagnostic:',JSON.stringify({errors,state:await page.evaluate(()=>{
+    const describe=node=>{if(!node)return null;const style=getComputedStyle(node),rect=node.getBoundingClientRect();return{tag:node.tagName,id:node.id,classes:node.className,hidden:node.hidden,dataset:{...node.dataset},display:style.display,visibility:style.visibility,opacity:style.opacity,rect:{x:rect.x,y:rect.y,width:rect.width,height:rect.height},rects:node.getClientRects().length}};
+    const first=document.querySelector('.recruit-workspace-card'),ancestors=[];for(let node=first;node&&ancestors.length<10;node=node.parentElement)ancestors.push(describe(node));
+    return{viewport:{width:innerWidth,height:innerHeight,scrollY,visibility:document.visibilityState},workspace:window.DynastyRecruitingWorkspaceView?.read?.(),classView:window.DynastyRecruitingClasses?.current?.(),filters:window.DynastyLabRecruitingFilters?.getState?.(),save:window.DynastySessionStatus?.read?.(),setup:window.__DL_TEST__?.setupDebug?.(),world:window.__DL_TEST__?.preseasonDebug?.(),activeTabs:[...document.querySelectorAll('.tabs button.active')].map(node=>node.dataset.tab),activePanels:[...document.querySelectorAll('.tab.active')].map(node=>node.id),counts:{cards:document.querySelectorAll('.recruit-workspace-card').length,rows:document.querySelectorAll('#recruitBody tr').length,targets:document.querySelectorAll('#recruitBody tr.target').length},hosts:Object.fromEntries(['#app','#recruiting','#recruitWorkspace','.recruit-workspace-list','.recruit-workspace-dossier','#rwSwitch','#recruitClassViews'].map(selector=>[selector,describe(document.querySelector(selector))])),ancestors,pool:{...document.querySelector('[data-recruit-pool]')?.dataset},listText:document.querySelector('.rw-card-list')?.textContent?.slice(0,700),status:document.querySelector('#saveStatus')?.textContent};
+   })}));throw error;
+  }
+  const screenshotDir=process.env.DYNASTY_RECRUIT_SCREENSHOT_DIR;
+  if(screenshotDir){require('node:fs').mkdirSync(screenshotDir,{recursive:true});await page.screenshot({path:path.join(screenshotDir,'recruiting-phone-list.png')})}
+  const first=await page.locator('.recruit-workspace-card .rw-main strong').first().boundingBox();
+  if(screenshotDir)require('node:fs').writeFileSync(path.join(screenshotDir,'layout.json'),JSON.stringify({viewport:{width:390,height:844},firstProspectNameTop:first?.y},null,2)+'\n');
+  assert.ok(first&&first.y>=0&&first.y<600,`first prospect name should be above y=600, got ${first?.y}`);
+  assert.equal(await page.locator('#rwFilters').evaluate(e=>e.open),false,'extra filters start folded');
+  await page.locator('#rwFilters > summary').focus();await page.keyboard.press('Enter');
+  const pos=(await page.locator('#recruitBody td[data-label="Pos"]').first().innerText()).trim();
+  await page.locator('[data-recruit-filter="pos"]').focus();
+  await page.selectOption('[data-recruit-filter="pos"]',pos);
+  await page.waitForFunction(pos=>[...document.querySelectorAll('#recruitBody td[data-label="Pos"]')].every(e=>e.textContent.trim()===pos),pos);
+  assert.equal(await page.locator('[data-recruit-filter="pos"]').evaluate(e=>e===document.activeElement),true,'filter updates preserve keyboard focus');
+  assert.equal(await page.locator('#rwFilters').evaluate(e=>e.open),true,'filter refresh preserves the open disclosure');
+  await page.click('[data-recruit-filter-reset]');
+  await page.waitForFunction(()=>document.querySelector('[data-recruit-filter="pos"]').value==='ALL');
+  await page.click('#rwFilters > summary');
+  await page.click('[data-rw-more]');
+  assert.equal(await page.locator('.recruit-workspace-card').count(),60);
+  const card=page.locator('.recruit-workspace-card').nth(40),id=await card.getAttribute('data-rwid');
+  await card.scrollIntoViewIfNeeded();
+  await card.focus();
+  const before=await page.evaluate(()=>({list:document.querySelector('.rw-card-list').scrollTop,page:window.scrollY,week:window.__DL_TEST__.preseasonDebug().week}));
+  await page.keyboard.press('Enter');
+  assert.equal(await page.locator('.recruit-workspace-list').isVisible(),false,'phone dossier replaces the list');
+  assert.equal(await page.locator('.recruit-workspace-dossier').isVisible(),true);
+  assert.equal(await page.locator('[data-rw-back]').isVisible(),true);
+  if(screenshotDir)await page.screenshot({path:path.join(screenshotDir,'recruiting-phone-dossier.png')});
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'no phone dossier overflow');
+  await page.click('[data-rwa="quick"]');
+  await page.waitForFunction(()=>/Film reviewed/.test(document.querySelector('.recruit-workspace-dossier').textContent));
+  assert.equal(await page.locator('.recruit-workspace-card.active').getAttribute('data-rwid'),id);
+  assert.equal(await page.locator('.recruit-workspace-list').isVisible(),false,'scouting stays in the phone dossier');
+  await page.click('[data-rw-back]');
+  assert.equal(await page.locator('.recruit-workspace-list').isVisible(),true);
+  assert.equal(await page.locator('.recruit-workspace-card').count(),60,'Back keeps loaded cards');
+  const after=await page.evaluate(()=>({list:document.querySelector('.rw-card-list').scrollTop,page:window.scrollY,week:window.__DL_TEST__.preseasonDebug().week,focus:document.activeElement.dataset.rwid}));
+  assert.ok(Math.abs(after.list-before.list)<3,'Back restores the list scroll');
+  assert.ok(Math.abs(after.page-before.page)<3,'Back restores page scroll');
+  assert.equal(after.focus,id,'Back restores keyboard focus to the selected prospect');
+  assert.equal(after.week,before.week,'review and scouting do not advance time');
+  // Removing an open prospect from My Board must not focus another prospect's Remove action.
+  await page.locator('.recruit-workspace-card').first().click();await page.click('[data-rwa="target"]');await page.click('[data-rw-back]');
+  await page.locator('.recruit-workspace-card').nth(1).click();await page.click('[data-rwa="target"]');await page.click('[data-rw-back]');
+  await page.click('[data-rwf="board"]');await page.waitForSelector('.recruit-workspace-card');
+  await page.locator('.recruit-workspace-card').first().click();await page.click('[data-rwa="target"]');
+  await page.waitForFunction(()=>document.querySelector('.recruit-workspace-list').getClientRects().length>0);
+  assert.equal(await page.locator('#rwSearch').evaluate(e=>e===document.activeElement),true,'removal returns focus to a safe list control');
+  assert.equal(await page.locator('.recruit-workspace-dossier').isVisible(),false);
+  await page.click('[data-rwf="all"]');
+  await page.locator('.recruit-workspace-card').first().click();
+  await page.setViewportSize({width:1440,height:1000});
+  await page.waitForFunction(()=>document.activeElement?.matches('.recruit-workspace-card.active'));
+  await page.setViewportSize({width:390,height:844});
+  await page.waitForFunction(()=>document.activeElement?.matches('[data-rw-back]'));
+  await page.click('[data-rw-back]');
+  await page.fill('#rwSearch','__no_matching_prospect__');
+  await page.waitForFunction(()=>document.querySelectorAll('.recruit-workspace-card').length===0);
+  assert.equal(await page.locator('.recruit-workspace-dossier').isVisible(),false,'empty phone results do not leave a stale dossier');
+  await page.fill('#rwSearch','');await page.waitForSelector('.recruit-workspace-card');
+  await page.setViewportSize({width:1440,height:1000});
+  assert.equal(await page.locator('.recruit-workspace-list').isVisible(),true);
+  assert.equal(await page.locator('.recruit-workspace-dossier').isVisible(),true,'desktop keeps the side-by-side dossier');
+  assert.equal(await page.locator('[data-rw-back]').isVisible(),false);
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+  assert.deepEqual(errors,[]);
+  console.log('PASS compact filters, first phone prospect, dedicated dossier, real scouting, Back scroll/focus, empty results and desktop layout');
+ }finally{await browser.close()}
+})().catch(e=>{console.error(e);process.exit(1)});

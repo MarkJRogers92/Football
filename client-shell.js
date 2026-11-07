@@ -1,13 +1,13 @@
 (function(){
   'use strict';
 
-  const TAB_GROUP={dashboard:'program',program:'program',history:'program',roster:'team',depth:'team',development:'team',recruiting:'recruiting',gamelab:'games',season:'games',stats:'games',newsletter:'games',staff:'staff',offseason:'staff',records:'staff'};
+  const TAB_GROUP={dashboard:'home',newsletter:'home',program:'program',roster:'program',depth:'program',development:'program',staff:'program',offseason:'program',recruiting:'recruiting',gamelab:'season',season:'season',stats:'season',history:'world',records:'world',legacy:'world'};
   const NAV=[
-    {label:'Home',items:[['dashboard','Command Center'],['newsletter','News / Inbox']]},
-    {label:'Program',items:[['program','Program Overview'],['roster','Roster'],['depth','Roles & Depth'],['development','Development'],['staff','Staff'],['offseason','Offseason']]},
+    {label:'Home',items:[['dashboard','This Week'],['newsletter','News']]},
+    {label:'Program',items:[['program','Overview'],['roster','Roster'],['depth','Roles & Depth'],['development','Player Development'],['staff','Staff'],['offseason','Offseason']]},
     {label:'Recruiting',items:[['recruiting','Recruiting Board']]},
-    {label:'Season',items:[['gamelab','Game Lab'],['season','Schedule'],['stats','Stats & Rankings']]},
-    {label:'World',items:[['history','History'],['records','Awards & Records']]}
+    {label:'Season',items:[['gamelab','Game Day'],['season','Schedule'],['stats','Stats']]},
+    {label:'World',items:[['history','History'],['records','Awards & Records'],['legacy','Legacy']]}
   ];
 
   // Outline icons (16x16, stroke = currentColor) so the nav can be scanned, not just read.
@@ -26,6 +26,7 @@
     stats:'<path d="M3.5 13V8.5M7.5 13V4M11.5 13V6.5M2 13.5h12"/>',
     history:'<circle cx="8" cy="8" r="5.5"/><path d="M8 4.8V8l2.2 1.4"/>',
     records:'<path d="M5 2.5h6v3.5a3 3 0 0 1-6 0zM5 4H2.5c0 2 1 3 2.5 3M11 4h2.5c0 2-1 3-2.5 3M8 9v2.5M5.5 13.5h5"/>',
+    legacy:'<path d="M8 2l1.8 3.7 4 .6-2.9 2.8.7 4L8 11.2 4.4 13.1l.7-4L2.2 6.3l4-.6z"/>',
     more:'<circle cx="3.5" cy="8" r="1"/><circle cx="8" cy="8" r="1"/><circle cx="12.5" cy="8" r="1"/>'
   };
   const navIcon=tab=>NAV_ICONS[tab]?`<svg class="client-nav-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">${NAV_ICONS[tab]}</svg>`:'';
@@ -78,18 +79,20 @@
   const mobile=document.createElement('nav');
   mobile.className='client-mobile-nav';
   mobile.setAttribute('aria-label','Quick navigation');
-  mobile.innerHTML=`${navButton('dashboard','Home','client-mobile-item')}${navButton('roster','Program','client-mobile-item')}${navButton('recruiting','Recruit','client-mobile-item')}${navButton('gamelab','Season','client-mobile-item')}<button type="button" class="client-mobile-item" data-client-more>${navIcon('more')}<span>More</span></button>`;
+  mobile.innerHTML=`${navButton('dashboard','Home','client-mobile-item')}${navButton('program','Program','client-mobile-item')}${navButton('recruiting','Recruit','client-mobile-item')}${navButton('gamelab','Season','client-mobile-item')}<button type="button" class="client-mobile-item" data-client-more>${navIcon('more')}<span>More</span></button>`;
   app.appendChild(mobile);
 
   function currentTab(){return app.querySelector('.tabs button.active[data-tab]')?.dataset.tab||'dashboard'}
 
   function go(tab){
+    const changed=currentTab()!==tab;
     const groupId=TAB_GROUP[tab];
     const group=groupId&&app.querySelector(`.tab-groups button[data-group="${groupId}"]`);
     if(group&&!group.classList.contains('active'))group.click();
     const target=app.querySelector(`.tabs button[data-tab="${tab}"]`);
     if(target)target.click();
     closeRail();
+    if(changed)window.scrollTo?.({top:0,left:0,behavior:'instant'});
     setTimeout(sync,0);
   }
 

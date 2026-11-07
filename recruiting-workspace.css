@@ -10,3 +10,55 @@
 .rw-more:hover{background:rgba(143,177,255,.16)}
 .rw-list-head strong{white-space:nowrap}
 .rw-list-head small{flex:1 1 180px;text-align:right}
+
+/* Compact preparation controls and a dedicated prospect view on phones. */
+#recruiting.active>#rwFilters{order:2}
+.rw-extra-filters{margin:0 0 10px;border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.rw-extra-filters>summary{cursor:pointer;font-size:12px;font-weight:750;color:var(--muted);padding:4px 0}
+.rw-extra-filters[hidden]{display:none!important}
+.rw-extra-filters .recruiting-filter-strip{margin:8px 0 0;border:0;padding:4px 0;background:none}
+.rw-back{display:none;scroll-margin-top:160px}
+@media(max-width:700px){
+ #recruiting.rw-mode>.section-head .muted{display:none}
+ #recruiting.rw-mode>.section-head{margin-bottom:8px;gap:8px}
+ .recruit-workspace-switcher{padding:7px;margin-bottom:8px}
+ .recruit-workspace-switcher>div:first-child{display:none}
+ .recruit-workspace-nav{padding:9px;gap:8px}
+ .recruit-workspace-nav>.eyebrow,.recruit-workspace-nav>strong{display:none}
+ .rw-filter-stack{gap:5px}
+ .rw-filter-stack button{padding:6px 5px;font-size:11px}
+ .rw-filter-stack button b{font-size:10px}
+ .rw-list-head{padding:10px}
+ .recruit-workspace[data-phone-view="list"]>.recruit-workspace-dossier{display:none}
+ .recruit-workspace[data-phone-view="dossier"]>.recruit-workspace-nav,.recruit-workspace[data-phone-view="dossier"]>.recruit-workspace-list{display:none}
+ #recruiting.rw-phone-dossier>#rwFilters{display:none}
+ .rw-back{display:block;justify-self:start;min-height:42px}
+}
+.recruit-workspace-nav input[type="search"]{min-width:0;width:100%;min-height:40px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel2);color:var(--text);font:inherit;font-size:13px}
+.recruit-workspace-nav input[type="search"]:focus-visible,.rw-extra-filters>summary:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
+
+.recruit-class-views{display:flex;gap:6px;margin:0 0 8px;min-width:0;max-width:100%;overflow-x:auto;scrollbar-width:thin}
+.recruit-class-views button{flex:0 0 auto;min-height:38px;padding:7px 10px;font-size:12px;white-space:nowrap}
+#recruitClassViews button[aria-pressed="true"]{background:var(--accent2);color:#09121c}
+#recruiting.active>#recruitClassViews{order:1}
+#recruiting.active>#recruitingNeeds{order:2}
+#recruiting[data-recruit-class-view="current"]>[data-recruit-class-panel]:not([data-recruit-class-panel="current"]),
+#recruiting[data-recruit-class-view="rising"]>[data-recruit-class-panel]:not([data-recruit-class-panel="rising"]),
+#recruiting[data-recruit-class-view="outlook"]>[data-recruit-class-panel]:not([data-recruit-class-panel="outlook"]),
+#recruiting[data-recruit-class-view="map"]>[data-recruit-class-panel]:not([data-recruit-class-panel="map"]),
+#recruiting[data-recruit-class-view="shortlist"]>[data-recruit-class-panel]:not([data-recruit-class-panel="shortlist"]),
+#recruiting[data-recruit-class-view="summary"]>[data-recruit-class-panel]:not([data-recruit-class-panel="summary"]),
+#recruiting[data-recruit-class-view="history"]>[data-recruit-class-panel]:not([data-recruit-class-panel="history"]){display:none!important}
+#recruiting[data-recruit-class-view]:not([data-recruit-class-view="current"]) #autoTarget{display:none}
+#recruitingNeedsRows{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px}
+.roster-outlook-position{border:1px solid var(--line);border-radius:10px;padding:12px;min-width:0}
+.roster-outlook-title{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.roster-outlook-title h4{margin:0}.roster-outlook-title>strong{font-size:12px;color:var(--muted)}
+.roster-outlook-position dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0}
+.roster-outlook-position dt{font-size:10px;color:var(--muted)}.roster-outlook-position dd{margin:3px 0 0;font-size:16px;font-weight:750}
+.roster-outlook-actions{display:flex;gap:6px;flex-wrap:wrap}.roster-outlook-actions button{font-size:11px;flex:1}
+
+#recruitingNeeds .roster-outlook-note{font-size:12px;font-weight:400;line-height:1.5;letter-spacing:normal;text-transform:none;color:var(--muted)}
+
+.rw-budget{align-self:center;flex-shrink:0;font-size:11px;color:var(--accent2);font-weight:700;white-space:nowrap}
+@media(max-width:700px){.recruit-mode-buttons button{min-width:0}.recruit-class-views button{font-size:11px}.rw-budget{font-size:10px}}
