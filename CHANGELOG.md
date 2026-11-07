@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.14.4 — Long-save fixes and the full season story
+
+Unpublished candidate. Fixes the defects confirmed by the 30-season long-save soak and makes the
+postseason and offseason read as part of the season. No balance, difficulty or archive-retention
+changes.
+
+- **Reloading is now deterministic (soak D1).** Lazy academic defaults no longer draw from the gameplay random stream when a save loads, so a reloaded session produces the same results as one that never stopped.
+- **Desktop saves stop leaking disk (soak D2).** Archive chunk generations that neither the current save nor a retained backup reference are removed after each save. At season 20 this was 65% of game-chunk bytes (113 MB). Existing orphans are cleaned on the next save; backups keep everything they need.
+- **Honest size message (soak D3).** A desktop save past 256 MB now says it is too large and that the previous save is safe, instead of calling valid data "not valid JSON".
+- **Faster late dynasties (soak P1).** Duplicate-story checks use an incremental index instead of scanning the whole event log for every player in every game and every graduate.
+- **Flaky recruiting search test (soak H1)** asserts the pool's real match count instead of a five-row cap that about 6% of dynasties exceed.
+- **Postseason on the Season card.** Last result and streak include title games, bowls and playoff rounds, and the card says what comes next (championship weekend, bowl season, playoff, season complete, national champions) instead of "No remaining regular-season game".
+- **Week strip continues past Week 12** with CCG, BOWL, R16, QF, SF and TITLE chips; a won title is gold. On phones the strip centres the next game, or the latest result once the regular season is over.
+- **Postseason finals are announced.** Your conference title game, bowl and playoff results reach the ticker, toast and win/loss sting ("National champions!").
+- **The status bar names the stage**: Conference championships, Bowl season, Playoff, Season complete and Offseason replace "Week 12" after the regular season. The rank arrow resets at a new season instead of comparing the preseason poll with last year's final poll.
+- **History.** The tracked record counts a finished season before the offseason review instead of reading 0–0 beside it, and a new **Dynasty Arc** charts every archived season's win share with titles and top-10 finishes.
+- **Transfer portal paging.** The portal table shows 40 players at a time (targets and your commitments always visible) with a Show more row.
+
 ## v0.14.3 — One More Saturday
 
 - Fresh save scopes open All Recruits so an empty target board cannot hide the prospect pool; matching saved My Board preferences still restore.
