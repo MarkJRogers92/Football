@@ -10,7 +10,7 @@ const start=page=>sharedStartNewDynasty(page);
   const page=await browser.newPage({viewport,reducedMotion:'no-preference'}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));const check=(name,ok,detail='')=>{ok?pass++:fail++;console.log(`${ok?'PASS':'FAIL'} [${label}] ${name}${detail?` — ${detail}`:''}`)};
   await page.goto('file://'+path.join(__dirname,'..','index.html'));await start(page);
   check('motion system identifies full-motion preference',await page.evaluate(()=>document.documentElement.dataset.dlMotion==='full'));
-  const animation=await page.evaluate(()=>{const p=document.createElement('div');p.className='dl-motion-surface';document.body.append(p);const v=getComputedStyle(p).animationName;p.remove();return v});check('surface motion CSS is active when motion is allowed',animation.includes('dl-surface-in'),animation);
+  const animation=await page.evaluate(()=>{const p=document.createElement('div');p.className='dl-motion-surface';document.body.append(p);const v=getComputedStyle(p).animationName;p.remove();return v});check('routine navigation stays still even when motion is allowed',animation==='none',animation);
 
   await goTab(page,'recruiting','recruiting');await page.waitForSelector('#recruitWorkspace',{state:'visible',timeout:10000});
   const allButton=page.locator('#recruitWorkspace [data-rwf="all"]');if(await allButton.count())await allButton.click();await page.waitForFunction(()=>document.querySelectorAll('.recruit-workspace-card').length>1,{timeout:10000});

@@ -88,7 +88,7 @@ function paint(){
  }
  // Keep detailed coverage available inside the existing optional briefing, below the short summary.
  const detail=document.getElementById('weeklyDeskDetails');
- if(detail)for(const id of ['rivalWatch','highlightsCard']){const card=document.getElementById(id);if(card&&card.parentElement!==detail)detail.append(card)}
+ if(detail)for(const id of ['rivalWatch']){const card=document.getElementById(id);if(card&&card.parentElement!==detail)detail.append(card)}
  decorate(snap);
 }
 function queue(){if(queued)return;queued=true;setTimeout(paint,90)}

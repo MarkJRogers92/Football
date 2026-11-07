@@ -25,7 +25,12 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
  if(!hidden)throw new Error('expected a punter outside the default 220 rows');
  await page.click('[data-recruit-filter-reset]');await page.waitForFunction(()=>document.querySelector('[data-recruit-filter="pos"]')?.value==='ALL');
  await page.fill('[data-recruit-filter="query"]',hidden);await page.press('[data-recruit-filter="query"]','Enter');
- await page.waitForFunction(n=>{const a=[...document.querySelectorAll('#recruitBody tr [data-recruit]')];return a.length>=1&&a.length<=5&&a.some(x=>x.textContent.trim()===n)},hidden);
+ try{
+  await page.waitForFunction(n=>{const a=[...document.querySelectorAll('#recruitBody tr [data-recruit]')];return a.length>=1&&a.length<=5&&a.some(x=>x.textContent.trim()===n)},hidden);
+ }catch(error){
+  console.error('Full-pool search diagnostic',JSON.stringify({hidden,errors,state:await page.evaluate(()=>({filters:window.DynastyLabRecruitingFilters?.getState(),query:document.querySelector('[data-recruit-filter="query"]')?.value,pool:document.querySelector('[data-recruit-pool]')?.dataset,names:[...document.querySelectorAll('#recruitBody tr [data-recruit]')].map(a=>a.textContent.trim())}))}));
+  throw error;
+ }
  await page.click('[data-recruit-filter-reset]');await page.waitForFunction(()=>document.querySelector('[data-recruit-filter="query"]')?.value==='');
  await page.selectOption('[data-recruit-filter="state"]',{index:1});
  await page.waitForFunction(t=>{const m=Number(document.querySelector('[data-recruit-pool]')?.getAttribute('data-matching'));return m>0&&m<t},poolTotal);

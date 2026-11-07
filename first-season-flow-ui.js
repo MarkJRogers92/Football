@@ -181,7 +181,7 @@ function renderPrepPath(state){
   if(!state.prepPath?.hasGame){host.hidden=true;return}
   host.hidden=false;
   const stages=state.prepPath.stages.map((stage,index)=>`<button type="button" class="first-season-stage first-season-stage-${esc(stage.status)}" data-flow-stage="${esc(stage.key)}"><span class="first-season-stage-index">${index+1}</span><span><strong>${esc(stage.label)}</strong><small>${esc(stage.status)}</small></span></button>`).join('');
-  host.innerHTML=`<div class="section-head"><div><div class="eyebrow">GAME WEEK PATH</div><h3>${esc(state.opponent?`Prepare for ${state.opponent}`:'Prepare for Game Day')}</h3><div class="muted">A route through existing coaching tools—not a second set of decisions.</div></div></div><div class="first-season-stage-list">${stages}</div>`;
+  host.innerHTML=`<div class="section-head"><div><div class="eyebrow">GAME WEEK PATH</div><h3>${esc(state.opponent?`Prepare for ${state.opponent}`:'Prepare for Game Day')}</h3><div class="muted">Review the matchup, adjust your plan, then kick off.</div></div></div><div class="first-season-stage-list">${stages}</div>`;
   host.querySelectorAll('[data-flow-stage]').forEach(button=>button.addEventListener('click',()=>openStage(button.dataset.flowStage)))
 }
 

@@ -55,7 +55,7 @@ async function resolveWeeklyDecisions(page){
     for(const side of ['home','away'])assert.equal(after.lastArchive.drivePoints[side]+after.lastArchive.scoreAdjustment[side],after.lastArchive.score[side],`${side} Watch Mode scoring should reconcile to the final`);
     assert.equal(after.lastDetailed.engine,'v2','last detailed game should identify v2');
     await goTab(page,'gamelab');
-    assert.equal((await page.locator('#clientRail [data-client-tab="gamelab"]').innerText()).trim(),'Game Lab','season navigation should name the workspace it actually opens');
+    assert.equal((await page.locator('#clientRail [data-client-tab="gamelab"]').innerText()).trim(),'Game Day','season navigation should name the workspace it actually opens');
     const heroBox=page.locator(`#gamedayEventHero [data-game="${after.lastArchive.id}"][data-game-tab="Box Score"]`);await heroBox.waitFor({state:'visible'});
     assert.equal((await heroBox.innerText()).trim(),'View Box Score','postgame hero should promote the box score');
     const order=await page.evaluate(()=>{const hero=document.querySelector('#gamedayEventHero'),quick=document.querySelector('#detailedBox')?.closest('.two-col'),receipt=document.querySelector('#v2PlanReceipt');return{heroBeforeQuick:!!(hero.compareDocumentPosition(quick)&Node.DOCUMENT_POSITION_FOLLOWING),quickBeforeReceipt:!!(quick.compareDocumentPosition(receipt)&Node.DOCUMENT_POSITION_FOLLOWING)}});

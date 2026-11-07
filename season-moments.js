@@ -8,11 +8,26 @@
 'use strict';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const helmet=(id,cls)=>globalThis.DynastyBrandVisuals?.helmetHTML?.(id,cls)||'';
-function highlightsHTML(h){
+function performerHTML(p,label){
+ return`<button type="button" class="hl-star" data-player="${esc(p.id)}" data-hl-focus="player:${esc(p.id)}">${p.face?`<canvas class="portrait portrait-list" width="44" height="44" data-portrait="${esc(p.id)}" data-portrait-size="44" data-portrait-frame="list" data-portrait-kind="player" aria-hidden="true"></canvas>`:''}<span><small>${label}</small><b>${esc(p.name)}</b><em>${esc([p.pos,p.line].filter(Boolean).join(' · '))}</em></span></button>`;
+}
+function saveStatusHTML(status,context){
+ const labels={pending:'Save queued',saving:'Saving',saved:'Saved',unsaved:'Not saved',failed:'Save failed'};
+ if(!status||!context||!labels[status.state]||context.slot==null)return'';
+ if(['slot','year','week','programId','world'].some(k=>status[k]==null||String(status[k])!==String(context[k])))return'';
+ return`<p class="hl-save" data-save-state="${status.state}" role="status"><b>${labels[status.state]}</b>${status.message?` · ${esc(status.message)}`:''}</p>`;
+}
+function highlightsHTML(h,rhythm,status){
  if(!h)return'';
- return`<section id="highlightsCard" class="card highlights ${h.won?'is-win':'is-loss'}" aria-label="Last game"><div class="hl-head"><div><span class="eyebrow">LAST GAME · WEEK ${esc(h.week??'')}</span><strong>${h.won?'W':'L'} ${esc(h.us)}–${esc(h.them)} <small>vs ${esc(h.opponent)}</small></strong></div><div class="hl-actions">${h.hasReplay?'<button type="button" class="bi-primary" data-hl-watch>Watch highlights</button>':''}<button type="button" data-hl-box>Box score</button></div></div>`+
-  ((h.performers||[]).length?`<div class="hl-stars">${h.performers.map((p,i)=>`<button type="button" class="hl-star" data-player="${esc(p.id)}">${p.face?`<canvas class="portrait portrait-list" width="44" height="44" data-portrait="${esc(p.id)}" data-portrait-size="44" data-portrait-frame="list" data-portrait-kind="player" aria-hidden="true"></canvas>`:''}<span><small>${i===0?'Player of the game':'Top performer'}</small><b>${esc(p.name)}</b><em>${esc(p.pos)} · ${esc(p.line)}</em></span></button>`).join('')}</div>`:'')+
-  (h.plays.length?`<ol class="hl-plays">${h.plays.map(p=>`<li class="${p.ours?'is-ours':'is-theirs'}"><span>${esc(p.clock)}</span>${esc(p.text)}</li>`).join('')}</ol>`:'')+`</section>`;
+ const outcome=h?.outcome||(h?.won?'W':h?'L':null),performers=h?.performers||[],plays=h?.plays||[];
+ const result=h?`<div class="hl-head"><div><span class="eyebrow">LAST FINAL · ${esc(h.label&&h.label!=='Regular season'?h.label:`WEEK ${h.week??''}`)}</span><strong>${outcome} ${esc(h.us)}–${esc(h.them)} <small>vs ${esc(h.opponent)}</small></strong></div><div class="hl-actions">${h.gameId&&h.hasBoxScore!==false?'<button type="button" data-hl-box data-hl-focus="box">Box score</button>':''}</div></div>`:'';
+ const payoff=h?`<div class="hl-payoff">${performers[0]?performerHTML(performers[0],'Top performer'):'<p class="hl-missing">Individual game statistics unavailable here.</p>'}${h.consequence?`<p class="hl-consequence"><small>What changed</small><b>${esc(h.consequence)}</b></p>`:''}</div>`:'';
+ const next=rhythm?.next,note=next?`Next opponent: ${next.home===false?'at':'vs'} ${next.opponent} · ${next.label==='Regular season'?`Week ${next.week}`:next.label}`:rhythm?.phase==='complete'?'No further games this season.':rhythm?'Next opponent not set yet.':'';
+ const choices=rhythm?.careerChoice?'Coaching post choice pending.':rhythm?.requiredChoices?`${rhythm.requiredChoices} required choice${rhythm.requiredChoices===1?'':'s'} in This Week.`:'No required weekly choices.';
+ const weekly=rhythm?`<div class="hl-week"><p class="hl-next">${rhythm.bye?`Week ${esc(rhythm.week)} is a bye. `:''}${esc(note)}</p><p class="hl-choices">${esc(choices)}</p></div>`:'';
+ const more=h&&(performers.length>1||plays.length||h.hasReplay)?`<details class="hl-more"><summary data-hl-focus="more">More from this game</summary>${performers.length>1?`<div class="hl-stars">${performers.slice(1).map(p=>performerHTML(p,'Contributor')).join('')}</div>`:''}${plays.length?`<ol class="hl-plays">${plays.map(p=>`<li class="${p.ours?'is-ours':'is-theirs'}"><span>${esc(p.clock)}</span>${esc(p.text)}</li>`).join('')}</ol>`:''}${h.hasReplay?'<div class="hl-actions"><button type="button" data-hl-watch data-hl-focus="watch">Watch highlights</button></div>':''}</details>`:'';
+ const stop=rhythm?.stop?`<p class="hl-stop">${esc(rhythm.stop)}</p>`:'';
+ return`<section id="highlightsCard" data-hl-game="${esc(h?.gameId||'')}" class="card highlights${outcome?` is-${outcome==='W'?'win':outcome==='L'?'loss':'tie'}`:''}" aria-label="Weekly rhythm and game result">${result}${payoff}${weekly}${stop}${saveStatusHTML(status,rhythm?.context)}${more}</section>`;
 }
 function yearbookHTML(y){
  const t=y.team,headline=y.champ?'National Champions':y.confChamp?`${esc(t.conference)} Champions`:y.bowl?.won?`${esc(y.bowl.label)} Champions`:`${t.w}-${t.l}`;
@@ -36,13 +51,17 @@ function openYearbook(){
 let sig='',queued=false;
 function paint(){
  queued=false;const dash=document.querySelector('#dashboard');if(!dash)return;const api=globalThis.DynastySeasonMoments;if(!api)return;
- const h=api.highlights(),rw=api.rivalryWeek(),yb=api.yearbook();
- const next=JSON.stringify([h,rw,yb?.done]);if(next===sig)return;sig=next;
- // Highlights card sits with the week's work, after the matchup and rival cards.
- let host=dash.querySelector('#highlightsCard');const html=highlightsHTML(h);
- if(!html)host?.remove();else if(host)host.outerHTML=html;else{const anchor=dash.querySelector('#rivalWatch')||dash.querySelector('#broadcastFeature')||dash.querySelector('.command-center');anchor?anchor.insertAdjacentHTML('afterend',html):dash.insertAdjacentHTML('beforeend',html)}
+ const h=api.highlights(),rhythm=api.weeklyRhythm?.(),rw=api.rivalryWeek(),yb=api.yearbook(),status=globalThis.DynastySessionStatus?.read?.();
+ let host=dash.querySelector('#highlightsCard');
+ const next=JSON.stringify([h,rhythm,status,rw,yb?.done]);if(next===sig&&host)return;sig=next;
+ // Keep the compact payoff visible beside the desk; Rival Watch may be in closed details.
+ const sameGame=host?.dataset.hlGame===String(h?.gameId||''),expanded=sameGame&&!!host?.querySelector('.hl-more')?.open,focused=sameGame&&host?.contains(document.activeElement)?document.activeElement?.getAttribute('data-hl-focus'):null;
+ const html=highlightsHTML(h,rhythm,status);
+ if(!html)host?.remove();else if(host)host.outerHTML=html;else{const anchor=dash.querySelector(':scope > #broadcastFeature')||dash.querySelector(':scope > .command-center');anchor?anchor.insertAdjacentHTML('afterend',html):dash.insertAdjacentHTML('beforeend',html)}
  host=dash.querySelector('#highlightsCard');
  if(host){host.dataset.dview='week';
+  if(expanded&&host.querySelector('.hl-more'))host.querySelector('.hl-more').open=true;
+  if(focused)[...host.querySelectorAll('[data-hl-focus]')].find(el=>el.getAttribute('data-hl-focus')===focused)?.focus({preventScroll:true});
   if(yb?.done&&!host.querySelector('[data-yearbook]'))host.querySelector('.hl-actions')?.insertAdjacentHTML('beforeend','<button type="button" data-yearbook>Season yearbook</button>');
   host.querySelector('[data-hl-watch]')?.addEventListener('click',()=>{globalThis.DynastyLabOpenGame?.(h.gameId,'Watch');setTimeout(()=>{const sel=document.querySelector('#gameDialog [data-gcf-speed]');if(sel){sel.value='key';sel.dispatchEvent(new Event('change',{bubbles:true}))}},350)});
   host.querySelector('[data-hl-box]')?.addEventListener('click',()=>globalThis.DynastyLabOpenGame?.(h.gameId,'Box Score'));
@@ -59,7 +78,7 @@ function mount(){
  if(typeof document==='undefined')return;
  const start=()=>{for(const sel of ['#recordBig','#weekLine','#teamName','#saveStatus'])document.querySelectorAll(sel).forEach(el=>new MutationObserver(queue).observe(el,{childList:true,subtree:true,characterData:true}));
   const dash=document.querySelector('#dashboard');if(dash)new MutationObserver(rs=>{if(rs.some(r=>[...r.addedNodes].some(n=>n.id==='rivalWatch')))sig='',queue()}).observe(dash,{childList:true});
-  document.addEventListener('click',e=>{if(e.target.closest('[data-tab="dashboard"],[data-client-tab="dashboard"]'))queue()});queue()};
+  document.addEventListener('click',e=>{if(e.target.closest('[data-tab="dashboard"],[data-client-tab="dashboard"]'))queue()});globalThis.addEventListener?.('dynasty:save-status',queue);queue()};
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 }
 return{highlightsHTML,yearbookHTML,openYearbook,mount};

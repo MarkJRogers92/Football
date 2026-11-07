@@ -106,7 +106,7 @@
     <button data-group="world">World</button>
   </nav>
   <nav class="tabs">
-    <button data-tab="dashboard" class="active">Command Center</button>
+    <button data-tab="dashboard" class="active">This Week</button>
     <button data-tab="newsletter">News</button>
     <button data-tab="program" hidden>Overview</button>
     <button data-tab="roster" hidden>Roster</button>
@@ -115,7 +115,7 @@
     <button data-tab="staff" hidden>Staff</button>
     <button data-tab="offseason" hidden>Offseason</button>
     <button data-tab="recruiting" hidden>Recruiting</button>
-    <button data-tab="gamelab" hidden>Game Lab</button>
+    <button data-tab="gamelab" hidden>Game Day</button>
     <button data-tab="season" hidden>Schedule</button>
     <button data-tab="stats" hidden>Stats</button>
     <button data-tab="history" hidden>History</button>
@@ -142,7 +142,7 @@
           <div id="weekLine" class="muted">2027 · Week 0</div>
         </div>
         <details id="programDetails" class="desk-details program-details">
-          <summary>Program ratings &amp; simulation options</summary>
+          <summary>Program ratings &amp; season controls</summary>
           <div class="metric-grid" id="teamMetrics"></div>
           <div class="masthead-actions button-row">
             <button id="simWeek">Sim Week</button>
@@ -152,13 +152,13 @@
         </details>
       </div>
       <div class="card command-center">
-        <div class="section-head"><div><div class="eyebrow">WEEKLY COMMAND CENTER</div><h2 id="hubTitle">Preseason Briefing</h2></div><button id="hubAdvance">Advance Week</button></div>
+        <div class="section-head"><div><div class="eyebrow">THIS WEEK</div><h2 id="hubTitle">Preseason Briefing</h2></div><button id="hubAdvance">Advance Week</button></div>
         <section id="weeklyDeskFocus" class="weekly-desk-focus" aria-label="Next coaching action"></section>
         <section id="guidanceReturnSummary" class="guidance-return-summary" aria-label="Welcome back"></section>
         <div id="weeklyDecisions"></div>
         <section id="weeklyWorldBriefing" class="lw-world" aria-label="Around your program"></section>
         <details id="weeklyDeskDetails" class="desk-details weekly-desk-details">
-          <summary>Briefing, optional prep &amp; coaching agenda</summary>
+          <summary>Scouting, staff advice &amp; league news</summary>
           <div class="command-grid">
             <div class="plan-card">
               <section id="coachingAgenda" class="coaching-agenda" aria-label="Coaching agenda"></section>
@@ -232,7 +232,7 @@
 
     <section id="gamelab" class="panel tab">
       <div class="section-head">
-        <div><h2>Game Lab</h2><div class="muted">Coach your next game live, watch it, or sim it.</div></div>
+        <div><h2>Game Day</h2><div class="muted">Coach your next game live, watch it, or sim it.</div></div>
         <div class="button-row"><button id="coachLiveGame" type="button" data-coach-live>Coach It Live</button><button id="watchDetailedGame">Watch</button><button id="simDetailedGame">Sim Instantly</button></div>
       </div>
       <p id="detailedGateNote" class="gate-note" role="status" hidden></p>
@@ -288,7 +288,7 @@
     </section>
 
     <section id="program" class="panel tab">
-      <div class="section-head"><div><h2>Program Lab</h2><div class="muted">Your job security, season goals and program profile.</div></div></div><div class="card"><div class="eyebrow">PROGRAM OVERVIEW</div><div id="programOverview"></div></div>
+      <div class="section-head"><div><h2>Your Program</h2><div class="muted">Your job security, season goals and program profile.</div></div></div><div class="card"><div class="eyebrow">PROGRAM OVERVIEW</div><div id="programOverview"></div></div>
       <div class="card" id="programAttributes"></div>
       <div class="card" id="programTrends"></div>
       <div id="programEditNotice" class="card muted"></div>
@@ -306,14 +306,14 @@
       <div class="card" id="careerMilestones"></div>
       <div class="card" id="gameSettings"></div>
       <div id="careerPost"></div>
-      <div class="card"><h3>Season Goals</h3><div class="muted" style="margin-bottom:8px">Objectives are generated from program stature, rivalry context and administration expectations.</div><div id="programGoals"></div></div>
+      <div class="card"><h3>Season Goals</h3><div class="muted" style="margin-bottom:8px">What your administration expects this season.</div><div id="programGoals"></div></div>
       <div class="two-col"><div class="card"><h3>Coaching Career</h3><div id="careerHistory"></div></div><div class="card"><h3>Program History</h3><div id="programHistory"></div></div></div>
-      <div class="card"><h3>Institutional DNA</h3><div id="programDNA"></div></div>
+      <div class="card"><h3>Program Identity</h3><div id="programDNA"></div></div>
     </section>
 
     <section id="development" class="panel tab stacked-table">
       <div class="section-head">
-        <div><h2>Development & Camp</h2><div class="muted">Training improves the odds, not the outcome.</div></div>
+        <div><h2>Player Development</h2><div class="muted">Training improves the odds, not the outcome.</div></div>
         <div class="button-row"><button id="runSpringCamp">Run Spring Development</button><button id="runFallCamp">Run Fall Camp</button><button id="applyCampWinners">Use Staff Recommendations</button></div>
       </div>
       <div class="two-col">
@@ -339,10 +339,10 @@
       </div>
       <div class="card">
         <div class="section-head"><div><h3>Individual Training Plans</h3><div class="muted">Young players and transition projects benefit most, but every focus has tradeoffs.</div></div></div>
-        <div class="table-wrap"><table><thead><tr><th>Player</th><th>Elig</th><th>Current Read</th><th>Potential Read</th><th>Body</th><th>Focus</th><th>Staff Note</th></tr></thead><tbody id="trainingBody"></tbody></table></div>
+        <div class="table-wrap"><table><thead><tr><th>Player</th><th>Elig</th><th>Staff Rating</th><th>Potential</th><th>Body</th><th>Focus</th><th>Staff Note</th></tr></thead><tbody id="trainingBody"></tbody></table></div>
       </div>
       <div class="card development-results-card">
-        <div class="section-head"><div><h3>Development Results Center</h3><div class="muted">A complete receipt for roster growth, physical changes and staff re-evaluation.</div></div><div class="button-row development-phase-tabs"><button type="button" data-development-phase="SPRING">Spring</button><button type="button" data-development-phase="FALL">Fall</button></div></div>
+        <div class="section-head"><div><h3>Camp Results</h3><div class="muted">How your players changed through camp.</div></div><div class="button-row development-phase-tabs"><button type="button" data-development-phase="SPRING">Spring</button><button type="button" data-development-phase="FALL">Fall</button></div></div>
         <div id="developmentResults"></div>
       </div>
       <div class="two-col">

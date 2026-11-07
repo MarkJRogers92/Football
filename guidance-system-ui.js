@@ -66,6 +66,51 @@
   if(counts&&typeof counts==='object')return Object.entries(counts).filter(([,value])=>Number.isFinite(Number(value))).map(([label,value])=>`${label.charAt(0).toUpperCase()+label.slice(1)}: ${value}`);
   return [['Required',summary?.required],['Due',summary?.due],['In view',summary?.visibleCount??summary?.visible]].filter(([,value])=>Number.isFinite(Number(value))).map(([label,value])=>`${label}: ${value}`);
  }
+ // A separate quiet status line leaves the existing news/action channel intact.
+ function renderSessionStatus(){
+  const status=window.DynastySessionStatus?.read?.();if(!status)return;
+  let host=target('#dynastySessionSaveStatus');
+  if(!host){
+   const topbar=target('#app .topbar');if(!topbar?.insertAdjacentElement)return;
+   host=document.createElement('div');host.id='dynastySessionSaveStatus';host.className='dynasty-session-status';
+   const text=document.createElement('span');text.dataset.sessionSaveMessage='';text.setAttribute('role','status');text.setAttribute('aria-live','polite');text.setAttribute('aria-atomic','true');
+   const retry=document.createElement('button');retry.type='button';retry.textContent='Retry Save';retry.dataset.sessionSaveRetry='';retry.addEventListener('click',()=>{if(typeof saveBrowser==='function')saveBrowser()});
+   host.append(text,retry);topbar.insertAdjacentElement('afterend',host);
+  }
+  host.dataset.state=status.state;
+  const text=host.querySelector('[data-session-save-message]');if(text&&text.textContent!==status.message)text.textContent=status.message;
+  const retry=host.querySelector('[data-session-save-retry]');if(retry)retry.hidden=status.state!=='failed';
+ }
+ function syncSessionView(){
+  if(!universe)return;
+  const programId=selected()?.id,previous=sessionViewRestoredFor;
+  if(previous?.target===universe&&previous.slot===activeSaveSlot&&previous.programId===programId)return;
+  sessionViewRestoredFor={target:universe,slot:activeSaveSlot,programId};
+  if(restoreSessionViewContext())return;
+  // Unmatched worlds and programs begin at a neutral view, never an old person's
+  // dialog, an advancement button, or the other program's recruiting filters.
+  window.DynastyDashboardViews?.show?.('week');window.DynastyRecruitingClasses?.show?.('current');
+  window.DynastyLabRecruitingFilters?.reset?.();
+  window.DynastyRecruitingWorkspaceView?.restore?.({mode:'workspace',filter:'board',selectedId:'',shown:30});
+  for(const [id,value] of [['positionFilter','ALL'],['statsScope','national']]){const control=target('#'+id);if(control)control.value=value}
+  if(previous)goToTab('dashboard');
+ }
+ const rememberViewAfterEvent=()=>{
+  if(sessionViewRestoring)return;
+  const targetUniverse=universe,slot=activeSaveSlot;
+  const remember=()=>{if(universe===targetUniverse&&slot===activeSaveSlot)rememberSessionViewContext()};
+  if(typeof queueMicrotask==='function')queueMicrotask(remember);else setTimeout(remember,0);
+ };
+ document.addEventListener('click',event=>{
+  if(event.target?.closest?.('.tabs button,.tab-groups button,[data-client-tab],[data-dash-view],[data-recruit-class],[data-recruit-view],[data-recruit-filter-reset],[data-rwid],[data-rwm],[data-rwf]'))rememberViewAfterEvent();
+ });
+ document.addEventListener('change',event=>{
+  if(SESSION_VIEW_SELECTS.includes(event.target?.id)||event.target?.matches?.('[data-recruit-filter]'))rememberViewAfterEvent();
+ });
+ document.addEventListener('input',event=>{if(event.target?.id==='rwSearch')rememberViewAfterEvent()});
+ window.addEventListener?.('pagehide',rememberSessionViewContext);
+ document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')rememberSessionViewContext()});
+ window.addEventListener?.('dynasty:save-status',renderSessionStatus);
  function renderReturnSummary(){
   const host=target('#guidanceReturnSummary');if(!host)return;
   const summary=typeof guidanceReturnSummary==='function'?guidanceReturnSummary():null;
@@ -74,7 +119,11 @@
   const boundary=summary.boundary?.title||summary.boundary?.label||summary.boundary||summary.forecast?.title||summary.title||'Current coaching boundary';
   const counts=summaryCounts(summary);
   const context=summary.currentLabel?`${summary.currentLabel} · Next: ${boundary}`:boundary;
-  host.innerHTML=`<div class="guidance-welcome"><div><div class="eyebrow">WELCOME BACK</div><strong>${esc(context)}</strong>${counts.length?`<span class="guidance-welcome-counts">${counts.map(esc).join(' · ')}</span>`:''}<small>No simulation occurred while you were away.</small></div><button type="button" data-guidance-dismiss-return>Dismiss</button></div>`;
+  const result=summary.lastResult;
+  const resultLine=result?`<p class="guidance-welcome-result"><strong>Last result:</strong> ${esc(result.outcome)} ${esc(result.userPts)}–${esc(result.oppPts)} vs ${esc(result.opponent)} <span>· ${esc(result.label)}</span></p>`:summary.resultUnavailable?'<p class="guidance-welcome-result">Postseason result details are available in History.</p>':'';
+  const priority=summary.priority?.title?`<p class="guidance-welcome-priority"><strong>Current priority:</strong> ${esc(summary.priority.title)}</p>`:'';
+  const choice=summary.pendingChoice?.title?`<p class="guidance-welcome-choice"><strong>${summary.pendingChoice.meaning==='must_resolve'?'Required choice':'Open choice'}:</strong> ${esc(summary.pendingChoice.title)}</p>`:'<p class="guidance-welcome-choice">No pending coaching choice.</p>';
+  host.innerHTML=`<div class="guidance-welcome"><div><div class="eyebrow">WELCOME BACK</div><strong>${esc(context)}</strong>${resultLine}${priority}${choice}${counts.length?`<span class="guidance-welcome-counts">${counts.map(esc).join(' · ')}</span>`:''}<small>No simulation occurred while you were away.</small></div><button type="button" data-guidance-dismiss-return>Dismiss</button></div>`;
  }
  function focusDestination(item){
   const destination=item.destination||{},focus=destination.focus;
@@ -123,7 +172,7 @@
   host.querySelectorAll('[data-guidance-restore]').forEach(button=>button.addEventListener('click',()=>{callGuidance('guidanceRestoreItem',button.dataset.guidanceRestore);renderGuidanceSystem()}));
  }
  function bindReturnSummary(){target('#guidanceReturnSummary')?.querySelector('[data-guidance-dismiss-return]')?.addEventListener('click',()=>{if(typeof dismissGuidanceReturnSummary==='function')dismissGuidanceReturnSummary();renderGuidanceSystem()})}
- function renderGuidanceSystem(){const model=currentModel();if(!model)return;renderDeskFocus(model);renderReturnSummary();renderAgenda(model);renderForecast(model);renderPlan(model);bindAgenda();bindReturnSummary()}
+ function renderGuidanceSystem(){syncSessionView();renderSessionStatus();const model=currentModel();if(!model)return;renderDeskFocus(model);renderReturnSummary();renderAgenda(model);renderForecast(model);renderPlan(model);bindAgenda();bindReturnSummary()}
  window.renderGuidanceSystem=renderGuidanceSystem;
  window.getDynastyGuidance=currentModel;
  window.openGuidanceItem=openGuidanceItem;

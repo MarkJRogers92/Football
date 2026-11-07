@@ -2,7 +2,7 @@
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.14.2';
+const APP_VERSION='0.14.3';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -1414,7 +1414,7 @@ function coachingReportHTML(g){
 // --- v0.9.49 commit 4: tiered game-detail compaction --------------------------
 // Measured first (docs/SAVE_GROWTH_V0949.md): per-game player deltas are 87.9% of the game
 // archive and ~44% of all save growth. The packet's proposed target, drive/play detail, is
-// 0.0% of routine games because only the Game Lab's detailed engine ever produces it — so
+// 0.0% of routine games because only the Game Day's detailed engine ever produces it — so
 // the packet's own tiering is applied to the field that actually holds the bytes instead.
 const GAME_DETAIL_HORIZON=3,COMPACTION_MANIFEST_CAP=40;
 // Never compacted: anything a player would go back and read. Everything the permanent tier
@@ -1422,7 +1422,7 @@ const GAME_DETAIL_HORIZON=3,COMPACTION_MANIFEST_CAP=40;
 function gameIsProtected(g,userTeamName){
  if(!g)return true;
  if(g.label&&g.label!=='Regular season')return true;          // titles, bowls, playoff
- if(g.drives?.length||g.plays?.length)return true;            // a Game Lab game the player watched
+ if(g.drives?.length||g.plays?.length)return true;            // a Game Day game the player watched
  const names=[g.home?.name,g.away?.name];
  if(userTeamName&&names.includes(userTeamName))return true;
  const home=T(g.home?.name),away=T(g.away?.name);
@@ -2419,7 +2419,7 @@ function applyGameplanDecision(t,option){
 }
 function buildWeeklyHub(beforeRank=selected()?.rank||null){const u=selected(),items=[...pulledOfferHubItems(u),...coachOpeningHubItems(u),...coachFalloutHubItems(u),...promiseHubItems(u),...recordChaseHubItems(u),...rivalryHubItems(u),...adminHubItems(u),...careerHubItems(u),...(typeof milestoneHubItems==='function'?milestoneHubItems(u):[]),...bowlHubItems(u),...signingDayHubItems(),...academicHubItems(u),...coachTreeHubItems(u),...newsHeadlineHubItem(u)],res=userWeekResult(u);if(res)items.push({type:res.win?'good-news':'bad-news',tab:'season',kicker:'FINAL',importance:res.win?50:60,gameId:res.gameId,main:`${res.win?'Win':'Loss'} ${res.userPts}–${res.oppPts} ${res.loc} ${res.opp}`,sub:res.label?`${res.label} · ${u.w}-${u.l} overall`:`${u.w}-${u.l} overall · ${u.cw}-${u.cl} conference`});if(beforeRank&&u.rank!==beforeRank)items.push({type:u.rank<beforeRank?'good-news':'alert',tab:'season',kicker:'RANKINGS',importance:45,main:`${u.rank<beforeRank?'Up':'Down'} to #${u.rank}`,sub:`Previous ranking: #${beforeRank}`});let inj=u.roster.filter(p=>(p.injuryHistory||[]).some(x=>x.year===universe.year&&x.week===universe.week)).slice(0,2);for(const p of inj)items.push({type:'bad-news',tab:'roster',player:p.id,kicker:'MEDICAL',importance:55,main:`${p.name}: ${p.injury}`,sub:`Expected absence: ${p.injuryWeeks} week${p.injuryWeeks===1?'':'s'}`});let commits=universe.recruits.filter(r=>r.committed===u.name&&r.commitWeek===universe.week).slice(0,3);for(const r of commits)items.push({type:'good-news',tab:'recruiting',recruit:r.id,kicker:'COMMITMENT',importance:40+r.stars*3,main:`${'★'.repeat(r.stars)} ${r.pos} ${r.name}`,sub:`#${r.nationalRank} nationally · ${r.homeCity}, ${r.homeState}`});let next=findUserGame();if(next){let opp=T(next.home===u.name?next.away:next.home);items.push({type:'action',tab:'gamelab',kicker:'NEXT UP',importance:48,main:`Week ${universe.week+1}: ${next.home===u.name?'vs':'@'} ${opp.name}`,sub:`${opp.w}-${opp.l} · #${opp.rank<=25?opp.rank:'—'} · ${opp.offScheme}`})}let risk=u.roster.map(p=>({p,r:transferRisk(p)})).sort((a,b)=>b.r-a.r)[0];if(risk?.r>=42)items.push({type:'alert',tab:'roster',player:risk.p.id,kicker:'LOCKER ROOM',importance:Math.min(80,Math.round(risk.r)),main:`${risk.p.name} transfer risk: ${Math.round(risk.r)}`,sub:`${risk.p.role} · morale ${risk.p.morale}`});for(const e of (universe.decommitLog||[]).filter(e=>e.year===universe.year&&e.week===universe.week&&(e.from===u.name||e.to===u.name)).slice(0,3))items.push(e.from===u.name?{type:'bad-news',tab:'recruiting',recruit:e.id,kicker:'DECOMMIT',importance:50+e.stars*3,main:`${'★'.repeat(e.stars)} ${e.pos} ${e.name}`,sub:e.to?`Flipped to ${e.to}`:'Reopened his recruitment'}:{type:'good-news',tab:'recruiting',recruit:e.id,kicker:'FLIP',importance:45+e.stars*3,main:`${'★'.repeat(e.stars)} ${e.pos} ${e.name}`,sub:`Flipped from ${e.from}`});let waver=universe.recruits.filter(r=>r.committed===u.name&&r.challenger&&r.pressure>0).sort((a,b)=>b.pressure-a.pressure)[0];if(waver)items.push({type:'alert',tab:'recruiting',recruit:waver.id,kicker:'WAVERING',importance:52,main:`${waver.name} hearing from ${waver.challenger}`,sub:`${'★'.repeat(waver.stars)} ${waver.pos} commit · target, visit or promise to hold him`});let hot=universe.recruits.filter(r=>r.targeted&&!r.committed).sort((a,b)=>b.interest-a.interest)[0];if(hot)items.push({type:'action',tab:'recruiting',recruit:hot.id,kicker:'TOP TARGET',importance:35,main:`${hot.name} · ${hot.interest}%`,sub:`#${hot.nationalRank} ${hot.pos} · ${hot.trend>0?'↑ '+hot.trend:hot.trend<0?'↓ '+Math.abs(hot.trend):'steady'}`});universe.weeklyHub=items.sort((a,b)=>(b.importance??40)-(a.importance??40)).slice(0,9)}
 
-const GUIDANCE_STATE_VERSION=1,GUIDANCE_FAMILIARITY_MAX=3,GUIDANCE_RETURN_AFTER_MS=6*60*60*1000;
+const GUIDANCE_STATE_VERSION=1,GUIDANCE_FAMILIARITY_MAX=3,GUIDANCE_RETURN_AFTER_MS=15*60*1000;
 const GUIDANCE_CATEGORIES=new Set(['career','coach_desk','game_plan','roster_management','staffing','recruiting','monitoring']);
 let guidanceReturnState=null;
 function guidanceCalendarStamp(target=universe){
@@ -2467,13 +2467,34 @@ function guidanceCurrentLabel(target=universe){
  if(target?.phase==='complete')return `${target.year} offseason · ${guidanceOffseasonPhase()}`;
  return `${target?.year??''} · ${target?.phase||'dynasty'}`;
 }
+// Read recorded results only; a deferred postseason archive must never masquerade as
+// a current result from a prior week, another program, or a future season.
+function guidanceLastResult(t=selected()){
+ if(!t||!universe||openingPreseason())return null;
+ const phase=universe.phase,maxWeek=phase==='regular'?Number(universe.week)+1:phase==='confReady'?12:['bowlReady','playoffReady'].includes(phase)?13:17;
+ const belongs=side=>side?.id!=null?String(side.id)===String(t.id):side?.name===t.name;
+ const games=(universe.gameArchive||[]).filter(g=>g?.season===universe.year&&Number.isFinite(g.week)&&g.week<=maxWeek&&(belongs(g.home)||belongs(g.away))&&Number.isFinite(g.score?.home)&&Number.isFinite(g.score?.away));
+ const archived=games.reduce((latest,g)=>!latest||g.week>=latest.week?g:latest,null);
+ const scheduled=(t.schedule||[]).filter(g=>g?.played&&Number.isFinite(g.week)&&g.week<=Math.min(maxWeek,12)&&(g.season==null||g.season===universe.year)&&(g.home===t.name||g.away===t.name)&&Array.isArray(g.score)&&g.score.length===2&&g.score.every(Number.isFinite)).sort((a,b)=>b.week-a.week)[0];
+ if(gamesAreDeferred()&&!['preseason','regular','confReady'].includes(phase))return null;
+ let result;
+ if(archived&&(!scheduled||archived.week>=scheduled.week)){
+  const home=belongs(archived.home);result={gameId:archived.id,week:archived.week,label:archived.label||'Game',opponent:home?archived.away.name:archived.home.name,userPts:home?archived.score.home:archived.score.away,oppPts:home?archived.score.away:archived.score.home};
+ }else if(scheduled){
+  const home=scheduled.home===t.name;result={gameId:scheduled.gameId||null,week:scheduled.week,label:'Regular season',opponent:home?scheduled.away:scheduled.home,userPts:home?scheduled.score[1]:scheduled.score[0],oppPts:home?scheduled.score[0]:scheduled.score[1]};
+ }
+ return result?{...result,programId:t.id,year:universe.year,outcome:result.userPts>result.oppPts?'Win':result.userPts<result.oppPts?'Loss':'Tie'}:null;
+}
 function guidanceWelcomeBack(savedAt,t=selected(),loadedAt=Date.now()){
  const saved=Date.parse(savedAt),elapsed=loadedAt-saved;if(!t||!Number.isFinite(saved)||!Number.isFinite(loadedAt)||elapsed<GUIDANCE_RETURN_AFTER_MS)return null;
  const model=guidanceModel(t),counts={required:model.items.filter(x=>x.meaning==='must_resolve').length,due:model.items.filter(x=>x.meaning==='decision_due').length,recommended:model.items.filter(x=>x.meaning==='staff_recommendation').length};
- return {kind:'guidance_return',savedAt,elapsedMs:elapsed,currentLabel:guidanceCurrentLabel(),boundary:{key:model.forecast?.key||'none',label:model.forecast?.label||'No advance available',status:model.forecast?.status||'ready'},counts,items:model.leading.slice(0,3).map(x=>({id:x.id,title:x.title,meaning:x.meaning}))};
+ const itemSummary=item=>item?{id:item.id,title:item.title,meaning:item.meaning}:null;
+ const pendingChoice=model.items.find(x=>x.meaning==='must_resolve')||model.items.find(x=>x.meaning==='decision_due');
+ return {kind:'guidance_return',savedAt,elapsedMs:elapsed,currentLabel:guidanceCurrentLabel(),boundary:{key:model.forecast?.key||'none',label:model.forecast?.label||'No advance available',status:model.forecast?.status||'ready'},counts,items:model.leading.slice(0,3).map(itemSummary),
+  lastResult:guidanceLastResult(t),resultUnavailable:gamesAreDeferred()&&!['preseason','regular','confReady'].includes(universe.phase),priority:itemSummary(model.leading[0])||{title:model.forecast?.title||model.forecast?.label||'Review your program'},pendingChoice:itemSummary(pendingChoice)};
 }
-function guidancePrepareReturn(savedAt){const loadedAt=Date.now();guidanceReturnState=guidanceWelcomeBack(savedAt,selected(),loadedAt)?{savedAt,loadedAt}:null;return guidanceReturnState}
-function guidanceReturnSummary(){return guidanceReturnState?guidanceWelcomeBack(guidanceReturnState.savedAt,selected(),guidanceReturnState.loadedAt):null}
+function guidancePrepareReturn(savedAt){const loadedAt=Date.now();guidanceReturnState=guidanceWelcomeBack(savedAt,selected(),loadedAt)?{savedAt,loadedAt,programId:selected()?.id}:null;return guidanceReturnState}
+function guidanceReturnSummary(){return guidanceReturnState&&String(guidanceReturnState.programId)===String(selected()?.id)?guidanceWelcomeBack(guidanceReturnState.savedAt,selected(),guidanceReturnState.loadedAt):null}
 function dismissGuidanceReturnSummary(){guidanceReturnState=null;return true}
 function guidanceDeferItem(id,t=selected()){return snoozeGuidance(id,t)}
 function guidanceRestoreItem(id,t=selected()){return restoreGuidance(id,t)}
@@ -2569,7 +2590,7 @@ function guidanceModel(t=selected()){
  if(hasPendingCareerChoice())add({id:guidanceItemId(t,'career','open-offers'),occurrence:'open-offers',meaning:'must_resolve',category:'career',priority:400,title:'Choose your next coaching post',cause:`Your prior tenure ended and ${(universe.jobOffers||[]).length} offer${(universe.jobOffers||[]).length===1?' is':'s are'} waiting.`,affectedEntity:{type:'coach',id:'user',label:'Head coach'},destination:{tab:'program',focus:'career-post'},boundary:'Before departures or another eligible calendar action',consequence:'Weekly, season, detailed-game, and post-review offseason advancement remain blocked until a post is accepted.'});
  for(const d of guidanceStoredDecisions(t)){
   const gameplan=d.type==='WEEKLY_GAMEPLAN',entity=guidanceAffectedEntity(t,d);
-  add({id:guidanceItemId(t,gameplan?'gameplan':'coach-desk',d.id),occurrence:d.id,meaning:gameplan?'decision_due':'must_resolve',category:gameplan?'game_plan':'coach_desk',priority:gameplan?285:350+(d.priority||0)/100,title:d.title,cause:d.summary,affectedEntity:entity,destination:{tab:'dashboard',focus:'weekly-decision',decisionId:d.id,playerId:d.playerId||null,recruitId:d.recruitId||null},boundary:`Week ${universe.week+1} kickoff`,consequence:gameplan?'If unchanged, the game uses the existing Standard week plan.':'Advance Week and Game Lab remain blocked; Sim Regular Season delegates the choice to staff.',boundaryKey:'advance-week'});
+  add({id:guidanceItemId(t,gameplan?'gameplan':'coach-desk',d.id),occurrence:d.id,meaning:gameplan?'decision_due':'must_resolve',category:gameplan?'game_plan':'coach_desk',priority:gameplan?285:350+(d.priority||0)/100,title:d.title,cause:d.summary,affectedEntity:entity,destination:{tab:'dashboard',focus:'weekly-decision',decisionId:d.id,playerId:d.playerId||null,recruitId:d.recruitId||null},boundary:`Week ${universe.week+1} kickoff`,consequence:gameplan?'If unchanged, the game uses the existing Standard week plan.':'Advance Week and Game Day remain blocked; Sim Regular Season delegates the choice to staff.',boundaryKey:'advance-week'});
  }
  const sch=scholarshipSummary(t);
  if(sch.over)add({id:guidanceItemId(t,'scholarships','over-limit'),occurrence:'over-limit',meaning:'decision_due',category:'roster_management',priority:260,title:`Reduce the signing class by ${sch.over}`,cause:`${sch.committed} commitments currently exceed the ${sch.capacity}-player class capacity.`,affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'recruiting',focus:'scholarship-summary'},boundary:'Playoff completion',consequence:'This does not block time. When the playoff finalizes recruiting, the game pulls the weakest commitments until the class fits.',boundaryKey:'playoff'});
@@ -2764,7 +2785,7 @@ function placeUnsignedElites(){
  return {placed,displaced};
 }
 function finalizeRecruiting(){const u=selected();clearUnitCache();buildSigningDay();universe.recruitCycle={year:universe.year,seasonCommits:universe.recruits.filter(r=>r.commitWeek).length,decommits:(universe.decommitLog||[]).filter(e=>e.year===universe.year).length,flips:(universe.decommitLog||[]).filter(e=>e.year===universe.year&&e.to).length};Object.assign(universe.recruitCycle,{elites:placeUnsignedElites()});let remaining=universe.recruits.filter(r=>!r.committed);while(remaining.length){let needy=universe.teams.filter(t=>scholarshipRoom(t)>0&&classCommitCount(t.name)<15);if(!needy.length)break;let r=remaining.shift();if(r.targeted&&r.interest>=68&&canTakeCommit(u.name)&&classCommitCount(u.name)<15){commitRecruit(r,u.name);continue}let top=sample(needy,16).sort((a,b)=>recruitPitch(b,r)-recruitPitch(a,r))[0]||needy[0];commitRecruit(r,top.name)}for(const r of remaining){if(r.committed)continue;if(r.targeted&&r.interest>=68&&canTakeCommit(u.name)){let available=universe.teams.filter(t=>canTakeCommit(t.name)),top=sample(available,24).sort((a,b)=>recruitPitch(b,r)-recruitPitch(a,r))[0];if(!top||recruitPitch(u,r)+10+r.relationship*.12>=recruitPitch(top,r)-3){commitRecruit(r,u.name);continue}}let available=universe.teams.filter(t=>canTakeCommit(t.name));if(!available.length)break;let top=sample(available,28).sort((a,b)=>recruitPitch(b,r)-recruitPitch(a,r))[0]||available[0];commitRecruit(r,top.name)}enforceScholarshipLimits(new Set(universe.signingDay?.board?.map(b=>b.recruitId)||[]));universe.recruitCycle.signeesByTeam=Object.fromEntries(universe.teams.map(t=>[t.name,universe.recruits.filter(r=>r.committed===t.name).length]));}
-function autoTarget(){const u=selected();universe.recruits.forEach(r=>r.targeted=false);let needs={};POS.forEach(p=>needs[p]=(POS_COUNTS[p]||4)-u.roster.filter(x=>x.pos===p&&x.year!=='SR').length*.55);universe.recruits.filter(r=>!r.committed).sort((a,b)=>(b.scoutUp+(needs[b.pos]||0)*5)-(a.scoutUp+(needs[a.pos]||0)*5)).slice(0,20).forEach(r=>{r.targeted=true;firstRecruitEvaluation(r,u)});renderRecruiting()}
+function autoTarget(){const u=selected();universe.recruits.forEach(r=>r.targeted=false);let needs={};POS.forEach(p=>needs[p]=(POS_COUNTS[p]||4)-u.roster.filter(x=>x.pos===p&&x.year!=='SR').length*.55);universe.recruits.filter(r=>!r.committed).sort((a,b)=>(b.scoutUp+(needs[b.pos]||0)*5)-(a.scoutUp+(needs[a.pos]||0)*5)).slice(0,20).forEach(r=>{r.targeted=true;firstRecruitEvaluation(r,u)});autosaveAfter('management');renderRecruiting()}
 function chooseCoachMoveDestination(c,from,slot,changed,moved){
  const user=selected()?.name,candidates=universe.teams.filter(t=>t.id!==from.id&&t.name!==user&&!changed.get(t.id)?.has(slot)&&!moved.has(t.staff?.[slot]?.id)&&t.prestige>=from.prestige-5);
  if(!candidates.length)return null;const scored=candidates.map(t=>({t,score:(t.prestige-from.prestige)*1.1+t.resources*.14+(slot==='RC'?t.nil*.10:t.development*.09)+(c.ambition||60)*.05+gauss()*3})).sort((a,b)=>b.score-a.score),short=scored.slice(0,6),best=short[0]?.score??0;let total=0;for(const x of short){x.weight=Math.exp((x.score-best)/6);total+=x.weight}let roll=gameplayRandom()*total;for(const x of short){roll-=x.weight;if(roll<=0)return x.t}return short.at(-1)?.t||null
@@ -3560,7 +3581,7 @@ function resolveWeeklyDecision(id,optionId){const d=(universe.weeklyDecisions||[
  else if(d.type==='PLAYER_REDSHIRT_DISCUSSION'&&p){if(option.id==='preserve'){p.redshirtActive=true;p.staffTrust=clamp((p.staffTrust??70)+2,0,100)}else if(option.id==='continue'){p.redshirtActive=false;p.morale=clamp(p.morale+2,15,99)}else p.staffTrust=clamp((p.staffTrust??70)-2,0,100)}
  else if(d.type==='PLAYER_POSITION_CHANGE_REQUEST'&&p){if(option.id==='approve'&&applyRequestedPositionChange(t,p,d.requestedPosition)){p.morale=clamp(p.morale+4,15,99);p.staffTrust=clamp((p.staffTrust??70)+3,0,100)}else if(option.id==='defer')p.requestedPositionChange={season:universe.year,week:universe.week,from:p.pos,to:d.requestedPosition,status:'DEFERRED'};else if(option.id==='decline'){p.requestedPositionChange={season:universe.year,week:universe.week,from:p.pos,to:d.requestedPosition,status:'DECLINED'};p.morale=clamp(p.morale-4,15,99);p.staffTrust=clamp((p.staffTrust??70)-3,0,100)}}
  else if(d.type==='RECRUITING_PRIORITY'&&option.id.startsWith('prioritize_')){const rid=option.id.slice(11),r=universe.recruits.find(x=>String(x.id)===rid);if(r){scheduleVisit(r);growRecruiterRelationship(r,t,3)}}
- d.resolved=true;d.resolvedOptionId=option.id;d.resolvedSeason=universe.year;d.resolvedWeek=universe.week;addWeeklyDecisionEvent(d,option,t);setStatus(`Decision recorded: ${option.label}.`);render();return true}
+ d.resolved=true;d.resolvedOptionId=option.id;d.resolvedSeason=universe.year;d.resolvedWeek=universe.week;addWeeklyDecisionEvent(d,option,t);autosaveAfter('management');setStatus(`Decision recorded: ${option.label}.`);render();return true}
 // A face for every named player: portrait, jersey and position, linking to the canonical profile.
 function playerFaceChip(id,role=''){const f=id!=null&&findPlayer(id);if(!f?.p)return'';const p=ensurePortrait(f.p);return `<button type="button" class="face-chip" data-player="${gameEscape(p.id)}">${portraitTag(p,36,'list')}<span><b>${gameEscape(p.name)}</b><small>#${gameEscape(p.jerseyNumber??'')} · ${gameEscape(p.pos)}${role?` · ${gameEscape(role)}`:''}</small></span></button>`}
 function decisionFacesHTML(d){const faces=d.starterId&&d.playerId?[playerFaceChip(d.starterId,'Starter'),playerFaceChip(d.playerId,'Challenger')]:[playerFaceChip(d.playerId)];const html=faces.filter(Boolean).join(faces.length>1?'<span class="face-vs">vs</span>':'');return html?`<div class="decision-faces">${html}</div>`:''}
@@ -3591,7 +3612,7 @@ function weeklyPlan(u){
  if(openingPreseason())
   out.push(planStep('begin','Begin season','Your schedule is ready. Start Week 1 when your setup feels right.','dashboard',false,100));
  else if(phase==='regular'&&universe.week<12)
-  out.push(planStep('sim',`Play week ${universe.week+1}`,'Simulate the week, or take the game yourself in Game Lab.','dashboard',false,100));
+  out.push(planStep('sim',`Play week ${universe.week+1}`,'Simulate the week, or take the game yourself in Game Day.','dashboard',false,100));
  else if(phase==='confReady')
   out.push(planStep('conf','Play the conference championships','The regular season is over.','season',false,100));
  else if(phase==='bowlReady')
@@ -3688,7 +3709,7 @@ function renderGameLab(){
   const opp=T(g.home===u.name?g.away:g.home),P=profiles(u),O=profiles(opp);
   $('#nextGameCard').innerHTML=`<strong>Week ${universe.week+1}: ${g.home===u.name?'vs':'@'} ${opp.name}</strong><div class="muted">${u.name}: O ${grade(P.offense)} / D ${grade(P.defense)} · ${opp.name}: O ${grade(O.offense)} / D ${grade(O.defense)}</div>`;
   $('#keyMatchups').innerHTML=`<div class="lineitem"><span>Your QB vs their coverage</span><strong>${grade(P.qb)} vs ${grade(O.coverage)}</strong></div><div class="lineitem"><span>Your OL vs their front</span><strong>${grade(P.ol)} vs ${grade(O.front)}</strong></div><div class="lineitem"><span>Your scheme fit</span><strong>${grade(P.offFit)}</strong></div><div class="lineitem"><span>Their scheme fit</span><strong>${grade(O.offFit)}</strong></div>`;
- }else $('#nextGameCard').innerHTML=openingPreseason()?'<strong>Week 1 is waiting.</strong><div class="muted">Finish your preseason setup, then choose Begin Season in the Command Center to unlock this matchup.</div>':'<span class="muted">No unsimulated user game in the current regular-season week.</span>';
+ }else $('#nextGameCard').innerHTML=openingPreseason()?'<strong>Week 1 is waiting.</strong><div class="muted">Choose Begin Season in This Week when your team is ready.</div>':'<span class="muted">No remaining game for your team this week.</span>';
  const d=universe.lastDetailedGame;
  if(d){
   $('#detailedBox').innerHTML=`${gameResultActions(d.gameId)}${d.season?`<div class="small muted">${d.season} · Week ${d.week}</div>`:''}<div class="big">${d.away} ${d.ap} – ${d.hp} ${d.home}</div><div class="lineitem"><span>${d.away} total offense</span><strong>${d.box.away.passYds+d.box.away.rushYds}</strong></div><div class="lineitem"><span>${d.home} total offense</span><strong>${d.box.home.passYds+d.box.home.rushYds}</strong></div><div class="lineitem"><span>Turnovers</span><strong>${d.box.away.turnovers} – ${d.box.home.turnovers}</strong></div>`;
@@ -3707,7 +3728,7 @@ function renderMatchupStrategy(){
   rankLabel=t=>t.rank<=25?`#${t.rank}`:'NR',
   row=(label,value)=>`<div class="lineitem"><span>${label}</span><strong class="${value>=3?'good':value<=-3?'bad':''}">${matchupEdgeLabel(value)} (${value>=0?'+':''}${value})</strong></div>`;
  $('#nextGameCard').innerHTML=`<div class="gameday-data" hidden data-week="${universe.week+1}" data-location="${isHome?'vs':'@'}" data-user-id="${u.id}" data-opponent-id="${opp.id}" data-user-name="${gameEscape(u.name)}" data-opponent-name="${gameEscape(opp.name)}" data-user-record="${u.w}-${u.l}" data-opponent-record="${opp.w}-${opp.l}" data-user-rank="${rankLabel(u)}" data-opponent-rank="${rankLabel(opp)}" data-user-conference="${gameEscape(u.conference)}" data-opponent-conference="${gameEscape(opp.conference)}" data-venue="${gameEscape(venue)}" data-stakes="${gameEscape(stakes)}" data-rivalry="${isRival?'true':'false'}" data-user-offense="${grade(P.offense)}" data-user-defense="${grade(P.defense)}" data-opponent-offense="${grade(O.offense)}" data-opponent-defense="${grade(O.defense)}" data-opponent-pass-mix="${Math.round(OFF_SCHEMES[opp.offScheme].pass*100)}" data-home-edge="${gameEscape(home)}" data-user-out="${outU}" data-opponent-out="${outO}" data-active-plan="${gameEscape(tier.label)}" data-recommended-plan="${gameEscape(GAMEPLAN_TIERS[rec.id].label)}" data-recommendation="${gameEscape(rec.reason)}"></div><strong>Week ${universe.week+1}: ${isHome?'vs':'@'} ${gameEscape(opp.name)}</strong><div class="muted">${gameEscape(u.name)}: O ${grade(P.offense)} / D ${grade(P.defense)} · ${gameEscape(opp.name)}: O ${grade(O.offense)} / D ${grade(O.defense)}</div><div class="small muted">Expected opponent mix: ${Math.round(OFF_SCHEMES[opp.offScheme].pass*100)}% pass · ${home} · unavailable: ${outU} yours / ${outO} theirs</div><div class="small"><strong>Active plan:</strong> ${tier.label}. <strong>Staff recommendation:</strong> ${GAMEPLAN_TIERS[rec.id].label} — ${rec.reason}</div>`;
- $('#keyMatchups').innerHTML=`${row('Your passing game vs their coverage',e.passGame)}${row('Your run game vs their front',e.runGame)}${row('Your pass protection vs their rush',e.passProtection)}${row('Their passing game vs your coverage',oe.passGame)}${row('Their run game vs your front',oe.runGame)}${row('Their protection vs your rush',oe.passProtection)}<div class="small muted">These edges use the same current profiles consumed at kickoff, including health, wear, scheme, staff and the active gameplan.</div>`
+ $('#keyMatchups').innerHTML=`${row('Your passing game vs their coverage',e.passGame)}${row('Your run game vs their front',e.runGame)}${row('Your pass protection vs their rush',e.passProtection)}${row('Their passing game vs your coverage',oe.passGame)}${row('Their run game vs your front',oe.runGame)}${row('Their protection vs your rush',oe.passProtection)}<div class="small muted">Based on current health, fatigue, scheme and game plan.</div>`
 }
 TAB_RENDERERS.gamelab=()=>runRender('gamelab',()=>{renderGameLab();renderMatchupStrategy()});
 function renderSeason(){const u=selected();$('#seasonPhase').textContent=openingPreseason()?`${universe.year} · Preseason`:`${universe.year} · ${seasonStageLabel()}`;$('#confStandings').innerHTML=confStand(u.conference).map((t,i)=>`<div class="rankrow ${t.name===u.name?'strong':''}"><div>${i+1}. ${teamLogoHTML(t.id,20,'team-logo--inline')} ${t.name}</div><div>${t.cw}-${t.cl} · ${t.w}-${t.l}</div></div>`).join('');$('#latestResults').innerHTML=universe.latest.length?universe.latest.slice(-12).reverse().map(r=>`<div class="resultrow ${r.label?'champ':''}"><div>${r.label?`<span class="small muted">${r.label}</span><br>`:''}${teamLogoHTML(T(r.away)?.id,18,'team-logo--inline')} ${r.away}</div><div><strong>${r.ap}</strong> – <strong>${r.hp}</strong> ${teamLogoHTML(T(r.home)?.id,18,'team-logo--inline')} ${r.home} ${gameLink(r.gameId)}</div></div>`).join(''):'<div class="muted">No results yet.</div>';$('#teamSchedule').innerHTML=u.schedule.map(g=>{let opp=g.home===u.name?g.away:g.home,loc=g.home===u.name?'vs':'@',score=g.played?`${g.score[0]}-${g.score[1]}`:'—';return `<div class="resultrow"><div>Wk ${g.week} · ${loc} ${teamLogoHTML(T(opp)?.id,18,'team-logo--inline')} ${opp}${g.detailed?' <span class="pill">Detailed</span>':''}</div><div>${g.played?gameLink(g.gameId,`${g.winner===u.name?'W':'L'} ${g.home===u.name?g.score[1]:g.score[0]}–${g.home===u.name?g.score[0]:g.score[1]}`):score}</div></div>`}).join('')}
@@ -4082,13 +4103,93 @@ let storageBusy = false;
 let titleBrowserSave = null;
 let titleSaveSlots=[];
 let browserStore = DynastyStorage.create({slot:activeSaveSlot});
+// Session presentation observes real persistence. It never serializes a live game or
+// changes the portable save schema. Calendar and checkpoint versions guard late writes.
+let sessionSaveRecord=null,sessionCheckpointVersion=0;
+const SESSION_VIEW_KEY='dynastyLabSessionContextV1';
+const SESSION_VIEW_SELECTS=['positionFilter','statsScope','newsScope','newsWeek','gameHistoryYear'];
+let sessionViewRestoredFor=null,sessionViewRestoring=false;
+function sessionSaveContext(target=universe,slot=activeSaveSlot){
+ const program=target?.teams?.find(t=>t.name===$('#userTeam')?.value);
+ return {slot,year:target?.year??null,week:target?.week??null,programId:program?.id??null,world:String(target?.rng?.seed??'')};
+}
+function readSessionSaveStatus(){
+ const context=sessionSaveContext(),record=sessionSaveRecord,matching=record?.universe===universe&&record.slot===activeSaveSlot&&record.programId===context.programId;
+ let state='unsaved',message=universe?'Not saved in this slot. Use Save to preserve this dynasty.':'No dynasty open.';
+ if(matching){
+  state=record.state;message=record.message;
+  if(state==='saved'&&(record.stamp!==guidanceCalendarStamp()||record.version!==sessionCheckpointVersion)){state=autosaveKind?'pending':'unsaved';message=autosaveKind?'Checkpoint waiting to save…':'Changes since the last checkpoint. Use Save.'}
+ }
+ if(!autosaveEnabled&&!['saving','failed'].includes(state)){
+  if(state==='saved')message='Saved manually. Autosave is off.';
+  else{state='unsaved';message='Autosave is off. Use Save to preserve your progress.'}
+ }
+ return {...context,state,message,autosaveEnabled};
+}
+function emitSessionSaveStatus(){
+ const status=readSessionSaveStatus();
+ if(typeof window?.dispatchEvent==='function'&&typeof CustomEvent==='function')window.dispatchEvent(new CustomEvent('dynasty:save-status',{detail:status}));
+ return status;
+}
+function setSessionSaveStatus(state,message,{target=universe,slot=activeSaveSlot,version=sessionCheckpointVersion,stamp=guidanceCalendarStamp(target),programId=sessionSaveContext(target,slot).programId}={}){
+ if(target!==universe||slot!==activeSaveSlot)return readSessionSaveStatus();
+ sessionSaveRecord={state,message,universe:target,slot,version,stamp,programId};return emitSessionSaveStatus();
+}
+if(typeof window!=='undefined')window.DynastySessionStatus=Object.freeze({read:readSessionSaveStatus});
+function sessionViewIdentity(){
+ const context=sessionSaveContext(),archive=currentArchiveState()?.archiveRef?.id;
+ // The storage archive identity prevents preferences leaking between two worlds
+ // deliberately created with the same seed. Unsaved/legacy worlds restore nothing.
+ return context.world&&archive&&context.programId!=null?JSON.stringify([context.slot,context.world,archive,String(context.programId)]):null;
+}
+function readSessionViewContext(){
+ const key=sessionViewIdentity();if(!key)return null;
+ try{
+  const rows=JSON.parse(localStorage.getItem(SESSION_VIEW_KEY)||'[]');
+  const row=Array.isArray(rows)?rows.find(x=>x?.key===key):null;if(!row)return null;
+  const selects={};for(const id of SESSION_VIEW_SELECTS)if(typeof row.selects?.[id]==='string'&&row.selects[id].length<=80)selects[id]=row.selects[id];
+  let recruitFilters=null;
+  if(row.recruitFilters&&typeof row.recruitFilters==='object'){
+   const filters=row.recruitFilters;
+   recruitFilters={pos:POS.includes(filters.pos)?filters.pos:'ALL',stage:['PRELIMINARY','QUICK_FILM','FULL_EVALUATION'].includes(filters.stage)?filters.stage:'ALL',verdict:['Priority take','Take','Strong target','Boardable','Developmental','Pass'].includes(filters.verdict)?filters.verdict:'ALL',state:typeof filters.state==='string'&&/^[A-Z]{2}$/.test(filters.state)?filters.state:'ALL',query:typeof filters.query==='string'?filters.query.slice(0,40):'',targetedOnly:filters.targetedOnly===true};
+  }
+  const workspace=row.recruitingWorkspace;
+  const recruitingWorkspace=workspace&&typeof workspace==='object'?{mode:workspace.mode==='table'?'table':'workspace',filter:['board','all','commits'].includes(workspace.filter)?workspace.filter:'board',selectedId:typeof workspace.selectedId==='string'?workspace.selectedId.slice(0,100):'',shown:Number.isInteger(workspace.shown)?Math.max(1,Math.min(220,workspace.shown)):30}:null;
+  return {key,tab:TAB_GROUPS.some(group=>group.tabs.includes(row.tab))?row.tab:'dashboard',recruitingWorkspace,dashboardView:['week','stories','league'].includes(row.dashboardView)?row.dashboardView:'week',recruitingView:['current','rising','outlook','map','shortlist','summary','history'].includes(row.recruitingView)?row.recruitingView:'current',selects,recruitFilters};
+ }catch{return null}
+}
+function rememberSessionViewContext(){
+ if(sessionViewRestoring)return false;const key=sessionViewIdentity();if(!key)return false;
+ const selects={};for(const id of SESSION_VIEW_SELECTS){const value=$('#'+id)?.value;if(typeof value==='string'&&value.length<=80)selects[id]=value}
+ const row={key,tab:activeTab,dashboardView:window.DynastyDashboardViews?.current?.()||'week',recruitingView:window.DynastyRecruitingClasses?.current?.()||'current',selects,recruitFilters:window.DynastyLabRecruitingFilters?.getState?.()||null,recruitingWorkspace:window.DynastyRecruitingWorkspaceView?.read?.()||null};
+ const search=$('#rwSearch');if(row.tab==='recruiting'&&row.recruitingWorkspace?.mode==='workspace'&&search?.tagName==='INPUT')row.recruitFilters={...(row.recruitFilters||{}),query:String(search.value||'').slice(0,40)};
+ try{const prior=JSON.parse(localStorage.getItem(SESSION_VIEW_KEY)||'[]'),rows=Array.isArray(prior)?prior:[];localStorage.setItem(SESSION_VIEW_KEY,JSON.stringify([...rows.filter(x=>x?.key!==key).slice(-11),row]));return true}catch{return false}
+}
+function restoreSessionViewContext(){
+ if(sessionViewRestoring)return false;
+ const record=readSessionViewContext();if(!record)return false;
+ sessionViewRestoring=true;
+ try{
+  window.DynastyDashboardViews?.show?.(record.dashboardView);
+  window.DynastyRecruitingClasses?.show?.(record.recruitingView);
+  if(record.recruitFilters)window.DynastyLabRecruitingFilters?.setState?.(record.recruitFilters);
+  // Rendering the destination first supplies dynamic week/season options. Setting
+  // allowlisted controls directly never dispatches their gameplay event handlers.
+  goToTab(record.tab);let changed=false;
+  for(const [id,value] of Object.entries(record.selects)){
+   const control=$('#'+id);if(control&&Array.from(control.options||[]).some(option=>option.value===value)&&control.value!==value){control.value=value;changed=true}
+  }
+  if(changed)renderActiveTab();
+  if(record.recruitingWorkspace)window.DynastyRecruitingWorkspaceView?.restore?.(record.recruitingWorkspace);return true;
+ }finally{sessionViewRestoring=false}
+}
 function currentArchiveState(){const state=browserArchives.get(activeSaveSlot);return state?.universe===universe?state:null}
 function activeSlotMeta(){return titleSaveSlots.find(s=>s.slot===activeSaveSlot)||null}
 function slotStorageError(meta=activeSlotMeta()){return meta?.storageError||meta?.migrationError||''}
 function loadableSlotMeta(){const meta=activeSlotMeta();return !meta?.empty&&!slotStorageError(meta)?meta:null}
 function setActiveSaveSlot(slot){
  if(!SAVE_SLOT_IDS.includes(slot))throw new Error('Unknown save slot.');
- activeSaveSlot=slot;browserStore=DynastyStorage.create({slot});
+ cancelQueuedAutosave();activeSaveSlot=slot;browserStore=DynastyStorage.create({slot});sessionViewRestoredFor=null;emitSessionSaveStatus();
  if($('#saveSlot'))$('#saveSlot').value=slot;if($('#titleSaveSlot'))$('#titleSaveSlot').value=slot;
  titleBrowserSave=loadableSlotMeta();
  renderTitleState();return slot;
@@ -4174,104 +4275,131 @@ function validateSave(d){
   return u;
 }
 function installSave(d,state=null){
-  const candidate=validateSave(d),previous=universe,previousArchive=browserArchives.get(activeSaveSlot),previousTeam=$('#userTeam').value,previousGuidanceReturn=guidanceReturnState;
+  const candidate=validateSave(d),previous=universe,previousArchive=browserArchives.get(activeSaveSlot),previousTeam=$('#userTeam').value,previousGuidanceReturn=guidanceReturnState,previousSessionSave=sessionSaveRecord;
   try{
     syncGameplayRng(previous);universe=candidate;ensureGameplayRng();if(!universe.mode)universe.mode=legacyControlMode(d,universe);
     if(state)browserArchives.set(activeSaveSlot,{...state,slot:activeSaveSlot,universe:candidate,loading:null,gamesLoading:null,gamesDirty:false});
     else browserArchives.delete(activeSaveSlot);
-    normalizeUniverse();normalizeGuidanceState();normalizeOffseasonState();refreshTeamOptions(d.userTeam||universe.teams[0].name);guidancePrepareReturn(d.savedAt);render();
+    normalizeUniverse();normalizeGuidanceState();normalizeOffseasonState();refreshTeamOptions(d.userTeam||universe.teams[0].name);guidancePrepareReturn(d.savedAt);sessionViewRestoredFor=null;setSessionSaveStatus(state?'saved':'unsaved',state?'Saved checkpoint loaded.':'Imported dynasty is open. Use Save to preserve it in this slot.');render();
   }catch(e){
-    universe=previous;guidanceReturnState=previousGuidanceReturn;ensureGameplayRng();if(previousArchive)browserArchives.set(activeSaveSlot,previousArchive);else browserArchives.delete(activeSaveSlot);rebuildIndexes();refreshTeamOptions(previousTeam);throw e;
+    universe=previous;guidanceReturnState=previousGuidanceReturn;sessionSaveRecord=previousSessionSave;ensureGameplayRng();if(previousArchive)browserArchives.set(activeSaveSlot,previousArchive);else browserArchives.delete(activeSaveSlot);rebuildIndexes();refreshTeamOptions(previousTeam);throw e;
   }
 }
-// v0.9.49 commit 3: one write path, two callers. A manual save reports success and may
-// disable the UI while it runs; an autosave must never do either, because a checkpoint the
-// player did not ask for should be invisible unless it fails.
+// One write path for both callers. Manual saves retain their existing action message;
+// background checkpoints update only the dedicated status and keep play responsive.
 async function writeBrowserSave(checkpointType='manual'){
-  const state=currentArchiveState();
-  const rows=universe.playerArchive||[];
-  // Existing archive rows never change after retirement. Only append new rows.
-  const start=state?.loaded?state.archiveRef?.count||0:0;
-  if(start>rows.length)throw new Error('The archive changed unexpectedly. Export before saving.');
-  const additions=rows.slice(start).map(packPlayer);
-  // Box scores never change after the whistle, so only the ones written since
-  // the last save are appended. A twelve-season dynasty stops rewriting itself.
-  const games=universe.gameArchive||[];
-  const rewriteGames=!!state?.gamesDirty;
-  const gameStart=state?.gamesLoaded&&!rewriteGames?state.gameRef?.count||0:0;
-  if(gameStart>games.length)throw new Error('The game archive changed unexpectedly. Export before saving.');
-  const gameAdditions=games.slice(gameStart);
-  const snapshot={universe:packUniverse(universe,false),userTeam:$('#userTeam').value,savedAt:new Date().toISOString(),version:APP_VERSION};
-  const saved=await browserStore.save(snapshot,{expectedRevision:state?.revision??null,archiveRef:state?.archiveRef||null,additions,
+  const target=universe,slot=activeSaveSlot,store=browserStore,state=currentArchiveState(),version=sessionCheckpointVersion,stamp=guidanceCalendarStamp(target),programId=sessionSaveContext(target,slot).programId;
+  setSessionSaveStatus('saving',checkpointType==='manual'?'Saving dynasty…':'Saving checkpoint…',{target,slot,version,stamp,programId});
+  try{
+   const rows=target.playerArchive||[];
+   const start=state?.loaded?state.archiveRef?.count||0:0;
+   if(start>rows.length)throw new Error('The archive changed unexpectedly. Export before saving.');
+   const additions=rows.slice(start).map(packPlayer),games=target.gameArchive||[],rewriteGames=!!state?.gamesDirty;
+   const gameStart=state?.gamesLoaded&&!rewriteGames?state.gameRef?.count||0:0;
+   if(gameStart>games.length)throw new Error('The game archive changed unexpectedly. Export before saving.');
+   const rowCount=rows.length,gameCount=games.length,gameAdditions=games.slice(gameStart),snapshot={universe:packUniverse(target,false),userTeam:$('#userTeam').value,savedAt:new Date().toISOString(),version:APP_VERSION};
+   const saved=await store.save(snapshot,{expectedRevision:state?.revision??null,archiveRef:state?.archiveRef||null,additions,
     gameRef:rewriteGames?null:state?.gameRef||null,gameAdditions,checkpointType});
-  const browserArchive={slot:activeSaveSlot,universe,revision:saved.revision,archiveRef:saved.archiveRef,loaded:state?.loaded??true,loading:null,
+   const browserArchive={slot,universe:target,revision:saved.revision,archiveRef:saved.archiveRef,loaded:state?.loaded??true,loading:null,
     gameRef:saved.gameRef,gamesLoaded:state?.gamesLoaded??true,gamesLoading:null,gamesDirty:false};
-  browserArchives.set(activeSaveSlot,browserArchive);
-  // Committed box scores now live in storage; they must not also stay pending.
-  if(!browserArchive.gamesLoaded)universe.gameArchive=[];
-  // A deferred archive can have freshly appended rows; after committing them,
-  // all of its rows now live in storage and must not also remain as pending rows.
-  if(!browserArchive.loaded){universe.playerArchive=[];rebuildIndexes()}
-  // Keep only title metadata, not a second complete league in memory.
-  titleSaveSlots=titleSaveSlots.filter(s=>s.slot!==activeSaveSlot).concat(saved.meta).sort((a,b)=>SAVE_SLOT_IDS.indexOf(a.slot)-SAVE_SLOT_IDS.indexOf(b.slot));
-  titleBrowserSave=saved.meta;renderSaveSlotControls();
-  return saved;
+   browserArchives.set(slot,browserArchive);
+   // Clear only the rows in this completed snapshot. Another action may have
+   // appended rows while storage was writing; those still need a checkpoint.
+   if(!browserArchive.gamesLoaded)target.gameArchive=(target.gameArchive||[]).slice(gameCount);
+   if(!browserArchive.loaded){target.playerArchive=(target.playerArchive||[]).slice(rowCount);if(target===universe)rebuildIndexes()}
+   titleSaveSlots=titleSaveSlots.filter(s=>s.slot!==slot).concat(saved.meta).sort((a,b)=>SAVE_SLOT_IDS.indexOf(a.slot)-SAVE_SLOT_IDS.indexOf(b.slot));
+   if(slot===activeSaveSlot){titleBrowserSave=saved.meta;renderSaveSlotControls()}
+   if(target===universe&&slot===activeSaveSlot){
+    const current=version===sessionCheckpointVersion&&stamp===guidanceCalendarStamp(target);
+    setSessionSaveStatus(current?'saved':autosaveKind?'pending':'unsaved',current?'Checkpoint saved.':autosaveKind?'New progress waiting to save…':'Changes since the saved checkpoint. Use Save.',{target,slot,version:current?version:sessionCheckpointVersion,programId});
+    rememberSessionViewContext();
+   }
+   return saved;
+  }catch(error){
+   setSessionSaveStatus('failed',`Save failed: ${error.message||'storage unavailable'}. Retry Save or Export a backup.`,{target,slot,version,stamp,programId});throw error;
+  }
 }
 function saveBrowser(){return storageOperation(async()=>{
   const occupied=activeSlotMeta()&&!activeSlotMeta().empty&&!currentArchiveState();
   if(occupied&&!confirm(`Replace ${activeSlotMeta().label}? Its current dynasty will be overwritten.`))return false;
-  await writeBrowserSave('manual');
-  setStatus(`Saved ${universe.year}, Week ${universe.week} to ${activeSlotMeta()?.label||savedDynastyLabel()} ${storageLocation()}.`);
+  const target=universe,slot=activeSaveSlot;await writeBrowserSave('manual');
+  if(target===universe&&slot===activeSaveSlot)setStatus(`Saved ${universe.year}, Week ${universe.week} to ${activeSlotMeta()?.label||savedDynastyLabel()} ${storageLocation()}.`);
 })}
 
 // Autosave fires only after a completed atomic action, never mid-transaction. The debounce
 // coalesces a burst (simming a season fires one per week) into a single write.
 const AUTOSAVE_DEBOUNCE_MS=900;
-const AUTOSAVE_KINDS=['week','postseason','signing','portal','camp','preseason','guidance'];
-let autosaveTimer=null,autosaveKind=null,autosaveEnabled=true,autosaveInFlight=null;
-// Drops a queued checkpoint and waits out one already writing, so the caller finds the
-// store free. Never rejects: a failed checkpoint must not break the action the player asked for.
-async function yieldToUserAction(){
+const AUTOSAVE_KINDS=['week','postseason','signing','portal','camp','preseason','guidance','management','game'];
+let autosaveTimer=null,autosaveKind=null,autosaveEnabled=true,autosaveInFlight=null,autosaveContext=null;
+function cancelQueuedAutosave(){
  if(typeof clearTimeout==='function')clearTimeout(autosaveTimer);
- autosaveTimer=null;autosaveKind=null;
- if(autosaveInFlight)await autosaveInFlight.catch(()=>{});
+ const queued=!!autosaveKind;autosaveTimer=null;autosaveKind=null;autosaveContext=null;
+ if(queued&&sessionSaveRecord?.state==='pending')setSessionSaveStatus('unsaved','Checkpoint has not been saved. Use Save.');
 }
+// Manual storage actions supersede the debounce, then wait for a real in-flight
+// write. Cancelling a queued checkpoint can never create a Saved indication.
+async function yieldToUserAction(){cancelQueuedAutosave();if(autosaveInFlight)await autosaveInFlight.catch(()=>{})}
 function autosaveBlocked(){
- if(!universe||!autosaveEnabled)return 'no dynasty';
+ if(!universe)return 'no dynasty';
+ if(!autosaveEnabled)return 'autosave is off';
  if(activeSlotMeta()&&!activeSlotMeta().empty&&!currentArchiveState())return 'the selected slot belongs to another dynasty';
- // A pending career choice or an open dialog means the player is mid-decision; a checkpoint
- // taken now could capture a state they are still resolving.
  if(hasPendingCareerChoice())return 'a career decision is open';
- // querySelectorAll is counted rather than querySelector truth-tested: a stub or shim can
- // return an object for any selector, which would wedge autosave off permanently.
  if(typeof document!=='undefined'&&document.querySelectorAll?.('dialog[open]')?.length)return 'a dialog is open';
  return null;
 }
 function autosaveAfter(kind){
  if(!AUTOSAVE_KINDS.includes(kind))throw new Error(`Unknown autosave checkpoint "${kind}".`);
- autosaveKind=kind;
+ sessionCheckpointVersion++;
+ if(!universe||!autosaveEnabled){cancelQueuedAutosave();setSessionSaveStatus('unsaved',autosaveEnabled?'No dynasty open.':'Autosave is off. Use Save to preserve your progress.');return}
+ autosaveKind=kind;autosaveContext={target:universe,slot:activeSaveSlot};
+ setSessionSaveStatus('pending','Checkpoint waiting to save…');
  if(typeof setTimeout!=='function')return;
- clearTimeout(autosaveTimer);
- autosaveTimer=setTimeout(()=>runAutosave(),AUTOSAVE_DEBOUNCE_MS);
+ clearTimeout(autosaveTimer);autosaveTimer=setTimeout(()=>runAutosave(),AUTOSAVE_DEBOUNCE_MS);
 }
 async function runAutosave(){
- const kind=autosaveKind;
- if(!kind)return false;
- if(autosaveBlocked()){autosaveKind=null;return false}
- // A manual save owns the store while it runs; come back rather than racing it.
- if(storageBusy){autosaveAfter(kind);return false}
- autosaveKind=null;storageBusy=true;
- let settle;
- autosaveInFlight=new Promise(r=>{settle=r});
+ const kind=autosaveKind,context=autosaveContext;if(!kind)return false;
+ if(context?.target!==universe||context?.slot!==activeSaveSlot){cancelQueuedAutosave();return false}
+ const blocked=autosaveBlocked();
+ if(blocked==='a dialog is open'){
+  clearTimeout(autosaveTimer);autosaveTimer=null;
+  setSessionSaveStatus('pending','Changes waiting to save after you close the open dialog.');return false;
+ }
+ if(blocked){cancelQueuedAutosave();setSessionSaveStatus('unsaved',`Checkpoint not saved: ${blocked}. Use Save when ready.`);return false}
+ if(storageBusy){clearTimeout(autosaveTimer);autosaveTimer=setTimeout(()=>runAutosave(),AUTOSAVE_DEBOUNCE_MS);return false}
+ clearTimeout(autosaveTimer);autosaveTimer=null;autosaveKind=null;autosaveContext=null;storageBusy=true;
+ let settle;autosaveInFlight=new Promise(r=>{settle=r});
  try{
-  await writeBrowserSave(kind);
-  universe.lastCheckpoint={kind,year:universe.year,week:universe.week,at:new Date().toISOString()};
+  const year=universe.year,week=universe.week;await writeBrowserSave(kind);
+  if(universe===context.target&&activeSaveSlot===context.slot)universe.lastCheckpoint={kind,year,week,at:new Date().toISOString()};
   return true;
- }catch(e){
-  // Never block play on a failed checkpoint: the dynasty in memory is still fine.
-  setStatus(`Autosave failed (${e.message||'unknown error'}). Your dynasty is still open — use Save or Export.`);
-  return false;
- }finally{storageBusy=false;autosaveInFlight=null;settle()}
+ }catch{return false}
+ finally{storageBusy=false;autosaveInFlight=null;settle()}
+}
+// Inline and extension controls share a bounded management checkpoint hook.
+// Capture the control before render removes it, then queue after its handler runs.
+// Pure navigation, sorting, filters, profile opening, and live-game controls are absent.
+const SESSION_MANAGEMENT_CLICK=[
+ '#autoTarget','#autoDepth','#applyCampWinners','#applyPositionChange','#applyProgramEdit','#portalOpen','#portalAdvance','#portalFinalize',
+ '[data-decision]','[data-target]','[data-visit]','[data-pull]','[data-redshirt]','[data-nil-player]','[data-nil-recruit]','[data-scout-action]',
+ '[data-feature-development]','[data-recruit-focus]','[data-shortlist-target]','[data-rising-watch]','[data-interview]','[data-send-offer]','[data-post]',
+ '[data-portal-nil]','[data-portal-nil-off]','[data-v0102-prep-focus]','[data-v0102-prep-delegate]','[data-v0102-prep-clear]','[data-v0102-staff-plan]'
+].join(',');
+const SESSION_MANAGEMENT_CHANGE=['#teamTrainingFocus','[data-role]','[data-training]','[data-promise]','[data-portal-attention]','[data-portal-promise]'].join(',');
+function sessionManagementEvent(event){
+ const selector=event.type==='click'?SESSION_MANAGEMENT_CLICK:event.type==='change'?SESSION_MANAGEMENT_CHANGE:null;
+ const control=selector&&event.target?.closest?.(selector);if(!control||control.disabled||!universe)return false;
+ const target=universe,slot=activeSaveSlot,version=sessionCheckpointVersion;
+ const completed=()=>{if(universe===target&&activeSaveSlot===slot&&version===sessionCheckpointVersion)autosaveAfter('management')};
+ if(typeof queueMicrotask==='function')queueMicrotask(completed);else setTimeout(completed,0);
+ return true;
+}
+function resumeAutosaveAfterDialog(){
+ if(!autosaveKind||autosaveContext?.target!==universe||autosaveContext?.slot!==activeSaveSlot||autosaveBlocked())return false;
+ return runAutosave();
+}
+if(typeof document!=='undefined'){
+ document.addEventListener('click',sessionManagementEvent,true);document.addEventListener('change',sessionManagementEvent,true);
+ document.addEventListener('close',event=>{if(event.target?.tagName==='DIALOG')resumeAutosaveAfterDialog()},true);
 }
 function loadBrowser(){return storageOperation(async()=>{
   const d=await browserStore.load();

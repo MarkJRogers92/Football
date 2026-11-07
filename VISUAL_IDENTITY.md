@@ -2,6 +2,16 @@
 
 Unreleased (source still v0.14.1). Presentation only: no simulation, balance, save-shape or RNG changes.
 
+## One More Saturday experience pass
+
+The shared Midnight & Brass palette now supports distinct compositions: an open weekly desk and compact program nameplate, a ruled recruiting sheet, a field/scoreboard focus on Game Day, and an almanac in History. Routine card entrances, chart draw-ins, button sweeps, next-game pulses, ticker movement and weekly flips are quiet. State-change feedback and earned ceremonies remain.
+
+The existing highlights card becomes the visible postgame stopping point: final score, one standout, one supported consequence, and the next known opponent. More contributors, recorded plays and replay stay in a closed disclosure. No card appears before a final, and no acknowledgement is required. `season-moments.css` supplies its component layout.
+
+A separate `#dynastySessionSaveStatus` reports real persistence completion, pending writes and failures; `session-status.css` styles it. Returning after a meaningful absence adds last result, priority and pending choice to the existing welcome-back summary. Safe local view preferences are scoped to slot, seed, archive identity and program; they never restore gameplay actions or unfinished live games.
+
+History’s existing museum adds a closed “People, classes & rivalry” disclosure. It uses retained signing receipts and school-season records, never infers a signing from a roster spot, and labels deferred or partial archives. Full source and verification evidence belong in `agent_docs/latest_session_work.md`.
+
 ## Living world first pass
 
 The Command Center now has a compact optional briefing below the existing advance and required-decision controls, with no more than three factual items. Players and coaches can be followed from their profiles or story cards; the followed cast is inside an optional disclosure. Updates describe meaningful changes, not routine statistical increments. Prior players, recruits whose recorded top five included the program, and former coaches may reappear in next-opponent coverage. Rival Watch and highlights move into the existing detailed weekly disclosure.

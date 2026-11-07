@@ -3,10 +3,10 @@
 
   const TAB_GROUP={dashboard:'home',newsletter:'home',program:'program',roster:'program',depth:'program',development:'program',staff:'program',offseason:'program',recruiting:'recruiting',gamelab:'season',season:'season',stats:'season',history:'world',records:'world',legacy:'world'};
   const NAV=[
-    {label:'Home',items:[['dashboard','Command Center'],['newsletter','News']]},
-    {label:'Program',items:[['program','Overview'],['roster','Roster'],['depth','Roles & Depth'],['development','Development'],['staff','Staff'],['offseason','Offseason']]},
+    {label:'Home',items:[['dashboard','This Week'],['newsletter','News']]},
+    {label:'Program',items:[['program','Overview'],['roster','Roster'],['depth','Roles & Depth'],['development','Player Development'],['staff','Staff'],['offseason','Offseason']]},
     {label:'Recruiting',items:[['recruiting','Recruiting Board']]},
-    {label:'Season',items:[['gamelab','Game Lab'],['season','Schedule'],['stats','Stats']]},
+    {label:'Season',items:[['gamelab','Game Day'],['season','Schedule'],['stats','Stats']]},
     {label:'World',items:[['history','History'],['records','Awards & Records'],['legacy','Legacy']]}
   ];
 
@@ -85,12 +85,14 @@
   function currentTab(){return app.querySelector('.tabs button.active[data-tab]')?.dataset.tab||'dashboard'}
 
   function go(tab){
+    const changed=currentTab()!==tab;
     const groupId=TAB_GROUP[tab];
     const group=groupId&&app.querySelector(`.tab-groups button[data-group="${groupId}"]`);
     if(group&&!group.classList.contains('active'))group.click();
     const target=app.querySelector(`.tabs button[data-tab="${tab}"]`);
     if(target)target.click();
     closeRail();
+    if(changed)window.scrollTo?.({top:0,left:0,behavior:'instant'});
     setTimeout(sync,0);
   }
 

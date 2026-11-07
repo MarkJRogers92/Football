@@ -4,7 +4,7 @@
   // The Command Center stacks every dashboard card in one long scroll. This splits the cards that
   // arrive from several modules into three views without changing any of them: the week's work
   // (default), stories and goals, and the league picture. Cards are classified; the weekly action stays ahead of supporting coverage.
-  const VIEWS=[['week','This week'],['stories','Players & goals'],['league','League']];
+  const VIEWS=[['week','Briefing'],['stories','Players & goals'],['league','League']];
   const dash=document.querySelector('#dashboard');
   if(!dash||dash.querySelector('.dash-views'))return;
 
@@ -44,7 +44,7 @@
   }
   function mount(){
     const bar=document.createElement('div');
-    bar.className='dash-views';bar.setAttribute('role','tablist');bar.setAttribute('aria-label','Dashboard view');
+    bar.className='dash-views';bar.setAttribute('role','tablist');bar.setAttribute('aria-label','This Week view');
     bar.innerHTML=VIEWS.map(([key,label])=>`<button type="button" role="tab" data-dash-view="${key}">${label}<i></i></button>`).join('');
     bar.addEventListener('click',event=>{const button=event.target.closest('[data-dash-view]');if(button)show(button.dataset.dashView)});
     bar.addEventListener('keydown',event=>{

@@ -19,3 +19,24 @@
 .history-controls select{background:#0c141d;color:inherit;border:1px solid #223142;border-radius:8px;padding:6px 8px;font:inherit}
 .history-row.is-head{background:transparent;border-color:transparent;cursor:default;pointer-events:none;padding-top:0;padding-bottom:0}
 .history-row.is-head .history-who strong{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#93a5ba}
+
+/* Personal history stays inside the existing almanac, behind one optional disclosure. */
+.dynasty-museum .legacy-program,.dynasty-museum .legacy-person{max-width:100%;height:auto;min-height:32px;padding:3px 0;white-space:normal;overflow-wrap:anywhere;text-align:left;color:inherit;background:transparent;border:0;border-radius:2px;font:inherit;font-weight:700;line-height:1.35}
+.dynasty-museum .legacy-name .legacy-program{font-size:inherit;line-height:1.15}
+.dynasty-museum .legacy-program:hover,.dynasty-museum .legacy-person:hover{text-decoration:underline;text-underline-offset:3px}
+.dynasty-museum button:focus-visible,.legacy-memory>summary:focus-visible{outline:2px solid var(--brass,#d5ae61);outline-offset:3px}
+.legacy-memory{border-top:1px solid var(--line,#28384b);border-bottom:1px solid var(--line,#28384b)}
+.legacy-memory-summary{cursor:pointer;padding:12px 3px;font-size:12px;line-height:1.5}
+.legacy-memory-summary strong{margin-right:12px}.legacy-memory-summary>span{font-size:10px;color:var(--muted,#9dafc1)}
+.legacy-memory-grid{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:18px;padding:0 3px 14px}
+.legacy-memory-section{min-width:0}.legacy-memory-section h4{margin:3px 0 6px;font-size:13px}.legacy-memory-section h5{margin:0 0 3px;font-size:12px}
+.legacy-note{display:block;font-size:10px;line-height:1.5;color:var(--muted,#9dafc1);overflow-wrap:anywhere}.legacy-memory p{margin:4px 0 9px}
+.legacy-deferred{padding-left:8px;border-left:2px solid var(--brass,#d5ae61)}
+.legacy-class{padding:10px 0;border-top:1px solid var(--line,#28384b)}
+.legacy-player-file{min-width:0;padding:7px 0}.legacy-player-file+.legacy-player-file{border-top:1px solid rgba(143,163,184,.13)}
+.legacy-player-file .legacy-person{font-size:11px}
+.legacy-progression{list-style:none;margin:4px 0 0;padding:0 0 0 9px;border-left:1px solid var(--line,#3b4c5f);font-size:10px;line-height:1.6;color:var(--muted,#9dafc1);font-variant-numeric:tabular-nums}
+.legacy-meetings{display:grid;gap:7px}.legacy-meeting{padding:6px 0;border-bottom:1px solid var(--line,#28384b)}
+.legacy-meeting .game-link{max-width:100%;min-height:32px;height:auto;white-space:normal;overflow-wrap:anywhere;text-align:left;font-variant-numeric:tabular-nums}
+@media(max-width:1000px){.legacy-memory-grid{grid-template-columns:1fr 1fr}.legacy-memory-section:first-child{grid-column:1/-1}}
+@media(max-width:560px){.legacy-memory-grid{grid-template-columns:1fr;gap:12px}.legacy-memory-section:first-child{grid-column:auto}.legacy-memory-summary>span{display:block;margin-top:2px}.dynasty-museum .legacy-person,.dynasty-museum .legacy-program,.legacy-meeting .game-link{min-height:40px}}

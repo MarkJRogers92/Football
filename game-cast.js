@@ -43,7 +43,7 @@ function gameCastModel(g){
 function gameCastPct(v){return`${Math.round(v*100)}%`}
 function gameCastHTML(g){
  const m=gameCastModel(g);
- if(!m)return'<section class="watch-unavailable"><h3>Game Cast unavailable</h3><p>Game Cast needs recorded play-by-play, which is kept for games played in Game Lab or Game Day. Summary and Box Score still have the full result.</p></section>';
+ if(!m)return'<section class="watch-unavailable"><h3>Game Cast unavailable</h3><p>This game has no recorded play-by-play. Summary and Box Score still have the full result.</p></section>';
  const W=m[m.winner],L=m[m.winner==='home'?'away':'home'],s=m.swing&&m.plays[m.swing.i],sp=s&&m.plays[m.swing.i+1];
  const swingTeam=m.swing&&(m.swing.delta>0?m.home:m.away);
  const facts=[`<li><strong>${gameEscape(W)}</strong> won ${m.final[m.winner]}–${m.final[m.winner==='home'?'away':'home']}${m.winnerLow<.25?`, rallying from as low as ${gameCastPct(m.winnerLow)} to win`:''}.</li>`];

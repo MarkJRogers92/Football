@@ -43,6 +43,6 @@ function recordV2GameLabResult(options={}){
     completeScheduledGame(g,result,true);if(options.testFault==='afterSchedule')throw new Error('Injected v2 rollback fault after schedule settlement.');
     universe.lastDetailedGame={...result,season:universe.year,week:g.week,engine:'v2',transactionVersion:prepared.tx.VERSION};universe.latest=[result];
     const validation=v2RecordValidate(candidate,record,home,away,rollback,g);if(!validation.ok)throw new Error(`Recorded v2 game failed post-commit validation: ${validation.errors.join('; ')}`);
-    ranked();if(options.testFault==='afterRank')throw new Error('Injected v2 rollback fault after rankings.');syncGameplayRng();v2GameLabPreview={key:prepared.key,...preview,recorded:true,gameId:result.gameId};return{ok:true,result,record,candidate,validation,preview};
+    ranked();if(options.testFault==='afterRank')throw new Error('Injected v2 rollback fault after rankings.');syncGameplayRng();v2GameLabPreview={key:prepared.key,...preview,recorded:true,gameId:result.gameId};autosaveAfter('game');return{ok:true,result,record,candidate,validation,preview};
   }catch(err){v2RecordRestore(rollback,g,home,away);throw err}
 }

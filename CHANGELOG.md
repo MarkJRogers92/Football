@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.14.3 — One More Saturday
+
+- Distinct weekly desk, recruiting sheet, Game Day scoreboard and history almanac; tighter headers and quieter routine motion. Earned milestone ceremonies remain.
+- Natural football labels, including This Week, Game Day, Player Development and Finish Game. Routine finals use the persistent recap rather than a full-screen splash.
+- Compact factual postgame payoff: one standout, recorded consequence, next opponent and stopping point. Secondary highlights remain optional; no extra advancement gate.
+- Separate truthful persistence status and retry, management/completed-game checkpoints, scoped view/filter/prospect recovery, and a shorter welcome-back threshold. No save-format or simulation-balance change; unfinished live games are not persisted.
+- Optional personal history within History: recorded signing classes, returning players and recent rivalry meetings, with canonical links and explicit deferred/partial records.
+
 ## v0.14.2 — Living world and Midnight & Brass
 
 Presentation only: no simulation, balance, save-shape or randomness changes. See `VISUAL_IDENTITY.md`.

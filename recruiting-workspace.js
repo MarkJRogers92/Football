@@ -40,7 +40,7 @@ function dossier(x){
  '<div class="rw-verdict"><span>STAFF READ</span><strong>'+esc(staff.label)+'</strong><small>'+esc(staff.detail)+'</small>'+(confidence!=null?'<div class="rw-confidence" role="meter" aria-label="Report confidence" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+confidence+'"><i style="width:'+confidence+'%"></i></div>':'')+(staff.risk?'<small>Biggest uncertainty: '+esc(staff.risk)+'.</small>':'')+'</div>'+
  '<div class="rw-battle"><div><span class="eyebrow">RECRUITING BATTLE</span><strong>'+esc(battle.label)+'</strong></div><div class="rw-battle-grid"><div><span>Your position</span><strong>'+esc(battle.rank)+'</strong></div><div><span>Gap to leader</span><strong>'+esc(battle.gap)+'</strong></div><div><span>Leader</span><strong>'+esc(battle.leader)+'</strong></div><div><span>Momentum</span><strong>'+esc(mom)+'</strong></div></div></div>'+
  '<div class="rw-dossier-grid"><div><span>Priority</span><strong>'+esc(x.priority)+'</strong></div><div><span>Interest</span><strong>'+esc(x.interest)+'</strong></div><div><span>Evaluation stage</span><strong>'+esc(stage)+'</strong></div><div><span>Board status</span><strong>'+(x.commit?'Committed':x.target?'Targeted':'Untracked')+'</strong></div></div>'+
- '<div class="rw-intel-note">Staff estimates only. The dossier preserves scouting uncertainty and never exposes hidden true ratings.</div>'+
+ '<div class="rw-intel-note">Staff estimates. More scouting narrows the uncertainty.</div>'+
  '<div class="rw-actions"><button data-rwa="open">Open Full Profile</button>'+(q?'<button data-rwa="quick" '+(q.disabled?'disabled':'')+'>'+esc(q.textContent.trim())+'</button>':'')+(f?'<button data-rwa="full" '+(f.disabled?'disabled':'')+'>'+esc(f.textContent.trim())+'</button>':'')+(t?'<button data-rwa="target">'+esc(t.textContent.trim())+'</button>':'')+'</div>'
 }
 function syncCanonicalSelection(all){for(const x of all)x.row.classList.toggle('recruit-selected-row',x.id===sel)}
@@ -59,6 +59,18 @@ function render(){
  if(removedDetail){$('#rwSearch').focus({preventScroll:true});$('#rwSearch').scrollIntoView({block:'center',behavior:'instant'})}
  globalThis.DynastyLabPortraits?.paint?.(shell);syncCanonicalSelection(all);if(keepFocus!==null){const si=$('#rwSearch');si.focus();si.setSelectionRange(keepFocus,keepFocus)}const si=$('#rwSearch');si.oninput=()=>{shown=PAGE;clearTimeout(searchTimer);const query=si.value;searchTimer=setTimeout(()=>poolFilters()?.setState({query}),300)};shell.querySelectorAll('[data-rw-more]').forEach(b=>b.onclick=()=>{shown+=PAGE;render()});shell.querySelectorAll('[data-rwf]').forEach(b=>b.onclick=()=>{filter=b.dataset.rwf;shown=PAGE;if(filter==='board')poolFilters()?.setState({targetedOnly:true});else if(poolFilters()?.getState().targetedOnly)poolFilters().setState({targetedOnly:false});render()});shell.querySelectorAll('[data-rwid]').forEach(b=>b.onclick=()=>{listScroll=$('.rw-card-list').scrollTop;pageScroll=window.scrollY;returnId=b.dataset.rwid;sel=returnId;phoneDetail=phone();render();if(phoneDetail){const back=$('[data-rw-back]');back?.focus({preventScroll:true});back?.scrollIntoView({block:'start',behavior:'instant'})}});shell.querySelectorAll('[data-rwa]').forEach(b=>b.onclick=()=>{const x=data().find(y=>y.id===sel);if(b.dataset.rwa==='open')delegate(x,'[data-recruit]');if(b.dataset.rwa==='quick')delegate(x,'[data-scout-action="quick"]');if(b.dataset.rwa==='full')delegate(x,'[data-scout-action="full"]');if(b.dataset.rwa==='target')delegate(x,'[data-target]')})
 }
+// Device-local view preferences restore the file being read, never a scouting action.
+globalThis.DynastyRecruitingWorkspaceView=Object.freeze({
+ read:()=>({mode,filter,selectedId:sel,shown}),
+ restore(view){
+  if(!view||!['workspace','table'].includes(view.mode)||!['board','all','commits'].includes(view.filter))return false;
+  const rows=data(),selected=typeof view.selectedId==='string'&&rows.some(row=>row.id===view.selectedId)?view.selectedId:'';
+  mode=view.mode;filter=view.filter;sel=selected;boardSeen=true;phoneDetail=false;
+  shown=Math.max(PAGE,Math.min(rows.length||PAGE,Number.isFinite(view.shown)?Math.floor(view.shown):PAGE));
+  const index=filtered(rows).findIndex(row=>row.id===selected);if(index>=shown)shown=Math.ceil((index+1)/PAGE)*PAGE;
+  render();syncCanonicalSelection(data());return true;
+ }
+});
 phoneQuery.addEventListener('change',()=>{if(!phoneDetail)return;render();const control=phone()?$('[data-rw-back]'):$('.recruit-workspace-card.active');control?.focus({preventScroll:true})});
 let pending=false;function queue(){if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;render()})}
 new MutationObserver(queue).observe($('#recruitBody'),{childList:true,subtree:true});document.addEventListener('click',e=>{if(e.target.closest('[data-tab="recruiting"],[data-scout-action],[data-target]'))setTimeout(queue,0)});queue();
