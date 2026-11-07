@@ -30,6 +30,22 @@ test('full evaluation costs three and supersedes quick film',()=>{const {api}=fi
 
 test('budget resets when the week advances',()=>{const {api,universe}=fixture(),t=team(),r=recruit();api.performScoutingAction(r,t,'full');assert.ok(api.scoutingHoursLeft(t)<api.scoutingBudgetFor(t));universe.week++;assert.equal(api.scoutingHoursLeft(t),api.scoutingBudgetFor(t))});
 
+test('reading unused evaluation hours and workload does not create scouting state',()=>{
+ const {api}=fixture(),t=team(),before=JSON.stringify(t);
+ assert.equal(api.scoutingHoursLeft(t),13);assert.equal(api.evaluationWorkload([],t).remaining,13);
+ assert.equal(JSON.stringify(t),before,'displaying evaluation hours is read-only');
+});
+
+test('reading a stale scouting week preserves it until an evaluation spends current-week hours',()=>{
+ const {api,universe}=fixture(),t=team(),r=recruit();
+ t.scoutingWeek={year:2027,week:0,budget:13,spent:13};const before=JSON.stringify(t);
+ assert.equal(api.scoutingHoursLeft(t),13);assert.equal(api.evaluationWorkload([r],t).remaining,13);
+ assert.equal(api.actionAvailability(r,t,'quick').ok,true);
+ assert.equal(JSON.stringify(t),before,'browsing cannot rewrite the prior checkpoint');
+ const result=api.performScoutingAction(r,t,'quick');assert.equal(result.ok,true);assert.equal(result.remaining,12);
+ assert.deepEqual(t.scoutingWeek,{year:universe.year,week:2,budget:13,spent:1});
+});
+
 test('cannot manually scout a recruit committed elsewhere',()=>{const {api}=fixture(),t=team(),r={...recruit(),committed:'Wisconsin Commonwealth'};const res=api.performScoutingAction(r,t,'quick');assert.equal(res.ok,false);assert.match(res.reason,/committed elsewhere/i)});
 
 test('staff verdict never reads hidden true rating directly',()=>{const {api}=fixture(),t=team(),r=recruit(),a=api.staffVerdict(r,t);r.trueNow=30;r.upside=35;const b=api.staffVerdict(r,t);assert.deepEqual(b,a)});

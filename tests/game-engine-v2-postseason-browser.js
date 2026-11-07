@@ -31,30 +31,8 @@ function checkDurable(row,label){
     const conf=await browser.newPage({viewport:{width:1280,height:900}});conf.on('pageerror',e=>browserErrors.push(String(e)));
     conf.on('console',m=>{if(m.type()==='error'&&!/Injected postseason v2 rollback fault/.test(m.text()))browserErrors.push(m.text())});
     await startNewDynasty(conf);await reachPostseason(conf);await conf.evaluate(()=>window.__DL_TEST__.v2PostseasonPrepare('conference'));
-    const beforeDigest=await conf.evaluate(()=>{
-      const stringify=JSON.stringify;let text;
-      JSON.stringify=function(value,...args){const out=stringify.call(this,value,...args);if(Array.isArray(value?.teams)&&Array.isArray(value?.recruits))text=out;return out};
-      try{const digest=window.__DL_TEST__.v2PostseasonStateDigest();window.__POSTSEASON_ROLLBACK_BASELINE__={text,status:window.DynastySessionStatus.read()};return digest}finally{JSON.stringify=stringify}
-    });await conf.evaluate(()=>window.__DL_TEST__.v2PostseasonInjectFault('afterArchive'));
-    await conf.evaluate(()=>{
-      const stringify=JSON.stringify;let captured=false;
-      JSON.stringify=function(value,...args){const out=stringify.call(this,value,...args);if(!captured&&Array.isArray(value?.teams)&&Array.isArray(value?.recruits)){window.__POSTSEASON_ROLLBACK_BASELINE__.stage=out;captured=true}return out};
-      try{document.querySelector('#simConf').click()}finally{JSON.stringify=stringify}
-    });const afterDigest=await conf.evaluate(()=>window.__DL_TEST__.v2PostseasonStateDigest());
-    if(afterDigest!==beforeDigest)console.error('Postseason rollback diagnostics:',JSON.stringify(await conf.evaluate(()=>{
-      const baseline=window.__POSTSEASON_ROLLBACK_BASELINE__,stringify=JSON.stringify;let current;
-      JSON.stringify=function(value,...args){const out=stringify.call(this,value,...args);if(Array.isArray(value?.teams)&&Array.isArray(value?.recruits))current=value;return out};
-      try{window.__DL_TEST__.v2PostseasonStateDigest()}finally{JSON.stringify=stringify}
-      const changes=(before,after)=>{
-        const out=[],walk=(a,b,path)=>{
-          if(out.length>=20||Object.is(a,b))return;
-          if(a===null||b===null||typeof a!=='object'||typeof b!=='object'){out.push({path,before:a??null,after:b??null});return}
-          for(const key of new Set([...Object.keys(a),...Object.keys(b)]))walk(a[key],b[key],`${path}.${key}`);
-        };walk(before,after,'universe');return out;
-      };
-      const before=JSON.parse(baseline.text),stage=baseline.stage?JSON.parse(baseline.stage):null;
-      return {beforeStatus:baseline.status,afterStatus:window.DynastySessionStatus.read(),beforeCheckpoint:before.lastCheckpoint,afterCheckpoint:current?.lastCheckpoint,beforeToStage:stage?changes(before,stage):null,stageToAfter:stage?changes(stage,current):null,beforeToAfter:changes(before,current)};
-    })));
+    const beforeDigest=await conf.evaluate(()=>window.__DL_TEST__.v2PostseasonStateDigest());await conf.evaluate(()=>window.__DL_TEST__.v2PostseasonInjectFault('afterArchive'));
+    await conf.evaluate(()=>document.querySelector('#simConf').click());const afterDigest=await conf.evaluate(()=>window.__DL_TEST__.v2PostseasonStateDigest());
     assert.equal(afterDigest,beforeDigest,'conference stage rollback must restore the complete dynasty after a post-archive v2 fault');
     let audit=await conf.evaluate(()=>window.__DL_TEST__.v2PostseasonAudit());assert.equal(audit.phase,'confReady');assert.equal(audit.totalPostseason,0,'failed conference stage must leave no partial AI or v2 archives');
     await conf.evaluate(()=>document.querySelector('#simConf').click());audit=await conf.evaluate(()=>window.__DL_TEST__.v2PostseasonAudit());

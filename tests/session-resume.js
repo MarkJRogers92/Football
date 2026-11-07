@@ -317,6 +317,7 @@ test('the debounce starts a real checkpoint at 900ms and reports saved only afte
 test('postseason rollback restores the whole world after the preceding checkpoint has settled',async t=>{
  const f=await fixture(8332,{fullRuntime:true}),{e,store}=f,api=assertApi(f),errors=[];
  t.mock.method(console,'error',error=>errors.push(String(error)));
+ e.T('Chicago Metropolitan').scoutingWeek={year:e.universe.year,week:0,budget:13,spent:3};
  e.autosaveAfter('week');await e.runAutosave();assert.equal(e.universe.lastCheckpoint.week,0);
  e.simSeason();assert.equal(e.universe.phase,'confReady');
  const release=f.hold(),saving=e.runAutosave();assert.equal(api.read().state,'saving');
@@ -328,6 +329,7 @@ test('postseason rollback restores the whole world after the preceding checkpoin
  global.__DL_TEST__.v2PostseasonPrepare('conference');
  const before=global.__DL_TEST__.v2PostseasonStateDigest();
  global.__DL_TEST__.v2PostseasonInjectFault('afterArchive');e.simConferenceChampionships();
+ e.scoutingHoursInfo(e.T('Chicago Metropolitan'));
  assert.equal(global.__DL_TEST__.v2PostseasonStateDigest(),before,'rollback restores the complete dynasty');
  assert.equal(e.universe.phase,'confReady');assert.equal(global.__DL_TEST__.v2PostseasonAudit().totalPostseason,0);
  assert.equal(errors.length,1);assert.match(errors[0],/Injected postseason v2 rollback fault after archive write/);

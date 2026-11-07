@@ -18,8 +18,8 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
     assert.match(pre.matchup.text,/% pass/i);assert.match(pre.matchup.text,/Active plan/i);
     await page.waitForSelector('[data-v2-gameday-start]',{timeout:10000});await page.click('[data-v2-gameday-start]');await page.click('[data-v2-gameday-delegate]');
     await page.waitForFunction(()=>window.__DL_TEST__.v2GameDayPreviewState()?.state?.status==='final',{timeout:60000});await page.click('[data-v2-gameday-record]');
-    await page.waitForFunction(()=>/POSTGAME PLAN RECEIPT/i.test(window.__DL_TEST__.v2MatchupSummary()?.receipt||''),{timeout:30000});const post=await page.evaluate(()=>window.__DL_TEST__.v2MatchupSummary());
-    assert.match(post.receipt,/POSTGAME PLAN RECEIPT/i);assert.match(post.receipt,/Standard week/i);assert.match(post.receipt,/Baseline/i);assert.match(post.receipt,/does not claim the plan alone caused/i);
+    await page.waitForFunction(()=>/GAME PLAN REVIEW/i.test(window.__DL_TEST__.v2MatchupSummary()?.receipt||''),{timeout:30000});const post=await page.evaluate(()=>window.__DL_TEST__.v2MatchupSummary());
+    assert.match(post.receipt,/GAME PLAN REVIEW/i);assert.match(post.receipt,/Standard week/i);assert.match(post.receipt,/Baseline/i);assert.match(post.receipt,/other factors also affect the outcome/i);
     assert.deepEqual(errors,[],`matchup intelligence browser emitted errors: ${errors.join('\n')}`);console.log('PASS v0.10.2 matchup intelligence: weekly blockers resolved before Game Day; pregame intelligence and archived postgame receipt remain intact');
   }finally{await browser.close()}
 })().catch(err=>{console.error(err);process.exit(1)});
