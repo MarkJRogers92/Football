@@ -2011,7 +2011,7 @@ function bowlNameFor(i){return `${BOWL_NAMES[i%BOWL_NAMES.length]} Bowl`}
 // selection-committee model nobody would see.
 function simBowls(){
  if(universe.phase!=='bowlReady')return [];
- const field=bowlField(),logs=[];
+ const field=bowlField(),logs=[],archiveStart=(universe.gameArchive||[]).length;
  universe.bowls=[];
  for(let i=0;i+1<field.length;i+=2){
   const a=field[i],b=field[i+1],label=bowlNameFor(i/2);
@@ -2030,6 +2030,7 @@ function simBowls(){
  }
  universe.phase='playoffReady';
  if(universe.latest)universe.latest=logs.length?logs:universe.latest;
+ announceUserPostseason(archiveStart);
  ranked();buildWeeklyHub();render();
  return logs;
 }
@@ -2623,12 +2624,15 @@ function completeScheduledGame(g,r,detailed=false){
 function watchUserDetailed(){const before=universe.lastDetailedGame?.gameId;simulateUserDetailed();const id=universe.lastDetailedGame?.gameId;if(id&&id!==before)showGameCenter(id,'Watch')}
 function hasPendingCareerChoice(){return !!(universe.jobOffers||[]).length}
 function simWeek(skipDecisions=false){const gate=guidanceActionEligibility(skipDecisions===true?'simulate-season':'advance-week');if(!gate.allowed){if(gate.blockers[0])setStatus(gate.blockers[0].message);return}recoverWeek();const u=selected(),beforeRank=u.rank;advanceAcademicsForWeek(u);let results=[];for(const g of universe.schedule[universe.week]){if(g.played){settleRivalryGame(g);continue;}let r=gameSim(T(g.home),T(g.away),false,g.conf);completeScheduledGame(g,r);results.push(r);if(g.home===u.name||g.away===u.name)universe.lastDetailedGame=null}const userGame=universe.schedule[universe.week].find(g=>g.played&&(g.home===u.name||g.away===u.name));universe.week++;if(results.length)universe.latest=results;ranked();advanceRecruiting();buildWeeklyHub(beforeRank);if(universe.week===12)universe.phase='confReady';setStatus(weekResultStatus(universe.week,u,userGame));autosaveAfter('week');render()}
+// Postseason games never reach weekResultStatus, so the status line (and the ticker that mirrors it)
+// kept showing the Week 12 final through championship weekend, bowls and the playoff.
+function announceUserPostseason(fromIndex){const u=selected(),games=universe.gameArchive||[];if(!u)return;let r=null;for(let i=games.length-1;i>=Math.max(0,fromIndex);i--){const g=games[i];if(g?.home?.id===u.id||g?.away?.id===u.id){r=g;break}}if(!r?.label)return;const home=r.home?.id===u.id,us=Number(r.score?.[home?'home':'away'])||0,them=Number(r.score?.[home?'away':'home'])||0,opp=(home?r.away:r.home)?.name||'opponent',won=us>them;setStatus(`${r.label} final: ${won?'W':'L'} ${us}-${them} ${home||r.venue==='Neutral site'?'vs':'at'} ${opp}.${won&&r.label==='National Championship'?' National champions!':''}`)}
 function weekResultStatus(week,u,g){if(!g?.score)return `Week ${week} complete.`;const home=g.home===u.name,us=home?g.score[1]:g.score[0],them=home?g.score[0]:g.score[1];return `Week ${week} final: ${g.winner===u.name?'W':'L'} ${us}-${them} ${home?'vs':'at'} ${home?g.away:g.home}.`}
 function simSeason(){const gate=guidanceActionEligibility('simulate-season');if(!gate.allowed){if(gate.blockers[0])setStatus(gate.blockers[0].message);return}while(universe.phase==='regular'){delegateWeeklyDecisions(selected());simWeek(true)}render()}
 function confStand(c){return universe.teams.filter(t=>t.conference===c).map(t=>({t,s:rankingScore(t)})).sort((a,b)=>b.t.cw-a.t.cw||b.t.w-a.t.w||b.s-a.s).map(x=>x.t)}
-function simConferenceChampionships(){if(universe.phase!=='confReady')return;universe.latest=[];universe.confChamps=[];universe.playoffFieldIds=[];universe.playoffFieldUnavailable=false;allConfs().forEach(c=>{let s=confStand(c);if(s.length<2)return;let r=gameSim(s[0],s[1],true,false,{week:13,label:c+' Championship'}),w=T(r.winner);w.champ=true;universe.confChamps.push(w.id);universe.latest.push({...r,label:c+' Championship'})});ranked();freezePlayoffField();universe.phase='bowlReady';buildWeeklyHub();autosaveAfter('postseason');render()}
+function simConferenceChampionships(){if(universe.phase!=='confReady')return;const archiveStart=(universe.gameArchive||[]).length;universe.latest=[];universe.confChamps=[];universe.playoffFieldIds=[];universe.playoffFieldUnavailable=false;allConfs().forEach(c=>{let s=confStand(c);if(s.length<2)return;let r=gameSim(s[0],s[1],true,false,{week:13,label:c+' Championship'}),w=T(r.winner);w.champ=true;universe.confChamps.push(w.id);universe.latest.push({...r,label:c+' Championship'})});ranked();freezePlayoffField();universe.phase='bowlReady';buildWeeklyHub();announceUserPostseason(archiveStart);autosaveAfter('postseason');render()}
 function seedField(){if(universe.playoffFieldUnavailable)return [];const frozen=playoffFieldFromIds();return frozen.length===16?frozen:selectPlayoffField()}
-function simPlayoff(){if(universe.phase==='bowlReady')simBowls();if(universe.phase!=='playoffReady')return;if(universe.playoffFieldUnavailable){setStatus('This older postseason save predates frozen playoff selections after its bowls. The original field is unavailable, so no playoff was simulated.');return}let field=seedField();if(field.length!==16){setStatus('The saved playoff field is incomplete, so no playoff was simulated.');return}field.forEach((t,i)=>t.seed=i+1);let logs=[];function round(arr,label){let out=[];for(let i=0;i<arr.length/2;i++){let a=arr[i],b=arr[arr.length-1-i],r=gameSim(a,b,true,false,{week:14+['Round of 16','Quarterfinal','Semifinal','National Championship'].indexOf(label),label});logs.push({...r,label});out.push(T(r.winner))}return out}let r16=round(field,'Round of 16'),q=round(r16,'Quarterfinal'),s=round(q,'Semifinal'),f=round(s,'National Championship');universe.champion=f[0].name;universe.phase='complete';universe.offseason=makeOffseasonState(universe.year,'review');universe.latest=logs;finalizeRecruiting();finalizeSeasonHonors();archiveSeason();ranked();buildWeeklyHub();autosaveAfter('postseason');render()}
+function simPlayoff(){if(universe.phase==='bowlReady')simBowls();if(universe.phase!=='playoffReady')return;if(universe.playoffFieldUnavailable){setStatus('This older postseason save predates frozen playoff selections after its bowls. The original field is unavailable, so no playoff was simulated.');return}let field=seedField();if(field.length!==16){setStatus('The saved playoff field is incomplete, so no playoff was simulated.');return}const archiveStart=(universe.gameArchive||[]).length;field.forEach((t,i)=>t.seed=i+1);let logs=[];function round(arr,label){let out=[];for(let i=0;i<arr.length/2;i++){let a=arr[i],b=arr[arr.length-1-i],r=gameSim(a,b,true,false,{week:14+['Round of 16','Quarterfinal','Semifinal','National Championship'].indexOf(label),label});logs.push({...r,label});out.push(T(r.winner))}return out}let r16=round(field,'Round of 16'),q=round(r16,'Quarterfinal'),s=round(q,'Semifinal'),f=round(s,'National Championship');universe.champion=f[0].name;universe.phase='complete';universe.offseason=makeOffseasonState(universe.year,'review');universe.latest=logs;finalizeRecruiting();finalizeSeasonHonors();archiveSeason();ranked();buildWeeklyHub();announceUserPostseason(archiveStart);autosaveAfter('postseason');render()}
 function championshipOpponent(year,champion){
  const game=(universe.gameArchive||[]).find(g=>g.season===year&&g.label==='National Championship'&&
   ((g.home?.name===champion&&g.score?.home>g.score?.away)||(g.away?.name===champion&&g.score?.away>g.score?.home)));
@@ -3483,7 +3487,7 @@ function render(){
  $('#teamName').textContent=u.name;const mm=$('.masthead-mark');if(mm){mm.innerHTML=teamLogoHTML(u.id,48);mm.classList.add('has-logo')}
  $('#teamMeta').textContent=`${u.conference} · ${u.offScheme} / ${u.defScheme} · Prestige ${u.prestige} · Ceiling ${u.program_ceiling}`;
  $('#teamMetrics').innerHTML=[['Offense',grade(p.offense)],['Defense',grade(p.defense)],['Scheme Fit',grade((p.offFit+p.defFit)/2)],['Development',grade(u.development)]].map(x=>`<div class="metric"><div class="small muted">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');
- $('#recordBig').textContent=`${u.w}–${u.l}`;$('#rankLine').textContent=preseason?`Preseason · #${u.rank} nationally`:u.rank<=25?`#${u.rank} nationally`:`#${u.rank} nationally · outside the top 25`;$('#weekLine').textContent=preseason?`${universe.year} · Preseason`:`${universe.year} · ${universe.week===0?'Opening week':`Week ${universe.week}`}`;
+ $('#recordBig').textContent=`${u.w}–${u.l}`;$('#rankLine').textContent=preseason?`Preseason · #${u.rank} nationally`:u.rank<=25?`#${u.rank} nationally`:`#${u.rank} nationally · outside the top 25`;$('#weekLine').textContent=preseason?`${universe.year} · Preseason`:universe.phase!=='regular'&&SEASON_STAGE_LABELS[universe.phase]?`${universe.year} · ${universe.phase==='complete'&&universe.offseason?.year===universe.year&&(universe.offseason.completed||[]).includes('review')?'Offseason':SEASON_STAGE_LABELS[universe.phase]}`:`${universe.year} · ${universe.week===0?'Opening week':`Week ${universe.week}`}`;
  $('#top15').innerHTML=order.slice(0,15).map((t,i)=>`<div class="rankrow${t.name===u.name?' target':''}"><div><span class="rank">${i+1}.</span> ${teamLogoHTML(t.id,20,'team-logo--inline')} ${t.name}</div><div>${t.w}-${t.l}</div></div>`).join('');
  const leaders=u.roster.slice().sort((a,b)=>b.perceived-a.perceived).slice(0,5);$('#snapshot').innerHTML=`<div class="lineitem"><span>Roster</span><strong>${u.roster.length}</strong></div><div class="lineitem"><span>Protected redshirts</span><strong>${u.roster.filter(p=>p.redshirtActive).length}</strong></div><div class="lineitem"><span>Commits</span><strong>${u.commits.length}</strong></div><div class="lineitem"><span>Head Coach</span><strong>${u.staff.HC.name}</strong></div><div class="lineitem"><span>PF / PA</span><strong>${u.pf} / ${u.pa}</strong></div>`+leaders.map(x=>`<div class="lineitem compact"><span>${x.pos} ${x.name}</span><span>${playerGrade(x)} · ${x.style}</span></div>`).join('');
  renderWeeklyDecisions();if(typeof renderGuidanceSystem==='function')renderGuidanceSystem();renderWeeklyHub();renderActiveTab();$('#simConf').disabled=universe.phase!=='confReady';$('#simBowls').disabled=universe.phase!=='bowlReady';$('#simPlayoff').disabled=universe.phase!=='playoffReady';
@@ -3846,6 +3850,7 @@ function portalSyncFilterOptions(){
  fill('#portalElig',[...new Set(rows.map(x=>x.p.year))].sort(),'All');
  fill('#portalConf',[...new Set(rows.map(x=>universe.teams.find(t=>t.id===x.fromSchoolId)?.conference).filter(Boolean))].sort(),'All conferences');
 }
+var PORTAL_PAGE=40,portalRowLimit=40;
 function renderPortal(){
  if(!$('#portalBoard'))return;
  const c=ensurePortalCycle(),u=portalUserTeam();
@@ -3864,8 +3869,10 @@ function renderPortal(){
   ['Roster room',u?`${portalRoomFor(u)} spots`:'—'],
  ].map(([k,v])=>`<div class="metric"><div class="small muted">${k}</div><div class="v">${v}</div></div>`).join('');
  portalSyncFilterOptions();
- const rows=portalVisibleCandidates();
- $('#portalBoard').innerHTML=rows.length?rows.map(x=>{
+ // The portal can hold ~180 players; render the first PORTAL_PAGE (plus every target and decided
+ // signing) and let the coach page through the rest instead of drawing a 14,000px table.
+ const allRows=portalVisibleCandidates(),rows=allRows.filter((x,i)=>i<portalRowLimit||portalTargetFor(x.candidateId)||(u&&x.decision?.schoolId===u.id)),hiddenRows=allRows.length-rows.length;
+ $('#portalBoard').innerHTML=(rows.length?rows.map(x=>{
   const from=universe.teams.find(t=>t.id===x.fromSchoolId),target=portalTargetFor(x.candidateId);
   const mine=u?(x.interest[u.id]??null):null,deal=u?nilDealActive(x.p,u):null;
   const field=x.finalists.map(id=>universe.teams.find(t=>t.id===id)?.name).filter(Boolean).slice(0,3).join(', ')||'—';
@@ -3884,7 +3891,7 @@ function renderPortal(){
    <td data-label="NIL">${x.decision?'—':deal?`<button data-portal-nil-off="${x.candidateId}">Withdraw ${deal.amount}</button>`:`<button data-portal-nil="${x.candidateId}">Offer</button>`}</td>
    <td data-label="Promise">${x.decision?'—':`<select data-portal-promise="${x.candidateId}">${PROMISES.map(p=>`<option ${promiseLabel(x.promiseOffer?.type)===p?'selected':''}>${p}</option>`).join('')}</select>`}</td>
    <td data-label="Status">${status}</td>
-  </tr>`}).join(''):'<tr><td colspan="12" class="muted">No portal candidates match these filters.</td></tr>';
+  </tr>`}).join(''):'<tr><td colspan="12" class="muted">No portal candidates match these filters.</td></tr>')+(hiddenRows>0?`<tr class="portal-more-row"><td colspan="12"><button type="button" class="ghost" data-portal-more>Show ${Math.min(PORTAL_PAGE,hiddenRows)} more · ${hiddenRows} not shown</button></td></tr>`:'');
  const log=c.log.slice(-8).reverse();
  $('#portalLog').innerHTML=log.length?log.map(x=>`<div class="lineitem"><span>Round ${x.round}</span><span>${x.message}</span></div>`).join(''):'No portal activity yet.';
  bindPortalControls();
@@ -3893,6 +3900,7 @@ function renderPortal(){
 // setStatus carries every refusal, so a rule the engine enforces is never silently swallowed.
 function bindPortalControls(){
  const act=(res,ok)=>{if(res)setStatus(res);else if(ok)setStatus(ok);renderPortal()};
+ $$('[data-portal-more]').forEach(b=>b.onclick=()=>{portalRowLimit+=PORTAL_PAGE;renderPortal()});
  $$('[data-portal-attention]').forEach(s=>s.onchange=()=>{
   const id=s.dataset.portalAttention,n=Number(s.value);
   act(n>0?targetPortalCandidate(id,n):untargetPortalCandidate(id));
@@ -3901,7 +3909,7 @@ function bindPortalControls(){
  $$('[data-portal-nil-off]').forEach(b=>b.onclick=()=>act(withdrawPortalNil(b.dataset.portalNilOff),'NIL offer withdrawn.'));
  $$('[data-portal-promise]').forEach(s=>s.onchange=()=>act(promisePortalCandidate(s.dataset.portalPromise,s.value)));
  for(const [sel,fn] of [['#portalPos',0],['#portalElig',0],['#portalConf',0],['#portalSort',0],['#portalTargetedOnly',0]]){
-  const el=$(sel);if(el)el.onchange=()=>renderPortal();
+  const el=$(sel);if(el)el.onchange=()=>{portalRowLimit=PORTAL_PAGE;renderPortal()};
  }
 }
 
