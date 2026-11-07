@@ -252,12 +252,16 @@
     if(rec&&!watched.has(rec)){watched.add(rec);let last=rec.textContent;new MutationObserver(()=>{const v=rec.textContent;if(v===last)return;
       const w=a=>Number((a.match(/^(\d+)/)||[])[1]||0);flash(rec,w(v)>w(last)?1:w(v)===w(last)?-1:0);last=v}).observe(rec,{childList:true,characterData:true,subtree:true})}
     if(rank&&!watched.has(rank)){watched.add(rank);let last=rank.textContent;
+      // A new season's preseason poll is not a move from last season's final poll; reset the baseline.
+      const seasonOf=()=>(document.querySelector('[data-client-week]')?.textContent.match(/\b(20\d\d)\b/)||[])[1]||'';let season=seasonOf();
       const badge=document.createElement('span');badge.className='hud-rank-move';badge.hidden=true;rank.after(badge);
-      new MutationObserver(()=>{const v=rank.textContent;if(v===last)return;const a=rankNum(last),b=rankNum(v);last=v;
+      new MutationObserver(()=>{const v=rank.textContent;if(v===last)return;const a=rankNum(last),b=rankNum(v),now=seasonOf();last=v;
+        if(now!==season){season=now;badge.hidden=true;return}
         if(a!=null&&b!=null&&a!==b){const up=b<a;badge.hidden=false;badge.className='hud-rank-move '+(up?'is-up':'is-down');badge.textContent=(up?'▲':'▼')+Math.abs(a-b);flash(rank,up?1:-1)}
         else if(b==null)badge.hidden=true;
       }).observe(rank,{childList:true,characterData:true,subtree:true})}
     if(week&&!watched.has(week)){watched.add(week);let last=week.textContent;new MutationObserver(()=>{const v=week.textContent;if(v===last)return;
+      const year=x=>(x.match(/\b(20\d\d)\b/)||[])[1];if(year(v)&&year(v)!==year(last)){const badge=document.querySelector('.hud-rank-move');if(badge)badge.hidden=true}
       const m=v.match(/Week \d+|Bowl[^·]*|Playoff[^·]*|Offseason|Preseason/i);if(m&&!titleOpen()&&!last.includes(m[0]))weekFlip(m[0].trim());last=v}).observe(week,{childList:true,characterData:true,subtree:true})}
   }
   watchStatus();setTimeout(watchStatus,500);new MutationObserver(watchStatus).observe(document.body,{childList:true});
