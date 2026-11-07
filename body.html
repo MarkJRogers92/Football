@@ -97,27 +97,27 @@
 
   <div class="tabs-shell">
   <nav class="tab-groups" aria-label="Sections">
-    <button data-group="program" class="active">Program</button>
-    <button data-group="team">Team</button>
+    <button data-group="home" class="active">Home</button>
+    <button data-group="program">Program</button>
     <button data-group="recruiting">Recruiting</button>
-    <button data-group="games">Games</button>
-    <button data-group="staff">Staff &amp; Offseason</button>
+    <button data-group="season">Season</button>
+    <button data-group="world">World</button>
   </nav>
   <nav class="tabs">
-    <button data-tab="dashboard" class="active">Dashboard</button>
+    <button data-tab="dashboard" class="active">Command Center</button>
+    <button data-tab="newsletter">News</button>
+    <button data-tab="program" hidden>Overview</button>
     <button data-tab="roster" hidden>Roster</button>
-    <button data-tab="depth" hidden>Roles & Depth</button>
-    <button data-tab="staff" hidden>Staff & Schemes</button>
-    <button data-tab="gamelab" hidden>Game Lab</button>
-    <button data-tab="season" hidden>Season</button>
-    <button data-tab="newsletter" hidden>Newsletter</button>
-    <button data-tab="stats" hidden>Stats</button>
-    <button data-tab="recruiting" hidden>Recruiting</button>
-    <button data-tab="program">Program Lab</button>
-    <button data-tab="development" hidden>Development & Camp</button>
+    <button data-tab="depth" hidden>Roles &amp; Depth</button>
+    <button data-tab="development" hidden>Development</button>
+    <button data-tab="staff" hidden>Staff</button>
     <button data-tab="offseason" hidden>Offseason</button>
-    <button data-tab="records" hidden>Awards & Records</button>
-    <button data-tab="history">History</button>
+    <button data-tab="recruiting" hidden>Recruiting</button>
+    <button data-tab="gamelab" hidden>Game Lab</button>
+    <button data-tab="season" hidden>Schedule</button>
+    <button data-tab="stats" hidden>Stats</button>
+    <button data-tab="history" hidden>History</button>
+    <button data-tab="records" hidden>Awards &amp; Records</button>
   </nav>
   </div>
 
@@ -178,7 +178,7 @@
 
     <section id="roster" class="panel tab stacked-table">
       <div class="section-head">
-        <div><h2>Roster</h2><div class="muted">Displayed grades are staff estimates. True talent, growth and some personality traits remain hidden.</div></div>
+        <div><h2>Roster</h2><div class="muted">Grades are your staff&#39;s estimates. The bar shows how sure they are.</div></div>
         <select id="positionFilter"><option value="ALL">All positions</option></select>
       </div>
       <div class="table-wrap"><table><thead><tr>
@@ -189,7 +189,7 @@
 
     <section id="depth" class="panel tab">
       <div class="section-head">
-        <div><h2>Football Roles & Personnel Packages</h2><div class="muted">Set real roles — X/Z/slot, third-down back, rush edge, nickel, box safety, returners and more. Injured or protected redshirt players automatically fall to the next option.</div></div>
+        <div><h2>Roles &amp; Packages</h2><div class="muted">Pick who plays each role. Injured or redshirting players drop to the next option automatically.</div></div>
         <button id="autoDepth">Auto-Set Role Fits</button>
       </div>
       <div class="two-col">
@@ -200,7 +200,7 @@
     </section>
 
     <section id="staff" class="panel tab">
-      <div class="section-head"><div><h2>Staff & Schemes</h2><div class="muted">Coaches affect evaluation, recruiting, development, play calling and how efficiently the roster fits the system.</div></div></div>
+      <div class="section-head"><div><h2>Staff & Schemes</h2><div class="muted">Your coaches shape scouting, recruiting, development and game calling.</div></div></div>
       <div class="two-col">
         <div class="card"><h3>Coaching Staff</h3><div id="staffList"></div></div>
         <div class="card"><h3>Scheme Identity</h3><div id="schemeCard"></div></div>
@@ -212,7 +212,7 @@
     </section>
 
     <section id="newsletter" class="panel tab">
-      <div class="section-head"><div><h2>Weekly Newsletter</h2><div class="muted">Recaps written from the archived box scores. Nothing here is invented — every number comes from the game record.</div></div></div>
+      <div class="section-head"><div><h2>Weekly Newsletter</h2><div class="muted">This week&#39;s stories, written from the real box scores.</div></div></div>
       <div class="card">
         <div class="editor-grid">
           <label>Week<select id="newsWeek"></select></label>
@@ -228,8 +228,8 @@
 
     <section id="gamelab" class="panel tab">
       <div class="section-head">
-        <div><h2>Game Lab</h2><div class="muted">Watch your next game drive by drive with your real roster, or sim it instantly. Every other game in the country is simulated quickly either way.</div></div>
-        <div class="button-row"><button id="watchDetailedGame">Watch My Next Game</button><button id="simDetailedGame">Sim Instantly</button></div>
+        <div><h2>Game Lab</h2><div class="muted">Coach your next game live, watch it, or sim it.</div></div>
+        <div class="button-row"><button id="coachLiveGame" type="button" data-coach-live>Coach It Live</button><button id="watchDetailedGame">Watch</button><button id="simDetailedGame">Sim Instantly</button></div>
       </div>
       <p id="detailedGateNote" class="gate-note" role="status" hidden></p>
       <div class="card" id="nextGameCard"></div>
@@ -259,7 +259,7 @@
 
 
     <section id="stats" class="panel tab">
-      <div class="section-head"><div><h2>Statistics Center</h2><div class="muted">Production now comes from role usage and game context, not a single starter stat dump.</div></div><select id="statsScope"><option value="national">National</option><option value="team">My Program</option></select></div>
+      <div class="section-head"><div><h2>Statistics Center</h2><div class="muted">National and team leaders this season.</div></div><select id="statsScope"><option value="national">National</option><option value="team">My Program</option></select></div>
       <div class="stats-grid">
         <div class="card"><h3>Passing Leaders</h3><div id="passingLeaders"></div></div>
         <div class="card"><h3>Rushing Leaders</h3><div id="rushingLeaders"></div></div>
@@ -271,7 +271,7 @@
 
     <section id="recruiting" class="panel tab stacked-table">
       <div class="section-head">
-        <div><h2>Recruiting Board</h2><div class="muted">Each recruit now has a region and a major priority. Visits, coaching, scheme, NIL, development and program trajectory influence the race.</div></div>
+        <div><h2>Recruiting Board</h2><div class="muted">Find, scout and win the players who fit your program.</div></div>
         <button id="autoTarget">Auto-Target 20</button>
       </div>
       <div id="signingDay"></div>
@@ -284,7 +284,7 @@
     </section>
 
     <section id="program" class="panel tab">
-      <div class="section-head"><div><h2>Program Lab</h2><div class="muted">Track the job, the board, the season and the institutional identity behind your dynasty.</div></div></div><div class="card"><div class="eyebrow">PROGRAM OVERVIEW</div><div id="programOverview"></div></div>
+      <div class="section-head"><div><h2>Program Lab</h2><div class="muted">Your job security, season goals and program profile.</div></div></div><div class="card"><div class="eyebrow">PROGRAM OVERVIEW</div><div id="programOverview"></div></div>
       <div class="card" id="programAttributes"></div>
       <div class="card" id="programTrends"></div>
       <div id="programEditNotice" class="card muted"></div>
@@ -309,7 +309,7 @@
 
     <section id="development" class="panel tab stacked-table">
       <div class="section-head">
-        <div><h2>Development & Camp</h2><div class="muted">Training influences outcomes; it does not guarantee them. Growth curves, body maturation and true talent remain partially hidden.</div></div>
+        <div><h2>Development & Camp</h2><div class="muted">Training improves the odds, not the outcome.</div></div>
         <div class="button-row"><button id="runSpringCamp">Run Spring Development</button><button id="runFallCamp">Run Fall Camp</button><button id="applyCampWinners">Use Staff Recommendations</button></div>
       </div>
       <div class="two-col">
@@ -349,7 +349,7 @@
 
     <section id="offseason" class="panel tab">
       <div class="section-head">
-        <div><h2>Offseason Lab</h2><div class="muted">After spring development and fall camp, finalize graduation, transfers, draft decisions, coaching movement and the incoming class.</div></div>
+        <div><h2>Offseason Lab</h2><div class="muted">Graduation, transfers, the draft, staff moves and the incoming class.</div></div>
         <button id="runOffseason" disabled>Advance Offseason Phase</button>
       </div>
       <div class="two-col">
@@ -388,7 +388,7 @@
 
 
     <section id="records" class="panel tab">
-      <div class="section-head"><div><h2>Awards, Records & Draft</h2><div class="muted">Season honors, record books and draft outcomes are preserved permanently.</div></div></div>
+      <div class="section-head"><div><h2>Awards, Records & Draft</h2><div class="muted">Honors, record books and draft results.</div></div></div>
       <div class="two-col">
         <div class="card"><h3 id="awardsHeading">Awards Watch</h3><div id="awardsBoard"></div></div>
         <div class="card"><h3>Recent Draft Results</h3><div id="draftBoard"></div></div>
@@ -400,7 +400,7 @@
     </section>
 
     <section id="history" class="panel tab">
-      <div class="section-head"><div><h2>History</h2><div class="muted">Season snapshots, champions and major movement survive year advancement and save/export.</div></div></div>
+      <div class="section-head"><div><h2>History</h2><div class="muted">Every season, champion and milestone of your dynasty.</div></div></div>
       <div class="card">
         <div class="section-head"><div><h3>Player Archive</h3><div class="muted">Search active and retired players preserved by the dynasty database.</div></div></div>
         <input id="archiveSearch" class="wide-input" type="search" placeholder="Search player name">

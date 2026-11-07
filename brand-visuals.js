@@ -26,8 +26,8 @@ function gaugeArc(from,to,opts={}){
  const {radius=1}=opts,[x1,y1]=gaugePoint(from,opts),[x2,y2]=gaugePoint(to,opts);
  return`M${x1} ${y1}A${radius} ${radius} 0 0 1 ${x2} ${y2}`;
 }
-// Parses a staff estimate such as "A- · 85-93" into a bounded range on the 40–99 rating scale.
-function estimateRange(label,{lo=40,hi=99}={}){
+// Parses a staff estimate such as "A- · 85-93" into a bounded range on the game's 25–99 rating scale.
+function estimateRange(label,{lo=25,hi=99}={}){
  const m=String(label||'').match(/(\d{2})\s*[-–]\s*(\d{2})/);if(!m)return null;
  let a=Number(m[1]),b=Number(m[2]);if(a>b)[a,b]=[b,a];
  const pct=v=>f1(clamp((v-lo)/(hi-lo),0,1)*100);
@@ -123,6 +123,8 @@ function paintProgram(team){
 // Next-matchup card: swap the flat marks for the two real helmets, facing each other.
 function paintMatchup(team){
  const host=document.querySelector('#broadcastFeature .broadcast-matchup');if(!host)return;
+ const actions=document.querySelector('#broadcastFeature .broadcast-actions');
+ if(actions&&!actions.querySelector('[data-coach-live]'))actions.insertAdjacentHTML('afterbegin','<button type="button" class="bi-primary" data-coach-live>Coach It Live</button>');
  const byName=new Map([[team.name,team.id],...team.schedule.map(g=>[g.opponent.name,g.opponent.id])]);
  for(const card of host.querySelectorAll('.broadcast-team')){
   const name=(card.querySelector('strong')?.textContent||'').trim(),id=byName.get(name);
@@ -152,10 +154,19 @@ function enter(section){
  section.classList.remove('bi-enter');void section.offsetWidth;section.classList.add('bi-enter');
  clearTimeout(section._biEnter);section._biEnter=setTimeout(()=>section.classList.remove('bi-enter'),900);
 }
+// "How to read this" keys: each explains a number once, where it appears, from the game's real rules.
+const LEGENDS={
+ roster:[['A- · 85–93','The letter is your staff’s best read of current ability; the numbers are the likely range on the 25–99 scale.'],['Range bar','Draws that range. A narrow bar is a confident read; better evaluators and more time with the player narrow it.'],['Upside','Hidden growth is never shown as a number. Development shows what training actually moved.']],
+ recruiting:[['★★★★★','National prospect tier.'],['42%','The prospect’s current interest in your program. Visits, pitch fit and the recruiting race move it.'],['36% sure','How confident your staff report is. Quick Film and Full Evaluation raise it and spend weekly hours.'],['14 / 14h left','Weekly evaluation hours, shared by the current and rising classes. They reset each week.']],
+ program:[['Admin confidence','0–100. Secure 80+, Backed 60–79, Watched 40–59, Hot seat 20–39, Final warning below 20.'],['Season goals','Goals the administration set this year; finishing them raises confidence at season’s end.'],['Win pace','Your wins against the expectation set by program prestige.']]
+};
+function legendHTML(key){return `<details class="bi-legend"><summary>How to read this</summary><dl>${LEGENDS[key].map(([t,d])=>`<div><dt>${esc(t)}</dt><dd>${esc(d)}</dd></div>`).join('')}</dl></details>`}
+function mountLegends(){for(const key of Object.keys(LEGENDS)){const head=document.querySelector(`#${key} > .section-head`);if(head&&!head.querySelector('.bi-legend'))head.insertAdjacentHTML('beforeend',legendHTML(key))}}
 function mount(){
  if(typeof document==='undefined')return;
  const start=()=>{
   document.documentElement.classList.add('bi-brand');
+  mountLegends();
   const ownNode=n=>n.nodeType===1&&(n.classList?.contains('bi-strip-host')||n.classList?.contains('bi-helmet')||n.classList?.contains('bi-program-visual')||n.closest?.('.bi-strip-host,.bi-program-visual'));
   const real=records=>records.some(r=>!(r.target.nodeType===1&&r.target.closest?.('.bi-strip-host,.bi-program-visual'))&&![...r.addedNodes,...r.removedNodes].every(ownNode));
   const obs=new MutationObserver(records=>{if(real(records))queue()});
@@ -163,9 +174,13 @@ function mount(){
   for(const sel of ['#dashboard .program-masthead','#programAttributes','#recordBig','#weekLine','#teamName'])document.querySelectorAll(sel).forEach(el=>obs.observe(el,sel==='#programAttributes'?{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['hidden']}:{childList:true,subtree:true,characterData:true}));
   const tabObs=new MutationObserver(records=>{for(const r of records){const s=r.target;if(s.classList.contains('active')&&!(r.oldValue||'').split(/\s+/).includes('active')){enter(s);queue()}}});
   document.querySelectorAll('main section.tab').forEach(s=>tabObs.observe(s,{attributes:true,attributeFilter:['class'],attributeOldValue:true}));
+  // Section label on the page-tab strip follows the active group (the same five sections as the sidebar).
+  const tabs=document.querySelector('.tabs'),groups=document.querySelector('.tab-groups');
+  const section=()=>{const g=groups?.querySelector('button.active');const label=(g?.firstChild?.textContent||'').trim();if(tabs&&tabs.dataset.section!==label){if(label)tabs.dataset.section=label;else delete tabs.dataset.section}};
+  if(groups)new MutationObserver(section).observe(groups,{subtree:true,attributes:true,attributeFilter:['class']});section();
   watchFeature=feature;queue();
  };
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 }
-return{radarPoints,gaugePoint,gaugeArc,estimateRange,seasonStrip,radarSVG,gaugeSVG,ringSVG,helmetHTML,stripHTML,mount};
+return{radarPoints,gaugePoint,gaugeArc,estimateRange,seasonStrip,radarSVG,gaugeSVG,ringSVG,helmetHTML,stripHTML,LEGENDS,mount};
 });

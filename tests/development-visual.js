@@ -2,7 +2,7 @@ const {chromium}=require('playwright-core');
 const {chromiumPath}=require('./helpers/chromium-path');
 const path=require('path');
 const {startNewDynasty}=require('./helpers/start-new-dynasty');
-const goDevelopment=page=>page.evaluate(()=>{const g=document.querySelector('.tab-groups button[data-group="team"]');if(g&&!g.classList.contains('active'))g.click();document.querySelector('.tabs button[data-tab="development"]')?.click()});
+const goDevelopment=page=>page.evaluate(()=>{const g=document.querySelector('.tab-groups button[data-group="program"]');if(g&&!g.classList.contains('active'))g.click();document.querySelector('.tabs button[data-tab="development"]')?.click()});
 
 (async()=>{
  const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});let failures=0;

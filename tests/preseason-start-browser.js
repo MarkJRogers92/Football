@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const path = require('path');
 
 const TAB_GROUP = {
-  dashboard: 'program', depth: 'team', recruiting: 'recruiting', gamelab: 'games',
+  dashboard: 'home', depth: 'program', recruiting: 'recruiting', gamelab: 'season',
 };
 const goTab = (page, id) => page.evaluate(({id, group}) => {
   document.querySelector(`.tab-groups button[data-group="${group}"]`)?.click();

@@ -21,7 +21,7 @@ The title screen already had an identity (brass, stadium light, the trophy); the
 | Program radar (six attributes) | Program Lab | `team().attributes`; replaces the duplicate tile row visually (tiles stay in the DOM) |
 | Admin confidence gauge, season goals ring, win pace | Program Lab | `team().confidence`, `goals`, `w` vs `expectedWins` |
 | Leader bars (share of the category leader) | Stats | `--lead` set by `statLeaderRows` in `app.js` |
-| Estimate range bar (40–99 scale) | Roster cards | the staff range already in each card's label |
+| Estimate range bar (25–99 scale) | Roster cards | the staff range already in each card's label |
 | Recruit confidence bars | Recruiting desk | unchanged values, brand colours |
 
 `brand-snapshot-adapter.js` is an engine extension (shares `app.js`'s closure) and only copies values out. `brand-visuals.js` is the DOM layer: pure geometry is exported for `tests/brand-visuals.js`, mounting happens in the browser only, and repaints are signature-guarded so they never loop with the app's own renders.
@@ -36,9 +36,18 @@ Section entrance (cards rise in once per tab change), radar/gauge/bar draw-ins, 
 - The required-decision focus line reads as a slim status header instead of a second copy of the decision card below it.
 - The recruiting *Recruiting mode* explainer card became just its toggle (and shares the class-view row on wide screens).
 
+## Cohesion and fun pass
+
+- **Navigation:** `TAB_GROUPS` in `app.js` (and the copies in `client-shell.js`, `game-hud.js`) are the sidebar's five sections. `brand-visuals.js` writes the active section onto the tab strip (`data-section`).
+- **Faces:** `playerFaceChip` / `decisionFacesHTML` in `app.js`; stat leaders use `portraitTag`.
+- **Keys:** `LEGENDS` in `brand-visuals.js`, mounted into each section header once.
+- **Coach It Live:** `gameday-momentum.js` (pure, tested in `tests/gameday-momentum.js`) estimates win chance from score, time left, possession, field position and home field; `game-engine-v2-gameday-ui.js` renders it and exposes `[data-coach-live]`. Nothing feeds back into the simulation.
+- **Rival Watch:** `rival-snapshot-adapter.js` (read-only) + `rival-watch.js`; archetypes and lines are deterministic functions of real ratings and facts.
+- **Ceremonies:** `ceremony-snapshot-adapter.js` (read-only) + `ceremonies.js`. A ceremony plays when a milestone key appears that was not in the previous snapshot for the same program and season; loading or switching programs resets the baseline. They stay off under browser automation unless a test sets `DynastyCeremonies.autoplay=true`.
+
 ## Files
 
-`brand-identity.css` (last in the cascade), `brand-visuals.js`, `brand-snapshot-adapter.js`, `assets/fonts/*`, `tests/brand-visuals.js`, `tests/brand-identity-browser.js` (`npm run test:brand-identity-browser`).
+`brand-identity.css` (last in the cascade), `brand-visuals.js`, `brand-snapshot-adapter.js`, `gameday-momentum.js`, `rival-snapshot-adapter.js`, `rival-watch.js`, `ceremony-snapshot-adapter.js`, `ceremonies.js`, `assets/fonts/*`. Tests: `tests/brand-visuals.js`, `tests/gameday-momentum.js`, `tests/rival-ceremonies.js`, `tests/brand-identity-browser.js`, `tests/fun-features-browser.js`.
 
 ---
 

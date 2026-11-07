@@ -111,19 +111,19 @@ html.bi-brand .recruit-mode-buttons{padding:3px}
 html.bi-brand .recruit-mode-buttons .rw-budget{align-self:center;padding:0 8px;font:800 13px/1 var(--bi-display);letter-spacing:.06em;color:var(--bi-gold-hi);background:none;box-shadow:none}
 
 /* ---------- Primary actions: brass, with a light sweep on hover ---------- */
-html.bi-brand :is(#simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason):not(:disabled){
+html.bi-brand :is(#simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#coachLiveGame,.bi-primary,[data-v2-gameday-start],#autoTarget,#applyProgramEdit,#runOffseason):not(:disabled){
  position:relative;overflow:hidden;border:1px solid #f0c768;color:#160f02;
  background:linear-gradient(180deg,var(--bi-gold-hi),var(--bi-gold) 55%,#cf9a35);
  font:800 15px/1 var(--bi-display);letter-spacing:.08em;
  box-shadow:0 8px 22px rgba(var(--bi-gold-rgb),.28),inset 0 1px 0 rgba(255,255,255,.55);transition:transform .15s var(--bi-ease),box-shadow .2s
 }
-html.bi-brand :is(#simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason):not(:disabled)::after{
+html.bi-brand :is(#simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#coachLiveGame,.bi-primary,[data-v2-gameday-start],#autoTarget,#applyProgramEdit,#runOffseason):not(:disabled)::after{
  content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);transform:translateX(-120%);pointer-events:none
 }
-html.bi-brand :is(#simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason):not(:disabled):hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(var(--bi-gold-rgb),.38),inset 0 1px 0 rgba(255,255,255,.6);border-color:#ffe09a;background:linear-gradient(180deg,#ffe29a,var(--bi-gold-hi) 55%,var(--bi-gold))}
-html.bi-brand :is(#simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#autoTarget,#applyProgramEdit,#runOffseason):not(:disabled):hover::after{transform:translateX(120%);transition:transform .7s var(--bi-ease)}
-html.bi-brand :is(#simWeek,#simSeason):not(:disabled){background:transparent;color:var(--bi-gold-hi);border-color:rgba(var(--bi-gold-rgb),.55);box-shadow:none}
-html.bi-brand :is(#simWeek,#simSeason):not(:disabled):hover{background:rgba(var(--bi-gold-rgb),.12);color:#fff}
+html.bi-brand :is(#simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#coachLiveGame,.bi-primary,[data-v2-gameday-start],#autoTarget,#applyProgramEdit,#runOffseason):not(:disabled):hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(var(--bi-gold-rgb),.38),inset 0 1px 0 rgba(255,255,255,.6);border-color:#ffe09a;background:linear-gradient(180deg,#ffe29a,var(--bi-gold-hi) 55%,var(--bi-gold))}
+html.bi-brand :is(#simWeek,#simSeason,#hubAdvance,#seasonWeek,#simDetailedGame,#coachLiveGame,.bi-primary,[data-v2-gameday-start],#autoTarget,#applyProgramEdit,#runOffseason):not(:disabled):hover::after{transform:translateX(120%);transition:transform .7s var(--bi-ease)}
+html.bi-brand :is(#simWeek,#simSeason,#simDetailedGame):not(:disabled){background:transparent;color:var(--bi-gold-hi);border-color:rgba(var(--bi-gold-rgb),.55);box-shadow:none}
+html.bi-brand :is(#simWeek,#simSeason,#simDetailedGame):not(:disabled):hover{background:rgba(var(--bi-gold-rgb),.12);color:#fff}
 
 /* ---------- Dashboard masthead: a team-coloured banner with the helmet and the season strip ---------- */
 html.bi-brand #dashboard .program-masthead{
@@ -304,3 +304,126 @@ html.bi-brand .season-next strong,html.bi-brand .season-result strong{font-famil
 html.bi-brand .event-center b{font-size:44px;font-family:var(--bi-display);font-weight:800;color:var(--bi-gold-hi);text-shadow:0 0 22px rgba(var(--bi-gold-rgb),.4)}
 html.bi-brand .event-team-copy strong{font-family:var(--bi-display);font-weight:800;letter-spacing:.01em;font-size:28px}
 @media(max-width:720px){.bi-helmet--pulse{width:56px}.bi-helmet--pulse-next{width:40px}html.bi-brand .event-team-copy strong{font-size:22px}}
+/* One map: the page-tab strip names its section, and the active tab carries a solid brass marker. */
+html.bi-brand .client-shell-ready .tabs button.active{color:var(--bi-gold-hi);box-shadow:inset 0 -3px 0 var(--bi-gold)}
+html.bi-brand .client-shell-ready .tabs[data-section]::before{content:attr(data-section) " ›";flex:0 0 auto;align-self:center;padding:0 10px 0 2px;font:800 12px/1 var(--bi-display);letter-spacing:.16em;text-transform:uppercase;color:#4f6177;white-space:nowrap}
+/* One news channel: the save-status line is already mirrored into the ticker and a single toast,
+   so it steps aside; the toast region is the announced live region. */
+html.bi-brand .client-shell-ready #saveStatus.save-status{display:none}
+/* Faces: every named player in decisions and leader boards shows portrait, jersey and position. */
+.decision-faces{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0 6px}
+.face-chip{display:inline-flex;align-items:center;gap:9px;padding:4px 12px 4px 4px;border:1px solid var(--bi-line-2,#2a3b4f);border-radius:999px;background:rgba(5,8,12,.55);color:inherit;text-align:left;cursor:pointer;transition:border-color .18s,background .18s}
+.face-chip:hover{border-color:rgba(var(--bi-gold-rgb,227,176,75),.7);background:rgba(var(--bi-gold-rgb,227,176,75),.08)}
+.face-chip canvas.portrait{width:36px;height:36px;border-radius:50%;background:radial-gradient(circle at 50% 30%,rgba(var(--team-secondary-rgb,115,168,255),.3),#0d141d 70%)}
+.face-chip b{display:block;font-size:13.5px;line-height:1.1}.face-chip small{display:block;font-size:11px;color:var(--bi-mute,#8c9bb0)}
+.face-vs{font:800 13px/1 var(--bi-display);letter-spacing:.12em;color:var(--bi-gold,#e3b04b);text-transform:uppercase}
+.leader-who{display:flex;align-items:center;gap:10px;min-width:0}
+.leader-who canvas.portrait{width:34px;height:34px;flex:0 0 auto;border-radius:50%;background:radial-gradient(circle at 50% 30%,rgba(255,255,255,.12),#0d141d 70%);box-shadow:0 0 0 1px rgba(255,255,255,.08)}
+.leader-who>span{min-width:0}
+/* "How to read this" keys sit in the section header and open in place. */
+.section-head{flex-wrap:wrap}
+.bi-legend{flex:1 1 100%;order:9;margin-top:2px}
+.bi-legend>summary{display:inline-flex;align-items:center;gap:6px;cursor:pointer;list-style:none;font:800 12px/1 var(--bi-display);letter-spacing:.12em;text-transform:uppercase;color:color-mix(in srgb,var(--bi-gold) 70%,#8c9bb0)}
+.bi-legend>summary::-webkit-details-marker{display:none}
+.bi-legend>summary::before{content:"?";display:grid;place-items:center;width:16px;height:16px;border-radius:50%;border:1px solid currentColor;font-size:11px;letter-spacing:0}
+.bi-legend dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px 18px;margin:10px 0 4px;padding:12px 14px;border:1px solid var(--bi-line);border-radius:12px;background:rgba(5,8,12,.6)}
+.bi-legend dl>div{display:grid;gap:3px}
+.bi-legend dt{font:800 15px/1.1 var(--bi-display);color:var(--bi-gold-hi)}
+.bi-legend dd{margin:0;font-size:12.5px;line-height:1.45;color:#b4c1d1}
+/* One matchup language: every place the next opponent appears (dashboard, Game Lab hero, Game Lab card,
+   Season) uses the same name type, the same "rank · record" line and the same brass VS. */
+html.bi-brand :is(.broadcast-team strong,.event-team-copy>strong,.matchup-team strong,.season-next strong){font-family:var(--bi-display);font-weight:800;letter-spacing:.01em;line-height:1.02}
+html.bi-brand :is(.event-team-copy>strong,.broadcast-team strong){font-size:28px}
+html.bi-brand .matchup-team strong{font-size:22px}
+html.bi-brand :is(.broadcast-team span:not(.broadcast-team-role),.event-team-copy>span,.matchup-team>span,.season-next small){font-size:12px;letter-spacing:.04em;color:#9fb0c4}
+html.bi-brand :is(.broadcast-versus b,.event-center b,.matchup-center b,.matchup-center strong){font-family:var(--bi-display);font-weight:800;color:var(--bi-gold-hi);text-shadow:0 0 22px rgba(var(--bi-gold-rgb),.4)}
+html.bi-brand :is(.broadcast-feature-main,.gameday-event-hero,#nextGameCard .matchup-shell,.season-next){border-color:var(--bi-line);border-radius:var(--bi-radius)}
+@media(max-width:720px){html.bi-brand :is(.event-team-copy>strong,.broadcast-team strong){font-size:21px}}
+/* ---------- Rival Watch: the coach across the field ---------- */
+.rival-watch{position:relative;overflow:hidden;isolation:isolate;background:linear-gradient(100deg,rgba(214,90,99,.12),transparent 45%),linear-gradient(180deg,#141018,#0d1118)!important;border-color:rgba(214,90,99,.35)!important}
+.rival-watch::after{content:"";position:absolute;z-index:-1;right:-40px;bottom:-30px;width:340px;height:200px;opacity:.06;background:var(--bi-chalk-play) center/contain no-repeat;transform:scaleX(-1)}
+.rw-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.rival-watch .eyebrow{color:#e58a92!important}
+.rw-trophy{font:800 12px/1 var(--bi-display);letter-spacing:.12em;text-transform:uppercase;color:var(--bi-gold-hi);padding:5px 9px;border:1px solid rgba(var(--bi-gold-rgb),.45);border-radius:999px}
+.rw-main{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(200px,260px);gap:16px;align-items:center;margin-top:8px}
+.rw-helmet{width:96px;filter:drop-shadow(0 12px 16px rgba(0,0,0,.55))}
+.rw-id strong{display:block;font:800 30px/1 var(--bi-display);letter-spacing:.01em}
+.rw-id>span{display:block;margin-top:3px;font-size:12.5px;color:#a9b6c6}
+.rw-id p{margin:7px 0 0;font-size:13px;color:#c5cfdb}
+.rw-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.rw-arch{font:800 13px/1 var(--bi-display);letter-spacing:.1em;text-transform:uppercase;padding:5px 10px;border-radius:7px;background:#d65a63;color:#fff}
+.rw-tags i{font:800 12px/1 var(--bi-display);font-style:normal;letter-spacing:.08em;text-transform:uppercase;padding:5px 8px;border-radius:7px;border:1px solid #4a3340;color:#e5b8bd}
+.rw-meters{display:grid;gap:7px}
+.rw-meter{display:grid;grid-template-columns:86px minmax(0,1fr) 26px;align-items:center;gap:8px;font-size:11.5px;color:#a9b6c6}
+.rw-meter i{position:relative;height:6px;border-radius:999px;background:rgba(255,255,255,.08)}
+.rw-meter i::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--v);border-radius:inherit;background:linear-gradient(90deg,#8e3b44,#e58a92);animation:bi-fill .8s var(--bi-ease) both;transform-origin:left}
+.rw-meter b{font:800 14px/1 var(--bi-display);color:#fff;text-align:right}
+.rw-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+.rw-facts>div{padding:9px 11px;border:1px solid rgba(255,255,255,.07);border-radius:10px;background:rgba(5,8,12,.45)}
+.rw-facts span{display:block;font:800 11px/1 var(--bi-display);letter-spacing:.12em;text-transform:uppercase;color:#7f8ea2}
+.rw-facts b{display:block;margin-top:5px;font:800 20px/1 var(--bi-display);color:#fff}
+.rw-quotes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:12px}
+.rw-quotes blockquote{margin:0;padding:10px 14px;border-left:3px solid #d65a63;background:rgba(214,90,99,.07);border-radius:0 10px 10px 0}
+.rw-quotes p{margin:0;font:600 19px/1.15 var(--bi-display);color:#fff}
+.rw-quotes footer{margin-top:5px;font-size:11.5px;color:#a9b6c6}.rw-quotes footer span{color:#7f8ea2}
+.rw-others{display:grid;gap:6px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07)}
+.rw-other{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center}
+.rw-helmet-sm{width:40px}
+.rw-other strong{display:block;font:800 16px/1 var(--bi-display)}.rw-other span{font-size:11.5px;color:#a9b6c6}.rw-other small{font-size:12px;color:#e5b8bd;text-align:right}
+@media(max-width:900px){.rw-main{grid-template-columns:auto minmax(0,1fr)}.rw-meters{grid-column:1/-1}}
+@media(max-width:560px){.rw-helmet{width:64px}.rw-id strong{font-size:24px}.rw-facts b{font-size:17px}.rw-other{grid-template-columns:auto minmax(0,1fr)}.rw-other small{grid-column:2;text-align:left}}
+@media(prefers-reduced-motion:reduce){.rw-meter i::after{animation:none}}
+body.motion-reduced .rw-meter i::after{animation:none}
+
+/* ---------- Game Day: live win chance ---------- */
+.gm-panel{margin:12px 0;padding:12px 14px 8px;border:1px solid var(--bi-line);border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,.03),transparent),rgba(5,8,12,.55)}
+.gm-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:6px}
+.gm-head>div:first-child{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.gm-head .eyebrow{flex-basis:100%}
+.gm-head strong{font:800 44px/1 var(--bi-display);color:#fff;transition:color .3s}
+.gm-panel.is-up .gm-head strong{color:var(--bi-win)}.gm-panel.is-down .gm-head strong{color:var(--bi-loss)}
+.gm-head em{font:800 16px/1 var(--bi-display);font-style:normal}.gm-head em.up{color:var(--bi-win)}.gm-head em.down{color:var(--bi-loss)}
+.gm-key{display:flex;gap:12px;font-size:11.5px;color:var(--bi-mute)}.gm-key span{display:inline-flex;align-items:center;gap:5px}
+.gm-key i{width:9px;height:9px;border-radius:50%}.gm-key .k-dec{background:var(--bi-gold)}.gm-key .k-score{background:#fff}
+.gm-graph{display:block;width:100%;height:150px}
+.gm-q{stroke:rgba(255,255,255,.06)}.gm-mid{stroke:rgba(255,255,255,.22);stroke-dasharray:4 4}
+.gm-area-up{fill:rgba(95,211,154,.18)}.gm-area-down{fill:rgba(239,125,132,.16)}
+.gm-line{fill:none;stroke:#fff;stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+.gm-decision{fill:var(--bi-gold);stroke:#05080c;stroke-width:1.5}.gm-score{fill:#fff}
+.gm-axis{display:grid;grid-template-columns:repeat(4,1fr);font:800 11px/1 var(--bi-display);letter-spacing:.12em;color:#5d6e84;text-align:center;margin-top:4px}
+html.bi-brand .v2-gameday-decision{border:1px solid rgba(var(--bi-gold-rgb),.6);border-radius:12px;padding:12px 14px;background:linear-gradient(180deg,rgba(var(--bi-gold-rgb),.12),rgba(var(--bi-gold-rgb),.03));animation:bi-pulse 2.4s ease-in-out infinite}
+html.bi-brand .v2-gameday-decision h3{font:800 24px/1.05 var(--bi-display)}
+html.bi-brand .v2-gameday-decision button.recommended{border-color:rgba(var(--bi-gold-rgb),.8);color:var(--bi-gold-hi)}
+html.bi-brand .v2-gameday-scoreboard b{font-family:var(--bi-display);font-weight:800;font-size:46px}
+@media(prefers-reduced-motion:reduce){html.bi-brand .v2-gameday-decision{animation:none}}
+body.motion-reduced .v2-gameday-decision{animation:none!important}
+.broadcast-actions [data-coach-live]{margin-left:0}
+/* ---------- Ceremonies ---------- */
+.ceremony{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:20px;background:radial-gradient(900px 600px at 50% 40%,rgba(var(--team-primary-rgb,35,72,117),.55),rgba(3,5,8,.94) 70%);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:cer-in .35s var(--bi-ease) both;overflow:hidden}
+.ceremony.tone-gold{background:radial-gradient(900px 600px at 50% 35%,rgba(var(--bi-gold-rgb),.32),rgba(3,5,8,.95) 68%)}
+.ceremony.is-leaving{animation:cer-out .25s ease both}
+.cer-card{position:relative;display:grid;justify-items:center;gap:6px;width:min(560px,100%);max-height:calc(100vh - 40px);overflow:auto;padding:26px 24px 22px;text-align:center}
+.cer-kicker{font:800 13px/1 var(--bi-display);letter-spacing:.22em;text-transform:uppercase;color:var(--bi-gold)}
+.cer-card h2{margin:4px 0 0;font:800 clamp(40px,8vw,72px)/.92 var(--bi-display);text-transform:uppercase;letter-spacing:.01em;background:linear-gradient(180deg,#fff 20%,var(--bi-gold-hi) 75%,var(--bi-gold-deep));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 18px rgba(var(--bi-gold-rgb),.35));animation:cer-pop .6s .1s var(--bi-ease) both}
+.cer-team{margin:6px 0 0;font:800 26px/1 var(--bi-display);color:#fff}
+.cer-sub{margin:2px 0 8px;color:#b4c1d1;font-size:14px}
+.cer-trophy{width:min(260px,52vw);aspect-ratio:3/4;background:url("assets/trophy-still-v3.png") center/contain no-repeat;filter:drop-shadow(0 22px 40px rgba(0,0,0,.6)) drop-shadow(0 0 40px rgba(var(--bi-gold-rgb),.45));animation:cer-rise .9s var(--bi-ease) both}
+.cer-helmet{width:140px;filter:drop-shadow(0 18px 24px rgba(0,0,0,.55));animation:cer-rise .8s var(--bi-ease) both}
+.cer-faceoff{display:flex;align-items:center;gap:18px}.cer-faceoff b{font:800 44px/1 var(--bi-display);color:#fff}.cer-faceoff .cer-helmet{width:110px}
+.cer-stars{display:flex;gap:10px;margin:4px 0 6px}.cer-stars span{display:grid;justify-items:center;min-width:64px;padding:8px 10px;border:1px solid rgba(var(--bi-gold-rgb),.35);border-radius:10px;font:800 13px/1 var(--bi-display);color:var(--bi-gold-hi)}.cer-stars b{font-size:30px;color:#fff}
+.cer-list{display:grid;gap:7px;width:100%;margin:6px 0 10px;padding:0;list-style:none;text-align:left}
+.cer-list li{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:12px;padding:8px 12px;border:1px solid var(--bi-line-2);border-radius:12px;background:rgba(5,8,12,.6);animation:cer-reveal .5s calc(.35s + var(--i)*.28s) var(--bi-ease) both}
+.cer-list canvas.portrait{width:44px;height:44px;border-radius:50%}
+.cer-list b{display:block;font:800 19px/1.05 var(--bi-display)}.cer-list small{display:block;font-size:12px;color:#a9b6c6}
+.cer-pick{display:grid;place-items:center;width:52px;height:46px;border-radius:10px;background:linear-gradient(180deg,var(--bi-gold-hi),var(--bi-gold));color:#140e02;font:800 18px/1 var(--bi-display)}.cer-pick small{color:#3d2c08;font-size:11px}
+.cer-continue{margin-top:8px;min-width:180px}
+.cer-confetti{position:absolute;inset:0;pointer-events:none}
+.cer-confetti i{position:absolute;top:-4%;left:var(--x);width:8px;height:14px;border-radius:2px;opacity:0;transform:rotate(var(--r));animation:cer-fall var(--t) var(--d) linear infinite}
+.cer-confetti .c0{background:var(--bi-gold-hi)}.cer-confetti .c1{background:#fff}.cer-confetti .c2{background:var(--team-secondary,#73a8ff)}.cer-confetti .c3{background:var(--bi-gold-deep)}
+@keyframes cer-in{from{opacity:0}to{opacity:1}}@keyframes cer-out{to{opacity:0}}
+@keyframes cer-pop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
+@keyframes cer-rise{from{opacity:0;transform:translateY(30px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes cer-reveal{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:none}}
+@keyframes cer-fall{0%{opacity:1;transform:translateY(0) rotate(var(--r))}100%{opacity:.9;transform:translateY(110vh) rotate(calc(var(--r) + 540deg))}}
+@media(prefers-reduced-motion:reduce){.ceremony,.ceremony *{animation:none!important}.cer-confetti{display:none}}
+body.motion-reduced .ceremony,body.motion-reduced .ceremony *{animation:none!important}body.motion-reduced .cer-confetti{display:none}

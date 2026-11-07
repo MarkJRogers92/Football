@@ -1,7 +1,7 @@
 const path=require('path');
 const {chromium}=require('playwright-core');
 const {chromiumPath}=require('./helpers/chromium-path');
-const TAB_GROUP={dashboard:'program',program:'program',history:'program',roster:'team',depth:'team',development:'team',recruiting:'recruiting',gamelab:'games',season:'games',stats:'games',newsletter:'games',staff:'staff',offseason:'staff',records:'staff'};
+const TAB_GROUP={dashboard:'home',program:'program',history:'world',roster:'program',depth:'program',development:'program',recruiting:'recruiting',gamelab:'season',season:'season',stats:'season',newsletter:'home',staff:'program',offseason:'program',records:'world'};
 let passed=0,failed=0;
 function check(label,ok,detail=''){if(ok){passed++;console.log(`  PASS  ${label}${detail?` — ${detail}`:''}`)}else{failed++;console.error(`  FAIL  ${label}${detail?` — ${detail}`:''}`)}}
 const goTab=async(page,id)=>page.evaluate(({id,group})=>{const g=document.querySelector(`.tab-groups button[data-group="${group}"]`);if(g&&!g.classList.contains('active'))g.click();document.querySelector(`.tabs button[data-tab="${id}"]`)?.click()},{id,group:TAB_GROUP[id]});

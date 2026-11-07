@@ -10,6 +10,14 @@ Presentation only: no simulation, balance, save-shape or randomness changes. See
 - **One menu language.** Underlined page tabs; one brass segmented track for every in-page view switcher.
 - **Motion** that respects reduced-motion: tab entrances, chart draw-ins, a sweep on primary buttons, a pulse on the next game.
 - **Less clutter.** No zero-stat defensive leaders, a slimmer required-decision header, and the recruiting mode explainer reduced to its toggle.
+- **One navigation map.** The page tabs now use the sidebar's five sections (Home, Program, Recruiting, Season, World) and the phone bar's order; the strip names its section and tab labels match the sidebar.
+- **Faces everywhere.** Decision cards show the players involved (starter vs challenger), and stat leaders show portraits.
+- **One news channel.** The save-status line no longer repeats what the ticker and toast already say.
+- **Plain-language subtitles** replace developer notes under each page title.
+- **"How to read this" keys** in Roster, Recruiting and Program explain grade ranges, interest, "% sure", evaluation hours and admin confidence bands where they appear.
+- **Coach It Live.** The interactive Game Day (fourth downs, two-point tries, halftime, late-game tempo) is now the headline action on the dashboard and in Game Lab, with a live win-chance estimate and graph that marks your calls and every score. The estimate is presentation only.
+- **Rival Watch.** Your rival's head coach as a character: an archetype from the coach's strongest rating (The Closer, The Schemer, The Builder, The Talent Scout), traits from ambition, loyalty and age, the series, the next meeting, and pressure lines tied to real facts (which of your targets they lead, the last result, streaks). Other coaches leading your recruiting races are listed too.
+- **Ceremonies.** National title, conference title and bowl wins get a trophy or helmet presentation with confetti; a completed Signing Day shows the class; Draft Night lists your players going pro. They play only for milestones earned while playing, never on load.
 
 ## v0.14.1 — Visual pass
 

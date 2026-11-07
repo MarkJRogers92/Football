@@ -3,7 +3,7 @@ const path=require('path');
 const {chromium}=require('playwright-core');
 const {chromiumPath}=require('./helpers/chromium-path');
 const {startNewDynasty}=require('./helpers/start-new-dynasty');
-const TAB_GROUP={gamelab:'games',season:'games'};
+const TAB_GROUP={gamelab:'season',season:'season'};
 const goTab=async(page,id)=>page.evaluate(({id,group})=>{const g=document.querySelector(`.tab-groups button[data-group="${group}"]`);if(g&&!g.classList.contains('active'))g.click();document.querySelector(`.tabs button[data-tab="${id}"]`)?.click()},{id,group:TAB_GROUP[id]});
 const state=page=>page.evaluate(()=>document.querySelector('[data-gcf-host]').__gcf.state);
 const activeTab=page=>page.evaluate(()=>document.querySelector('#gameTabs button.active')?.dataset.gameTab);

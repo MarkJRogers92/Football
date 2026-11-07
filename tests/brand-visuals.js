@@ -17,11 +17,11 @@ test('gauge runs left (0) to right (max) across the top',()=>{
  assert.match(V.gaugeArc(0,100,{radius:10}),/^M-10 0A10 10 0 0 1 10 0$/);
 });
 
-test('estimate ranges map onto the 40-99 scale and reject unreadable labels',()=>{
- assert.deepEqual(V.estimateRange('A- · 85-93'),{low:85,high:93,start:76.3,end:89.8});
+test('estimate ranges map onto the 25-99 scale and reject unreadable labels',()=>{
+ assert.deepEqual(V.estimateRange('A- · 85-93'),{low:85,high:93,start:81.1,end:91.9});
  assert.deepEqual(V.estimateRange('B · 93–85').low,85,'reversed ranges are ordered');
  assert.equal(V.estimateRange('Staff read unavailable'),null);
- assert.equal(V.estimateRange('C · 30-45').start,0,'below the scale clamps to the start');
+ assert.equal(V.estimateRange('F · 10-30').start,0,'below the scale clamps to the start');
 });
 
 test('season strip orders weeks, labels results and marks only the first unplayed game as next',()=>{

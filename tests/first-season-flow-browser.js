@@ -6,7 +6,7 @@ const {chromium}=require('playwright-core');
 const {chromiumPath}=require('./helpers/chromium-path');
 const {startNewDynasty}=require('./helpers/start-new-dynasty');
 
-const TAB_GROUP={dashboard:'program',gamelab:'games'};
+const TAB_GROUP={dashboard:'home',gamelab:'season'};
 const goTab=async(page,id)=>page.evaluate(({id,group})=>{
   const groupButton=document.querySelector(`.tab-groups button[data-group="${group}"]`);
   if(groupButton&&!groupButton.classList.contains('active'))groupButton.click();

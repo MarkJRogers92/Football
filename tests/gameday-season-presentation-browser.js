@@ -1,7 +1,7 @@
 const {chromium}=require('playwright-core');
 const {chromiumPath}=require('./helpers/chromium-path');
 const path=require('path');
-const goTab=(page,id,group='games')=>page.evaluate(({id,group})=>{const g=document.querySelector(`.tab-groups button[data-group="${group}"]`);if(g&&!g.classList.contains('active'))g.click();document.querySelector(`.tabs button[data-tab="${id}"]`)?.click()},{id,group});
+const goTab=(page,id,group='season')=>page.evaluate(({id,group})=>{const g=document.querySelector(`.tab-groups button[data-group="${group}"]`);if(g&&!g.classList.contains('active'))g.click();document.querySelector(`.tabs button[data-tab="${id}"]`)?.click()},{id,group});
 const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
 const start=page=>sharedStartNewDynasty(page);
 (async()=>{

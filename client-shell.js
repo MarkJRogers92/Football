@@ -1,12 +1,12 @@
 (function(){
   'use strict';
 
-  const TAB_GROUP={dashboard:'program',program:'program',history:'program',roster:'team',depth:'team',development:'team',recruiting:'recruiting',gamelab:'games',season:'games',stats:'games',newsletter:'games',staff:'staff',offseason:'staff',records:'staff'};
+  const TAB_GROUP={dashboard:'home',newsletter:'home',program:'program',roster:'program',depth:'program',development:'program',staff:'program',offseason:'program',recruiting:'recruiting',gamelab:'season',season:'season',stats:'season',history:'world',records:'world'};
   const NAV=[
-    {label:'Home',items:[['dashboard','Command Center'],['newsletter','News / Inbox']]},
-    {label:'Program',items:[['program','Program Overview'],['roster','Roster'],['depth','Roles & Depth'],['development','Development'],['staff','Staff'],['offseason','Offseason']]},
+    {label:'Home',items:[['dashboard','Command Center'],['newsletter','News']]},
+    {label:'Program',items:[['program','Overview'],['roster','Roster'],['depth','Roles & Depth'],['development','Development'],['staff','Staff'],['offseason','Offseason']]},
     {label:'Recruiting',items:[['recruiting','Recruiting Board']]},
-    {label:'Season',items:[['gamelab','Game Lab'],['season','Schedule'],['stats','Stats & Rankings']]},
+    {label:'Season',items:[['gamelab','Game Lab'],['season','Schedule'],['stats','Stats']]},
     {label:'World',items:[['history','History'],['records','Awards & Records']]}
   ];
 
@@ -78,7 +78,7 @@
   const mobile=document.createElement('nav');
   mobile.className='client-mobile-nav';
   mobile.setAttribute('aria-label','Quick navigation');
-  mobile.innerHTML=`${navButton('dashboard','Home','client-mobile-item')}${navButton('roster','Program','client-mobile-item')}${navButton('recruiting','Recruit','client-mobile-item')}${navButton('gamelab','Season','client-mobile-item')}<button type="button" class="client-mobile-item" data-client-more>${navIcon('more')}<span>More</span></button>`;
+  mobile.innerHTML=`${navButton('dashboard','Home','client-mobile-item')}${navButton('program','Program','client-mobile-item')}${navButton('recruiting','Recruit','client-mobile-item')}${navButton('gamelab','Season','client-mobile-item')}<button type="button" class="client-mobile-item" data-client-more>${navIcon('more')}<span>More</span></button>`;
   app.appendChild(mobile);
 
   function currentTab(){return app.querySelector('.tabs button.active[data-tab]')?.dataset.tab||'dashboard'}
