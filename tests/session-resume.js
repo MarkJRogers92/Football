@@ -335,3 +335,30 @@ test('postseason rollback restores the whole world after the preceding checkpoin
  assert.equal(errors.length,1);assert.match(errors[0],/Injected postseason v2 rollback fault after archive write/);
  await e.yieldToUserAction();
 });
+
+test('a fresh scope shows prospects while an explicit saved My Board view remains restorable',async t=>{
+ const {e,privateApi}=await fixture(8333,{fullRuntime:true}),vm=require('node:vm'),frames=[];
+ // Run the actual workspace bridge/render with two real recruits and a small DOM.
+ const classes={toggle(){}},rows=e.universe.recruits.slice(0,2).map(r=>({
+  classList:{toggle(){},contains:key=>key==='target'&&r.targeted},
+  querySelector:selector=>selector==='[data-recruit]'?{dataset:{recruit:r.id},textContent:r.name}:selector.startsWith('[data-label=')?{innerText:'',children:[],querySelector:()=>null}:null
+ }));
+ const shell={innerHTML:'',dataset:{},querySelector:()=>null,querySelectorAll:()=>[]};
+ const elements={'#rwSwitch':{},'#rwFilters':{firstElementChild:{}},'#recruitWorkspace':shell,'.rw-card-list':{scrollTop:0},'[data-rw-budget]':{},'#rwSearch':{},
+  '#recruiting':{classList:classes,querySelector:selector=>selector===':scope > .section-head'?{}:selector===':scope > .table-wrap'?{classList:classes}:null}};
+ const context={document:{querySelector:selector=>elements[selector]||null,querySelectorAll:selector=>selector==='#recruitBody tr'?rows:[],activeElement:{dataset:{}},addEventListener(){}},
+  matchMedia:()=>({matches:true,addEventListener(){}}),MutationObserver:class{observe(){}},requestAnimationFrame:fn=>frames.push(fn),setTimeout:fn=>frames.push(fn),clearTimeout(){},window:{scrollY:0}};
+ vm.runInNewContext(fs.readFileSync(require.resolve('../recruiting-workspace.js'),'utf8'),context);
+ const workspace=context.DynastyRecruitingWorkspaceView,cards=()=>[...shell.innerHTML.matchAll(/\bdata-rwid="/g)].length;
+ global.DynastyRecruitingWorkspaceView=workspace;t.after(()=>delete global.DynastyRecruitingWorkspaceView);
+ privateApi.setNavigator(()=>{});while(frames.length)frames.shift()();
+ global.renderGuidanceSystem();
+ assert.equal(workspace.read().filter,'all','a fresh scope preserves the original browseable default');
+ assert.equal(cards(),2,'a new dynasty with no targets still renders real prospects');
+ await e.saveBrowser();privateApi.setTab('recruiting');
+ workspace.restore({mode:'workspace',filter:'board',selectedId:'',shown:30});privateApi.capture();
+ assert.equal(cards(),0,'an explicitly selected empty My Board remains empty');
+ await e.loadBrowser();global.renderGuidanceSystem();
+ assert.equal(workspace.read().filter,'board','a matching saved My Board preference outranks the fresh-scope default');
+ assert.equal(cards(),0);
+});

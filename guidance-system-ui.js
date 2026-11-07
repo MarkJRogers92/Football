@@ -91,7 +91,7 @@
   // dialog, an advancement button, or the other program's recruiting filters.
   window.DynastyDashboardViews?.show?.('week');window.DynastyRecruitingClasses?.show?.('current');
   window.DynastyLabRecruitingFilters?.reset?.();
-  window.DynastyRecruitingWorkspaceView?.restore?.({mode:'workspace',filter:'board',selectedId:'',shown:30});
+  window.DynastyRecruitingWorkspaceView?.restore?.({mode:'workspace',filter:'all',selectedId:'',shown:30});
   for(const [id,value] of [['positionFilter','ALL'],['statsScope','national']]){const control=target('#'+id);if(control)control.value=value}
   if(previous)goToTab('dashboard');
  }
