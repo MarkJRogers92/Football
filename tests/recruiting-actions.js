@@ -16,7 +16,8 @@ function fixture(over={}){
   recruitBlocked:over.blocked||(()=>false),
   growRecruiterRelationship:()=>{calls.grown++},
   ensureTargeted:r=>{r.targeted=true},
-  scheduleVisit:r=>{calls.visit++;r.visitWeek=universe.week+1;r.visit=true}
+  scheduleVisit:r=>{calls.visit++;r.visitWeek=universe.week+1;r.visit=true},
+  topRivals:(r,t,n)=>(over.rivals||['Kentucky Commonwealth','Texas Tech Plains','Ohio Valley']).slice(0,n)
  });
  return{universe,api,calls};
 }
@@ -308,6 +309,125 @@ test('saves from before the desk have no hidden motives, so nothing changes unde
  assert.equal(api.pitchProjection(r,weak,api.motivesFor(r).secondary,{actual:true}).fit,.4);
 });
 
+// ---------- rival reactions ----------
+const worked=(api,r,t)=>{api.perform(r,t,'call');return r};
+test('rivals only react to recruits you are actually working',()=>{
+ const {api,universe}=fixture(),t=team();universe.week=5;
+ const idle=recruit('I',{targeted:true}),untargeted=recruit('U'),signed=recruit('S',{targeted:true,committed:'Other U'}),active=worked(api,recruit('A'),t);
+ universe.recruits.push(idle,untargeted,signed,active);
+ for(let w=1;w<=11;w++){universe.week=w;api.generateRivals(universe.recruits,t)}
+ assert.equal(api.rivalMoves(idle).length,0);assert.equal(api.rivalMoves(untargeted).length,0);assert.equal(api.rivalMoves(signed).length,0);
+});
+
+test('rival activity is decided by a hash, not by gameplay randomness, and repeats exactly',()=>{
+ const run=()=>{
+  const {api,universe}=fixture(),t=team(),realRandom=Math.random;
+  for(let i=0;i<120;i++)universe.recruits.push(worked(api,recruit(`V${i}`,{stars:3+i%3}),t));
+  Math.random=()=>{throw new Error('rivals must not draw randomness')};
+  try{for(let w=1;w<=11;w++){universe.week=w;api.generateRivals(universe.recruits,t)}}finally{Math.random=realRandom}
+  return JSON.stringify(universe.recruits.map(r=>api.rivalMoves(r)));
+ };
+ assert.equal(run(),run());
+});
+
+test('rivals escalate in order, offer then visit then in-home, and never before their week',()=>{
+ const {api,universe}=fixture(),t=team();
+ for(let i=0;i<300;i++)universe.recruits.push(worked(api,recruit(`E${i}`,{stars:3+i%3}),t));
+ for(let w=1;w<=11;w++){universe.week=w;api.generateRivals(universe.recruits,t)}
+ const order=['offer','visit','inhome'],minWeek={offer:1,visit:3,inhome:6},seen={offer:0,visit:0,inhome:0};
+ for(const r of universe.recruits){
+  const byTeam={};
+  for(const m of api.rivalMoves(r).slice().reverse()){
+   seen[m.kind]++;assert.ok(m.week>=minWeek[m.kind],`${m.kind} in week ${m.week}`);
+   (byTeam[m.team]??=[]).push(m);
+  }
+  for(const list of Object.values(byTeam)){
+   assert.deepEqual(list.map(m=>m.kind),order.slice(0,list.length),'steps come in order, none skipped');
+   for(let i=1;i<list.length;i++)assert.ok(list[i].week>list[i-1].week||list[i].week===list[i-1].week);
+  }
+  assert.ok(api.rivalMoves(r).length<=12);
+ }
+ assert.ok(seen.offer>seen.visit&&seen.visit>seen.inhome&&seen.inhome>0,JSON.stringify(seen));
+});
+
+test('an unanswered move adds to that program only, and fades with time',()=>{
+ const {api,universe}=fixture(),t=team(),r=worked(api,recruit('A'),t);universe.week=4;
+ api.addRivalEvent(r,t,'Kentucky Commonwealth','visit');
+ assert.equal(api.rivalHeat(r,'Kentucky Commonwealth'),5);assert.equal(api.rivalHeat(r,'Texas Tech Plains'),0);assert.equal(api.rivalHeat(r,t.name),0);
+ universe.week=5;assert.equal(api.rivalHeat(r,'Kentucky Commonwealth'),5,'a full week at full strength');
+ universe.week=6;assert.equal(api.rivalHeat(r,'Kentucky Commonwealth'),2.5,'then half');
+ universe.week=8;assert.equal(api.rivalHeat(r,'Kentucky Commonwealth'),0,'then gone');
+ assert.equal(api.rivalMoves(r)[0].state,'lapsed');
+});
+
+test('your own step answers a rival move, and only the right ones',()=>{
+ const {api,universe}=fixture(),t=team();universe.week=7;
+ const a=recruit('A',{interest:60}),b=recruit('B',{interest:60}),c=recruit('C',{interest:60});
+ for(const r of [a,b,c]){worked(api,r,t);api.perform(r,t,'offer')}
+ // They are offered by us already, so offers are born answered; visits and in-homes are not.
+ for(const r of [a,b,c]){api.addRivalEvent(r,t,'Kentucky Commonwealth','visit');api.addRivalEvent(r,t,'Kentucky Commonwealth','inhome')}
+ assert.equal(api.liveMoves(a).length,2);
+ let out=api.perform(a,t,'visit');assert.equal(out.answered,1,'a visit answers a visit');
+ assert.deepEqual(api.liveMoves(a).map(m=>m.kind),['inhome'],'but not an in-home');
+ out=api.perform(b,t,'inhome');assert.equal(out.answered,2,'an in-home answers both');
+ assert.equal(api.liveMoves(b).length,0);
+ assert.equal(api.rivalHeat(b,'Kentucky Commonwealth'),0);
+ assert.equal(api.liveMoves(c).length,2);
+});
+
+test('a rival offer is answered only by your own offer',()=>{
+ const {api,universe}=fixture(),t=team(),r=worked(api,recruit('A',{interest:60}),t);universe.week=2;
+ api.addRivalEvent(r,t,'Kentucky Commonwealth','offer');
+ assert.equal(api.liveMoves(r).length,1);
+ api.perform(r,t,'pitch');api.perform(r,t,'call');assert.equal(api.liveMoves(r).length,1,'talking is not an offer');
+ assert.equal(api.perform(r,t,'offer').answered,1);assert.equal(api.liveMoves(r).length,0);
+});
+
+test('answering works in the opening preseason, when the week number is zero',()=>{
+ const {api,universe}=fixture(),t=team(),r=worked(api,recruit('A',{interest:60}),t);universe.week=0;universe.phase='preseason';
+ api.addRivalEvent(r,t,'Kentucky Commonwealth','offer');
+ assert.equal(api.rivalHeat(r,'Kentucky Commonwealth'),3);
+ api.perform(r,t,'offer');
+ assert.equal(api.rivalHeat(r,'Kentucky Commonwealth'),0);assert.equal(api.liveMoves(r).length,0);assert.equal(api.rivalMoves(r)[0].state,'answered');
+});
+
+test('a move that matches something you already did is born answered',()=>{
+ const {api,universe}=fixture(),t=team(),r=worked(api,recruit('A',{interest:60}),t);universe.week=6;
+ api.perform(r,t,'offer');api.perform(r,t,'visit');
+ assert.equal(api.addRivalEvent(r,t,'Kentucky Commonwealth','offer').answered,universe.week);
+ assert.equal(api.addRivalEvent(r,t,'Texas Tech Plains','visit').answered,universe.week);
+ assert.equal(api.addRivalEvent(r,t,'Ohio Valley','inhome').answered,false,'we have not been to the family');
+});
+
+test('the board counts live rival moves and drops committed recruits',()=>{
+ const {api,universe}=fixture(),t=team();universe.week=4;
+ const a=worked(api,recruit('A'),t),b=worked(api,recruit('B'),t),c=worked(api,recruit('C'),t);
+ universe.recruits.push(a,b,c);
+ api.addRivalEvent(a,t,'Kentucky Commonwealth','offer');api.addRivalEvent(a,t,'Texas Tech Plains','offer');api.addRivalEvent(b,t,'Kentucky Commonwealth','offer');
+ assert.equal(api.workload(universe.recruits,t).rivals,3);
+ assert.equal(api.status(a,t).rivals.length,2);
+ b.committed='Other U';assert.equal(api.workload(universe.recruits,t).rivals,2);
+ assert.equal(api.unansweredMoves(universe.recruits,t).length,1);
+});
+
+test('staff answer a rival offer sooner than an ordinary one, but leave visits to you',()=>{
+ const {api,universe}=fixture(),t=team();universe.week=4;
+ const threatened=recruit('T',{targeted:true,interest:45,nationalRank:1}),quiet=recruit('Q',{targeted:true,interest:45,nationalRank:2}),visited=recruit('V',{targeted:true,interest:70,nationalRank:3});
+ universe.recruits.push(threatened,quiet,visited);
+ api.addRivalEvent(threatened,t,'Kentucky Commonwealth','offer');api.addRivalEvent(visited,t,'Kentucky Commonwealth','offer');api.addRivalEvent(visited,t,'Kentucky Commonwealth','visit');
+ api.staffPlan(universe.recruits,t);
+ assert.equal(api.hasOffer(threatened,t),true,'a rival offered him, so they matched it');
+ assert.equal(api.hasOffer(quiet,t),false,'nothing pressing at 45%');
+ assert.equal(api.liveMoves(visited).some(m=>m.kind==='visit'),true,'the visit stays for you to answer');
+ assert.ok(!visited.visitWeek);
+});
+
+test('the history of rival moves is bounded',()=>{
+ const {api,universe}=fixture(),t=team(),r=worked(api,recruit('A'),t);
+ for(let i=0;i<30;i++){universe.week=1+i%11;api.addRivalEvent(r,t,`Team ${i}`,'offer')}
+ assert.ok(api.rivalMoves(r).length<=12);
+});
+
 test('handing recruiting to the staff is a saved setting that defaults to off',()=>{
  const {api,universe}=fixture();
  assert.equal(api.isAuto(universe),false);
@@ -424,6 +544,45 @@ test('the weekly reminder to spend hours goes quiet once the staff have recruiti
  assert.equal(globalThis.DynastyRecruitingWeek(team()).spent,0,'the reminder reads an unspent week');
  A.setAuto(u,true);
  assert.equal(globalThis.DynastyRecruitingWeek(team()),null,'and says nothing once the staff have it');
+});
+
+test('an unanswered rival move raises that rival\'s pitch in the real race, and answering takes it back',async()=>{
+ const {e,A,team}=await engine(7110),u=e.universe,t=team();
+ const r=u.recruits.filter(x=>!x.committed)[0];r.targeted=true;A.perform(r,t,'call');
+ const rival=u.teams.find(x=>x.name!==t.name),other=u.teams.find(x=>x.name!==t.name&&x!==rival);
+ const base=e.recruitPitch(rival,r),otherBase=e.recruitPitch(other,r),mine=e.recruitPitch(t,r);
+ A.addRivalEvent(r,t,rival.name,'offer');
+ assert.equal(e.recruitPitch(rival,r)-base,3,'their pitch rose by the move\'s weight');
+ assert.equal(e.recruitPitch(other,r),otherBase,'nobody else moved');assert.equal(e.recruitPitch(t,r),mine);
+ A.perform(r,t,'offer');
+ assert.equal(e.recruitPitch(rival,r),base,'answering takes it back');
+});
+
+test('rival moves show up in the desk, on the card, in the sidebar and in the weekly reminder',async()=>{
+ const {e,A,team}=await engine(7111),u=e.universe,t=team(),D=globalThis.DynastyRecruitingDesk;
+ const r=u.recruits.filter(x=>!x.committed)[0];r.targeted=true;A.perform(r,t,'call');
+ assert.equal(D.badge(r.id),'');assert.doesNotMatch(D.html(r.id),/RIVAL WATCH/);assert.equal(globalThis.DynastyRecruitingRivals(t).count,0);
+ const rival=u.teams.find(x=>x.name!==t.name);
+ A.addRivalEvent(r,t,rival.name,'visit');
+ const desk=D.html(r.id);
+ assert.match(desk,/RIVAL WATCH/);assert.match(desk,new RegExp(rival.name));assert.match(desk,/Unanswered/);
+ assert.match(desk,/class="ra-answer"[^>]*data-ra-action="visit"/,'the buttons that would answer it are marked');
+ assert.match(desk,/class="ra-answer"[^>]*data-ra-action="inhome"|data-ra-action="inhome"/);
+ assert.match(D.badge(r.id),new RegExp(rival.name));
+ assert.match(D.nav(),/RIVAL MOVES/);assert.match(D.nav(),new RegExp(`data-rwid="${r.id}"`));
+ const reminder=globalThis.DynastyRecruitingRivals(t);assert.equal(reminder.count,1);assert.deepEqual(reminder.names,[r.name]);
+ A.perform(r,t,'visit');
+ assert.equal(globalThis.DynastyRecruitingRivals(t).count,0);assert.match(D.html(r.id),/Answered/);
+});
+
+test('the same seed and the same choices give the same rival moves',async()=>{
+ const run=async()=>{
+  const {e,A,team}=await engine(7112),u=e.universe,t=team();
+  const pool=u.recruits.filter(r=>!r.committed).slice(0,15);pool.forEach(r=>{r.targeted=true});
+  for(let w=0;w<9;w++){for(const r of pool)if(!r.committed)A.perform(r,t,'call');e.simWeek()}
+  return JSON.stringify(pool.map(r=>A.rivalMoves(r)));
+ };
+ const a=await run(),b=await run();assert.equal(a,b);assert.ok(JSON.parse(a).some(x=>x.length),'something happened');
 });
 
 test('simulating the season hands the board to the staff instead of letting it cool',async()=>{

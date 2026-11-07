@@ -53,6 +53,17 @@ const hoursLeft=async page=>{await page.waitForFunction(()=>/^\d+\s*\/\s*\d+/.te
   await page.waitForFunction(()=>!/Offer out/.test(document.querySelector('.recruit-workspace-dossier')?.innerText||''));
   check(`[${label}] withdrawing the offer puts the gate back`,await page.locator('.recruit-workspace-dossier [data-ra-action="offer"]').isEnabled());
 
+  // Rival reactions: a move on this prospect shows up everywhere, and your own offer answers it.
+  await page.evaluate(i=>{const D=window.DynastyRecruitingDesk,A=window.DynastyRecruitingActions;A.addRivalEvent(D.recruit(i),D.team(),'Rival Test University','offer')},id);
+  await desk.locator('[data-ra-action="call"]').click();// any action repaints the board
+  await page.waitForSelector('.recruit-workspace-dossier .ra-rivals');
+  const rival=await page.locator('.recruit-workspace-dossier .ra-rivals').innerText();
+  check(`[${label}] the desk names the rival move, says it is unanswered and how to answer`,/Rival Test University/.test(rival)&&/offered/.test(rival)&&/Unanswered/.test(rival)&&/Offer \(2h\)/.test(rival),rival.replace(/\s+/g,' '));
+  check(`[${label}] the card, the sidebar list and the answering button all flag it`,await page.locator('.recruit-workspace-card.active .ra-rival-badge').count()===1&&await page.locator('.ra-nav .ra-rival-row').count()===1&&await page.locator('.recruit-workspace-dossier [data-ra-action="offer"].ra-answer').count()===1);
+  await page.locator('.recruit-workspace-dossier [data-ra-action="offer"]').click();
+  await page.waitForFunction(()=>/Answered\./.test(document.querySelector('.recruit-workspace-dossier .ra-rivals')?.innerText||''));
+  check(`[${label}] making your own offer answers it and clears every flag`,await page.locator('.recruit-workspace-card.active .ra-rival-badge').count()===0&&await page.locator('.ra-nav .ra-rival-row').count()===0&&await page.locator('.recruit-workspace-dossier [data-ra-action="offer"].ra-answer').count()===0);
+
   // The staff controls are in the sidebar on desktop and inside the desk on a phone; use whichever is on screen.
   const staffButton=page.locator('[data-ra-staff]:visible').first(),autoSwitch=page.locator('[data-ra-auto]:visible').first();
   // Staff have nothing to add to a board that is already worked, so give it some targets first.

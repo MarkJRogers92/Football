@@ -42,3 +42,13 @@
 .ra-motives i{font-style:normal;color:var(--muted)}
 .ra-motives .ra-warn-text{color:var(--warn)}
 @media(max-width:700px){.ra-motives{grid-template-columns:1fr}}
+.ra-rivals{display:grid;gap:5px;padding:8px 10px;border:1px solid var(--warn);border-radius:10px;background:rgba(255,255,255,.02)}
+.ra-rival{display:grid;gap:1px;font-size:.8rem}
+.ra-rival em{font-style:normal;color:var(--muted)}
+.ra-rival.ra-live b{color:var(--warn)}
+.ra-rival.ra-answered,.ra-rival.ra-lapsed{opacity:.7}
+.ra-actions button.ra-answer{border-color:var(--warn);color:var(--warn)}
+.ra-nav-rivals{display:grid;gap:5px}
+.ra-rival-row{display:grid;gap:1px;text-align:left;font-size:.78rem;padding:6px 8px;border-color:var(--warn)}
+.ra-rival-row small{color:var(--muted)}
+.ra-rival-badge{color:var(--warn);font-size:.68rem}
