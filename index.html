@@ -918,6 +918,12 @@ tr[hidden]{display:none!important}
 /* A phone has no room for the sidebar block above the list; the staff controls ride inside the desk instead. */
 .ra-desk-staff{display:none;padding-top:2px;border-top:1px solid var(--line)}
 @media(max-width:700px){.ra-nav{display:none}.ra-desk-staff{display:block}.ra-desk-staff .ra-staff{margin-left:0}}
+.ra-motives{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.ra-motives span{background:var(--panel2);border-radius:8px;padding:7px 9px;font-size:.8rem;display:grid;gap:2px}
+.ra-motives b{font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.ra-motives i{font-style:normal;color:var(--muted)}
+.ra-motives .ra-warn-text{color:var(--warn)}
+@media(max-width:700px){.ra-motives{grid-template-columns:1fr}}
 
 .development-plan-board{grid-column:1/-1;margin-top:10px;border-top:1px solid var(--line);padding-top:10px}.development-plan-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:5px}.development-plan-head>div{display:flex;flex-direction:column}.development-plan-head small,.development-plan-head>span{color:var(--muted);font-size:11px}.development-plan-attribution{max-width:90ch;margin:4px 0 8px;color:var(--muted);font-size:11px;line-height:1.4}.development-plan-row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}.development-plan-player{display:flex;flex-direction:column;gap:3px;min-width:0}.development-plan-player>span{font-size:12px;color:var(--muted)}.development-plan-player .development-plan-outcome{color:var(--text)}.development-plan-outcome.good b{color:var(--good)}.development-plan-outcome.bad b{color:var(--bad)}.development-plan-outcome.mixed b{color:var(--warn)}.development-plan-support{max-width:80ch}.development-plan-coaching{margin-top:2px;font-size:11px;color:var(--muted)}.development-plan-coaching summary{cursor:pointer;color:var(--accent)}.development-plan-coaching p{max-width:72ch;margin:5px 0}.development-plan-coach-rows{max-width:80ch;line-height:1.45}.development-plan-row button{flex:0 0 auto}.development-feature-btn{display:block;margin-top:6px;padding:5px 8px;font-size:11px}.development-feature-btn.active{border-color:var(--good);color:var(--good)}@media(max-width:640px){.development-plan-row{gap:7px}.development-plan-player>span{line-height:1.4}.development-plan-support{font-size:11px}.development-plan-coaching{max-width:100%;overflow-wrap:anywhere}}
 .development-coaching-support{margin-top:12px;padding:10px;border:1px solid var(--line);border-radius:8px}.development-coaching-support>strong{display:block}.development-coaching-support>p{margin:5px 0 8px;color:var(--muted);font-size:12px;line-height:1.45}.development-coach-row{display:grid;grid-template-columns:minmax(120px,.7fr) minmax(0,1.3fr);gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:11px}.development-coach-row span{color:var(--muted)}@media(max-width:640px){.development-coach-row{grid-template-columns:1fr;gap:2px}}
@@ -11784,6 +11790,12 @@ function makeRecruitingActionSystem(env){
  const OFFER={interest:2,relationship:2,boost:3},INHOME={interest:5,relationship:4,boost:4,minInterest:45,minWeek:5};
  const WITHDRAW={interest:-6,relationship:-5};
  const GRACE_WEEKS=1,WARM_WEEKS=1;
+ // Motivations. His stated priority is on the card. Beyond it he has a second priority worth 70% as
+ // much when you pitch it, and about three in ten have a dealbreaker: an area where, if your program
+ // is below the floor, he will not commit and your whole pitch drags. Both stay hidden until contact
+ // uncovers them. They are derived from a hash of the recruit, so they draw no gameplay randomness.
+ const SECOND_AT=2,DEALBREAKER_AT=4,DEALBREAKER_RATE=30,DEALBREAKER_FLOOR=50,SECOND_FIT=.7,DEALBREAKER_PITCH=-6;
+ function hash(v){let h=2166136261>>>0;for(const ch of String(v??'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
  function universe(){return env.getUniverse()}
  const clamp=(v,a,b)=>env.clamp(v,a,b);
 
@@ -11807,10 +11819,10 @@ function makeRecruitingActionSystem(env){
  function isActive(){const u=universe();return u.phase==='regular'||(u.phase==='preseason'&&u.week===0)}
 
  // ---------- per-recruit records ----------
- function blank(){return{season:universe().year,offered:false,offerWeek:null,inHome:false,lastWorkedWeek:null,graceWeek:null,week:null,history:[]}}
+ function blank(){return{season:universe().year,offered:false,offerWeek:null,inHome:false,lastWorkedWeek:null,graceWeek:null,week:null,history:[],contacts:0,known:{secondary:false,dealbreaker:false}}}
  function record(r,t,create=true){
   const u=universe(),key=String(t.id),old=r?.recruitingActions?.[key];
-  if(old&&old.season===u.year){old.history=Array.isArray(old.history)?old.history:[];return old}
+  if(old&&old.season===u.year){old.history=Array.isArray(old.history)?old.history:[];old.contacts??=0;old.known??={secondary:false,dealbreaker:false};return old}
   if(!create)return blank();
   r.recruitingActions??={};return(r.recruitingActions[key]=blank());
  }
@@ -11847,21 +11859,65 @@ function makeRecruitingActionSystem(env){
   }
   return 50;
  }
- const pitchFit=(r,topic)=>topic===r.priority?1:PITCH_OFF_PRIORITY;
- const pitchFactor=strength=>clamp((strength-40)/35,-.6,1.4);
- function pitchDiminish(rec,topic){
-  const wk=weekState(rec);let m=Math.pow(PITCH_NEXT,wk.pitchCount);if(wk.pitches[topic])m*=PITCH_REPEAT_TOPIC;return m;
+ // Universes that predate the desk keep their in-flight targets exactly as they were, so they have
+ // no hidden motivations either.
+ function motivesOn(){return!universe().recruitingActions?.migrated}
+ function motivesFor(r){
+  const others=env.priorities.filter(p=>p!==r.priority),second=others[hash(`${r.id}|second`)%others.length];
+  const rest=others.filter(p=>p!==second),deal=hash(`${r.id}|deal`)%100<DEALBREAKER_RATE?rest[hash(`${r.id}|dealtopic`)%rest.length]:null;
+  return{primary:r.priority,secondary:second,dealbreaker:deal};
  }
+ // The dealbreaker bites whether or not he has told you about it.
+ function dealbreakerUnmet(r,t){
+  if(!motivesOn())return null;
+  const topic=motivesFor(r).dealbreaker;if(!topic)return null;
+  const strength=topicStrength(t,r,topic);
+  return strength<DEALBREAKER_FLOOR?{topic,strength,floor:DEALBREAKER_FLOOR}:null;
+ }
+ // `actual` is what a pitch really does; the menu only knows what he has told you.
+ function fitFor(r,t,topic,{actual=false}={}){
+  if(topic===r.priority)return 1;
+  if(motivesOn()&&topic===motivesFor(r).secondary&&(actual||record(r,t,false).known.secondary))return SECOND_FIT;
+  return PITCH_OFF_PRIORITY;
+ }
+ const pitchFactor=strength=>clamp((strength-40)/35,-.6,1.4);
  function pitchLabel(delta){return delta>=6?'Strong':delta>=3?'Good':delta>=1?'Modest':delta===0?'Flat':'Risky'}
- function pitchProjection(r,t,topic){
-  const rec=record(r,t,false),strength=topicStrength(t,r,topic),fit=pitchFit(r,topic);
+ function pitchProjection(r,t,topic,opts={}){
+  const rec=record(r,t,false),strength=topicStrength(t,r,topic),fit=fitFor(r,t,topic,opts);
   const wk=rec.week&&rec.week.week===universe().week?rec.week:{pitchCount:0,pitches:{}};
   let m=Math.pow(PITCH_NEXT,wk.pitchCount);if(wk.pitches[topic])m*=PITCH_REPEAT_TOPIC;
   const delta=Math.round(PITCH_BASE*fit*pitchFactor(strength)*m);
-  return{topic,strength,fit,delta,label:pitchLabel(delta),priority:topic===r.priority};
+  const m2=motivesOn()?motivesFor(r):{},k=rec.known;
+  return{topic,strength,fit,delta,label:pitchLabel(delta),priority:topic===r.priority,
+   secondary:!!k.secondary&&topic===m2.secondary,dealbreaker:!!k.dealbreaker&&!!m2.dealbreaker&&topic===m2.dealbreaker};
  }
  function pitchOptions(r,t){
   return env.priorities.map(topic=>pitchProjection(r,t,topic)).sort((a,b)=>b.delta-a.delta||b.strength-a.strength);
+ }
+ // What contact has taught you. Two contacts open his second priority, four settle whether he has a
+ // dealbreaker, and a campus or in-home visit shows you both at once.
+ function learn(rec,r,kind,topic){
+  const out=[];if(!motivesOn())return out;
+  const m=motivesFor(r),k=rec.known,visit=kind==='visit'||kind==='inhome';
+  rec.contacts++;
+  if(!k.secondary&&(rec.contacts>=SECOND_AT||visit||(kind==='pitch'&&topic===m.secondary))){k.secondary=true;out.push(`His second priority is ${m.secondary}.`)}
+  if(!k.dealbreaker&&(rec.contacts>=DEALBREAKER_AT||visit||(kind==='pitch'&&m.dealbreaker&&topic===m.dealbreaker))){
+   k.dealbreaker=true;out.push(m.dealbreaker?`${m.dealbreaker} is a dealbreaker for him.`:'He has no dealbreakers.');
+  }
+  return out;
+ }
+ // For the desk: only ever what he has actually told you.
+ function intel(r,t){
+  if(!motivesOn())return{on:false,primary:r.priority};
+  const m=motivesFor(r),rec=record(r,t,false),k=rec.known,unmet=dealbreakerUnmet(r,t);
+  return{on:true,primary:m.primary,
+   secondary:k.secondary?m.secondary:null,secondaryIn:k.secondary?0:Math.max(1,SECOND_AT-rec.contacts),
+   dealbreaker:k.dealbreaker?(m.dealbreaker?{topic:m.dealbreaker,strength:topicStrength(t,r,m.dealbreaker),floor:DEALBREAKER_FLOOR,met:!unmet}:{none:true}):null,
+   dealbreakerIn:k.dealbreaker?0:Math.max(1,DEALBREAKER_AT-rec.contacts)};
+ }
+ // A dealbreaker he has told you about that your program does not clear.
+ function knownBlock(r,t){
+  const i=intel(r,t);return i.dealbreaker&&i.dealbreaker.topic&&!i.dealbreaker.met?i.dealbreaker:null;
  }
 
  // ---------- availability / perform ----------
@@ -11901,9 +11957,10 @@ function makeRecruitingActionSystem(env){
    note=wk.calls>1?'Another call this week means less each time.':'';
   }else if(kind==='pitch'){
    topic=opts.topic&&env.priorities.includes(opts.topic)?opts.topic:pitchOptions(r,t)[0].topic;
-   const proj=pitchProjection(r,t,topic);dI=proj.delta;dR=dI>0?Math.max(1,Math.round(2*proj.fit)):0;
+   const proj=pitchProjection(r,t,topic,{actual:true});dI=proj.delta;dR=dI>0?Math.max(1,Math.round(2*proj.fit)):0;
    wk.pitchCount++;wk.pitches[topic]=(wk.pitches[topic]||0)+1;
-   note=`${proj.label} pitch on ${topic}${proj.priority?' — it is what he cares about':''}.`;
+   const hidden=proj.fit===SECOND_FIT&&topic!==r.priority&&!rec.known.secondary;
+   note=`${proj.label} pitch on ${topic}${proj.priority?' — it is what he cares about':hidden?' — it landed better than expected':''}.`;
   }else if(kind==='offer'){
    rec.offered=true;rec.offerWeek=u.week;dI=OFFER.interest;dR=OFFER.relationship;note='Scholarship offer is out.';
   }else if(kind==='inhome'){
@@ -11915,8 +11972,9 @@ function makeRecruitingActionSystem(env){
   if(dR){r.relationship=clamp((r.relationship||0)+dR,0,100);if(dR>0&&env.growRecruiterRelationship)env.growRecruiterRelationship(r,t,dR)}
   const week=ensureWeek(t);week.spent+=check.cost;
   rec.lastWorkedWeek=u.week;wk.hours+=check.cost;
+  const reveals=learn(rec,r,kind,topic);
   pushHistory(rec,{week:u.week,kind,cost:check.cost,topic,dI,dR});
-  return{ok:true,kind,label:LABELS[kind],cost:check.cost,remaining:hoursLeft(t),dI,dR,topic,note};
+  return{ok:true,kind,label:LABELS[kind],cost:check.cost,remaining:hoursLeft(t),dI,dR,topic,note,reveals};
  }
  function withdrawOffer(r,t){
   if(!r||!t)return{ok:false,reason:'No recruit selected.'};
@@ -11948,22 +12006,24 @@ function makeRecruitingActionSystem(env){
  function effort(r,t){return effortFromSince(weeksSinceWorked(r,t,universe().week-1,{stamp:true}))}
  // The same question asked now: what happens to him if the week were played as it stands?
  function previewEffort(r,t){return effortFromSince(weeksSinceWorked(r,t,universe().week))}
- function mayCommit(r,t){return!!t&&hasOffer(r,t)}
+ // An offer is necessary, and so is clearing his dealbreaker if he has one, told or not.
+ function mayCommit(r,t){return!!t&&hasOffer(r,t)&&!dealbreakerUnmet(r,t)}
  // Standing bonus to the pitch the program makes, so offers and visits compete against rival programs.
+ // An unmet dealbreaker drags it down for as long as it stands.
  function pitchBoost(r,t){
   const x=r?.recruitingActions?.[String(t?.id)];if(!x||x.season!==universe().year)return 0;
-  return(x.offered?OFFER.boost:0)+(x.inHome?INHOME.boost:0);
+  return(x.offered?OFFER.boost:0)+(x.inHome?INHOME.boost:0)+(dealbreakerUnmet(r,t)?DEALBREAKER_PITCH:0);
  }
 
  // ---------- board status ----------
  function status(r,t){
   const rec=record(r,t,false),u=universe(),open=!r.committed;
-  const worked=rec.lastWorkedWeek===u.week,pe=open&&r.targeted?previewEffort(r,t):null;
+  const worked=rec.lastWorkedWeek===u.week,pe=open&&r.targeted?previewEffort(r,t):null,blocked=knownBlock(r,t);
   return{
-   offered:!!rec.offered,inHome:!!rec.inHome,worked,
+   offered:!!rec.offered,inHome:!!rec.inHome,worked,blocked,
    cooling:!!pe&&!worked&&pe.state==='cooling',
    warm:!!pe&&!worked&&pe.state==='warm',
-   ready:open&&r.targeted&&!rec.offered&&(r.interest||0)>=68,
+   ready:open&&r.targeted&&!rec.offered&&!blocked&&(r.interest||0)>=68,
    history:rec.history.slice(-3).reverse()
   };
  }
@@ -11983,7 +12043,8 @@ function makeRecruitingActionSystem(env){
   const done={calls:0,pitches:0,offers:0,hours:0};
   const run=(r,kind,opts)=>{const out=perform(r,t,kind,opts);if(out.ok){done.hours+=out.cost;if(kind==='call')done.calls++;else if(kind==='pitch')done.pitches++;else if(kind==='offer')done.offers++}return out.ok};
   let n=0;
-  for(const r of targets){if(n>=maxOffers)break;if(!hasOffer(r,t)&&(r.interest||0)>=60&&run(r,'offer'))n++}
+  // Staff do not offer a recruit who has told them they cannot clear his dealbreaker.
+  for(const r of targets){if(n>=maxOffers)break;if(!hasOffer(r,t)&&!knownBlock(r,t)&&(r.interest||0)>=60&&run(r,'offer'))n++}
   for(const r of targets)if(!workedThisWeek(r,t))run(r,'call');
   let p=0;
   for(const r of targets){
@@ -12019,7 +12080,7 @@ function makeRecruitingActionSystem(env){
  }
 
  return{COSTS,LABELS,INHOME,OFFER,hoursBudgetFor,weekInfo,ensureWeek,hoursLeft,isActive,record,weekState,workedThisWeek,
-  offerLimit,offersOut,hasOffer,topicStrength,pitchProjection,pitchOptions,availability,perform,withdrawOffer,
+  offerLimit,offersOut,hasOffer,topicStrength,motivesFor,dealbreakerUnmet,intel,knownBlock,pitchProjection,pitchOptions,availability,perform,withdrawOffer,
   effort,previewEffort,effortFromSince,weeksSinceWorked,mayCommit,pitchBoost,status,workload,staffPlan,isAuto,setAuto,grandfather};
 }
 
@@ -12111,6 +12172,7 @@ if(typeof module==='object'&&module.exports){
  const hoursText=n=>`${n} hour${n===1?'':'s'}`;
  function chipsHTML(r,t){
   const s=recruitingActions.status(r,t),out=[];
+  if(s.blocked)out.push(`<span class="ra-chip ra-warn" title="Your ${raEsc(s.blocked.topic)} is ${s.blocked.strength}; he needs ${s.blocked.floor}.">Dealbreaker: ${raEsc(s.blocked.topic)}</span>`);
   if(s.offered)out.push('<span class="ra-chip ra-ok">Offer out</span>');
   if(s.inHome)out.push('<span class="ra-chip ra-ok">In-home done</span>');
   if(s.ready)out.push('<span class="ra-chip ra-hot">Ready to commit — needs an offer</span>');
@@ -12119,21 +12181,34 @@ if(typeof module==='object'&&module.exports){
   else if(s.warm)out.push('<span class="ra-chip">Warm — work him this week</span>');
   return out.join('');
  }
+ // Only ever what he has told you. Contacts uncover his second priority and whether he has a dealbreaker.
+ function motivesHTML(r,t){
+  const i=recruitingActions.intel(r,t);if(!i.on)return'';
+  const more=n=>`<i title="Calls, pitches and offers each count; a campus or in-home visit shows you at once.">not yet — ${n} more contact${n===1?'':'s'}</i>`;
+  let deal,warn=false;
+  if(!i.dealbreaker)deal=more(i.dealbreakerIn);
+  else if(i.dealbreaker.none)deal='none';
+  else{const d=i.dealbreaker;warn=!d.met;deal=`${raEsc(d.topic)} — your ${d.strength}, he needs ${d.floor}${d.met?' (you clear it)':' (you do not)'}`}
+  return`<div class="ra-motives"><span><b>Cares most about</b>${raEsc(i.primary)}</span><span><b>Second priority</b>${i.secondary?raEsc(i.secondary):more(i.secondaryIn)}</span><span class="${warn?'ra-warn-text':''}"><b>Dealbreaker</b>${deal}</span></div>`;
+ }
  function deskHTML(id){
   if(!universe?.teams)return'';
   const r=raRecruit(id),t=selected();if(!r||!t)return'';
   const w=recruitingActions.weekInfo(t),left=recruitingActions.hoursLeft(t),A=kind=>recruitingActions.availability(r,t,kind);
   const btn=(kind,label)=>{const a=A(kind);return`<button type="button" data-ra-action="${kind}" data-ra-recruit="${raEsc(r.id)}" ${a.ok?'':`disabled title="${raEsc(a.reason)}"`}>${label} · ${recruitingActions.COSTS[kind]}h</button>`};
   const opts=recruitingActions.pitchOptions(r,t);
-  const select=`<select data-ra-topic="${raEsc(r.id)}" aria-label="Pitch topic">${opts.map(o=>`<option value="${raEsc(o.topic)}">${raEsc(o.topic)}${o.priority?' (his priority)':''} — ${o.label}</option>`).join('')}</select>`;
+  const tag=o=>o.priority?' (his priority)':o.secondary?' (also matters)':o.dealbreaker?' (dealbreaker)':'';
+  const select=`<select data-ra-topic="${raEsc(r.id)}" aria-label="Pitch topic">${opts.map(o=>`<option value="${raEsc(o.topic)}">${raEsc(o.topic)}${tag(o)} — ${o.label}</option>`).join('')}</select>`;
   const rec=recruitingActions.record(r,t,false);
   const withdraw=rec.offered&&!r.committed?`<button type="button" class="ra-quiet" data-ra-action="withdraw" data-ra-recruit="${raEsc(r.id)}" title="Takes the offer back. He cools toward you.">Withdraw offer</button>`:'';
   const hist=recruitingActions.status(r,t).history.map(h=>`<span>W${h.week}: ${raEsc(h.kind==='withdraw'?'Offer withdrawn':recruitingActions.LABELS[h.kind]+(h.topic?' · '+h.topic:''))}${h.dI?` · ${h.dI>0?'+':''}${h.dI} interest`:''}</span>`).join('');
-  return`<section class="recruiting-desk" data-recruiting-desk="${raEsc(r.id)}"><div class="ra-head"><div><span class="eyebrow">RECRUITING DESK</span><strong>${left} / ${w.budget} hours left this week</strong></div><div class="ra-chips">${chipsHTML(r,t)}</div></div><div class="ra-actions">${btn('call','Call')}<span class="ra-pitch">${select}${btn('pitch','Pitch')}</span>${btn('offer','Offer')}${btn('visit','Visit')}${btn('inhome','In-Home')}${withdraw}</div>${hist?`<div class="ra-history">${hist}</div>`:''}<small class="muted">Sell what he cares about, and only what you can back up: a weak topic costs you interest. He needs an offer before he can commit to you.</small><div class="ra-desk-staff">${staffControlsHTML(recruitingActions.workload(universe.recruits,t))}</div></section>`;
+  return`<section class="recruiting-desk" data-recruiting-desk="${raEsc(r.id)}"><div class="ra-head"><div><span class="eyebrow">RECRUITING DESK</span><strong>${left} / ${w.budget} hours left this week</strong></div><div class="ra-chips">${chipsHTML(r,t)}</div></div>${motivesHTML(r,t)}<div class="ra-actions">${btn('call','Call')}<span class="ra-pitch">${select}${btn('pitch','Pitch')}</span>${btn('offer','Offer')}${btn('visit','Visit')}${btn('inhome','In-Home')}${withdraw}</div>${hist?`<div class="ra-history">${hist}</div>`:''}<small class="muted">Sell what he cares about, and only what you can back up: a weak topic costs you interest. He needs an offer before he can commit to you.</small><div class="ra-desk-staff">${staffControlsHTML(recruitingActions.workload(universe.recruits,t))}</div></section>`;
  }
  function announce(res,r){
   const t=selected();
   if(!res.ok){setStatus(res.reason);return}
+  const learned=(res.reveals||[]).map(x=>`Learned: ${x}`).join(' ');
+  if(learned)res.note=`${res.note||''} ${learned}`.trim();
   const d=[res.dI?`${res.dI>0?'+':''}${res.dI} interest`:'',res.dR?`${res.dR>0?'+':''}${res.dR} relationship`:''].filter(Boolean).join(', ');
   setStatus(`${res.label||'Offer withdrawn'}: ${r.name}.${d?` ${d}.`:''} ${res.note||''} ${hoursText(recruitingActions.hoursLeft(t))} left this week.`.replace(/\s+/g,' ').trim());
  }

@@ -36,3 +36,9 @@
 /* A phone has no room for the sidebar block above the list; the staff controls ride inside the desk instead. */
 .ra-desk-staff{display:none;padding-top:2px;border-top:1px solid var(--line)}
 @media(max-width:700px){.ra-nav{display:none}.ra-desk-staff{display:block}.ra-desk-staff .ra-staff{margin-left:0}}
+.ra-motives{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.ra-motives span{background:var(--panel2);border-radius:8px;padding:7px 9px;font-size:.8rem;display:grid;gap:2px}
+.ra-motives b{font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.ra-motives i{font-style:normal;color:var(--muted)}
+.ra-motives .ra-warn-text{color:var(--warn)}
+@media(max-width:700px){.ra-motives{grid-template-columns:1fr}}

@@ -194,6 +194,120 @@ test('the staff plan is deterministic, stays inside the budget and never books v
  assert.ok(worked.some(r=>r.nationalRank===1));
 });
 
+// ---------- motivations and dealbreakers ----------
+// Find a recruit id whose hidden motives match a predicate, so the tests do not depend on luck.
+function findMotive(api,pred,limit=3000){
+ for(let i=0;i<limit;i++){const r=recruit(`M${i}`,{priority:PRIORITIES[i%PRIORITIES.length]});if(pred(api.motivesFor(r),r))return r}
+ throw new Error('no recruit with those motives');
+}
+const strongTeam=()=>team({prestige:85,nil:85,development:85,academics:85,facilities:85,fan_support:85});
+const weakTeam=()=>team({prestige:30,nil:30,development:30,academics:30,facilities:30,fan_support:30});
+const CONTROLLABLE=['Prestige','NIL','Development','Academics','Campus Life'];
+
+test('hidden motives are stable, valid and distinct, and about three in ten recruits have a dealbreaker',()=>{
+ const {api}=fixture(),realRandom=Math.random;let deal=0;const N=1000;
+ Math.random=()=>{throw new Error('motives must not draw randomness')};
+ try{
+  for(let i=0;i<N;i++){
+   const r=recruit(`X${i}`,{priority:PRIORITIES[i%PRIORITIES.length]}),m=api.motivesFor(r);
+   assert.deepEqual(m,api.motivesFor(r),'the same recruit always has the same motives');
+   assert.ok(PRIORITIES.includes(m.secondary)&&m.secondary!==m.primary);
+   if(m.dealbreaker){deal++;assert.ok(PRIORITIES.includes(m.dealbreaker)&&m.dealbreaker!==m.primary&&m.dealbreaker!==m.secondary)}
+  }
+ }finally{Math.random=realRandom}
+ assert.ok(deal>N*.22&&deal<N*.38,`${deal} of ${N}`);
+});
+
+test('nothing about his second priority or dealbreaker is shown until contact uncovers it',()=>{
+ const {api}=fixture(),t=strongTeam(),r=findMotive(api,m=>m.dealbreaker);
+ let i=api.intel(r,t);
+ assert.equal(i.primary,r.priority);assert.equal(i.secondary,null);assert.equal(i.dealbreaker,null);
+ assert.equal(i.secondaryIn,2);assert.equal(i.dealbreakerIn,4);
+ const menu=api.pitchOptions(r,t);
+ assert.ok(menu.every(o=>!o.secondary&&!o.dealbreaker),'the pitch menu does not tag what you have not learned');
+ const m=api.motivesFor(r);
+ assert.equal(menu.find(o=>o.topic===m.secondary).fit,.4,'and prices it as if it did not matter');
+});
+
+test('two contacts uncover the second priority and four settle the dealbreaker',()=>{
+ const {api}=fixture(),t=strongTeam(),r=findMotive(api,m=>m.dealbreaker),m=api.motivesFor(r);
+ let out=api.perform(r,t,'call');assert.deepEqual(out.reveals,[]);
+ out=api.perform(r,t,'call');
+ assert.equal(out.reveals.length,1);assert.match(out.reveals[0],new RegExp(m.secondary));
+ assert.equal(api.intel(r,t).secondary,m.secondary);assert.equal(api.intel(r,t).dealbreaker,null);
+ api.perform(r,t,'call');out=api.perform(r,t,'call');
+ assert.match(out.reveals[0],new RegExp(m.dealbreaker));
+ assert.equal(api.intel(r,t).dealbreaker.topic,m.dealbreaker);
+});
+
+test('a recruit with no dealbreaker is eventually confirmed to have none',()=>{
+ const {api}=fixture(),t=strongTeam(),r=findMotive(api,m=>!m.dealbreaker);
+ for(let i=0;i<4;i++)api.perform(r,t,'call');
+ assert.equal(api.intel(r,t).dealbreaker.none,true);
+});
+
+test('a visit shows you both at once, and pitching a hidden topic uncovers it',()=>{
+ const {api}=fixture(),t=strongTeam(),r=findMotive(api,m=>m.dealbreaker);
+ const out=api.perform(r,t,'visit');assert.equal(out.reveals.length,2);
+ const a=findMotive(api,m=>m.dealbreaker),b=findMotive(api,m=>m.dealbreaker),ma=api.motivesFor(a);
+ const p=api.perform(a,t,'pitch',{topic:ma.secondary});
+ assert.equal(p.reveals.length,1,'one pitch on his second priority is enough');
+ assert.match(p.note,/better than expected/);
+ const q=api.perform(b,t,'pitch',{topic:api.motivesFor(b).dealbreaker});
+ assert.ok(q.reveals.some(x=>/dealbreaker/.test(x)),'touching the sore spot shows you it');
+});
+
+test('his second priority pays more than the menu promised, and the menu catches up once you know',()=>{
+ const {api}=fixture(),t=strongTeam(),r=findMotive(api,m=>m.secondary==='Academics'&&!m.dealbreaker);
+ const shown=api.pitchProjection(r,t,'Academics').delta,out=api.perform(r,t,'pitch',{topic:'Academics'});
+ assert.ok(out.dI>shown,`landed ${out.dI}, menu said ${shown}`);
+ const after=api.pitchProjection(r,t,'Academics');
+ assert.equal(after.fit,.7);assert.equal(after.secondary,true);
+});
+
+test('an unmet dealbreaker blocks the commit and drags the pitch, whether or not he has said so',()=>{
+ const {api}=fixture(),weak=weakTeam(),strong=strongTeam();
+ const r=findMotive(api,m=>m.dealbreaker&&CONTROLLABLE.includes(m.dealbreaker));
+ api.perform(r,weak,'offer');
+ assert.ok(api.dealbreakerUnmet(r,weak));assert.equal(api.mayCommit(r,weak),false);
+ assert.equal(api.pitchBoost(r,weak),3-6,'the offer edge is more than eaten by the dealbreaker');
+ assert.equal(api.knownBlock(r,weak),null,'he has not told you yet');
+ const s=api.status(r,weak);assert.equal(s.blocked,null);
+ // Same recruit, a program that clears his floor.
+ api.perform(r,strong,'offer');
+ assert.equal(api.dealbreakerUnmet(r,strong),null);assert.equal(api.mayCommit(r,strong),true);
+});
+
+test('once he tells you, it shows on the board and he is no longer "ready" for an offer',()=>{
+ const {api}=fixture(),weak=weakTeam();
+ const r=findMotive(api,m=>m.dealbreaker&&CONTROLLABLE.includes(m.dealbreaker));
+ r.interest=80;r.targeted=true;
+ assert.equal(api.status(r,weak).ready,true,'before he says anything he looks ready');
+ api.perform(r,weak,'visit');
+ const s=api.status(r,weak);
+ assert.equal(s.blocked.topic,api.motivesFor(r).dealbreaker);assert.equal(s.ready,false);
+ assert.ok(s.blocked.strength<s.blocked.floor);
+});
+
+test('staff do not spend an offer on a recruit who has said you cannot clear his dealbreaker',()=>{
+ const {api,universe}=fixture(),weak=weakTeam();
+ const blocked=findMotive(api,m=>m.dealbreaker&&CONTROLLABLE.includes(m.dealbreaker)),clear=findMotive(api,m=>!m.dealbreaker);
+ for(const r of [blocked,clear]){r.targeted=true;r.interest=75;universe.recruits.push(r)}
+ blocked.nationalRank=1;clear.nationalRank=2;
+ api.perform(blocked,weak,'visit');// he tells you
+ api.staffPlan(universe.recruits,weak);
+ assert.equal(api.hasOffer(blocked,weak),false);assert.equal(api.hasOffer(clear,weak),true);
+});
+
+test('saves from before the desk have no hidden motives, so nothing changes under them',()=>{
+ const {api,universe}=fixture(),weak=weakTeam();
+ const r=findMotive(api,m=>m.dealbreaker&&CONTROLLABLE.includes(m.dealbreaker));
+ universe.recruitingActions={migrated:true};
+ assert.equal(api.dealbreakerUnmet(r,weak),null);assert.equal(api.intel(r,weak).on,false);
+ api.perform(r,weak,'offer');assert.equal(api.mayCommit(r,weak),true);
+ assert.equal(api.pitchProjection(r,weak,api.motivesFor(r).secondary,{actual:true}).fit,.4);
+});
+
 test('handing recruiting to the staff is a saved setting that defaults to off',()=>{
  const {api,universe}=fixture();
  assert.equal(api.isAuto(universe),false);

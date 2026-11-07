@@ -26,6 +26,9 @@ const hoursLeft=async page=>{await page.waitForFunction(()=>/^\d+\s*\/\s*\d+/.te
   check(`[${label}] in-home is locked until there is an offer`,await desk.locator('[data-ra-action="inhome"]').isDisabled());
   check(`[${label}] the scouting actions still sit beside the desk`,await page.locator('.recruit-workspace-dossier [data-rwa="quick"]').count()===1);
 
+  const motives=()=>page.locator('.recruit-workspace-dossier .ra-motives').innerText();
+  const m0=await motives();
+  check(`[${label}] the desk shows what he cares about, with the rest still hidden`,/Cares most about/i.test(m0)&&/Second priority\s*not yet — 2 more contacts/i.test(m0)&&/Dealbreaker\s*not yet — 4 more contacts/i.test(m0),m0.replace(/\s+/g,' '));
   await desk.locator('[data-ra-action="call"]').click();
   await page.waitForFunction(b=>{const m=window.__hoursText().match(/^(\d+)/);return m&&+m[1]===b-2},strip.left);
   check(`[${label}] a call spends two hours and keeps the same prospect selected`,(await hoursLeft(page)).left===strip.left-2&&await page.locator('.recruit-workspace-card.active').getAttribute('data-rwid')===id);
@@ -37,6 +40,10 @@ const hoursLeft=async page=>{await page.waitForFunction(()=>/^\d+\s*\/\s*\d+/.te
   await page.locator('.recruit-workspace-dossier [data-ra-action="pitch"]').click();
   await page.waitForFunction(b=>{const m=window.__hoursText().match(/^(\d+)/);return m&&+m[1]===b-5},strip.left);
   check(`[${label}] a pitch spends three more hours`,(await hoursLeft(page)).left===strip.left-5);
+  const m2=await motives();
+  check(`[${label}] two contacts uncover his second priority and say what is left`,!/Second priority\s*not yet/i.test(m2)&&/Dealbreaker\s*not yet — 2 more contacts/i.test(m2),m2.replace(/\s+/g,' '));
+  const status2=await page.evaluate(()=>document.body.innerText);
+  check(`[${label}] the status line announces what was learned`,/Learned: His second priority is/.test(status2));
 
   await page.locator('.recruit-workspace-dossier [data-ra-action="offer"]').click();
   await page.waitForFunction(()=>/Offer out/.test(document.querySelector('.recruit-workspace-dossier')?.innerText||''));
