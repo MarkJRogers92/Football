@@ -3605,12 +3605,12 @@ function renderWeeklyDecisions(){
  const host=$('#weeklyDecisions'),t=selected();if(!host||!t)return;
  ensureWeeklyDecisions(t);
  const open=guidanceStoredDecisions(t),blocked=open.some(d=>d.type!=='WEEKLY_GAMEPLAN');
- const card=d=>`<div class="decision-card${d.source==='PLAYER'?' player-request':''}"><div class="decision-kicker">${d.type==='WEEKLY_GAMEPLAN'?'OPTIONAL PREPARATION':d.source==='PLAYER'?'PLAYER REQUEST':'DECISION REQUIRED'}</div><div class="decision-title">${gameEscape(d.title)}</div>${decisionFacesHTML(d)}<div class="decision-summary">${gameEscape(d.summary)}</div><div class="decision-options">${d.options.map(o=>`<button class="decision-option" data-decision="${gameEscape(d.id)}" data-choice="${gameEscape(o.id)}">${gameEscape(o.label)}${o.recommended?' · Staff pick':''}<small>${gameEscape(o.description)}</small></button>`).join('')}</div></div>`;
+ const card=d=>`<div class="decision-card${d.source==='PLAYER'?' player-request':''}"><div class="decision-kicker">${d.type==='WEEKLY_GAMEPLAN'?'OPTIONAL PREPARATION':d.source==='PLAYER'?'PLAYER REQUEST':'DECISION REQUIRED'}</div><div class="decision-title">${gameEscape(d.title)}</div>${decisionFacesHTML(d)}<div class="decision-summary">${gameEscape(d.summary)}</div>${d.type!=='WEEKLY_GAMEPLAN'?`<button type="button" class="decision-room-link" data-decision-room="${gameEscape(d.id)}">Compare and decide</button>`:''}<div class="decision-options">${d.options.map(o=>`<button class="decision-option" data-decision="${gameEscape(d.id)}" data-choice="${gameEscape(o.id)}">${gameEscape(o.label)}${o.recommended?' · Staff pick':''}<small>${gameEscape(o.description)}</small></button>`).join('')}</div></div>`;
  host.innerHTML=open.filter(d=>d.type!=='WEEKLY_GAMEPLAN').map(card).join('');
  const optional=$('#optionalWeeklyDecisions');if(optional)optional.innerHTML=open.filter(d=>d.type==='WEEKLY_GAMEPLAN').map(card).join('');
  for(const id of ['#simWeek','#seasonWeek'])$(id).disabled=openingPreseason()||blocked;
  $('#hubAdvance').disabled=openingPreseason()?false:blocked;
- $$('[data-decision]').forEach(b=>b.onclick=()=>resolveWeeklyDecision(b.dataset.decision,b.dataset.choice));
+ $$('[data-decision]').forEach(b=>b.onclick=()=>resolveWeeklyDecision(b.dataset.decision,b.dataset.choice));$$('[data-decision-room]').forEach(b=>b.onclick=()=>globalThis.DynastyDecisionRoom?.open(b.dataset.decisionRoom));
  for(const h of [host,optional])if(h){h.querySelectorAll('.face-chip[data-player]').forEach(b=>b.onclick=()=>showPlayerProfile(b.dataset.player));paintPortraits(h)}
 }
 

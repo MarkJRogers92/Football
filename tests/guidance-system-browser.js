@@ -34,9 +34,10 @@ const startNewDynasty=page=>sharedStartNewDynasty(page,{beginSeason:false});
   const blockedWeek=await page.evaluate(()=>window.__DL_TEST__.preseasonDebug().week);
   const blockerId=await page.evaluate(()=>window.getDynastyGuidance().items.find(x=>x.meaning==='must_resolve').id);
   await page.evaluate(id=>window.openGuidanceItem(id),blockerId);
-  await page.waitForSelector('.guidance-return-context');
+  // A required weekly decision opens in the Decision Room; looking never advances time.
+  await page.waitForSelector('#decisionRoom[open] [data-room-choice]');
   assert.equal(await page.evaluate(()=>window.__DL_TEST__.preseasonDebug().week),blockedWeek);
-  await page.click('.guidance-return');
+  await page.click('#decisionRoom [data-room-close]');await page.waitForFunction(()=>!document.querySelector('#decisionRoom[open]'));
   assert.equal(await page.evaluate(()=>window.__DL_TEST__.preseasonDebug().week),blockedWeek);
   while(await page.evaluate(()=>window.getDynastyGuidance().items.some(x=>x.meaning==='must_resolve'))){
    const decisionId=await page.evaluate(()=>window.getDynastyGuidance().items.find(x=>x.meaning==='must_resolve').destination.decisionId);

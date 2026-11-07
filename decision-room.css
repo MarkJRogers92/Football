@@ -1,0 +1,30 @@
+/* Decision Room: a focused window for required weekly decisions. */
+.decision-room{width:min(860px,calc(100vw - 32px));max-height:calc(100vh - 48px);padding:0;border:1px solid rgba(230,184,106,.4);border-radius:16px;background:#0e151d;color:var(--text,#e7edf3);box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.decision-room::backdrop{background:rgba(4,7,11,.72);backdrop-filter:blur(3px)}
+.decision-room-shell{display:grid;gap:14px;padding:18px 20px}
+.decision-room header{display:flex;justify-content:space-between;align-items:start;gap:12px}
+.decision-room header h2{margin:4px 0 0;font-size:24px;line-height:1.1}
+.decision-room-summary{margin:0;color:#b8c5d3;font-size:15px}
+.decision-room-people{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.decision-room-person{position:relative;display:grid;gap:8px;padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.03)}
+.decision-room-person.is-context{opacity:.82;border-style:dashed}
+.decision-room-tag{justify-self:start;padding:2px 8px;border-radius:999px;background:rgba(230,184,106,.16);color:#e6c27a;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.decision-room-person.is-context .decision-room-tag{background:rgba(255,255,255,.07);color:#9fb0c4}
+.decision-room-face{display:flex;align-items:center;gap:10px;padding:0;border:0;background:none;color:inherit;text-align:left;cursor:pointer}
+.decision-room-face b{display:block;font-size:17px}
+.decision-room-face small{color:#9fb0c4}
+.decision-room-person dl{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;margin:0}
+.decision-room-person dl div{display:grid;gap:1px}
+.decision-room-person dt{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#8e9aa6)}
+.decision-room-person dd{margin:0;font-weight:700}
+.decision-room-line{margin:0;font-size:12px;color:#9fb0c4}
+.decision-room-staff{margin:0;font-size:14px;color:#c8d4e1}
+.decision-room-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.decision-room-option{display:grid;gap:4px;padding:12px 14px;text-align:left;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.04);color:inherit;cursor:pointer}
+.decision-room-option strong{font-size:15px}
+.decision-room-option small{font-size:12px;color:#9fb0c4;line-height:1.35}
+.decision-room-option.is-pick{border-color:rgba(230,184,106,.65);background:linear-gradient(180deg,rgba(230,184,106,.12),rgba(230,184,106,.03))}
+.decision-room-option:hover{background:rgba(255,255,255,.08)}
+.decision-room footer{display:flex;justify-content:flex-end}
+.decision-room-link{justify-self:start;margin:6px 0 2px;padding:6px 12px;border:1px solid rgba(230,184,106,.5);border-radius:8px;background:rgba(230,184,106,.1);color:#ffe7b0;font-weight:800;cursor:pointer}
+@media(max-width:520px){.decision-room{width:100vw;max-width:100vw;max-height:100vh;height:100%;border-radius:0;margin:0}.decision-room-shell{padding:14px}.decision-room header h2{font-size:20px}}

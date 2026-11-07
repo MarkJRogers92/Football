@@ -3014,6 +3014,37 @@ button.lw-follow[aria-pressed="true"]{color:var(--text);border-color:var(--team-
 .guidance-welcome .guidance-welcome-result strong,.guidance-welcome .guidance-welcome-priority strong,.guidance-welcome .guidance-welcome-choice strong{display:inline;margin:0}
 .guidance-welcome-result>span{color:var(--muted)}
 @media(max-width:700px){.dynasty-session-status{padding:5px 10px;justify-content:space-between}}
+
+/* Decision Room: a focused window for required weekly decisions. */
+.decision-room{width:min(860px,calc(100vw - 32px));max-height:calc(100vh - 48px);padding:0;border:1px solid rgba(230,184,106,.4);border-radius:16px;background:#0e151d;color:var(--text,#e7edf3);box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.decision-room::backdrop{background:rgba(4,7,11,.72);backdrop-filter:blur(3px)}
+.decision-room-shell{display:grid;gap:14px;padding:18px 20px}
+.decision-room header{display:flex;justify-content:space-between;align-items:start;gap:12px}
+.decision-room header h2{margin:4px 0 0;font-size:24px;line-height:1.1}
+.decision-room-summary{margin:0;color:#b8c5d3;font-size:15px}
+.decision-room-people{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.decision-room-person{position:relative;display:grid;gap:8px;padding:12px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.03)}
+.decision-room-person.is-context{opacity:.82;border-style:dashed}
+.decision-room-tag{justify-self:start;padding:2px 8px;border-radius:999px;background:rgba(230,184,106,.16);color:#e6c27a;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.decision-room-person.is-context .decision-room-tag{background:rgba(255,255,255,.07);color:#9fb0c4}
+.decision-room-face{display:flex;align-items:center;gap:10px;padding:0;border:0;background:none;color:inherit;text-align:left;cursor:pointer}
+.decision-room-face b{display:block;font-size:17px}
+.decision-room-face small{color:#9fb0c4}
+.decision-room-person dl{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;margin:0}
+.decision-room-person dl div{display:grid;gap:1px}
+.decision-room-person dt{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#8e9aa6)}
+.decision-room-person dd{margin:0;font-weight:700}
+.decision-room-line{margin:0;font-size:12px;color:#9fb0c4}
+.decision-room-staff{margin:0;font-size:14px;color:#c8d4e1}
+.decision-room-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.decision-room-option{display:grid;gap:4px;padding:12px 14px;text-align:left;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.04);color:inherit;cursor:pointer}
+.decision-room-option strong{font-size:15px}
+.decision-room-option small{font-size:12px;color:#9fb0c4;line-height:1.35}
+.decision-room-option.is-pick{border-color:rgba(230,184,106,.65);background:linear-gradient(180deg,rgba(230,184,106,.12),rgba(230,184,106,.03))}
+.decision-room-option:hover{background:rgba(255,255,255,.08)}
+.decision-room footer{display:flex;justify-content:flex-end}
+.decision-room-link{justify-self:start;margin:6px 0 2px;padding:6px 12px;border:1px solid rgba(230,184,106,.5);border-radius:8px;background:rgba(230,184,106,.1);color:#ffe7b0;font-weight:800;cursor:pointer}
+@media(max-width:520px){.decision-room{width:100vw;max-width:100vw;max-height:100vh;height:100%;border-radius:0;margin:0}.decision-room-shell{padding:14px}.decision-room header h2{font-size:20px}}
 </style></head><body>
 <section id="titleScreen" class="title-screen" aria-labelledby="titleGameName">
   <div class="title-screen-art" aria-hidden="true"></div>
@@ -9826,12 +9857,12 @@ function renderWeeklyDecisions(){
  const host=$('#weeklyDecisions'),t=selected();if(!host||!t)return;
  ensureWeeklyDecisions(t);
  const open=guidanceStoredDecisions(t),blocked=open.some(d=>d.type!=='WEEKLY_GAMEPLAN');
- const card=d=>`<div class="decision-card${d.source==='PLAYER'?' player-request':''}"><div class="decision-kicker">${d.type==='WEEKLY_GAMEPLAN'?'OPTIONAL PREPARATION':d.source==='PLAYER'?'PLAYER REQUEST':'DECISION REQUIRED'}</div><div class="decision-title">${gameEscape(d.title)}</div>${decisionFacesHTML(d)}<div class="decision-summary">${gameEscape(d.summary)}</div><div class="decision-options">${d.options.map(o=>`<button class="decision-option" data-decision="${gameEscape(d.id)}" data-choice="${gameEscape(o.id)}">${gameEscape(o.label)}${o.recommended?' · Staff pick':''}<small>${gameEscape(o.description)}</small></button>`).join('')}</div></div>`;
+ const card=d=>`<div class="decision-card${d.source==='PLAYER'?' player-request':''}"><div class="decision-kicker">${d.type==='WEEKLY_GAMEPLAN'?'OPTIONAL PREPARATION':d.source==='PLAYER'?'PLAYER REQUEST':'DECISION REQUIRED'}</div><div class="decision-title">${gameEscape(d.title)}</div>${decisionFacesHTML(d)}<div class="decision-summary">${gameEscape(d.summary)}</div>${d.type!=='WEEKLY_GAMEPLAN'?`<button type="button" class="decision-room-link" data-decision-room="${gameEscape(d.id)}">Compare and decide</button>`:''}<div class="decision-options">${d.options.map(o=>`<button class="decision-option" data-decision="${gameEscape(d.id)}" data-choice="${gameEscape(o.id)}">${gameEscape(o.label)}${o.recommended?' · Staff pick':''}<small>${gameEscape(o.description)}</small></button>`).join('')}</div></div>`;
  host.innerHTML=open.filter(d=>d.type!=='WEEKLY_GAMEPLAN').map(card).join('');
  const optional=$('#optionalWeeklyDecisions');if(optional)optional.innerHTML=open.filter(d=>d.type==='WEEKLY_GAMEPLAN').map(card).join('');
  for(const id of ['#simWeek','#seasonWeek'])$(id).disabled=openingPreseason()||blocked;
  $('#hubAdvance').disabled=openingPreseason()?false:blocked;
- $$('[data-decision]').forEach(b=>b.onclick=()=>resolveWeeklyDecision(b.dataset.decision,b.dataset.choice));
+ $$('[data-decision]').forEach(b=>b.onclick=()=>resolveWeeklyDecision(b.dataset.decision,b.dataset.choice));$$('[data-decision-room]').forEach(b=>b.onclick=()=>globalThis.DynastyDecisionRoom?.open(b.dataset.decisionRoom));
  for(const h of [host,optional])if(h){h.querySelectorAll('.face-chip[data-player]').forEach(b=>b.onclick=()=>showPlayerProfile(b.dataset.player));paintPortraits(h)}
 }
 
@@ -12914,6 +12945,41 @@ if(globalThis.__DL_TEST__){
   globalThis.__DL_TEST__.weeklyPersonnelDepth=(pos='QB')=>{const t=selected();ensureDepth(t);return[...(t?.depthChart?.[pos]||[])]};
 }
 
+// Decision Room: a required weekly decision opens in its own window with the people involved side
+// by side (depth position, staff grade, season line, morale), what the staff recommends and what
+// each choice does. Choosing resolves the same decision the Coach's Desk card does.
+function decisionRoomDecision(id){const t=selected();return t?guidanceStoredDecisions(t).find(d=>String(d.id)===String(id))||null:null}
+function decisionRoomPeople(d,t){
+  const rows=[],seen=new Set(),push=(id,tag)=>{if(id==null||seen.has(String(id)))return;const hit=findPlayer(id);if(!hit?.p)return;seen.add(String(id));rows.push({p:hit.p,team:hit.team||t,tag})};
+  if(d.starterId!=null){push(d.starterId,'Starter');push(d.playerId,'Challenger')}else push(d.playerId,d.source==='PLAYER'?'Asking':'Player');
+  // For a playing-time question, compare with the players ahead of him at his position.
+  const p=rows[0]?.p,order=p&&t?.depthChart?.[p.pos];
+  if(rows.length===1&&Array.isArray(order)){const at=order.indexOf(p.id);for(const id of order.slice(0,Math.max(0,at)).slice(-2).reverse())push(id,'Ahead of him')}
+  return rows;
+}
+function decisionRoomPersonHTML(row,t){
+  const p=ensurePortrait(row.p),order=t?.depthChart?.[p.pos]||[],depth=order.indexOf(p.id),s=p.stats||{},games=Number(s.games)||0;
+  const morale=Number.isFinite(p.morale)?Math.round(p.morale):null,risk=typeof transferRisk==='function'?Math.round(transferRisk(p)):null;
+  const stat=games?statLine(s).split(' · ').slice(0,3).join(' · '):'No games yet this season';
+  const facts=[['Depth',depth>=0?`${p.pos}${depth+1}`:p.pos],['Staff grade',`${grade(p.perceived)} · ${scoutRange(p,t).join('–')}`],['Role',p.role||'—'],['Games',String(games)],morale!=null?['Morale',String(morale)]:null,risk!=null&&row.tag!=='Ahead of him'?['Transfer risk',`${risk}%`]:null].filter(Boolean);
+  return `<article class="decision-room-person${row.tag==='Ahead of him'?' is-context':''}"><span class="decision-room-tag">${gameEscape(row.tag)}</span><button type="button" class="decision-room-face" data-player="${gameEscape(p.id)}">${portraitTag(p,72,'list')}<span><b>${gameEscape(p.name)}</b><small>#${gameEscape(p.jerseyNumber??'')} · ${gameEscape(p.pos)} · ${gameEscape(p.year||'')}</small></span></button><dl>${facts.map(([k,v])=>`<div><dt>${gameEscape(k)}</dt><dd>${gameEscape(v)}</dd></div>`).join('')}</dl><p class="decision-room-line">${gameEscape(stat)}</p></article>`;
+}
+function ensureDecisionRoomDialog(){
+  let dialog=document.querySelector('#decisionRoom');if(dialog)return dialog;
+  dialog=document.createElement('dialog');dialog.id='decisionRoom';dialog.className='decision-room';dialog.setAttribute('aria-labelledby','decisionRoomTitle');document.body.appendChild(dialog);
+  dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close()});return dialog;
+}
+function openDecisionRoom(id){
+  const d=decisionRoomDecision(id),t=selected();if(!d||!t||typeof document==='undefined')return false;
+  const dialog=ensureDecisionRoomDialog(),people=decisionRoomPeople(d,t),pick=d.options.find(o=>o.recommended);
+  dialog.innerHTML=`<div class="decision-room-shell"><header><div><span class="eyebrow">${d.source==='PLAYER'?'PLAYER REQUEST':'DECISION'}</span><h2 id="decisionRoomTitle">${gameEscape(d.title)}</h2></div><button type="button" class="dialog-close" data-room-close aria-label="Close decision">Close</button></header><p class="decision-room-summary">${gameEscape(d.summary)}</p>${people.length?`<div class="decision-room-people">${people.map(r=>decisionRoomPersonHTML(r,t)).join('')}</div>`:''}${pick?`<p class="decision-room-staff"><b>Staff pick:</b> ${gameEscape(pick.label)}</p>`:''}<div class="decision-room-options">${d.options.map(o=>`<button type="button" class="decision-room-option${o.recommended?' is-pick':''}" data-room-choice="${gameEscape(o.id)}"><strong>${gameEscape(o.label)}</strong><small>${gameEscape(o.description)}</small></button>`).join('')}</div><footer><button type="button" class="guidance-text-action" data-room-close>Decide later</button></footer></div>`;
+  dialog.querySelectorAll('[data-room-close]').forEach(b=>b.onclick=()=>dialog.close());
+  dialog.querySelectorAll('[data-room-choice]').forEach(b=>b.onclick=()=>{dialog.close();resolveWeeklyDecision(d.id,b.dataset.roomChoice)});
+  dialog.querySelectorAll('[data-player]').forEach(b=>b.onclick=()=>{dialog.close();showPlayerProfile(b.dataset.player)});
+  if(!dialog.open)dialog.showModal?.();paintPortraits(dialog);return true;
+}
+globalThis.DynastyDecisionRoom={open:openDecisionRoom,people:(id)=>{const d=decisionRoomDecision(id),t=selected();return d?decisionRoomPeople(d,t).map(r=>({id:r.p.id,tag:r.tag})):[]}};
+
 // v0.10.2 Slice 4 — factual Player Story Cards on the weekly dashboard.
 const v0102StoryApi=globalThis.DynastyPlayerStories;
 function v0102StoryPlayerInput(t,p){
@@ -13106,6 +13172,7 @@ if(globalThis.__DL_TEST__){
  function openGuidanceItem(id){
   const model=currentModel(),item=model?.items?.find(x=>x.id===id);if(!item){if(typeof setStatus==='function')setStatus('That agenda item is no longer active.');renderGuidanceSystem();return}
   callGuidance('guidanceMarkFamiliar',item.id);
+  if(item.destination?.focus==='weekly-decision'&&item.destination.decisionId&&window.DynastyDecisionRoom?.open(item.destination.decisionId))return;
   agendaContext={itemId:item.id};
   const destination=item.destination||{};
   if(destination.tab&&typeof goToTab==='function')goToTab(destination.tab);

@@ -167,6 +167,7 @@
  function openGuidanceItem(id){
   const model=currentModel(),item=model?.items?.find(x=>x.id===id);if(!item){if(typeof setStatus==='function')setStatus('That agenda item is no longer active.');renderGuidanceSystem();return}
   callGuidance('guidanceMarkFamiliar',item.id);
+  if(item.destination?.focus==='weekly-decision'&&item.destination.decisionId&&window.DynastyDecisionRoom?.open(item.destination.decisionId))return;
   agendaContext={itemId:item.id};
   const destination=item.destination||{};
   if(destination.tab&&typeof goToTab==='function')goToTab(destination.tab);
