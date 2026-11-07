@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased — Recruiting Desk
+
+Recruiting is now something you do each week, not a list you maintain. Scouting hours still tell you
+how good a prospect is; **recruiting hours** are how you win him. (Source version is unchanged until this is released.)
+
+- **Weekly recruiting hours** (30–60, from your recruiting coordinator, head coach and resources), separate from evaluation hours. Unused hours do not carry over.
+- **Five actions per recruit**, each with a cost: Call (2h), Pitch (3h), Offer (2h), Campus Visit (5h) and In-Home Visit (8h; needs an offer, an interested recruit and week 5). Calls and repeated pitches fade within a week, so one recruit cannot soak up the budget.
+- **Pitching is a decision.** Pick which of ten topics to sell. A pitch pays when it matches what he cares about and your program can actually back it up; selling a weak topic costs you interest. The menu shows an honest read (Strong, Good, Modest, Flat, Risky) for every topic.
+- **No offer, no commit.** A target can only commit to you once you have offered him (up to about 1.6× your class size outstanding). Offers and in-home visits also give a standing edge against rival programs. A "Ready to commit — needs an offer" flag appears when he is waiting on you.
+- **Neglect cools.** A target gets a grace week, then slows down, then cools if nobody works him. Idle boards land a little less than before; boards worked well land clearly more.
+- **Staff can handle it.** A "Staff handle recruiting" switch has the staff spend any hours you leave unused before every week plays (calls for everyone in rank order, ripe offers, up to three good pitches). They never book visits or in-homes, and you can always act first. Simulating the season uses the same staff plan. "Work the board now" does one pass on demand.
+- **Where it lives.** The Recruiting Desk is in the Workspace dossier and the full recruit profile, the hours and staff controls are in the Workspace sidebar (and a strip in Table mode), the table's Visit button now costs hours, and a This Week reminder appears when nobody has been worked.
+- **Saves.** Existing saves keep every current target committing as before (they are treated as already offered). New field `universe.recruitingActions` (`auto` is the staff switch), per-recruit `recruitingActions`, and `team.recruitingWeek` / `recruitingLastWeek`. Seeded recruiting draws are unchanged apart from the new effort model.
+- **Balance.** Measured over full seasons (9 seeds, three program tiers): idle play lands a little below the old behavior, casual and staff-run play lands about the same, and skilled play lands about 1.5 more blue chips per class for low and mid programs. Rival classes are unchanged (league average 2.81–2.82 stars).
+
 ## v0.14.5 — Locked-in games and a calmer desk
 
 - **Coached games are locked in.** A Coach It Live game records itself at the final whistle. Advancing the week, simming the season, Sim Instantly or Watch while a live game is unfinished lets your staff finish that same game and records it, instead of simulating a different one. An unfinished live game is kept in the save and rebuilt exactly after a reload. Restart Game is gone.

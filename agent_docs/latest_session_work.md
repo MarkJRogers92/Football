@@ -1,5 +1,13 @@
 # Latest Session Work
 
+## Recruiting Desk (unreleased, branch `claude/pensive-gates-g6e24q`)
+
+- Goal from the owner: recruiting should be an active weekly decision like the NCAA games, not passive scouting. Scope agreed: Phase 1 = recruiting hours + action menu + neglect cooling, separate from evaluation hours; staff can run it. Not built yet: stage funnel / Top 5 cuts / decision dates, hidden motivations and dealbreakers, rival reactions, recruiter assignments (see the design in the CHANGELOG "Unreleased" entry's follow-ups below).
+- New `recruiting-actions.js` (pure factory `makeRecruitingActionSystem` + browser wiring) and `recruiting-actions.css`, registered in `tools/build.js` and `tools/harness.js`. `app.js` gained two overridable hooks (`recruitEffort`, `userMayCommit`) used by `advanceRecruiting`, `finalizeRecruiting` and `placeUnsignedElites`; with the module absent the engine is bit-identical to before (verified by hashing a seeded 11-week run before/after). The weekly pass keeps the original RNG draw order.
+- Calibration (scratch harness, not committed): full seasons x 9 seeds x low/mid/high programs x policies idle/casual/staff/skilled/legacy. Constants live at the top of `recruiting-actions.js`. Finding worth knowing: in the old system a board of 25 top prospects landed only ~0.3-0.8 of them, because signing day hands over targets only while the class has room and interest is already 68+.
+- Tests: `tests/recruiting-actions.js` (28, rules + engine), `tests/recruiting-actions-browser.js` (desktop + phone). Both are in `package.json`.
+- Follow-ups worth doing: stage funnel with decision dates, hidden motivations/dealbreakers uncovered by contact, rival offer/visit events, per-position recruiter assignments, and a "keep warm" action for committed recruits (flip defense).
+
 ## v0.14.5 — 2026-11-07
 
 - From owner playtest feedback: a coached (Coach It Live) game was discarded and re-simulated when the week advanced. Live games now record at the final whistle, any advance finishes and records the same game, and the live game is kept in the save as its seeded action log (`universe.liveGameDay`) and rebuilt after reload. New `tests/live-game-lock-browser.js`.

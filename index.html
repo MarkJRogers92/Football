@@ -880,6 +880,45 @@ tr[hidden]{display:none!important}
 .recruit-race-card{border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:12px;background:linear-gradient(180deg,var(--panel2),var(--panel))}.recruit-race-head strong{display:block;font-size:18px}.recruit-race-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:10px 0}.recruit-race-kpis span{background:var(--panel2);padding:8px;border-radius:8px;font-size:11px;color:var(--muted)}.recruit-race-kpis b{display:block;color:var(--text);font-size:14px}.recruit-race-schools>div{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line)}.recruit-race-history{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.recruit-race-history span{font-size:10px;border:1px solid var(--line);border-radius:999px;padding:3px 6px;color:var(--muted)}.recruit-race-card>small{color:var(--muted)}
 @media(max-width:700px){.recruit-race-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
+.recruiting-hours-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}
+.recruiting-hours-strip strong{letter-spacing:.04em;text-transform:uppercase;font-size:.78rem}
+.recruiting-hours-strip span{font-weight:700}
+.recruiting-hours-strip small{width:100%;color:var(--muted)}
+.recruiting-hours-strip button{margin-left:auto}
+.recruiting-desk{display:grid;gap:9px;padding:12px;margin:0 0 12px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,var(--panel2),var(--panel))}
+.recruiting-desk .ra-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.recruiting-desk .ra-head>div:first-child{display:grid;gap:2px}
+.recruiting-desk .ra-chips{display:flex;gap:5px;flex-wrap:wrap}
+.ra-chip{font-size:.68rem;border:1px solid var(--line);border-radius:999px;padding:3px 8px;color:var(--muted);white-space:nowrap}
+.ra-chip.ra-ok{border-color:var(--good);color:var(--good)}
+.ra-chip.ra-hot{border-color:var(--accent2);color:var(--accent)}
+.ra-chip.ra-warn{border-color:var(--warn);color:var(--warn)}
+.ra-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.ra-actions button{font-size:.76rem;padding:6px 9px;white-space:nowrap}
+.ra-actions button:disabled{opacity:.45}
+.ra-actions .ra-quiet{margin-left:auto;opacity:.8}
+.ra-pitch{display:inline-flex;gap:4px;align-items:center;max-width:100%}
+.ra-pitch select{font-size:.74rem;padding:5px;max-width:190px;min-width:0}
+.ra-history{display:flex;gap:6px;flex-wrap:wrap}
+.ra-history span{font-size:10px;border:1px solid var(--line);border-radius:999px;padding:3px 6px;color:var(--muted)}
+.recruiting-desk>small{color:var(--muted)}
+@media(max-width:700px){.ra-actions button{flex:1 1 auto}.ra-pitch{width:100%}.ra-pitch select{flex:1 1 auto;max-width:none}.recruiting-hours-strip button{margin-left:0;width:100%}}
+.ra-nav{display:grid;gap:5px;margin-top:12px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}
+.ra-nav strong{font-size:1rem}
+.ra-nav small{color:var(--muted);line-height:1.35}
+.ra-nav button{font-size:.76rem;padding:6px 8px}
+@media(max-width:700px){.ra-nav{margin-top:6px;padding:8px}.ra-nav small{display:none}}
+#recruiting.rw-mode>#raStrip{display:none}
+#raStrip:empty{display:none}
+.ra-staff{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:auto}
+.ra-nav .ra-staff{margin-left:0}
+.ra-auto{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;cursor:pointer}
+.ra-auto input{margin:0;accent-color:var(--accent)}
+.recruiting-hours-strip .ra-staff{width:100%;margin-left:0}
+/* A phone has no room for the sidebar block above the list; the staff controls ride inside the desk instead. */
+.ra-desk-staff{display:none;padding-top:2px;border-top:1px solid var(--line)}
+@media(max-width:700px){.ra-nav{display:none}.ra-desk-staff{display:block}.ra-desk-staff .ra-staff{margin-left:0}}
+
 .development-plan-board{grid-column:1/-1;margin-top:10px;border-top:1px solid var(--line);padding-top:10px}.development-plan-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:5px}.development-plan-head>div{display:flex;flex-direction:column}.development-plan-head small,.development-plan-head>span{color:var(--muted);font-size:11px}.development-plan-attribution{max-width:90ch;margin:4px 0 8px;color:var(--muted);font-size:11px;line-height:1.4}.development-plan-row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}.development-plan-player{display:flex;flex-direction:column;gap:3px;min-width:0}.development-plan-player>span{font-size:12px;color:var(--muted)}.development-plan-player .development-plan-outcome{color:var(--text)}.development-plan-outcome.good b{color:var(--good)}.development-plan-outcome.bad b{color:var(--bad)}.development-plan-outcome.mixed b{color:var(--warn)}.development-plan-support{max-width:80ch}.development-plan-coaching{margin-top:2px;font-size:11px;color:var(--muted)}.development-plan-coaching summary{cursor:pointer;color:var(--accent)}.development-plan-coaching p{max-width:72ch;margin:5px 0}.development-plan-coach-rows{max-width:80ch;line-height:1.45}.development-plan-row button{flex:0 0 auto}.development-feature-btn{display:block;margin-top:6px;padding:5px 8px;font-size:11px}.development-feature-btn.active{border-color:var(--good);color:var(--good)}@media(max-width:640px){.development-plan-row{gap:7px}.development-plan-player>span{line-height:1.4}.development-plan-support{font-size:11px}.development-plan-coaching{max-width:100%;overflow-wrap:anywhere}}
 .development-coaching-support{margin-top:12px;padding:10px;border:1px solid var(--line);border-radius:8px}.development-coaching-support>strong{display:block}.development-coaching-support>p{margin:5px 0 8px;color:var(--muted);font-size:12px;line-height:1.45}.development-coach-row{display:grid;grid-template-columns:minmax(120px,.7fr) minmax(0,1.3fr);gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:11px}.development-coach-row span{color:var(--muted)}@media(max-width:640px){.development-coach-row{grid-template-columns:1fr;gap:2px}}
 
@@ -8894,6 +8933,8 @@ function guidanceModel(t=selected()){
  if(targets&&sch.room>0&&inSeason&&targets<Math.min(sch.room,6))add({id:guidanceItemId(t,'recruiting-board','thin'),occurrence:'thin',meaning:'staff_recommendation',category:'recruiting',priority:165,title:`Add recruiting targets (${targets} for ${sch.room} spots)`,cause:`Only ${targets} active target${targets===1?'':'s'} for ${sch.room} open scholarship${sch.room===1?'':'s'}.`,affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'recruiting',focus:'recruiting-board'},boundary:null,consequence:optional});
  const scoutWeek=universe.phase==='regular'&&targets?globalThis.DynastyScoutingWeek?.(t):null;
  if(scoutWeek&&scoutWeek.spent===0&&scoutWeek.budget>0)add({id:guidanceItemId(t,'scouting-hours',`${universe.year}-${universe.week}`),occurrence:`${universe.year}-${universe.week}`,meaning:'staff_recommendation',category:'recruiting',priority:160,title:`Use ${scoutWeek.budget} scouting hours`,cause:'No targets have been scouted this week. Unused hours do not carry over.',affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'recruiting',focus:'recruiting-board'},boundary:null,consequence:optional});
+ const recruitWeek=universe.phase==='regular'&&targets?globalThis.DynastyRecruitingWeek?.(t):null;
+ if(recruitWeek&&recruitWeek.spent===0&&recruitWeek.budget>0)add({id:guidanceItemId(t,'recruiting-hours',`${universe.year}-${universe.week}`),occurrence:`${universe.year}-${universe.week}`,meaning:'staff_recommendation',category:'recruiting',priority:162,title:`Use ${recruitWeek.budget} recruiting hours`,cause:'Nobody on the board has been worked this week. A target left alone for two weeks starts to cool, and unused hours do not carry over.',affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'recruiting',focus:'recruiting-board'},boundary:null,consequence:optional});
  if(inSeason&&t.trainingFocusSeason!==universe.year)add({id:guidanceItemId(t,'training-focus',String(universe.year)),occurrence:String(universe.year),meaning:'staff_recommendation',category:'development',priority:150,title:'Set a training focus',cause:`Practice is running the default ${t.trainingFocus||'Balanced'} plan.`,affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'development',focus:'training-focus'},boundary:null,consequence:optional});
  if(universe.phase==='complete'&&typeof developmentPlanSystem!=='undefined'&&!(universe.developmentState?.year===universe.year&&universe.developmentState.springRun)){const used=developmentPlanSystem.count(t.roster||[],universe),open=developmentPlanSystem.LIMIT-used;if(open>0)add({id:guidanceItemId(t,'featured-plans',String(universe.year)),occurrence:String(universe.year),meaning:'staff_recommendation',category:'development',priority:175,title:`Choose featured development plans (${used}/${developmentPlanSystem.LIMIT})`,cause:`${open} featured plan slot${open===1?' is':'s are'} open before spring development.`,affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'development',focus:'featured-plans'},boundary:null,consequence:optional})}
  const state=guidanceStateFor(t),stamp=guidanceCalendarStamp();
@@ -9053,7 +9094,15 @@ function oversignAppetite(t){
 }
 function canTakeCommit(name){const t=T(name);return t?classCommitCount(name)<scholarshipCapacity(t)+oversignAppetite(t):false}
 function commitRecruit(r,name){if(r.committed||!canTakeCommit(name))return false;let t=T(name);if(recruitBlocked(t,r))return false;assignPrimaryRecruiter(r,t,t.name===selected()?.name?r.relationship:null);r.committed=name;r.commitWeek=universe.week;r.challenger=null;r.pressure=0;r.signedPromise=r.promiseOffer?.schoolId===t.id?{...r.promiseOffer}:null;universe.recruitClassCounts??={};universe.recruitClassCounts[name]=classCommitCount(name)+1;t.commits??=[];t.commits.push(r);r.recruitingMemory=captureRecruitment(r,t);return true}
-function advanceRecruiting(){const u=selected();clearUnitCache();universe.recruits.forEach(r=>{ensureRecruitRelationships(r);if(r.committed){pressureCommit(r,u);return}r.prevInterest=r.interest;let pool=sample(universe.teams,20).map(t=>({t,pitch:recruitPitch(t,r)})).sort((a,b)=>b.pitch-a.pitch).map(x=>x.t),top=pool.find(t=>canTakeCommit(t.name))||pool[0];r.leader=top.name;let promiseBoost=recruitPromiseBoost(r,u),visitBoost=0;if(r.visitWeek===universe.week){let g=u.schedule.find(g=>g.week===universe.week&&g.home===u.name);visitBoost=g&&g.played?(g.winner===u.name?13:5):7;r.visit=false}let us=recruitPitch(u,r)+(r.targeted?10:0)+r.relationship*.12+visitBoost+promiseBoost,ais=recruitPitch(top,r);if(r.targeted){firstRecruitEvaluation(r,u);refreshScoutingIntel(r,u,2+(visitBoost?4:0),'RECRUITING',true);let gain=gi(2,6);r.relationship=clamp(r.relationship+gain,0,100);growRecruiterRelationship(r,u,gain);r.interest=clamp(Math.round(r.interest+(us-ais)*.065+gi(1,5)+gauss()*2),1,100)}else r.interest=clamp(Math.round(r.interest+(us-ais)*.018+gauss()*2),1,100);r.trend=r.interest-r.prevInterest;if(universe.week>=5&&gameplayRandom()<.028+universe.week*.009){if(r.targeted&&r.interest>=72&&us>=ais-4&&canTakeCommit(u.name))commitRecruit(r,u.name);else{let dest=pool.find(t=>canTakeCommit(t.name));if(dest)commitRecruit(r,dest.name)}}})}
+// v0.15.0: recruiting-actions.js reassigns both of these. The defaults keep the engine standalone:
+// no effort model (targets drift for free) and no scholarship-offer gate on commitments.
+function recruitEffort(r,t){return null}
+function userMayCommit(r,t){return true}
+function advanceRecruiting(){const u=selected();clearUnitCache();universe.recruits.forEach(r=>{ensureRecruitRelationships(r);if(r.committed){pressureCommit(r,u);return}r.prevInterest=r.interest;let pool=sample(universe.teams,20).map(t=>({t,pitch:recruitPitch(t,r)})).sort((a,b)=>b.pitch-a.pitch).map(x=>x.t),top=pool.find(t=>canTakeCommit(t.name))||pool[0];r.leader=top.name;let promiseBoost=recruitPromiseBoost(r,u),visitBoost=0;if(r.visitWeek===universe.week){let g=u.schedule.find(g=>g.week===universe.week&&g.home===u.name);visitBoost=g&&g.played?(g.winner===u.name?13:5):7;r.visit=false}let us=recruitPitch(u,r)+(r.targeted?10:0)+r.relationship*.12+visitBoost+promiseBoost,ais=recruitPitch(top,r);if(r.targeted){firstRecruitEvaluation(r,u);refreshScoutingIntel(r,u,2+(visitBoost?4:0),'RECRUITING',true);
+ // Draw order is part of the seeded contract: gain, bump, noise. recruitEffort() only scales what was drawn.
+ let gain=gi(2,6),bump=gi(1,5),noise=gauss()*2,drift=(us-ais)*.065,cool=0;const eff=recruitEffort(r,u);
+ if(eff){gain=Math.round(gain*eff.relScale);bump*=eff.bumpScale;noise*=eff.noiseScale;if(eff.freeze)drift=Math.min(0,drift);cool=eff.cool}
+ r.relationship=clamp(r.relationship+gain-(eff?.relDecay||0),0,100);if(gain>0)growRecruiterRelationship(r,u,gain);r.interest=clamp(Math.round(r.interest+drift+bump+noise-cool),1,100)}else r.interest=clamp(Math.round(r.interest+(us-ais)*.018+gauss()*2),1,100);r.trend=r.interest-r.prevInterest;if(universe.week>=5&&gameplayRandom()<.028+universe.week*.009){if(r.targeted&&r.interest>=72&&us>=ais-4&&canTakeCommit(u.name)&&userMayCommit(r,u))commitRecruit(r,u.name);else{let dest=pool.find(t=>canTakeCommit(t.name));if(dest)commitRecruit(r,dest.name)}}})}
 // v0.12.29: commitments fill first-come, so in a small-class year the room is gone before
 // the best prospects decide, and 4- and 5-stars were left unsigned (149 of them in one
 // measured cycle, as good as the ones who signed). Signing day places each unsigned elite
@@ -9069,7 +9118,7 @@ function placeUnsignedElites(){
  const elites=universe.recruits.filter(r=>!r.committed&&r.stars>=ELITE_MIN_STARS).sort((a,b)=>(a.nationalRank||1e9)-(b.nationalRank||1e9));
  for(const e of elites){
   // A target the controlled program is winning is settled by the normal fill below.
-  if(userRoom&&e.targeted&&e.interest>=68)continue;
+  if(userRoom&&e.targeted&&e.interest>=68&&userMayCommit(e,selected()))continue;
   const open=universe.teams.filter(t=>t.name!==controlled&&canTakeCommit(t.name)&&!recruitBlocked(t,e));
   let dest=null,removed=null;
   if(open.length)dest=sample(open,24).sort((a,b)=>recruitPitch(b,e)-recruitPitch(a,e))[0];
@@ -9086,7 +9135,7 @@ function placeUnsignedElites(){
  }
  return {placed,displaced};
 }
-function finalizeRecruiting(){const u=selected();clearUnitCache();buildSigningDay();universe.recruitCycle={year:universe.year,seasonCommits:universe.recruits.filter(r=>r.commitWeek).length,decommits:(universe.decommitLog||[]).filter(e=>e.year===universe.year).length,flips:(universe.decommitLog||[]).filter(e=>e.year===universe.year&&e.to).length};Object.assign(universe.recruitCycle,{elites:placeUnsignedElites()});let remaining=universe.recruits.filter(r=>!r.committed);while(remaining.length){let needy=universe.teams.filter(t=>scholarshipRoom(t)>0&&classCommitCount(t.name)<15);if(!needy.length)break;let r=remaining.shift();if(r.targeted&&r.interest>=68&&canTakeCommit(u.name)&&classCommitCount(u.name)<15){commitRecruit(r,u.name);continue}let top=sample(needy,16).sort((a,b)=>recruitPitch(b,r)-recruitPitch(a,r))[0]||needy[0];commitRecruit(r,top.name)}for(const r of remaining){if(r.committed)continue;if(r.targeted&&r.interest>=68&&canTakeCommit(u.name)){let available=universe.teams.filter(t=>canTakeCommit(t.name)),top=sample(available,24).sort((a,b)=>recruitPitch(b,r)-recruitPitch(a,r))[0];if(!top||recruitPitch(u,r)+10+r.relationship*.12>=recruitPitch(top,r)-3){commitRecruit(r,u.name);continue}}let available=universe.teams.filter(t=>canTakeCommit(t.name));if(!available.length)break;let top=sample(available,28).sort((a,b)=>recruitPitch(b,r)-recruitPitch(a,r))[0]||available[0];commitRecruit(r,top.name)}enforceScholarshipLimits(new Set(universe.signingDay?.board?.map(b=>b.recruitId)||[]));universe.recruitCycle.signeesByTeam=Object.fromEntries(universe.teams.map(t=>[t.name,universe.recruits.filter(r=>r.committed===t.name).length]));}
+function finalizeRecruiting(){const u=selected();clearUnitCache();buildSigningDay();universe.recruitCycle={year:universe.year,seasonCommits:universe.recruits.filter(r=>r.commitWeek).length,decommits:(universe.decommitLog||[]).filter(e=>e.year===universe.year).length,flips:(universe.decommitLog||[]).filter(e=>e.year===universe.year&&e.to).length};Object.assign(universe.recruitCycle,{elites:placeUnsignedElites()});let remaining=universe.recruits.filter(r=>!r.committed);while(remaining.length){let needy=universe.teams.filter(t=>scholarshipRoom(t)>0&&classCommitCount(t.name)<15);if(!needy.length)break;let r=remaining.shift();if(r.targeted&&r.interest>=68&&canTakeCommit(u.name)&&classCommitCount(u.name)<15&&userMayCommit(r,u)){commitRecruit(r,u.name);continue}let top=sample(needy,16).sort((a,b)=>recruitPitch(b,r)-recruitPitch(a,r))[0]||needy[0];commitRecruit(r,top.name)}for(const r of remaining){if(r.committed)continue;if(r.targeted&&r.interest>=68&&canTakeCommit(u.name)&&userMayCommit(r,u)){let available=universe.teams.filter(t=>canTakeCommit(t.name)),top=sample(available,24).sort((a,b)=>recruitPitch(b,r)-recruitPitch(a,r))[0];if(!top||recruitPitch(u,r)+10+r.relationship*.12>=recruitPitch(top,r)-3){commitRecruit(r,u.name);continue}}let available=universe.teams.filter(t=>canTakeCommit(t.name));if(!available.length)break;let top=sample(available,28).sort((a,b)=>recruitPitch(b,r)-recruitPitch(a,r))[0]||available[0];commitRecruit(r,top.name)}enforceScholarshipLimits(new Set(universe.signingDay?.board?.map(b=>b.recruitId)||[]));universe.recruitCycle.signeesByTeam=Object.fromEntries(universe.teams.map(t=>[t.name,universe.recruits.filter(r=>r.committed===t.name).length]));}
 function autoTarget(){const u=selected();universe.recruits.forEach(r=>r.targeted=false);let needs={};POS.forEach(p=>needs[p]=(POS_COUNTS[p]||4)-u.roster.filter(x=>x.pos===p&&x.year!=='SR').length*.55);universe.recruits.filter(r=>!r.committed).sort((a,b)=>(b.scoutUp+(needs[b.pos]||0)*5)-(a.scoutUp+(needs[a.pos]||0)*5)).slice(0,20).forEach(r=>{r.targeted=true;firstRecruitEvaluation(r,u)});autosaveAfter('management');renderRecruiting()}
 function chooseCoachMoveDestination(c,from,slot,changed,moved){
  const user=selected()?.name,candidates=universe.teams.filter(t=>t.id!==from.id&&t.name!==user&&!changed.get(t.id)?.has(slot)&&!moved.has(t.staff?.[slot]?.id)&&t.prestige>=from.prestige-5);
@@ -11712,6 +11761,450 @@ else{
  showRecruitProfile=function(id){showRecruitProfileBeforeV0955Battles(id);const r=universe.recruits.find(x=>String(x.id)===String(id)),t=selected(),body=$('#recruitDialogBody');if(r&&t&&body&&!body.querySelector('.recruit-race-card')){body.insertAdjacentHTML('afterbegin',raceCard(r,t));bindRecruitFocus()}};
  extendRender('recruiting',()=>{const t=selected(),summary=$('#classSummary');if(t&&summary&&!summary.querySelector('.recruit-focus-strip')){const used=recruitingBattleSystem.focusCount(universe.recruits,t,universe);summary.insertAdjacentHTML('beforeend',`<div class="recruit-focus-strip"><strong>Weekly Priority Push</strong><span>${used} / ${RECRUITING_FOCUS_LIMIT} assigned</span><small>Use these on your most important open battles or to help protect a challenged commitment.</small></div>`)}bindRecruitFocus()});
  globalThis.DynastyLabRecruitingBattles={summary:r=>recruitingBattleSystem.raceSummary(battleRows(r,5),selected()?.id),toggle:r=>recruitingBattleSystem.toggleFocus(r,selected(),universe,RECRUITING_FOCUS_LIMIT)};
+}
+
+// Recruiting Desk (v0.15.0). Scouting hours tell you how good a prospect is; recruiting hours are how
+// you win him. Each week the staff has a budget of hours, spent per recruit on calls, pitches,
+// scholarship offers and visits. Targets nobody works start to cool, so the board is an allocation
+// problem instead of a free list.
+//
+// The rules live in a pure factory (testable in Node). The browser branch below wires them into the
+// engine through three small hooks app.js already exposes (recruitEffort, userMayCommit and the
+// existing recruitPitch / advanceRecruiting / scheduleVisit functions) and adds the desk UI.
+function makeRecruitingActionSystem(env){
+ 'use strict';
+ const COSTS={call:2,pitch:3,offer:2,visit:5,inhome:8};
+ const LABELS={call:'Call',pitch:'Pitch',offer:'Offer',visit:'Campus Visit',inhome:'In-Home Visit'};
+ // Calibrated against full seasons: a board that is only called and offered when ripe lands about what
+ // passive targeting used to, an idle board lands a little less, and a board worked with pitches and
+ // in-homes on the winnable targets lands clearly more. Calls and pitches shrink inside a single week
+ // so one recruit cannot soak up the whole budget.
+ const CALL_INTEREST=[1,1,0,0],CALL_RELATIONSHIP=[2,1,1,0];
+ const PITCH_BASE=4,PITCH_REPEAT_TOPIC=.35,PITCH_NEXT=.7,PITCH_OFF_PRIORITY=.4;
+ const OFFER={interest:2,relationship:2,boost:3},INHOME={interest:5,relationship:4,boost:4,minInterest:45,minWeek:5};
+ const WITHDRAW={interest:-6,relationship:-5};
+ const GRACE_WEEKS=1,WARM_WEEKS=1;
+ function universe(){return env.getUniverse()}
+ const clamp=(v,a,b)=>env.clamp(v,a,b);
+
+ // ---------- hours ----------
+ function hoursBudgetFor(t){
+  const rc=t?.staff?.RC||{},hc=t?.staff?.HC||{};
+  return clamp(Math.round(12+(rc.recruiting||60)*.38+(hc.recruiting||60)*.10+(t?.resources??60)*.06),30,60);
+ }
+ // Pure read: a stale or missing week reads as unspent without writing anything.
+ function weekInfo(t){
+  const u=universe(),budget=hoursBudgetFor(t),old=t?.recruitingWeek;
+  const spent=old&&old.year===u.year&&old.week===u.week?clamp(Math.round(old.spent||0),0,budget):0;
+  return{year:u.year,week:u.week,budget,spent};
+ }
+ function ensureWeek(t){
+  const cur=weekInfo(t),old=t.recruitingWeek;
+  if(!old||old.year!==cur.year||old.week!==cur.week)t.recruitingWeek=cur;else Object.assign(old,cur);
+  return t.recruitingWeek;
+ }
+ function hoursLeft(t){const w=weekInfo(t);return Math.max(0,w.budget-w.spent)}
+ function isActive(){const u=universe();return u.phase==='regular'||(u.phase==='preseason'&&u.week===0)}
+
+ // ---------- per-recruit records ----------
+ function blank(){return{season:universe().year,offered:false,offerWeek:null,inHome:false,lastWorkedWeek:null,graceWeek:null,week:null,history:[]}}
+ function record(r,t,create=true){
+  const u=universe(),key=String(t.id),old=r?.recruitingActions?.[key];
+  if(old&&old.season===u.year){old.history=Array.isArray(old.history)?old.history:[];return old}
+  if(!create)return blank();
+  r.recruitingActions??={};return(r.recruitingActions[key]=blank());
+ }
+ // Counters that only mean something inside one week.
+ function weekState(rec){
+  const wk=universe().week;
+  if(!rec.week||rec.week.week!==wk)rec.week={week:wk,calls:0,pitches:{},pitchCount:0,hours:0};
+  return rec.week;
+ }
+ function workedThisWeek(r,t){const rec=record(r,t,false);return rec.lastWorkedWeek===universe().week}
+
+ // ---------- offers ----------
+ function offerLimit(t){return Math.max(10,Math.round(env.scholarshipCapacity(t)*1.6))}
+ function offersOut(recruits,t){
+  const u=universe(),key=String(t.id);let n=0;
+  for(const r of recruits||[]){const x=r?.recruitingActions?.[key];if(x&&x.season===u.year&&x.offered&&!r.committed)n++}
+  return n;
+ }
+ function hasOffer(r,t){return!!record(r,t,false).offered}
+
+ // ---------- pitching ----------
+ function topicStrength(t,r,topic){
+  switch(topic){
+   case'Prestige':return t.prestige;
+   case'NIL':return t.nil;
+   case'Development':return t.development;
+   case'Early Role':return clamp(Math.round((90-env.unitStrength(t,r.pos))*2.2),0,100);
+   case'Coaching':return Math.round(((t.staff?.HC?.loyalty??60)+(t.staff?.RC?.recruiting??60))/2);
+   case'Academics':return t.academics;
+   case'Scheme Fit':return clamp(Math.round(env.schemeFit(t,r)),0,100);
+   case'Winning':{const g=(t.w||0)+(t.l||0);return g?Math.round(t.w/g*100):Math.round((t.prestige||50)*.8)}
+   case'Stay Close':return clamp(Math.round(100-env.distance(t,r)/12),0,100);
+   case'Campus Life':return Math.round(((t.fan_support??60)+(t.facilities??60))/2);
+  }
+  return 50;
+ }
+ const pitchFit=(r,topic)=>topic===r.priority?1:PITCH_OFF_PRIORITY;
+ const pitchFactor=strength=>clamp((strength-40)/35,-.6,1.4);
+ function pitchDiminish(rec,topic){
+  const wk=weekState(rec);let m=Math.pow(PITCH_NEXT,wk.pitchCount);if(wk.pitches[topic])m*=PITCH_REPEAT_TOPIC;return m;
+ }
+ function pitchLabel(delta){return delta>=6?'Strong':delta>=3?'Good':delta>=1?'Modest':delta===0?'Flat':'Risky'}
+ function pitchProjection(r,t,topic){
+  const rec=record(r,t,false),strength=topicStrength(t,r,topic),fit=pitchFit(r,topic);
+  const wk=rec.week&&rec.week.week===universe().week?rec.week:{pitchCount:0,pitches:{}};
+  let m=Math.pow(PITCH_NEXT,wk.pitchCount);if(wk.pitches[topic])m*=PITCH_REPEAT_TOPIC;
+  const delta=Math.round(PITCH_BASE*fit*pitchFactor(strength)*m);
+  return{topic,strength,fit,delta,label:pitchLabel(delta),priority:topic===r.priority};
+ }
+ function pitchOptions(r,t){
+  return env.priorities.map(topic=>pitchProjection(r,t,topic)).sort((a,b)=>b.delta-a.delta||b.strength-a.strength);
+ }
+
+ // ---------- availability / perform ----------
+ function availability(r,t,kind,opts={}){
+  if(!COSTS[kind])return{ok:false,reason:'Unknown recruiting action.'};
+  if(!r||!t)return{ok:false,reason:'No recruit selected.'};
+  const u=universe();
+  if(!isActive())return{ok:false,reason:'Recruiting hours are available during the season and the preseason.'};
+  if(r.committed)return{ok:false,reason:`${r.name} has already committed${r.committed===t.name?' to you':' elsewhere'}.`};
+  if(env.recruitBlocked&&env.recruitBlocked(t,r))return{ok:false,reason:`${r.name} will not consider ${t.name} again.`};
+  const rec=record(r,t,false),cost=COSTS[kind],left=hoursLeft(t);
+  if(kind==='offer'){
+   if(rec.offered)return{ok:false,reason:'A scholarship offer is already out.'};
+   const limit=offerLimit(t),out=offersOut(u.recruits,t);
+   if(out>=limit)return{ok:false,reason:`You have ${out} of ${limit} offers out. Withdraw one first.`};
+  }
+  if(kind==='inhome'){
+   if(!rec.offered)return{ok:false,reason:'Offer a scholarship before an in-home visit.'};
+   if(rec.inHome)return{ok:false,reason:'The in-home visit is already done.'};
+   if(u.week<INHOME.minWeek)return{ok:false,reason:`In-home visits open in week ${INHOME.minWeek}.`};
+   if((r.interest||0)<INHOME.minInterest)return{ok:false,reason:`He has to be at ${INHOME.minInterest}% interest before the family opens the door.`};
+  }
+  if(kind==='visit'&&r.visitWeek)return{ok:false,reason:'A campus visit is already scheduled.'};
+  if(kind==='pitch'&&opts.topic&&!env.priorities.includes(opts.topic))return{ok:false,reason:'Unknown pitch topic.'};
+  if(cost>left)return{ok:false,reason:`Only ${left} recruiting hour${left===1?'':'s'} left this week; this costs ${cost}.`};
+  return{ok:true,cost,left};
+ }
+ function pushHistory(rec,row){rec.history.push(row);if(rec.history.length>10)rec.history.splice(0,rec.history.length-10)}
+ function perform(r,t,kind,opts={}){
+  const check=availability(r,t,kind,opts);if(!check.ok)return check;
+  const u=universe();
+  env.ensureTargeted(r,t);
+  const rec=record(r,t,true),wk=weekState(rec);
+  let dI=0,dR=0,topic=null,note='';
+  if(kind==='call'){
+   const i=Math.min(wk.calls,CALL_INTEREST.length-1);dI=CALL_INTEREST[i];dR=CALL_RELATIONSHIP[i];wk.calls++;
+   note=wk.calls>1?'Another call this week means less each time.':'';
+  }else if(kind==='pitch'){
+   topic=opts.topic&&env.priorities.includes(opts.topic)?opts.topic:pitchOptions(r,t)[0].topic;
+   const proj=pitchProjection(r,t,topic);dI=proj.delta;dR=dI>0?Math.max(1,Math.round(2*proj.fit)):0;
+   wk.pitchCount++;wk.pitches[topic]=(wk.pitches[topic]||0)+1;
+   note=`${proj.label} pitch on ${topic}${proj.priority?' — it is what he cares about':''}.`;
+  }else if(kind==='offer'){
+   rec.offered=true;rec.offerWeek=u.week;dI=OFFER.interest;dR=OFFER.relationship;note='Scholarship offer is out.';
+  }else if(kind==='inhome'){
+   rec.inHome=true;dI=INHOME.interest;dR=INHOME.relationship;note='The family hosted your staff.';
+  }else if(kind==='visit'){
+   env.scheduleVisit(r);dR=2;note=`Visit set for week ${r.visitWeek}.`;
+  }
+  if(dI)r.interest=clamp(Math.round((r.interest||0)+dI),1,100);
+  if(dR){r.relationship=clamp((r.relationship||0)+dR,0,100);if(dR>0&&env.growRecruiterRelationship)env.growRecruiterRelationship(r,t,dR)}
+  const week=ensureWeek(t);week.spent+=check.cost;
+  rec.lastWorkedWeek=u.week;wk.hours+=check.cost;
+  pushHistory(rec,{week:u.week,kind,cost:check.cost,topic,dI,dR});
+  return{ok:true,kind,label:LABELS[kind],cost:check.cost,remaining:hoursLeft(t),dI,dR,topic,note};
+ }
+ function withdrawOffer(r,t){
+  if(!r||!t)return{ok:false,reason:'No recruit selected.'};
+  if(r.committed)return{ok:false,reason:`${r.name} has already committed.`};
+  const rec=record(r,t,false);if(!rec.offered)return{ok:false,reason:'There is no offer to withdraw.'};
+  rec.offered=false;rec.offerWeek=null;rec.withdrawn=true;
+  r.interest=clamp(Math.round((r.interest||0)+WITHDRAW.interest),1,100);r.relationship=clamp((r.relationship||0)+WITHDRAW.relationship,0,100);
+  pushHistory(rec,{week:universe().week,kind:'withdraw',cost:0,topic:null,dI:WITHDRAW.interest,dR:WITHDRAW.relationship});
+  return{ok:true,dI:WITHDRAW.interest,dR:WITHDRAW.relationship};
+ }
+
+ // ---------- what the engine asks ----------
+ // How many weeks it has been since this recruit was last worked, as of `playedWeek`.
+ function weeksSinceWorked(r,t,playedWeek,{stamp=false}={}){
+  const rec=record(r,t,stamp);
+  let last=rec.lastWorkedWeek;
+  if(last==null){
+   if(rec.graceWeek==null){if(!stamp)return 0;rec.graceWeek=playedWeek}
+   last=rec.graceWeek;
+  }
+  return Math.max(0,playedWeek-last);
+ }
+ function effortFromSince(since){
+  if(since<=GRACE_WEEKS-1)return{state:'worked',relScale:.75,bumpScale:.75,noiseScale:1,freeze:false,cool:0,relDecay:0};
+  if(since<=GRACE_WEEKS-1+WARM_WEEKS)return{state:'warm',relScale:.4,bumpScale:.4,noiseScale:1,freeze:false,cool:0,relDecay:0};
+  return{state:'cooling',relScale:0,bumpScale:0,noiseScale:.5,freeze:true,cool:1+Math.min(2,Math.floor((since-2)/2)),relDecay:1};
+ }
+ // Called inside the weekly pass, after the week counter has moved on, so the week just played is week-1.
+ function effort(r,t){return effortFromSince(weeksSinceWorked(r,t,universe().week-1,{stamp:true}))}
+ // The same question asked now: what happens to him if the week were played as it stands?
+ function previewEffort(r,t){return effortFromSince(weeksSinceWorked(r,t,universe().week))}
+ function mayCommit(r,t){return!!t&&hasOffer(r,t)}
+ // Standing bonus to the pitch the program makes, so offers and visits compete against rival programs.
+ function pitchBoost(r,t){
+  const x=r?.recruitingActions?.[String(t?.id)];if(!x||x.season!==universe().year)return 0;
+  return(x.offered?OFFER.boost:0)+(x.inHome?INHOME.boost:0);
+ }
+
+ // ---------- board status ----------
+ function status(r,t){
+  const rec=record(r,t,false),u=universe(),open=!r.committed;
+  const worked=rec.lastWorkedWeek===u.week,pe=open&&r.targeted?previewEffort(r,t):null;
+  return{
+   offered:!!rec.offered,inHome:!!rec.inHome,worked,
+   cooling:!!pe&&!worked&&pe.state==='cooling',
+   warm:!!pe&&!worked&&pe.state==='warm',
+   ready:open&&r.targeted&&!rec.offered&&(r.interest||0)>=68,
+   history:rec.history.slice(-3).reverse()
+  };
+ }
+ function workload(recruits,t){
+  const targets=(recruits||[]).filter(r=>r?.targeted&&!r.committed);
+  let worked=0,cooling=0,ready=0;
+  for(const r of targets){const s=status(r,t);if(s.worked)worked++;if(s.cooling)cooling++;if(s.ready)ready++}
+  return{targets:targets.length,worked,cooling,ready,offersOut:offersOut(recruits,t),offerLimit:offerLimit(t),left:hoursLeft(t),budget:hoursBudgetFor(t)};
+ }
+
+ // ---------- staff work ----------
+ // What the staff does when told to work the board: warm everyone, hand out the offers that are ripe,
+ // then spend what is left on the best-fitting pitches. It never books visits or in-homes; those are
+ // yours to call. Fully deterministic, so it consumes no gameplay randomness.
+ function staffPlan(recruits,t,{maxOffers=3,maxPitches=3}={}){
+  const targets=(recruits||[]).filter(r=>r?.targeted&&!r.committed).sort((a,b)=>(a.nationalRank||1e9)-(b.nationalRank||1e9));
+  const done={calls:0,pitches:0,offers:0,hours:0};
+  const run=(r,kind,opts)=>{const out=perform(r,t,kind,opts);if(out.ok){done.hours+=out.cost;if(kind==='call')done.calls++;else if(kind==='pitch')done.pitches++;else if(kind==='offer')done.offers++}return out.ok};
+  let n=0;
+  for(const r of targets){if(n>=maxOffers)break;if(!hasOffer(r,t)&&(r.interest||0)>=60&&run(r,'offer'))n++}
+  for(const r of targets)if(!workedThisWeek(r,t))run(r,'call');
+  let p=0;
+  for(const r of targets){
+   if(p>=maxPitches)break;
+   const best=pitchOptions(r,t)[0];
+   if(best&&best.delta>=4&&run(r,'pitch',{topic:best.topic}))p++;
+  }
+  return done;
+ }
+
+ // ---------- automation ----------
+ // "Staff handle recruiting": every week, before it plays, the staff spend whatever hours the coach
+ // left unspent using the staff plan. The coach can still act first and the staff fill in around it.
+ function isAuto(u){return!!u?.recruitingActions?.auto}
+ function setAuto(u,on){
+  if(!u)return false;
+  u.recruitingActions??={version:1,year:u.year,week:u.week};
+  u.recruitingActions.auto=!!on;return u.recruitingActions.auto;
+ }
+
+ // ---------- one-time migration ----------
+ // A save from before the Recruiting Desk has targets that were committing on interest alone.
+ // Treat those as already offered so nothing in flight changes under the player.
+ function grandfather(u,t){
+  // Without a controlled program there is nothing to grandfather yet; try again on the next load.
+  if(!u||u.recruitingActions||!t)return false;
+  u.recruitingActions={version:1,year:u.year,week:u.week,migrated:true};
+  for(const r of u.recruits||[]){
+   if(!r.targeted||r.committed)continue;
+   const rec=record(r,t,true);rec.offered=true;rec.offerWeek=u.week;rec.grandfathered=true;
+  }
+  return true;
+ }
+
+ return{COSTS,LABELS,INHOME,OFFER,hoursBudgetFor,weekInfo,ensureWeek,hoursLeft,isActive,record,weekState,workedThisWeek,
+  offerLimit,offersOut,hasOffer,topicStrength,pitchProjection,pitchOptions,availability,perform,withdrawOffer,
+  effort,previewEffort,effortFromSince,weeksSinceWorked,mayCommit,pitchBoost,status,workload,staffPlan,isAuto,setAuto,grandfather};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeRecruitingActionSystem};
+}else{
+ const recruitingActions=makeRecruitingActionSystem({
+  getUniverse:()=>universe,clamp,priorities:PRIORITIES,
+  scholarshipCapacity:t=>scholarshipCapacity(t),
+  unitStrength:(t,pos)=>unitCached(t,pos),
+  schemeFit:(t,r)=>recruitSchemeFit(t,r),
+  distance:(t,r)=>recruitDistance(t,r),
+  recruitBlocked:(t,r)=>recruitBlocked(t,r),
+  growRecruiterRelationship:(r,t,gain)=>growRecruiterRelationship(r,t,gain),
+  ensureTargeted:(r,t)=>{if(!r.targeted)r.targeted=true;firstRecruitEvaluation(r,t)},
+  scheduleVisit:r=>scheduleVisitBeforeRecruitingActions(r)
+ });
+ globalThis.DynastyRecruitingActions=recruitingActions;
+ // Null when the staff have recruiting, so the weekly reminder to spend hours stays quiet.
+ globalThis.DynastyRecruitingWeek=t=>t&&!recruitingActions.isAuto(universe)?recruitingActions.weekInfo(t):null;
+
+ // --- engine hooks ---
+ recruitEffort=function(r,t){
+  const e=recruitingActions.effort(r,t);
+  if(e.state==='cooling')passCooled.push(r.id);
+  return e;
+ };
+ userMayCommit=function(r,t){return recruitingActions.mayCommit(r,t)};
+ let passCooled=[];
+ const recruitPitchBeforeRecruitingActions=recruitPitch;
+ recruitPitch=function(t,r){
+  const base=recruitPitchBeforeRecruitingActions(t,r);
+  if(!r.recruitingActions)return base;
+  const boost=recruitingActions.pitchBoost(r,t);
+  return boost?base+boost:base;
+ };
+ // A campus visit costs hours; cancelling one is free but gives nothing back.
+ const scheduleVisitBeforeRecruitingActions=scheduleVisit;
+ scheduleVisit=function(r){
+  if(r.visitWeek)return scheduleVisitBeforeRecruitingActions(r);
+  const t=selected(),res=recruitingActions.perform(r,t,'visit');
+  setStatus(res.ok?`${res.label}: ${r.name}. ${res.note} ${res.remaining} recruiting hour${res.remaining===1?'':'s'} left.`:res.reason);
+ };
+ const advanceRecruitingBeforeRecruitingActions=advanceRecruiting;
+ advanceRecruiting=function(){
+  const t=selected(),playedWeek=universe.week-1;passCooled=[];
+  const out=advanceRecruitingBeforeRecruitingActions();
+  if(t){
+   // The hours ledger still describes the week just played, because the counter has already moved on.
+   const w=t.recruitingWeek&&t.recruitingWeek.year===universe.year&&t.recruitingWeek.week===playedWeek?t.recruitingWeek:null;
+   t.recruitingLastWeek={year:universe.year,week:playedWeek,spent:w?w.spent:0,budget:recruitingActions.hoursBudgetFor(t),cooled:passCooled.slice(0,12),cooledCount:passCooled.length};
+  }
+  return out;
+ };
+ // Universes created from here on never need the migration; only saves that predate the desk do.
+ const initUniverseBeforeRecruitingActions=initUniverse;
+ initUniverse=function(...args){
+  const out=initUniverseBeforeRecruitingActions(...args);
+  if(universe)universe.recruitingActions??={version:1,year:universe.year,week:universe.week};
+  return out;
+ };
+ const normalizeUniverseBeforeRecruitingActions=normalizeUniverse;
+ normalizeUniverse=function(){
+  const out=normalizeUniverseBeforeRecruitingActions();
+  try{recruitingActions.grandfather(universe,selected())}catch{}
+  return out;
+ };
+ // The staff work the board before a week plays when the coach has handed recruiting over, and
+ // always when the whole season is being simulated (that already hands decisions to the staff).
+ const simWeekBeforeRecruitingActions=simWeek;
+ simWeek=function(skipDecisions=false){
+  if(recruitingActions.isActive()){
+   const t=selected(),skipping=skipDecisions===true;
+   if(t&&(skipping||recruitingActions.isAuto(universe))&&guidanceActionEligibility(skipping?'simulate-season':'advance-week').allowed)recruitingActions.staffPlan(universe.recruits,t);
+  }
+  return simWeekBeforeRecruitingActions(skipDecisions);
+ };
+ // The opening preseason is its own step; hand it over too.
+ const beginSeasonBeforeRecruitingActions=beginSeason;
+ beginSeason=function(...args){
+  const t=selected();
+  if(t&&openingPreseason()&&recruitingActions.isActive()&&recruitingActions.isAuto(universe))recruitingActions.staffPlan(universe.recruits,t);
+  return beginSeasonBeforeRecruitingActions(...args);
+ };
+
+ // --- desk UI ---
+ const raEsc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const raRecruit=id=>(universe.recruits||[]).find(x=>String(x.id)===String(id))||null;
+ const hoursText=n=>`${n} hour${n===1?'':'s'}`;
+ function chipsHTML(r,t){
+  const s=recruitingActions.status(r,t),out=[];
+  if(s.offered)out.push('<span class="ra-chip ra-ok">Offer out</span>');
+  if(s.inHome)out.push('<span class="ra-chip ra-ok">In-home done</span>');
+  if(s.ready)out.push('<span class="ra-chip ra-hot">Ready to commit — needs an offer</span>');
+  if(s.worked)out.push('<span class="ra-chip ra-ok">Worked this week</span>');
+  else if(s.cooling)out.push('<span class="ra-chip ra-warn">Cooling — not worked</span>');
+  else if(s.warm)out.push('<span class="ra-chip">Warm — work him this week</span>');
+  return out.join('');
+ }
+ function deskHTML(id){
+  if(!universe?.teams)return'';
+  const r=raRecruit(id),t=selected();if(!r||!t)return'';
+  const w=recruitingActions.weekInfo(t),left=recruitingActions.hoursLeft(t),A=kind=>recruitingActions.availability(r,t,kind);
+  const btn=(kind,label)=>{const a=A(kind);return`<button type="button" data-ra-action="${kind}" data-ra-recruit="${raEsc(r.id)}" ${a.ok?'':`disabled title="${raEsc(a.reason)}"`}>${label} · ${recruitingActions.COSTS[kind]}h</button>`};
+  const opts=recruitingActions.pitchOptions(r,t);
+  const select=`<select data-ra-topic="${raEsc(r.id)}" aria-label="Pitch topic">${opts.map(o=>`<option value="${raEsc(o.topic)}">${raEsc(o.topic)}${o.priority?' (his priority)':''} — ${o.label}</option>`).join('')}</select>`;
+  const rec=recruitingActions.record(r,t,false);
+  const withdraw=rec.offered&&!r.committed?`<button type="button" class="ra-quiet" data-ra-action="withdraw" data-ra-recruit="${raEsc(r.id)}" title="Takes the offer back. He cools toward you.">Withdraw offer</button>`:'';
+  const hist=recruitingActions.status(r,t).history.map(h=>`<span>W${h.week}: ${raEsc(h.kind==='withdraw'?'Offer withdrawn':recruitingActions.LABELS[h.kind]+(h.topic?' · '+h.topic:''))}${h.dI?` · ${h.dI>0?'+':''}${h.dI} interest`:''}</span>`).join('');
+  return`<section class="recruiting-desk" data-recruiting-desk="${raEsc(r.id)}"><div class="ra-head"><div><span class="eyebrow">RECRUITING DESK</span><strong>${left} / ${w.budget} hours left this week</strong></div><div class="ra-chips">${chipsHTML(r,t)}</div></div><div class="ra-actions">${btn('call','Call')}<span class="ra-pitch">${select}${btn('pitch','Pitch')}</span>${btn('offer','Offer')}${btn('visit','Visit')}${btn('inhome','In-Home')}${withdraw}</div>${hist?`<div class="ra-history">${hist}</div>`:''}<small class="muted">Sell what he cares about, and only what you can back up: a weak topic costs you interest. He needs an offer before he can commit to you.</small><div class="ra-desk-staff">${staffControlsHTML(recruitingActions.workload(universe.recruits,t))}</div></section>`;
+ }
+ function announce(res,r){
+  const t=selected();
+  if(!res.ok){setStatus(res.reason);return}
+  const d=[res.dI?`${res.dI>0?'+':''}${res.dI} interest`:'',res.dR?`${res.dR>0?'+':''}${res.dR} relationship`:''].filter(Boolean).join(', ');
+  setStatus(`${res.label||'Offer withdrawn'}: ${r.name}.${d?` ${d}.`:''} ${res.note||''} ${hoursText(recruitingActions.hoursLeft(t))} left this week.`.replace(/\s+/g,' ').trim());
+ }
+ function bindDesk(root=document){
+  root.querySelectorAll?.('[data-ra-action]').forEach(b=>{
+   if(b.dataset.raBound)return;b.dataset.raBound='1';
+   b.onclick=e=>{
+    e.preventDefault();e.stopPropagation();
+    const r=raRecruit(b.dataset.raRecruit),t=selected(),kind=b.dataset.raAction;if(!r||!t)return;
+    const dialog=b.closest?.('#recruitDialog');
+    let res;
+    if(kind==='withdraw'){if(!confirm(`Withdraw the scholarship offer to ${r.name}? He will cool toward your program.`))return;res=recruitingActions.withdrawOffer(r,t)}
+    else if(kind==='visit'){scheduleVisit(r);renderRecruiting();if(dialog){const d=$('#recruitDialog');if(d?.open)d.close();showRecruitProfile(r.id)}return}
+    else{const topic=kind==='pitch'?b.parentElement?.querySelector('select')?.value:undefined;res=recruitingActions.perform(r,t,kind,{topic})}
+    announce(res,r);
+    renderRecruiting();
+    if(dialog&&res.ok){const d=$('#recruitDialog');if(d?.open)d.close();showRecruitProfile(r.id)}
+   };
+  });
+ }
+ // Staff controls: a one-off "work the board now" and the standing hand-over.
+ function staffControlsHTML(work){
+  const auto=recruitingActions.isAuto(universe);
+  return`<div class="ra-staff"><label class="ra-auto" title="Each week, before it plays, the staff spend any recruiting hours you left unused."><input type="checkbox" data-ra-auto ${auto?'checked':''}><span>Staff handle recruiting</span></label><button type="button" data-ra-staff ${work.left&&work.targets?'':'disabled'}>Work the board now</button></div>`;
+ }
+ function navHTML(){
+  // The workspace paints once at page load, before any dynasty exists.
+  if(!universe?.teams)return'';
+  const t=selected();if(!t||!recruitingActions.isActive())return'';
+  const work=recruitingActions.workload(universe.recruits,t),auto=recruitingActions.isAuto(universe);
+  return`<div class="ra-nav"><span class="eyebrow">RECRUITING HOURS</span><strong>${work.left} / ${work.budget} left</strong><small>${work.targets} on the board · ${work.worked} worked · ${auto?'staff cover the rest':`${work.cooling} cooling`} · ${work.ready} ready for an offer · ${work.offersOut}/${work.offerLimit} offers out</small>${staffControlsHTML(work)}${auto?'<small>Each week the staff spend what you leave: calls for everyone, ripe offers, a few pitches. They never book visits or in-homes.</small>':''}</div>`;
+ }
+ globalThis.DynastyRecruitingDesk={html:deskHTML,nav:navHTML,bind:root=>{bindDesk(root);bindStaff(root)}};
+ function stripHTML(t){
+  const w=recruitingActions.weekInfo(t),work=recruitingActions.workload(universe.recruits,t),last=t.recruitingLastWeek;
+  const lastWeek=last&&last.year===universe.year?`<small>Last week: ${last.spent} of ${last.budget} hours spent${last.cooledCount?` · ${last.cooledCount} target${last.cooledCount===1?'':'s'} cooled (${last.cooled.map(id=>raEsc(raRecruit(id)?.name||'')).filter(Boolean).slice(0,4).join(', ')}${last.cooledCount>4?'…':''})`:' · nobody cooled'}.</small>`:'';
+  return`<div class="recruiting-hours-strip"><strong>Recruiting Hours</strong><span>${work.left} / ${w.budget} left this week</span><small>${work.targets} active target${work.targets===1?'':'s'} · ${work.worked} worked this week · ${work.cooling} cooling · ${work.ready} ready for an offer · ${work.offersOut}/${work.offerLimit} offers out</small><small>Call ${recruitingActions.COSTS.call} · Pitch ${recruitingActions.COSTS.pitch} · Offer ${recruitingActions.COSTS.offer} · Visit ${recruitingActions.COSTS.visit} · In-Home ${recruitingActions.COSTS.inhome} hours. Unused hours do not carry over. A target nobody works for two weeks starts to cool.</small>${lastWeek}${staffControlsHTML(work)}</div>`;
+ }
+ function staffWorkBoard(){
+  const out=recruitingActions.staffPlan(universe.recruits,selected());
+  setStatus(out.hours?`Staff worked the board: ${out.calls} call${out.calls===1?'':'s'}, ${out.pitches} pitch${out.pitches===1?'':'es'}, ${out.offers} offer${out.offers===1?'':'s'} (${hoursText(out.hours)}).`:'The staff had nothing to add this week.');
+  renderRecruiting();
+ }
+ function toggleAuto(on){
+  recruitingActions.setAuto(universe,on);
+  setStatus(on?'Staff now handle recruiting. Each week they spend any hours you leave unused; you can still act first.':'Recruiting is back in your hands. Targets nobody works will cool.');
+  renderRecruiting();
+ }
+ function bindStaff(root){
+  root.querySelectorAll?.('[data-ra-staff]').forEach(b=>{if(b.dataset.raBound)return;b.dataset.raBound='1';b.onclick=e=>{e.preventDefault();staffWorkBoard()}});
+  root.querySelectorAll?.('[data-ra-auto]').forEach(b=>{if(b.dataset.raBound)return;b.dataset.raBound='1';b.onchange=()=>toggleAuto(b.checked)});
+ }
+ // The summary card is hidden, so the strip gets its own host under the mode switch. Workspace mode
+ // shows the same numbers in its sidebar, so the strip only appears in Table mode.
+ function renderRecruitingHours(){
+  if(!universe?.teams)return;
+  const t=selected();if(!t||!recruitingActions.isActive()){$('#raStrip')?.remove();return}
+  let host=$('#raStrip');
+  if(!host){
+   const anchor=$('#rwSwitch')||$('#recruiting > .section-head');if(!anchor)return;
+   host=document.createElement('div');host.id='raStrip';anchor.after(host);
+  }
+  host.innerHTML=stripHTML(t);bindStaff(host);
+ }
+ extendRender('recruiting',renderRecruitingHours);
+ const showRecruitProfileBeforeRecruitingActions=showRecruitProfile;
+ showRecruitProfile=function(id){
+  showRecruitProfileBeforeRecruitingActions(id);
+  const body=$('#recruitDialogBody'),r=raRecruit(id);
+  if(r&&body&&!body.querySelector?.('.recruiting-desk')&&!r.committed){body.insertAdjacentHTML?.('afterbegin',deskHTML(id));bindDesk(body)}
+ };
 }
 
 // Read-only presentation adapter for the premium recruiting workspace.
@@ -15435,7 +15928,7 @@ function momentum(intel,x){return intel?.momentum||x?.trend||'Steady'}
 function battleRead(intel,x){const s=intel?.battle;return s?{label:s.label||'No race',rank:s.rank?`#${s.rank}`:'Outside top group',gap:s.gap==null?'—':s.gap===0?'Even':`${s.gap>0?'+':''}${s.gap}`,leader:s.leader||x?.leader||'—'}:{label:'Race developing',rank:'—',gap:'—',leader:x?.leader||'—'}}
 function ensure(){
  const tab=$('#recruiting'),head=tab?.querySelector(':scope > .section-head');if(!tab||!head)return null;
- if(!$('#rwSwitch')){const n=document.createElement('div');n.id='rwSwitch';n.className='recruit-workspace-switcher';n.innerHTML='<div><span class="eyebrow">RECRUITING MODE</span><strong>Scout and act without losing board context.</strong></div><div class="recruit-mode-buttons"><button data-rwm="workspace" class="active">Workspace</button><button data-rwm="table">Table</button><span class="rw-budget" data-rw-budget title="Evaluation hours shared with the rising class"></span></div>';head.after(n);n.querySelectorAll('[data-rwm]').forEach(b=>b.onclick=()=>{mode=b.dataset.rwm;phoneDetail=false;render()})}
+ if(!$('#rwSwitch')){const n=document.createElement('div');n.id='rwSwitch';n.className='recruit-workspace-switcher';n.innerHTML='<div><span class="eyebrow">RECRUITING MODE</span><strong>Scout and act without losing board context.</strong></div><div class="recruit-mode-buttons"><button data-rwm="workspace" class="active">Workspace</button><button data-rwm="table">Table</button><span class="rw-budget" data-rw-budget title="Evaluation hours shared with the rising class"></span><span class="rw-budget" data-rw-rhours title="Recruiting hours: calls, pitches, offers and visits"></span></div>';head.after(n);n.querySelectorAll('[data-rwm]').forEach(b=>b.onclick=()=>{mode=b.dataset.rwm;phoneDetail=false;render()})}
  if(!$('#rwFilters')){const n=document.createElement('details');n.id='rwFilters';n.className='rw-extra-filters';n.innerHTML='<summary>Filters</summary>';tab.querySelector(':scope > .table-wrap').before(n)}
  if(!$('#recruitWorkspace')){const n=document.createElement('section');n.id='recruitWorkspace';n.className='recruit-workspace';tab.querySelector(':scope > .table-wrap').before(n)}
  return $('#recruitWorkspace')
@@ -15453,24 +15946,24 @@ function dossier(x){
  '<div class="rw-verdict"><span>STAFF READ</span><strong>'+esc(staff.label)+'</strong><small>'+esc(staff.detail)+'</small>'+(confidence!=null?'<div class="rw-confidence" role="meter" aria-label="Report confidence" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+confidence+'"><i style="width:'+confidence+'%"></i></div>':'')+(staff.risk?'<small>Biggest uncertainty: '+esc(staff.risk)+'.</small>':'')+'</div>'+
  '<div class="rw-battle"><div><span class="eyebrow">RECRUITING BATTLE</span><strong>'+esc(battle.label)+'</strong></div><div class="rw-battle-grid"><div><span>Your position</span><strong>'+esc(battle.rank)+'</strong></div><div><span>Gap to leader</span><strong>'+esc(battle.gap)+'</strong></div><div><span>Leader</span><strong>'+esc(battle.leader)+'</strong></div><div><span>Momentum</span><strong>'+esc(mom)+'</strong></div></div></div>'+
  '<div class="rw-dossier-grid"><div><span>Priority</span><strong>'+esc(x.priority)+'</strong></div><div><span>Interest</span><strong>'+esc(x.interest)+'</strong></div><div><span>Evaluation stage</span><strong>'+esc(stage)+'</strong></div><div><span>Board status</span><strong>'+(x.commit?'Committed':x.target?'Targeted':'Untracked')+'</strong></div></div>'+
- '<div class="rw-intel-note">Staff estimates. More scouting narrows the uncertainty.</div>'+
+ '<div class="rw-intel-note">Staff estimates. More scouting narrows the uncertainty.</div>'+(x.commit?'':(globalThis.DynastyRecruitingDesk?.html?.(x.id)||''))+
  '<div class="rw-actions"><button data-rwa="open">Open Full Profile</button>'+(q?'<button data-rwa="quick" '+(q.disabled?'disabled':'')+'>'+esc(q.textContent.trim())+'</button>':'')+(f?'<button data-rwa="full" '+(f.disabled?'disabled':'')+'>'+esc(f.textContent.trim())+'</button>':'')+(t?'<button data-rwa="target">'+esc(t.textContent.trim())+'</button>':'')+'</div>'
 }
 function syncCanonicalSelection(all){for(const x of all)x.row.classList.toggle('recruit-selected-row',x.id===sel)}
 function render(){
- const tab=$('#recruiting'),shell=ensure();if(!tab||!shell)return;$$('#rwSwitch [data-rwm]').forEach(b=>b.classList.toggle('active',b.dataset.rwm===mode));const table=tab.querySelector(':scope > .table-wrap'),battle=$('#recruitBattleBoard')?.closest('.card');shell.hidden=mode!=='workspace';table?.classList.toggle('recruit-table-hidden',mode==='workspace');battle?.classList.toggle('recruit-table-hidden',mode==='workspace');tab.classList.toggle('rw-mode',mode==='workspace');const budget=$('[data-rw-budget]'),hours=$('.scouting-budget-strip span')?.textContent.match(/^(\d+)\s*\/\s*(\d+)/),budgetText=hours?`${hours[1]} / ${hours[2]}h left`:'';if(budget.textContent!==budgetText)budget.textContent=budgetText;budget.hidden=!hours;
+ const tab=$('#recruiting'),shell=ensure();if(!tab||!shell)return;$$('#rwSwitch [data-rwm]').forEach(b=>b.classList.toggle('active',b.dataset.rwm===mode));const table=tab.querySelector(':scope > .table-wrap'),battle=$('#recruitBattleBoard')?.closest('.card');shell.hidden=mode!=='workspace';table?.classList.toggle('recruit-table-hidden',mode==='workspace');battle?.classList.toggle('recruit-table-hidden',mode==='workspace');tab.classList.toggle('rw-mode',mode==='workspace');const budget=$('[data-rw-budget]'),hours=$('.scouting-budget-strip span')?.textContent.match(/^(\d+)\s*\/\s*(\d+)/),budgetText=hours?`${hours[1]} / ${hours[2]}h left`:'';if(budget.textContent!==budgetText)budget.textContent=budgetText;budget.hidden=!hours;const rh=$('[data-rw-rhours]'),rhours=$('.recruiting-hours-strip span')?.textContent.match(/^(\d+)\s*\/\s*(\d+)/),rhText=rhours?`${rhours[1]} / ${rhours[2]}h recruiting`:'';if(rh){if(rh.textContent!==rhText)rh.textContent=rhText;rh.hidden=!rhours}
  const strip=$('[data-recruiting-filters]'),extra=$('#rwFilters');extra.hidden=mode!=='workspace';
  if(strip){const count=strip.querySelector('.recruiting-filter-count');if(count)count.hidden=mode==='workspace';if(mode==='workspace'){if(strip.parentElement!==extra){const focus=strip.contains(document.activeElement)?document.activeElement:null;extra.append(strip);focus?.focus({preventScroll:true})}const state=poolFilters()?.getState()||{},active=['pos','state','stage','verdict'].filter(k=>state[k]&&state[k]!=='ALL').length+(state.targetedOnly?1:0),label='Filters'+(active?' · '+active+' active':'');if(extra.firstElementChild.textContent!==label)extra.firstElementChild.textContent=label}else if(table&&strip.nextElementSibling!==table)table.before(strip)}if(mode!=='workspace')return;
  const scroll=phoneDetail?listScroll:($('.rw-card-list')?.scrollTop||0),action=document.activeElement?.dataset.rwa;
  const oldSelection=sel;
  const all=data();if(!boardSeen&&all.length){boardSeen=true;if(filter==='board'&&!all.some(x=>x.target))filter='all'}markChanges(all);const vis=filtered(all);if(!all.some(x=>x.id===sel))sel=(vis[0]||all[0])?.id||'';if(filter!=='all'&&vis.length&&!vis.some(x=>x.id===sel))sel=vis[0].id;const chosen=all.find(x=>x.id===sel),q=poolFilters()?.getState().query||'',keepFocus=document.activeElement?.id==='rwSearch'?document.activeElement.selectionStart:null,meta=$('[data-recruit-pool]')?.dataset||{},poolMatching=+meta.matching||all.length,poolTotal=+meta.total||poolMatching,shownNow=Math.min(shown,vis.length),headMatching=filter==='all'?Math.max(poolMatching,vis.length):vis.length,headline=(shownNow<headMatching?'Showing '+fmt(shownNow)+' of '+fmt(headMatching):fmt(headMatching))+' prospects',hint=filter==='all'&&poolMatching>all.length?'Best '+fmt(all.length)+' of '+fmt(poolTotal)+' in board order. Narrow by position, state or search to reach the rest.':'Selection stays anchored while scouting updates',more=vis.length>shown?'<button type="button" class="rw-more" data-rw-more>Show '+Math.min(PAGE,vis.length-shown)+' more</button>':'';
- shell.innerHTML='<aside class="recruit-workspace-nav"><span class="eyebrow">BOARD</span><strong>Recruiting Desk</strong><input id="rwSearch" type="search" value="'+esc(q)+'" placeholder="Name, school or city" aria-label="Search recruits by name, school or city" maxlength="40"><div class="rw-filter-stack"><button data-rwf="board" class="'+(filter==='board'?'active':'')+'">My Board <b>'+all.filter(x=>x.target).length+'</b></button><button data-rwf="all" class="'+(filter==='all'?'active':'')+'">All Recruits <b>'+fmt(poolMatching)+'</b></button><button data-rwf="commits" class="'+(filter==='commits'?'active':'')+'">Commits <b>'+all.filter(x=>x.commit).length+'</b></button></div></aside><div class="recruit-workspace-list"><div class="rw-list-head"><strong>'+headline+'</strong><small>'+hint+'</small></div><div class="rw-card-list">'+(vis.slice(0,shown).map(card).join('')||'<div class="rw-empty">No prospects here yet. Use All Recruits to browse, or Auto-Target 20 to start a board.</div>')+more+'</div></div><aside class="recruit-workspace-dossier'+(chosen&&changed(chosen)?' rw-dossier-updated':'')+'">'+dossier(chosen)+'</aside>';
+ shell.innerHTML='<aside class="recruit-workspace-nav"><span class="eyebrow">BOARD</span><strong>Recruiting Desk</strong><input id="rwSearch" type="search" value="'+esc(q)+'" placeholder="Name, school or city" aria-label="Search recruits by name, school or city" maxlength="40"><div class="rw-filter-stack"><button data-rwf="board" class="'+(filter==='board'?'active':'')+'">My Board <b>'+all.filter(x=>x.target).length+'</b></button><button data-rwf="all" class="'+(filter==='all'?'active':'')+'">All Recruits <b>'+fmt(poolMatching)+'</b></button><button data-rwf="commits" class="'+(filter==='commits'?'active':'')+'">Commits <b>'+all.filter(x=>x.commit).length+'</b></button></div>'+(globalThis.DynastyRecruitingDesk?.nav?.()||'')+'</aside><div class="recruit-workspace-list"><div class="rw-list-head"><strong>'+headline+'</strong><small>'+hint+'</small></div><div class="rw-card-list">'+(vis.slice(0,shown).map(card).join('')||'<div class="rw-empty">No prospects here yet. Use All Recruits to browse, or Auto-Target 20 to start a board.</div>')+more+'</div></div><aside class="recruit-workspace-dossier'+(chosen&&changed(chosen)?' rw-dossier-updated':'')+'">'+dossier(chosen)+'</aside>';
  const removedDetail=phoneDetail&&(!chosen||sel!==oldSelection);if(removedDetail){phoneDetail=false;returnId=''}
  phoneDetail=phoneDetail&&!!chosen;shell.dataset.phoneView=phoneDetail?'dossier':'list';tab.classList.toggle('rw-phone-dossier',phoneDetail);$('.rw-card-list').scrollTop=scroll;
  const back=shell.querySelector('[data-rw-back]');if(back)back.onclick=()=>{phoneDetail=false;render();$('.rw-card-list').scrollTop=listScroll;const card=$$('.recruit-workspace-card').find(b=>b.dataset.rwid===returnId)||$('.recruit-workspace-card.active');card?.focus({preventScroll:true});window.scrollTo({top:pageScroll,behavior:'instant'})};
  if(phoneDetail&&phone()&&action){const button=shell.querySelector('[data-rwa="'+action+'"]');(button&&!button.disabled?button:back)?.focus({preventScroll:true})}
  if(removedDetail){$('#rwSearch').focus({preventScroll:true});$('#rwSearch').scrollIntoView({block:'center',behavior:'instant'})}
- globalThis.DynastyLabPortraits?.paint?.(shell);syncCanonicalSelection(all);if(keepFocus!==null){const si=$('#rwSearch');si.focus();si.setSelectionRange(keepFocus,keepFocus)}const si=$('#rwSearch');si.oninput=()=>{shown=PAGE;clearTimeout(searchTimer);const query=si.value;searchTimer=setTimeout(()=>poolFilters()?.setState({query}),300)};shell.querySelectorAll('[data-rw-more]').forEach(b=>b.onclick=()=>{shown+=PAGE;render()});shell.querySelectorAll('[data-rwf]').forEach(b=>b.onclick=()=>{filter=b.dataset.rwf;shown=PAGE;if(filter==='board')poolFilters()?.setState({targetedOnly:true});else if(poolFilters()?.getState().targetedOnly)poolFilters().setState({targetedOnly:false});render()});shell.querySelectorAll('[data-rwid]').forEach(b=>b.onclick=()=>{listScroll=$('.rw-card-list').scrollTop;pageScroll=window.scrollY;returnId=b.dataset.rwid;sel=returnId;phoneDetail=phone();render();if(phoneDetail){const back=$('[data-rw-back]');back?.focus({preventScroll:true});back?.scrollIntoView({block:'start',behavior:'instant'})}});shell.querySelectorAll('[data-rwa]').forEach(b=>b.onclick=()=>{const x=data().find(y=>y.id===sel);if(b.dataset.rwa==='open')delegate(x,'[data-recruit]');if(b.dataset.rwa==='quick')delegate(x,'[data-scout-action="quick"]');if(b.dataset.rwa==='full')delegate(x,'[data-scout-action="full"]');if(b.dataset.rwa==='target')delegate(x,'[data-target]')})
+ globalThis.DynastyLabPortraits?.paint?.(shell);globalThis.DynastyRecruitingDesk?.bind?.(shell);syncCanonicalSelection(all);if(keepFocus!==null){const si=$('#rwSearch');si.focus();si.setSelectionRange(keepFocus,keepFocus)}const si=$('#rwSearch');si.oninput=()=>{shown=PAGE;clearTimeout(searchTimer);const query=si.value;searchTimer=setTimeout(()=>poolFilters()?.setState({query}),300)};shell.querySelectorAll('[data-rw-more]').forEach(b=>b.onclick=()=>{shown+=PAGE;render()});shell.querySelectorAll('[data-rwf]').forEach(b=>b.onclick=()=>{filter=b.dataset.rwf;shown=PAGE;if(filter==='board')poolFilters()?.setState({targetedOnly:true});else if(poolFilters()?.getState().targetedOnly)poolFilters().setState({targetedOnly:false});render()});shell.querySelectorAll('[data-rwid]').forEach(b=>b.onclick=()=>{listScroll=$('.rw-card-list').scrollTop;pageScroll=window.scrollY;returnId=b.dataset.rwid;sel=returnId;phoneDetail=phone();render();if(phoneDetail){const back=$('[data-rw-back]');back?.focus({preventScroll:true});back?.scrollIntoView({block:'start',behavior:'instant'})}});shell.querySelectorAll('[data-rwa]').forEach(b=>b.onclick=()=>{const x=data().find(y=>y.id===sel);if(b.dataset.rwa==='open')delegate(x,'[data-recruit]');if(b.dataset.rwa==='quick')delegate(x,'[data-scout-action="quick"]');if(b.dataset.rwa==='full')delegate(x,'[data-scout-action="full"]');if(b.dataset.rwa==='target')delegate(x,'[data-target]')})
 }
 // Device-local view preferences restore the file being read, never a scouting action.
 globalThis.DynastyRecruitingWorkspaceView=Object.freeze({
