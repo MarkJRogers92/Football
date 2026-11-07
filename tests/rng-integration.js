@@ -30,3 +30,22 @@ test('legacy saves receive a stable zero-draw stream before migration work',asyn
  e.universe=structuredClone(save);delete e.universe.rng;e.normalizeUniverse();
  assert.deepEqual(e.syncGameplayRng(),first);
 });
+
+// Soak defect D1: players created after the last normalisation (walk-ons, late signees) reach a
+// save without academic fields. Filling them on load used to draw from the gameplay stream, so a
+// reloaded session diverged from an uninterrupted one. Loading must now be RNG-neutral.
+test('loading a save with players missing academics does not move the gameplay stream',async()=>{
+ const first=await setup(954),save=structuredClone(first.packUniverse(first.universe));
+ let stripped=0;
+ for(const t of save.teams)for(const p of t.roster||[]){
+  if(!p||typeof p!=='object'||Array.isArray(p))continue;
+  delete p.academicStanding;delete p.academicPlan;delete p.academicHold;stripped++;
+ }
+ const expected=Array.from({length:12},()=>first.gameplayRandom());
+ const a=loadEngine({seed:999});a.setUserTeam('Chicago Metropolitan');await a.loadSchools();a.universe=structuredClone(save);a.normalizeUniverse();
+ assert.deepEqual(Array.from({length:12},()=>a.gameplayRandom()),expected,`loading ${stripped} stripped players kept the stream position`);
+ const b=loadEngine({seed:998});b.setUserTeam('Chicago Metropolitan');await b.loadSchools();b.universe=structuredClone(save);b.normalizeUniverse();
+ const standings=e=>e.universe.teams.flatMap(t=>t.roster.map(p=>p.academicStanding));
+ assert.deepEqual(standings(a),standings(b),'the filled standings are the same on every load');
+ assert.ok(standings(a).every(v=>Number.isInteger(v)&&v>=5&&v<=99),'and stay bounded');
+});

@@ -169,6 +169,70 @@ test('a missing occupied save cannot be mistaken for an empty replacement slot',
   assert.equal(damaged.label, 'Dynasty 1');
 });
 
+// Soak defect D2: every new game-archive generation (the season compaction rewrite) used to stay
+// on disk after the save stopped referencing it. Generations a retained backup still needs stay.
+test('replaced archive generations are pruned once no committed save or backup references them', async () => {
+  const gameDirs = () => fs.readdir(path.join(root, 'Dynasty 1', 'games'));
+  const first = await store.save({slot: 'main', snapshot: snapshot(2028), options: {
+    additions: rows('career', 2), gameAdditions: rows('season-2028', 3),
+  }});
+  let prior = first;
+  const generations = [first.gameRef.id];
+  // Seven compaction-style saves: each starts a new game generation (no gameRef passed).
+  for (let year = 2029; year < 2036; year++) {
+    prior = await store.save({slot: 'main', snapshot: snapshot(year), options: {
+      expectedRevision: prior.revision, archiveRef: prior.archiveRef,
+      gameAdditions: rows(`season-${year}`, 3),
+    }});
+    generations.push(prior.gameRef.id);
+  }
+  const kept = await gameDirs();
+  // The committed generation plus the five generations the rolling backups point at.
+  assert.deepEqual(new Set(kept), new Set(generations.slice(-6)));
+  assert.ok(!kept.includes(first.gameRef.id), 'the oldest generation is gone');
+  assert.deepEqual((await fs.readdir(path.join(root, 'Dynasty 1', 'history'))), [first.archiveRef.id],
+    'the append-only career archive keeps its single generation');
+  assert.deepEqual((await store.readGames({slot: 'main', ref: prior.gameRef})).map(row => row.id),
+    ['season-2035-0', 'season-2035-1', 'season-2035-2']);
+  // Recovery still works: corrupt the current save, and the newest backup's generation is intact.
+  await fs.writeFile(path.join(root, 'Dynasty 1', 'dynasty.json'), '{not-json', 'utf8');
+  const recovered = await store.load({slot: 'main'});
+  assert.equal(recovered.universe.year, 2034);
+  assert.deepEqual((await store.readGames({slot: 'main', ref: recovered.gameRef})).map(row => row.id),
+    ['season-2034-0', 'season-2034-1', 'season-2034-2']);
+});
+
+test('backups written before refs were named still protect their generations', async () => {
+  const first = await store.save({slot: 'main', snapshot: snapshot(2028), options: {gameAdditions: rows('old', 2)}});
+  const second = await store.save({slot: 'main', snapshot: snapshot(2029), options: {
+    expectedRevision: first.revision, archiveRef: first.archiveRef, gameAdditions: rows('new', 2),
+  }});
+  // Rename the backup to the legacy pattern and leave a true orphan from an abandoned attempt.
+  const backups = path.join(root, 'Dynasty 1', 'backups');
+  const [named] = await fs.readdir(backups);
+  await fs.rename(path.join(backups, named), path.join(backups, named.replace(/\.g-.*$/, '.json')));
+  await fs.mkdir(path.join(root, 'Dynasty 1', 'games', 'abandoned'), {recursive: true});
+  await fs.writeFile(path.join(root, 'Dynasty 1', 'games', 'abandoned', '00000000.json'), '[]');
+  await store.save({slot: 'main', snapshot: snapshot(2030), options: {
+    expectedRevision: second.revision, archiveRef: second.archiveRef, gameRef: second.gameRef,
+  }});
+  const kept = new Set(await fs.readdir(path.join(root, 'Dynasty 1', 'games')));
+  assert.ok(kept.has(first.gameRef.id), 'the legacy backup generation is retained');
+  assert.ok(kept.has(second.gameRef.id), 'the committed generation is retained');
+  assert.ok(!kept.has('abandoned'), 'the unreferenced orphan is removed');
+});
+
+// Soak defect D3: an oversized save is valid JSON; the message must say what is actually wrong.
+test('an oversized save is reported as too large, not as invalid JSON', async () => {
+  const big = snapshot();
+  big.universe.padding = 'x'.repeat(256 * 1024 * 1024 + 16);
+  await assert.rejects(() => store.save({slot: 'main', snapshot: big}), error => {
+    assert.match(error.message, /256 MB desktop save limit/);
+    assert.doesNotMatch(error.message, /not valid JSON/);
+    return true;
+  });
+});
+
 test('invalid slots, labels, refs, and renderer paths are rejected', async () => {
   await assert.rejects(() => store.load({slot: '../Dynasty 1'}), /Invalid save slot/);
   await assert.rejects(() => store.load({slot: 'main/../../elsewhere'}), /Invalid save slot/);

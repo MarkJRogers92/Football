@@ -26,7 +26,9 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
  await page.click('[data-recruit-filter-reset]');await page.waitForFunction(()=>document.querySelector('[data-recruit-filter="pos"]')?.value==='ALL');
  await page.fill('[data-recruit-filter="query"]',hidden);await page.press('[data-recruit-filter="query"]','Enter');
  try{
-  await page.waitForFunction(n=>{const a=[...document.querySelectorAll('#recruitBody tr [data-recruit]')];return a.length>=1&&a.length<=5&&a.some(x=>x.textContent.trim()===n)},hidden);
+  // Names repeat in a 2,800-player pool (about 6% of fresh dynasties have a name six or more
+  // times), so assert that the table shows exactly the pool's matches rather than a fixed cap.
+  await page.waitForFunction(n=>{const a=[...document.querySelectorAll('#recruitBody tr [data-recruit]')],m=Number(document.querySelector('[data-recruit-pool]')?.getAttribute('data-matching'));return a.length>=1&&a.length===Math.min(m,220)&&m<200&&a.some(x=>x.textContent.trim()===n)},hidden);
  }catch(error){
   console.error('Full-pool search diagnostic',JSON.stringify({hidden,errors,state:await page.evaluate(()=>({filters:window.DynastyLabRecruitingFilters?.getState(),query:document.querySelector('[data-recruit-filter="query"]')?.value,pool:document.querySelector('[data-recruit-pool]')?.dataset,names:[...document.querySelectorAll('#recruitBody tr [data-recruit]')].map(a=>a.textContent.trim())}))}));
   throw error;
@@ -45,7 +47,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
  await page.click('[data-rw-more]');await page.waitForFunction(c=>document.querySelectorAll('.rw-card-list [data-rwid]').length>c,cards);
  // Search the full pool through Workspace, including a prospect outside the table cap.
  await page.fill('#rwSearch',hidden);
- await page.waitForFunction(n=>{const cards=[...document.querySelectorAll('.recruit-workspace-card')];return cards.length>0&&cards.length<=5&&cards.some(c=>c.querySelector('.rw-main strong')?.textContent===n)&&document.querySelector('.rw-list-head strong')?.textContent===`${cards.length} prospects`},hidden);
+ await page.waitForFunction(n=>{const cards=[...document.querySelectorAll('.recruit-workspace-card')];return cards.length>0&&cards.length<=30&&cards.some(c=>c.querySelector('.rw-main strong')?.textContent===n)&&document.querySelector('.rw-list-head strong')?.textContent===`${cards.length} prospects`},hidden);
  const queryMatches=await page.locator('.recruit-workspace-card').count();
  await page.click('#rwSwitch [data-rwm="table"]');
  if(!await page.locator('.recruiting-filter-count').isVisible())throw new Error('Table must restore its own visible row count');

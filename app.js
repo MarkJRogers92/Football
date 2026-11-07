@@ -2157,16 +2157,20 @@ function signingDayHubItems(){
 // 90-academics school was mechanically identical to one at a 55. Standing now drifts toward what
 // the program and the player can sustain, and falling far enough costs you the player.
 const ACADEMIC_FLOOR=30,ACADEMIC_WATCH=48;
-function academicTarget(p,t){
+function academicTarget(p,t,wear=p?.wear||0){
  // The program sets the support, the player's head does the rest, and a heavy season drags on both.
- return clamp(Math.round((((t?.academics??60)-50)*.5)+(((p.iq??60)-50)*.6)+55-((p.wear||0)*.08)),5,99);
+ return clamp(Math.round((((t?.academics??60)-50)*.5)+(((p.iq??60)-50)*.6)+55-(wear*.08)),5,99);
 }
 function ensureAcademics(p,t){
  if(!p)return;
- p.academicStanding??=clamp(Math.round(academicTarget(p,t)+gi(-9,9)),5,99);
+ // Deterministic on purpose: this lazy default also runs when a save is loaded, and drawing from the
+ // gameplay RNG there made a reloaded session diverge from an uninterrupted one (soak defect D1).
+ // The spread (-9..9) and the wear-free starting target match a freshly created player.
+ p.academicStanding??=clamp(academicTarget(p,t,0)+academicSeedOffset(p),5,99);
  p.academicPlan??=null;
  p.academicHold??=0;
 }
+function academicSeedOffset(p){return ((hashString(`academic:${p?.id??p?.name??''}`)>>>0)%19)-9}
 function academicRisk(p){return (p.academicStanding??70)<ACADEMIC_WATCH}
 function academicallyIneligible(p){return (p.academicHold||0)>0}
 function academicStatusText(p){
