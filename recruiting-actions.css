@@ -52,3 +52,13 @@
 .ra-rival-row{display:grid;gap:1px;text-align:left;font-size:.78rem;padding:6px 8px;border-color:var(--warn)}
 .ra-rival-row small{color:var(--muted)}
 .ra-rival-badge{color:var(--warn);font-size:.68rem}
+/* The dossier is a narrow column pinned to the right edge on desktop, so nothing here may be wider than it.
+   Content shrinks and wraps instead of pushing the page sideways, whatever font the browser falls back to. */
+.recruiting-desk,.ra-nav,.ra-nav-rivals,.ra-staff{min-width:0;max-width:100%}
+.recruiting-desk{overflow:hidden}
+.recruiting-desk *,.ra-nav *{min-width:0;overflow-wrap:anywhere}
+.ra-chip,.ra-actions button,.ra-nav button,.ra-rival-row{white-space:normal}
+.ra-motives{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
+.ra-pitch{flex-wrap:wrap;max-width:100%}
+.ra-pitch select{max-width:100%}
+.ra-rival-badge{display:block;overflow-wrap:anywhere}

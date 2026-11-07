@@ -103,6 +103,19 @@ const hoursLeft=async page=>{await page.waitForFunction(()=>/^\d+\s*\/\s*\d+/.te
   }
   await page.click('#rwSwitch [data-rwm="workspace"]');
   if(label==='iphone'){const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);check(`[${label}] the desk adds no horizontal overflow`,overflow<=1,`${overflow}px`)}
+  // The desk sits in a narrow column; it must wrap instead of widening the page, whatever font the browser
+  // falls back to (CI's Chrome has wider text than a dev machine). Stress it with the longest content.
+  await page.evaluate(i=>{const D=window.DynastyRecruitingDesk,A=window.DynastyRecruitingActions,r=D.recruit(i),t=D.team();
+   for(const [team,kind] of [['Southwestern Metropolitan State Commonwealth','visit'],['Northeastern Metropolitan Technical University','inhome']])A.addRivalEvent(r,t,team,kind)},id);
+  await page.addStyleTag({content:'body,button,select,input{letter-spacing:.12em!important}'});
+  // Back in Workspace mode the phone shows the list; open the prospect to see his desk again.
+  await page.waitForSelector('.recruit-workspace-card.active');
+  if(label==='iphone')await page.locator('.recruit-workspace-card.active').click();
+  await page.waitForSelector('.recruit-workspace-dossier [data-ra-action="call"]',{state:'visible'});
+  await page.locator('.recruit-workspace-dossier [data-ra-action="call"]').click();
+  await page.waitForSelector('.recruit-workspace-dossier .ra-rivals');
+  const stress=await page.evaluate(()=>({sw:document.documentElement.scrollWidth,iw:innerWidth}));
+  check(`[${label}] wide text and long rival names do not push the page sideways`,stress.sw<=stress.iw+1,`${stress.sw}px of ${stress.iw}px`);
   check(`[${label}] no console errors`,errors.length===0,errors.slice(0,2).join(' | '));await page.close();
  }
  await browser.close();console.log(out.join('\n'));console.log(`\n${pass} passed, ${fail} failed`);process.exit(fail?1:0);
