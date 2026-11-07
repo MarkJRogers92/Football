@@ -13,6 +13,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page,{beginSeason:false});
  try{
   await page.goto('file://'+path.join(__dirname,'..','index.html'));
   await startNewDynasty(page);
+  await page.click('#weeklyDeskDetails > summary');
 
   assert.match(await page.locator('#coachingAgenda').innerText(),/COACHING AGENDA/i);
   assert.match(await page.locator('#advanceForecast').innerText(),/Week 1 becomes available/i);

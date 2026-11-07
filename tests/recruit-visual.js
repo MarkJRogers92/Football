@@ -16,14 +16,16 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
  for(const [label,viewport] of [['desktop',{width:1280,height:900}],['iphone',{width:390,height:844}]]){
   const page=await browser.newPage({viewport}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
   await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);
-  await goTab(page, 'recruiting');await useTableView(page);await page.waitForSelector('#recruitBody tr');await page.waitForSelector('#signingClassFeature .signing-class-board');
+  await goTab(page, 'recruiting');await useTableView(page);await page.waitForSelector('#recruitBody tr');await page.click('[data-recruit-class="summary"]');await page.waitForSelector('#signingClassFeature .signing-class-board');
   check(`[${label}] signing-class board renders`,/SIGNING CLASS/.test(await page.locator('#signingClassFeature').innerText()));
   check(`[${label}] signing-class meter renders`,await page.locator('#signingClassFeature .signing-meter').count()===1);
+  await page.click('[data-recruit-class="current"]');
   check(`[${label}] recruiting list has portrait canvases`,await page.locator('#recruitBody canvas[data-portrait-kind="recruit"]').count()>0);
   const firstPortrait=page.locator('#recruitBody canvas[data-portrait-kind="recruit"]').first();await firstPortrait.scrollIntoViewIfNeeded();await page.waitForFunction(()=>document.querySelector('#recruitBody canvas[data-portrait-kind="recruit"]')?.dataset.portraitPainted==='1',{timeout:10000});
   check(`[${label}] visible recruit portrait paints`,await firstPortrait.getAttribute('data-portrait-painted')==='1');
   // Presentation is DOM-driven. Mark one rendered row committed to verify the card path without altering game state.
   await page.evaluate(()=>{const row=document.querySelector('#recruitBody tr');const interest=row?.querySelector('[data-label="Interest"]');if(interest)interest.textContent='COMMITTED'});
+  await page.click('[data-recruit-class="summary"]');
   await page.waitForSelector('#signingClassFeature .signing-card');
   check(`[${label}] committed recruit becomes signing card`,await page.locator('#signingClassFeature .signing-card').count()>=1);
   await page.waitForFunction(()=>document.querySelector('#signingClassFeature .signing-card canvas[data-portrait-kind="recruit"]')?.dataset.portraitPainted==='1',{timeout:10000});

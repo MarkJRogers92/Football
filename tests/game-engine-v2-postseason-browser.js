@@ -5,6 +5,7 @@ const {chromiumPath}=require('./helpers/chromium-path');
 const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
 const startNewDynasty=async page=>{await page.goto('file://'+path.join(__dirname,'..','index.html'));return sharedStartNewDynasty(page)};
 async function reachPostseason(page){
+  if(!await page.locator('#simSeason').isVisible())await page.click('#programDetails > summary');
   await page.click('#simSeason');await page.waitForFunction(()=>window.DynastyGameEngineV2LabBridge.cutoverDebug().phase==='confReady',{timeout:60000});
 }
 function checkDurable(row,label){

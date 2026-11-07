@@ -27,10 +27,10 @@ function gameCastModel(g){
    const text=m[12],lead=score.home-score.away;
    plays.push({drive:di,label:d.label,q,quarter:q<=4?`Q${q}`:`OT${q-4}`,clock:`${m[4]}:${m[5]}`,elapsed,x,offense:side,down:Number(m[6]),distance:Number(m[7]),text,
     home:score.home,away:score.away,wp:gameCastWinProbability(lead,side,100-fromOwn,secondsLeft)});
-   const pts=/TOUCHDOWN/.test(text)?6:/extra point good/.test(text)?1:/field goal good/.test(text)?3:0;
+   const pts=/TOUCHDOWN/.test(text)?6:/extra point good/.test(text)?1:/field goal good/.test(text)?3:/two-point try good/.test(text)||/^SAFETY for /.test(text)?2:0;
    if(pts){score[side]+=pts;scored+=pts;plays.at(-1).scoring=pts}
   }
-  // Reconcile anything the text doesn't spell out (two-point tries, adjustments) at the drive's end.
+  // Reconcile any archived points whose play text is unavailable at the drive's end.
   const rest=(Number(d.points)||0)-scored;if(rest)score[side]+=rest;
  }
  if(!plays.length)return null;
@@ -48,7 +48,7 @@ function gameCastHTML(g){
  const swingTeam=m.swing&&(m.swing.delta>0?m.home:m.away);
  const facts=[`<li><strong>${gameEscape(W)}</strong> won ${m.final[m.winner]}–${m.final[m.winner==='home'?'away':'home']}${m.winnerLow<.25?`, rallying from as low as ${gameCastPct(m.winnerLow)} to win`:''}.</li>`];
  if(s)facts.push(`<li>Biggest swing: <strong>${gameEscape(swingTeam)} +${gameCastPct(Math.abs(m.swing.delta))}</strong> · ${gameEscape(s.quarter)} ${gameEscape(s.clock)} · ${gameEscape(s.text)}</li>`);
- const scoring=m.plays.filter(p=>p.scoring).map(p=>`<tr><td>${gameEscape(p.quarter)} ${gameEscape(p.clock)}</td><td>${gameEscape(m[p.offense])}</td><td>${gameEscape(p.text)}</td><td>${p.home+(p.offense==='home'?p.scoring:0)}–${p.away+(p.offense==='away'?p.scoring:0)}</td><td>${gameCastPct(p.wp)}</td></tr>`).join('');
+ const scoring=m.plays.filter(p=>p.scoring).map(p=>`<tr><td>${gameEscape(p.quarter)} ${gameEscape(p.clock)}</td><td>${gameEscape(m[p.offense])}</td><td>${gameEscape(p.text)}</td><td>${p.away+(p.offense==='away'?p.scoring:0)}–${p.home+(p.offense==='home'?p.scoring:0)}</td><td>${gameCastPct(p.wp)}</td></tr>`).join('');
  return `<section class="game-cast" data-game-cast="${gameEscape(g.id)}">
  <div class="gc-head"><div><div class="eyebrow">GAME CAST</div><h3>Win probability</h3></div><ul class="gc-facts">${facts.join('')}</ul></div>
  ${gameCastPlayLog(g)?`<div class="gc-watch-cta"><button type="button" class="game-link game-link--primary" data-game="${gameEscape(g.id)}" data-game-tab="Watch">▶ Watch the 3D replay</button><span class="small muted">Every snap on an angled field, with players.</span></div>`:''}

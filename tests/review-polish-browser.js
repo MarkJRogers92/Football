@@ -36,6 +36,7 @@ const tab = (page, id) => page.evaluate(t => document.querySelector(`.tabs butto
         if (gated) break;
         await tab(page, 'dashboard');
         const before = await page.evaluate(() => document.querySelector('#weekLine')?.textContent);
+        if(!await page.locator('#simWeek').isVisible())await page.click('#programDetails > summary');
         await page.click('#simWeek');
         await page.waitForFunction(w => document.querySelector('#weekLine')?.textContent !== w, before, { timeout: 60000 });
       }

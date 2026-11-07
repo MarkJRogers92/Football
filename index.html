@@ -734,6 +734,58 @@ tbody tr:hover{background:rgba(115,168,255,.04)}
 .rw-list-head strong{white-space:nowrap}
 .rw-list-head small{flex:1 1 180px;text-align:right}
 
+/* Compact preparation controls and a dedicated prospect view on phones. */
+#recruiting.active>#rwFilters{order:2}
+.rw-extra-filters{margin:0 0 10px;border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.rw-extra-filters>summary{cursor:pointer;font-size:12px;font-weight:750;color:var(--muted);padding:4px 0}
+.rw-extra-filters[hidden]{display:none!important}
+.rw-extra-filters .recruiting-filter-strip{margin:8px 0 0;border:0;padding:4px 0;background:none}
+.rw-back{display:none;scroll-margin-top:160px}
+@media(max-width:700px){
+ #recruiting.rw-mode>.section-head .muted{display:none}
+ #recruiting.rw-mode>.section-head{margin-bottom:8px;gap:8px}
+ .recruit-workspace-switcher{padding:7px;margin-bottom:8px}
+ .recruit-workspace-switcher>div:first-child{display:none}
+ .recruit-workspace-nav{padding:9px;gap:8px}
+ .recruit-workspace-nav>.eyebrow,.recruit-workspace-nav>strong{display:none}
+ .rw-filter-stack{gap:5px}
+ .rw-filter-stack button{padding:6px 5px;font-size:11px}
+ .rw-filter-stack button b{font-size:10px}
+ .rw-list-head{padding:10px}
+ .recruit-workspace[data-phone-view="list"]>.recruit-workspace-dossier{display:none}
+ .recruit-workspace[data-phone-view="dossier"]>.recruit-workspace-nav,.recruit-workspace[data-phone-view="dossier"]>.recruit-workspace-list{display:none}
+ #recruiting.rw-phone-dossier>#rwFilters{display:none}
+ .rw-back{display:block;justify-self:start;min-height:42px}
+}
+.recruit-workspace-nav input[type="search"]{min-width:0;width:100%;min-height:40px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel2);color:var(--text);font:inherit;font-size:13px}
+.recruit-workspace-nav input[type="search"]:focus-visible,.rw-extra-filters>summary:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
+
+.recruit-class-views{display:flex;gap:6px;margin:0 0 8px;min-width:0;max-width:100%;overflow-x:auto;scrollbar-width:thin}
+.recruit-class-views button{flex:0 0 auto;min-height:38px;padding:7px 10px;font-size:12px;white-space:nowrap}
+#recruitClassViews button[aria-pressed="true"]{background:var(--accent2);color:#09121c}
+#recruiting.active>#recruitClassViews{order:1}
+#recruiting.active>#recruitingNeeds{order:2}
+#recruiting[data-recruit-class-view="current"]>[data-recruit-class-panel]:not([data-recruit-class-panel="current"]),
+#recruiting[data-recruit-class-view="rising"]>[data-recruit-class-panel]:not([data-recruit-class-panel="rising"]),
+#recruiting[data-recruit-class-view="outlook"]>[data-recruit-class-panel]:not([data-recruit-class-panel="outlook"]),
+#recruiting[data-recruit-class-view="map"]>[data-recruit-class-panel]:not([data-recruit-class-panel="map"]),
+#recruiting[data-recruit-class-view="shortlist"]>[data-recruit-class-panel]:not([data-recruit-class-panel="shortlist"]),
+#recruiting[data-recruit-class-view="summary"]>[data-recruit-class-panel]:not([data-recruit-class-panel="summary"]),
+#recruiting[data-recruit-class-view="history"]>[data-recruit-class-panel]:not([data-recruit-class-panel="history"]){display:none!important}
+#recruiting[data-recruit-class-view]:not([data-recruit-class-view="current"]) #autoTarget{display:none}
+#recruitingNeedsRows{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px}
+.roster-outlook-position{border:1px solid var(--line);border-radius:10px;padding:12px;min-width:0}
+.roster-outlook-title{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.roster-outlook-title h4{margin:0}.roster-outlook-title>strong{font-size:12px;color:var(--muted)}
+.roster-outlook-position dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0}
+.roster-outlook-position dt{font-size:10px;color:var(--muted)}.roster-outlook-position dd{margin:3px 0 0;font-size:16px;font-weight:750}
+.roster-outlook-actions{display:flex;gap:6px;flex-wrap:wrap}.roster-outlook-actions button{font-size:11px;flex:1}
+
+#recruitingNeeds .roster-outlook-note{font-size:12px;font-weight:400;line-height:1.5;letter-spacing:normal;text-transform:none;color:var(--muted)}
+
+.rw-budget{align-self:center;flex-shrink:0;font-size:11px;color:var(--accent2);font-weight:700;white-space:nowrap}
+@media(max-width:700px){.recruit-mode-buttons button{min-width:0}.recruit-class-views button{font-size:11px}.rw-budget{font-size:10px}}
+
 .scouting-budget-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding:9px 11px;border:1px solid rgba(255,255,255,.12);border-radius:8px}.scouting-budget-strip strong{letter-spacing:.04em;text-transform:uppercase;font-size:.78rem}.scouting-budget-strip span{font-weight:700}.scouting-budget-strip small{opacity:.7}.scouting-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.scouting-actions button{font-size:.72rem;padding:4px 7px;white-space:nowrap}.scouting-actions button:disabled{opacity:.45}.scouting-profile-actions{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px;margin-bottom:12px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.scouting-profile-actions>div:first-child{display:grid;gap:2px}.scouting-profile-actions>div:first-child span{font-size:.82rem;opacity:.72}.staff-verdict-compact{display:grid;gap:1px;margin-top:6px}.staff-verdict-compact strong{font-size:.78rem}.staff-verdict-compact span{font-size:.68rem;opacity:.7}.staff-verdict-card{margin:0 0 12px;padding:12px;border:1px solid rgba(255,255,255,.14);border-radius:10px}.staff-verdict-card p{margin:.65rem 0}.staff-verdict-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.staff-verdict-head>div{display:grid;gap:3px}.staff-verdict-head>div>strong{font-size:1.05rem}.staff-verdict-head>b{font-size:1.5rem;line-height:1}@media(max-width:760px){.scouting-profile-actions{align-items:flex-start}.scouting-actions{width:100%}.scouting-actions button{flex:1 1 130px}}
 @media(max-width:700px){#recruiting td[data-label="Scout"]{grid-column:1/-1;white-space:normal;flex-wrap:wrap;align-items:flex-start}#recruiting td[data-label="Scout"]::before{width:100%}#recruiting td[data-label="Scout"] .staff-verdict-compact{min-width:0}#recruiting td[data-label="Scout"] .staff-verdict-compact span{white-space:normal}}
 
@@ -1740,6 +1792,46 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
 .milestone.is-done{border-color:#7a6a2c;background:linear-gradient(180deg,rgba(232,191,74,.14),rgba(232,191,74,.04))}.milestone.is-done strong::before{content:"★ ";color:#e8bf4a}.milestone.is-done em{color:#e8bf4a}
 .milestone-bar{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:4px}.milestone-bar i{display:block;height:100%;background:#6fa3d8}
 
+/* Weekly desk: program identity and one authoritative action before supporting detail. */
+#dashboard .program-masthead{grid-template-areas:"identity status" "details details";gap:12px 20px;padding:16px 20px;margin-bottom:12px}
+#dashboard .masthead-mark{width:48px;height:48px}
+#dashboard #teamName{font-size:27px}
+#dashboard .masthead-status .big{font-size:34px}
+#dashboard .program-details{grid-area:details;margin:0}
+.desk-details{border-top:1px solid var(--line);padding-top:9px}
+.desk-details>summary{cursor:pointer;color:var(--muted);font-size:12px;font-weight:700;padding:5px 0;min-height:30px}
+.desk-details>summary:hover{color:var(--text)}
+.desk-details>summary:focus-visible{outline:2px solid var(--accent2);outline-offset:3px;border-radius:3px}
+.program-details[open] .metric-grid{margin:10px 0}
+.program-details .masthead-actions{justify-content:flex-start;margin-top:10px}
+#dashboard .command-center>.section-head{margin-bottom:12px;align-items:center}
+.weekly-desk-focus{border-left:3px solid var(--good);padding:4px 14px 6px;margin-bottom:16px}
+.weekly-desk-focus[data-status="blocked"]{border-color:var(--warn)}
+.weekly-desk-status{color:var(--good);font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:800}
+.weekly-desk-focus[data-status="blocked"] .weekly-desk-status{color:var(--warn)}
+.weekly-desk-focus h3{font-size:21px;line-height:1.18;margin:5px 0 6px;overflow-wrap:anywhere}
+.weekly-desk-focus p{font-size:12px;color:var(--muted);line-height:1.5;margin:0;max-width:80ch}
+.weekly-desk-details>.command-grid{margin-top:12px}
+#dashboard .command-center>#weeklyDecisions:empty{display:none}
+#dashboard .command-center>#weeklyDecisions{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px}
+@media(max-width:700px){
+ #dashboard .program-masthead{grid-template-columns:minmax(0,1fr);grid-template-areas:"identity" "status" "details";padding:12px;gap:8px}
+ #dashboard .masthead-identity{gap:10px}
+ #dashboard #teamName{font-size:22px;line-height:1.1}
+ #dashboard #teamMeta{font-size:10px;line-height:1.4}
+ #dashboard .masthead-status{display:flex;flex-wrap:wrap;gap:5px 10px;align-items:baseline;text-align:left;min-width:0;padding:0;border:0}
+ #dashboard .masthead-status>.eyebrow{display:none}
+ #dashboard .masthead-status .big{font-size:24px;margin:0}
+ #dashboard #rankLine,#dashboard #weekLine{font-size:10px;margin:0}
+ #dashboard .program-details>summary{font-size:11px;padding:3px 0;min-height:24px}
+ #dashboard .command-center{padding:14px}
+ #dashboard .command-center>.section-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+ #dashboard .command-center>.section-head h2{font-size:19px;margin:3px 0}
+ #dashboard #hubAdvance{width:100%;min-height:42px}
+ .weekly-desk-focus{padding-left:10px;margin-bottom:12px}
+ .weekly-desk-focus h3{font-size:19px}
+}
+
 /* Dynasty Lab Premium Client Shell — Milestone A
    Presentation/navigation layer only. Existing tab buttons and game actions remain canonical. */
 
@@ -2264,28 +2356,36 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
           <div id="rankLine" class="muted">Preseason</div>
           <div id="weekLine" class="muted">2027 · Week 0</div>
         </div>
-        <div class="metric-grid" id="teamMetrics"></div>
-        <div class="masthead-actions button-row">
-          <button id="simWeek">Sim Week</button>
-          <button id="simSeason">Sim Regular Season</button>
-        </div>
-        <p id="weekGateNote" class="gate-note" role="status" hidden></p>
+        <details id="programDetails" class="desk-details program-details">
+          <summary>Program ratings &amp; simulation options</summary>
+          <div class="metric-grid" id="teamMetrics"></div>
+          <div class="masthead-actions button-row">
+            <button id="simWeek">Sim Week</button>
+            <button id="simSeason">Sim Regular Season</button>
+          </div>
+          <p id="weekGateNote" class="gate-note" role="status" hidden></p>
+        </details>
       </div>
       <div class="card command-center">
         <div class="section-head"><div><div class="eyebrow">WEEKLY COMMAND CENTER</div><h2 id="hubTitle">Preseason Briefing</h2></div><button id="hubAdvance">Advance Week</button></div>
-        <div class="command-grid">
-          <div class="plan-card">
-            <section id="guidanceReturnSummary" class="guidance-return-summary" aria-label="Welcome back"></section>
-            <section id="coachingAgenda" class="coaching-agenda" aria-label="Coaching agenda"></section>
-            <div id="weeklyDecisions"></div>
-            <section id="currentPlan" class="current-plan" aria-label="Current plan"></section>
+        <section id="weeklyDeskFocus" class="weekly-desk-focus" aria-label="Next coaching action"></section>
+        <section id="guidanceReturnSummary" class="guidance-return-summary" aria-label="Welcome back"></section>
+        <div id="weeklyDecisions"></div>
+        <details id="weeklyDeskDetails" class="desk-details weekly-desk-details">
+          <summary>Briefing, optional prep &amp; coaching agenda</summary>
+          <div class="command-grid">
+            <div class="plan-card">
+              <section id="coachingAgenda" class="coaching-agenda" aria-label="Coaching agenda"></section>
+              <div id="optionalWeeklyDecisions"></div>
+              <section id="currentPlan" class="current-plan" aria-label="Current plan"></section>
+            </div>
+            <div class="hub-wire">
+              <section id="advanceForecast" class="advance-forecast" aria-label="Advance forecast"></section>
+              <div class="hub-wire-head"><span class="eyebrow">THE WIRE</span></div>
+              <div id="weeklyHub" class="hub-grid"></div>
+            </div>
           </div>
-          <div class="hub-wire">
-            <section id="advanceForecast" class="advance-forecast" aria-label="Advance forecast"></section>
-            <div class="hub-wire-head"><span class="eyebrow">THE WIRE</span></div>
-            <div id="weeklyHub" class="hub-grid"></div>
-          </div>
-        </div>
+        </details>
       </div>
       <div class="card"><div class="section-head"><div><div class="eyebrow">ADMINISTRATION</div><h3>Season Goals</h3></div></div><div id="seasonGoalsDashboard"></div></div>
       <div class="two-col">
@@ -2394,6 +2494,7 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
       </div>
       <div id="signingDay"></div>
       <div class="card card--compact" id="classSummary"></div>
+      <section class="card" id="recruitingHistory"><h3>Recruiting history</h3><p class="muted">No signing-day scouting records yet. Signed classes will appear here as evidence is recorded.</p></section>
       <div class="card"><h3>Active Recruiting Battles</h3><div id="recruitBattleBoard"></div></div>
       <div class="table-wrap"><table><thead><tr>
         <th class="sortable" data-sort="name">Recruit</th><th class="sortable" data-sort="pos">Pos</th><th class="sortable" data-sort="rank">Rank</th><th class="sortable" data-sort="stars">Stars</th><th class="sortable" data-sort="home">Hometown / HS</th><th class="sortable" data-sort="miles">Miles</th><th class="sortable" data-sort="priority">Priority</th><th class="sortable" data-sort="scout">Scout</th><th class="sortable" data-sort="interest">Interest</th><th class="sortable" data-sort="trend">Trend</th><th class="sortable" data-sort="leader">Leader</th><th>Visit</th><th>Promise</th><th></th>
@@ -5953,7 +6054,27 @@ function recruitDistance(t,r){let byTeam=distCache.get(r);if(!byTeam){byTeam=new
 function distancePitch(t,r){let d=recruitDistance(t,r),importance=r.distanceImportance??50,tol=r.distanceTolerance??500;if(importance<20)return 0;if(d<=75)return importance*.11;if(d<=tol)return importance*.04*(1-d/Math.max(100,tol));return -Math.min(18,(d-tol)/150)*(importance/100)}
 function recruitSchemeFit(t,r){const def=OFF_POS.has(r.pos)?OFF_SCHEMES[t.offScheme]:DEF_SCHEMES[t.defScheme];return schemeFitFor(r,def)}
 function recruitSchemePriority(t,r){return clamp((recruitSchemeFit(t,r)-60)*.3,-8,12)}
-function recruitPitchBreakdown(t,r){let items=[['Program prestige',t.prestige*.32],['NIL resources',t.nil*.16],['Development',t.development*.15],['Facilities',t.facilities*.07],['Recruiting staff',t.staff.RC.recruiting*.10],['Head coach',t.staff.HC.recruiting*.05],['Coach relationship',recruitCoachRelationshipBoost(t,r)],['Pipeline',pipelineStrength(t,r.homeRegion)*.10],['Distance',distancePitch(t,r)],['NIL deal',nilDealActive(r,t)?nilDealActive(r,t).amount*3:0]];let pri=0;switch(r.priority){case'Prestige':pri=t.prestige*.18;break;case'NIL':pri=t.nil*.20;break;case'Development':pri=t.development*.18;break;case'Early Role':pri=Math.max(0,90-unitCached(t,r.pos))*.20;break;case'Coaching':pri=(t.staff.HC.loyalty+t.staff.RC.recruiting)*.08;break;case'Academics':pri=t.academics*.18;break;case'Scheme Fit':pri=recruitSchemePriority(t,r);break;case'Winning':pri=(t.w/Math.max(1,t.w+t.l))*18;break;case'Stay Close':pri=Math.max(-12,12-recruitDistance(t,r)/80);break;case'Campus Life':pri=(t.fan_support+t.facilities)*.06;break}items.push([`${r.priority} priority`,pri]);const edge=recruitingEdgeFor(t);if(edge)items.push(['Game setting',edge]);return items}
+// The simulation and profile use the same ordered contributions. Keep this order stable:
+// changing floating-point addition order can change seeded recruiting outcomes.
+function recruitPitchBreakdown(t,r){
+ const items=[['Program prestige',t.prestige*.42],['NIL resources',t.nil*.16],['Development',t.development*.15],['Academics',t.academics*.06],['Facilities',t.facilities*.07],['Recruiting staff',t.staff.RC.recruiting*.10],['Head coach',t.staff.HC.recruiting*.05],['Season record',(t.w-t.l)*.7],['Pipeline',pipelineStrength(t,r.homeRegion)*.10],['Distance',distancePitch(t,r)],['Coach relationship',recruitCoachRelationshipBoost(t,r)],['NIL deal',nilDealActive(r,t)?nilDealActive(r,t).amount*3:0]];
+ let priority=0;
+ switch(r.priority){
+  case'Prestige':priority=t.prestige*.22;break;
+  case'NIL':priority=t.nil*.20;break;
+  case'Development':priority=t.development*.18;break;
+  case'Early Role':priority=Math.max(0,90-unitCached(t,r.pos))*.20;break;
+  case'Coaching':priority=(t.staff.HC.loyalty+t.staff.RC.recruiting)*.08;break;
+  case'Academics':priority=t.academics*.18;break;
+  case'Scheme Fit':priority=recruitSchemePriority(t,r);break;
+  case'Winning':priority=(t.w/Math.max(1,t.w+t.l))*18;break;
+  case'Stay Close':priority=Math.max(-12,12-recruitDistance(t,r)/80);break;
+  case'Campus Life':priority=(t.fan_support+t.facilities)*.06;break;
+ }
+ items.push([`${r.priority} priority`,priority]);
+ const edge=recruitingEdgeFor(t);if(edge)items.push(['Game setting',edge]);
+ return items;
+}
 function sample(arr,n){if(arr.length<=n)return arr.slice();let seen=new Set(),out=[];while(out.length<n){let j=gi(0,arr.length-1);if(seen.has(j))continue;seen.add(j);out.push(arr[j])}return out}
 function recruitTopSchools(r,n=5){return universe.teams.map(t=>({t,score:recruitPitch(t,r)+(t.name===selected()?.name&&r.targeted?10+r.relationship*.12:0)})).sort((a,b)=>b.score-a.score).slice(0,n)}
 function normalizeRecruitGeography(r,hsPool=universe.highSchools||[]){if(!r.highSchoolId){let h=weightedHighSchool(hsPool);Object.assign(r,{highSchoolId:h.id,highSchool:h.name,homeCity:h.city,homeState:h.state,lat:h.lat,lon:h.lon,homeRegion:h.region,distanceImportance:gi(5,100),distanceTolerance:pick([100,150,250,400,600,900,1500,2500])})}r.prevInterest??=r.interest;r.trend??=0;ensureRecruitRelationships(r)}
@@ -7928,7 +8049,10 @@ function gameSetting(key){
  const n=Number(raw);return Number.isFinite(n)?clamp(n,def.min,def.max):def.fallback;
 }
 function recruitingEdgeFor(t){const edge=gameSetting('recruitingEdge');return edge&&t.name===selected()?.name?edge:0}
-function recruitPitch(t,r){if(recruitBlocked(t,r))return -1e6;let v=t.prestige*.42+t.nil*.16+t.development*.15+t.academics*.06+t.facilities*.07+t.staff.RC.recruiting*.10+t.staff.HC.recruiting*.05+(t.w-t.l)*.7+pipelineStrength(t,r.homeRegion)*.10+distancePitch(t,r)+recruitCoachRelationshipBoost(t,r)+(nilDealActive(r,t)?nilDealActive(r,t).amount*3:0);switch(r.priority){case'Prestige':v+=t.prestige*.22;break;case'NIL':v+=t.nil*.20;break;case'Development':v+=t.development*.18;break;case'Early Role':v+=Math.max(0,90-unitCached(t,r.pos))*.20;break;case'Coaching':v+=(t.staff.HC.loyalty+t.staff.RC.recruiting)*.08;break;case'Academics':v+=t.academics*.18;break;case'Scheme Fit':v+=recruitSchemePriority(t,r);break;case'Winning':v+=(t.w/Math.max(1,t.w+t.l))*18;break;case'Stay Close':v+=Math.max(-12,12-recruitDistance(t,r)/80);break;case'Campus Life':v+=(t.fan_support+t.facilities)*.06;break}return v+recruitingEdgeFor(t)}
+function recruitPitch(t,r){
+ if(recruitBlocked(t,r))return -1e6;
+ return recruitPitchBreakdown(t,r).reduce((total,[,value])=>total+value,0);
+}
 function scheduleVisit(r){const u=selected();if(r.visitWeek){r.visitWeek=null;r.visit=false;return}let g=u.schedule.find(g=>!g.played&&g.home===u.name&&g.week>=universe.week+1);r.visitWeek=g?g.week:Math.min(12,universe.week+1);r.visit=true;firstRecruitEvaluation(r,u);refreshScoutingIntel(r,u,5,'VISIT',true)}
 function decommitRecruit(r,reason){if(!r.committed)return false;let from=r.committed,t=T(from);r.committed=null;r.commitWeek=null;r.flippedFrom=from;universe.recruitClassCounts[from]=Math.max(0,classCommitCount(from)-1);if(t?.commits)t.commits=t.commits.filter(x=>x.id!==r.id);universe.decommitLog??=[];universe.decommitLog.push({year:universe.year,week:universe.week,id:r.id,name:r.name,pos:r.pos,stars:r.stars,from,to:null,reason});if(universe.decommitLog.length>80)universe.decommitLog.splice(0,universe.decommitLog.length-80);return true}
 function pressureCommit(r,u){if(universe.week<6||(r.commitWeek??0)+2>universe.week)return;let home=T(r.committed);if(!home)return;let mine=r.committed===u.name,boost=(r.targeted?10:0)+r.relationship*.12+recruitPromiseBoost(r,u)+(r.visitWeek===universe.week?7:0);if(r.visitWeek===universe.week)r.visit=false;let hold=recruitPitch(home,r)+(mine?boost:0)+6;let best=null,bestPitch=-1e9;for(const t of sample(universe.teams,12)){if(t.name===r.committed||!canTakeCommit(t.name))continue;let v=recruitPitch(t,r)+(t.name===u.name?(r.targeted?boost:-1e9):0);if(v>bestPitch){bestPitch=v;best=t}}if(!best)return;let gap=bestPitch-hold;r.pressure=Math.round(gap);r.challenger=gap>-14?best.name:null;if(gap<-30)return;if(gameplayRandom()<.07/(1+Math.exp(-(gap+11)/4))){let from=r.committed;decommitRecruit(r,'flip');r.interest=clamp(Math.round(best.name===u.name?Math.max(r.interest,70):40+gauss()*8),1,100);if(commitRecruit(r,best.name)){let e=universe.decommitLog[universe.decommitLog.length-1];if(e&&e.id===r.id)e.to=best.name}r.trend=0}}
@@ -8850,7 +8974,17 @@ function resolveWeeklyDecision(id,optionId){const d=(universe.weeklyDecisions||[
  else if(d.type==='PLAYER_POSITION_CHANGE_REQUEST'&&p){if(option.id==='approve'&&applyRequestedPositionChange(t,p,d.requestedPosition)){p.morale=clamp(p.morale+4,15,99);p.staffTrust=clamp((p.staffTrust??70)+3,0,100)}else if(option.id==='defer')p.requestedPositionChange={season:universe.year,week:universe.week,from:p.pos,to:d.requestedPosition,status:'DEFERRED'};else if(option.id==='decline'){p.requestedPositionChange={season:universe.year,week:universe.week,from:p.pos,to:d.requestedPosition,status:'DECLINED'};p.morale=clamp(p.morale-4,15,99);p.staffTrust=clamp((p.staffTrust??70)-3,0,100)}}
  else if(d.type==='RECRUITING_PRIORITY'&&option.id.startsWith('prioritize_')){const rid=option.id.slice(11),r=universe.recruits.find(x=>String(x.id)===rid);if(r){scheduleVisit(r);growRecruiterRelationship(r,t,3)}}
  d.resolved=true;d.resolvedOptionId=option.id;d.resolvedSeason=universe.year;d.resolvedWeek=universe.week;addWeeklyDecisionEvent(d,option,t);setStatus(`Decision recorded: ${option.label}.`);render();return true}
-function renderWeeklyDecisions(){const host=$('#weeklyDecisions'),t=selected();if(!host||!t)return;ensureWeeklyDecisions(t);const open=guidanceStoredDecisions(t),blocked=open.some(d=>d.type!=='WEEKLY_GAMEPLAN');host.innerHTML=open.map(d=>`<div class="decision-card${d.source==='PLAYER'?' player-request':''}"><div class="decision-kicker">${d.source==='PLAYER'?'PLAYER REQUEST':'DECISION REQUIRED'}</div><div class="decision-title">${gameEscape(d.title)}</div><div class="decision-summary">${gameEscape(d.summary)}</div><div class="decision-options">${d.options.map(o=>`<button class="decision-option" data-decision="${gameEscape(d.id)}" data-choice="${gameEscape(o.id)}">${gameEscape(o.label)}${o.recommended?' · Staff pick':''}<small>${gameEscape(o.description)}</small></button>`).join('')}</div></div>`).join('');for(const id of ['#simWeek','#seasonWeek'])$(id).disabled=openingPreseason()||blocked;$('#hubAdvance').disabled=openingPreseason()?false:blocked;$$('[data-decision]').forEach(b=>b.onclick=()=>resolveWeeklyDecision(b.dataset.decision,b.dataset.choice))}
+function renderWeeklyDecisions(){
+ const host=$('#weeklyDecisions'),t=selected();if(!host||!t)return;
+ ensureWeeklyDecisions(t);
+ const open=guidanceStoredDecisions(t),blocked=open.some(d=>d.type!=='WEEKLY_GAMEPLAN');
+ const card=d=>`<div class="decision-card${d.source==='PLAYER'?' player-request':''}"><div class="decision-kicker">${d.type==='WEEKLY_GAMEPLAN'?'OPTIONAL PREPARATION':d.source==='PLAYER'?'PLAYER REQUEST':'DECISION REQUIRED'}</div><div class="decision-title">${gameEscape(d.title)}</div><div class="decision-summary">${gameEscape(d.summary)}</div><div class="decision-options">${d.options.map(o=>`<button class="decision-option" data-decision="${gameEscape(d.id)}" data-choice="${gameEscape(o.id)}">${gameEscape(o.label)}${o.recommended?' · Staff pick':''}<small>${gameEscape(o.description)}</small></button>`).join('')}</div></div>`;
+ host.innerHTML=open.filter(d=>d.type!=='WEEKLY_GAMEPLAN').map(card).join('');
+ const optional=$('#optionalWeeklyDecisions');if(optional)optional.innerHTML=open.filter(d=>d.type==='WEEKLY_GAMEPLAN').map(card).join('');
+ for(const id of ['#simWeek','#seasonWeek'])$(id).disabled=openingPreseason()||blocked;
+ $('#hubAdvance').disabled=openingPreseason()?false:blocked;
+ $$('[data-decision]').forEach(b=>b.onclick=()=>resolveWeeklyDecision(b.dataset.decision,b.dataset.choice))
+}
 
 // --- v0.9.13: the weekly plan ----------------------------------------------
 // Fourteen tabs and no signposting: the sequence that actually advances a
@@ -9044,7 +9178,8 @@ function programTrendsHTML(){
  const head='<div class="eyebrow">THIS TENURE</div><h3>Season by season</h3>';
  if(rows.length<2)return `${head}<div class="muted">Complete two seasons to see the trend.</div>`;
  const W=Math.max(320,rows.length*56+48),H=130,top=14,base=H-24,step=(W-40)/rows.length,barW=Math.min(30,step*.56);
- const y=v=>base-(base-top)*Math.min(12,Math.max(0,v))/12,yc=v=>base-(base-top)*Math.min(100,Math.max(0,v))/100;
+ const maxWins=Math.max(12,...rows.flatMap(r=>[r.w,r.expected]).map(Number).filter(Number.isFinite));
+ const y=v=>base-(base-top)*Math.min(maxWins,Math.max(0,v))/maxWins,yc=v=>base-(base-top)*Math.min(100,Math.max(0,v))/100;
  const x=i=>20+step*i+step/2;
  const bars=rows.map((r,i)=>`<rect class="trend-bar${r.champ?' is-champ':r.confChamp?' is-conf':''}" x="${(x(i)-barW/2).toFixed(1)}" y="${y(r.w).toFixed(1)}" width="${barW.toFixed(1)}" height="${(base-y(r.w)).toFixed(1)}" rx="3"><title>${r.year}: ${r.w}-${r.l}, expected ${r.expected} wins</title></rect><line class="trend-exp" x1="${(x(i)-barW/2-3).toFixed(1)}" x2="${(x(i)+barW/2+3).toFixed(1)}" y1="${y(r.expected).toFixed(1)}" y2="${y(r.expected).toFixed(1)}"/><text class="trend-label" x="${x(i).toFixed(1)}" y="${H-8}" text-anchor="middle">${String(r.year).slice(2)}</text><text class="trend-val" x="${x(i).toFixed(1)}" y="${(y(r.w)-4).toFixed(1)}" text-anchor="middle">${r.w}</text>`).join('');
  const line=rows.map((r,i)=>`${i?'L':'M'}${x(i).toFixed(1)} ${yc(r.after).toFixed(1)}`).join(' ');
@@ -9183,7 +9318,15 @@ function championTimeline({limit=25}={}){
 // App scope is not global by design; the history module reaches these through this bridge.
 if(typeof globalThis!=='undefined')globalThis.DynastyHistoryIndex=Object.freeze({coaches:coachIndexRows,champions:championTimeline,openCoach:showCoachProfile});
 // Recruiting-needs bridge: only POS_COUNTS, roster positions/years and committed counts leave app scope.
-if(typeof globalThis!=='undefined')globalThis.DynastyRecruitingNeeds=Object.freeze({posCounts:POS_COUNTS,snapshot:()=>{if(!universe)return null;const t=selected();if(!t)return null;const committed={};for(const r of universe?.recruits||[])if(r.committed===t.name)committed[r.pos]=(committed[r.pos]||0)+1;return{team:t.name,players:(t.roster||[]).map(p=>({pos:p.pos,year:p.year})),committed}}});
+if(typeof globalThis!=='undefined')globalThis.DynastyRecruitingNeeds=Object.freeze({posCounts:POS_COUNTS,snapshot:()=>{
+ if(!universe)return null;const t=selected();if(!t)return null;
+ const committed={},targeted={},watched={};
+ for(const r of universe.recruits||[]){if(r.committed===t.name)committed[r.pos]=(committed[r.pos]||0)+1;else if(r.targeted&&!r.committed)targeted[r.pos]=(targeted[r.pos]||0)+1}
+ for(const r of universe.risingClass||[])if(r.watch)watched[r.pos]=(watched[r.pos]||0)+1;
+ const done=universe.phase==='complete'&&universe.offseason?.year===universe.year?universe.offseason.completed||[]:[];
+ return{year:universe.year,team:t.name,players:(t.roster||[]).map(p=>({pos:p.pos,year:p.year})),committed,targeted,watched,departuresDone:done.includes('departures'),enrolled:done.includes('signing')};
+}});
+
 // v0.12.14 — Hall of Fame. Induction uses only recorded, player-visible facts:
 // awards, draft result, career production and coach titles. There is no hidden
 // rating and no new save field; inductees are derived every time from the archive.
@@ -9946,10 +10089,12 @@ if(typeof module==='object'&&module.exports){
  }
  function renderRecruitingFilters(){
   const root=$('#recruiting'),table=root?.querySelector?.('.table-wrap');if(!root||!table)return;
+  const focusKey=document.activeElement?.dataset?.recruitFilter,caret=focusKey==='query'?document.activeElement.selectionStart:null;
   root.querySelector?.('[data-recruiting-board-view]')?.remove();
   root.querySelector?.('[data-recruiting-filters]')?.remove();
   table.insertAdjacentHTML?.('beforebegin',`${recruitingBoardViewHTML()}${recruitingFilterHTML()}`);
   bindRecruitingFilters();
+  if(focusKey){const control=[...root.querySelectorAll('[data-recruit-filter]')].find(el=>el.dataset.recruitFilter===focusKey);control?.focus({preventScroll:true});if(caret!=null)control?.setSelectionRange(caret,caret)}
  }
  extendRender('recruiting',renderRecruitingFilters);
  globalThis.DynastyLabRecruitingFilters={
@@ -10247,8 +10392,8 @@ if(typeof module==='object'&&module.exports){
   posCounts:POS_COUNTS,eligibilityBase,staffVerdict:recruitStaffVerdict,pipelineStrength,distance:recruitDistance
  });
  function staffShortlistHTML(t){
-  const needs=staffShortlistSystem.positionNeeds(t,universe.recruits),rows=staffShortlistSystem.shortlist(t,universe.recruits),urgent=needs.filter(x=>x.gap>0).slice(0,6);
-  return `<div class="section-head"><div><div class="eyebrow">STAFF ROOM</div><h3>Roster Outlook & Staff Shortlist</h3><div class="muted">Recommendations use projected openings and your current scouting information — never hidden ratings.</div></div></div><div class="roster-need-strip">${urgent.map(x=>`<div class="roster-need${x.gap>=3?' urgent':''}"><strong>${x.pos}</strong><span>${x.gap} need${x.gap===1?'':'s'}</span><small>${x.returning} returning · ${x.committed} committed</small></div>`).join('')||'<span class="muted">No obvious positional shortage after projected departures.</span>'}</div><div class="staff-shortlist-grid">${rows.map((x,i)=>{const r=x.r,rec=recruitScoutingRecord(r,t,false);return `<article class="staff-shortlist-card${r.targeted?' targeted':''}"><div class="staff-shortlist-rank">${i+1}</div><div><button class="player-button" data-recruit="${r.id}">${r.pos} ${r.name}</button><div class="small muted">#${r.nationalRank} · ${'★'.repeat(r.stars)} · ${r.homeCity}, ${r.homeState}</div></div><div class="staff-shortlist-verdict"><strong>${x.verdict.label}</strong><span>${x.verdict.score} · ${x.verdict.conviction}</span></div><div class="small muted staff-shortlist-reason">${x.reason}</div><div class="staff-shortlist-actions"><button type="button" data-shortlist-target="${r.id}">${r.targeted?'On Board':'Add to Board'}</button>${scoutingActionButtonsHTML(r,t)}</div><div class="small muted">${rec.full?'Full evaluation complete':rec.quick?'Film reviewed':'Preliminary evaluation'} · ${x.verdict.confidence}% confidence</div></article>`}).join('')}</div>`;
+  const rows=staffShortlistSystem.shortlist(t,universe.recruits);
+  return `<div class="section-head"><div><div class="eyebrow">STAFF ROOM</div><h3>Staff shortlist</h3><div class="muted">Recommendations use projected openings and your current scouting information — never hidden ratings.</div></div></div><div class="staff-shortlist-grid">${rows.map((x,i)=>{const r=x.r,rec=recruitScoutingRecord(r,t,false);return `<article class="staff-shortlist-card${r.targeted?' targeted':''}"><div class="staff-shortlist-rank">${i+1}</div><div><button class="player-button" data-recruit="${r.id}">${r.pos} ${r.name}</button><div class="small muted">#${r.nationalRank} · ${'★'.repeat(r.stars)} · ${r.homeCity}, ${r.homeState}</div></div><div class="staff-shortlist-verdict"><strong>${x.verdict.label}</strong><span>${x.verdict.score} · ${x.verdict.conviction}</span></div><div class="small muted staff-shortlist-reason">${x.reason}</div><div class="staff-shortlist-actions"><button type="button" data-shortlist-target="${r.id}">${r.targeted?'On Board':'Add to Board'}</button>${scoutingActionButtonsHTML(r,t)}</div><div class="small muted">${rec.full?'Full evaluation complete':rec.quick?'Film reviewed':'Preliminary evaluation'} · ${x.verdict.confidence}% confidence</div></article>`}).join('')}</div>`;
  }
  function bindStaffShortlist(){
   $$('[data-shortlist-target]').forEach(b=>b.onclick=()=>{const r=universe.recruits.find(x=>String(x.id)===String(b.dataset.shortlistTarget));if(!r)return;r.targeted=!r.targeted;if(r.targeted)firstRecruitEvaluation(r,selected());setStatus(`${r.name} ${r.targeted?'added to':'removed from'} the recruiting board.`);renderRecruiting()});
@@ -10357,8 +10502,9 @@ if(typeof module==='object'&&module.exports){
   }
  }
  function renderRecruitingReceiptRecap(){
-  const t=selected(),host=$('#classSummary');if(!t||!host||host.querySelector?.('.scouting-receipt-recap'))return;
-  const summary=scoutingReceiptSystem.summarizePlayers(receiptPlayers(t),universe.year,t.id);if(!summary.tracked)return;
+  const t=selected(),host=$('#recruitingHistory');if(!t||!host)return;
+  host.innerHTML='<h3>Recruiting history</h3>';
+  const summary=scoutingReceiptSystem.summarizePlayers(receiptPlayers(t),universe.year,t.id);if(!summary.tracked){host.insertAdjacentHTML?.('beforeend','<p class="muted">No signing-day scouting records yet. Signed classes will appear here as evidence is recorded.</p>');return}
   const count=code=>summary.counts[code]||0,top=summary.notable.map(({p,result})=>`<div class="scouting-receipt-row"><span><strong>${receiptEscape(p.pos)} ${receiptEscape(p.name)}</strong><small>${receiptEscape(result.snapshot.verdictLabel)} at signing · ${result.games} games / ${result.starts} starts</small></span><b class="scouting-receipt-${result.tone}">${receiptEscape(result.label)} · ${result.delta>=0?'+':''}${result.delta}</b></div>`).join('');
   host.insertAdjacentHTML?.('beforeend',`<div class="scouting-receipt-recap"><div class="scouting-receipt-head"><div><strong>Scouting Receipts</strong><small>What the staff believed at signing versus what has actually been observed later.</small></div><span>${summary.final} settled · ${summary.watch} developing</span></div><div class="scouting-receipt-kpis"><span><b>${count('DIAMOND')}</b> Diamonds</span><span><b>${count('HIT')}</b> Hits</span><span><b>${count('BUST')}</b> Busts</span><span><b>${count('MISS')}</b> Misses</span><span><b>${summary.costly}</b> Costly misreads</span></div>${top?`<div class="scouting-receipt-list">${top}</div>`:''}<small class="scouting-receipt-note">Watch labels are provisional. Final labels require at least two seasons, 12 games and strong staff confidence. Hidden true ratings are never used.</small></div>`);
  }
@@ -11732,6 +11878,16 @@ if(globalThis.__DL_TEST__){
   if(!items.length)return '';
   return `<details class="guidance-snoozed"><summary>Snoozed for now <span>${items.length}</span></summary><p class="muted small">These are out of the active agenda only. Restoring one does not advance time.</p><div class="guidance-snoozed-list">${items.map(item=>`<div><span><strong>${esc(item.title)}</strong><small>${esc(meaningLabel[item.meaning]||'Guidance')} · ${esc(item.affectedEntity?.label||'Program')}</small></span><button type="button" data-guidance-restore="${esc(item.id)}">Restore</button></div>`).join('')}</div></details>`;
  }
+ function renderDeskFocus(model){
+  const host=target('#weeklyDeskFocus'),f=model.forecast;if(!host||!f)return;
+  const blockers=window.DynastyNextAction?.blockingItems(model)||[],next=blockers[0];
+  const label=f.key==='none'?'No advance available':statusLabel[f.status]||'Next boundary';
+  const title=next?.title||f.title||f.label;
+  const detail=next?`${blockers.length} required decision${blockers.length===1?'':'s'} before the next advance. ${f.title}.`:f.status==='caution'?'You can advance with the current plan. Review open choices in the full briefing if you want to change it.':f.key==='begin-season'?'Opens your first matchup without simulating a game.':f.key==='none'?'Review your program for the next available action.':'Your current plan is ready. The full briefing explains what happens next.';
+  host.dataset.status=f.status;
+  host.innerHTML=`<span class="weekly-desk-status">${esc(label)}</span><h3>${esc(title)}</h3><p>${esc(detail)}</p>`;
+ }
+ function revealDetails(el){if(el?.closest('#dashboard'))window.DynastyDashboardViews?.show('week');for(let parent=el?.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true}
  function renderAgenda(model){
   const host=target('#coachingAgenda');if(!host)return;
   const visible=model.visible||model,leading=visible.leading||model.leading||[],remaining=visible.remaining||model.remaining||[],snoozed=model.snoozed||[];
@@ -11768,14 +11924,15 @@ if(globalThis.__DL_TEST__){
  }
  function focusDestination(item){
   const destination=item.destination||{},focus=destination.focus;
+  if(['scholarship-summary','recruiting-board'].includes(focus))window.DynastyRecruitingClasses?.show(focus==='scholarship-summary'?'summary':'current');
   let el=null;
   if(focus==='weekly-decision'&&destination.decisionId){
    el=[...document.querySelectorAll('[data-decision]')].find(button=>button.dataset.decision===String(destination.decisionId))?.closest('.decision-card')||target('#weeklyDecisions');
   }else if(focus==='career-post')el=target('#careerPost');
   else if(focus==='coach-opening')el=target('#coachMarket');
   else if(focus==='scholarship-summary')el=target('#classSummary');
-  else if(focus==='recruiting-board')el=target('#recruitBody')||target('#classSummary');
-  if(el){el.classList.add('guidance-focus-target');el.tabIndex=-1;el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>el?.focus?.({preventScroll:true}),250);return true}
+  else if(focus==='recruiting-board'){const workspace=target('#recruitWorkspace');if(workspace&&!workspace.hidden){target('[data-rwm="workspace"]')?.click();el=workspace}else el=target('#recruitBody')||target('#classSummary')}
+  if(el){revealDetails(el);el.classList.add('guidance-focus-target');el.tabIndex=-1;el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>el?.focus?.({preventScroll:true}),250);return true}
   return false;
  }
  function addReturnControl(item){
@@ -11789,7 +11946,7 @@ if(globalThis.__DL_TEST__){
  function returnToAgenda(){
   document.querySelectorAll('.guidance-return-context').forEach(context=>context.remove());
   if(typeof goToTab==='function')goToTab('dashboard');
-  requestAnimationFrame(()=>{const host=target('#coachingAgenda');host?.scrollIntoView({behavior:'smooth',block:'start'});const opener=agendaContext?.itemId?agendaButton(agendaContext.itemId):null;opener?.focus?.({preventScroll:true});agendaContext=null;});
+  requestAnimationFrame(()=>{const host=target('#coachingAgenda');revealDetails(host);host?.scrollIntoView({behavior:'smooth',block:'start'});const opener=agendaContext?.itemId?agendaButton(agendaContext.itemId):null;opener?.focus?.({preventScroll:true});agendaContext=null;});
  }
  function openGuidanceItem(id){
   const model=currentModel(),item=model?.items?.find(x=>x.id===id);if(!item){if(typeof setStatus==='function')setStatus('That agenda item is no longer active.');renderGuidanceSystem();return}
@@ -11812,7 +11969,7 @@ if(globalThis.__DL_TEST__){
   host.querySelectorAll('[data-guidance-restore]').forEach(button=>button.addEventListener('click',()=>{callGuidance('guidanceRestoreItem',button.dataset.guidanceRestore);renderGuidanceSystem()}));
  }
  function bindReturnSummary(){target('#guidanceReturnSummary')?.querySelector('[data-guidance-dismiss-return]')?.addEventListener('click',()=>{if(typeof dismissGuidanceReturnSummary==='function')dismissGuidanceReturnSummary();renderGuidanceSystem()})}
- function renderGuidanceSystem(){const model=currentModel();if(!model)return;renderReturnSummary();renderAgenda(model);renderForecast(model);renderPlan(model);bindAgenda();bindReturnSummary()}
+ function renderGuidanceSystem(){const model=currentModel();if(!model)return;renderDeskFocus(model);renderReturnSummary();renderAgenda(model);renderForecast(model);renderPlan(model);bindAgenda();bindReturnSummary()}
  window.renderGuidanceSystem=renderGuidanceSystem;
  window.getDynastyGuidance=currentModel;
  window.openGuidanceItem=openGuidanceItem;
@@ -12328,10 +12485,10 @@ function gameCastModel(g){
    const text=m[12],lead=score.home-score.away;
    plays.push({drive:di,label:d.label,q,quarter:q<=4?`Q${q}`:`OT${q-4}`,clock:`${m[4]}:${m[5]}`,elapsed,x,offense:side,down:Number(m[6]),distance:Number(m[7]),text,
     home:score.home,away:score.away,wp:gameCastWinProbability(lead,side,100-fromOwn,secondsLeft)});
-   const pts=/TOUCHDOWN/.test(text)?6:/extra point good/.test(text)?1:/field goal good/.test(text)?3:0;
+   const pts=/TOUCHDOWN/.test(text)?6:/extra point good/.test(text)?1:/field goal good/.test(text)?3:/two-point try good/.test(text)||/^SAFETY for /.test(text)?2:0;
    if(pts){score[side]+=pts;scored+=pts;plays.at(-1).scoring=pts}
   }
-  // Reconcile anything the text doesn't spell out (two-point tries, adjustments) at the drive's end.
+  // Reconcile any archived points whose play text is unavailable at the drive's end.
   const rest=(Number(d.points)||0)-scored;if(rest)score[side]+=rest;
  }
  if(!plays.length)return null;
@@ -12349,7 +12506,7 @@ function gameCastHTML(g){
  const swingTeam=m.swing&&(m.swing.delta>0?m.home:m.away);
  const facts=[`<li><strong>${gameEscape(W)}</strong> won ${m.final[m.winner]}–${m.final[m.winner==='home'?'away':'home']}${m.winnerLow<.25?`, rallying from as low as ${gameCastPct(m.winnerLow)} to win`:''}.</li>`];
  if(s)facts.push(`<li>Biggest swing: <strong>${gameEscape(swingTeam)} +${gameCastPct(Math.abs(m.swing.delta))}</strong> · ${gameEscape(s.quarter)} ${gameEscape(s.clock)} · ${gameEscape(s.text)}</li>`);
- const scoring=m.plays.filter(p=>p.scoring).map(p=>`<tr><td>${gameEscape(p.quarter)} ${gameEscape(p.clock)}</td><td>${gameEscape(m[p.offense])}</td><td>${gameEscape(p.text)}</td><td>${p.home+(p.offense==='home'?p.scoring:0)}–${p.away+(p.offense==='away'?p.scoring:0)}</td><td>${gameCastPct(p.wp)}</td></tr>`).join('');
+ const scoring=m.plays.filter(p=>p.scoring).map(p=>`<tr><td>${gameEscape(p.quarter)} ${gameEscape(p.clock)}</td><td>${gameEscape(m[p.offense])}</td><td>${gameEscape(p.text)}</td><td>${p.away+(p.offense==='away'?p.scoring:0)}–${p.home+(p.offense==='home'?p.scoring:0)}</td><td>${gameCastPct(p.wp)}</td></tr>`).join('');
  return `<section class="game-cast" data-game-cast="${gameEscape(g.id)}">
  <div class="gc-head"><div><div class="eyebrow">GAME CAST</div><h3>Win probability</h3></div><ul class="gc-facts">${facts.join('')}</ul></div>
  ${gameCastPlayLog(g)?`<div class="gc-watch-cta"><button type="button" class="game-link game-link--primary" data-game="${gameEscape(g.id)}" data-game-tab="Watch">▶ Watch the 3D replay</button><span class="small muted">Every snap on an angled field, with players.</span></div>`:''}
@@ -13635,7 +13792,7 @@ queue();
 
 (()=>{'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-let mode='workspace',filter='board',sel='',boardSeen=false,shown=30,searchTimer=0;const PAGE=30,fmt=n=>Number(n).toLocaleString('en-US'),poolFilters=()=>globalThis.DynastyLabRecruitingFilters;const stateCache=new Map(),flashUntil=new Map();
+let mode='workspace',filter='board',sel='',boardSeen=false,shown=30,searchTimer=0,phoneDetail=false,listScroll=0,pageScroll=0,returnId='';const phoneQuery=matchMedia('(max-width:700px)'),phone=()=>phoneQuery.matches;const PAGE=30,fmt=n=>Number(n).toLocaleString('en-US'),poolFilters=()=>globalThis.DynastyLabRecruitingFilters;const stateCache=new Map(),flashUntil=new Map();
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function cell(r,l){return r?.querySelector('[data-label="'+l+'"]')}
 function parts(r,l){const c=cell(r,l);return c?[...c.children].map(n=>n.textContent.replace(/\s+/g,' ').trim()).filter(Boolean):[]}
@@ -13644,7 +13801,8 @@ function data(){return $$('#recruitBody tr').map(row=>{const a=row.querySelector
 function stateSig(x){return[x.priority,x.scout,x.interest,x.trend,x.leader,x.target?'1':'0',x.commit?'1':'0'].join('|')}
 function markChanges(rows){const now=Date.now(),live=new Set(rows.map(x=>x.id));for(const x of rows){const sig=stateSig(x),prev=stateCache.get(x.id);if(prev&&prev!==sig)flashUntil.set(x.id,now+1800);stateCache.set(x.id,sig)}for(const id of [...stateCache.keys()])if(!live.has(id)){stateCache.delete(id);flashUntil.delete(id)}}
 function changed(x){return(flashUntil.get(x?.id)||0)>Date.now()}
-function filtered(rows){const q=($('#rwSearch')?.value||'').toLowerCase();return rows.filter(x=>(filter==='all'||filter==='board'&&x.target||filter==='commits'&&x.commit)&&(!q||[x.name,x.pos,x.home,x.priority,x.leader].join(' ').toLowerCase().includes(q)))}
+// Search is applied to the whole pool by the canonical filters before table pagination.
+function filtered(rows){return rows.filter(x=>filter==='all'||filter==='board'&&x.target||filter==='commits'&&x.commit)}
 function delegate(x,s){const b=x?.row.querySelector(s);if(b&&!b.disabled)b.click()}
 function intelFor(x){try{return x?globalThis.DynastyRecruitingWorkspaceIntel?.forId?.(x.id)||null:null}catch{return null}}
 function staffRead(intel,x){
@@ -13656,7 +13814,8 @@ function momentum(intel,x){return intel?.momentum||x?.trend||'Steady'}
 function battleRead(intel,x){const s=intel?.battle;return s?{label:s.label||'No race',rank:s.rank?`#${s.rank}`:'Outside top group',gap:s.gap==null?'—':s.gap===0?'Even':`${s.gap>0?'+':''}${s.gap}`,leader:s.leader||x?.leader||'—'}:{label:'Race developing',rank:'—',gap:'—',leader:x?.leader||'—'}}
 function ensure(){
  const tab=$('#recruiting'),head=tab?.querySelector(':scope > .section-head');if(!tab||!head)return null;
- if(!$('#rwSwitch')){const n=document.createElement('div');n.id='rwSwitch';n.className='recruit-workspace-switcher';n.innerHTML='<div><span class="eyebrow">RECRUITING MODE</span><strong>Scout and act without losing board context.</strong></div><div class="recruit-mode-buttons"><button data-rwm="workspace" class="active">Workspace</button><button data-rwm="table">Table</button></div>';head.after(n);n.querySelectorAll('[data-rwm]').forEach(b=>b.onclick=()=>{mode=b.dataset.rwm;render()})}
+ if(!$('#rwSwitch')){const n=document.createElement('div');n.id='rwSwitch';n.className='recruit-workspace-switcher';n.innerHTML='<div><span class="eyebrow">RECRUITING MODE</span><strong>Scout and act without losing board context.</strong></div><div class="recruit-mode-buttons"><button data-rwm="workspace" class="active">Workspace</button><button data-rwm="table">Table</button><span class="rw-budget" data-rw-budget title="Evaluation hours shared with the rising class"></span></div>';head.after(n);n.querySelectorAll('[data-rwm]').forEach(b=>b.onclick=()=>{mode=b.dataset.rwm;phoneDetail=false;render()})}
+ if(!$('#rwFilters')){const n=document.createElement('details');n.id='rwFilters';n.className='rw-extra-filters';n.innerHTML='<summary>Filters</summary>';tab.querySelector(':scope > .table-wrap').before(n)}
  if(!$('#recruitWorkspace')){const n=document.createElement('section');n.id='recruitWorkspace';n.className='recruit-workspace';tab.querySelector(':scope > .table-wrap').before(n)}
  return $('#recruitWorkspace')
 }
@@ -13669,7 +13828,7 @@ function card(x){return '<button class="recruit-workspace-card'+(x.id===sel?' ac
 function dossier(x){
  if(!x)return'<div class="recruit-dossier-empty"><span class="eyebrow">SCOUTING DOSSIER</span><strong>Select a prospect</strong></div>';
  const intel=intelFor(x),staff=staffRead(intel,x),battle=battleRead(intel,x),stage=scoutStage(intel),mom=momentum(intel,x),sc=cell(x.row,'Scout'),q=sc?.querySelector('[data-scout-action="quick"]'),f=sc?.querySelector('[data-scout-action="full"]'),t=x.row.querySelector('[data-target]'),confidence=Number.isFinite(staff.confidence)?Math.max(0,Math.min(100,staff.confidence)):null;
- return '<div class="recruit-dossier-head"><span class="eyebrow">SCOUTING DOSSIER</span><strong>'+esc(x.name)+(changed(x)?' <b class="rw-update-chip">UPDATED</b>':'')+'</strong><small>'+esc(x.pos)+' · '+esc(x.stars)+' · '+esc(x.rank)+' · '+esc(x.home)+'</small></div>'+
+ return '<button type="button" class="rw-back" data-rw-back>← Back to prospects</button><div class="recruit-dossier-head"><span class="eyebrow">SCOUTING DOSSIER</span><strong>'+esc(x.name)+(changed(x)?' <b class="rw-update-chip">UPDATED</b>':'')+'</strong><small>'+esc(x.pos)+' · '+esc(x.stars)+' · '+esc(x.rank)+' · '+esc(x.home)+'</small></div>'+
  '<div class="rw-verdict"><span>STAFF READ</span><strong>'+esc(staff.label)+'</strong><small>'+esc(staff.detail)+'</small>'+(confidence!=null?'<div class="rw-confidence" role="meter" aria-label="Report confidence" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+confidence+'"><i style="width:'+confidence+'%"></i></div>':'')+(staff.risk?'<small>Biggest uncertainty: '+esc(staff.risk)+'.</small>':'')+'</div>'+
  '<div class="rw-battle"><div><span class="eyebrow">RECRUITING BATTLE</span><strong>'+esc(battle.label)+'</strong></div><div class="rw-battle-grid"><div><span>Your position</span><strong>'+esc(battle.rank)+'</strong></div><div><span>Gap to leader</span><strong>'+esc(battle.gap)+'</strong></div><div><span>Leader</span><strong>'+esc(battle.leader)+'</strong></div><div><span>Momentum</span><strong>'+esc(mom)+'</strong></div></div></div>'+
  '<div class="rw-dossier-grid"><div><span>Priority</span><strong>'+esc(x.priority)+'</strong></div><div><span>Interest</span><strong>'+esc(x.interest)+'</strong></div><div><span>Evaluation stage</span><strong>'+esc(stage)+'</strong></div><div><span>Board status</span><strong>'+(x.commit?'Committed':x.target?'Targeted':'Untracked')+'</strong></div></div>'+
@@ -13678,15 +13837,35 @@ function dossier(x){
 }
 function syncCanonicalSelection(all){for(const x of all)x.row.classList.toggle('recruit-selected-row',x.id===sel)}
 function render(){
- const tab=$('#recruiting'),shell=ensure();if(!tab||!shell)return;$$('#rwSwitch [data-rwm]').forEach(b=>b.classList.toggle('active',b.dataset.rwm===mode));const table=tab.querySelector(':scope > .table-wrap'),battle=$('#recruitBattleBoard')?.closest('.card');shell.hidden=mode!=='workspace';table?.classList.toggle('recruit-table-hidden',mode==='workspace');battle?.classList.toggle('recruit-table-hidden',mode==='workspace');tab.classList.toggle('rw-mode',mode==='workspace');const strip=$('[data-recruiting-filters]');if(strip){if(mode==='workspace'){if(strip.nextElementSibling!==shell)shell.before(strip)}else if(table&&strip.nextElementSibling!==table)table.before(strip)}if(mode!=='workspace')return;
- const all=data();if(!boardSeen&&all.length){boardSeen=true;if(filter==='board'&&!all.some(x=>x.target))filter='all'}markChanges(all);const vis=filtered(all);if(!all.some(x=>x.id===sel))sel=(vis[0]||all[0])?.id||'';if(filter!=='all'&&vis.length&&!vis.some(x=>x.id===sel))sel=vis[0].id;const chosen=all.find(x=>x.id===sel),q=$('#rwSearch')?.value||'',keepFocus=document.activeElement?.id==='rwSearch'?document.activeElement.selectionStart:null,meta=$('[data-recruit-pool]')?.dataset||{},poolMatching=+meta.matching||all.length,poolTotal=+meta.total||poolMatching,shownNow=Math.min(shown,vis.length),headMatching=filter==='all'?Math.max(poolMatching,vis.length):vis.length,headline=(shownNow<headMatching?'Showing '+fmt(shownNow)+' of '+fmt(headMatching):fmt(headMatching))+' prospects',hint=filter==='all'&&poolMatching>all.length?'Best '+fmt(all.length)+' of '+fmt(poolTotal)+' in board order. Narrow by position, state or search to reach the rest.':'Selection stays anchored while scouting updates',more=vis.length>shown?'<button type="button" class="rw-more" data-rw-more>Show '+Math.min(PAGE,vis.length-shown)+' more</button>':'';
- shell.innerHTML='<aside class="recruit-workspace-nav"><span class="eyebrow">BOARD</span><strong>Recruiting Desk</strong><input id="rwSearch" type="search" value="'+esc(q)+'" placeholder="Search prospects"><div class="rw-filter-stack"><button data-rwf="board" class="'+(filter==='board'?'active':'')+'">My Board <b>'+all.filter(x=>x.target).length+'</b></button><button data-rwf="all" class="'+(filter==='all'?'active':'')+'">All Recruits <b>'+fmt(poolMatching)+'</b></button><button data-rwf="commits" class="'+(filter==='commits'?'active':'')+'">Commits <b>'+all.filter(x=>x.commit).length+'</b></button></div></aside><div class="recruit-workspace-list"><div class="rw-list-head"><strong>'+headline+'</strong><small>'+hint+'</small></div><div class="rw-card-list">'+(vis.slice(0,shown).map(card).join('')||'<div class="rw-empty">No prospects here yet. Use All Recruits to browse, or Auto-Target 20 to start a board.</div>')+more+'</div></div><aside class="recruit-workspace-dossier'+(chosen&&changed(chosen)?' rw-dossier-updated':'')+'">'+dossier(chosen)+'</aside>';
- globalThis.DynastyLabPortraits?.paint?.(shell);syncCanonicalSelection(all);if(keepFocus!==null){const si=$('#rwSearch');si.focus();si.setSelectionRange(keepFocus,keepFocus)}const si=$('#rwSearch');si.oninput=()=>{shown=PAGE;render();clearTimeout(searchTimer);searchTimer=setTimeout(()=>poolFilters()?.setState({query:si.value}),300)};shell.querySelectorAll('[data-rw-more]').forEach(b=>b.onclick=()=>{shown+=PAGE;render()});shell.querySelectorAll('[data-rwf]').forEach(b=>b.onclick=()=>{filter=b.dataset.rwf;shown=PAGE;if(filter==='board')poolFilters()?.setState({targetedOnly:true});else if(poolFilters()?.getState().targetedOnly)poolFilters().setState({targetedOnly:false});render()});shell.querySelectorAll('[data-rwid]').forEach(b=>b.onclick=()=>{sel=b.dataset.rwid;render()});shell.querySelectorAll('[data-rwa]').forEach(b=>b.onclick=()=>{const x=data().find(y=>y.id===sel);if(b.dataset.rwa==='open')delegate(x,'[data-recruit]');if(b.dataset.rwa==='quick')delegate(x,'[data-scout-action="quick"]');if(b.dataset.rwa==='full')delegate(x,'[data-scout-action="full"]');if(b.dataset.rwa==='target')delegate(x,'[data-target]')})
+ const tab=$('#recruiting'),shell=ensure();if(!tab||!shell)return;$$('#rwSwitch [data-rwm]').forEach(b=>b.classList.toggle('active',b.dataset.rwm===mode));const table=tab.querySelector(':scope > .table-wrap'),battle=$('#recruitBattleBoard')?.closest('.card');shell.hidden=mode!=='workspace';table?.classList.toggle('recruit-table-hidden',mode==='workspace');battle?.classList.toggle('recruit-table-hidden',mode==='workspace');tab.classList.toggle('rw-mode',mode==='workspace');const budget=$('[data-rw-budget]'),hours=$('.scouting-budget-strip span')?.textContent.match(/^(\d+)\s*\/\s*(\d+)/),budgetText=hours?`${hours[1]} / ${hours[2]}h left`:'';if(budget.textContent!==budgetText)budget.textContent=budgetText;budget.hidden=!hours;
+ const strip=$('[data-recruiting-filters]'),extra=$('#rwFilters');extra.hidden=mode!=='workspace';
+ if(strip){const count=strip.querySelector('.recruiting-filter-count');if(count)count.hidden=mode==='workspace';if(mode==='workspace'){if(strip.parentElement!==extra){const focus=strip.contains(document.activeElement)?document.activeElement:null;extra.append(strip);focus?.focus({preventScroll:true})}const state=poolFilters()?.getState()||{},active=['pos','state','stage','verdict'].filter(k=>state[k]&&state[k]!=='ALL').length+(state.targetedOnly?1:0),label='Filters'+(active?' · '+active+' active':'');if(extra.firstElementChild.textContent!==label)extra.firstElementChild.textContent=label}else if(table&&strip.nextElementSibling!==table)table.before(strip)}if(mode!=='workspace')return;
+ const scroll=phoneDetail?listScroll:($('.rw-card-list')?.scrollTop||0),action=document.activeElement?.dataset.rwa;
+ const oldSelection=sel;
+ const all=data();if(!boardSeen&&all.length){boardSeen=true;if(filter==='board'&&!all.some(x=>x.target))filter='all'}markChanges(all);const vis=filtered(all);if(!all.some(x=>x.id===sel))sel=(vis[0]||all[0])?.id||'';if(filter!=='all'&&vis.length&&!vis.some(x=>x.id===sel))sel=vis[0].id;const chosen=all.find(x=>x.id===sel),q=poolFilters()?.getState().query||'',keepFocus=document.activeElement?.id==='rwSearch'?document.activeElement.selectionStart:null,meta=$('[data-recruit-pool]')?.dataset||{},poolMatching=+meta.matching||all.length,poolTotal=+meta.total||poolMatching,shownNow=Math.min(shown,vis.length),headMatching=filter==='all'?Math.max(poolMatching,vis.length):vis.length,headline=(shownNow<headMatching?'Showing '+fmt(shownNow)+' of '+fmt(headMatching):fmt(headMatching))+' prospects',hint=filter==='all'&&poolMatching>all.length?'Best '+fmt(all.length)+' of '+fmt(poolTotal)+' in board order. Narrow by position, state or search to reach the rest.':'Selection stays anchored while scouting updates',more=vis.length>shown?'<button type="button" class="rw-more" data-rw-more>Show '+Math.min(PAGE,vis.length-shown)+' more</button>':'';
+ shell.innerHTML='<aside class="recruit-workspace-nav"><span class="eyebrow">BOARD</span><strong>Recruiting Desk</strong><input id="rwSearch" type="search" value="'+esc(q)+'" placeholder="Name, school or city" aria-label="Search recruits by name, school or city" maxlength="40"><div class="rw-filter-stack"><button data-rwf="board" class="'+(filter==='board'?'active':'')+'">My Board <b>'+all.filter(x=>x.target).length+'</b></button><button data-rwf="all" class="'+(filter==='all'?'active':'')+'">All Recruits <b>'+fmt(poolMatching)+'</b></button><button data-rwf="commits" class="'+(filter==='commits'?'active':'')+'">Commits <b>'+all.filter(x=>x.commit).length+'</b></button></div></aside><div class="recruit-workspace-list"><div class="rw-list-head"><strong>'+headline+'</strong><small>'+hint+'</small></div><div class="rw-card-list">'+(vis.slice(0,shown).map(card).join('')||'<div class="rw-empty">No prospects here yet. Use All Recruits to browse, or Auto-Target 20 to start a board.</div>')+more+'</div></div><aside class="recruit-workspace-dossier'+(chosen&&changed(chosen)?' rw-dossier-updated':'')+'">'+dossier(chosen)+'</aside>';
+ const removedDetail=phoneDetail&&(!chosen||sel!==oldSelection);if(removedDetail){phoneDetail=false;returnId=''}
+ phoneDetail=phoneDetail&&!!chosen;shell.dataset.phoneView=phoneDetail?'dossier':'list';tab.classList.toggle('rw-phone-dossier',phoneDetail);$('.rw-card-list').scrollTop=scroll;
+ const back=shell.querySelector('[data-rw-back]');if(back)back.onclick=()=>{phoneDetail=false;render();$('.rw-card-list').scrollTop=listScroll;const card=$$('.recruit-workspace-card').find(b=>b.dataset.rwid===returnId)||$('.recruit-workspace-card.active');card?.focus({preventScroll:true});window.scrollTo({top:pageScroll,behavior:'instant'})};
+ if(phoneDetail&&phone()&&action){const button=shell.querySelector('[data-rwa="'+action+'"]');(button&&!button.disabled?button:back)?.focus({preventScroll:true})}
+ if(removedDetail){$('#rwSearch').focus({preventScroll:true});$('#rwSearch').scrollIntoView({block:'center',behavior:'instant'})}
+ globalThis.DynastyLabPortraits?.paint?.(shell);syncCanonicalSelection(all);if(keepFocus!==null){const si=$('#rwSearch');si.focus();si.setSelectionRange(keepFocus,keepFocus)}const si=$('#rwSearch');si.oninput=()=>{shown=PAGE;clearTimeout(searchTimer);const query=si.value;searchTimer=setTimeout(()=>poolFilters()?.setState({query}),300)};shell.querySelectorAll('[data-rw-more]').forEach(b=>b.onclick=()=>{shown+=PAGE;render()});shell.querySelectorAll('[data-rwf]').forEach(b=>b.onclick=()=>{filter=b.dataset.rwf;shown=PAGE;if(filter==='board')poolFilters()?.setState({targetedOnly:true});else if(poolFilters()?.getState().targetedOnly)poolFilters().setState({targetedOnly:false});render()});shell.querySelectorAll('[data-rwid]').forEach(b=>b.onclick=()=>{listScroll=$('.rw-card-list').scrollTop;pageScroll=window.scrollY;returnId=b.dataset.rwid;sel=returnId;phoneDetail=phone();render();if(phoneDetail){const back=$('[data-rw-back]');back?.focus({preventScroll:true});back?.scrollIntoView({block:'start',behavior:'instant'})}});shell.querySelectorAll('[data-rwa]').forEach(b=>b.onclick=()=>{const x=data().find(y=>y.id===sel);if(b.dataset.rwa==='open')delegate(x,'[data-recruit]');if(b.dataset.rwa==='quick')delegate(x,'[data-scout-action="quick"]');if(b.dataset.rwa==='full')delegate(x,'[data-scout-action="full"]');if(b.dataset.rwa==='target')delegate(x,'[data-target]')})
 }
+phoneQuery.addEventListener('change',()=>{if(!phoneDetail)return;render();const control=phone()?$('[data-rw-back]'):$('.recruit-workspace-card.active');control?.focus({preventScroll:true})});
 let pending=false;function queue(){if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;render()})}
 new MutationObserver(queue).observe($('#recruitBody'),{childList:true,subtree:true});document.addEventListener('click',e=>{if(e.target.closest('[data-tab="recruiting"],[data-scout-action],[data-target]'))setTimeout(queue,0)});queue();
 })();
-// Roster needs — read-only Recruiting-tab card. Thin groups are derived from the
+// Counts only: targets and rising watches never count as enrolled players.
+function rosterOutlook(snap={},posCounts={}){
+ return Object.entries(posCounts).map(([pos,target])=>{
+  const players=(snap.players||[]).filter(p=>p.pos===pos),current=players.length;
+  const departing=snap.departuresDone?0:players.filter(p=>p.year==='SR').length,returning=current-departing;
+  const committed=snap.enrolled?0:snap.committed?.[pos]||0,targeted=snap.targeted?.[pos]||0,watched=snap.watched?.[pos]||0,projected=returning+committed;
+  return{pos,target,current,departing,returning,committed,targeted,watched,projected,gap:Math.max(0,target-projected)};
+ });
+}
+if(typeof module==='object'&&module.exports)module.exports={rosterOutlook};
+else // Roster needs — read-only Recruiting-tab card. Thin groups are derived from the
 // engine's designed roster shape (POS_COUNTS) against returning players plus
 // commitments. No save fields, simulation, or randomness: everything comes from
 // the existing DynastyRecruitingNeeds bridge.
@@ -13702,43 +13881,71 @@ new MutationObserver(queue).observe($('#recruitBody'),{childList:true,subtree:tr
   if(host)return host;
   host=document.createElement('section');
   host.id='recruitingNeeds';host.className='card recruiting-needs';host.hidden=true;
-  host.innerHTML='<div class="section-head"><div><div class="eyebrow">ROSTER SHAPE</div><h3>Roster needs</h3><div class="muted" id="recruitingNeedsCount" aria-live="polite"></div></div></div><div class="roster-need-strip" id="recruitingNeedsRows"></div><div class="small muted">Thin against the designed roster shape: returning players plus committed recruits, with seniors excluded because they leave before signing day.</div>';
+  host.innerHTML='<div class="section-head"><div><div class="eyebrow">ROSTER SHAPE</div><h3>Roster outlook</h3><div class="muted" id="recruitingNeedsCount" aria-live="polite"></div></div></div><p class="small muted roster-outlook-note"></p><div class="roster-need-strip" id="recruitingNeedsRows"></div>';
   const summary=tab.querySelector('#classSummary');
   if(summary)summary.insertAdjacentElement('afterend',host);
   else{const table=tab.querySelector(':scope > .table-wrap');if(table)table.insertAdjacentElement('beforebegin',host);else tab.append(host)}
   return host;
- }
- function thinRows(snap){
-  const thin=[];
-  for(const [pos,target] of Object.entries(api.posCounts)){
-   const returning=(snap.players||[]).filter(p=>p.pos===pos&&p.year!=='SR').length;
-   const committed=snap.committed?.[pos]||0;
-   const have=returning+committed;
-   if(have<target)thin.push({pos,target,returning,committed,have,gap:target-have});
-  }
-  return thin;
  }
  function render(){
   queued=false;
   const snap=api.snapshot?.(),node=ensureHost();
   if(!node)return;
   if(!snap){node.hidden=true;lastSig='';return}
-  const thin=thinRows(snap),sig=[snap.team,...thin.map(x=>`${x.pos}:${x.have}:${x.target}:${x.committed}`)].join('|');
+  const rows=rosterOutlook(snap,api.posCounts),thin=rows.filter(x=>x.gap>0),sig=JSON.stringify(snap);
   if(sig===lastSig&&!node.hidden)return;
   lastSig=sig;node.hidden=false;
   node.querySelector('#recruitingNeedsCount').textContent=thin.length
    ?`${thin.length} position group${thin.length===1?'':'s'} thin for ${snap.team}`
    :`No position group is thin for ${snap.team}`;
-  node.querySelector('#recruitingNeedsRows').innerHTML=thin.length
-   ?thin.map(x=>`<div class="roster-need${x.gap>=3?' urgent':''}" data-need-pos="${esc(x.pos)}" title="${esc(`${x.returning} returning + ${x.committed} committed against ${x.target} designed`)}"><strong>${esc(x.pos)}</strong><span>${x.have} of ${x.target}</span><small>${x.committed} committed</small></div>`).join('')
-   :'<span class="muted">Every position group projects at or above its designed depth.</span>';
+  node.querySelector('#recruitingNeedsRows').innerHTML=rows.map(x=>`<article class="roster-outlook-position" data-outlook-pos="${esc(x.pos)}"${x.gap?` data-need-pos="${esc(x.pos)}"`:""}><div class="roster-outlook-title"><h4>${esc(x.pos)}</h4><strong>${x.gap?`${x.gap} short`:'Depth covered'}</strong></div><dl><div><dt>On roster</dt><dd>${x.current}</dd></div><div><dt>Eligibility exits</dt><dd>${x.departing}</dd></div><div><dt>Returning</dt><dd>${x.returning}</dd></div><div><dt>Committed, not enrolled</dt><dd>${x.committed}</dd></div><div><dt>Projected / target</dt><dd>${x.projected} of ${x.target}</dd></div><div><dt>Current targets</dt><dd>${x.targeted}</dd></div><div><dt>Watched · ${snap.year+1}</dt><dd data-outlook-watched>${x.watched}</dd></div></dl><div class="roster-outlook-actions"><button type="button" data-need-current="${esc(x.pos)}">Find current ${esc(x.pos)}</button><button type="button" data-need-rising="${esc(x.pos)}">Find rising ${esc(x.pos)}</button></div></article>`).join('');
+  node.querySelector('.small.muted').textContent=`Projected ${snap.year+1} = returning players + commitments not yet enrolled. Targets and watched class ${snap.year+1} prospects are not roster additions. Transfers and early draft departures can change these totals.${snap.enrolled?' Signing is complete; enrolled recruits are already counted on the roster.':''}`;
+  node.querySelectorAll('[data-need-current]').forEach(b=>b.onclick=()=>{
+   globalThis.DynastyRecruitingClasses?.show('current');
+   tab.querySelector('[data-rwm="workspace"]')?.click();tab.querySelector('[data-rwf="all"]')?.click();
+   globalThis.DynastyLabRecruitingFilters?.setState({pos:b.dataset.needCurrent,stage:'ALL',verdict:'ALL',state:'ALL',query:'',targetedOnly:false});
+   tab.querySelector('#rwSearch')?.focus({preventScroll:true});
+  });
+  node.querySelectorAll('[data-need-rising]').forEach(b=>b.onclick=()=>{
+   globalThis.DynastyRecruitingClasses?.show('rising');
+   const only=tab.querySelector('[data-rising-only]');if(only?.checked){only.checked=false;only.dispatchEvent(new Event('change',{bubbles:true}))}
+   const pos=tab.querySelector('[data-rising-pos]');if(pos){pos.value=b.dataset.needRising;pos.dispatchEvent(new Event('change',{bubbles:true}));tab.querySelector('[data-rising-pos]')?.focus({preventScroll:true})}
+  });
  }
  function queue(){if(queued)return;queued=true;(window.requestAnimationFrame||setTimeout)(render,0)}
  const summary=tab.querySelector('#classSummary');
  if(summary&&window.MutationObserver)new MutationObserver(queue).observe(summary,{childList:true,subtree:true,characterData:true});
- document.addEventListener('click',event=>{if(event.target.closest?.('[data-tab="recruiting"],[data-client-tab="recruiting"]'))setTimeout(queue,0)});
+ document.addEventListener('click',event=>{if(event.target.closest?.('[data-tab="recruiting"],[data-client-tab="recruiting"],[data-recruit-class="outlook"]'))setTimeout(queue,0)});
  document.querySelector('#userTeam')?.addEventListener('change',()=>{lastSig='';setTimeout(queue,0)});
  queue();
+})();
+
+// Peer recruiting views preserve the existing modules and their independent UI state.
+(()=>{
+ 'use strict';
+ const tab=document.querySelector('#recruiting');if(!tab)return;
+ let view='current',queued=false;
+ const keys=['current','rising','outlook','map','shortlist','summary','history'];
+ function paint(){
+  queued=false;
+  const head=tab.querySelector(':scope > .section-head');if(!head)return;
+  let bar=tab.querySelector('#recruitClassViews');
+  if(!bar){bar=document.createElement('div');bar.id='recruitClassViews';bar.className='recruit-class-views';bar.setAttribute('role','group');bar.setAttribute('aria-label','Recruiting views');bar.innerHTML=keys.map(key=>`<button type="button" data-recruit-class="${key}" aria-pressed="false"></button>`).join('');head.after(bar);bar.addEventListener('click',e=>{const button=e.target.closest('[data-recruit-class]');if(button)show(button.dataset.recruitClass)})}
+  if(head.nextElementSibling!==bar)head.after(bar);
+  const year=globalThis.DynastyRecruitingNeeds?.snapshot?.()?.year;
+  const labels={current:`Current · ${year??'this year'}`,rising:`Rising · ${year!=null?year+1:'next year'}`,outlook:'Outlook',map:'Map',shortlist:'Shortlist',summary:'Class summary',history:'History'};
+  bar.querySelectorAll('[data-recruit-class]').forEach(b=>{const key=b.dataset.recruitClass;if(b.textContent!==labels[key])b.textContent=labels[key];b.setAttribute('aria-pressed',String(view===key))});
+  const panels={risingClass:'rising',recruitingNeeds:'outlook',recruitMap:'map',staffRecruitShortlist:'shortlist',classSummary:'summary',signingClassFeature:'summary',signingDay:'summary',recruitingHistory:'history'};
+  for(const node of tab.children){if(node===head||node===bar||node.matches('.guidance-return-context')){delete node.dataset.recruitClassPanel;continue}const key=panels[node.id]||'current';if(node.dataset.recruitClassPanel!==key)node.dataset.recruitClassPanel=key}
+  tab.dataset.recruitClassView=view;
+ }
+ function show(key){if(!keys.includes(key))return;view=key;paint();tab.querySelector(`[data-recruit-class="${key}"]`)?.scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'})}
+ function queue(){if(queued)return;queued=true;requestAnimationFrame(paint)}
+ // Panel additions and canonical summary rebuilds affect routing; map hover tips do not.
+ const observer=new MutationObserver(queue);observer.observe(tab,{childList:true});
+ const summary=tab.querySelector('#classSummary');if(summary)observer.observe(summary,{childList:true});
+ globalThis.DynastyRecruitingClasses=Object.freeze({show,current:()=>view});
+ paint();
 })();
 
 (() => {
@@ -14097,6 +14304,11 @@ queue();
   const items=nodes.map((el,index)=>({index,done:el.classList?.contains('plan-done'),label:el.querySelector?.('.plan-label')?.textContent?.trim()||'',tab:el.dataset?.tab||null,node:el}));
   return{decisions,items,next:model({decisionCount:decisions.length,items})};
  }
+ // Shared by the compact desk and the action controller: only the current boundary's gates count.
+ function blockingItems(guidance){
+  const gates=guidance?.forecast?.eligibility?.blockers||[];
+  return (guidance?.items||[]).filter(item=>item.meaning==='must_resolve'&&gates.some(gate=>(gate.kind==='career_choice'&&item.category==='career')||(gate.kind==='weekly_decisions'&&item.category==='coach_desk')));
+ }
  function readGuidance(root){try{return root.getDynastyGuidance?.()||null}catch{return null}}
  function install(doc){
   if(!doc?.querySelector)return false;
@@ -14109,7 +14321,7 @@ queue();
     button.textContent='Begin Season';button.disabled=false;button.title='Open Week 1 without simulating a game.';return {guidance};
    }
    if(guidance?.forecast){
-    const f=guidance.forecast,gateBlockers=f.eligibility?.blockers||[],blockers=(guidance.items||[]).filter(x=>x.meaning==='must_resolve'&&gateBlockers.some(b=>(b.kind==='career_choice'&&x.category==='career')||(b.kind==='weekly_decisions'&&x.category==='coach_desk')));
+    const f=guidance.forecast,blockers=blockingItems(guidance);
     button.dataset.guidanceAction=f.key||'none';
     if(blockers.length){button.textContent=blockers.length===1?'Resolve required decision':`Resolve ${blockers.length} required decisions`;button.disabled=false;button.title='Open the highest-priority blocking item in the Coaching Agenda.'}
     else{button.textContent=f.key==='none'?'No advance available':`Next: ${f.label}`;button.disabled=f.key==='none';button.title=f.status==='caution'?'This action is allowed, with a consequential decision still open.':f.title||f.label}
@@ -14151,7 +14363,7 @@ queue();
   refresh();
   return true;
  }
- return{model,readState,install,actionSelector};
+ return{model,readState,install,actionSelector,blockingItems};
 });
 
 (() => {
@@ -14428,7 +14640,7 @@ queue();
 
   // The Command Center stacks every dashboard card in one long scroll. This splits the cards that
   // arrive from several modules into three views without changing any of them: the week's work
-  // (default), stories and goals, and the league picture. Cards are classified, never moved.
+  // (default), stories and goals, and the league picture. Cards are classified; the weekly action stays ahead of supporting coverage.
   const VIEWS=[['week','This week'],['stories','Players & goals'],['league','League']];
   const dash=document.querySelector('#dashboard');
   if(!dash||dash.querySelector('.dash-views'))return;
@@ -14445,6 +14657,8 @@ queue();
     // Other modules insert their strips right after the masthead; keep the switcher first so it never jumps between views.
     const bar=dash.querySelector('.dash-views'),masthead=dash.querySelector('.program-masthead');
     if(bar&&masthead&&masthead.nextElementSibling!==bar)masthead.insertAdjacentElement('afterend',bar);
+    const desk=dash.querySelector('.command-center');
+    if(bar&&desk&&bar.nextElementSibling!==desk)bar.insertAdjacentElement('afterend',desk);
     for(const node of dash.children)node.dataset.dview=classify(node);
     dash.dataset.view=view;
   }

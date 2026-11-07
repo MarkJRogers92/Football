@@ -138,28 +138,36 @@
           <div id="rankLine" class="muted">Preseason</div>
           <div id="weekLine" class="muted">2027 · Week 0</div>
         </div>
-        <div class="metric-grid" id="teamMetrics"></div>
-        <div class="masthead-actions button-row">
-          <button id="simWeek">Sim Week</button>
-          <button id="simSeason">Sim Regular Season</button>
-        </div>
-        <p id="weekGateNote" class="gate-note" role="status" hidden></p>
+        <details id="programDetails" class="desk-details program-details">
+          <summary>Program ratings &amp; simulation options</summary>
+          <div class="metric-grid" id="teamMetrics"></div>
+          <div class="masthead-actions button-row">
+            <button id="simWeek">Sim Week</button>
+            <button id="simSeason">Sim Regular Season</button>
+          </div>
+          <p id="weekGateNote" class="gate-note" role="status" hidden></p>
+        </details>
       </div>
       <div class="card command-center">
         <div class="section-head"><div><div class="eyebrow">WEEKLY COMMAND CENTER</div><h2 id="hubTitle">Preseason Briefing</h2></div><button id="hubAdvance">Advance Week</button></div>
-        <div class="command-grid">
-          <div class="plan-card">
-            <section id="guidanceReturnSummary" class="guidance-return-summary" aria-label="Welcome back"></section>
-            <section id="coachingAgenda" class="coaching-agenda" aria-label="Coaching agenda"></section>
-            <div id="weeklyDecisions"></div>
-            <section id="currentPlan" class="current-plan" aria-label="Current plan"></section>
+        <section id="weeklyDeskFocus" class="weekly-desk-focus" aria-label="Next coaching action"></section>
+        <section id="guidanceReturnSummary" class="guidance-return-summary" aria-label="Welcome back"></section>
+        <div id="weeklyDecisions"></div>
+        <details id="weeklyDeskDetails" class="desk-details weekly-desk-details">
+          <summary>Briefing, optional prep &amp; coaching agenda</summary>
+          <div class="command-grid">
+            <div class="plan-card">
+              <section id="coachingAgenda" class="coaching-agenda" aria-label="Coaching agenda"></section>
+              <div id="optionalWeeklyDecisions"></div>
+              <section id="currentPlan" class="current-plan" aria-label="Current plan"></section>
+            </div>
+            <div class="hub-wire">
+              <section id="advanceForecast" class="advance-forecast" aria-label="Advance forecast"></section>
+              <div class="hub-wire-head"><span class="eyebrow">THE WIRE</span></div>
+              <div id="weeklyHub" class="hub-grid"></div>
+            </div>
           </div>
-          <div class="hub-wire">
-            <section id="advanceForecast" class="advance-forecast" aria-label="Advance forecast"></section>
-            <div class="hub-wire-head"><span class="eyebrow">THE WIRE</span></div>
-            <div id="weeklyHub" class="hub-grid"></div>
-          </div>
-        </div>
+        </details>
       </div>
       <div class="card"><div class="section-head"><div><div class="eyebrow">ADMINISTRATION</div><h3>Season Goals</h3></div></div><div id="seasonGoalsDashboard"></div></div>
       <div class="two-col">
@@ -268,6 +276,7 @@
       </div>
       <div id="signingDay"></div>
       <div class="card card--compact" id="classSummary"></div>
+      <section class="card" id="recruitingHistory"><h3>Recruiting history</h3><p class="muted">No signing-day scouting records yet. Signed classes will appear here as evidence is recorded.</p></section>
       <div class="card"><h3>Active Recruiting Battles</h3><div id="recruitBattleBoard"></div></div>
       <div class="table-wrap"><table><thead><tr>
         <th class="sortable" data-sort="name">Recruit</th><th class="sortable" data-sort="pos">Pos</th><th class="sortable" data-sort="rank">Rank</th><th class="sortable" data-sort="stars">Stars</th><th class="sortable" data-sort="home">Hometown / HS</th><th class="sortable" data-sort="miles">Miles</th><th class="sortable" data-sort="priority">Priority</th><th class="sortable" data-sort="scout">Scout</th><th class="sortable" data-sort="interest">Interest</th><th class="sortable" data-sort="trend">Trend</th><th class="sortable" data-sort="leader">Leader</th><th>Visit</th><th>Promise</th><th></th>

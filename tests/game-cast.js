@@ -48,3 +48,21 @@ test('games without play-by-play have no Game Cast model', async () => {
   const quick = e.universe.gameArchive.find(x => !x.drives?.length);
   assert.equal(GC().model(quick), null);
 });
+
+test('scoring plays include made two-point tries and safeties without double-counting',async()=>{
+ const {e}=await detailedGame(91003);
+ const g={id:'scoring-types',home:{name:'Home'},away:{name:'Away'},score:{home:8,away:2},drives:[
+  {side:'home',label:'H1',points:8,result:'TD',playByPlay:['Q1 12:00 · 1st & 10 at opp 1 · TOUCHDOWN Home.','Q1 12:00 · 1st & 2 at opp 2 · Home two-point try good.']},
+  {side:'away',label:'A1',points:2,result:'SAFETY',playByPlay:['Q2 10:00 · 1st & 10 at own 1 · SAFETY for Away.']},
+  {side:'home',label:'H2',points:0,result:'END',playByPlay:['Q3 10:00 · 1st & 2 at opp 2 · Home two-point try failed.']}
+ ]};
+ const before=JSON.stringify(g),m=GC().model(g),scores=m.plays.filter(p=>p.scoring);
+ assert.deepEqual(scores.map(p=>[p.offense,p.scoring]),[['home',6],['home',2],['away',2]]);
+ assert.deepEqual(m.plays.filter(p=>!p.final).map(p=>[p.home,p.away]),[[0,0],[6,0],[8,0],[8,2]],'running score is reconciled exactly once');
+ assert.equal(m.plays.at(-2).scoring,undefined,'a failed try is not a scoring play');
+ assert.equal(JSON.stringify(g),before,'presentation never rewrites the archive');
+ e.universe.gameArchive.push(g);e.showGameCenter(g.id,'Game Cast');
+ const table=document.querySelector('#gameDialogBody').innerHTML.match(/<tbody>([\s\S]*?)<\/tbody>/)[1];
+ assert.equal((table.match(/<tr>/g)||[]).length,3);
+ assert.match(table,/<td>0–6<\/td>[\s\S]*<td>0–8<\/td>[\s\S]*<td>2–8<\/td>/,'score cells follow the advertised away–home order');
+});

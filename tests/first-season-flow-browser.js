@@ -21,6 +21,7 @@ const goTab=async(page,id)=>page.evaluate(({id,group})=>{
   try{
     await page.goto('file://'+path.join(__dirname,'..','index.html'));
     await startNewDynasty(page);
+    await page.click('#weeklyDeskDetails > summary');
 
     await page.waitForSelector('#firstSeasonBriefing',{state:'visible',timeout:15000});
     const flow=await page.evaluate(()=>window.getFirstSeasonFlow?.());

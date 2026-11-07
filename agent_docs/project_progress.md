@@ -1,5 +1,15 @@
 # Project Progress
 
+Current continuation packet: `agent_docs/CLAUDE_HANDOFF_2026-11-06_DYNASTY_LAB.md`. Work remains local, uncommitted and unreleased; the original checkout is preserved.
+
+## Recruiting continuation — 2026-11-06
+
+Implemented active-view count visibility, shared full-pool search/reset, compact Workspace filters and a dedicated phone dossier with Back restoring list position and focus. Targeted recruiting and desktop/phone browser checks passed; see `latest_session_work.md`. Current/Rising peer views, roster outlook and position shortcuts are now also implemented, with 47 targeted tests and 119 smoke checks passed. Focused map/shortlist/summary/history views are now also implemented. Mark prefers fewer menus and a condensed, clean layout: use the flat direct-view strip. Latest validation: 54 targeted tests and 119 smoke checks passed. Next: visual-density review before release scope.
+
+## Unreleased work in progress — 2026-11-04
+
+Recruiting explanation parity, the first shorter weekly desk, postseason win-chart scaling and Game Cast scoring corrections are implemented and verified locally (final full run: 538 Node tests and 53 smoke checks passed) on `codex/recruiting-weekly-desk`, in `/Users/markrogers/.codex/worktrees/recruiting-weekly-desk/Football`, based on v0.14.1 commit `252a784e8a55ae48d09920be396d709b8e60dd7a`. No commit, push, publication or desktop install occurred. See `latest_session_work.md` for scope, verification, evidence and the continuation point. The complete proposed upgrade roadmap is `/Users/markrogers/Documents/Codex/2026-11-04/dynasty-upgrade-review/ROADMAP.html`.
+
 ## Version and branch
 
 Source is `0.14.1` on `claude/review-improvement-dwjemy` (PR #33, merge 07d5ca8). Web published (production run 41775769252). GitHub
@@ -58,10 +68,7 @@ preservation and the offseason recap (PR #13).
 
 ## Current position
 
-v0.12.18 source merged and Mac installed: historical championship/conference facts,
-off-field career preservation, roster accounting and offseason recap.
-Live web remains v0.12.17. Further league-health metrics and Hall of Fame
-transparency remain backlog; no balance tuning was performed.
+The source baseline is v0.14.1. The unreleased recruiting explanation and weekly desk work above is ready for review. This session did not change published or installed builds; the release records above are historical context.
 
 ## Next milestone
 

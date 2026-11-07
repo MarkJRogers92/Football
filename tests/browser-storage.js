@@ -24,6 +24,7 @@ const {clickShellUtility}=require('./helpers/client-shell');
   const tab=id=>goTab(page, id);
   const status=pattern=>page.waitForFunction(source=>new RegExp(source).test(document.querySelector('#saveStatus').textContent),pattern,{timeout:30000});
   const replaceSavedSlot=async()=>{page.once('dialog',dialog=>dialog.accept());await clickShellUtility(page,'#saveBrowser');await status('^Saved')};
+  if(!await page.locator('#simSeason').isVisible())await page.click('#programDetails > summary');
   await page.click('#simSeason');await tab('season');await page.click('#simConf');await page.click('#simBowls');await page.click('#simPlayoff');
   // The ordered offseason calendar introduced before v0.9.52 requires review, departures,
   // signing and portal resolution before Spring Development becomes actionable.

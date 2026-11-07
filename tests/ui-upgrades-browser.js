@@ -93,10 +93,12 @@ const resolveDecisions = async page => {
         await page.waitForFunction(g => document.querySelector('#weekGateNote')?.hidden === !g, gated, { timeout: 10000 });
         if (gated) break;
         const before = await page.evaluate(() => document.querySelector('#weekLine')?.textContent);
+        if(!await page.locator('#simWeek').isVisible())await page.click('#programDetails > summary');
         await page.click('#simWeek');
         await page.waitForFunction(w => document.querySelector('#weekLine')?.textContent !== w, before, { timeout: 60000 });
       }
       assert.ok(gated, `[${label}] reached a gated week`);
+      if(!await page.locator('#simWeek').isVisible())await page.click('#programDetails > summary');
       assert.match(await page.locator('#weekGateNote').innerText(), /Resolve the Coach’s Desk decisions before advancing the week\. Or use Sim Regular Season and your staff will decide\./, `[${label}] the hero states why and offers the alternative`);
       assert.equal(await page.locator('#weekGateNote .gate-note-go').innerText(), 'Go to decisions', `[${label}] and offers the jump`);
       await resolveDecisions(page);

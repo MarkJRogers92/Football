@@ -79,6 +79,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
     check(`[${label}] weekly decision gate clears before sim`, simReady);
     if (!simReady) throw new Error(`[${label}] Sim Week remained disabled after resolving visible weekly decisions`);
     const t0 = Date.now();
+    if(!await page.locator('#simWeek').isVisible())await page.click('#programDetails > summary');
     await page.click('#simWeek');
     await page.waitForFunction(() => /Week 1/.test(document.querySelector('#weekLine').textContent), { timeout: 60000 });
     const simMs = Date.now() - t0;
@@ -96,6 +97,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
 
     // Weekly hub items link to the tab they describe.
     const hubTab = await page.$eval('#weeklyHub .hub-link', el => el.dataset.tab);
+    await page.click('#weeklyDeskDetails > summary');
     await page.click('#weeklyHub .hub-link');
     await page.waitForTimeout(120);
     check(`[${label}] hub item opens its tab (${hubTab})`,

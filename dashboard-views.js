@@ -3,7 +3,7 @@
 
   // The Command Center stacks every dashboard card in one long scroll. This splits the cards that
   // arrive from several modules into three views without changing any of them: the week's work
-  // (default), stories and goals, and the league picture. Cards are classified, never moved.
+  // (default), stories and goals, and the league picture. Cards are classified; the weekly action stays ahead of supporting coverage.
   const VIEWS=[['week','This week'],['stories','Players & goals'],['league','League']];
   const dash=document.querySelector('#dashboard');
   if(!dash||dash.querySelector('.dash-views'))return;
@@ -20,6 +20,8 @@
     // Other modules insert their strips right after the masthead; keep the switcher first so it never jumps between views.
     const bar=dash.querySelector('.dash-views'),masthead=dash.querySelector('.program-masthead');
     if(bar&&masthead&&masthead.nextElementSibling!==bar)masthead.insertAdjacentElement('afterend',bar);
+    const desk=dash.querySelector('.command-center');
+    if(bar&&desk&&bar.nextElementSibling!==desk)bar.insertAdjacentElement('afterend',desk);
     for(const node of dash.children)node.dataset.dview=classify(node);
     dash.dataset.view=view;
   }

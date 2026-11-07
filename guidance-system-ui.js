@@ -32,6 +32,16 @@
   if(!items.length)return '';
   return `<details class="guidance-snoozed"><summary>Snoozed for now <span>${items.length}</span></summary><p class="muted small">These are out of the active agenda only. Restoring one does not advance time.</p><div class="guidance-snoozed-list">${items.map(item=>`<div><span><strong>${esc(item.title)}</strong><small>${esc(meaningLabel[item.meaning]||'Guidance')} · ${esc(item.affectedEntity?.label||'Program')}</small></span><button type="button" data-guidance-restore="${esc(item.id)}">Restore</button></div>`).join('')}</div></details>`;
  }
+ function renderDeskFocus(model){
+  const host=target('#weeklyDeskFocus'),f=model.forecast;if(!host||!f)return;
+  const blockers=window.DynastyNextAction?.blockingItems(model)||[],next=blockers[0];
+  const label=f.key==='none'?'No advance available':statusLabel[f.status]||'Next boundary';
+  const title=next?.title||f.title||f.label;
+  const detail=next?`${blockers.length} required decision${blockers.length===1?'':'s'} before the next advance. ${f.title}.`:f.status==='caution'?'You can advance with the current plan. Review open choices in the full briefing if you want to change it.':f.key==='begin-season'?'Opens your first matchup without simulating a game.':f.key==='none'?'Review your program for the next available action.':'Your current plan is ready. The full briefing explains what happens next.';
+  host.dataset.status=f.status;
+  host.innerHTML=`<span class="weekly-desk-status">${esc(label)}</span><h3>${esc(title)}</h3><p>${esc(detail)}</p>`;
+ }
+ function revealDetails(el){if(el?.closest('#dashboard'))window.DynastyDashboardViews?.show('week');for(let parent=el?.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true}
  function renderAgenda(model){
   const host=target('#coachingAgenda');if(!host)return;
   const visible=model.visible||model,leading=visible.leading||model.leading||[],remaining=visible.remaining||model.remaining||[],snoozed=model.snoozed||[];
@@ -68,14 +78,15 @@
  }
  function focusDestination(item){
   const destination=item.destination||{},focus=destination.focus;
+  if(['scholarship-summary','recruiting-board'].includes(focus))window.DynastyRecruitingClasses?.show(focus==='scholarship-summary'?'summary':'current');
   let el=null;
   if(focus==='weekly-decision'&&destination.decisionId){
    el=[...document.querySelectorAll('[data-decision]')].find(button=>button.dataset.decision===String(destination.decisionId))?.closest('.decision-card')||target('#weeklyDecisions');
   }else if(focus==='career-post')el=target('#careerPost');
   else if(focus==='coach-opening')el=target('#coachMarket');
   else if(focus==='scholarship-summary')el=target('#classSummary');
-  else if(focus==='recruiting-board')el=target('#recruitBody')||target('#classSummary');
-  if(el){el.classList.add('guidance-focus-target');el.tabIndex=-1;el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>el?.focus?.({preventScroll:true}),250);return true}
+  else if(focus==='recruiting-board'){const workspace=target('#recruitWorkspace');if(workspace&&!workspace.hidden){target('[data-rwm="workspace"]')?.click();el=workspace}else el=target('#recruitBody')||target('#classSummary')}
+  if(el){revealDetails(el);el.classList.add('guidance-focus-target');el.tabIndex=-1;el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>el?.focus?.({preventScroll:true}),250);return true}
   return false;
  }
  function addReturnControl(item){
@@ -89,7 +100,7 @@
  function returnToAgenda(){
   document.querySelectorAll('.guidance-return-context').forEach(context=>context.remove());
   if(typeof goToTab==='function')goToTab('dashboard');
-  requestAnimationFrame(()=>{const host=target('#coachingAgenda');host?.scrollIntoView({behavior:'smooth',block:'start'});const opener=agendaContext?.itemId?agendaButton(agendaContext.itemId):null;opener?.focus?.({preventScroll:true});agendaContext=null;});
+  requestAnimationFrame(()=>{const host=target('#coachingAgenda');revealDetails(host);host?.scrollIntoView({behavior:'smooth',block:'start'});const opener=agendaContext?.itemId?agendaButton(agendaContext.itemId):null;opener?.focus?.({preventScroll:true});agendaContext=null;});
  }
  function openGuidanceItem(id){
   const model=currentModel(),item=model?.items?.find(x=>x.id===id);if(!item){if(typeof setStatus==='function')setStatus('That agenda item is no longer active.');renderGuidanceSystem();return}
@@ -112,7 +123,7 @@
   host.querySelectorAll('[data-guidance-restore]').forEach(button=>button.addEventListener('click',()=>{callGuidance('guidanceRestoreItem',button.dataset.guidanceRestore);renderGuidanceSystem()}));
  }
  function bindReturnSummary(){target('#guidanceReturnSummary')?.querySelector('[data-guidance-dismiss-return]')?.addEventListener('click',()=>{if(typeof dismissGuidanceReturnSummary==='function')dismissGuidanceReturnSummary();renderGuidanceSystem()})}
- function renderGuidanceSystem(){const model=currentModel();if(!model)return;renderReturnSummary();renderAgenda(model);renderForecast(model);renderPlan(model);bindAgenda();bindReturnSummary()}
+ function renderGuidanceSystem(){const model=currentModel();if(!model)return;renderDeskFocus(model);renderReturnSummary();renderAgenda(model);renderForecast(model);renderPlan(model);bindAgenda();bindReturnSummary()}
  window.renderGuidanceSystem=renderGuidanceSystem;
  window.getDynastyGuidance=currentModel;
  window.openGuidanceItem=openGuidanceItem;

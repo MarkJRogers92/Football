@@ -41,3 +41,14 @@ test('only the last ten seasons are drawn, and out-of-range values stay inside t
  const ys=[...html.matchAll(/class="trend-dot" cx="[\d.]+" cy="([\d.-]+)"/g)].map(m=>Number(m[1]));
  assert.ok(ys.every(y=>y>=0&&y<=130),'confidence points are clamped into the chart');
 });
+
+test('postseason win totals retain their proportions above twelve wins',async()=>{
+ const e=await setup(9954);
+ tenureWith(e.universe,[row(2027,12,8,60,{l:2}),row(2028,15,8,70,{l:0}),row(2029,17,10,80,{l:0,champ:true})]);
+ const html=e.programTrendsHTML();
+ const heights=[...html.matchAll(/class="trend-bar[^\"]*"[^>]*height="([\d.]+)"/g)].map(m=>Number(m[1]));
+ assert.equal(heights.length,3);
+ assert.ok(heights[0]<heights[1]&&heights[1]<heights[2],'12, 15 and 17 wins must have distinct increasing heights');
+ assert.ok(Math.abs(heights[0]/heights[2]-12/17)<.002,'bar heights remain proportional to the win totals');
+ assert.ok(heights.every(h=>h>=0&&h<=92),'all bars fit the chart');
+});

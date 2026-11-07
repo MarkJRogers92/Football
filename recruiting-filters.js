@@ -81,10 +81,12 @@ if(typeof module==='object'&&module.exports){
  }
  function renderRecruitingFilters(){
   const root=$('#recruiting'),table=root?.querySelector?.('.table-wrap');if(!root||!table)return;
+  const focusKey=document.activeElement?.dataset?.recruitFilter,caret=focusKey==='query'?document.activeElement.selectionStart:null;
   root.querySelector?.('[data-recruiting-board-view]')?.remove();
   root.querySelector?.('[data-recruiting-filters]')?.remove();
   table.insertAdjacentHTML?.('beforebegin',`${recruitingBoardViewHTML()}${recruitingFilterHTML()}`);
   bindRecruitingFilters();
+  if(focusKey){const control=[...root.querySelectorAll('[data-recruit-filter]')].find(el=>el.dataset.recruitFilter===focusKey);control?.focus({preventScroll:true});if(caret!=null)control?.setSelectionRange(caret,caret)}
  }
  extendRender('recruiting',renderRecruitingFilters);
  globalThis.DynastyLabRecruitingFilters={
