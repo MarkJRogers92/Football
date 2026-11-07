@@ -38,6 +38,10 @@ async function resolveChoices(page){
    await page.click('#hubAdvance');
    await page.waitForFunction(()=>window.__DL_TEST__.preseasonDebug().week===1,null,{timeout:60000});
    await saved(page);await page.waitForSelector('#highlightsCard',{state:'visible'});
+   // The recap paints on its existing 80ms queue after the persistence event.
+   try{await page.waitForSelector('#highlightsCard [data-save-state="saved"]',{state:'visible'})}catch(error){
+    console.error('Postgame save display',await page.evaluate(()=>({status:window.DynastySessionStatus?.read(),rhythm:window.DynastySeasonMoments?.weeklyRhythm(),display:document.querySelector('#highlightsCard .hl-save')?.outerHTML||null})));throw error;
+   }
    assert.equal(await page.locator('.hud-splash').count(),0,'ordinary finals use the persistent recap rather than a full-screen interruption');
    const final=await page.evaluate(()=>window.DynastySeasonMoments.highlights());
    assert.ok(final?.gameId,'payoff comes from a recorded final');
