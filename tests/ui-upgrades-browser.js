@@ -106,6 +106,14 @@ const resolveDecisions = async page => {
 
       // The phone ticker is one still headline.
       if (phone) {
+        // A fresh dynasty can reach its first required decision without playing a game.
+        // Setup/decision confirmations are deliberately excluded from the ticker, so
+        // arrange two eligible headlines through its normal status-line input rather
+        // than depending on a randomly generated starting week to have produced one.
+        for (const headline of ['Scouting update: phone ticker fixture one', 'Scouting update: phone ticker fixture two']) {
+          await page.evaluate(text => { document.querySelector('#saveStatus').textContent = text; }, headline);
+          await page.waitForFunction(text => [...document.querySelectorAll('.hud-ticker-reel span')].some(s => s.textContent === text), headline, { timeout: 10000 });
+        }
         await page.waitForSelector('.hud-ticker', { state: 'attached', timeout: 10000 });
         const shown = await page.evaluate(() => [...document.querySelectorAll('.hud-ticker-reel span')].filter(s => getComputedStyle(s).display !== 'none').length);
         assert.equal(shown, 1, `[${label}] one headline shows on a phone`);
