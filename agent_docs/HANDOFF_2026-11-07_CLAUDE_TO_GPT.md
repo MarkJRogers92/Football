@@ -89,4 +89,7 @@ Results recorded so far:
 
 ## Status of the final test run on `cee6f4c`
 
-Pending at the time of writing (Node suite running). Claude will update this line when it completes.
+Run sequentially with nothing else in parallel:
+- `npm test`: **566/566 passed**.
+- `npm run test:browser`: **passed**.
+- `npm run test:browser-extended` (40 files run one by one): **39 passed, 1 failed** — `tests/recruiting-phone-browser.js` at line 62, "removal returns focus to a safe list control". It then **passed 3 of 3 times run alone**. It has failed twice, both late in a long sequential run, and passed in every isolated or clean rerun. Treat it as an intermittent focus-timing issue to investigate (does a late canonical refresh replace `#rwSearch` after the removal focuses it?). Do not loosen the assertion.
