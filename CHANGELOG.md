@@ -1,8 +1,15 @@
 # Changelog
 
+## v0.14.5 — Locked-in games and a calmer desk
+
+- **Coached games are locked in.** A Coach It Live game records itself at the final whistle. Advancing the week, simming the season, Sim Instantly or Watch while a live game is unfinished lets your staff finish that same game and records it, instead of simulating a different one. An unfinished live game is kept in the save and rebuilt exactly after a reload. Restart Game is gone.
+- **Decision Room.** Required decisions (a player asking for more playing time, a starter under pressure) open in their own window: the players involved side by side with depth, staff grade, role, games, morale and transfer risk, the players ahead of him on the depth chart, the staff pick, and what each choice does.
+- **Setup reminders.** A short, optional "Worth doing this week" list on This Week flags an empty or thin recruiting board, unused scouting hours, a training focus not set this season, and open featured development plans before spring. Each opens the right screen or snoozes; none blocks advancing.
+- **Calmer screens.** Game Day's hero is just the matchup, the plan and edges appear once, inner panels no longer draw boxes inside boxes, empty and duplicate panels are hidden, and coordinator advice is folded away. A single required decision reads as one item. Game Day shows about 40% fewer words.
+
 ## v0.14.4 — Long-save fixes and the full season story
 
-Unpublished candidate. Fixes the defects confirmed by the 30-season long-save soak and makes the
+Fixes the defects confirmed by the 30-season long-save soak and makes the
 postseason and offseason read as part of the season. No balance, difficulty or archive-retention
 changes.
 

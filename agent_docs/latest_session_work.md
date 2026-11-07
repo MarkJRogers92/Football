@@ -1,5 +1,13 @@
 # Latest Session Work
 
+## v0.14.5 — 2026-11-07
+
+- From owner playtest feedback: a coached (Coach It Live) game was discarded and re-simulated when the week advanced. Live games now record at the final whistle, any advance finishes and records the same game, and the live game is kept in the save as its seeded action log (`universe.liveGameDay`) and rebuilt after reload. New `tests/live-game-lock-browser.js`.
+- Decision Room (`decision-room.js/.css`): required weekly decisions open in a dialog with the involved players side by side, the staff pick and every option. New `tests/decision-room-browser.js`.
+- Optional setup reminders on This Week (recruiting board, scouting hours, training focus, featured plans) via new guidance items; never blocking.
+- Calmer layouts (`calm-layout.css`): Game Day hero is the matchup only, no boxes inside boxes, hidden empty/duplicate panels. Game Day visible words 675 -> 387.
+- Validation here: npm test 650/650, test:browser, test:browser-extended and test:browser-storage all passed locally (Chromium 1243).
+
 ## v0.14.4 candidate (unpublished) — 2026-11-07
 
 - Branch `claude/eager-albattani-agpo72` from `84a7770`. Canonical handoff: `agent_docs/HANDOFF_2026-11-07_v0.14.4.md`. Nothing published or installed; no real saves touched.
