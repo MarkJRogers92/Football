@@ -29,12 +29,12 @@ const {startNewDynasty}=require('./helpers/start-new-dynasty');
   }
   const before=await page.evaluate(()=>window.__DL_TEST__.preseasonDebug());
   await page.click('#hubAdvance');
-  await page.waitForSelector('.guidance-return-context');
+  await page.waitForSelector('#decisionRoom[open]');
   assert.equal(await page.evaluate(()=>window.__DL_TEST__.preseasonDebug().week),before.week,'reviewing a blocker never advances');
-  assert.equal(await page.locator('.decision-card.guidance-focus-target').isVisible(),true,'the primary action opens the actual choice');
-  await page.click('.guidance-return');
-  await page.waitForFunction(()=>document.querySelector('#weeklyDeskDetails').open);
-  assert.equal(await page.locator('#weeklyDeskDetails').getAttribute('open'),'','return opens the agenda disclosure');
+  assert.ok(await page.locator('#decisionRoom [data-room-choice]').count()>=2,'the primary action opens the actual choice in the Decision Room');
+  const roomBox=await page.locator('#decisionRoom').boundingBox();assert.ok(roomBox&&roomBox.width<=391,'the Decision Room fits the viewport');
+  await page.click('#decisionRoom [data-room-close]');
+  await page.waitForFunction(()=>!document.querySelector('#decisionRoom[open]'));
   while(await page.evaluate(()=>window.DynastyNextAction.blockingItems(window.getDynastyGuidance()).length)){
    const id=await page.evaluate(()=>window.DynastyNextAction.blockingItems(window.getDynastyGuidance())[0].destination.decisionId);
    assert.ok(id,'this fixture only has weekly blockers');
@@ -43,6 +43,7 @@ const {startNewDynasty}=require('./helpers/start-new-dynasty');
   assert.doesNotMatch(await page.locator('#weeklyDeskFocus').innerText(),/Decision required/);
   assert.equal(await page.locator('#hubAdvance').isDisabled(),false,'optional preparation does not block advancement');
   const optionalWeek=await page.evaluate(()=>window.__DL_TEST__.preseasonDebug().week);
+  await page.evaluate(()=>{for(let el=document.querySelector('#optionalWeeklyDecisions');el;el=el.parentElement)if(el.tagName==='DETAILS')el.open=true});
   await page.locator('#optionalWeeklyDecisions .decision-option').first().click();
   await page.waitForFunction(()=>!document.querySelector('#optionalWeeklyDecisions .decision-card'));
   assert.equal(await page.evaluate(()=>window.__DL_TEST__.preseasonDebug().week),optionalWeek,'choosing optional preparation does not advance the week');

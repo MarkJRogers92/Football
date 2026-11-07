@@ -5,3 +5,11 @@
 .v2-gameday-decision{margin-top:12px;padding:14px;border:1px solid var(--warn);border-radius:12px;background:rgba(243,202,120,.06)}.v2-gameday-decision h3{margin:2px 0 6px}.v2-gameday-decision .button-row{margin-top:12px}.v2-gameday-decision button.recommended{border-color:var(--good)}
 .v2-gameday-controls{align-items:center;margin:12px 0}.v2-gameday-feed{margin-top:10px;border:1px solid var(--line);border-radius:12px;overflow:hidden}.v2-gameday-feed-head{display:flex;justify-content:space-between;gap:10px;padding:9px 11px;background:var(--panel2);border-bottom:1px solid var(--line)}.v2-gameday-feed-row{display:grid;grid-template-columns:90px minmax(0,1fr) auto;gap:10px;padding:8px 11px;border-bottom:1px solid var(--line);align-items:start}.v2-gameday-feed-row:last-child{border-bottom:0}.v2-gameday-feed-row span{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}.v2-gameday-feed-row strong{font-size:13px}.v2-gameday-feed-row b{font-variant-numeric:tabular-nums}
 @media(max-width:720px){.v2-gameday-head{flex-direction:column}.v2-gameday-scoreboard{grid-template-columns:1fr}.v2-gameday-team,.v2-gameday-team.home{grid-template-columns:auto minmax(0,1fr) auto}.v2-gameday-center{order:-1}.v2-gameday-feed-row{grid-template-columns:72px minmax(0,1fr) auto}.v2-gameday-team b{font-size:28px}}
+
+/* Fewer words on Game Day: hide empty last-game panels and the duplicate matchup table. */
+#gamelab .card:has(> #detailedBox[data-empty="1"]),#gamelab .card:has(> #detailedLog[data-empty="1"]){display:none}
+#gamelab:has(.v2-matchup-head) .card:has(> #keyMatchups){display:none}
+.v0102-staff-room>summary{cursor:pointer;list-style:none}
+.v0102-staff-room>summary::-webkit-details-marker{display:none}
+.v0102-staff-room>summary::after{content:"Show";margin-left:auto;font-size:12px;font-weight:800;color:#e6c27a}
+.v0102-staff-room[open]>summary::after{content:"Hide"}

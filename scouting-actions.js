@@ -96,6 +96,7 @@ if(typeof module==='object'&&module.exports){
  const scoutingBudgetFor=recruitScoutingActions.scoutingBudgetFor;
  const scoutingWeekInfo=recruitScoutingActions.scoutingWeekInfo;
  const scoutingHoursLeft=recruitScoutingActions.scoutingHoursLeft;
+ globalThis.DynastyScoutingWeek=t=>t?scoutingWeekInfo(t):null;
  recruitScoutingRecord=recruitScoutingActions.recruitScoutingRecord;
  const scoutingActionAvailability=recruitScoutingActions.actionAvailability;
  scoutingHoursInfo=t=>{const w=scoutingWeekInfo(t);return{left:scoutingHoursLeft(t),budget:w.budget}};

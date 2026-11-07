@@ -17,7 +17,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
     await goTab(page,'gamelab');
     await page.waitForSelector('[data-v2-gameday-start]',{timeout:15000});
     const before=await page.evaluate(()=>window.__DL_TEST__.v2GameDayCommitDebug());
-    await page.click('[data-v2-gameday-start]');await page.waitForSelector('.v2-gameday-scoreboard',{timeout:10000});
+    await page.evaluate(()=>window.__DL_TEST__.v2GameDayHoldFinal(true));await page.click('[data-v2-gameday-start]');await page.waitForSelector('.v2-gameday-scoreboard',{timeout:10000});
     await page.click('[data-v2-gameday-delegate]');await page.waitForFunction(()=>window.__DL_TEST__.v2GameDayPreviewState()?.state?.status==='final',{timeout:60000});
     const staged=await page.evaluate(()=>window.__DL_TEST__.v2GameDayPreviewState());assert.equal(staged.status,'final');assert.ok(staged.state.events.some(e=>e.type==='coaching_decision'),'staged game should contain coaching decisions');
     assert.deepEqual(await page.evaluate(()=>window.__DL_TEST__.v2GameDayCommitDebug()),before,'staged final must not alter permanent dynasty state');

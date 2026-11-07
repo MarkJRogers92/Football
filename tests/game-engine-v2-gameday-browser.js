@@ -14,7 +14,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
     await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);await goTab(page,'gamelab');
     await page.waitForSelector('#v2InteractiveGameDay [data-v2-gameday-start]',{timeout:15000});
     const before=await page.evaluate(()=>window.__DL_TEST__.v2GameDayPreviewDigest());assert.ok(before,'preview integrity digest should be available');
-    await page.click('[data-v2-gameday-start]');await page.waitForSelector('#v2InteractiveGameDay .v2-gameday-scoreboard',{timeout:10000});
+    await page.evaluate(()=>window.__DL_TEST__.v2GameDayHoldFinal(true));await page.click('[data-v2-gameday-start]');await page.waitForSelector('#v2InteractiveGameDay .v2-gameday-scoreboard',{timeout:10000});
     let state=await page.evaluate(()=>window.__DL_TEST__.v2GameDayPreviewState());assert.ok(state);assert.ok(['live','decision'].includes(state.status));assert.ok(state.state.events.length>=3,'interactive preview should start the football event stream');
     for(let i=0;i<3;i++)if(await page.locator('[data-v2-gameday-next]').count())await page.click('[data-v2-gameday-next]');
     if(await page.locator('[data-v2-gameday-decision]').count())await page.click('[data-v2-gameday-decision]');
@@ -25,7 +25,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
     await page.click('[data-v2-gameday-delegate]');await page.waitForFunction(()=>window.__DL_TEST__.v2GameDayPreviewState()?.state?.status==='final',{timeout:60000});
     state=await page.evaluate(()=>window.__DL_TEST__.v2GameDayPreviewState());assert.equal(state.status,'final');assert.ok(state.state.events.some(e=>e.type==='coaching_decision'));assert.ok(state.state.events.length>50);
     assert.equal(await page.evaluate(()=>window.__DL_TEST__.v2GameDayPreviewDigest()),before,'a staged final must leave schedule, records, stats and archive untouched');
-    assert.match(await page.locator('#v2InteractiveGameDay').textContent(),/Final whistle\. Finish Game records this result in your dynasty\./);assert.equal(await page.locator('[data-v2-gameday-record]').count(),1,'staged final should expose the official-record button');assert.equal(await page.locator('[data-v2-gameday-record]').innerText(),'Finish Game');
+    assert.match(await page.locator('#v2InteractiveGameDay').textContent(),/Final whistle\. Record the final to keep this result\./);assert.equal(await page.locator('[data-v2-gameday-record]').count(),1,'staged final should expose the official-record button');assert.equal(await page.locator('[data-v2-gameday-record]').innerText(),'Record Final');
     assert.deepEqual(errors,[],`interactive Game Day preview emitted browser errors: ${errors.join('\n')}`);
     console.log('PASS v0.10.1 interactive Game Day: live scoreboard, fourth-down decision UI, deterministic staged final, zero mutation before official record');
   }finally{await browser.close()}

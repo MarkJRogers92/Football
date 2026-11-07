@@ -1,0 +1,22 @@
+/* Calm layout: fewer boxes inside boxes. Loaded last so it wins over feature styles. */
+
+/* Inner sections sit on the card itself: separated by space and a hairline, not their own boxes. */
+.v2-matchup-grid>section,.v0102-weekly-grid section{background:none;border:0;border-radius:0;padding:0}
+.v2-matchup-grid,.v0102-weekly-grid{gap:20px 28px}
+.v2-matchup-plan{background:none;border:0;border-top:1px solid var(--line);border-radius:0;padding:12px 0 0}
+.v2-matchup-tendency{background:none;padding:0}
+.v0102-staff-card{background:none;border:0;border-left:2px solid var(--line);border-radius:0;padding:4px 0 4px 12px}
+
+/* Preparation choices: compact chips; the full description shows on the chosen ones only. */
+.v0102-prep-focus{min-height:0;padding:9px 12px}
+.v0102-prep-focus small{display:none}
+.v0102-prep-focus.active small,.v0102-prep-focus[aria-pressed="true"] small{display:block}
+
+/* A single required decision reads as the body of the weekly focus, not a second headline. */
+#weeklyDecisions .decision-card:only-child .decision-kicker,#weeklyDecisions .decision-card:only-child .decision-title{display:none}
+#weeklyDecisions .decision-card:only-child{margin-top:6px}
+
+/* Game Day hero without data grids: the matchup is the picture. */
+.gameday-event-hero:not(:has(.event-recent)){gap:0}
+/* Around your program only takes space when it has something to say. */
+#weeklyWorldBriefing:not(:has(.lw-brief)) .lw-heading{display:none}

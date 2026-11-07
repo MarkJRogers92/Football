@@ -260,17 +260,21 @@ test('a completed detailed game queues and persists its official result without 
  await e.loadBrowser();await e.ensureGamesLoaded();assert.equal(e.universe.gameArchive.length,1);assert.equal(e.universe.gameArchive[0].engine,'v2');
 });
 
-test('interactive preview and rollback stay unpersisted while a committed final queues a real checkpoint',async()=>{
+// v0.14.5: a live game is kept in the save as its coaching-action log so it survives a reload, but
+// neither a live game nor a rolled-back recording ever saves an official result.
+test('live games save only their action log; rollback records nothing; a committed final queues a real checkpoint',async()=>{
  const f=await fixture(8328,{fullRuntime:true}),{e,store}=f,api=assertApi(f);
  const ready=global.__DL_TEST__.v2PrepareDetailedGame();assert.equal(ready.ready,true);await e.saveBrowser();
  const bridge=global.DynastyGameEngineV2LabBridge,gameDay=global.DynastyGameEngineV2GameDay;
- bridge.interactive.start();const session=bridge.interactive.getSession();assert.ok(session);gameDay.simulate(session,()=> 'delegate');
- assert.equal(session.state.status,'final');assert.equal(api.read().state,'saved','a staged final is not a committed game');
- assert.equal((await store.load()).gameRef.count,0);assert.equal(await e.runAutosave(),false);
+ bridge.interactive.start();const session=bridge.interactive.getSession();assert.ok(session);
+ assert.equal(api.read().state,'pending','starting a live game checkpoints its action log');await e.runAutosave();
+ let saved=await store.load();assert.equal(saved.gameRef.count,0,'no official game is saved for a live game');
+ assert.ok(saved.universe.liveGameDay?.key,'the live game is kept for a reload');assert.equal(saved.universe.week,0);
+ gameDay.simulate(session,()=> 'delegate');assert.equal(session.state.status,'final');
  assert.throws(()=>bridge.recordInteractive(session,{testFault:'afterArchive'}),/Injected.*rollback fault/);
- assert.equal(api.read().state,'saved');assert.equal(await e.runAutosave(),false,'rollback never schedules an official save');
+ assert.equal(await e.runAutosave(),false,'rollback never schedules an official save');assert.equal((await store.load()).gameRef.count,0);
  const recorded=bridge.recordInteractive(session);assert.equal(recorded.ok,true);assert.equal(api.read().state,'pending');
- await e.runAutosave();const saved=await store.load();assert.equal(saved.gameRef.count,1);assert.equal(saved.universe.week,0);
+ await e.runAutosave();saved=await store.load();assert.equal(saved.gameRef.count,1);assert.equal(saved.universe.week,0);
  await e.loadBrowser();await e.ensureGamesLoaded();assert.equal(e.universe.gameArchive[0].gameDayVersion,gameDay.VERSION);
 });
 

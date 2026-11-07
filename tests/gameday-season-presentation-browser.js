@@ -19,8 +19,11 @@ const start=page=>sharedStartNewDynasty(page);
   check('both teams get a recolored helmet carrying their real logo decal',await page.locator('#gamedayEventHero .event-team-helmet .event-team-shell[data-team-id]').count()===2&&await page.locator('#gamedayEventHero .event-team-helmet .event-team-logo[data-team-id]').count()===2);
   check('home helmet is mirrored to face the away helmet',await page.$eval('#gamedayEventHero .event-team.home .event-team-shell',el=>getComputedStyle(el).scale)==='-1 1');
   check('real week and stakes context are visible',event.includes('game day')&&event.includes('week')&&(event.includes('conference game')||event.includes('nonconference game')||event.includes('rivalry')));
-  check('real plan context is visible',event.includes('active plan')&&event.includes('staff recommendation'));
-  check('availability and opponent tendency are visible',event.includes('availability')&&event.includes('opponent tendency'));
+  // The hero is a clean matchup; plan, availability and tendency appear once, in the matchup breakdown.
+  const intel=(await page.locator('#v2MatchupIntelligence').innerText()).toLowerCase();
+  check('real plan context is visible',intel.includes('active plan')&&intel.includes('staff recommendation'));
+  check('availability and opponent tendency are visible',intel.includes('availability')&&intel.includes('pass tendency'));
+  check('the hero does not repeat the breakdown',!event.includes('active plan')&&!event.includes('opponent tendency'));
   check('canonical matchup intelligence remains available',await page.locator('#v2MatchupIntelligence').count()===1&&await page.locator('#v2MatchupIntelligence').isVisible());
   await goTab(page,'season');await page.waitForSelector('#seasonPulse',{timeout:10000});const pulse=(await page.locator('#seasonPulse').innerText()).toLowerCase();
   check('season pulse is visible',await page.locator('#seasonPulse').isVisible());
