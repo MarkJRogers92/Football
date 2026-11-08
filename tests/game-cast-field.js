@@ -28,13 +28,21 @@ function context(prefix) {
 }
 
 test('recording per-play actors leaves every stat line byte-identical', () => {
-  // The digest was taken from the attribution module before per-play actors existed (v0.12.5).
+  // The digest was taken from the attribution module before per-play actors existed (v0.12.5). It is checked on the
+  // original rules (rules:false); v0.16 only added zero-valued keys (returns, penalty and pressure totals) to the
+  // stat lines, which are removed here so the same bytes are compared.
+  const NEW_PLAYER = ['returns', 'returnYds', 'returnTD'], NEW_TEAM = ['pressures', 'penalties', 'penaltyYds', 'returns', 'returnYds', 'returnTD'];
+  const strip = (obj, keys) => { const out = {...obj}; for (const k of keys) delete out[k]; return out; };
+  const legacy = a => [
+    Object.fromEntries(Object.entries(a.playerStats).map(([side, lines]) => [side, lines.map(l => ({...l, stats: strip(l.stats, NEW_PLAYER)}))])),
+    Object.fromEntries(Object.entries(a.teamStats).map(([side, t]) => [side, strip(t, NEW_TEAM)]))
+  ];
   const h = crypto.createHash('sha256');
   for (let i = 0; i < 200; i++) {
     const seed = `cmp-${i}`;
-    const s = adapter.simulateShadow({gameId: seed, seed, home: {id: 1, name: 'H'}, away: {id: 2, name: 'A'}, homeProfile: {overall: 80, offense: 82, defense: 78}, awayProfile: {overall: 77, offense: 76, defense: 78}, homeFieldRating: 2.4});
+    const s = adapter.simulateShadow({gameId: seed, seed, rules: false, home: {id: 1, name: 'H'}, away: {id: 2, name: 'A'}, homeProfile: {overall: 80, offense: 82, defense: 78}, awayProfile: {overall: 77, offense: 76, defense: 78}, homeFieldRating: 2.4});
     const a = attribution.attributeGame(s.state, {home: context('H'), away: context('A')});
-    h.update(JSON.stringify([a.playerStats, a.teamStats]));
+    h.update(JSON.stringify(legacy(a)));
     const snaps = s.state.events.filter(e => ['scrimmage', 'interception', 'fumble'].includes(e.type));
     for (const e of snaps) assert.ok(a.playActors[e.seq], `snap ${e.seq} has recorded actors`);
   }

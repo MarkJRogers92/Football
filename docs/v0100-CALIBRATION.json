@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-08T07:09:59.485Z",
+  "generatedAt": "2026-11-08T13:10:22.042Z",
   "branch": "codex/v0100-game-engine-2",
   "baselineVersion": "0.15.2",
   "mode": "development-only shadow comparison",
@@ -21,45 +21,45 @@
   },
   "v2": {
     "games": 120,
-    "meanPoints": 40.86,
-    "meanPlays": 120.06,
-    "meanYards": 614.94,
-    "meanTurnovers": 2.08,
-    "meanTouchdowns": 4.98,
-    "meanFgMade": 2.04,
-    "meanFgAtt": 2.87,
-    "meanPunts": 8.57,
-    "homeWinRate": 0.53,
-    "meanHomeMargin": 1.61,
+    "meanPoints": 41.31,
+    "meanPlays": 114.72,
+    "meanYards": 591.52,
+    "meanTurnovers": 2.09,
+    "meanTouchdowns": 4.95,
+    "meanFgMade": 2.22,
+    "meanFgAtt": 3.27,
+    "meanPunts": 7.98,
+    "homeWinRate": 0.54,
+    "meanHomeMargin": 1.66,
     "meanHomeFieldRating": 2.38
   },
   "delta": {
-    "meanPoints": -1.62,
-    "meanPlays": -0.47,
-    "meanYards": 26.05,
-    "meanTurnovers": -0.3,
-    "meanTouchdowns": 0.35,
-    "meanFgMade": -0.49,
-    "meanFgAtt": -0.29,
-    "meanPunts": 0.59,
-    "homeWinRate": 0.02,
-    "meanHomeMargin": 0.37
+    "meanPoints": -1.17,
+    "meanPlays": -5.81,
+    "meanYards": 2.63,
+    "meanTurnovers": -0.29,
+    "meanTouchdowns": 0.32,
+    "meanFgMade": -0.31,
+    "meanFgAtt": 0.11,
+    "meanPunts": 0,
+    "homeWinRate": 0.03,
+    "meanHomeMargin": 0.42
   },
   "strengthSensitivity": {
     "favored": {
       "games": 27,
       "oldHomeWinRate": 0.85,
-      "v2HomeWinRate": 0.7
+      "v2HomeWinRate": 0.89
     },
     "even": {
       "games": 72,
       "oldHomeWinRate": 0.46,
-      "v2HomeWinRate": 0.5
+      "v2HomeWinRate": 0.54
     },
     "underdog": {
       "games": 21,
       "oldHomeWinRate": 0.24,
-      "v2HomeWinRate": 0.38
+      "v2HomeWinRate": 0.1
     }
   },
   "notes": [
@@ -70,7 +70,7 @@
     "These are calibration observations, not release thresholds."
   ],
   "calibrationContract": 1,
-  "sourceSha256": "51e5cbceedcde5841202aaec03dffbe102438e3212e379f51c4b3c5bd8dae261",
+  "sourceSha256": "3b2e7ebcf7d1ac6888896e7f7fccf35e91f34b457e475483b3f991c4cb4c1339",
   "sourceFiles": [
     "game-engine-v2.js",
     "game-engine-v2-adapter.js",

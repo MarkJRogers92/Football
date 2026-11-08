@@ -1,9 +1,11 @@
+const crypto = require('crypto');
 const fs = require('fs');
 const https = require('https');
 const path = require('path');
 const {fileURLToPath, pathToFileURL} = require('url');
 const { app, BrowserWindow, ipcMain, session, shell } = require('electron');
 const { createDesktopStorage } = require('./storage.js');
+const { createStagingArea, routeSave } = require('./staging.js');
 
 const GAME_ENTRY = path.join(__dirname, '..', 'index.html');
 const GAME_URL = pathToFileURL(GAME_ENTRY).href;
@@ -100,10 +102,12 @@ function registerStorageHandlers(store) {
     'dynasty-storage:list-slots': 'listSlots',
     'dynasty-storage:rename': 'rename',
   };
+  const staging = createStagingArea({makeToken: () => crypto.randomUUID().replace(/-/g, '')});
   for (const [channel, method] of Object.entries(handlers)) {
     ipcMain.handle(channel, (event, payload) => {
       validateIpcSender(event);
-      return store[method](payload);
+      // Saves may be a staging step or may use rows staged earlier (see desktop/staging.js).
+      return method === 'save' ? routeSave(store, staging, payload) : store[method](payload);
     });
   }
 }

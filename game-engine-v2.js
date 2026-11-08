@@ -1,9 +1,10 @@
 (function(root,factory){
   const rngApi=(typeof module==='object'&&module.exports)?require('./rng.js'):root.DynastyRng;
-  const api=factory(rngApi);
+  const conditionsApi=(typeof module==='object'&&module.exports)?require('./game-conditions.js'):root.DynastyGameConditions;
+  const api=factory(rngApi,conditionsApi);
   if(typeof module==='object'&&module.exports)module.exports=api;
   else root.DynastyGameEngineV2=api;
-})(typeof window==='object'?window:globalThis,function(DynastyRng){
+})(typeof window==='object'?window:globalThis,function(DynastyRng,GameConditions){
 'use strict';
 if(!DynastyRng)throw new Error('Game Engine 2 requires DynastyRng.');
 
@@ -23,6 +24,39 @@ const scoreCopy=s=>({home:s.home,away:s.away});
 const timeoutsCopy=t=>({home:t.home,away:t.away});
 const lineDistance=field=>Math.max(1,Math.min(10,100-field));
 
+// v0.16 play model. A game created with rules (penalties, returns, pressure, and the stadium and weather in
+// `conditions`) plays by them; a game without a `rules` object plays exactly as before, so a live game saved
+// by an earlier version rebuilds the same way and the standalone engine keeps its original behavior.
+const RULES_VERSION=1;
+const NEUTRAL_EFFECTS=Object.freeze({dome:false,high:false,wind:0,precip:0,temp:70,passComp:0,passYards:1,rushYards:1,passRate:0,fumble:1,interception:1,fgFlat:0,fgPerYard:0,puntYards:0,touchback:0});
+function normalizeRules(value){
+  if(!value||typeof value!=='object')return null;
+  const rules={version:RULES_VERSION,penalties:value.penalties!==false,returns:value.returns!==false,pressure:value.pressure!==false};
+  const conditions=GameConditions&&value.conditions?GameConditions.sanitize(value.conditions):null;
+  if(conditions)rules.conditions=conditions;
+  return rules;
+}
+const rulesOf=state=>state&&state.rules&&typeof state.rules==='object'?state.rules:null;
+function effectsOf(state){
+  const rules=rulesOf(state);
+  return rules&&rules.conditions&&GameConditions?GameConditions.effects(rules.conditions):NEUTRAL_EFFECTS;
+}
+// Penalties the model can throw. `weight` is a chance per snap before discipline and crowd adjustments; `dead`
+// fouls stop the play before the snap, `pass` fouls need a pass, `auto` gives the offense a first down.
+const PENALTY_TYPES=Object.freeze({
+  false_start:{label:'False start',against:'offense',yards:5,dead:true,weight:.0128},
+  delay:{label:'Delay of game',against:'offense',yards:5,dead:true,weight:.0028},
+  holding_off:{label:'Offensive holding',against:'offense',yards:10,weight:.0235},
+  ineligible:{label:'Ineligible receiver downfield',against:'offense',yards:5,pass:true,weight:.0034},
+  offside:{label:'Offside',against:'defense',yards:5,dead:true,weight:.0072},
+  encroachment:{label:'Encroachment',against:'defense',yards:5,dead:true,weight:.0022},
+  holding_def:{label:'Defensive holding',against:'defense',yards:5,auto:true,pass:true,weight:.0120},
+  interference:{label:'Pass interference',against:'defense',yards:0,auto:true,pass:true,spot:true,weight:.0112},
+  roughing:{label:'Roughing the passer',against:'defense',yards:15,auto:true,pass:true,weight:.0034},
+  personal_foul:{label:'Unnecessary roughness',against:'defense',yards:15,auto:true,weight:.0026},
+  face_mask:{label:'Face mask',against:'defense',yards:15,auto:true,weight:.0022}
+});
+
 function createGame(options={}){
   const home=cloneTeam(options.home),away=cloneTeam(options.away);
   const gameId=String(options.gameId??`v2-${home.id??home.name}-${away.id??away.name}`);
@@ -37,6 +71,7 @@ function createGame(options={}){
     score:{home:0,away:0},timeouts:{home:3,away:3},home,away,openingReceiver,
     secondHalfReceiver:other(openingReceiver),pendingKickoff:null,drive:0,play:0,ot:null,events:[],rng:rng.snapshot()
   };
+  const rules=normalizeRules(options.rules);if(rules)state.rules=rules;
   validateState(state);
   return state;
 }
@@ -70,7 +105,19 @@ function startGame(state){
 }
 function kickoffTo(state,receiver,reason='kickoff'){
   state.pendingKickoff=null;state.possession=receiver;state.fieldPosition=KICKOFF_SPOT;state.down=1;state.distance=10;state.drive++;
-  pushEvent(state,'kickoff',{receiver,reason,touchback:true});
+  const rules=rulesOf(state);
+  if(!rules||rules.returns===false){pushEvent(state,'kickoff',{receiver,reason,touchback:true});return}
+  // One draw each for touchback, return length and breakaway, whatever the result, so the stream stays aligned.
+  const rng=rngFor(state),tbRoll=rng.next(),yardsDraw=rng.gauss(),breakRoll=rng.next();finishRng(state,rng);
+  const touchback=tbRoll<clamp(.6+effectsOf(state).touchback,.3,.85);
+  if(touchback){pushEvent(state,'kickoff',{receiver,reason,touchback:true,ret:0});return}
+  const start=clamp(Math.round(26+yardsDraw*6.5),10,48),breakaway=breakRoll<.0035;
+  if(breakaway){
+    state.fieldPosition=100;pushEvent(state,'kickoff',{receiver,reason,touchback:false,ret:97,td:true});
+    touchdown(state,receiver,{kind:'return',source:'kickoff'});return;
+  }
+  state.fieldPosition=start;
+  pushEvent(state,'kickoff',{receiver,reason,touchback:false,ret:start-3});
 }
 function kickoffAfterScore(state,receiver,reason){
   if(state.period<=4&&state.clock===0){state.pendingKickoff={receiver,reason};return}
@@ -106,6 +153,7 @@ function applyScrimmage(state,outcome={}){
   requireStatus(state,'live');
   if(state.period>4)return applyOvertimeSnap(state,outcome);
   if(!state.possession)throw new Error('Cannot run a play without possession.');
+  if(outcome.penalty)return applyPenalty(state,outcome);
   const offense=state.possession,defense=other(offense),beforeField=state.fieldPosition,beforeDown=state.down,beforeDistance=state.distance;
   const clock=clamp(Math.round(outcome.clock??30),1,45);consumeClock(state,clock);
   if(outcome.turnover){
@@ -135,8 +183,31 @@ function applyScrimmage(state,outcome={}){
   endRegulationPeriodIfNeeded(state);validateState(state);return state;
 }
 
-function touchdown(state,side){
-  addPoints(state,side,6,'touchdown',{});
+// An accepted penalty replaces the snap: no play, no stats, just the foul and its enforcement. Yardage is
+// capped at half the distance to the offender's goal line; defensive fouls that carry an automatic first down
+// (or cover the distance) give a fresh set of downs, and every other foul replays the down.
+function applyPenalty(state,outcome){
+  requireStatus(state,'live');
+  const spec=outcome.penalty,offense=state.possession,defense=other(offense);
+  const type=PENALTY_TYPES[spec?.kind];if(!type)throw new Error(`Unknown penalty: ${spec?.kind}`);
+  const against=type.against==='defense'?defense:offense,beforeField=state.fieldPosition,beforeDown=state.down,beforeDistance=state.distance;
+  const half=Math.max(1,Math.floor((against===offense?beforeField:100-beforeField)/2));
+  const yards=clamp(Math.round(Number(spec.yards)||type.yards||5),1,half);
+  // A foul never ends a period by itself: the clock stops with one second left and the next snap is the untimed down.
+  consumeClock(state,Math.min(clamp(Math.round(outcome.clock??(type.dead?4:12)),0,45),Math.max(0,state.clock-1)));
+  let field,down=beforeDown,distance;
+  if(against===offense){field=beforeField-yards;distance=beforeDistance+yards}
+  else{
+    field=beforeField+yards;
+    if(type.auto||yards>=beforeDistance){down=1;distance=lineDistance(field)}else distance=beforeDistance-yards;
+  }
+  state.fieldPosition=clamp(field,1,99);state.down=down;state.distance=clamp(Math.round(distance),1,99);
+  pushEvent(state,'penalty',{team:offense,against,kind:spec.kind,label:type.label,yards,deadBall:!!type.dead,autoFirst:against===defense&&(!!type.auto||yards>=beforeDistance),from:{fieldPosition:beforeField,down:beforeDown,distance:beforeDistance}});
+  endRegulationPeriodIfNeeded(state);validateState(state);return state;
+}
+
+function touchdown(state,side,data={}){
+  addPoints(state,side,6,'touchdown',data);
   // One draw either way, so a playbook choice never shifts the rest of the game's randomness.
   const rng=rngFor(state),roll=rng.next();finishRng(state,rng);
   if(playbookTwoPoint(state,side)){
@@ -194,11 +265,18 @@ function sanitizePlaybook(value){
   const out={};for(const [k,opts] of Object.entries(PLAYBOOK_OPTIONS))out[k]=opts.includes(value[k])?value[k]:opts[0];
   return out;
 }
+// Wind, wet or frozen balls and thin air move a field goal's odds; without rules this is the original curve.
+function fieldGoalChance(state,distance){
+  const base=.97-Math.max(0,distance-30)*.018;
+  if(!rulesOf(state))return clamp(base,.18,.97);
+  const e=effectsOf(state);
+  return clamp(base-e.fgFlat-e.fgPerYard*Math.max(0,distance-25),.12,.98);
+}
 function attemptFieldGoal(state){
   requireStatus(state,'live');if(state.period>4)throw new Error('Use overtime resolution for overtime field goals.');
   const side=state.possession;if(!side)throw new Error('No possession for field goal.');
   const distance=Math.round(100-state.fieldPosition+17),rng=rngFor(state);
-  const probability=clamp(.97-Math.max(0,distance-30)*.018,.18,.97),made=rng.next()<probability;finishRng(state,rng);
+  const probability=fieldGoalChance(state,distance),made=rng.next()<probability;finishRng(state,rng);
   consumeClock(state,5);
   if(made){addPoints(state,side,3,'field_goal',{distance,made:true});kickoffAfterScore(state,other(side),'post_field_goal')}
   else{pushEvent(state,'field_goal',{team:side,points:0,distance,made:false});setPossession(state,other(side),Math.max(20,100-state.fieldPosition),'missed_field_goal')}
@@ -206,9 +284,38 @@ function attemptFieldGoal(state){
 }
 function punt(state){
   requireStatus(state,'live');if(state.period>4)throw new Error('Punts are not used in overtime.');
+  const rules=rulesOf(state);
+  if(rules&&rules.returns!==false)return puntWithReturn(state);
   const side=state.possession,rng=rngFor(state),net=clamp(Math.round(40+rng.gauss()*5),28,52);finishRng(state,rng);consumeClock(state,7);
   const landing=state.fieldPosition+net;pushEvent(state,'punt',{team:side,net,touchback:landing>=100});
   setPossession(state,other(side),landing>=100?TOUCHBACK_SPOT:100-landing,'punt');endRegulationPeriodIfNeeded(state);validateState(state);return state;
+}
+// A punt with a returner: gross distance depends on the weather, a punt that lands deep is often downed or
+// fair caught, and a returned punt can break (rarely) for a touchdown. `net` stays the kick's own distance,
+// the way punting stats have always been recorded; the return is in `ret`.
+function puntWithReturn(state){
+  const side=state.possession,receiver=other(side),rng=rngFor(state),e=effectsOf(state);
+  const grossDraw=rng.gauss(),coverRoll=rng.next(),retDraw=rng.gauss(),breakRoll=rng.next();finishRng(state,rng);
+  consumeClock(state,7);
+  const net=clamp(Math.round(40+e.puntYards+grossDraw*5.5),24,62),landing=state.fieldPosition+net;
+  if(landing>=100){
+    pushEvent(state,'punt',{team:side,net,touchback:true,ret:0});
+    setPossession(state,receiver,TOUCHBACK_SPOT,'punt');endRegulationPeriodIfNeeded(state);validateState(state);return state;
+  }
+  const deep=landing>=88,fairCatch=coverRoll<(deep?.55:.27);
+  if(fairCatch){
+    pushEvent(state,'punt',{team:side,net,touchback:false,ret:0,fairCatch:true});
+    setPossession(state,receiver,100-landing,'punt');endRegulationPeriodIfNeeded(state);validateState(state);return state;
+  }
+  const spot=100-landing;
+  if(breakRoll<.0065){
+    pushEvent(state,'punt',{team:side,net,touchback:false,ret:spot,td:true});
+    state.possession=receiver;state.fieldPosition=100;
+    touchdown(state,receiver,{kind:'return',source:'punt'});endRegulationPeriodIfNeeded(state);validateState(state);return state;
+  }
+  const ret=clamp(Math.round(8.2+retDraw*6),0,Math.max(0,Math.min(45,98-spot)));
+  pushEvent(state,'punt',{team:side,net,touchback:false,ret});
+  setPossession(state,receiver,spot+ret,'punt');endRegulationPeriodIfNeeded(state);validateState(state);return state;
 }
 
 function generateOutcome(state){
@@ -268,7 +375,7 @@ function applyOvertimeSnap(state,outcome={}){
   pushEvent(state,'scrimmage',{team:offense,yards,ot:true});return state;
 }
 function overtimeFieldGoal(state){
-  const side=state.possession,rng=rngFor(state),distance=Math.round(100-state.fieldPosition+17),prob=clamp(.97-Math.max(0,distance-30)*.018,.18,.97),made=rng.next()<prob;finishRng(state,rng);
+  const side=state.possession,rng=rngFor(state),distance=Math.round(100-state.fieldPosition+17),prob=fieldGoalChance(state,distance),made=rng.next()<prob;finishRng(state,rng);
   if(made)addPoints(state,side,3,'field_goal',{ot:true,distance,made:true});else pushEvent(state,'field_goal',{team:side,points:0,ot:true,distance,made:false});
   endOvertimePossession(state);return made;
 }
@@ -319,6 +426,7 @@ function validateState(state){
     if(!Number.isInteger(state.down)||state.down<1||state.down>4)throw new Error('Down out of bounds.');
     if(!Number.isInteger(state.distance)||state.distance<1||state.distance>99)throw new Error('Distance out of bounds.');
   }
+  if(state.rules!==undefined&&(state.rules===null||typeof state.rules!=='object'))throw new Error('Invalid game rules.');
   DynastyRng.create(state.rng);
   if(!Array.isArray(state.events)||state.events.length>MAX_EVENTS)throw new Error('Invalid event log.');
   return true;
@@ -332,5 +440,5 @@ function validateGame(state){
   return true;
 }
 
-return{ENGINE_VERSION,QUARTER_SECONDS,PLAYBOOK_OPTIONS,TWO_POINT_CHART,playbookFourthDown,playbookTwoPoint,playbookTempo,playbookClock,sanitizePlaybook,createGame,startGame,step,simulate,applyScrimmage,attemptFieldGoal,punt,snapshot,restore,scoringTotals,validateState,validateGame,generateOutcome};
+return{ENGINE_VERSION,RULES_VERSION,PENALTY_TYPES,fieldGoalChance,QUARTER_SECONDS,PLAYBOOK_OPTIONS,normalizeRules,effectsOf,kickoffTo,TWO_POINT_CHART,playbookFourthDown,playbookTwoPoint,playbookTempo,playbookClock,sanitizePlaybook,createGame,startGame,step,simulate,applyScrimmage,attemptFieldGoal,punt,snapshot,restore,scoringTotals,validateState,validateGame,generateOutcome};
 });

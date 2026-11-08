@@ -1,5 +1,26 @@
 # Latest Session Work
 
+## Unreleased on top of v0.15.2 — deeper play model, facilities and boosters (2026-11-08, branch `claude/cool-knuth-aomwcv`)
+
+Not released: the version is still 0.15.2 and the CHANGELOG entry is "Unreleased". Release only on the owner's explicit say-so.
+
+**Play model** (`game-engine-v2.js`, `game-engine-v2-adapter.js`, new `game-conditions.js`)
+- A game carries `state.rules` (`{version, penalties, returns, pressure, conditions}`). **No `rules` = the exact v0.15.2 behavior** (`tests/play-model.js` pins a digest of the committed engine; the old attribution digest in `tests/game-cast-field.js` is checked with `rules:false`). `adapter.profileOutcome` dispatches to `legacyProfileOutcome` or `profileOutcomeRules`; `createShadowGame` turns rules on unless `rules:false`; callers pass `year`/`week` (and `neutral` for postseason) so the conditions match the calendar.
+- A live game is stored as seed + action list and rebuilt by replay, so `universe.liveGameDay` now stores `rules`; a save without it replays with `rules:false`. Do not change engine draw order for games with rules without thinking about that.
+- Penalty outcomes (`outcome.penalty`) replace the snap in `applyScrimmage` -> `applyPenalty`. The event's `team` is the OFFENSE (so drive logic is unchanged) and `against` is the penalized side. Declined penalties are not drawn at all. Weights are in `PENALTY_TYPES` (engine) and `PENALTY_SCALE`/crowd factors (adapter); tuned with a scratch harness against the legacy model (5.4 flags and 41 yards per team, scoring within 2%).
+- `kickoffTo` is exported and used by `game-engine-v2-gameday.js`; returns and return TDs (`touchdown` event with `kind:'return'`) are attributed to the depth chart's KR/PR. New player stat keys `returns`, `returnYds`, `returnTD`; new team box keys in `EXTRA_BOX_KEYS` (optional, so old archives still validate).
+- Weather never touches the gameplay stream; `DynastyGameConditions.forGame` is a pure function of home program + year + week.
+- Calibration report regenerated (`npm run calibrate:game-engine-v2`); remember to re-stamp after any engine/adapter/compare edit.
+
+**Facilities and boosters** (`facilities-boosters.js`, `facilities-boosters.css`, host `#facilitiesBoosters` in `body.html`)
+- Pure factory `makeFacilitySystem(env)` plus browser wiring, modeled on `staff-assignments.js`. State on the controlled team only: `team.facilityPlan` (`fund`, `goodwill`, `levels`, `projects`, `campaigns`, `nilBonus`, `log`). Created lazily; sanitized on every read.
+- Wraps `resetNilSeason` (the season rollover hook: goodwill, completions, annual gifts), `nilBudgetFor` (campaign gifts sent to NIL), and `TAB_RENDERERS.program`. `recruiting-actions.js` takes an optional `env.hoursBonus` for Football Ops. Campaign outcomes are hash-based, never `gameplayRandom`.
+- Every program has a plan. AI programs run `aiSeason` from the same `resetNilSeason` wrapper (fixed rule, hash-based tie-break, quiet: no events, no log). `globalThis.__FACILITIES_AI_OFF` disables it for soak baselines. Upkeep (`UPKEEP_PER_LEVEL=.9`) and `facilityGain` (+1 at rating 90+) came out of the soak: see `docs/SOAK_FACILITIES_2026-11-08.md`.
+
+**Verification run so far** (Node 22 here, CI uses 24): full `npm test` 802/802 before the facilities tests were added (these pass separately: 10/10), the Game Day / recording / postseason / cast / weekly-desk browser suites, `one-more-saturday-browser`, `gameday-season-presentation-browser`, and the new `facilities-boosters-browser` at desktop and phone width. Not yet run: the complete `test:browser-extended` matrix, storage, audit, long-run/soak with the new systems, desktop packaging.
+
+**Soak done** (`tools/facilities-soak.js`, 20 seasons, seeds 7 and 11): no stalls or invariant problems, no save growth beyond the existing archive growth, faithful reload, play-model rates on target. It found AI facility saturation, fixed with upkeep and diminishing returns. Weak and mid-tier controlled programs were also soaked (not locked out; they keep pace with the league). Electron is 44.10.2; the remaining `npm audit` items are in Electron Forge (build tooling, needs a major upgrade). A 20-season save was loaded in real Chromium and the real Electron shell (`tests/long-save-browser.js`, `tests/long-save-desktop.js`, `LONG_SAVE=<file>`). That found the first desktop save of a huge import taking 6 to 13 minutes (one giant bridge message); `desktop/staging.js` plus `saveInBatches` in `storage.js` fixed it (13 s). Packaged Mac/Windows smoke passed on CI at `ba20f57`. Forge is upgraded to 8.0.1 (audit 30 to 15). Remaining: an ordinary desktop save of a mature dynasty takes about 21 s at season 20 (main-process backup, write and prune; splitting the core was measured and does not help), and it grows with the dynasty.
+
 ## v0.15.2 published — 2026-11-08
 
 All four reviewed fixes and three upgrades are merged and published. Portal commitments survive resolution; returned entrants regain a roster spot; successful desk edits autosave; custom playbooks affect the controlled team's weekly simulation; class reports load alumni and use appearances/starts; staff recommend portal prospects on a compact scouting board; first college starts can produce a factual recruiting callback.

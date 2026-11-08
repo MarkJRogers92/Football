@@ -13,7 +13,8 @@ const statKeys=[
   'games','starts','snaps','passAtt','passComp','passYds','passTD','int','sacksTaken',
   'rushAtt','rushYds','rushTD','fumbles','targets','receptions','recYds','recTD','drops','yac',
   'tackles','tfl','sacks','pressures','intDef','passBreakups','forcedFumbles',
-  'sacksAllowed','pressuresAllowed','penalties','fgMade','fgAtt','punts','puntYds'
+  'sacksAllowed','pressuresAllowed','penalties','fgMade','fgAtt','punts','puntYds',
+  'returns','returnYds','returnTD'
 ];
 
 function blankStats(){
@@ -26,7 +27,8 @@ function blankTeam(points=0){
     points,plays:0,firstDowns:0,
     passAtt:0,passComp:0,passYds:0,passTD:0,int:0,sacksTaken:0,
     rushAtt:0,rushYds:0,rushTD:0,fumblesLost:0,turnovers:0,
-    recYds:0,recTD:0,fgMade:0,fgAtt:0,punts:0,puntYds:0
+    recYds:0,recTD:0,fgMade:0,fgAtt:0,punts:0,puntYds:0,
+    pressures:0,penalties:0,penaltyYds:0,returns:0,returnYds:0,returnTD:0
   };
 }
 function playerRef(p){
@@ -52,6 +54,8 @@ function normalizeContext(ctx={}){
     offensiveLine:normalizeList(ctx.offensiveLine),
     kicker:playerRef(ctx.kicker),
     punter:playerRef(ctx.punter),
+    kickReturner:playerRef(ctx.kickReturner),
+    puntReturner:playerRef(ctx.puntReturner),
     teamName:String(ctx.teamName||'Team')
   };
 }
@@ -96,6 +100,7 @@ function addTackle(result,defSide,evt,rng,{sack=false}={}){
     line.stats.sacks++;
     line.stats.tfl++;
     line.stats.pressures++;
+    result.teamStats[other(defSide)].pressures++;
   }else if((Number(evt.yards)||0)<0){
     line.stats.tfl++;
   }
@@ -120,6 +125,47 @@ function noteActors(result,e,actors){
   const row={};
   for(const [key,p] of Object.entries(actors))if(p&&p.id!=null)row[key]=p.id;
   result.playActors[e.seq]=row;
+}
+// A hurry that stops short of a sack: the rusher is credited with a pressure and the line with one allowed.
+function addPressure(result,offSide,def,e,rng){
+  const rusher=weightedPick(result.contexts[def].defenders,rng,'rush');
+  if(!rusher)return null;
+  ensureLine(result.lines[def],rusher).stats.pressures++;
+  result.teamStats[offSide].pressures++;
+  const blocker=weightedPick(result.contexts[offSide].offensiveLine,rng,'protect');
+  if(blocker)ensureLine(result.lines[offSide],blocker).stats.pressuresAllowed++;
+  return rusher;
+}
+// Who takes the flag: linemen for most offensive fouls, the quarterback for delay, defenders by the foul.
+function attributePenalty(result,e,rng){
+  const against=e.against;if(against!=='home'&&against!=='away')return;
+  const ctx=result.contexts[against],team=result.teamStats[against],yards=Number(e.yards)||0;
+  let p=null;
+  if(against===e.team){
+    p=e.kind==='delay'&&ctx.qb?ctx.qb:weightedPick(ctx.offensiveLine,rng,'protect');
+  }else{
+    const only=positions=>{const list=ctx.defenders.filter(x=>positions.includes(x.player.pos));return list.length?list:ctx.defenders};
+    if(e.kind==='interference'||e.kind==='holding_def')p=weightedPick(only(['CB','S','LB']),rng,'coverage');
+    else if(e.kind==='offside'||e.kind==='encroachment'||e.kind==='roughing')p=weightedPick(only(['EDGE','DT','LB']),rng,'rush');
+    else p=weightedPick(ctx.defenders,rng,'tackle');
+  }
+  team.penalties++;team.penaltyYds+=yards;
+  if(p)ensureLine(result.lines[against],p).stats.penalties++;
+  noteActors(result,e,{pn:p});
+}
+// A kick or punt return: the returner is the depth chart's KR or PR, falling back to a receiver or rusher.
+function creditReturn(result,side,e,rng,kind){
+  const ctx=result.contexts[side],team=result.teamStats[side];
+  const preferred=kind==='kick'?ctx.kickReturner:ctx.puntReturner;
+  const p=preferred||weightedPick(ctx.receivers,rng,'carry')||weightedPick(ctx.rushers,rng,'carry');
+  const yards=Number(e.ret)||0;
+  if(yards>0||e.td){
+    team.returns++;team.returnYds+=yards;
+    if(p){const line=ensureLine(result.lines[side],p);line.stats.returns++;line.stats.returnYds+=yards;if(e.td){line.stats.returnTD++}}
+    if(e.td)team.returnTD++;
+  }
+  if(p)noteActors(result,e,{rt:p});
+  result.lastPlay[side]=null;
 }
 function eventIsSnap(e){
   return e.type==='scrimmage'||e.type==='interception'||e.type==='fumble';
@@ -184,10 +230,11 @@ function attributeScrimmage(result,e,rng,side,def,team,ctx){
 
     if(e.completed)completedPass(result,side,def,e,rng,team,qb,q,target);
     else incompletePass(result,side,def,e,rng,qb,target);
+    if(e.pressure){const rusher=addPressure(result,side,def,e,rng);if(rusher&&result.playActors[e.seq])result.playActors[e.seq].pr=rusher.id}
     return;
   }
 
-  const runner=weightedPick(ctx.rushers,rng,'carry')||ctx.qb;
+  const runner=(e.scramble&&ctx.qb)||weightedPick(ctx.rushers,rng,'carry')||ctx.qb;
   if(!runner)throw new Error(`${side} has no rushing attribution candidate.`);
   const r=ensureLine(result.lines[side],runner);
   r.stats.rushAtt++;
@@ -197,6 +244,7 @@ function attributeScrimmage(result,e,rng,side,def,team,ctx){
   result.lastPlay[side]={type:'rush',rusher:runner};
   const tackler=e.state?.fieldPosition<100?addTackle(result,def,e,rng):null;
   noteActors(result,e,{ca:runner,qb:ctx.qb,tk:tackler});
+  if(e.pressure){const rusher=addPressure(result,side,def,e,rng);if(rusher&&result.playActors[e.seq])result.playActors[e.seq].pr=rusher.id}
 }
 function attributeInterception(result,e,rng,side,def,team,ctx){
   const qb=ctx.qb||weightedPick(ctx.rushers,rng,'carry');
@@ -279,6 +327,15 @@ function attributeGame(state,contexts={}){
   }
 
   for(const e of state.events){
+    if(e.type==='penalty'){attributePenalty(result,e,rng);continue}
+    if(e.type==='kickoff'&&(e.receiver==='home'||e.receiver==='away')){
+      if(!e.touchback||e.td)creditReturn(result,e.receiver,e,rng,'kick');
+      continue;
+    }
+    if(e.type==='punt'&&(e.team==='home'||e.team==='away')&&(e.ret>0||e.td||e.fairCatch)){
+      // The punting team's own stats are recorded below; the receiving team gets the return.
+      creditReturn(result,other(e.team),e,rng,'punt');
+    }
     const side=e.team;
     if(side!=='home'&&side!=='away')continue;
     const def=other(side);
@@ -297,7 +354,7 @@ function attributeGame(state,contexts={}){
     }else if(e.type==='fumble'){
       attributeFumble(result,e,rng,side,def,team,ctx);
     }else if(e.type==='touchdown'){
-      attributeTouchdown(result,side,team);
+      if(e.kind!=='return')attributeTouchdown(result,side,team);
     }else if(e.type==='field_goal'){
       team.fgAtt++;
       if(e.made)team.fgMade++;
@@ -360,7 +417,12 @@ function reconcile(result){
       ['puntYds',sum(p,'puntYds'),t.puntYds],
       ['defINT',sum(opp,'intDef'),t.int],
       ['defSacks',sum(opp,'sacks'),t.sacksTaken],
-      ['defFF',sum(opp,'forcedFumbles'),t.fumblesLost]
+      ['defFF',sum(opp,'forcedFumbles'),t.fumblesLost],
+      ['defPressures',sum(opp,'pressures'),t.pressures],
+      ['penalties',sum(p,'penalties'),t.penalties],
+      ['returns',sum(p,'returns'),t.returns],
+      ['returnYds',sum(p,'returnYds'),t.returnYds],
+      ['returnTD',sum(p,'returnTD'),t.returnTD]
     ];
     for(const [label,a,b] of checks){
       if(a!==b)errors.push(`${side} ${label} ${a} != ${b}`);

@@ -28,7 +28,7 @@ function v2PostseasonRecordMatch(home,away,options={}){
   const stub={week,label,conf:conference,played:false,home:home.name,away:away.name},rollback=v2RecordCapture(stub,home,away);
   try{
     const before=beginGame(home,away,neutral,{week,label}),homeProfile=gameProfiles(home,away.name),awayProfile=gameProfiles(away,home.name);
-    const key=`${universe.year}:${week}:${label}:${home.name}:${away.name}`,preview=api.simulate({gameId:`v0102-post-${key}`,seed:`v0102-post-${key}`,home,away,homeProfile,awayProfile,homeFieldRating:neutral?0:homeFieldFor(home)});
+    const key=`${universe.year}:${week}:${label}:${home.name}:${away.name}`,preview=api.simulate({gameId:`v0102-post-${key}`,seed:`v0102-post-${key}`,home,away,homeProfile,awayProfile,homeFieldRating:neutral?0:homeFieldFor(home),year:universe.year,week,neutral});
     const attribution=actors.attributeGame(preview.state,{home:v2AttributionContext(home),away:v2AttributionContext(away)});actors.attachEventSummary(attribution,preview.summary);preview.attribution=attribution;
     const candidate=tx.buildCandidate({state:preview.state,attribution,homeTeam:home,awayTeam:away,starterIds:{home:v2StarterIds(home),away:v2StarterIds(away)},meta:{season:universe.year,week,phase:universe.phase,label,venue:neutral?'Neutral site':`${home.name} · ${home.city||''}`},conference,homeOpponentOverall:awayProfile.overall,awayOpponentOverall:homeProfile.overall});
     preview.transactionProof=tx.dryRunTransaction({candidate,homeTeam:home,awayTeam:away,homeGameplan:gameplanSnapshot(home,away.name),awayGameplan:gameplanSnapshot(away,home.name)});
@@ -40,7 +40,7 @@ function v2PostseasonRecordMatch(home,away,options={}){
     const drives=v2RecordDriveArchive(preview),log=(preview.state.events||[]).slice(-160).map(e=>api.eventText(e,preview.names));
     const result=finishGame(before,home,away,{home:home.name,away:away.name,hp:candidate.hp,ap:candidate.ap,winner:win.name,box:candidate.box,detailed:true,drives,log,engine:'v2',transactionVersion:tx.VERSION});
     const record=(universe.gameArchive||[]).find(x=>x.id===result.gameId);if(!record)throw new Error('Postseason v2 game was not found in the permanent archive.');
-    record.engine='v2';record.transactionVersion=tx.VERSION;record.eventCount=candidate.eventCount;record.seed=candidate.seed;
+    record.engine='v2';record.transactionVersion=tx.VERSION;record.eventCount=candidate.eventCount;record.seed=candidate.seed;record.conditions=preview.state.rules?.conditions||null;
     for(const side of ['home','away']){const drivePoints=drives.filter(d=>d.side===side).reduce((n,d)=>n+(Number(d.points)||0),0);record.scoreAdjustment[side]=record.score[side]-drivePoints}
     v2StorePlayLog(record.id,preview.state,attribution);
     if(options.testFault==='afterArchive')throw new Error('Injected postseason v2 rollback fault after archive write.');

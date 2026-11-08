@@ -63,7 +63,8 @@ function eventState(state){return{
 }}
 function pushGameEvent(state,type,data={}){const e={seq:(state.events?.length||0)+1,type,...data,state:eventState(state)};state.events.push(e);return e}
 function addGamePoints(state,side,points,type,data={}){state.score[side]+=points;return pushGameEvent(state,type,{team:side,points,...data})}
-function kickoffGame(state,receiver,reason){state.pendingKickoff=null;state.possession=receiver;state.fieldPosition=25;state.down=1;state.distance=10;state.drive++;pushGameEvent(state,'kickoff',{receiver,reason,touchback:true})}
+// Kickoffs belong to the engine so a game with the v0.16 rules gets returns here too; without rules this is the original touchback.
+function kickoffGame(state,receiver,reason){engine.kickoffTo(state,receiver,reason)}
 function finishRegulationGame(state){state.status='final';state.possession=null;state.fieldPosition=null;state.down=null;state.distance=null;pushGameEvent(state,'game_end',{reason:'regulation',winner:state.score.home>state.score.away?'home':'away'})}
 function startRegulationOvertime(state){
   state.period=5;state.clock=0;state.ot={period:1,first:state.openingReceiver,possessions:0,possession:state.openingReceiver,startScore:{...state.score},pendingResult:null};
@@ -114,7 +115,7 @@ function playOutcome(session,state){
   halftimeAdjustedOutcome(session,state,outcome);
   if(!session.tempoDecisionMade[side]||session.tempo[side]==='staff')outcome=engine.playbookClock(state,outcome);
   else outcome.clock=tempoAdjustedClock(session,state,outcome.clock);
-  const yards=clamp(Math.round(outcome.yards??0),-99,99),touchdown=state.period<=4&&!outcome.turnover&&beforeField+yards>=100;
+  const yards=clamp(Math.round(outcome.yards??0),-99,99),touchdown=state.period<=4&&!outcome.turnover&&!outcome.penalty&&beforeField+yards>=100;
   if(touchdown)deferredTouchdown(session,state,outcome);else engine.applyScrimmage(state,outcome);
   adapter.annotateOutcomeEvent(state,start,outcome);return outcome
 }

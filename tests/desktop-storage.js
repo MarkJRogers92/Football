@@ -340,3 +340,124 @@ test('one failed legacy migration does not block other slots and is retried', as
     delete require.cache[modulePath];
   }
 });
+
+// ---- v0.16: large saves are sent in small staged messages and committed once ----
+const {createStagingArea, routeSave, MAX_BATCH_ROWS} = require('../desktop/staging.js');
+const modulePath = require.resolve('../storage.js');
+
+test('a staging area holds rows in memory until one save takes them, and forgets abandoned stages', () => {
+  let clock = 0, n = 0;
+  const area = createStagingArea({now: () => clock, makeToken: () => `t${++n}`});
+  const {token} = area.begin();
+  assert.deepEqual(area.add({token, kind: 'additions', rows: [{id: 'a'}, {id: 'b'}]}), {rows: 2});
+  assert.deepEqual(area.add({token, kind: 'gameAdditions', rows: [{id: 'g'}]}), {rows: 3});
+  assert.throws(() => area.add({token, kind: 'other', rows: []}), /Unknown staged rows/);
+  assert.throws(() => area.add({token, kind: 'additions', rows: 'nope'}), /array/);
+  assert.throws(() => area.add({token, kind: 'additions', rows: new Array(MAX_BATCH_ROWS + 1).fill({id: 'x'})}), /reasonable size/);
+  assert.throws(() => area.add({token: 'missing', kind: 'additions', rows: []}), /no longer available/);
+  const taken = area.take(token);
+  assert.deepEqual(taken.additions.map(r => r.id), ['a', 'b']);
+  assert.deepEqual(taken.gameAdditions.map(r => r.id), ['g']);
+  assert.throws(() => area.take(token), /no longer available/, 'rows are used once');
+  const stale = area.begin().token;
+  clock += 11 * 60 * 1000;
+  assert.equal(area.size(), 0, 'an abandoned stage is dropped');
+  assert.throws(() => area.take(stale), /no longer available/);
+  assert.throws(() => createStagingArea({}), /token generator/);
+});
+
+test('a big save goes through the real bridge path as small messages and lands exactly like a direct save', async () => {
+  const messages = [];
+  let n = 0;
+  const makeStore = async name => createDesktopStorage({rootDir: await fs.mkdtemp(path.join(os.tmpdir(), `dynasty-lab-stage-${name}-`))});
+  const direct = await makeStore('direct'), staged = await makeStore('staged');
+  const staging = createStagingArea({makeToken: () => `tok${++n}`});
+  // The same glue the main process uses, behind a bridge that records every message's size in rows.
+  const bridge = Object.freeze({
+    load: p => staged.load(p), readArchive: p => staged.readArchive(p), readGames: p => staged.readGames(p), listSlots: () => staged.listSlots(), rename: p => staged.rename(p),
+    save: payload => { messages.push({stage: payload.stage || null, rows: (payload.rows?.length || 0) + (payload.options?.additions?.length || 0) + (payload.options?.gameAdditions?.length || 0)}); return routeSave(staged, staging, payload); },
+  });
+  globalThis.DynastyDesktopStorage = bridge;
+  delete require.cache[modulePath];
+  try {
+    const api = require('../storage.js'), desktop = api.create({slot: 'main'});
+    const careers = rows('career', 9000), games = rows('game', 4500), snap = snapshot(2046, 'Chicago Metropolitan');
+    // A core with big sections: many small nested objects, like rosters and the event log, plus a big keyed object.
+    Object.assign(snap.universe, {
+      teams: Array.from({length: 120}, (_, t) => ({id: t + 1, name: `Team ${t}`, w: 3, l: 1, roster: Array.from({length: 300}, (_, p) => ({id: `p${t}-${p}`, stats: {a: 1, b: 2}, tags: ['x', 'y']}))})),
+      events: Array.from({length: 7000}, (_, e) => ({id: e, type: 'EVT', meta: {n: e}})),
+      draftHistory: Object.fromEntries(Array.from({length: 60}, (_, y) => [2030 + y, Array.from({length: 900}, (_, i) => ({pick: i}))])),
+      nothing: undefined, flag: true, note: 'kept',
+    });
+    const saved = await desktop.save(snap, {additions: careers, gameAdditions: games, checkpointType: 'manual'});
+    const expected = await direct.save({slot: 'main', snapshot: snap, options: {additions: careers, gameAdditions: games, checkpointType: 'manual'}});
+    assert.deepEqual([saved.archiveRef.count, saved.archiveRef.chunks, saved.gameRef.count, saved.gameRef.chunks], [expected.archiveRef.count, expected.archiveRef.chunks, expected.gameRef.count, expected.gameRef.chunks]);
+    const loaded = await desktop.load();
+    assert.equal(loaded.universe.year, 2046);
+    assert.deepEqual((await desktop.readArchive(loaded.archiveRef)).map(r => r.id), careers.map(r => r.id), 'every career, in order');
+    assert.deepEqual((await desktop.readGames(loaded.gameRef)).map(r => r.id), games.map(r => r.id), 'every game, in order');
+    assert.deepEqual(loaded.universe, (await direct.load({slot: 'main'})).universe, 'the stored core is exactly what a direct save stores, in the same key order');
+    assert.deepEqual(Object.keys(loaded.universe), Object.keys((await direct.load({slot: 'main'})).universe));
+    assert.ok(messages.filter(m => m.stage === 'core').length >= 3, 'the large core sections were staged in parts');
+    assert.equal(messages.filter(m => m.stage === null).length, 1, 'one commit');
+    assert.ok(messages.filter(m => m.stage === 'add').length >= 7, 'the rows arrived in several messages');
+    assert.ok(Math.max(...messages.map(m => m.rows)) <= 2000, 'no message carries more than a small batch of rows');
+    assert.equal(staging.size(), 0, 'the stage is gone after the save');
+
+    // An ordinary autosave (a few thousand rows at most) goes straight through, unchanged.
+    messages.length = 0;
+    await desktop.save(snapshot(2046, 'Chicago Metropolitan'), {expectedRevision: saved.revision, archiveRef: saved.archiveRef, gameRef: saved.gameRef, additions: rows('next', 50), gameAdditions: rows('ngame', 20), checkpointType: 'week'});
+    assert.deepEqual(messages.map(m => m.stage), [null], 'a small save is one message');
+  } finally {
+    delete globalThis.DynastyDesktopStorage;
+    delete require.cache[modulePath];
+  }
+});
+
+test('a staging failure discards the stage and writes nothing', async () => {
+  let n = 0, calls = 0;
+  const staging = createStagingArea({makeToken: () => `t${++n}`});
+  const store = createDesktopStorage({rootDir: await fs.mkdtemp(path.join(os.tmpdir(), 'dynasty-lab-stage-fail-'))});
+  globalThis.DynastyDesktopStorage = Object.freeze({
+    load: p => store.load(p), readArchive: p => store.readArchive(p), readGames: p => store.readGames(p), listSlots: () => store.listSlots(), rename: p => store.rename(p),
+    save: payload => { if (payload.stage === 'add' && ++calls === 3) return Promise.reject(new Error('the window closed')); return routeSave(store, staging, payload); },
+  });
+  delete require.cache[modulePath];
+  try {
+    const desktop = require('../storage.js').create({slot: 'main'});
+    await assert.rejects(desktop.save(snapshot(2040, 'Great Lakes University'), {additions: rows('c', 9000), gameAdditions: [], checkpointType: 'manual'}), /window closed/);
+    assert.equal(staging.size(), 0, 'the half-staged rows were dropped');
+    assert.ok(!(await desktop.load()), 'nothing was committed');
+    await assert.rejects(routeSave(store, staging, {slot: 'main', snapshot: snapshot(2040), options: {stagedToken: 'gone'}}), /no longer available/);
+    await assert.rejects(routeSave(store, staging, {stage: 'frob'}), /Unknown staged save step/);
+  } finally {
+    delete globalThis.DynastyDesktopStorage;
+    delete require.cache[modulePath];
+  }
+});
+
+test('the core is cut into bounded parts, keeps every key in order, and leaves the archives to be saved separately', () => {
+  const {planCoreParts} = require('../storage.js');
+  const universe = {year: 2046, teams: Array.from({length: 30}, (_, t) => ({id: t, roster: Array.from({length: 100}, (_, p) => ({id: p, s: {a: 1}}))})),
+    playerArchive: rows('x', 5), gameArchive: rows('g', 5), small: {a: [1, 2, 3]}, events: Array.from({length: 3000}, (_, i) => ({i})), map: {a: Array.from({length: 500}, (_, i) => ({i}))}, empty: []};
+  const plan = planCoreParts(universe, 5000);
+  assert.deepEqual(plan.keys, ['year', 'teams', 'small', 'events', 'map', 'empty'], 'every core key in its original order, without the archives');
+  const countOf = v => { let n = 0; const walk = x => { if (x && typeof x === 'object') { n++; for (const k in x) walk(x[k]); } }; walk(v); return n; };
+  for (const part of plan.parts) assert.ok(countOf(part.array ?? part.value) <= 5000 * 1.1 + 400, `a part stays small (${part.key})`);
+  assert.ok(countOf(plan.remainder) <= 5000, 'the save message itself stays small');
+  // Reassembled, it is the same core.
+  let n = 0;
+  const staging = createStagingArea({makeToken: () => `k${++n}`}), {token} = staging.begin();
+  for (const part of plan.parts) staging.addCore({token, ...part});
+  const {assembleUniverse} = require('../desktop/staging.js');
+  const whole = assembleUniverse(plan.remainder, staging.take(token).core, plan.keys);
+  const {playerArchive, gameArchive, ...expected} = universe;
+  assert.deepEqual(whole, expected);
+  assert.deepEqual(Object.keys(whole), Object.keys(expected));
+  assert.throws(() => assembleUniverse({}, new Map(), ['__proto__']), /Unknown staged core key/);
+  const again = createStagingArea({makeToken: () => 'z'}), t2 = again.begin().token;
+  assert.throws(() => again.addCore({token: t2, key: '__proto__', value: 1}), /Unknown staged core key/);
+  again.addCore({token: t2, key: 'v', value: 1});
+  assert.throws(() => again.addCore({token: t2, key: 'v', value: 2}), /sent twice/);
+  assert.throws(() => again.addCore({token: t2, key: 'v', array: []}), /both a value and an array/);
+});

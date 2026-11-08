@@ -41,7 +41,15 @@ function timeline(rows,meta={}){
   if(['scrimmage','interception','fumble','punt','field_goal'].includes(r.t)&&side&&(!drive||drive.side!==side))openDrive(side,r.p??spot,s.i);
   switch(r.t){
    case 'kickoff':
-    poss=side;spot=r.p??25;openDrive(side,spot,s.i);s.kind='cut';s.label='Touchback';s.text=`Kickoff through the end zone. ${team(side)} start at their own ${spot}.`;break;
+    poss=side;spot=r.p??25;openDrive(side,spot,s.i);s.kind='cut';
+    if(r.td){s.label='Kick return TD';s.text=`${nm(a.rt)||team(side)} takes the kickoff all the way back for a touchdown!`;s.big=true}
+    else if(r.rt>0){s.label='Kick return';s.text=`${nm(a.rt)||team(side)} returns the kickoff ${r.rt} yards to ${spotText(spot).toLowerCase()}.`}
+    else{s.label='Touchback';s.text=`Kickoff through the end zone. ${team(side)} start at their own ${spot}.`}
+    break;
+   case 'penalty':{
+    const against=sideKey(r.pa),y=Number(r.y)||0;poss=side||poss;spot=r.p??spot;s.kind='cut';s.label='Flag';s.key=true;
+    s.text=`Flag: ${r.pl||'penalty'} on ${nm(a.pn)||team(against)}, ${y} yard${y===1?'':'s'}${r.af?', automatic first down':''}. ${r.dn?`${ORD[r.dn]||r.dn} & ${r.ds||10}`:''}`.trim();
+    s.banner={text:'FLAG',side:against?other(against):side};break}
    case 'possession_change':
     {const ended=drive;poss=side;spot=r.p??spot;if(side&&(!drive||drive.side!==side))openDrive(side,spot,s.i);s.kind='cut';
     if(r.r==='turnover_on_downs'){s.text=`Turnover on downs. ${team(side)} take over at the ${spotText(spot).toLowerCase()}.`;s.key=true;s.banner={text:'TURNOVER ON DOWNS',side};if(ended&&ended!==drive)ended.result='DOWNS'}
@@ -55,12 +63,13 @@ function timeline(rows,meta={}){
     s.kind=r.t==='interception'?'int':r.t==='fumble'?'fumble':r.sk?'sack':r.k==='p'?(r.cp?'pass':'inc'):'run';
     Object.assign(s,{los:p,y,end,down:r.dn||1,toGo:r.ds||10,actors:a,k:r.k||null,sk:!!r.sk});
     const qb=nm(a.qb)||'The quarterback',tg=nm(a.tg),ca=nm(a.ca),tk=nm(a.tk);
-    if(s.kind==='run')s.text=`${ca||team(side)} ${a.ca&&a.ca===a.qb?'keeps':'runs'} ${yardsText(y)}${tk?`; tackle by ${tk}`:''}.`;
+    if(s.kind==='run')s.text=`${ca||team(side)} ${r.sr?'scrambles':a.ca&&a.ca===a.qb?'keeps':'runs'} ${yardsText(y)}${tk?`; tackle by ${tk}`:''}.`;
     else if(s.kind==='pass')s.text=`${qb} to ${tg||'a receiver'} ${yardsText(y)}${tk?`; tackle by ${tk}`:''}.`;
     else if(s.kind==='inc')s.text=`${qb} incomplete${tg?` for ${tg}`:''}${a.dr?' (dropped)':a.pb?`; broken up by ${nm(a.pb)||'the defense'}`:''}.`;
     else if(s.kind==='sack')s.text=`${nm(a.sb)||team(other(side))} sacks ${qb} ${yardsText(y)}.`;
     else if(s.kind==='int')s.text=`INTERCEPTED. ${nm(a.ib)||team(other(side))} picks off ${qb}${tg?` targeting ${tg}`:''}.`;
     else s.text=`FUMBLE. ${ca||qb} loses it; ${nm(a.ff)||team(other(side))} forces it and ${team(other(side))} recover.`;
+    if(a.pr&&(r.pr||r.sr))s.text+=` Pressure from ${nm(a.pr)}.`;
     if(drive){drive.plays++;drive.yards+=s.kind==='int'?0:y;drive.snaps.push(s.i)}
     const turnover=s.kind==='int'||s.kind==='fumble';
     if(turnover){s.big=true;s.banner={text:s.kind==='int'?'INTERCEPTION':'FUMBLE',side:other(side)};if(drive)drive.result=s.kind==='int'?'INT':'FUMBLE'}
@@ -70,13 +79,13 @@ function timeline(rows,meta={}){
     spot=end;lastSnap=s.i;break}
    case 'punt':{
     const p=r.p??spot,n=Number(r.n)||40;Object.assign(s,{kind:'punt',los:p,net:n,tb:!!r.tb,down:r.dn||4,toGo:r.ds||10,actors:a});
-    s.text=`${nm(a.pt)||team(side)} punts ${n} yards${r.tb?' into the end zone for a touchback':''}.`;if(drive){drive.result='PUNT';drive.snaps.push(s.i)}lastSnap=s.i;break}
+    s.text=`${nm(a.pt)||team(side)} punts ${n} yards${r.tb?' into the end zone for a touchback':''}.${r.td?` ${nm(a.rt)||team(other(side))} returns it for a touchdown!`:r.rt>0?` ${nm(a.rt)||team(other(side))} returns it ${r.rt}.`:r.fc?' Fair catch.':''}`;if(drive){drive.result='PUNT';drive.snaps.push(s.i)}lastSnap=s.i;break}
    case 'field_goal':{
     const p=r.p??spot;Object.assign(s,{kind:'fg',los:p,dist:Number(r.fd)||0,made:!!r.m,down:r.dn||4,toGo:r.ds||10,actors:a});
     s.text=`${nm(a.kk)||team(side)} ${s.dist}-yard field goal is ${s.made?'GOOD':'NO GOOD'}.`;
     s.banner={text:s.made?'FIELD GOAL':'NO GOOD',side:s.made?side:other(side)};if(!s.made)s.big=true;
     if(drive){drive.result=s.made?'FG':'MISS';if(s.made)drive.points+=3;drive.snaps.push(s.i)}lastSnap=s.i;break}
-   case 'touchdown':s.kind='score';s.from=lastSnap;s.big=true;s.banner={text:'TOUCHDOWN',side};s.text=`Touchdown, ${team(side)}.`;if(drive){drive.result='TD';drive.points+=6}spot=100;break;
+   case 'touchdown':if(r.rk&&side&&(!drive||drive.side!==side))openDrive(side,spot,s.i);s.kind='score';s.from=r.rk?null:lastSnap;s.big=true;s.banner={text:'TOUCHDOWN',side};s.text=`Touchdown, ${team(side)}.`;if(drive){drive.result='TD';drive.points+=6}spot=100;break;
    case 'extra_point':s.kind='after';s.from=lastSnap;s.text=`Extra point ${r.m?'good':'no good'}.`;if(drive&&r.m)drive.points+=1;break;
    case 'two_point':s.kind='after';s.from=lastSnap;s.text=`Two-point try ${r.m?'good':'fails'}.`;if(drive&&r.m)drive.points+=2;break;
    case 'safety':s.kind='score';s.from=lastSnap;s.big=true;s.banner={text:'SAFETY',side};s.text=`Safety. Two points for ${team(side)}.`;if(drive){drive.result='SAFETY'}break;

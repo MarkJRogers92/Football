@@ -13,3 +13,10 @@
 .v0102-staff-room>summary::-webkit-details-marker{display:none}
 .v0102-staff-room>summary::after{content:"Show";margin-left:auto;font-size:12px;font-weight:800;color:#e6c27a}
 .v0102-staff-room[open]>summary::after{content:"Hide"}
+.v2-gameday-conditions{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;margin:8px 0 2px;padding:7px 11px;border:1px solid var(--line,rgba(255,255,255,.14));border-left:3px solid var(--line,rgba(255,255,255,.3));border-radius:6px;font-size:.88rem}
+.v2-gameday-conditions span{opacity:.78}
+.v2-gameday-conditions[data-severity="rough"],.v2-gameday-conditions[data-severity="harsh"]{border-left-color:#d9a441}
+.v2-gameday-conditions[data-severity="harsh"]{border-left-color:#e0605a}
+.v2-forecast{font-weight:600}
+.v2-forecast[data-severity="rough"],.v2-forecast[data-severity="harsh"]{color:#d9a441}
+.game-conditions{margin:0 0 .6rem}
