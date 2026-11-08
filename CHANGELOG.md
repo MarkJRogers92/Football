@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — Recruiting news and tooling
+
+- **Recruiting news on This Week.** The week's recruiting results now appear in the weekly list: **LOST** (a target chose another program, with the reason in plain terms: you were not on his final list, you were on it but never made him an offer, none of his finalists had room, or he simply chose someone else), **CUT** (a target cut you from his Top 5 or Top 3, with who made his list) and **FLIPPED** (a commitment left for a rival). Commitments to you keep their existing item.
+- **The season review tells the desk's year.** A Recruiting Desk block shows hours spent against the budget, how many targets chose you, went elsewhere or cut you, your biggest win and loss (with why), how many recruits had you on a final list and never got an offer, commitments that flipped away, and rival moves answered.
+- **Staff now offer to anyone who has put you on his list.** A recruit cannot choose you without an offer, and in staff-run play 7 to 11 recruits a season had you on a final list and never got one. Staff-run blue chips are unchanged within noise; targets landed by top programs doubled.
+- **Tooling.** `npm run calibrate:recruiting` (`tools/recruiting-calibrate.js`) plays full seasons with scripted policies against the pre-desk behavior and prints the table every desk constant was tuned from, with `--tune` to try a candidate value without editing the file. `npm run soak:recruiting` (`tools/recruiting-soak.js`) plays many seasons with the desk on and checks save growth, stuck funnels, bad numbers, class-count drift and leftovers from old classes. Both are covered by tests and documented in `docs/RECRUITING_CALIBRATION.md`.
+
 ## v0.15.0 — Recruiting Desk
 
 Recruiting is now something you do each week, not a list you maintain. Scouting hours still tell you

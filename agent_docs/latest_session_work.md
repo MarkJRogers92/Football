@@ -1,5 +1,12 @@
 # Latest Session Work
 
+## Unreleased: recruiting news and tooling (branch `claude/pensive-gates-g6e24q`, after v0.15.0)
+
+- News: `recruiting-actions.js` keeps a per-season ledger on the controlled program (`team.recruitingSeason`: hours, actions, won/lost/cut/flipped entries, rival moves, answered), written by `perform` (`noteSpend`) and the weekly pass (`noteWeek`). `newsItems` turns the week just played (`team.recruitingLastWeek.funnel` / `.flipped`, now objects not names) into LOST / CUT / FLIPPED hub items via `DynastyRecruitingNews`, wired into `buildWeeklyHub` in `app.js`; `deskSummary` feeds the season review (`DynastyRecruitingSeason`, `season-review.js`). Decisions carry `listed` and `offered` so the explanation is built from records, never guessed.
+- Staff plan: offers now also go to any target whose Top 5 or Top 3 includes the program (`onHisList`).
+- Tooling: `tools/recruiting-calibrate.js` and `tools/recruiting-soak.js`, tested by `tests/recruiting-calibration-tools.js`, documented in `docs/RECRUITING_CALIBRATION.md` (policies, how to read the output, the v0.15.0 baseline, caveats). The scratch scripts from the v0.15.0 work are gone; use these.
+- Soak finding: the desk adds about 30 KB per season to a save and nothing measurable to memory (a game with the desk removed produces byte-identical saves). The save does grow about 15 MB per season in the full runtime (about 12.8 MB in the bare engine): that is the existing archive growth in `docs/SAVE_SIZE_MEASUREMENT.md`, not the desk.
+
 ## v0.15.0 — Recruiting Desk (2026-11-08, branch `claude/pensive-gates-g6e24q`, PR #40)
 
 - Goal from the owner: recruiting should be an active weekly decision like the NCAA games, not passive scouting. Scope agreed: Phase 1 = recruiting hours + action menu + neglect cooling, separate from evaluation hours; staff can run it. Not built yet: stage funnel / Top 5 cuts / decision dates, hidden motivations and dealbreakers, rival reactions, recruiter assignments (see the design in the CHANGELOG "Unreleased" entry's follow-ups below).
