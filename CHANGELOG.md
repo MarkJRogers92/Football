@@ -1,6 +1,17 @@
 # Changelog
 
-## Unreleased — Deeper play model, facilities and boosters
+## v0.16.0 — Deeper football, facilities and first-Saturday coaching
+
+### Weekly choices, player history and the first Saturday
+
+- Delegated weekly choices apply the same real effects as manual choices and record who made them. Missing targets or unsupported options stop advancement rather than marking a decision complete. Staff do not invent new promises or in-season position changes.
+- Staff territory suggestions preserve learning when the same coach keeps the same region. School-record and redshirt stories use recorded school/year production and the actual redshirt season.
+- A homegrown first college start becomes a permanent factual entry in the player profile and school history, linked to its recorded game. Failed game transactions roll the milestone back; reloads and later weeks do not duplicate it.
+- The opening briefing introduces two real players. The optional first-Saturday tour has three stops and opens collapsed content before introducing it; the original full desk tour remains available.
+- Staff Assignments saves a conservative medical instruction for delegated worn-starter decisions: limit their role or rest them. A coach's manual choice takes precedence.
+- **Coach big moments** advances between the existing coaching decisions. Paused games preserve the mode and explicit actions and rebuild the exact same session after reloading; old saves keep manual navigation.
+- Preparation buttons expose selection and point-budget context to assistive technology. The yearbook contains keyboard focus and restores its opener when closed.
+- Existing saves and archives are retained. No save-schema version bump or destructive migration is required.
 
 ### The game plays more like football
 

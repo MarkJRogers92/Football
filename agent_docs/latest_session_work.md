@@ -1,5 +1,12 @@
 # Latest Session Work
 
+## v0.16.0 release preparation — 2026-11-08
+
+The owner authorized production publication and macOS/Windows downloads after PR #44 merged at `4396e2c1360cd63ff40db93be1fb570c0a676016`. This release carries both Claude's merged play model/facilities/large-save work and the correctness/engagement improvements. The feature tree passed all seven PR CI jobs (run `42532996910`), including Node/build, main and extended browser suites, audit and packaged desktop smoke tests on both platforms.
+
+This preparation updates version metadata, release notes and the generated standalone artifact; gameplay behavior is unchanged from PR #44. Production is still v0.15.2 until the manual Publish Dynasty Lab workflow succeeds. Create the v0.16.0 prerelease and attach desktop artifacts from a passed validation run for the exact release commit. Do not reuse old-version binaries or overwrite v0.15.2. Historical candidate/validation reports below describe their original delivery points.
+
+
 ## Unreleased isolated handoff candidate — 2026-11-08
 
 The local `codex/dynasty-lab-correctness-current-20261108` worktree builds on Claude's merged PR #43 (`6e226c2`) and retains the D1–D4 correctness repairs. Its next stage adds factual, persistent homegrown first-start history; a three-stop first-Saturday tour plus optional full tour; saved medical delegation instructions; optional big-moments coaching with deterministic saved-action replay; and preparation/yearbook accessibility. This is an unpushed candidate, not a new release. See `docs/DYNASTY_ENGAGEMENT_2026-11-08.md` for final test results and the working native Chromium/loopback-HTTP validation route.
