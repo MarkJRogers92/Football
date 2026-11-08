@@ -1,5 +1,32 @@
 # Changelog
 
+## Unreleased — Deeper play model, facilities and boosters
+
+### The game plays more like football
+
+Coached and recorded games (Game Engine 2) have a richer play model. Quick-simulated games elsewhere in the league are unchanged.
+
+- **Penalties.** About 9% of snaps end in a flag, in eleven kinds: false start, delay of game, offensive holding, ineligible receiver, offside, encroachment, defensive holding, pass interference, roughing the passer, unnecessary roughness and face mask. The team that was fouled takes the flag or the play, whichever is better for it, so a holding call wipes out a long gain and is declined after a sack. Fouls are enforced from the line of scrimmage with the half-the-distance rule, automatic first downs where they apply, and the down replayed otherwise. A foul never ends a quarter by itself. Flags land on real players and fill the `penalties` stat that has existed since v0.9 and was never written. A loud stadium rattles the visiting line and a sloppy team is flagged more. About 5.4 flags and 41 yards per team per game.
+- **Weather and stadiums.** Every game has a roof and a sky derived from the home program's location and the calendar: about one program in ten plays indoors, the mountain west plays at altitude, the north gets cold and snow late in the year, the Gulf and the Pacific Northwest get rain. Wind makes long field goals less certain and deep passes harder, a wet or frozen ball is fumbled more, thin air lets kicks carry, a dome helps the passing game. A calm afternoon changes nothing. Conditions are shown on the matchup card and This Week before the game (the forecast), on the Game Day scoreboard with what they mean, and in the archived box score. They never draw from the gameplay random stream.
+- **Returns.** Kickoffs are no longer always touchbacks: about 60% are, the rest are returned (23 yards on average). Punts are fair caught, downed deep or returned, with weather and altitude changing the distance. Returns can go the distance, rarely (about one in twenty games). The depth chart's Kick Returner and Punt Returner get the credit, and returns are in the box score.
+- **Pressure.** A pass that is not a sack can still be a hurry. A hurried quarterback completes fewer passes, scrambles (as a real quarterback carry), or throws the ball away, and the rusher is credited with a pressure and the line with one allowed. The box score shows pressures allowed.
+- **The replay and the books.** Flags, returns, scrambles and pressure appear in the play-by-play, the drive archive, the compact play log and the Game Cast replay. Team stats gain penalties and yards, pressures allowed and return yards, and the player box score gains Returns and Penalties tables. Attribution reconciles flags, pressures and returns to the team totals in every game. An archived drive that ended on downs now says so instead of "END".
+- **Balance.** Measured against the legacy simulation over the same 120 real matchups: scoring 41.3 vs 42.5 points (it was 40.9), yards within 3 (it was 26 over), plays 115 vs 121. Bad weather lowers scoring by about three points, a dome raises it by under a point. `docs/v0100-CALIBRATION.json` was regenerated.
+- **Saves.** A game carries its rules, so a live game saved in an earlier version rebuilds under the rules it was started with, and a game without rules plays exactly as before (checked against the v0.15.2 engine over hundreds of seeds). New player stat keys `returns`, `returnYds`, `returnTD`; archived games gain `conditions` and the extra team totals. Old games, saves and box scores load unchanged.
+
+### Facilities and boosters
+
+Facilities was one number that only rose by one when the board was thrilled. It is now something you build, on the Program page.
+
+- **Booster goodwill and a fund.** Boosters give money each offseason, more when goodwill is high, the stadium is bigger and the crowd is loud. Goodwill follows wins against expectation and titles. You can also run up to three campaigns a season: a **Booster Dinner** is a steady gift, a **Major Gift Ask** is large when the base is happy and costs goodwill when it is not. Results come from a hash of the program, season and campaign, not a random draw, so reloading never changes them.
+- **Three build tracks, five levels each.** **Stadium & Game Day** (+2 fan support a level, so a bigger home-field edge, and bigger gifts), **Training & Performance Center** (+1 development at levels 2 and 4) and **Football Operations Building** (+2 recruiting hours a week a level). Each level also raises the facilities rating. A project is paid for out of the fund (4, 7, 11, 16 and 22 units), then takes one to three seasons to build. Two at a time. A project that is not yet fully funded can be shelved for a full refund.
+- **The NIL trade-off.** A campaign's gift goes to the facilities fund or to this season's NIL budget, and unspent NIL can be redirected into the fund. Holding the starter and finishing the stadium are the same money.
+- **Everywhere else.** The weekly hub announces a building that opens and money left idle in the offseason. Only the controlled program has a plan; the rest of the league is unchanged, and saves without one behave as before.
+
+### Tests
+
+New `tests/game-conditions.js`, `tests/play-model.js`, `tests/facilities-boosters.js` and `tests/facilities-boosters-browser.js`. The attribution digest test now proves the original guarantee on the legacy rules. The smoke test's player stat-key count is 36.
+
 ## v0.15.2 — Portal commitments, weekly playbooks and first starts
 
 - Resolving the portal honors announced commitments before placing undecided players. Finalizing commitments manually still works. A player who returns to his original school occupies a real roster spot.

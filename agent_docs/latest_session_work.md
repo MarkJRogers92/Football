@@ -1,5 +1,26 @@
 # Latest Session Work
 
+## Unreleased on top of v0.15.2 — deeper play model, facilities and boosters (2026-11-08, branch `claude/cool-knuth-aomwcv`)
+
+Not released: the version is still 0.15.2 and the CHANGELOG entry is "Unreleased". Release only on the owner's explicit say-so.
+
+**Play model** (`game-engine-v2.js`, `game-engine-v2-adapter.js`, new `game-conditions.js`)
+- A game carries `state.rules` (`{version, penalties, returns, pressure, conditions}`). **No `rules` = the exact v0.15.2 behavior** (`tests/play-model.js` pins a digest of the committed engine; the old attribution digest in `tests/game-cast-field.js` is checked with `rules:false`). `adapter.profileOutcome` dispatches to `legacyProfileOutcome` or `profileOutcomeRules`; `createShadowGame` turns rules on unless `rules:false`; callers pass `year`/`week` (and `neutral` for postseason) so the conditions match the calendar.
+- A live game is stored as seed + action list and rebuilt by replay, so `universe.liveGameDay` now stores `rules`; a save without it replays with `rules:false`. Do not change engine draw order for games with rules without thinking about that.
+- Penalty outcomes (`outcome.penalty`) replace the snap in `applyScrimmage` -> `applyPenalty`. The event's `team` is the OFFENSE (so drive logic is unchanged) and `against` is the penalized side. Declined penalties are not drawn at all. Weights are in `PENALTY_TYPES` (engine) and `PENALTY_SCALE`/crowd factors (adapter); tuned with a scratch harness against the legacy model (5.4 flags and 41 yards per team, scoring within 2%).
+- `kickoffTo` is exported and used by `game-engine-v2-gameday.js`; returns and return TDs (`touchdown` event with `kind:'return'`) are attributed to the depth chart's KR/PR. New player stat keys `returns`, `returnYds`, `returnTD`; new team box keys in `EXTRA_BOX_KEYS` (optional, so old archives still validate).
+- Weather never touches the gameplay stream; `DynastyGameConditions.forGame` is a pure function of home program + year + week.
+- Calibration report regenerated (`npm run calibrate:game-engine-v2`); remember to re-stamp after any engine/adapter/compare edit.
+
+**Facilities and boosters** (`facilities-boosters.js`, `facilities-boosters.css`, host `#facilitiesBoosters` in `body.html`)
+- Pure factory `makeFacilitySystem(env)` plus browser wiring, modeled on `staff-assignments.js`. State on the controlled team only: `team.facilityPlan` (`fund`, `goodwill`, `levels`, `projects`, `campaigns`, `nilBonus`, `log`). Created lazily; sanitized on every read.
+- Wraps `resetNilSeason` (the season rollover hook: goodwill, completions, annual gifts), `nilBudgetFor` (campaign gifts sent to NIL), and `TAB_RENDERERS.program`. `recruiting-actions.js` takes an optional `env.hoursBonus` for Football Ops. Campaign outcomes are hash-based, never `gameplayRandom`.
+- AI programs have no plan and stay static, as before.
+
+**Verification run so far** (Node 22 here, CI uses 24): full `npm test` 802/802 before the facilities tests were added (these pass separately: 10/10), the Game Day / recording / postseason / cast / weekly-desk browser suites, `one-more-saturday-browser`, `gameday-season-presentation-browser`, and the new `facilities-boosters-browser` at desktop and phone width. Not yet run: the complete `test:browser-extended` matrix, storage, audit, long-run/soak with the new systems, desktop packaging.
+
+**Next (the owner asked for health work on the new systems):** a 20-season soak with facilities in use (save growth: each plan is small, `record.conditions` is about 90 bytes a game), league-health with the penalty/return model on, and a look at whether AI programs should invest too (they do not today).
+
 ## v0.15.2 published — 2026-11-08
 
 All four reviewed fixes and three upgrades are merged and published. Portal commitments survive resolution; returned entrants regain a roster spot; successful desk edits autosave; custom playbooks affect the controlled team's weekly simulation; class reports load alumni and use appearances/starts; staff recommend portal prospects on a compact scouting board; first college starts can produce a factual recruiting callback.

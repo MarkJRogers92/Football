@@ -45,7 +45,9 @@ function makeRecruitingActionSystem(env){
  // ---------- hours ----------
  function hoursBudgetFor(t){
   const rc=t?.staff?.RC||{},hc=t?.staff?.HC||{};
-  return clamp(Math.round(12+(rc.recruiting||60)*.38+(hc.recruiting||60)*.10+(t?.resources??60)*.06),30,60);
+  // A Football Operations building adds hours (v0.16); with none built the budget is the original 30-60.
+  const extra=env.hoursBonus?Math.max(0,Math.round(env.hoursBonus(t)||0)):0;
+  return clamp(Math.round(12+(rc.recruiting||60)*.38+(hc.recruiting||60)*.10+(t?.resources??60)*.06)+extra,30,60+extra);
  }
  // Pure read: a stale or missing week reads as unspent without writing anything.
  function weekInfo(t){
@@ -594,6 +596,7 @@ if(typeof module==='object'&&module.exports){
 }else{
  const recruitingActions=makeRecruitingActionSystem({
   getUniverse:()=>universe,clamp,priorities:PRIORITIES,
+  hoursBonus:t=>globalThis.DynastyFacilities&&t&&t.name===$('#userTeam')?.value?globalThis.DynastyFacilities.hoursBonus(t):0,
   scholarshipCapacity:t=>scholarshipCapacity(t),
   unitStrength:(t,pos)=>unitCached(t,pos),
   schemeFit:(t,r)=>recruitSchemeFit(t,r),

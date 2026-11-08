@@ -126,7 +126,7 @@ const mean = a => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0);
   check('save round-trip preserves teams', v.teams.length === before.teams);
   check('save round-trip preserves archive', v.playerArchive.length === before.archive);
   check('save round-trip rehydrates stats',
-    Object.keys(v.teams[0].roster[0].stats).length === 33,
+    Object.keys(v.teams[0].roster[0].stats).length === 36,
     `${Object.keys(v.teams[0].roster[0].stats).length} keys`);
   check('save round-trip relinks schedule',
     v.schedule[0][0] === v.teams.find(t => t.name === v.schedule[0][0].home).schedule.find(g => g.week === 1));

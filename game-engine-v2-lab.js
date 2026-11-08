@@ -25,20 +25,38 @@ function downLabel(state={}){
 }
 function teamName(side,names={}){return names[side]||side||'Team'}
 function signedYards(y){const n=Number(y)||0;return n===0?'no gain':n>0?`gains ${n}`:`loses ${Math.abs(n)}`}
+function returnText(event){
+  const n=Number(event.ret)||0;
+  if(event.td)return', returned for a touchdown';
+  if(event.fairCatch)return', fair catch';
+  return n>0?`, returned ${n} yard${n===1?'':'s'}`:'';
+}
 function decisionActionLabel(value){return String(value||'decision').replaceAll('_',' ')}
 function eventText(event={},names={}){
   const state=event.state||{},team=teamName(event.team,names),receiver=teamName(event.receiver,names);
   if(event.type==='game_start')return'Game begins.';
-  if(event.type==='kickoff')return`${receiver} receives the kickoff.`;
-  if(event.type==='scrimmage')return`${team} ${signedYards(event.yards)} yard${Math.abs(Number(event.yards)||0)===1?'':'s'}.`;
+  if(event.type==='kickoff'){
+    if(event.td)return`${receiver} return the kickoff for a touchdown!`;
+    if(event.touchback===false&&Number(event.ret)>0)return`${receiver} return the kickoff ${event.ret} yards.`;
+    return`${receiver} receives the kickoff.`;
+  }
+  if(event.type==='penalty'){
+    const against=teamName(event.against,names),yards=Number(event.yards)||0;
+    return`Flag: ${event.label||'penalty'} on ${against}, ${yards} yard${yards===1?'':'s'}${event.autoFirst?', automatic first down':''}.`;
+  }
+  if(event.type==='scrimmage'&&event.scramble){
+    const y=Number(event.yards)||0;
+    return`${team} quarterback scrambles ${y>0?`for ${y} yard${y===1?'':'s'}`:y<0?`and loses ${Math.abs(y)}`:'for no gain'}.`;
+  }
+  if(event.type==='scrimmage')return Number(event.yards)?`${team} ${signedYards(event.yards)} yard${Math.abs(Number(event.yards)||0)===1?'':'s'}.`:`${team} no gain.`;
   if(event.type==='interception')return`${team} throws an interception.`;
   if(event.type==='fumble')return`${team} loses a fumble.`;
   if(event.type==='possession_change')return`${teamName(event.to,names)} takes possession.`;
-  if(event.type==='touchdown')return`TOUCHDOWN ${team}.`;
+  if(event.type==='touchdown')return event.kind==='return'?`RETURN TOUCHDOWN ${team}.`:`TOUCHDOWN ${team}.`;
   if(event.type==='extra_point')return`${team} extra point ${event.made===false?'missed':'good'}.`;
   if(event.type==='two_point')return`${team} two-point try ${event.made?'good':'failed'}.`;
   if(event.type==='field_goal')return`${team} ${event.distance||''}-yard field goal ${event.made?'good':'missed'}.`.replace('  -',' ');
-  if(event.type==='punt')return`${team} punts${event.touchback?' for a touchback':''}.`;
+  if(event.type==='punt')return`${team} punts${event.touchback?' for a touchback':''}${event.touchback?'':returnText(event)}.`;
   if(event.type==='safety')return`SAFETY for ${team}.`;
   if(event.type==='coaching_decision'){
     const choice=event.selectedOption==='delegate'?`delegates — staff chooses ${decisionActionLabel(event.resolvedAction)}`:`chooses ${decisionActionLabel(event.selectedOption)}`;

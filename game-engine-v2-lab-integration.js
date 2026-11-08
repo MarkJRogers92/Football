@@ -3,6 +3,16 @@
 let v2GameLabPreview=null;
 function v2GameLabKey(g){return g?`${universe.year}:${g.week||universe.week+1}:${g.home}:${g.away}`:''}
 function v2LabClone(value){return JSON.parse(JSON.stringify(value))}
+// The forecast for a scheduled game: a pure function of the home program and the calendar, so it matches the
+// weather the game is later played in and never draws from the gameplay random stream.
+function v2ForecastFor(g){
+  const api=globalThis.DynastyGameConditions,home=g?T(g.home):null;
+  return api&&home?api.forGame({home,year:universe.year,week:g.week??universe.week+1}):null;
+}
+function v2ConditionsLine(conditions){
+  const api=globalThis.DynastyGameConditions;
+  return api&&conditions?api.describe(conditions):null;
+}
 function v2RosterStatChecksum(team){let n=0;for(const p of team?.roster||[])for(const v of Object.values(p.stats||{}))if(Number.isFinite(Number(v)))n+=Number(v);return n}
 function v2LabIntegrity(g,home,away){return JSON.stringify({
   week:universe.week,phase:universe.phase,gameCounter:universe.gameCounter,
@@ -16,7 +26,7 @@ function v2WeightedRefs(items){return(items||[]).filter(x=>x?.p).map(x=>({player
 function v2AttributionContext(team){
   const qb=roleStarter(team,'QB1')||starter(team,'QB'),k=roleStarter(team,'K1')||starter(team,'K'),pu=roleStarter(team,'P1')||starter(team,'P');
   const ol=[...new Map(['LT','LG','C1','RG','RT'].map(id=>roleStarter(team,id)).filter(Boolean).map(p=>[p.id,p])).values()];
-  return{teamName:team.name,qb:v2PlayerRef(qb),rushers:v2WeightedRefs(rushingShares(team)),receivers:v2WeightedRefs(receivingShares(team)),defenders:v2WeightedRefs(defensiveShares(team)),offensiveLine:ol.map(p=>({player:v2PlayerRef(p),weight:1})),kicker:v2PlayerRef(k),punter:v2PlayerRef(pu)}
+  return{teamName:team.name,qb:v2PlayerRef(qb),rushers:v2WeightedRefs(rushingShares(team)),receivers:v2WeightedRefs(receivingShares(team)),defenders:v2WeightedRefs(defensiveShares(team)),offensiveLine:ol.map(p=>({player:v2PlayerRef(p),weight:1})),kicker:v2PlayerRef(k),punter:v2PlayerRef(pu),kickReturner:v2PlayerRef(roleStarter(team,'KR')),puntReturner:v2PlayerRef(roleStarter(team,'PR'))}
 }
 function v2StarterIds(team){
   const roles=['QB1','RB1','X','Z','SLOT','TE1','LT','LG','C1','RG','RT','RUSH','SETEDGE','NT','3TECH','MIKE','WILL','NICKEL','BCB','FCB','FS','BOXS'];
@@ -41,7 +51,8 @@ function runV2GameLabShadow(){
     gameId:`v0101-shadow-${key}`,
     seed:`v0101-shadow-${key}`,
     home,away,homeProfile,awayProfile,
-    homeFieldRating:homeFieldFor(home)
+    homeFieldRating:homeFieldFor(home),
+    year:universe.year,week:g.week??universe.week+1
   });
   const attribution=actors.attributeGame(preview.state,{home:v2AttributionContext(hc),away:v2AttributionContext(ac)});
   actors.attachEventSummary(attribution,preview.summary);preview.attribution=attribution;

@@ -2,7 +2,7 @@
 function v2RecordPrepared(g,home,away,homeProfile,awayProfile){
   const api=globalThis.DynastyGameEngineV2Lab,actors=globalThis.DynastyGameEngineV2Attribution,tx=globalThis.DynastyGameEngineV2Transaction;
   if(!api||!actors||!tx)throw new Error('Game Engine 2 development modules are unavailable.');
-  const key=v2GameLabKey(g),preview=api.simulate({gameId:`v0101-${key}`,seed:`v0101-${key}`,home,away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(home)});
+  const key=v2GameLabKey(g),preview=api.simulate({gameId:`v0101-${key}`,seed:`v0101-${key}`,home,away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(home),year:universe.year,week:g.week??universe.week+1});
   const attribution=actors.attributeGame(preview.state,{home:v2AttributionContext(home),away:v2AttributionContext(away)});actors.attachEventSummary(attribution,preview.summary);preview.attribution=attribution;
   const candidate=tx.buildCandidate({state:preview.state,attribution,homeTeam:home,awayTeam:away,starterIds:{home:v2StarterIds(home),away:v2StarterIds(away)},meta:{season:universe.year,week:g.week??universe.week+1,phase:universe.phase,label:'Regular season',venue:`${home.name} · ${home.city||''}`},conference:g.conf??home.conference===away.conference,homeOpponentOverall:awayProfile.overall,awayOpponentOverall:homeProfile.overall});
   return{api,tx,key,preview,candidate}
@@ -36,7 +36,7 @@ function recordV2GameLabResult(options={}){
     postGameCondition(home);postGameCondition(away);const drives=v2RecordDriveArchive(preview),log=(preview.state.events||[]).slice(-160).map(e=>prepared.api.eventText(e,preview.names));
     const result=finishGame(before,home,away,{home:home.name,away:away.name,hp:candidate.hp,ap:candidate.ap,winner:win.name,box:candidate.box,detailed:true,drives,log,engine:'v2',transactionVersion:prepared.tx.VERSION});
     const record=(universe.gameArchive||[]).find(x=>x.id===result.gameId);if(!record)throw new Error('Recorded v2 game was not found in the permanent archive.');
-    record.engine='v2';record.transactionVersion=prepared.tx.VERSION;record.eventCount=candidate.eventCount;record.seed=candidate.seed;
+    record.engine='v2';record.transactionVersion=prepared.tx.VERSION;record.eventCount=candidate.eventCount;record.seed=candidate.seed;record.conditions=preview.state.rules?.conditions||null;
     for(const side of ['home','away']){const drivePoints=drives.filter(d=>d.side===side).reduce((n,d)=>n+(Number(d.points)||0),0);record.scoreAdjustment[side]=record.score[side]-drivePoints}
     v2StorePlayLog(record.id,preview.state,preview.attribution);
     if(options.testFault==='afterArchive')throw new Error('Injected v2 rollback fault after archive write.');

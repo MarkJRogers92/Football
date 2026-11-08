@@ -1,0 +1,24 @@
+/* Facilities & boosters (v0.16): the build tracks, the fund and the booster campaigns on the Program page. */
+.facilities-boosters .fb-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:10px 0}
+.facilities-boosters .fb-summary>div{padding:9px 11px;border:1px solid var(--line,rgba(255,255,255,.14));border-radius:6px;display:flex;flex-direction:column;gap:2px}
+.facilities-boosters .fb-summary strong{font-size:1.35rem;line-height:1.1}
+.facilities-boosters .fb-summary small{font-size:.72rem;font-weight:500;opacity:.7;margin-left:3px}
+.facilities-boosters .fb-effects{margin:2px 0 8px;opacity:.85}
+.facilities-boosters .fb-tracks{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:10px 0}
+.facilities-boosters .fb-track{padding:11px 12px;border:1px solid var(--line,rgba(255,255,255,.14));border-radius:6px;display:flex;flex-direction:column;gap:7px}
+.facilities-boosters .fb-track-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.facilities-boosters .fb-pips{display:inline-flex;gap:4px}
+.facilities-boosters .fb-pip{width:11px;height:11px;border-radius:2px;border:1px solid var(--line,rgba(255,255,255,.35));background:transparent}
+.facilities-boosters .fb-pip.is-on{background:var(--accent,#d9a441);border-color:var(--accent,#d9a441)}
+.facilities-boosters .fb-progress{height:7px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden}
+.facilities-boosters .fb-progress i{display:block;height:100%;background:var(--accent,#d9a441)}
+.facilities-boosters .fb-progress.is-built i{background:#5fae7a}
+.facilities-boosters .fb-actions{display:flex;flex-wrap:wrap;gap:6px}
+.facilities-boosters .fb-button{padding:6px 10px;border-radius:5px;border:1px solid var(--line,rgba(255,255,255,.25));background:rgba(255,255,255,.06);color:inherit;font:inherit;font-size:.85rem;cursor:pointer}
+.facilities-boosters .fb-button:hover:not(:disabled){background:rgba(255,255,255,.14)}
+.facilities-boosters .fb-button:disabled{opacity:.45;cursor:not-allowed}
+.facilities-boosters .fb-quiet{opacity:.75}
+.facilities-boosters .fb-money{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px 16px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line,rgba(255,255,255,.12))}
+.facilities-boosters .fb-log{margin-top:10px}
+.facilities-boosters .fb-log ul{margin:6px 0 0;padding-left:18px}
+@media (max-width:560px){.facilities-boosters .fb-tracks{grid-template-columns:1fr}.facilities-boosters .fb-money{flex-direction:column;align-items:flex-start}}

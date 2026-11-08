@@ -68,10 +68,10 @@ function v2RecordDriveArchive(preview){
   for(const e of events){
     if(e.type==='kickoff'&&valid(e.receiver)){finish();start(e.receiver);continue}
     if(e.type==='overtime_possession'&&valid(e.possession)){finish();start(e.possession,true);continue}
-    if(e.type==='possession_change'&&valid(e.to)){if(drive&&drive.side!==e.to)finish();if(!drive)start(e.to);continue}
+    if(e.type==='possession_change'&&valid(e.to)){if(drive&&drive.side!==e.to){if(e.reason==='turnover_on_downs'&&!drive.result)drive.result='DOWNS';finish()}if(!drive)start(e.to);continue}
     const side=valid(e.team)?e.team:null;if(side&&(!drive||drive.side!==side)){finish();start(side,(e.state?.period||0)>4)}if(!drive)continue;
     if(['scrimmage','interception','fumble'].includes(e.type)){drive.plays++;drive.playByPlay.push(v2RecordArchiveText(e,names));if(e.type==='interception')drive.result='INT';if(e.type==='fumble')drive.result='FUMBLE'}
-    else if(e.type==='coaching_decision'){drive.playByPlay.push(v2RecordArchiveText(e,names))}
+    else if(e.type==='coaching_decision'||e.type==='penalty'){drive.playByPlay.push(v2RecordArchiveText(e,names))}
     else if(e.type==='touchdown'){drive.points+=6;drive.result='TD';drive.playByPlay.push(v2RecordArchiveText(e,names))}
     else if(e.type==='extra_point'){if(e.made!==false)drive.points++;drive.playByPlay.push(v2RecordArchiveText(e,names))}
     else if(e.type==='two_point'){if(e.made)drive.points+=2;drive.playByPlay.push(v2RecordArchiveText(e,names))}
@@ -103,11 +103,17 @@ function v2PlayLogProjection(state,attribution){
     if(['scrimmage','interception','fumble'].includes(e.type)){
       row.y=Number(e.yards)||0;
       if(e.kind==='pass')row.k='p';else if(e.kind==='rush')row.k='r';
-      if(e.completed)row.cp=1;if(e.sack)row.sk=1;
+      if(e.completed)row.cp=1;if(e.sack)row.sk=1;if(e.scramble)row.sr=1;if(e.pressure&&!e.sack)row.pr=1;
     }
-    if(e.type==='kickoff'||e.type==='possession_change'||e.type==='overtime_possession'||e.type==='overtime_start'){if(Number.isFinite(st.fieldPosition))row.p=st.fieldPosition;if(e.type==='kickoff')row.tb=1}
+    if(e.type==='kickoff'||e.type==='possession_change'||e.type==='overtime_possession'||e.type==='overtime_start'){if(Number.isFinite(st.fieldPosition))row.p=st.fieldPosition;if(e.type==='kickoff'){if(e.touchback!==false)row.tb=1;if(e.ret>0)row.rt=e.ret;if(e.td)row.td=1}}
+    if(e.type==='penalty'){
+      // The spot, down and distance are where play resumes; sd is the offense, pa the side that was flagged.
+      if(Number.isFinite(st.fieldPosition))row.p=st.fieldPosition;if(st.down)row.dn=st.down;if(st.distance)row.ds=st.distance;
+      row.y=Number(e.yards)||0;row.pk=e.kind;row.pl=e.label;row.pa=e.against==='home'?'h':'a';if(e.autoFirst)row.af=1;if(e.deadBall)row.db=1;
+    }
+    if(e.type==='touchdown'&&e.kind==='return')row.rk=1;
     if(e.type==='possession_change'&&e.reason)row.r=e.reason;
-    if(e.type==='punt'){row.n=Number(e.net)||0;if(e.touchback)row.tb=1}
+    if(e.type==='punt'){row.n=Number(e.net)||0;if(e.touchback)row.tb=1;if(e.ret>0)row.rt=e.ret;if(e.fairCatch)row.fc=1;if(e.td)row.td=1}
     if(e.type==='field_goal'){row.fd=Number(e.distance)||0;if(e.made)row.m=1}
     if((e.type==='extra_point'||e.type==='two_point')&&e.made!==false)row.m=1;
     if(V2_PLAY_LOG_SCORING.has(e.type)&&st.score)row.sc=[st.score.home,st.score.away];

@@ -30,7 +30,7 @@ async function main(){
   });
   if(u.gameArchive)u.gameArchive.length=archiveLen;if(u.events)u.events.length=eventLen;u.gameCounter=counter;
 
-  const shadow=adapter.simulateShadow({gameId:`cal-${week}-${i}-${home.id}-${away.id}`,seed:`v0100-cal-${week}-${i}-${home.id}-${away.id}`,home,away,homeProfile,awayProfile,homeFieldRating}),s=shadow.summary;
+  const shadow=adapter.simulateShadow({gameId:`cal-${week}-${i}-${home.id}-${away.id}`,seed:`v0100-cal-${week}-${i}-${home.id}-${away.id}`,home,away,homeProfile,awayProfile,homeFieldRating,year:u.year,week}),s=shadow.summary;
   v2Rows.push({
    points:s.totalPoints,homePoints:s.home.points,awayPoints:s.away.points,plays:s.totalPlays,yards:s.home.yards+s.away.yards,
    turnovers:s.home.turnovers+s.away.turnovers,touchdowns:s.home.touchdowns+s.away.touchdowns,

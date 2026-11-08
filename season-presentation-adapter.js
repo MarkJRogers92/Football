@@ -44,6 +44,7 @@ else{
    opponent:{id:opp.id,name:opp.name,record:`${opp.w}-${opp.l}`,rank:rankText(opp),conference:opp.conference,offense:grade(O.offense),defense:grade(O.defense)},
    venue:[homeTeam.city,homeTeam.state].filter(Boolean).join(', '),stakes,
    homeEdge:isHome?`Home field +${homeFieldFor(u).toFixed(1)} pts`:`Road game · ${opp.name} receives home field`,
+   forecast:v2ConditionsLine(v2ForecastFor(g))?.headline||'',
    userOut:(u.roster||[]).filter(p=>!gameAvailable(p)).length,opponentOut:(opp.roster||[]).filter(p=>!gameAvailable(p)).length,
    opponentPassMix:passMix,activePlan:tier?.label||'Standard',recommendedPlan:recommended?.label||tier?.label||'Standard',recommendation:rec?.reason||'Current staff recommendation.',lastShowcase:last
   };

@@ -10,12 +10,16 @@ const STAT_KEYS=new Set([
   'games','starts','snaps','passAtt','passComp','passYds','passTD','int','sacksTaken',
   'rushAtt','rushYds','rushTD','fumbles','targets','receptions','recYds','recTD','drops','yac',
   'tackles','tfl','sacks','pressures','intDef','passBreakups','forcedFumbles',
-  'sacksAllowed','pressuresAllowed','penalties','fgMade','fgAtt','punts','puntYds'
+  'sacksAllowed','pressuresAllowed','penalties','fgMade','fgAtt','punts','puntYds',
+  'returns','returnYds','returnTD'
 ]);
 const BOX_KEYS=[
   'pts','plays','firstDowns','passAtt','passComp','passYds','passTD','int','sacksTaken',
   'rushAtt','rushYds','rushTD','fumblesLost','turnovers','recYds','recTD','fgMade','fgAtt','punts','puntYds'
 ];
+// v0.16 team figures a box score may carry. They are written when present but not required, so a game
+// recorded before the penalty and return model still validates.
+const EXTRA_BOX_KEYS=['pressures','penalties','penaltyYds','returns','returnYds','returnTD'];
 const clone=value=>JSON.parse(JSON.stringify(value));
 const finite=(value,fallback=0)=>Number.isFinite(Number(value))?Number(value):fallback;
 const sideName=side=>side==='home'?'home':'away';
@@ -23,6 +27,7 @@ const sideName=side=>side==='home'?'home':'away';
 function normalizeBox(stats={},points=0){
   const box={};
   for(const key of BOX_KEYS)box[key]=key==='pts'?finite(points):finite(stats[key]);
+  for(const key of EXTRA_BOX_KEYS)box[key]=finite(stats[key]);
   return box;
 }
 function normalizeIdentity(team={},fallback='Team'){

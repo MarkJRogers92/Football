@@ -1040,6 +1040,31 @@ tr[hidden]{display:none!important}
 .sa-vacated{color:var(--warn)}
 @media(max-width:700px){.sa-controls{width:100%}.sa-controls select{flex:1 1 140px;max-width:none}}
 
+/* Facilities & boosters (v0.16): the build tracks, the fund and the booster campaigns on the Program page. */
+.facilities-boosters .fb-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:10px 0}
+.facilities-boosters .fb-summary>div{padding:9px 11px;border:1px solid var(--line,rgba(255,255,255,.14));border-radius:6px;display:flex;flex-direction:column;gap:2px}
+.facilities-boosters .fb-summary strong{font-size:1.35rem;line-height:1.1}
+.facilities-boosters .fb-summary small{font-size:.72rem;font-weight:500;opacity:.7;margin-left:3px}
+.facilities-boosters .fb-effects{margin:2px 0 8px;opacity:.85}
+.facilities-boosters .fb-tracks{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:10px 0}
+.facilities-boosters .fb-track{padding:11px 12px;border:1px solid var(--line,rgba(255,255,255,.14));border-radius:6px;display:flex;flex-direction:column;gap:7px}
+.facilities-boosters .fb-track-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.facilities-boosters .fb-pips{display:inline-flex;gap:4px}
+.facilities-boosters .fb-pip{width:11px;height:11px;border-radius:2px;border:1px solid var(--line,rgba(255,255,255,.35));background:transparent}
+.facilities-boosters .fb-pip.is-on{background:var(--accent,#d9a441);border-color:var(--accent,#d9a441)}
+.facilities-boosters .fb-progress{height:7px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden}
+.facilities-boosters .fb-progress i{display:block;height:100%;background:var(--accent,#d9a441)}
+.facilities-boosters .fb-progress.is-built i{background:#5fae7a}
+.facilities-boosters .fb-actions{display:flex;flex-wrap:wrap;gap:6px}
+.facilities-boosters .fb-button{padding:6px 10px;border-radius:5px;border:1px solid var(--line,rgba(255,255,255,.25));background:rgba(255,255,255,.06);color:inherit;font:inherit;font-size:.85rem;cursor:pointer}
+.facilities-boosters .fb-button:hover:not(:disabled){background:rgba(255,255,255,.14)}
+.facilities-boosters .fb-button:disabled{opacity:.45;cursor:not-allowed}
+.facilities-boosters .fb-quiet{opacity:.75}
+.facilities-boosters .fb-money{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px 16px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line,rgba(255,255,255,.12))}
+.facilities-boosters .fb-log{margin-top:10px}
+.facilities-boosters .fb-log ul{margin:6px 0 0;padding-left:18px}
+@media (max-width:560px){.facilities-boosters .fb-tracks{grid-template-columns:1fr}.facilities-boosters .fb-money{flex-direction:column;align-items:flex-start}}
+
 .situational-playbook{display:grid;gap:8px}
 .situational-playbook>p{margin:0}
 .pb-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--line)}
@@ -1092,6 +1117,7 @@ tr[hidden]{display:none!important}
 @media(max-width:720px){.event-team-helmet{width:84px}}
 
 .season-next-gold{border-color:rgba(230,184,106,.55);background:radial-gradient(120% 140% at 0% 0%,rgba(230,184,106,.22),transparent 60%),linear-gradient(115deg,#2a2112,#111923 74%);box-shadow:inset 0 1px rgba(255,236,190,.08),0 0 0 1px rgba(230,184,106,.08)}.season-next-gold span{color:#e6c27a}.season-next-gold strong{color:#ffe7b0}.season-next-done span{color:#a8b7c7}.season-result.win.postseason,.season-result.loss.postseason{background:linear-gradient(115deg,rgba(230,184,106,.08),#111923 70%)}
+.gameday-event-hero .event-center .event-forecast{display:block;margin-top:2px;opacity:.85}
 
 .dynasty-museum{display:grid;gap:8px;margin:0 0 16px}.legacy-hero{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:end;padding:16px 18px;border:1px solid rgba(var(--legacy-secondary-rgb,115,168,255),.28);border-radius:14px;background:linear-gradient(110deg,rgba(var(--legacy-primary-rgb,35,72,117),.46),rgba(11,17,24,.97) 58%,rgba(var(--legacy-secondary-rgb,115,168,255),.07))}.legacy-identity{display:grid;gap:2px}.legacy-kicker,.legacy-metrics span,.legacy-award span,.legacy-season span{font-size:8px;letter-spacing:.09em;color:var(--muted,#8e9aa6)}.legacy-name{margin:0;font-size:22px}.legacy-meta{font-size:9px;color:#9dafc1}.legacy-record{display:grid;text-align:right}.legacy-record strong{font-size:31px}.legacy-record span{font-size:8px;color:#9dafc1}.legacy-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;border:1px solid #28384b;border-radius:10px;overflow:hidden;background:#28384b}.legacy-metrics>div{display:grid;gap:3px;padding:8px 10px;background:#101821}.legacy-metrics strong{font-size:14px}.legacy-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:8px}.legacy-panel{padding:12px 13px;border:1px solid #28384b;border-radius:11px;background:#111923}.legacy-panel h4{margin:2px 0 9px}.legacy-chips{display:flex;flex-wrap:wrap;gap:6px}.legacy-chip{padding:5px 7px;border:1px solid rgba(var(--legacy-secondary-rgb,115,168,255),.45);border-radius:999px;font-size:8px;font-weight:800;color:var(--legacy-secondary,#8cb8f2)}.legacy-awards-kicker{display:block;margin-top:14px}.legacy-awards,.legacy-seasons{display:grid;gap:5px}.legacy-award,.legacy-season{display:grid;gap:2px;padding:7px 8px;border:1px solid #253447;border-radius:8px;background:#0e151e}.legacy-award strong,.legacy-season strong{font-size:10px}.legacy-season small{font-size:9px;color:#9dafc1}.legacy-season.is-title{border-color:rgba(var(--legacy-secondary-rgb,115,168,255),.4);background:linear-gradient(100deg,rgba(var(--legacy-primary-rgb,35,72,117),.22),#0e151e 55%)}.legacy-empty{font-size:9px;line-height:1.4;color:var(--muted,#8e9aa6)}@media(max-width:760px){.legacy-grid{grid-template-columns:1fr}}@media(max-width:520px){.legacy-hero{grid-template-columns:1fr;padding:13px}.legacy-record{text-align:left}.legacy-record strong{font-size:26px}}
 /* v0.12.13 — History index rows (coaches, champions). */
@@ -1176,6 +1202,13 @@ tr[hidden]{display:none!important}
 .v0102-staff-room>summary::-webkit-details-marker{display:none}
 .v0102-staff-room>summary::after{content:"Show";margin-left:auto;font-size:12px;font-weight:800;color:#e6c27a}
 .v0102-staff-room[open]>summary::after{content:"Hide"}
+.v2-gameday-conditions{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;margin:8px 0 2px;padding:7px 11px;border:1px solid var(--line,rgba(255,255,255,.14));border-left:3px solid var(--line,rgba(255,255,255,.3));border-radius:6px;font-size:.88rem}
+.v2-gameday-conditions span{opacity:.78}
+.v2-gameday-conditions[data-severity="rough"],.v2-gameday-conditions[data-severity="harsh"]{border-left-color:#d9a441}
+.v2-gameday-conditions[data-severity="harsh"]{border-left-color:#e0605a}
+.v2-forecast{font-weight:600}
+.v2-forecast[data-severity="rough"],.v2-forecast[data-severity="harsh"]{color:#d9a441}
+.game-conditions{margin:0 0 .6rem}
 
 .v2-matchup-host{border-color:#3b4e69;background:linear-gradient(180deg,#171e29,#141a22)}
 .v2-matchup-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:16px}.v2-matchup-head h2{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.v2-matchup-ratings{display:grid;gap:6px;text-align:right;min-width:190px}.v2-matchup-ratings span{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}.v2-matchup-ratings b{color:var(--text);font-size:12px;letter-spacing:0}
@@ -3552,6 +3585,7 @@ button.lw-follow[aria-pressed="true"]{color:var(--text);border-color:var(--team-
     <section id="program" class="panel tab">
       <div class="section-head"><div><h2>Your Program</h2><div class="muted">Your job security, season goals and program profile.</div></div></div><div class="card"><div class="eyebrow">PROGRAM OVERVIEW</div><div id="programOverview"></div></div>
       <div class="card" id="programAttributes"></div>
+      <div class="card facilities-boosters" id="facilitiesBoosters"></div>
       <div class="card" id="programTrends"></div>
       <div id="programEditNotice" class="card muted"></div>
       <div class="card editor-grid" id="programEditor">
@@ -4704,12 +4738,141 @@ button.lw-follow[aria-pressed="true"]{color:var(--text);border-color:var(--team-
   return{VERSION,create,hashSeed};
 });
 
+// Game conditions: the stadium and the weather a game is played in (v0.16 play model).
+//
+// Everything here is derived from the home program and the calendar, never from the gameplay random
+// stream: asking for a game's conditions (the forecast on This Week, the Game Day header, the archive)
+// always gives the same answer and consumes no draws. A dome removes the weather, altitude lets kicks
+// carry, and wind, rain, snow and cold change how the game is played (see effects()).
 (function(root,factory){
   const rngApi=(typeof module==='object'&&module.exports)?require('./rng.js'):root.DynastyRng;
   const api=factory(rngApi);
   if(typeof module==='object'&&module.exports)module.exports=api;
-  else root.DynastyGameEngineV2=api;
+  else root.DynastyGameConditions=api;
 })(typeof window==='object'?window:globalThis,function(DynastyRng){
+'use strict';
+if(!DynastyRng)throw new Error('Game conditions require DynastyRng.');
+
+const VERSION=1;
+const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+const num=(v,fallback)=>Number.isFinite(Number(v))?Number(v):fallback;
+
+// Weeks after the first Saturday of September. Week 1 is early September; the postseason runs into January.
+const weeksIn=week=>clamp(num(week,6)-1,0,19);
+
+function hasDome(home,neutral,rng){
+  if(neutral)return rng.next()<.34;                              // many neutral sites are indoor stadiums
+  const key=DynastyRng.hashSeed(`dome:${home.id??home.name}`)%100;
+  const rich=num(home.facilities,60)>=85,cold=num(home.lat,38)>=40;
+  return key<(4+(rich?7:0)+(cold?3:0));                          // about one program in ten plays indoors
+}
+// A rough mountain-west box; enough for kicking-distance flavor, not a surveyed elevation.
+function highAltitude(home){
+  const lat=num(home.lat,38),lon=num(home.lon,-90);
+  return lat>=34&&lat<=45.5&&lon<=-103&&lon>=-113;
+}
+
+function forGame(options={}){
+  const home=options.home||{},year=num(options.year,2027),week=num(options.week,6);
+  const neutral=!!options.neutral,seed=`conditions:${year}:${week}:${neutral?String(options.gameId??''):String(home.id??home.name??'home')}`;
+  const rng=DynastyRng.create(seed);
+  const lat=num(home.lat,38),lon=num(home.lon,-90);
+  const indoor=hasDome(home,neutral,rng);
+  const high=!neutral&&highAltitude(home);
+  // Draw everything in a fixed order so a dome or a neutral site never shifts the other numbers.
+  const tempNoise=rng.gauss()*6.5,windNoise=Math.abs(rng.gauss())*4.2,precipRoll=rng.next(),intensityRoll=rng.next(),skyRoll=rng.next();
+  if(indoor){
+    return{version:VERSION,roof:'dome',altitude:'low',temp:72,wind:0,precip:0,sky:'dome',neutral};
+  }
+  const w=weeksIn(week);
+  // Early-September highs fall with latitude, then 2.5 degrees a week into the winter.
+  const high0=92-1.05*(clamp(neutral?36:lat,24,49)-26),temp=Math.round(clamp(high0-w*2.5-6+tempNoise,-2,100));
+  const plains=lon>=-104&&lon<=-93&&lat>=30&&lat<=47,coast=lon<=-122||lon>=-81&&lat<=36||lat<=30.5;
+  let wind=5.5+windNoise+(plains?4:0)+(coast?2:0)+(w>=8?1.5:0);
+  const northwest=lat>=42&&lon<=-119,southeast=lon>=-92&&lat<=36,desert=lon<=-103&&lat<=37.5&&lon>=-121;
+  let chance=northwest?(w>=4?.30:.12):southeast?(w<=4?.22:.16):desert?.05:.14;
+  if(neutral)chance=.12;
+  const wet=precipRoll<chance;
+  let precip=0,sky='clear';
+  if(wet){precip=intensityRoll<.58?1:intensityRoll<.88?2:3;sky=temp<=33?'snow':'rain';wind+=precip>=3?3:0}
+  else sky=skyRoll<.34?'cloudy':'clear';
+  return{version:VERSION,roof:'open',altitude:high?'high':'low',temp,wind:Math.round(clamp(wind,0,38)),precip,sky,neutral};
+}
+
+// Numbers the engine reads. Everything is an adjustment to a rate already in the model; a calm 70 degree
+// afternoon at sea level returns all zeros and ones.
+function effects(c){
+  const cond=c&&typeof c==='object'?c:{};
+  const dome=cond.roof==='dome',temp=num(cond.temp,70),wind=dome?0:clamp(num(cond.wind,0),0,45),p=dome?0:clamp(num(cond.precip,0),0,3),high=cond.altitude==='high';
+  const gust=Math.max(0,wind-12),cold=temp<30,freezing=temp<20,snow=cond.sky==='snow';
+  const fgFlat=p*.008+(cold?.015:0)+gust*.0028-(dome?.01:0);
+  return{
+    dome,high,wind,precip:p,temp,
+    passComp:clamp(-gust*.0028-[0,.009,.021,.036][p]-(cold?.01:0)+(dome?.01:0),-.09,.02)+0,
+    passYards:clamp(1-Math.max(0,wind-15)*.005-p*.014-(freezing?.015:0)+(dome?.015:0),.78,1.04),
+    rushYards:clamp(1-p*.006+(snow?.01:0),.9,1.02),
+    passRate:clamp(-Math.max(0,wind-18)*.003-p*.014,-.08,0)+0,
+    fumble:clamp(1+p*.18+(cold?.12:0)+(freezing?.1:0),1,1.8),
+    interception:clamp(1+Math.max(0,wind-15)*.012+p*.05,1,1.4),
+    fgFlat:clamp(fgFlat,-.01,.14),
+    fgPerYard:clamp(Math.max(0,wind-8)*.0002-(high?.0016:0),-.003,.01),
+    puntYards:clamp(-Math.max(0,wind-10)*.25-p*.6-(freezing?.8:0)+(high?3.5:0)+(dome?.5:0),-9,5),
+    touchback:clamp((high?.1:0)+(dome?.03:0)-p*.02-gust*.003,-.12,.14)
+  };
+}
+
+function skyLabel(c){
+  if(c.roof==='dome')return'Indoors';
+  if(c.sky==='snow')return['Flurries','Light snow','Snow','Heavy snow'][c.precip]||'Snow';
+  if(c.sky==='rain')return['Drizzle','Light rain','Rain','Heavy rain'][c.precip]||'Rain';
+  return c.sky==='cloudy'?'Overcast':'Clear';
+}
+function severity(c){
+  const e=effects(c);
+  const score=Math.max(0,e.wind-12)/4+e.precip*1.3+(e.temp<30?1:0)+(e.temp<15?1:0)+(e.temp>96?.7:0);
+  return score>=4.2?'harsh':score>=2.4?'rough':score>=1?'mild':'calm';
+}
+// What the conditions mean for this game, in the words a coach would use. Empty for a calm afternoon.
+function notes(c){
+  const e=effects(c),out=[];
+  if(c.roof==='dome')out.push('Indoors: clean ball, true kicks, no wind');
+  if(e.wind>=18)out.push(`Wind ${e.wind} mph: deep passes and field goals suffer`);
+  else if(e.wind>=12)out.push(`Wind ${e.wind} mph: long field goals are less certain`);
+  if(e.precip>=2)out.push(c.sky==='snow'?'Heavy snow: slick ball, shorter kicks':'Wet field: more fumbles, harder to throw');
+  else if(e.precip===1)out.push(c.sky==='snow'?'Snow in the air: grip is a worry':'Light rain: the ball will be slick');
+  if(e.temp<=25)out.push(`${e.temp}°F: cold ball, shorter kicks`);
+  if(e.temp>=97)out.push(`${e.temp}°F: heat will wear on both lines`);
+  if(c.altitude==='high')out.push('Thin air: kicks and punts carry farther');
+  return out;
+}
+function describe(c){
+  if(!c||typeof c!=='object')return{headline:'',short:'',notes:[],severity:'calm'};
+  const parts=[skyLabel(c)];
+  if(c.roof!=='dome'){parts.push(`${num(c.temp,70)}°F`);if(num(c.wind,0)>=10)parts.push(`Wind ${Math.round(c.wind)} mph`)}
+  if(c.altitude==='high')parts.push('High altitude');
+  const sev=severity(c);
+  return{headline:parts.join(' · '),short:c.roof==='dome'?'Indoors':`${skyLabel(c)}, ${num(c.temp,70)}°F`,notes:notes(c),severity:sev};
+}
+function sanitize(value){
+  if(!value||typeof value!=='object')return null;
+  const sky=['clear','cloudy','rain','snow','dome'].includes(value.sky)?value.sky:'clear',roof=value.roof==='dome'||sky==='dome'?'dome':'open';
+  return{
+    version:VERSION,roof,altitude:value.altitude==='high'?'high':'low',
+    temp:Math.round(clamp(num(value.temp,70),-20,115)),wind:Math.round(clamp(num(value.wind,0),0,45)),
+    precip:Math.round(clamp(num(value.precip,0),0,3)),sky:roof==='dome'?'dome':sky,neutral:!!value.neutral
+  };
+}
+
+return{VERSION,forGame,effects,describe,notes,severity,sanitize};
+});
+
+(function(root,factory){
+  const rngApi=(typeof module==='object'&&module.exports)?require('./rng.js'):root.DynastyRng;
+  const conditionsApi=(typeof module==='object'&&module.exports)?require('./game-conditions.js'):root.DynastyGameConditions;
+  const api=factory(rngApi,conditionsApi);
+  if(typeof module==='object'&&module.exports)module.exports=api;
+  else root.DynastyGameEngineV2=api;
+})(typeof window==='object'?window:globalThis,function(DynastyRng,GameConditions){
 'use strict';
 if(!DynastyRng)throw new Error('Game Engine 2 requires DynastyRng.');
 
@@ -4729,6 +4892,39 @@ const scoreCopy=s=>({home:s.home,away:s.away});
 const timeoutsCopy=t=>({home:t.home,away:t.away});
 const lineDistance=field=>Math.max(1,Math.min(10,100-field));
 
+// v0.16 play model. A game created with rules (penalties, returns, pressure, and the stadium and weather in
+// `conditions`) plays by them; a game without a `rules` object plays exactly as before, so a live game saved
+// by an earlier version rebuilds the same way and the standalone engine keeps its original behavior.
+const RULES_VERSION=1;
+const NEUTRAL_EFFECTS=Object.freeze({dome:false,high:false,wind:0,precip:0,temp:70,passComp:0,passYards:1,rushYards:1,passRate:0,fumble:1,interception:1,fgFlat:0,fgPerYard:0,puntYards:0,touchback:0});
+function normalizeRules(value){
+  if(!value||typeof value!=='object')return null;
+  const rules={version:RULES_VERSION,penalties:value.penalties!==false,returns:value.returns!==false,pressure:value.pressure!==false};
+  const conditions=GameConditions&&value.conditions?GameConditions.sanitize(value.conditions):null;
+  if(conditions)rules.conditions=conditions;
+  return rules;
+}
+const rulesOf=state=>state&&state.rules&&typeof state.rules==='object'?state.rules:null;
+function effectsOf(state){
+  const rules=rulesOf(state);
+  return rules&&rules.conditions&&GameConditions?GameConditions.effects(rules.conditions):NEUTRAL_EFFECTS;
+}
+// Penalties the model can throw. `weight` is a chance per snap before discipline and crowd adjustments; `dead`
+// fouls stop the play before the snap, `pass` fouls need a pass, `auto` gives the offense a first down.
+const PENALTY_TYPES=Object.freeze({
+  false_start:{label:'False start',against:'offense',yards:5,dead:true,weight:.0128},
+  delay:{label:'Delay of game',against:'offense',yards:5,dead:true,weight:.0028},
+  holding_off:{label:'Offensive holding',against:'offense',yards:10,weight:.0235},
+  ineligible:{label:'Ineligible receiver downfield',against:'offense',yards:5,pass:true,weight:.0034},
+  offside:{label:'Offside',against:'defense',yards:5,dead:true,weight:.0072},
+  encroachment:{label:'Encroachment',against:'defense',yards:5,dead:true,weight:.0022},
+  holding_def:{label:'Defensive holding',against:'defense',yards:5,auto:true,pass:true,weight:.0120},
+  interference:{label:'Pass interference',against:'defense',yards:0,auto:true,pass:true,spot:true,weight:.0112},
+  roughing:{label:'Roughing the passer',against:'defense',yards:15,auto:true,pass:true,weight:.0034},
+  personal_foul:{label:'Unnecessary roughness',against:'defense',yards:15,auto:true,weight:.0026},
+  face_mask:{label:'Face mask',against:'defense',yards:15,auto:true,weight:.0022}
+});
+
 function createGame(options={}){
   const home=cloneTeam(options.home),away=cloneTeam(options.away);
   const gameId=String(options.gameId??`v2-${home.id??home.name}-${away.id??away.name}`);
@@ -4743,6 +4939,7 @@ function createGame(options={}){
     score:{home:0,away:0},timeouts:{home:3,away:3},home,away,openingReceiver,
     secondHalfReceiver:other(openingReceiver),pendingKickoff:null,drive:0,play:0,ot:null,events:[],rng:rng.snapshot()
   };
+  const rules=normalizeRules(options.rules);if(rules)state.rules=rules;
   validateState(state);
   return state;
 }
@@ -4776,7 +4973,19 @@ function startGame(state){
 }
 function kickoffTo(state,receiver,reason='kickoff'){
   state.pendingKickoff=null;state.possession=receiver;state.fieldPosition=KICKOFF_SPOT;state.down=1;state.distance=10;state.drive++;
-  pushEvent(state,'kickoff',{receiver,reason,touchback:true});
+  const rules=rulesOf(state);
+  if(!rules||rules.returns===false){pushEvent(state,'kickoff',{receiver,reason,touchback:true});return}
+  // One draw each for touchback, return length and breakaway, whatever the result, so the stream stays aligned.
+  const rng=rngFor(state),tbRoll=rng.next(),yardsDraw=rng.gauss(),breakRoll=rng.next();finishRng(state,rng);
+  const touchback=tbRoll<clamp(.6+effectsOf(state).touchback,.3,.85);
+  if(touchback){pushEvent(state,'kickoff',{receiver,reason,touchback:true,ret:0});return}
+  const start=clamp(Math.round(26+yardsDraw*6.5),10,48),breakaway=breakRoll<.0035;
+  if(breakaway){
+    state.fieldPosition=100;pushEvent(state,'kickoff',{receiver,reason,touchback:false,ret:97,td:true});
+    touchdown(state,receiver,{kind:'return',source:'kickoff'});return;
+  }
+  state.fieldPosition=start;
+  pushEvent(state,'kickoff',{receiver,reason,touchback:false,ret:start-3});
 }
 function kickoffAfterScore(state,receiver,reason){
   if(state.period<=4&&state.clock===0){state.pendingKickoff={receiver,reason};return}
@@ -4812,6 +5021,7 @@ function applyScrimmage(state,outcome={}){
   requireStatus(state,'live');
   if(state.period>4)return applyOvertimeSnap(state,outcome);
   if(!state.possession)throw new Error('Cannot run a play without possession.');
+  if(outcome.penalty)return applyPenalty(state,outcome);
   const offense=state.possession,defense=other(offense),beforeField=state.fieldPosition,beforeDown=state.down,beforeDistance=state.distance;
   const clock=clamp(Math.round(outcome.clock??30),1,45);consumeClock(state,clock);
   if(outcome.turnover){
@@ -4841,8 +5051,31 @@ function applyScrimmage(state,outcome={}){
   endRegulationPeriodIfNeeded(state);validateState(state);return state;
 }
 
-function touchdown(state,side){
-  addPoints(state,side,6,'touchdown',{});
+// An accepted penalty replaces the snap: no play, no stats, just the foul and its enforcement. Yardage is
+// capped at half the distance to the offender's goal line; defensive fouls that carry an automatic first down
+// (or cover the distance) give a fresh set of downs, and every other foul replays the down.
+function applyPenalty(state,outcome){
+  requireStatus(state,'live');
+  const spec=outcome.penalty,offense=state.possession,defense=other(offense);
+  const type=PENALTY_TYPES[spec?.kind];if(!type)throw new Error(`Unknown penalty: ${spec?.kind}`);
+  const against=type.against==='defense'?defense:offense,beforeField=state.fieldPosition,beforeDown=state.down,beforeDistance=state.distance;
+  const half=Math.max(1,Math.floor((against===offense?beforeField:100-beforeField)/2));
+  const yards=clamp(Math.round(Number(spec.yards)||type.yards||5),1,half);
+  // A foul never ends a period by itself: the clock stops with one second left and the next snap is the untimed down.
+  consumeClock(state,Math.min(clamp(Math.round(outcome.clock??(type.dead?4:12)),0,45),Math.max(0,state.clock-1)));
+  let field,down=beforeDown,distance;
+  if(against===offense){field=beforeField-yards;distance=beforeDistance+yards}
+  else{
+    field=beforeField+yards;
+    if(type.auto||yards>=beforeDistance){down=1;distance=lineDistance(field)}else distance=beforeDistance-yards;
+  }
+  state.fieldPosition=clamp(field,1,99);state.down=down;state.distance=clamp(Math.round(distance),1,99);
+  pushEvent(state,'penalty',{team:offense,against,kind:spec.kind,label:type.label,yards,deadBall:!!type.dead,autoFirst:against===defense&&(!!type.auto||yards>=beforeDistance),from:{fieldPosition:beforeField,down:beforeDown,distance:beforeDistance}});
+  endRegulationPeriodIfNeeded(state);validateState(state);return state;
+}
+
+function touchdown(state,side,data={}){
+  addPoints(state,side,6,'touchdown',data);
   // One draw either way, so a playbook choice never shifts the rest of the game's randomness.
   const rng=rngFor(state),roll=rng.next();finishRng(state,rng);
   if(playbookTwoPoint(state,side)){
@@ -4900,11 +5133,18 @@ function sanitizePlaybook(value){
   const out={};for(const [k,opts] of Object.entries(PLAYBOOK_OPTIONS))out[k]=opts.includes(value[k])?value[k]:opts[0];
   return out;
 }
+// Wind, wet or frozen balls and thin air move a field goal's odds; without rules this is the original curve.
+function fieldGoalChance(state,distance){
+  const base=.97-Math.max(0,distance-30)*.018;
+  if(!rulesOf(state))return clamp(base,.18,.97);
+  const e=effectsOf(state);
+  return clamp(base-e.fgFlat-e.fgPerYard*Math.max(0,distance-25),.12,.98);
+}
 function attemptFieldGoal(state){
   requireStatus(state,'live');if(state.period>4)throw new Error('Use overtime resolution for overtime field goals.');
   const side=state.possession;if(!side)throw new Error('No possession for field goal.');
   const distance=Math.round(100-state.fieldPosition+17),rng=rngFor(state);
-  const probability=clamp(.97-Math.max(0,distance-30)*.018,.18,.97),made=rng.next()<probability;finishRng(state,rng);
+  const probability=fieldGoalChance(state,distance),made=rng.next()<probability;finishRng(state,rng);
   consumeClock(state,5);
   if(made){addPoints(state,side,3,'field_goal',{distance,made:true});kickoffAfterScore(state,other(side),'post_field_goal')}
   else{pushEvent(state,'field_goal',{team:side,points:0,distance,made:false});setPossession(state,other(side),Math.max(20,100-state.fieldPosition),'missed_field_goal')}
@@ -4912,9 +5152,38 @@ function attemptFieldGoal(state){
 }
 function punt(state){
   requireStatus(state,'live');if(state.period>4)throw new Error('Punts are not used in overtime.');
+  const rules=rulesOf(state);
+  if(rules&&rules.returns!==false)return puntWithReturn(state);
   const side=state.possession,rng=rngFor(state),net=clamp(Math.round(40+rng.gauss()*5),28,52);finishRng(state,rng);consumeClock(state,7);
   const landing=state.fieldPosition+net;pushEvent(state,'punt',{team:side,net,touchback:landing>=100});
   setPossession(state,other(side),landing>=100?TOUCHBACK_SPOT:100-landing,'punt');endRegulationPeriodIfNeeded(state);validateState(state);return state;
+}
+// A punt with a returner: gross distance depends on the weather, a punt that lands deep is often downed or
+// fair caught, and a returned punt can break (rarely) for a touchdown. `net` stays the kick's own distance,
+// the way punting stats have always been recorded; the return is in `ret`.
+function puntWithReturn(state){
+  const side=state.possession,receiver=other(side),rng=rngFor(state),e=effectsOf(state);
+  const grossDraw=rng.gauss(),coverRoll=rng.next(),retDraw=rng.gauss(),breakRoll=rng.next();finishRng(state,rng);
+  consumeClock(state,7);
+  const net=clamp(Math.round(40+e.puntYards+grossDraw*5.5),24,62),landing=state.fieldPosition+net;
+  if(landing>=100){
+    pushEvent(state,'punt',{team:side,net,touchback:true,ret:0});
+    setPossession(state,receiver,TOUCHBACK_SPOT,'punt');endRegulationPeriodIfNeeded(state);validateState(state);return state;
+  }
+  const deep=landing>=88,fairCatch=coverRoll<(deep?.55:.27);
+  if(fairCatch){
+    pushEvent(state,'punt',{team:side,net,touchback:false,ret:0,fairCatch:true});
+    setPossession(state,receiver,100-landing,'punt');endRegulationPeriodIfNeeded(state);validateState(state);return state;
+  }
+  const spot=100-landing;
+  if(breakRoll<.0065){
+    pushEvent(state,'punt',{team:side,net,touchback:false,ret:spot,td:true});
+    state.possession=receiver;state.fieldPosition=100;
+    touchdown(state,receiver,{kind:'return',source:'punt'});endRegulationPeriodIfNeeded(state);validateState(state);return state;
+  }
+  const ret=clamp(Math.round(8.2+retDraw*6),0,Math.max(0,Math.min(45,98-spot)));
+  pushEvent(state,'punt',{team:side,net,touchback:false,ret});
+  setPossession(state,receiver,spot+ret,'punt');endRegulationPeriodIfNeeded(state);validateState(state);return state;
 }
 
 function generateOutcome(state){
@@ -4974,7 +5243,7 @@ function applyOvertimeSnap(state,outcome={}){
   pushEvent(state,'scrimmage',{team:offense,yards,ot:true});return state;
 }
 function overtimeFieldGoal(state){
-  const side=state.possession,rng=rngFor(state),distance=Math.round(100-state.fieldPosition+17),prob=clamp(.97-Math.max(0,distance-30)*.018,.18,.97),made=rng.next()<prob;finishRng(state,rng);
+  const side=state.possession,rng=rngFor(state),distance=Math.round(100-state.fieldPosition+17),prob=fieldGoalChance(state,distance),made=rng.next()<prob;finishRng(state,rng);
   if(made)addPoints(state,side,3,'field_goal',{ot:true,distance,made:true});else pushEvent(state,'field_goal',{team:side,points:0,ot:true,distance,made:false});
   endOvertimePossession(state);return made;
 }
@@ -5025,6 +5294,7 @@ function validateState(state){
     if(!Number.isInteger(state.down)||state.down<1||state.down>4)throw new Error('Down out of bounds.');
     if(!Number.isInteger(state.distance)||state.distance<1||state.distance>99)throw new Error('Distance out of bounds.');
   }
+  if(state.rules!==undefined&&(state.rules===null||typeof state.rules!=='object'))throw new Error('Invalid game rules.');
   DynastyRng.create(state.rng);
   if(!Array.isArray(state.events)||state.events.length>MAX_EVENTS)throw new Error('Invalid event log.');
   return true;
@@ -5038,7 +5308,7 @@ function validateGame(state){
   return true;
 }
 
-return{ENGINE_VERSION,QUARTER_SECONDS,PLAYBOOK_OPTIONS,TWO_POINT_CHART,playbookFourthDown,playbookTwoPoint,playbookTempo,playbookClock,sanitizePlaybook,createGame,startGame,step,simulate,applyScrimmage,attemptFieldGoal,punt,snapshot,restore,scoringTotals,validateState,validateGame,generateOutcome};
+return{ENGINE_VERSION,RULES_VERSION,PENALTY_TYPES,fieldGoalChance,QUARTER_SECONDS,PLAYBOOK_OPTIONS,normalizeRules,effectsOf,kickoffTo,TWO_POINT_CHART,playbookFourthDown,playbookTwoPoint,playbookTempo,playbookClock,sanitizePlaybook,createGame,startGame,step,simulate,applyScrimmage,attemptFieldGoal,punt,snapshot,restore,scoringTotals,validateState,validateGame,generateOutcome};
 });
 (function(root,factory){
   const engine=(typeof module==='object'&&module.exports)?require('./game-engine-v2.js'):root.DynastyGameEngineV2;
@@ -5172,10 +5442,11 @@ return{VERSION,ensureDecision,pendingDecision,resolveDecision,advanceUntilDecisi
 (function(root,factory){
   const engine=(typeof module==='object'&&module.exports)?require('./game-engine-v2.js'):root.DynastyGameEngineV2;
   const rngApi=(typeof module==='object'&&module.exports)?require('./rng.js'):root.DynastyRng;
-  const api=factory(engine,rngApi);
+  const conditionsApi=(typeof module==='object'&&module.exports)?require('./game-conditions.js'):root.DynastyGameConditions;
+  const api=factory(engine,rngApi,conditionsApi);
   if(typeof module==='object'&&module.exports)module.exports=api;
   else root.DynastyGameEngineV2Adapter=api;
-})(typeof window==='object'?window:globalThis,function(GameEngineV2,DynastyRng){
+})(typeof window==='object'?window:globalThis,function(GameEngineV2,DynastyRng,GameConditions){
 'use strict';
 if(!GameEngineV2||!DynastyRng)throw new Error('Game Engine 2 adapter requires engine and RNG.');
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
@@ -5187,13 +5458,14 @@ function profileTeam(team,profile={}){
   return{id:team?.id??null,name:String(team?.name??'Team'),rating,offense,defense};
 }
 function eventSummary(state){
-  const side=()=>({points:0,plays:0,yards:0,turnovers:0,punts:0,fieldGoals:{made:0,attempted:0},touchdowns:0,possessions:0});
+  const side=()=>({points:0,plays:0,yards:0,turnovers:0,punts:0,fieldGoals:{made:0,attempted:0},touchdowns:0,possessions:0,penalties:0,penaltyYards:0});
   const out={home:side(),away:side(),totalPlays:0,totalPoints:state.score.home+state.score.away,overtime:state.period>4};
   out.home.points=state.score.home;out.away.points=state.score.away;
   for(const e of state.events||[]){
     if(e.type==='kickoff'&&e.receiver)out[e.receiver].possessions++;
     if(e.type==='possession_change'&&e.to)out[e.to].possessions++;
     if(e.type==='overtime_possession'&&e.possession)out[e.possession].possessions++;
+    if(e.type==='penalty'&&(e.against==='home'||e.against==='away')){out[e.against].penalties++;out[e.against].penaltyYards+=Number(e.yards)||0;continue}
     const t=e.team;if(t!=='home'&&t!=='away')continue;
     if(e.type==='scrimmage'){out[t].plays++;out[t].yards+=Number(e.yards)||0;out.totalPlays++}
     else if(e.type==='interception'||e.type==='fumble'){out[t].turnovers++;out[t].plays++;out.totalPlays++;if(e.type==='fumble')out[t].yards+=Number(e.yards)||0}
@@ -5203,12 +5475,21 @@ function eventSummary(state){
   }
   return out;
 }
-function createShadowGame({gameId,seed,home,away,homeProfile,awayProfile,openingReceiver}={}){
+// A game plays by the v0.16 rules (penalties, returns, pressure and the stadium and weather) unless the caller
+// passes rules:false. Callers that know the date pass year and week so the conditions match the calendar.
+function rulesFor(options,home){
+  if(options.rules===false)return null;
+  if(options.rules&&typeof options.rules==='object')return options.rules;
+  const conditions=options.conditions||(GameConditions?GameConditions.forGame({home:home||options.home||{},year:options.year,week:options.week,neutral:options.neutral,gameId:options.gameId}):null);
+  return conditions?{version:GameEngineV2.RULES_VERSION,conditions}:{version:GameEngineV2.RULES_VERSION};
+}
+function createShadowGame(options={}){
+  const {gameId,seed,home,away,homeProfile,awayProfile,openingReceiver}=options;
   const homeInput=profileTeam(home,homeProfile),awayInput=profileTeam(away,awayProfile);
-  const state=GameEngineV2.createGame({gameId,seed,openingReceiver,home:homeInput,away:awayInput});
+  const state=GameEngineV2.createGame({gameId,seed,openingReceiver,home:homeInput,away:awayInput,rules:rulesFor(options,home)});
   return{state,homeInput,awayInput};
 }
-function profileOutcome(state,homeInput,awayInput,homeFieldRating=0){
+function legacyProfileOutcome(state,homeInput,awayInput,homeFieldRating=0){
   const rng=DynastyRng.create(state.rng),isHome=state.possession==='home',offense=isHome?homeInput:awayInput,defense=isHome?awayInput:homeInput;
   const venueEdge=isHome?homeFieldRating:-homeFieldRating,matchup=offense.offense-defense.defense+venueEdge,edge=matchup/18,roll=rng.next(),pass=rng.next()<.53;
   let outcome;
@@ -5236,6 +5517,87 @@ function profileOutcome(state,homeInput,awayInput,homeFieldRating=0){
   finishRng(state,rng);return outcome;
   function finishRng(target,source){target.rng=source.snapshot()}
 }
+
+// ---- v0.16 play model ----
+const clampTo=clamp;
+// Applicable penalties for this snap with their per-snap odds, adjusted for team discipline and the crowd.
+function penaltyOdds(state,offense,defense,hfr,isHome,outcome){
+  const out=[],pass=outcome.kind==='pass'&&!outcome.sack&&!outcome.scramble,fp=state.fieldPosition;
+  const offDiscipline=clamp(1+(70-offense.rating)/260,.85,1.22),defDiscipline=clamp(1+(70-defense.rating)/260,.85,1.22);
+  for(const [kind,type] of Object.entries(GameEngineV2.PENALTY_TYPES)){
+    if(type.pass&&!pass)continue;
+    if(type.against==='offense'&&fp<4)continue;
+    if(type.against==='defense'&&fp>97)continue;
+    let w=type.weight*PENALTY_SCALE*(type.against==='offense'?offDiscipline:defDiscipline);
+    if(kind==='false_start')w*=isHome?1-hfr/40:1+hfr/14;      // a loud stadium rattles the visiting line
+    if(kind==='offside'||kind==='encroachment')w*=isHome?1+hfr/20:1;
+    out.push([kind,w]);
+  }
+  return out;
+}
+const PENALTY_SCALE=1.62;
+// Whether the team that was fouled takes the penalty or the play. Dead-ball fouls are always enforced.
+function penaltyAccepted(state,type,spotYards,outcome){
+  if(type.dead)return true;
+  const yards=Number(outcome.yards)||0,distance=state.distance,conversion=yards>=distance;
+  if(type.against==='offense'){
+    // The defense takes a holding call that wipes out a good play and declines one that follows a stop or a sack.
+    return !outcome.turnover&&(yards>=5||(state.down>=3&&conversion));
+  }
+  const gain=spotYards+(type.auto||spotYards>=distance?5:0),playValue=Math.max(0,yards)+(conversion?5:0);
+  return !!outcome.turnover||gain>playValue;
+}
+function profileOutcomeRules(state,homeInput,awayInput,homeFieldRating=0){
+  const rng=DynastyRng.create(state.rng),isHome=state.possession==='home',offense=isHome?homeInput:awayInput,defense=isHome?awayInput:homeInput;
+  const rules=state.rules,e=GameEngineV2.effectsOf(state),pressureOn=rules.pressure!==false;
+  const venueEdge=isHome?homeFieldRating:-homeFieldRating,matchup=offense.offense-defense.defense+venueEdge,edge=matchup/18;
+  const roll=rng.next(),pass=rng.next()<clamp(.53+e.passRate,.35,.62);
+  let outcome;
+  if(pass){
+    const intRate=clamp(.0145-matchup*.00014,.006,.032)*e.interception,fumbleRate=clamp(.005-matchup*.00003,.0025,.010)*e.fumble,sackRate=clamp(.052-matchup*.00045,.030,.088);
+    const redZoneFinish=state.fieldPosition>=80?2.6:state.fieldPosition>=65?.9:0;
+    if(roll<intRate)outcome={turnover:'interception',kind:'pass',completed:false,yards:clamp(Math.round(8+rng.gauss()*9),-5,35),clock:rng.int(8,18)};
+    else if(roll<intRate+fumbleRate)outcome={turnover:'fumble',kind:'pass',completed:false,sack:true,pressure:true,yards:-clamp(Math.round(6+rng.gauss()*2),2,12),clock:rng.int(22,38)};
+    else if(roll<intRate+fumbleRate+sackRate)outcome={kind:'pass',completed:false,sack:true,pressure:true,yards:-clamp(Math.round(6+rng.gauss()*2),2,12),clock:rng.int(22,38)};
+    else{
+      // Pressure that stops short of a sack: the quarterback is hurried, scrambles, or throws it away.
+      const hurryRate=pressureOn?clamp(.205-matchup*.0022,.10,.34):0,hurried=rng.next()<hurryRate,shape=rng.next();
+      if(hurried&&shape<.17)outcome={kind:'rush',scramble:true,pressure:true,yards:clamp(Math.round(6.2+rng.gauss()*5.2),-4,32),clock:rng.int(26,40)};
+      else if(hurried&&shape<.42)outcome={kind:'pass',completed:false,pressure:true,yards:0,clock:rng.int(6,12)};
+      else{
+        const comp=clamp((hurried?.595:.724)+matchup*.0032+e.passComp,.36,.86),completed=rng.next()<comp;
+        if(!completed)outcome={kind:'pass',completed:false,yards:0,clock:rng.int(6,12)};
+        else{
+          const raw=(9.6+edge*1.15+redZoneFinish+rng.gauss()*7.2)*(hurried?.92:1.045)*e.passYards;
+          outcome={kind:'pass',completed:true,yards:clamp(Math.round(raw),-3,55),clock:rng.int(26,42)};
+        }
+        if(hurried)outcome.pressure=true;
+      }
+    }
+  }else{
+    const fumbleRate=clamp(.015-matchup*.00008,.007,.026)*e.fumble;
+    if(roll<fumbleRate)outcome={turnover:'fumble',kind:'rush',yards:clamp(Math.round(3+rng.gauss()*6),-8,18),clock:rng.int(18,34)};
+    else{
+      const redZoneFinish=state.fieldPosition>=80?2.6:state.fieldPosition>=65?1.0:0;
+      outcome={kind:'rush',yards:clamp(Math.round((4.3+edge*.7+redZoneFinish+rng.gauss()*4.8)*e.rushYards),-14,55),clock:rng.int(27,42)};
+    }
+  }
+  // Flags: one draw decides whether there is a foul at all, one picks it, one sizes a pass interference spot.
+  if(rules.penalties!==false&&state.period<=4){
+    const flag=rng.next(),pick=rng.next(),spotDraw=rng.gauss(),odds=penaltyOdds(state,offense,defense,homeFieldRating,isHome,outcome),total=odds.reduce((n,x)=>n+x[1],0);
+    if(flag<total){
+      let target=pick*total,kind=odds[odds.length-1][0];
+      for(const [k,w] of odds){target-=w;if(target<=0){kind=k;break}}
+      const type=GameEngineV2.PENALTY_TYPES[kind],spotYards=type.spot?clamp(Math.round(13+spotDraw*7),5,40):type.yards;
+      if(penaltyAccepted(state,type,spotYards,outcome))outcome={penalty:{kind,yards:spotYards},clock:type.dead?4:outcome.clock};
+    }
+  }
+  state.rng=rng.snapshot();return outcome;
+}
+// Games that carry rules use the v0.16 model; a game saved before it (no rules on the state) plays as it did.
+function profileOutcome(state,homeInput,awayInput,homeFieldRating=0){
+  return state&&state.rules?profileOutcomeRules(state,homeInput,awayInput,homeFieldRating):legacyProfileOutcome(state,homeInput,awayInput,homeFieldRating);
+}
 function annotateOutcomeEvent(state,startIndex,outcome){
   const events=state.events||[];
   for(let i=events.length-1;i>=startIndex;i--){
@@ -5243,6 +5605,8 @@ function annotateOutcomeEvent(state,startIndex,outcome){
     e.kind=outcome.kind||null;
     if(typeof outcome.completed==='boolean')e.completed=outcome.completed;
     if(outcome.sack)e.sack=true;
+    if(outcome.pressure)e.pressure=true;
+    if(outcome.scramble)e.scramble=true;
     e.attributionVersion=1;
     return e;
   }
@@ -5356,7 +5720,8 @@ function eventState(state){return{
 }}
 function pushGameEvent(state,type,data={}){const e={seq:(state.events?.length||0)+1,type,...data,state:eventState(state)};state.events.push(e);return e}
 function addGamePoints(state,side,points,type,data={}){state.score[side]+=points;return pushGameEvent(state,type,{team:side,points,...data})}
-function kickoffGame(state,receiver,reason){state.pendingKickoff=null;state.possession=receiver;state.fieldPosition=25;state.down=1;state.distance=10;state.drive++;pushGameEvent(state,'kickoff',{receiver,reason,touchback:true})}
+// Kickoffs belong to the engine so a game with the v0.16 rules gets returns here too; without rules this is the original touchback.
+function kickoffGame(state,receiver,reason){engine.kickoffTo(state,receiver,reason)}
 function finishRegulationGame(state){state.status='final';state.possession=null;state.fieldPosition=null;state.down=null;state.distance=null;pushGameEvent(state,'game_end',{reason:'regulation',winner:state.score.home>state.score.away?'home':'away'})}
 function startRegulationOvertime(state){
   state.period=5;state.clock=0;state.ot={period:1,first:state.openingReceiver,possessions:0,possession:state.openingReceiver,startScore:{...state.score},pendingResult:null};
@@ -5407,7 +5772,7 @@ function playOutcome(session,state){
   halftimeAdjustedOutcome(session,state,outcome);
   if(!session.tempoDecisionMade[side]||session.tempo[side]==='staff')outcome=engine.playbookClock(state,outcome);
   else outcome.clock=tempoAdjustedClock(session,state,outcome.clock);
-  const yards=clamp(Math.round(outcome.yards??0),-99,99),touchdown=state.period<=4&&!outcome.turnover&&beforeField+yards>=100;
+  const yards=clamp(Math.round(outcome.yards??0),-99,99),touchdown=state.period<=4&&!outcome.turnover&&!outcome.penalty&&beforeField+yards>=100;
   if(touchdown)deferredTouchdown(session,state,outcome);else engine.applyScrimmage(state,outcome);
   adapter.annotateOutcomeEvent(state,start,outcome);return outcome
 }
@@ -5508,7 +5873,8 @@ const statKeys=[
   'games','starts','snaps','passAtt','passComp','passYds','passTD','int','sacksTaken',
   'rushAtt','rushYds','rushTD','fumbles','targets','receptions','recYds','recTD','drops','yac',
   'tackles','tfl','sacks','pressures','intDef','passBreakups','forcedFumbles',
-  'sacksAllowed','pressuresAllowed','penalties','fgMade','fgAtt','punts','puntYds'
+  'sacksAllowed','pressuresAllowed','penalties','fgMade','fgAtt','punts','puntYds',
+  'returns','returnYds','returnTD'
 ];
 
 function blankStats(){
@@ -5521,7 +5887,8 @@ function blankTeam(points=0){
     points,plays:0,firstDowns:0,
     passAtt:0,passComp:0,passYds:0,passTD:0,int:0,sacksTaken:0,
     rushAtt:0,rushYds:0,rushTD:0,fumblesLost:0,turnovers:0,
-    recYds:0,recTD:0,fgMade:0,fgAtt:0,punts:0,puntYds:0
+    recYds:0,recTD:0,fgMade:0,fgAtt:0,punts:0,puntYds:0,
+    pressures:0,penalties:0,penaltyYds:0,returns:0,returnYds:0,returnTD:0
   };
 }
 function playerRef(p){
@@ -5547,6 +5914,8 @@ function normalizeContext(ctx={}){
     offensiveLine:normalizeList(ctx.offensiveLine),
     kicker:playerRef(ctx.kicker),
     punter:playerRef(ctx.punter),
+    kickReturner:playerRef(ctx.kickReturner),
+    puntReturner:playerRef(ctx.puntReturner),
     teamName:String(ctx.teamName||'Team')
   };
 }
@@ -5591,6 +5960,7 @@ function addTackle(result,defSide,evt,rng,{sack=false}={}){
     line.stats.sacks++;
     line.stats.tfl++;
     line.stats.pressures++;
+    result.teamStats[other(defSide)].pressures++;
   }else if((Number(evt.yards)||0)<0){
     line.stats.tfl++;
   }
@@ -5615,6 +5985,47 @@ function noteActors(result,e,actors){
   const row={};
   for(const [key,p] of Object.entries(actors))if(p&&p.id!=null)row[key]=p.id;
   result.playActors[e.seq]=row;
+}
+// A hurry that stops short of a sack: the rusher is credited with a pressure and the line with one allowed.
+function addPressure(result,offSide,def,e,rng){
+  const rusher=weightedPick(result.contexts[def].defenders,rng,'rush');
+  if(!rusher)return null;
+  ensureLine(result.lines[def],rusher).stats.pressures++;
+  result.teamStats[offSide].pressures++;
+  const blocker=weightedPick(result.contexts[offSide].offensiveLine,rng,'protect');
+  if(blocker)ensureLine(result.lines[offSide],blocker).stats.pressuresAllowed++;
+  return rusher;
+}
+// Who takes the flag: linemen for most offensive fouls, the quarterback for delay, defenders by the foul.
+function attributePenalty(result,e,rng){
+  const against=e.against;if(against!=='home'&&against!=='away')return;
+  const ctx=result.contexts[against],team=result.teamStats[against],yards=Number(e.yards)||0;
+  let p=null;
+  if(against===e.team){
+    p=e.kind==='delay'&&ctx.qb?ctx.qb:weightedPick(ctx.offensiveLine,rng,'protect');
+  }else{
+    const only=positions=>{const list=ctx.defenders.filter(x=>positions.includes(x.player.pos));return list.length?list:ctx.defenders};
+    if(e.kind==='interference'||e.kind==='holding_def')p=weightedPick(only(['CB','S','LB']),rng,'coverage');
+    else if(e.kind==='offside'||e.kind==='encroachment'||e.kind==='roughing')p=weightedPick(only(['EDGE','DT','LB']),rng,'rush');
+    else p=weightedPick(ctx.defenders,rng,'tackle');
+  }
+  team.penalties++;team.penaltyYds+=yards;
+  if(p)ensureLine(result.lines[against],p).stats.penalties++;
+  noteActors(result,e,{pn:p});
+}
+// A kick or punt return: the returner is the depth chart's KR or PR, falling back to a receiver or rusher.
+function creditReturn(result,side,e,rng,kind){
+  const ctx=result.contexts[side],team=result.teamStats[side];
+  const preferred=kind==='kick'?ctx.kickReturner:ctx.puntReturner;
+  const p=preferred||weightedPick(ctx.receivers,rng,'carry')||weightedPick(ctx.rushers,rng,'carry');
+  const yards=Number(e.ret)||0;
+  if(yards>0||e.td){
+    team.returns++;team.returnYds+=yards;
+    if(p){const line=ensureLine(result.lines[side],p);line.stats.returns++;line.stats.returnYds+=yards;if(e.td){line.stats.returnTD++}}
+    if(e.td)team.returnTD++;
+  }
+  if(p)noteActors(result,e,{rt:p});
+  result.lastPlay[side]=null;
 }
 function eventIsSnap(e){
   return e.type==='scrimmage'||e.type==='interception'||e.type==='fumble';
@@ -5679,10 +6090,11 @@ function attributeScrimmage(result,e,rng,side,def,team,ctx){
 
     if(e.completed)completedPass(result,side,def,e,rng,team,qb,q,target);
     else incompletePass(result,side,def,e,rng,qb,target);
+    if(e.pressure){const rusher=addPressure(result,side,def,e,rng);if(rusher&&result.playActors[e.seq])result.playActors[e.seq].pr=rusher.id}
     return;
   }
 
-  const runner=weightedPick(ctx.rushers,rng,'carry')||ctx.qb;
+  const runner=(e.scramble&&ctx.qb)||weightedPick(ctx.rushers,rng,'carry')||ctx.qb;
   if(!runner)throw new Error(`${side} has no rushing attribution candidate.`);
   const r=ensureLine(result.lines[side],runner);
   r.stats.rushAtt++;
@@ -5692,6 +6104,7 @@ function attributeScrimmage(result,e,rng,side,def,team,ctx){
   result.lastPlay[side]={type:'rush',rusher:runner};
   const tackler=e.state?.fieldPosition<100?addTackle(result,def,e,rng):null;
   noteActors(result,e,{ca:runner,qb:ctx.qb,tk:tackler});
+  if(e.pressure){const rusher=addPressure(result,side,def,e,rng);if(rusher&&result.playActors[e.seq])result.playActors[e.seq].pr=rusher.id}
 }
 function attributeInterception(result,e,rng,side,def,team,ctx){
   const qb=ctx.qb||weightedPick(ctx.rushers,rng,'carry');
@@ -5774,6 +6187,15 @@ function attributeGame(state,contexts={}){
   }
 
   for(const e of state.events){
+    if(e.type==='penalty'){attributePenalty(result,e,rng);continue}
+    if(e.type==='kickoff'&&(e.receiver==='home'||e.receiver==='away')){
+      if(!e.touchback||e.td)creditReturn(result,e.receiver,e,rng,'kick');
+      continue;
+    }
+    if(e.type==='punt'&&(e.team==='home'||e.team==='away')&&(e.ret>0||e.td||e.fairCatch)){
+      // The punting team's own stats are recorded below; the receiving team gets the return.
+      creditReturn(result,other(e.team),e,rng,'punt');
+    }
     const side=e.team;
     if(side!=='home'&&side!=='away')continue;
     const def=other(side);
@@ -5792,7 +6214,7 @@ function attributeGame(state,contexts={}){
     }else if(e.type==='fumble'){
       attributeFumble(result,e,rng,side,def,team,ctx);
     }else if(e.type==='touchdown'){
-      attributeTouchdown(result,side,team);
+      if(e.kind!=='return')attributeTouchdown(result,side,team);
     }else if(e.type==='field_goal'){
       team.fgAtt++;
       if(e.made)team.fgMade++;
@@ -5855,7 +6277,12 @@ function reconcile(result){
       ['puntYds',sum(p,'puntYds'),t.puntYds],
       ['defINT',sum(opp,'intDef'),t.int],
       ['defSacks',sum(opp,'sacks'),t.sacksTaken],
-      ['defFF',sum(opp,'forcedFumbles'),t.fumblesLost]
+      ['defFF',sum(opp,'forcedFumbles'),t.fumblesLost],
+      ['defPressures',sum(opp,'pressures'),t.pressures],
+      ['penalties',sum(p,'penalties'),t.penalties],
+      ['returns',sum(p,'returns'),t.returns],
+      ['returnYds',sum(p,'returnYds'),t.returnYds],
+      ['returnTD',sum(p,'returnTD'),t.returnTD]
     ];
     for(const [label,a,b] of checks){
       if(a!==b)errors.push(`${side} ${label} ${a} != ${b}`);
@@ -5905,12 +6332,16 @@ const STAT_KEYS=new Set([
   'games','starts','snaps','passAtt','passComp','passYds','passTD','int','sacksTaken',
   'rushAtt','rushYds','rushTD','fumbles','targets','receptions','recYds','recTD','drops','yac',
   'tackles','tfl','sacks','pressures','intDef','passBreakups','forcedFumbles',
-  'sacksAllowed','pressuresAllowed','penalties','fgMade','fgAtt','punts','puntYds'
+  'sacksAllowed','pressuresAllowed','penalties','fgMade','fgAtt','punts','puntYds',
+  'returns','returnYds','returnTD'
 ]);
 const BOX_KEYS=[
   'pts','plays','firstDowns','passAtt','passComp','passYds','passTD','int','sacksTaken',
   'rushAtt','rushYds','rushTD','fumblesLost','turnovers','recYds','recTD','fgMade','fgAtt','punts','puntYds'
 ];
+// v0.16 team figures a box score may carry. They are written when present but not required, so a game
+// recorded before the penalty and return model still validates.
+const EXTRA_BOX_KEYS=['pressures','penalties','penaltyYds','returns','returnYds','returnTD'];
 const clone=value=>JSON.parse(JSON.stringify(value));
 const finite=(value,fallback=0)=>Number.isFinite(Number(value))?Number(value):fallback;
 const sideName=side=>side==='home'?'home':'away';
@@ -5918,6 +6349,7 @@ const sideName=side=>side==='home'?'home':'away';
 function normalizeBox(stats={},points=0){
   const box={};
   for(const key of BOX_KEYS)box[key]=key==='pts'?finite(points):finite(stats[key]);
+  for(const key of EXTRA_BOX_KEYS)box[key]=finite(stats[key]);
   return box;
 }
 function normalizeIdentity(team={},fallback='Team'){
@@ -6102,20 +6534,38 @@ function downLabel(state={}){
 }
 function teamName(side,names={}){return names[side]||side||'Team'}
 function signedYards(y){const n=Number(y)||0;return n===0?'no gain':n>0?`gains ${n}`:`loses ${Math.abs(n)}`}
+function returnText(event){
+  const n=Number(event.ret)||0;
+  if(event.td)return', returned for a touchdown';
+  if(event.fairCatch)return', fair catch';
+  return n>0?`, returned ${n} yard${n===1?'':'s'}`:'';
+}
 function decisionActionLabel(value){return String(value||'decision').replaceAll('_',' ')}
 function eventText(event={},names={}){
   const state=event.state||{},team=teamName(event.team,names),receiver=teamName(event.receiver,names);
   if(event.type==='game_start')return'Game begins.';
-  if(event.type==='kickoff')return`${receiver} receives the kickoff.`;
-  if(event.type==='scrimmage')return`${team} ${signedYards(event.yards)} yard${Math.abs(Number(event.yards)||0)===1?'':'s'}.`;
+  if(event.type==='kickoff'){
+    if(event.td)return`${receiver} return the kickoff for a touchdown!`;
+    if(event.touchback===false&&Number(event.ret)>0)return`${receiver} return the kickoff ${event.ret} yards.`;
+    return`${receiver} receives the kickoff.`;
+  }
+  if(event.type==='penalty'){
+    const against=teamName(event.against,names),yards=Number(event.yards)||0;
+    return`Flag: ${event.label||'penalty'} on ${against}, ${yards} yard${yards===1?'':'s'}${event.autoFirst?', automatic first down':''}.`;
+  }
+  if(event.type==='scrimmage'&&event.scramble){
+    const y=Number(event.yards)||0;
+    return`${team} quarterback scrambles ${y>0?`for ${y} yard${y===1?'':'s'}`:y<0?`and loses ${Math.abs(y)}`:'for no gain'}.`;
+  }
+  if(event.type==='scrimmage')return Number(event.yards)?`${team} ${signedYards(event.yards)} yard${Math.abs(Number(event.yards)||0)===1?'':'s'}.`:`${team} no gain.`;
   if(event.type==='interception')return`${team} throws an interception.`;
   if(event.type==='fumble')return`${team} loses a fumble.`;
   if(event.type==='possession_change')return`${teamName(event.to,names)} takes possession.`;
-  if(event.type==='touchdown')return`TOUCHDOWN ${team}.`;
+  if(event.type==='touchdown')return event.kind==='return'?`RETURN TOUCHDOWN ${team}.`:`TOUCHDOWN ${team}.`;
   if(event.type==='extra_point')return`${team} extra point ${event.made===false?'missed':'good'}.`;
   if(event.type==='two_point')return`${team} two-point try ${event.made?'good':'failed'}.`;
   if(event.type==='field_goal')return`${team} ${event.distance||''}-yard field goal ${event.made?'good':'missed'}.`.replace('  -',' ');
-  if(event.type==='punt')return`${team} punts${event.touchback?' for a touchback':''}.`;
+  if(event.type==='punt')return`${team} punts${event.touchback?' for a touchback':''}${event.touchback?'':returnText(event)}.`;
   if(event.type==='safety')return`SAFETY for ${team}.`;
   if(event.type==='coaching_decision'){
     const choice=event.selectedOption==='delegate'?`delegates — staff chooses ${decisionActionLabel(event.resolvedAction)}`:`chooses ${decisionActionLabel(event.selectedOption)}`;
@@ -7273,7 +7723,7 @@ function generatePlayer(school,pos,idx){
  let growthProfile=pick(GROWTH_PROFILE_KEYS),growthVolatility=clamp(Math.round(45+gauss()*22),10,95),framePotential=clamp(Math.round(58+gauss()*20),10,98),speedRetention=clamp(Math.round(70+gauss()*16),20,99),scoutConfidence=clamp(Math.round(38+eligibilityUsed*13+school.development*.18+gauss()*5),28,94);return {id:uid(),name:`${pick(FIRST)} ${pick(LAST)}`,pos,year:classYr,eligibilityUsed,redshirtUsed,redshirtActive:false,redshirtSeason:null,height:h,weight:w,style,trueNow,upside,perceived,perceivedUpside,dev,work,coach,morale,role,...attrs,health:100,wear:gi(0,8),injury:null,injuryWeeks:0,injuryHistory:[],seasonHistory:[],awards:[],draftResult:null,promise:null,promiseBaseline:perceived,growthProfile,growthVolatility,framePotential,speedRetention,heightGrowthRemaining:eligibilityUsed===0&&gameplayRandom()<.24?1:0,trainingFocus:'Balanced',positionFamiliarity:{[pos]:100},formerPositions:[],scoutConfidence,lastDevelopmentDelta:0,lastPhysicalChange:'',campGrade:null,campHistory:[],stats:newStats(),career:newStats(),origin:'Initial roster',portraitSeed:portraitSeedFor(),portraitVersion:PORTRAIT_VERSION};
 }
 function packStats(o){if(!o)return{};let out={};for(const k in o)if(o[k])out[k]=o[k];return out}
-function newStats(){return {games:0,starts:0,snaps:0,passAtt:0,passComp:0,passYds:0,passTD:0,int:0,sacksTaken:0,rushAtt:0,rushYds:0,rushTD:0,fumbles:0,targets:0,receptions:0,recYds:0,recTD:0,drops:0,yac:0,tackles:0,tfl:0,sacks:0,pressures:0,intDef:0,passBreakups:0,forcedFumbles:0,sacksAllowed:0,pressuresAllowed:0,penalties:0,fgMade:0,fgAtt:0,punts:0,puntYds:0}}
+function newStats(){return {games:0,starts:0,snaps:0,passAtt:0,passComp:0,passYds:0,passTD:0,int:0,sacksTaken:0,rushAtt:0,rushYds:0,rushTD:0,fumbles:0,targets:0,receptions:0,recYds:0,recTD:0,drops:0,yac:0,tackles:0,tfl:0,sacks:0,pressures:0,intDef:0,passBreakups:0,forcedFumbles:0,sacksAllowed:0,pressuresAllowed:0,penalties:0,fgMade:0,fgAtt:0,punts:0,puntYds:0,returns:0,returnYds:0,returnTD:0}}
 function generateRoster(s){let r=[];Object.entries(POS_COUNTS).forEach(([p,n])=>{for(let i=0;i<n;i++)r.push(generatePlayer(s,p,i))});while(r.length<93)r.push(generatePlayer(s,pick(POS),99));return r}
 function generateFreshman(s,pos,origin='Walk-on / late addition'){let p=generatePlayer(s,pos,99);p.year='FR';p.eligibilityUsed=0;p.redshirtUsed=false;p.redshirtActive=false;p.redshirtSeason=null;p.origin=origin;return p}
 // v0.12.29: specialists are recruited too. Before this the pool held no K or P at all, so
@@ -7915,13 +8365,17 @@ function weeklyNewsletter(season,week,scope,teamName){
 function gameBoxHTML(g){
  const fields=[['First downs','firstDowns'],['Plays','plays'],['Passing yards','passYds'],['Rushing yards','rushYds'],['Turnovers','turnovers'],['Sacks taken','sacksTaken'],['Field goals made','fgMade'],['Field goal attempts','fgAtt'],['Punts','punts']];
  let rows=[['Total yards',...['away','home'].map(s=>g.teamStats[s].passYds+g.teamStats[s].rushYds)],...fields.map(([n,k])=>[n,g.teamStats.away[k],g.teamStats.home[k]])];
+ // Games recorded with the v0.16 play model carry flags, pressure and return totals; older games do not.
+ const recordsFlags=['away','home'].every(s=>typeof g.teamStats?.[s]?.penalties==='number');
+ if(recordsFlags){const ts=g.teamStats;rows.push(['Penalties – yards',...['away','home'].map(s=>`${ts[s].penalties}–${ts[s].penaltyYds||0}`)],['Pressures allowed',...['away','home'].map(s=>ts[s].pressures||0)],['Return yards',...['away','home'].map(s=>ts[s].returnYds||0)])}
+ const conditionLine=g.conditions&&globalThis.DynastyGameConditions?globalThis.DynastyGameConditions.describe(g.conditions):null,conditionsNote=conditionLine?`<p class="game-conditions muted" data-severity="${conditionLine.severity}"><strong>${gameEscape(conditionLine.headline)}</strong>${conditionLine.notes.length?` · ${gameEscape(conditionLine.notes.join(' · '))}`:''}</p>`:'';
  // A compacted game keeps its leaders and scorers; say so rather than let the shorter list
  // read as a quiet night from everyone else.
  const compactNote=g.compacted?`<p class="muted">Individual lines for this game were compacted to its leaders and scorers to keep long dynasties small. Team statistics, the score and injuries are unchanged.</p>`:'';
- const groups=[['Passing',['Cmp','Att','Yds','TD','INT','Sacks'],['passComp','passAtt','passYds','passTD','int','sacksTaken'],'passAtt',4],['Rushing',['Car','Yds','Avg','TD'],['rushAtt','rushYds','rushAvg','rushTD'],'rushAtt',3],['Receiving',['Rec','Targets','Yds','Avg','TD'],['receptions','targets','recYds','recAvg','recTD'],'targets',4],['Defense',['Tkl','TFL','Sack','INT','PD','Pressures'],['tackles','tfl','sacks','intDef','passBreakups','pressures'],'tackles',2],['Kicking',['FGM','FGA'],['fgMade','fgAtt'],'fgAtt',2],['Punting',['Punts','Yds','Avg'],['punts','puntYds','puntAvg'],'punts',3]];
+ const groups=[['Passing',['Cmp','Att','Yds','TD','INT','Sacks'],['passComp','passAtt','passYds','passTD','int','sacksTaken'],'passAtt',4],['Rushing',['Car','Yds','Avg','TD'],['rushAtt','rushYds','rushAvg','rushTD'],'rushAtt',3],['Receiving',['Rec','Targets','Yds','Avg','TD'],['receptions','targets','recYds','recAvg','recTD'],'targets',4],['Defense',['Tkl','TFL','Sack','INT','PD','Pressures'],['tackles','tfl','sacks','intDef','passBreakups','pressures'],'tackles',2],['Kicking',['FGM','FGA'],['fgMade','fgAtt'],'fgAtt',2],['Punting',['Punts','Yds','Avg'],['punts','puntYds','puntAvg'],'punts',3],['Returns',['Ret','Yds','Avg','TD'],['returns','returnYds','retAvg','returnTD'],'returns',2],['Penalties',['Flags'],['penalties'],'penalties',1]];
  const filters=`<div class="game-box-controls" aria-label="Box score filters"><label>Player team<select data-game-box-team><option value="all">Both teams</option><option value="away">${gameEscape(g.away.name)}</option><option value="home">${gameEscape(g.home.name)}</option></select></label><label>Category<select data-game-box-category><option value="all">All categories</option>${groups.map(([title])=>`<option value="${title.toLowerCase()}">${title}</option>`).join('')}</select></label><output data-game-box-status aria-live="polite">Showing both teams · all categories</output></div>`;
- let html=compactNote+filters+'<h3>Team statistics</h3>'+gameTable(['Statistic',g.away.name,g.home.name],rows)+'<p class="muted">The game does not record quarter scores, possession time, third and fourth downs, penalties or long gains. Player stat lines are distributed from each team’s production.</p><div class="game-player-stats">';
- for(const side of ['away','home']){html+=`<section class="game-stat-team" data-game-stat-team="${side}"><h3>${gameEscape(g[side].name)}</h3>`;for(const [title,cols,keys,filter,defaultSort] of groups){const list=g.playerStats[side].filter(p=>p.stats[filter]||keys.some(k=>p.stats[k]));if(!list.length)continue;const category=title.toLowerCase();html+=`<section class="game-stat-group" data-game-stat-category="${category}"><h4>${title}</h4>`+gameTable(['Player','Pos',...cols],list.map(p=>[p.name,p.pos,...keys.map(k=>{const s=p.stats;if(k==='rushAvg')return s.rushAtt?((s.rushYds||0)/s.rushAtt).toFixed(1):'—';if(k==='recAvg')return s.receptions?((s.recYds||0)/s.receptions).toFixed(1):'—';if(k==='puntAvg')return s.punts?((s.puntYds||0)/s.punts).toFixed(1):'—';return s[k]||0})]),{sortable:true,defaultSort})+'</section>'}html+='</section>'}
+ let html=conditionsNote+compactNote+filters+'<h3>Team statistics</h3>'+gameTable(['Statistic',g.away.name,g.home.name],rows)+`<p class="muted">The game does not record quarter scores, possession time, third and fourth downs${recordsFlags?'':', penalties'} or long gains. Player stat lines are distributed from each team’s production.</p><div class="game-player-stats">`;
+ for(const side of ['away','home']){html+=`<section class="game-stat-team" data-game-stat-team="${side}"><h3>${gameEscape(g[side].name)}</h3>`;for(const [title,cols,keys,filter,defaultSort] of groups){const list=g.playerStats[side].filter(p=>p.stats[filter]||keys.some(k=>p.stats[k]));if(!list.length)continue;const category=title.toLowerCase();html+=`<section class="game-stat-group" data-game-stat-category="${category}"><h4>${title}</h4>`+gameTable(['Player','Pos',...cols],list.map(p=>[p.name,p.pos,...keys.map(k=>{const s=p.stats;if(k==='rushAvg')return s.rushAtt?((s.rushYds||0)/s.rushAtt).toFixed(1):'—';if(k==='recAvg')return s.receptions?((s.recYds||0)/s.receptions).toFixed(1):'—';if(k==='puntAvg')return s.punts?((s.puntYds||0)/s.punts).toFixed(1):'—';if(k==='retAvg')return s.returns?((s.returnYds||0)/s.returns).toFixed(1):'—';return s[k]||0})]),{sortable:true,defaultSort})+'</section>'}html+='</section>'}
  html+='</div>';
  return html;
 }
@@ -8960,7 +9414,7 @@ function applyGameplanDecision(t,option){
  }
  return true;
 }
-function buildWeeklyHub(beforeRank=selected()?.rank||null){const u=selected(),items=[...pulledOfferHubItems(u),...coachOpeningHubItems(u),...coachFalloutHubItems(u),...promiseHubItems(u),...recordChaseHubItems(u),...rivalryHubItems(u),...adminHubItems(u),...careerHubItems(u),...(typeof milestoneHubItems==='function'?milestoneHubItems(u):[]),...bowlHubItems(u),...signingDayHubItems(),...(globalThis.DynastyRecruitingNews?.(u)||[]),...(globalThis.DynastyPlayerArcNews?.(u)||[]),...(globalThis.DynastyStaffAssignmentNews?.(u)||[]),...academicHubItems(u),...coachTreeHubItems(u),...newsHeadlineHubItem(u)],res=userWeekResult(u);if(res)items.push({type:res.win?'good-news':'bad-news',tab:'season',kicker:'FINAL',importance:res.win?50:60,gameId:res.gameId,main:`${res.win?'Win':'Loss'} ${res.userPts}–${res.oppPts} ${res.loc} ${res.opp}`,sub:res.label?`${res.label} · ${u.w}-${u.l} overall`:`${u.w}-${u.l} overall · ${u.cw}-${u.cl} conference`});if(beforeRank&&u.rank!==beforeRank)items.push({type:u.rank<beforeRank?'good-news':'alert',tab:'season',kicker:'RANKINGS',importance:45,main:`${u.rank<beforeRank?'Up':'Down'} to #${u.rank}`,sub:`Previous ranking: #${beforeRank}`});let inj=u.roster.filter(p=>(p.injuryHistory||[]).some(x=>x.year===universe.year&&x.week===universe.week)).slice(0,2);for(const p of inj)items.push({type:'bad-news',tab:'roster',player:p.id,kicker:'MEDICAL',importance:55,main:`${p.name}: ${p.injury}`,sub:`Expected absence: ${p.injuryWeeks} week${p.injuryWeeks===1?'':'s'}`});let commits=universe.recruits.filter(r=>r.committed===u.name&&r.commitWeek===universe.week).slice(0,3);for(const r of commits)items.push({type:'good-news',tab:'recruiting',recruit:r.id,kicker:'COMMITMENT',importance:40+r.stars*3,main:`${'★'.repeat(r.stars)} ${r.pos} ${r.name}`,sub:`#${r.nationalRank} nationally · ${r.homeCity}, ${r.homeState}`});let next=findUserGame();if(next){let opp=T(next.home===u.name?next.away:next.home);items.push({type:'action',tab:'gamelab',kicker:'NEXT UP',importance:48,main:`Week ${universe.week+1}: ${next.home===u.name?'vs':'@'} ${opp.name}`,sub:`${opp.w}-${opp.l} · #${opp.rank<=25?opp.rank:'—'} · ${opp.offScheme}`})}let risk=u.roster.map(p=>({p,r:transferRisk(p)})).sort((a,b)=>b.r-a.r)[0];if(risk?.r>=42)items.push({type:'alert',tab:'roster',player:risk.p.id,kicker:'LOCKER ROOM',importance:Math.min(80,Math.round(risk.r)),main:`${risk.p.name} transfer risk: ${Math.round(risk.r)}`,sub:`${risk.p.role} · morale ${risk.p.morale}`});for(const e of (universe.decommitLog||[]).filter(e=>e.year===universe.year&&e.week===universe.week&&(e.from===u.name||e.to===u.name)).slice(0,3))items.push(e.from===u.name?{type:'bad-news',tab:'recruiting',recruit:e.id,kicker:'DECOMMIT',importance:50+e.stars*3,main:`${'★'.repeat(e.stars)} ${e.pos} ${e.name}`,sub:e.to?`Flipped to ${e.to}`:'Reopened his recruitment'}:{type:'good-news',tab:'recruiting',recruit:e.id,kicker:'FLIP',importance:45+e.stars*3,main:`${'★'.repeat(e.stars)} ${e.pos} ${e.name}`,sub:`Flipped from ${e.from}`});let waver=universe.recruits.filter(r=>r.committed===u.name&&r.challenger&&r.pressure>0).sort((a,b)=>b.pressure-a.pressure)[0];if(waver)items.push({type:'alert',tab:'recruiting',recruit:waver.id,kicker:'WAVERING',importance:52,main:`${waver.name} hearing from ${waver.challenger}`,sub:`${'★'.repeat(waver.stars)} ${waver.pos} commit · target, visit or promise to hold him`});let hot=universe.recruits.filter(r=>r.targeted&&!r.committed).sort((a,b)=>b.interest-a.interest)[0];if(hot)items.push({type:'action',tab:'recruiting',recruit:hot.id,kicker:'TOP TARGET',importance:35,main:`${hot.name} · ${hot.interest}%`,sub:`#${hot.nationalRank} ${hot.pos} · ${hot.trend>0?'↑ '+hot.trend:hot.trend<0?'↓ '+Math.abs(hot.trend):'steady'}`});universe.weeklyHub=items.sort((a,b)=>(b.importance??40)-(a.importance??40)).slice(0,9)}
+function buildWeeklyHub(beforeRank=selected()?.rank||null){const u=selected(),items=[...pulledOfferHubItems(u),...coachOpeningHubItems(u),...coachFalloutHubItems(u),...promiseHubItems(u),...recordChaseHubItems(u),...rivalryHubItems(u),...adminHubItems(u),...careerHubItems(u),...(typeof milestoneHubItems==='function'?milestoneHubItems(u):[]),...bowlHubItems(u),...signingDayHubItems(),...(globalThis.DynastyRecruitingNews?.(u)||[]),...(globalThis.DynastyPlayerArcNews?.(u)||[]),...(globalThis.DynastyStaffAssignmentNews?.(u)||[]),...(globalThis.DynastyFacilityNews?.(u)||[]),...academicHubItems(u),...coachTreeHubItems(u),...newsHeadlineHubItem(u)],res=userWeekResult(u);if(res)items.push({type:res.win?'good-news':'bad-news',tab:'season',kicker:'FINAL',importance:res.win?50:60,gameId:res.gameId,main:`${res.win?'Win':'Loss'} ${res.userPts}–${res.oppPts} ${res.loc} ${res.opp}`,sub:res.label?`${res.label} · ${u.w}-${u.l} overall`:`${u.w}-${u.l} overall · ${u.cw}-${u.cl} conference`});if(beforeRank&&u.rank!==beforeRank)items.push({type:u.rank<beforeRank?'good-news':'alert',tab:'season',kicker:'RANKINGS',importance:45,main:`${u.rank<beforeRank?'Up':'Down'} to #${u.rank}`,sub:`Previous ranking: #${beforeRank}`});let inj=u.roster.filter(p=>(p.injuryHistory||[]).some(x=>x.year===universe.year&&x.week===universe.week)).slice(0,2);for(const p of inj)items.push({type:'bad-news',tab:'roster',player:p.id,kicker:'MEDICAL',importance:55,main:`${p.name}: ${p.injury}`,sub:`Expected absence: ${p.injuryWeeks} week${p.injuryWeeks===1?'':'s'}`});let commits=universe.recruits.filter(r=>r.committed===u.name&&r.commitWeek===universe.week).slice(0,3);for(const r of commits)items.push({type:'good-news',tab:'recruiting',recruit:r.id,kicker:'COMMITMENT',importance:40+r.stars*3,main:`${'★'.repeat(r.stars)} ${r.pos} ${r.name}`,sub:`#${r.nationalRank} nationally · ${r.homeCity}, ${r.homeState}`});let next=findUserGame();if(next){let opp=T(next.home===u.name?next.away:next.home);items.push({type:'action',tab:'gamelab',kicker:'NEXT UP',importance:48,main:`Week ${universe.week+1}: ${next.home===u.name?'vs':'@'} ${opp.name}`,sub:`${opp.w}-${opp.l} · #${opp.rank<=25?opp.rank:'—'} · ${opp.offScheme}`})}let risk=u.roster.map(p=>({p,r:transferRisk(p)})).sort((a,b)=>b.r-a.r)[0];if(risk?.r>=42)items.push({type:'alert',tab:'roster',player:risk.p.id,kicker:'LOCKER ROOM',importance:Math.min(80,Math.round(risk.r)),main:`${risk.p.name} transfer risk: ${Math.round(risk.r)}`,sub:`${risk.p.role} · morale ${risk.p.morale}`});for(const e of (universe.decommitLog||[]).filter(e=>e.year===universe.year&&e.week===universe.week&&(e.from===u.name||e.to===u.name)).slice(0,3))items.push(e.from===u.name?{type:'bad-news',tab:'recruiting',recruit:e.id,kicker:'DECOMMIT',importance:50+e.stars*3,main:`${'★'.repeat(e.stars)} ${e.pos} ${e.name}`,sub:e.to?`Flipped to ${e.to}`:'Reopened his recruitment'}:{type:'good-news',tab:'recruiting',recruit:e.id,kicker:'FLIP',importance:45+e.stars*3,main:`${'★'.repeat(e.stars)} ${e.pos} ${e.name}`,sub:`Flipped from ${e.from}`});let waver=universe.recruits.filter(r=>r.committed===u.name&&r.challenger&&r.pressure>0).sort((a,b)=>b.pressure-a.pressure)[0];if(waver)items.push({type:'alert',tab:'recruiting',recruit:waver.id,kicker:'WAVERING',importance:52,main:`${waver.name} hearing from ${waver.challenger}`,sub:`${'★'.repeat(waver.stars)} ${waver.pos} commit · target, visit or promise to hold him`});let hot=universe.recruits.filter(r=>r.targeted&&!r.committed).sort((a,b)=>b.interest-a.interest)[0];if(hot)items.push({type:'action',tab:'recruiting',recruit:hot.id,kicker:'TOP TARGET',importance:35,main:`${hot.name} · ${hot.interest}%`,sub:`#${hot.nationalRank} ${hot.pos} · ${hot.trend>0?'↑ '+hot.trend:hot.trend<0?'↓ '+Math.abs(hot.trend):'steady'}`});universe.weeklyHub=items.sort((a,b)=>(b.importance??40)-(a.importance??40)).slice(0,9)}
 
 const GUIDANCE_STATE_VERSION=1,GUIDANCE_FAMILIARITY_MAX=3,GUIDANCE_RETURN_AFTER_MS=15*60*1000;
 const GUIDANCE_CATEGORIES=new Set(['career','coach_desk','game_plan','roster_management','staffing','recruiting','monitoring']);
@@ -12124,7 +12578,9 @@ function makeRecruitingActionSystem(env){
  // ---------- hours ----------
  function hoursBudgetFor(t){
   const rc=t?.staff?.RC||{},hc=t?.staff?.HC||{};
-  return clamp(Math.round(12+(rc.recruiting||60)*.38+(hc.recruiting||60)*.10+(t?.resources??60)*.06),30,60);
+  // A Football Operations building adds hours (v0.16); with none built the budget is the original 30-60.
+  const extra=env.hoursBonus?Math.max(0,Math.round(env.hoursBonus(t)||0)):0;
+  return clamp(Math.round(12+(rc.recruiting||60)*.38+(hc.recruiting||60)*.10+(t?.resources??60)*.06)+extra,30,60+extra);
  }
  // Pure read: a stale or missing week reads as unspent without writing anything.
  function weekInfo(t){
@@ -12673,6 +13129,7 @@ if(typeof module==='object'&&module.exports){
 }else{
  const recruitingActions=makeRecruitingActionSystem({
   getUniverse:()=>universe,clamp,priorities:PRIORITIES,
+  hoursBonus:t=>globalThis.DynastyFacilities&&t&&t.name===$('#userTeam')?.value?globalThis.DynastyFacilities.hoursBonus(t):0,
   scholarshipCapacity:t=>scholarshipCapacity(t),
   unitStrength:(t,pos)=>unitCached(t,pos),
   schemeFit:(t,r)=>recruitSchemeFit(t,r),
@@ -13733,6 +14190,323 @@ if(typeof module==='object'&&module.exports){
   main:`${r.vacated.name}'s assignment is open`,sub:`${[r.vacated.region,r.vacated.group&&staffAssignments.GROUPS[r.vacated.group]?.label].filter(Boolean).join(' and ')} ha${r.vacated.region&&r.vacated.group?'ve':'s'} no coach. Reassign it on Staff.`}));
 }
 
+// Facilities and boosters (v0.16). Facilities used to be a single number that only moved by +1 when the board
+// was happy. This makes it something you build: raise money from boosters, decide whether it goes to the
+// facilities fund or to this season's NIL budget, and spend the fund on multi-season building projects.
+//
+//   Booster goodwill (0-100)  moves with wins against expectation and titles, and sets how generous gifts are.
+//   Booster fund (units)      banked money. Gifts arrive each offseason and from campaigns you run in a season.
+//   Three build tracks        Stadium & Game Day (fan support = home field), Training & Performance (development)
+//                             and Football Operations (recruiting hours), five levels each. A project is paid
+//                             for out of the fund, then takes one to three seasons to build.
+//   The NIL trade-off         a campaign's gift goes to the fund or to NIL, and unspent NIL can be redirected
+//                             into the fund. Holding the starter and finishing the stadium are the same money.
+//
+// Only the controlled program has any of this, so the rest of the league plays exactly as before, and nothing
+// here draws gameplay randomness: campaign results come from a hash of the program, season and campaign
+// number, so reloading a save never changes an outcome. A save without a plan behaves as it always did.
+function makeFacilitySystem(env){
+ 'use strict';
+ const universe=()=>env.getUniverse(),clamp=env.clamp;
+ const TRACKS={
+  stadium:{label:'Stadium & Game Day',short:'Stadium',blurb:'Seats, sightlines and a louder crowd.',perLevel:'+2 fan support (a bigger home-field edge), gifts grow'},
+  training:{label:'Training & Performance Center',short:'Training',blurb:'Weight room, recovery and sports science.',perLevel:'+1 development at levels 2 and 4'},
+  football_ops:{label:'Football Operations Building',short:'Football Ops',blurb:'Film rooms, a recruiting lounge and staff space.',perLevel:'+2 recruiting hours a week'}
+ };
+ const TRACK_IDS=Object.keys(TRACKS);
+ const MAX_LEVEL=5,LEVEL_COST=[4,7,11,16,22],BUILD_SEASONS=[1,1,2,2,3];
+ const FACILITY_POINTS=2,FUND_CAP=40,MAX_PROJECTS=2,CAMPAIGNS_PER_SEASON=3,LOG_LIMIT=14;
+ const STADIUM_FAN=2,TRAINING_DEV_LEVELS=[2,4],OPS_HOURS=2;
+ const CAMPAIGNS={
+  dinner:{label:'Booster Dinner',blurb:'A steady evening with the people who write the checks.'},
+  ask:{label:'Major Gift Ask',blurb:'A big request. It lands with a happy donor base and costs goodwill when it does not.'}
+ };
+ const DESTINATIONS={facilities:'the facilities fund',nil:'this season’s NIL budget'};
+
+ // FNV-1a over the parts: a stable roll that never touches the gameplay random stream.
+ function hash(...parts){let h=2166136261;for(const ch of parts.join('|')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+ const int=(v,fallback=0)=>Number.isFinite(Number(v))?Math.round(Number(v)):fallback;
+
+ function startingGoodwill(t){return clamp(Math.round(34+(t?.fan_support??60)*.3+((t?.prestige??60)-60)*.22),20,85)}
+ function state(t,create=true){
+  if(!t)return null;
+  if(!t.facilityPlan&&!create)return null;
+  const p=t.facilityPlan??={version:1};
+  p.fund=clamp(int(p.fund,2),0,FUND_CAP);
+  p.goodwill=clamp(int(p.goodwill,startingGoodwill(t)),0,100);
+  p.levels={...(p.levels||{})};for(const id of TRACK_IDS)p.levels[id]=clamp(int(p.levels[id],0),0,MAX_LEVEL);
+  p.projects=Array.isArray(p.projects)?p.projects.filter(x=>x&&TRACKS[x.track]):[];
+  p.campaigns=p.campaigns&&typeof p.campaigns==='object'?p.campaigns:{year:null,used:0};
+  p.log=Array.isArray(p.log)?p.log.slice(-LOG_LIMIT):[];
+  p.nextId=int(p.nextId,1);
+  return p;
+ }
+ const level=(t,track)=>state(t,false)?.levels?.[track]??0;
+ const fundOf=t=>state(t,false)?.fund??2;
+ const goodwillOf=t=>state(t,false)?.goodwill??startingGoodwill(t);
+ const totalLevels=t=>TRACK_IDS.reduce((n,id)=>n+level(t,id),0);
+ const goodwillLabel=g=>g>=80?'Devoted':g>=62?'Supportive':g>=45?'Steady':g>=28?'Restless':'Angry';
+ function campaignsUsed(t){const p=state(t,false),y=universe().year;return p&&p.campaigns.year===y?p.campaigns.used:0}
+ function campaignsLeft(t){return Math.max(0,CAMPAIGNS_PER_SEASON-campaignsUsed(t))}
+
+ function note(t,text){const p=state(t),u=universe();p.log.push({year:u.year,week:u.week,text});if(p.log.length>LOG_LIMIT)p.log.splice(0,p.log.length-LOG_LIMIT)}
+ function event(t,type,summary,importance=48,metadata={}){
+  const u=universe(),order=u.nextEventId++;u.events??=[];
+  u.events.push({id:`EVT_${order}`,season:u.year,week:u.week,timestampOrder:order,type,importance,schoolIds:[t.id],playerIds:[],coachIds:[],recruitIds:[],gameIds:[],summary,metadata});
+ }
+
+ // What the boosters give each offseason: a base, more from a happy base, a bigger stadium and a loud crowd.
+ function annualIncome(t){
+  const p=state(t,false),g=p?p.goodwill:startingGoodwill(t),stadium=level(t,'stadium');
+  return clamp(Math.round(1.5+g/28+stadium*.6+((t?.fan_support??60)-60)/25+(t?.resources??60)/60),2,10);
+ }
+ function nextCost(t,track){const l=level(t,track);return l>=MAX_LEVEL?null:LEVEL_COST[l]}
+ function activeProjects(t){return state(t,false)?.projects||[]}
+ function projectFor(t,track){return activeProjects(t).find(x=>x.track===track)||null}
+ function status(project){
+  if(project.paid<project.cost)return'funding';
+  return'building';
+ }
+ // Seasons until a fully funded project opens, counting the season it was paid in.
+ function opensIn(project){return project.completeYear==null?null:Math.max(0,project.completeYear-universe().year)}
+
+ function startProject(t,track){
+  if(!TRACKS[track])return{ok:false,reason:'Unknown project.'};
+  const p=state(t),l=level(t,track);
+  if(l>=MAX_LEVEL)return{ok:false,reason:`${TRACKS[track].label} is already as good as it gets.`};
+  if(projectFor(t,track))return{ok:false,reason:`${TRACKS[track].label} already has a project underway.`};
+  if(p.projects.length>=MAX_PROJECTS)return{ok:false,reason:`Only ${MAX_PROJECTS} projects can be underway at once.`};
+  const project={id:`FP${p.nextId++}`,track,level:l+1,cost:LEVEL_COST[l],paid:0,startedYear:universe().year,fundedYear:null,completeYear:null};
+  p.projects.push(project);
+  note(t,`Broke ground on ${TRACKS[track].label}, level ${project.level} (${project.cost} units).`);
+  return{ok:true,project};
+ }
+ function fundProject(t,id,units){
+  const p=state(t),project=p.projects.find(x=>x.id===id);
+  if(!project)return{ok:false,reason:'That project is no longer underway.'};
+  if(project.paid>=project.cost)return{ok:false,reason:'This project is already fully funded.'};
+  const want=Math.max(0,int(units===undefined?project.cost-project.paid:units));
+  if(!want)return{ok:false,reason:'Nothing to put in.'};
+  const amount=Math.min(want,project.cost-project.paid,p.fund);
+  if(amount<=0)return{ok:false,reason:'The booster fund is empty.'};
+  p.fund-=amount;project.paid+=amount;
+  let funded=false;
+  if(project.paid>=project.cost){
+   funded=true;project.fundedYear=universe().year;project.completeYear=project.fundedYear+BUILD_SEASONS[project.level-1];
+   note(t,`Fully funded ${TRACKS[project.track].label}, level ${project.level}. It opens in ${BUILD_SEASONS[project.level-1]} season${BUILD_SEASONS[project.level-1]===1?'':'s'}.`);
+  }
+  return{ok:true,amount,funded,project};
+ }
+ // Reversible until it is fully funded: a misallocated pledge comes back, a signed contractor does not.
+ function cancelProject(t,id){
+  const p=state(t),i=p.projects.findIndex(x=>x.id===id);
+  if(i<0)return{ok:false,reason:'That project is no longer underway.'};
+  const project=p.projects[i];
+  if(project.paid>=project.cost)return{ok:false,reason:'Construction has been contracted; it cannot be stopped.'};
+  p.fund=clamp(p.fund+project.paid,0,FUND_CAP);p.projects.splice(i,1);
+  note(t,`Shelved ${TRACKS[project.track].label}, level ${project.level}; ${project.paid} units returned.`);
+  return{ok:true,refund:project.paid};
+ }
+
+ // Gifts. A dinner is steady; an ask is large when the base is happy and costs goodwill when it is not.
+ function campaign(t,kind,destination='facilities'){
+  if(!CAMPAIGNS[kind])return{ok:false,reason:'Unknown campaign.'};
+  if(!DESTINATIONS[destination])return{ok:false,reason:'Unknown destination.'};
+  const p=state(t),u=universe();
+  if(campaignsLeft(t)<=0)return{ok:false,reason:`You have run all ${CAMPAIGNS_PER_SEASON} campaigns for ${u.year}.`};
+  if(destination==='nil'&&env.nilAvailable&&!env.nilAvailable(t))return{ok:false,reason:'NIL is not available to this program.'};
+  const used=campaignsUsed(t),roll=hash(t.id,u.year,used,kind)%100,g=p.goodwill;
+  let units=0,success=true,goodwillDelta=0;
+  if(kind==='dinner'){units=clamp(Math.round(1+g/40),1,3);goodwillDelta=1}
+  else{
+   const chance=clamp(Math.round(g*.85-10),15,90);
+   success=roll<chance;units=success?clamp(3+Math.round(g/25),4,7):0;goodwillDelta=success?0:-4;
+  }
+  p.campaigns={year:u.year,used:used+1};
+  p.goodwill=clamp(p.goodwill+goodwillDelta,0,100);
+  if(units>0)deposit(t,units,destination);
+  const label=CAMPAIGNS[kind].label;
+  const text=units>0?`${label} raised ${units} unit${units===1?'':'s'} for ${DESTINATIONS[destination]}.`:`${label} fell flat. The boosters felt pressed and goodwill slipped.`;
+  note(t,text);
+  event(t,'BOOSTER_CAMPAIGN',`${t.name} ${text.replace(/^[A-Z]/,c=>c.toLowerCase())}`,units>=5?56:44,{kind,destination,units,success});
+  return{ok:true,kind,label,units,success,destination,text,left:campaignsLeft(t)};
+ }
+ function deposit(t,units,destination){
+  const p=state(t);
+  if(destination==='nil'){
+   const y=universe().year;
+   p.nilBonus={year:y,amount:(p.nilBonus&&p.nilBonus.year===y?p.nilBonus.amount:0)+units};
+  }else p.fund=clamp(p.fund+units,0,FUND_CAP);
+ }
+ // The NIL budget gets whatever the boosters sent it this season. It is read by nilBudgetFor.
+ function nilBonus(t){const p=state(t,false),y=universe().year;return p&&p.nilBonus&&p.nilBonus.year===y?p.nilBonus.amount:0}
+ // Money already earmarked for NIL deals can be moved into the fund. It is gone from NIL for the season.
+ function divertNil(t,units=1){
+  const n=Math.max(0,int(units));if(!n)return{ok:false,reason:'Nothing to move.'};
+  if(!env.nilRemaining)return{ok:false,reason:'NIL is not available.'};
+  const left=env.nilRemaining(t);
+  if(left<n)return{ok:false,reason:`Only ${left} NIL unit${left===1?'':'s'} left this season.`};
+  const p=state(t);
+  if(p.fund>=FUND_CAP)return{ok:false,reason:'The facilities fund is full.'};
+  const moved=Math.min(n,FUND_CAP-p.fund);
+  t.nilSpent=(t.nilSpent||0)+moved;p.fund+=moved;
+  note(t,`Redirected ${moved} NIL unit${moved===1?'':'s'} into the facilities fund.`);
+  event(t,'FACILITY_DIVERSION',`${t.name} moved ${moved} NIL unit${moved===1?'':'s'} into facilities.`,42,{units:moved});
+  return{ok:true,moved,nilLeft:env.nilRemaining(t)};
+ }
+
+ function complete(t,project){
+  const p=state(t),track=TRACKS[project.track];
+  p.levels[project.track]=Math.max(p.levels[project.track],project.level);
+  t.facilities=clamp((t.facilities||60)+FACILITY_POINTS,0,99);
+  if(project.track==='stadium')t.fan_support=clamp((t.fan_support||60)+STADIUM_FAN,0,99);
+  if(project.track==='training'&&TRAINING_DEV_LEVELS.includes(project.level))t.development=clamp((t.development||60)+1,0,99);
+  p.goodwill=clamp(p.goodwill+3,0,100);
+  p.completed=[...(p.completed||[]).filter(x=>x.year===universe().year),{year:universe().year,track:project.track,level:project.level}];
+  note(t,`${track.label} level ${project.level} opened.`);
+  event(t,'FACILITY_OPENED',`${t.name} opened ${track.label}, level ${project.level}.`,project.level>=4?62:52,{track:project.track,level:project.level});
+ }
+ // How the boosters felt about the season that just ended.
+ function goodwillShift(t,{wins,expected,champion,confChampion,bowlWin}){
+  const delta=(wins-expected)*2.5+(champion?12:0)+(confChampion?4:0)+(bowlWin?2:0)-(wins<expected-2?4:0);
+  return Math.round(delta);
+ }
+ // Called once as a new season begins, for the controlled program only. `last` describes the season just played.
+ function newSeason(t,last={}){
+  if(!t)return null;
+  const p=state(t),u=universe(),report={year:u.year,income:0,opened:[],goodwill:{before:p.goodwill,after:p.goodwill}};
+  const before=p.goodwill,delta=goodwillShift(t,{wins:last.wins??0,expected:last.expected??6,champion:!!last.champion,confChampion:!!last.confChampion,bowlWin:!!last.bowlWin});
+  p.goodwill=clamp(Math.round(before*.9+55*.1+delta),5,100);
+  const done=p.projects.filter(x=>x.completeYear!=null&&u.year>=x.completeYear);
+  for(const project of done){complete(t,project);report.opened.push({track:project.track,level:project.level})}
+  p.projects=p.projects.filter(x=>!done.includes(x));
+  report.goodwill={before,after:p.goodwill};
+  const income=annualIncome(t);
+  p.fund=clamp(p.fund+income,0,FUND_CAP);report.income=income;
+  p.campaigns={year:u.year,used:0};
+  note(t,`Booster gifts for ${u.year}: ${income} units. Goodwill ${before} → ${p.goodwill}.`);
+  event(t,'BOOSTER_GIFTS',`${t.name} boosters gave ${income} units for ${u.year} (goodwill ${goodwillLabel(p.goodwill).toLowerCase()}).`,40,{income,goodwill:p.goodwill});
+  return report;
+ }
+
+ // Effects the rest of the game reads.
+ function hoursBonus(t){return level(t,'football_ops')*OPS_HOURS}
+ function effectsText(t){
+  const s=level(t,'stadium'),tr=level(t,'training'),o=level(t,'football_ops'),out=[];
+  if(s)out.push(`Stadium level ${s}: +${s*STADIUM_FAN} fan support, bigger gifts`);
+  if(tr)out.push(`Training level ${tr}: +${TRAINING_DEV_LEVELS.filter(x=>x<=tr).length} development`);
+  if(o)out.push(`Football Ops level ${o}: +${o*OPS_HOURS} recruiting hours a week`);
+  return out;
+ }
+ function trackRows(t){
+  return TRACK_IDS.map(id=>{
+   const project=projectFor(t,id),l=level(t,id);
+   return{id,...TRACKS[id],level:l,max:MAX_LEVEL,nextCost:nextCost(t,id),buildSeasons:l<MAX_LEVEL?BUILD_SEASONS[l]:null,
+    project:project?{...project,status:status(project),opensIn:opensIn(project)}:null};
+  });
+ }
+ function summary(t){
+  const p=state(t,false);
+  return{fund:p?p.fund:2,goodwill:goodwillOf(t),goodwillLabel:goodwillLabel(goodwillOf(t)),income:annualIncome(t),campaignsLeft:campaignsLeft(t),
+   totalLevels:totalLevels(t),projects:activeProjects(t).length,facilities:t?.facilities??null,nilBonus:nilBonus(t),log:p?p.log.slice(-6):[]};
+ }
+ // Items for the weekly hub: a building that opened, and money sitting unused in the offseason.
+ function newsItems(t){
+  const p=state(t,false),u=universe();if(!p)return[];
+  const out=[];
+  for(const c of (p.completed||[]).filter(x=>x.year===u.year)){
+   out.push({type:'good-news',tab:'program',kicker:'FACILITIES',importance:58,main:`${TRACKS[c.track].label} level ${c.level} is open`,sub:effectsText(t)[0]||'Boosters are pleased.'});
+  }
+  const cheapest=TRACK_IDS.map(id=>projectFor(t,id)?null:nextCost(t,id)).filter(x=>x!=null).sort((a,b)=>a-b)[0];
+  if((u.phase==='preseason'||u.phase==='complete')&&cheapest!=null&&p.fund>=cheapest&&p.projects.length<MAX_PROJECTS&&!(p.noticedYear===u.year)){
+   p.noticedYear=u.year;
+   out.push({type:'alert',tab:'program',kicker:'BOOSTERS',importance:46,main:`${p.fund} units are banked in the facilities fund`,sub:'Start a building project on your Program page, or send the money to NIL.'});
+  }
+  if(p.goodwill<=28&&(u.phase==='preseason')&&!(p.angryYear===u.year)){
+   p.angryYear=u.year;
+   out.push({type:'bad-news',tab:'program',kicker:'BOOSTERS',importance:54,main:'Boosters are restless',sub:'Goodwill is low, so gifts will be small and a big ask is likely to fail. Winning is the fix.'});
+  }
+  return out;
+ }
+
+ return{TRACKS,TRACK_IDS,CAMPAIGNS,DESTINATIONS,MAX_LEVEL,LEVEL_COST,BUILD_SEASONS,FACILITY_POINTS,FUND_CAP,MAX_PROJECTS,CAMPAIGNS_PER_SEASON,
+  state,level,fundOf,goodwillOf,goodwillLabel,totalLevels,annualIncome,nextCost,activeProjects,projectFor,status,opensIn,startProject,fundProject,cancelProject,
+  campaign,campaignsLeft,campaignsUsed,nilBonus,divertNil,newSeason,goodwillShift,hoursBonus,effectsText,trackRows,summary,newsItems};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeFacilitySystem};
+}else{
+ const facilities=makeFacilitySystem({getUniverse:()=>universe,clamp,nilRemaining:t=>nilRemaining(t),nilAvailable:t=>nilBudgetFor(t)>0});
+ globalThis.DynastyFacilities=facilities;
+ const fbEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const isMine=t=>t&&t.name===$('#userTeam')?.value;
+
+ // NIL and facilities are the same pool of booster money: a campaign sent to NIL raises this season's budget.
+ const nilBudgetBeforeFacilities=nilBudgetFor;
+ nilBudgetFor=function nilBudgetForWithBoosters(t){return nilBudgetBeforeFacilities(t)+(t&&isMine(t)?facilities.nilBonus(t):0)};
+
+ // A new season: judge the one just played, open what was finished, and bank the gifts.
+ const resetNilSeasonBeforeFacilities=resetNilSeason;
+ resetNilSeason=function resetNilSeasonWithFacilities(){
+  const t=selected();
+  // The calendar has already moved to the new year; the record on the team is still last season's.
+  const last=t?{wins:t.w||0,expected:seasonExpectation(t),champion:!!t.champ,confChampion:conferenceChampionIdsFor().includes(t.id),bowlWin:t.bowlResult?.won===true&&t.bowlResult?.year===universe.year-1}:null;
+  const out=resetNilSeasonBeforeFacilities.apply(this,arguments);
+  if(t)facilities.newSeason(t,last||{});
+  return out;
+ };
+
+ const CTL=(label,attrs,{disabled=false,title='',cls=''}={})=>`<button type="button" class="fb-button ${cls}" ${attrs} ${disabled?'disabled':''} title="${fbEsc(title)}">${label}</button>`;
+ function trackHTML(t,row){
+  const pips=Array.from({length:row.max},(_,i)=>`<i class="fb-pip${i<row.level?' is-on':''}" aria-hidden="true"></i>`).join('');
+  const p=row.project;let action='';
+  if(p){
+   const pct=Math.round(100*p.paid/p.cost);
+   if(p.status==='funding'){
+    const fund=facilities.fundOf(t);
+    action=`<div class="fb-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${p.cost}" aria-valuenow="${p.paid}"><i style="width:${pct}%"></i></div><div class="small muted">Level ${p.level} · ${p.paid} of ${p.cost} units paid</div><div class="fb-actions">${CTL('Put in 1',`data-fb-fund="${p.id}" data-fb-units="1"`,{disabled:fund<1})}${CTL(`Fund the rest · ${p.cost-p.paid}`,`data-fb-fund="${p.id}"`,{disabled:fund<1,title:fund<p.cost-p.paid?`Puts in all ${fund} available`:''})}${CTL('Shelve',`data-fb-cancel="${p.id}"`,{cls:'fb-quiet',title:'Gets back everything paid so far'})}</div>`;
+   }else{
+    const left=p.opensIn;
+    action=`<div class="fb-progress is-built" role="progressbar" aria-valuemin="0" aria-valuemax="${p.cost}" aria-valuenow="${p.cost}"><i style="width:100%"></i></div><div class="small">Under construction · level ${p.level} opens ${left>0?`in ${left} season${left===1?'':'s'} (${p.completeYear})`:'this offseason'}</div>`;
+   }
+  }else if(row.nextCost!=null){
+   const l=row.level+1,fits=facilities.activeProjects(t).length<facilities.MAX_PROJECTS;
+   action=`<div class="small muted">Level ${l} costs ${row.nextCost} units and takes ${row.buildSeasons} season${row.buildSeasons===1?'':'s'} to build.</div><div class="fb-actions">${CTL(`Start level ${l}`,`data-fb-start="${row.id}"`,{disabled:!fits,title:fits?'':`Only ${facilities.MAX_PROJECTS} projects at a time`})}</div>`;
+  }else action='<div class="small muted">Finished. This is as good as it gets.</div>';
+  return`<div class="fb-track" data-fb-track="${row.id}"><div class="fb-track-head"><strong>${fbEsc(row.label)}</strong><span class="fb-pips" aria-label="Level ${row.level} of ${row.max}">${pips}</span></div><div class="small muted">${fbEsc(row.blurb)} Each level: ${fbEsc(row.perLevel)}.</div>${action}</div>`;
+ }
+ function cardHTML(t){
+  const s=facilities.summary(t),rows=facilities.trackRows(t),nilLeft=nilRemaining(t),nilTotal=nilBudgetFor(t),left=s.campaignsLeft;
+  const effects=facilities.effectsText(t);
+  const camp=(kind,dest)=>CTL(`${facilities.CAMPAIGNS[kind].label} → ${dest==='nil'?'NIL':'Facilities'}`,`data-fb-campaign="${kind}" data-fb-dest="${dest}"`,{disabled:left<=0,title:facilities.CAMPAIGNS[kind].blurb});
+  const log=s.log.length?`<details class="fb-log"><summary>Recent activity</summary><ul>${s.log.slice().reverse().map(x=>`<li><span class="muted">${x.year}</span> ${fbEsc(x.text)}</li>`).join('')}</ul></details>`:'';
+  return`<div class="section-head"><div><div class="eyebrow">FACILITIES &amp; BOOSTERS</div><h3>Build the program</h3><div class="muted">Boosters give money. You decide whether it becomes buildings or NIL.</div></div></div>
+  <div class="fb-summary"><div><span class="small muted">Facilities rating</span><strong>${s.facilities??'—'}</strong></div><div><span class="small muted">Booster fund</span><strong>${s.fund}<small> units</small></strong></div><div><span class="small muted">Goodwill</span><strong>${s.goodwill}<small> ${fbEsc(s.goodwillLabel)}</small></strong></div><div><span class="small muted">Gifts next offseason</span><strong>+${s.income}</strong></div><div><span class="small muted">NIL this season</span><strong>${nilLeft}<small> of ${nilTotal}</small></strong></div></div>
+  ${effects.length?`<div class="small fb-effects">${effects.map(fbEsc).join(' · ')}</div>`:''}
+  <div class="fb-tracks">${rows.map(r=>trackHTML(t,r)).join('')}</div>
+  <div class="fb-money"><div><strong>Raise money</strong><div class="small muted">${left} of ${facilities.CAMPAIGNS_PER_SEASON} campaigns left in ${universe.year}. Choose where the gift goes before you ask.</div></div><div class="fb-actions">${camp('dinner','facilities')}${camp('dinner','nil')}${camp('ask','facilities')}${camp('ask','nil')}</div></div>
+  <div class="fb-money"><div><strong>Redirect NIL</strong><div class="small muted">Move unspent NIL into the fund. It cannot be moved back this season.</div></div><div class="fb-actions">${CTL('Move 1 NIL to facilities','data-fb-divert="1"',{disabled:nilLeft<1})}${CTL('Move 3','data-fb-divert="3"',{disabled:nilLeft<3})}</div></div>${log}`;
+ }
+ function bind(root,t){
+  const done=(r,msg)=>{setStatus(r.ok?msg(r):r.reason);if(r.ok)autosaveAfter('management');render()};
+  root.querySelectorAll('[data-fb-start]').forEach(b=>b.onclick=()=>done(facilities.startProject(t,b.dataset.fbStart),r=>`Broke ground on ${facilities.TRACKS[r.project.track].label}, level ${r.project.level}.`));
+  root.querySelectorAll('[data-fb-fund]').forEach(b=>b.onclick=()=>done(facilities.fundProject(t,b.dataset.fbFund,b.dataset.fbUnits?Number(b.dataset.fbUnits):undefined),r=>r.funded?`Fully funded. ${facilities.TRACKS[r.project.track].label} will open in ${facilities.BUILD_SEASONS[r.project.level-1]} season${facilities.BUILD_SEASONS[r.project.level-1]===1?'':'s'}.`:`Put ${r.amount} unit${r.amount===1?'':'s'} into ${facilities.TRACKS[r.project.track].label}.`));
+  root.querySelectorAll('[data-fb-cancel]').forEach(b=>b.onclick=()=>done(facilities.cancelProject(t,b.dataset.fbCancel),r=>`Shelved the project; ${r.refund} unit${r.refund===1?'':'s'} back in the fund.`));
+  root.querySelectorAll('[data-fb-campaign]').forEach(b=>b.onclick=()=>done(facilities.campaign(t,b.dataset.fbCampaign,b.dataset.fbDest),r=>r.text));
+  root.querySelectorAll('[data-fb-divert]').forEach(b=>b.onclick=()=>done(facilities.divertNil(t,Number(b.dataset.fbDivert)),r=>`Moved ${r.moved} NIL unit${r.moved===1?'':'s'} into the facilities fund.`));
+ }
+ function renderFacilities(){
+  const host=$('#facilitiesBoosters'),t=selected();
+  if(!host||!universe||!t)return;
+  facilities.state(t);
+  host.innerHTML=cardHTML(t);bind(host,t);
+ }
+ const renderProgramBeforeFacilities=TAB_RENDERERS.program;
+ TAB_RENDERERS.program=()=>{renderProgramBeforeFacilities();renderFacilities()};
+ globalThis.DynastyFacilityNews=t=>t&&isMine(t)?facilities.newsItems(t):[];
+}
+
 // Situational playbook (v0.15.1). How your staff call fourth downs, conversions and the late clock in the
 // games you do not coach live, and what they recommend when you do. The rules live in Game Engine 2
 // (playbookFourthDown, playbookTwoPoint, playbookClock) so a simulated game and a live one decide the same
@@ -14184,6 +14958,7 @@ else{
    opponent:{id:opp.id,name:opp.name,record:`${opp.w}-${opp.l}`,rank:rankText(opp),conference:opp.conference,offense:grade(O.offense),defense:grade(O.defense)},
    venue:[homeTeam.city,homeTeam.state].filter(Boolean).join(', '),stakes,
    homeEdge:isHome?`Home field +${homeFieldFor(u).toFixed(1)} pts`:`Road game · ${opp.name} receives home field`,
+   forecast:v2ConditionsLine(v2ForecastFor(g))?.headline||'',
    userOut:(u.roster||[]).filter(p=>!gameAvailable(p)).length,opponentOut:(opp.roster||[]).filter(p=>!gameAvailable(p)).length,
    opponentPassMix:passMix,activePlan:tier?.label||'Standard',recommendedPlan:recommended?.label||tier?.label||'Standard',recommendation:rec?.reason||'Current staff recommendation.',lastShowcase:last
   };
@@ -14313,6 +15088,16 @@ else{
 let v2GameLabPreview=null;
 function v2GameLabKey(g){return g?`${universe.year}:${g.week||universe.week+1}:${g.home}:${g.away}`:''}
 function v2LabClone(value){return JSON.parse(JSON.stringify(value))}
+// The forecast for a scheduled game: a pure function of the home program and the calendar, so it matches the
+// weather the game is later played in and never draws from the gameplay random stream.
+function v2ForecastFor(g){
+  const api=globalThis.DynastyGameConditions,home=g?T(g.home):null;
+  return api&&home?api.forGame({home,year:universe.year,week:g.week??universe.week+1}):null;
+}
+function v2ConditionsLine(conditions){
+  const api=globalThis.DynastyGameConditions;
+  return api&&conditions?api.describe(conditions):null;
+}
 function v2RosterStatChecksum(team){let n=0;for(const p of team?.roster||[])for(const v of Object.values(p.stats||{}))if(Number.isFinite(Number(v)))n+=Number(v);return n}
 function v2LabIntegrity(g,home,away){return JSON.stringify({
   week:universe.week,phase:universe.phase,gameCounter:universe.gameCounter,
@@ -14326,7 +15111,7 @@ function v2WeightedRefs(items){return(items||[]).filter(x=>x?.p).map(x=>({player
 function v2AttributionContext(team){
   const qb=roleStarter(team,'QB1')||starter(team,'QB'),k=roleStarter(team,'K1')||starter(team,'K'),pu=roleStarter(team,'P1')||starter(team,'P');
   const ol=[...new Map(['LT','LG','C1','RG','RT'].map(id=>roleStarter(team,id)).filter(Boolean).map(p=>[p.id,p])).values()];
-  return{teamName:team.name,qb:v2PlayerRef(qb),rushers:v2WeightedRefs(rushingShares(team)),receivers:v2WeightedRefs(receivingShares(team)),defenders:v2WeightedRefs(defensiveShares(team)),offensiveLine:ol.map(p=>({player:v2PlayerRef(p),weight:1})),kicker:v2PlayerRef(k),punter:v2PlayerRef(pu)}
+  return{teamName:team.name,qb:v2PlayerRef(qb),rushers:v2WeightedRefs(rushingShares(team)),receivers:v2WeightedRefs(receivingShares(team)),defenders:v2WeightedRefs(defensiveShares(team)),offensiveLine:ol.map(p=>({player:v2PlayerRef(p),weight:1})),kicker:v2PlayerRef(k),punter:v2PlayerRef(pu),kickReturner:v2PlayerRef(roleStarter(team,'KR')),puntReturner:v2PlayerRef(roleStarter(team,'PR'))}
 }
 function v2StarterIds(team){
   const roles=['QB1','RB1','X','Z','SLOT','TE1','LT','LG','C1','RG','RT','RUSH','SETEDGE','NT','3TECH','MIKE','WILL','NICKEL','BCB','FCB','FS','BOXS'];
@@ -14351,7 +15136,8 @@ function runV2GameLabShadow(){
     gameId:`v0101-shadow-${key}`,
     seed:`v0101-shadow-${key}`,
     home,away,homeProfile,awayProfile,
-    homeFieldRating:homeFieldFor(home)
+    homeFieldRating:homeFieldFor(home),
+    year:universe.year,week:g.week??universe.week+1
   });
   const attribution=actors.attributeGame(preview.state,{home:v2AttributionContext(hc),away:v2AttributionContext(ac)});
   actors.attachEventSummary(attribution,preview.summary);preview.attribution=attribution;
@@ -14457,10 +15243,10 @@ function v2RecordDriveArchive(preview){
   for(const e of events){
     if(e.type==='kickoff'&&valid(e.receiver)){finish();start(e.receiver);continue}
     if(e.type==='overtime_possession'&&valid(e.possession)){finish();start(e.possession,true);continue}
-    if(e.type==='possession_change'&&valid(e.to)){if(drive&&drive.side!==e.to)finish();if(!drive)start(e.to);continue}
+    if(e.type==='possession_change'&&valid(e.to)){if(drive&&drive.side!==e.to){if(e.reason==='turnover_on_downs'&&!drive.result)drive.result='DOWNS';finish()}if(!drive)start(e.to);continue}
     const side=valid(e.team)?e.team:null;if(side&&(!drive||drive.side!==side)){finish();start(side,(e.state?.period||0)>4)}if(!drive)continue;
     if(['scrimmage','interception','fumble'].includes(e.type)){drive.plays++;drive.playByPlay.push(v2RecordArchiveText(e,names));if(e.type==='interception')drive.result='INT';if(e.type==='fumble')drive.result='FUMBLE'}
-    else if(e.type==='coaching_decision'){drive.playByPlay.push(v2RecordArchiveText(e,names))}
+    else if(e.type==='coaching_decision'||e.type==='penalty'){drive.playByPlay.push(v2RecordArchiveText(e,names))}
     else if(e.type==='touchdown'){drive.points+=6;drive.result='TD';drive.playByPlay.push(v2RecordArchiveText(e,names))}
     else if(e.type==='extra_point'){if(e.made!==false)drive.points++;drive.playByPlay.push(v2RecordArchiveText(e,names))}
     else if(e.type==='two_point'){if(e.made)drive.points+=2;drive.playByPlay.push(v2RecordArchiveText(e,names))}
@@ -14492,11 +15278,17 @@ function v2PlayLogProjection(state,attribution){
     if(['scrimmage','interception','fumble'].includes(e.type)){
       row.y=Number(e.yards)||0;
       if(e.kind==='pass')row.k='p';else if(e.kind==='rush')row.k='r';
-      if(e.completed)row.cp=1;if(e.sack)row.sk=1;
+      if(e.completed)row.cp=1;if(e.sack)row.sk=1;if(e.scramble)row.sr=1;if(e.pressure&&!e.sack)row.pr=1;
     }
-    if(e.type==='kickoff'||e.type==='possession_change'||e.type==='overtime_possession'||e.type==='overtime_start'){if(Number.isFinite(st.fieldPosition))row.p=st.fieldPosition;if(e.type==='kickoff')row.tb=1}
+    if(e.type==='kickoff'||e.type==='possession_change'||e.type==='overtime_possession'||e.type==='overtime_start'){if(Number.isFinite(st.fieldPosition))row.p=st.fieldPosition;if(e.type==='kickoff'){if(e.touchback!==false)row.tb=1;if(e.ret>0)row.rt=e.ret;if(e.td)row.td=1}}
+    if(e.type==='penalty'){
+      // The spot, down and distance are where play resumes; sd is the offense, pa the side that was flagged.
+      if(Number.isFinite(st.fieldPosition))row.p=st.fieldPosition;if(st.down)row.dn=st.down;if(st.distance)row.ds=st.distance;
+      row.y=Number(e.yards)||0;row.pk=e.kind;row.pl=e.label;row.pa=e.against==='home'?'h':'a';if(e.autoFirst)row.af=1;if(e.deadBall)row.db=1;
+    }
+    if(e.type==='touchdown'&&e.kind==='return')row.rk=1;
     if(e.type==='possession_change'&&e.reason)row.r=e.reason;
-    if(e.type==='punt'){row.n=Number(e.net)||0;if(e.touchback)row.tb=1}
+    if(e.type==='punt'){row.n=Number(e.net)||0;if(e.touchback)row.tb=1;if(e.ret>0)row.rt=e.ret;if(e.fairCatch)row.fc=1;if(e.td)row.td=1}
     if(e.type==='field_goal'){row.fd=Number(e.distance)||0;if(e.made)row.m=1}
     if((e.type==='extra_point'||e.type==='two_point')&&e.made!==false)row.m=1;
     if(V2_PLAY_LOG_SCORING.has(e.type)&&st.score)row.sc=[st.score.home,st.score.away];
@@ -14517,7 +15309,7 @@ function v2StorePlayLog(gameId,state,attribution){
 function v2RecordPrepared(g,home,away,homeProfile,awayProfile){
   const api=globalThis.DynastyGameEngineV2Lab,actors=globalThis.DynastyGameEngineV2Attribution,tx=globalThis.DynastyGameEngineV2Transaction;
   if(!api||!actors||!tx)throw new Error('Game Engine 2 development modules are unavailable.');
-  const key=v2GameLabKey(g),preview=api.simulate({gameId:`v0101-${key}`,seed:`v0101-${key}`,home,away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(home)});
+  const key=v2GameLabKey(g),preview=api.simulate({gameId:`v0101-${key}`,seed:`v0101-${key}`,home,away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(home),year:universe.year,week:g.week??universe.week+1});
   const attribution=actors.attributeGame(preview.state,{home:v2AttributionContext(home),away:v2AttributionContext(away)});actors.attachEventSummary(attribution,preview.summary);preview.attribution=attribution;
   const candidate=tx.buildCandidate({state:preview.state,attribution,homeTeam:home,awayTeam:away,starterIds:{home:v2StarterIds(home),away:v2StarterIds(away)},meta:{season:universe.year,week:g.week??universe.week+1,phase:universe.phase,label:'Regular season',venue:`${home.name} · ${home.city||''}`},conference:g.conf??home.conference===away.conference,homeOpponentOverall:awayProfile.overall,awayOpponentOverall:homeProfile.overall});
   return{api,tx,key,preview,candidate}
@@ -14551,7 +15343,7 @@ function recordV2GameLabResult(options={}){
     postGameCondition(home);postGameCondition(away);const drives=v2RecordDriveArchive(preview),log=(preview.state.events||[]).slice(-160).map(e=>prepared.api.eventText(e,preview.names));
     const result=finishGame(before,home,away,{home:home.name,away:away.name,hp:candidate.hp,ap:candidate.ap,winner:win.name,box:candidate.box,detailed:true,drives,log,engine:'v2',transactionVersion:prepared.tx.VERSION});
     const record=(universe.gameArchive||[]).find(x=>x.id===result.gameId);if(!record)throw new Error('Recorded v2 game was not found in the permanent archive.');
-    record.engine='v2';record.transactionVersion=prepared.tx.VERSION;record.eventCount=candidate.eventCount;record.seed=candidate.seed;
+    record.engine='v2';record.transactionVersion=prepared.tx.VERSION;record.eventCount=candidate.eventCount;record.seed=candidate.seed;record.conditions=preview.state.rules?.conditions||null;
     for(const side of ['home','away']){const drivePoints=drives.filter(d=>d.side===side).reduce((n,d)=>n+(Number(d.points)||0),0);record.scoreAdjustment[side]=record.score[side]-drivePoints}
     v2StorePlayLog(record.id,preview.state,preview.attribution);
     if(options.testFault==='afterArchive')throw new Error('Injected v2 rollback fault after archive write.');
@@ -14665,7 +15457,7 @@ function v2PostseasonRecordMatch(home,away,options={}){
   const stub={week,label,conf:conference,played:false,home:home.name,away:away.name},rollback=v2RecordCapture(stub,home,away);
   try{
     const before=beginGame(home,away,neutral,{week,label}),homeProfile=gameProfiles(home,away.name),awayProfile=gameProfiles(away,home.name);
-    const key=`${universe.year}:${week}:${label}:${home.name}:${away.name}`,preview=api.simulate({gameId:`v0102-post-${key}`,seed:`v0102-post-${key}`,home,away,homeProfile,awayProfile,homeFieldRating:neutral?0:homeFieldFor(home)});
+    const key=`${universe.year}:${week}:${label}:${home.name}:${away.name}`,preview=api.simulate({gameId:`v0102-post-${key}`,seed:`v0102-post-${key}`,home,away,homeProfile,awayProfile,homeFieldRating:neutral?0:homeFieldFor(home),year:universe.year,week,neutral});
     const attribution=actors.attributeGame(preview.state,{home:v2AttributionContext(home),away:v2AttributionContext(away)});actors.attachEventSummary(attribution,preview.summary);preview.attribution=attribution;
     const candidate=tx.buildCandidate({state:preview.state,attribution,homeTeam:home,awayTeam:away,starterIds:{home:v2StarterIds(home),away:v2StarterIds(away)},meta:{season:universe.year,week,phase:universe.phase,label,venue:neutral?'Neutral site':`${home.name} · ${home.city||''}`},conference,homeOpponentOverall:awayProfile.overall,awayOpponentOverall:homeProfile.overall});
     preview.transactionProof=tx.dryRunTransaction({candidate,homeTeam:home,awayTeam:away,homeGameplan:gameplanSnapshot(home,away.name),awayGameplan:gameplanSnapshot(away,home.name)});
@@ -14677,7 +15469,7 @@ function v2PostseasonRecordMatch(home,away,options={}){
     const drives=v2RecordDriveArchive(preview),log=(preview.state.events||[]).slice(-160).map(e=>api.eventText(e,preview.names));
     const result=finishGame(before,home,away,{home:home.name,away:away.name,hp:candidate.hp,ap:candidate.ap,winner:win.name,box:candidate.box,detailed:true,drives,log,engine:'v2',transactionVersion:tx.VERSION});
     const record=(universe.gameArchive||[]).find(x=>x.id===result.gameId);if(!record)throw new Error('Postseason v2 game was not found in the permanent archive.');
-    record.engine='v2';record.transactionVersion=tx.VERSION;record.eventCount=candidate.eventCount;record.seed=candidate.seed;
+    record.engine='v2';record.transactionVersion=tx.VERSION;record.eventCount=candidate.eventCount;record.seed=candidate.seed;record.conditions=preview.state.rules?.conditions||null;
     for(const side of ['home','away']){const drivePoints=drives.filter(d=>d.side===side).reduce((n,d)=>n+(Number(d.points)||0),0);record.scoreAdjustment[side]=record.score[side]-drivePoints}
     v2StorePlayLog(record.id,preview.state,attribution);
     if(options.testFault==='afterArchive')throw new Error('Injected postseason v2 rollback fault after archive write.');
@@ -14886,7 +15678,7 @@ function recordInteractiveV2GameDay(session,options={}){
     const preview={state:session.state,names:session.names},drives=v2RecordDriveArchive(preview),log=(session.state.events||[]).slice(-160).map(e=>globalThis.DynastyGameEngineV2Lab.eventText(e,session.names));
     const result=finishGame(before,home,away,{home:home.name,away:away.name,hp:candidate.hp,ap:candidate.ap,winner:win.name,box:candidate.box,detailed:true,drives,log,engine:'v2',transactionVersion:tx.VERSION});
     const record=(universe.gameArchive||[]).find(x=>x.id===result.gameId);if(!record)throw new Error('Interactive Game Day archive record was not created.');
-    record.engine='v2';record.transactionVersion=tx.VERSION;record.eventCount=candidate.eventCount;record.seed=candidate.seed;record.gameDayVersion=gameday.VERSION;record.coachingDecisionVersion=globalThis.DynastyGameEngineV2Decisions?.VERSION||1;record.coachingDecisions=v2GameDayDecisionReceipts(session.state);
+    record.engine='v2';record.transactionVersion=tx.VERSION;record.eventCount=candidate.eventCount;record.seed=candidate.seed;record.gameDayVersion=gameday.VERSION;record.conditions=session.state.rules?.conditions||null;record.coachingDecisionVersion=globalThis.DynastyGameEngineV2Decisions?.VERSION||1;record.coachingDecisions=v2GameDayDecisionReceipts(session.state);
     for(const side of ['home','away']){const drivePoints=drives.filter(d=>d.side===side).reduce((n,d)=>n+(Number(d.points)||0),0);record.scoreAdjustment[side]=record.score[side]-drivePoints}
     v2StorePlayLog(record.id,session.state,attribution);
     if(options.testFault==='afterArchive')throw new Error('Injected Interactive Game Day rollback fault after archive write.');
@@ -14917,12 +15709,12 @@ function v2GameDayUILiveContext(){
 }
 function v2GameDayUIDigest(ctx=v2GameDayUILiveContext()){return ctx?v2LabIntegrity(ctx.g,ctx.home,ctx.away):null}
 function v2GameDayUIAssertUnchanged(before,ctx){const after=v2GameDayUIDigest(ctx);if(before!==after)throw new Error('Game Day preview mutated live dynasty state.')}
-function v2GameDayUIPrepare(playbook){
+function v2GameDayUIPrepare(playbook,rules){
   const ctx=v2GameDayUILiveContext(),api=globalThis.DynastyGameEngineV2GameDay;if(!ctx||!api)throw new Error('No upcoming game is available for Game Day.');
   const before=v2GameDayUIDigest(ctx),hc=v2LabClone(ctx.home),ac=v2LabClone(ctx.away);
   applyGameplanWear(hc,ac.name);applyGameplanWear(ac,hc.name);
   const homeProfile=gameProfiles(hc,ac.name),awayProfile=gameProfiles(ac,hc.name);
-  const session=api.createSession({gameId:`v0101-gameday-${ctx.key}`,seed:`v0101-gameday-${ctx.key}`,home:ctx.home,away:ctx.away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(ctx.home),playbook});
+  const session=api.createSession({gameId:`v0101-gameday-${ctx.key}`,seed:`v0101-gameday-${ctx.key}`,home:ctx.home,away:ctx.away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(ctx.home),playbook,year:universe.year,week:ctx.g.week??universe.week+1,rules});
   api.advanceOne(session);v2GameDayUIAssertUnchanged(before,ctx);
   v2InteractiveGameDay={key:ctx.key,session,integrity:before,actions:[]};v2GameDayUIPersist();renderV2InteractiveGameDay();return session
 }
@@ -14932,14 +15724,14 @@ function v2GameDayUIPersist(){
   if(!universe)return;
   if(!v2InteractiveGameDay){if(universe.liveGameDay){delete universe.liveGameDay;autosaveAfter('game')}return}
   const {key,session,actions}=v2InteractiveGameDay;
-  universe.liveGameDay={version:1,key,playbook:session.state.playbook??null,actions:actions.slice()};
+  universe.liveGameDay={version:1,key,playbook:session.state.playbook??null,rules:session.state.rules??null,actions:actions.slice()};
   autosaveAfter('game')
 }
 function v2GameDayUIApply(api,session,action){if(action==='next')return api.advanceOne(session);if(action==='decision')return api.advance(session);if(action==='delegate')return api.simulate(session,()=> 'delegate');if(typeof action==='string'&&action.startsWith('choice:'))return api.resolve(session,action.slice(7));throw new Error(`Unknown Game Day action ${action}`)}
 function v2GameDayUIRestore(){
   if(v2InteractiveGameDay||!universe?.liveGameDay)return false;const saved=universe.liveGameDay,ctx=v2GameDayUILiveContext();
   if(!ctx||saved.key!==ctx.key||!Array.isArray(saved.actions)){delete universe.liveGameDay;return false}
-  try{const session=v2GameDayUIPrepare(saved.playbook),api=globalThis.DynastyGameEngineV2GameDay;for(const a of saved.actions){v2GameDayUIApply(api,session,a);v2InteractiveGameDay.actions.push(a)}v2InteractiveGameDay.integrity=v2GameDayUIDigest(ctx);universe.liveGameDay.actions=v2InteractiveGameDay.actions.slice();return true}
+  try{const session=v2GameDayUIPrepare(saved.playbook,saved.rules&&typeof saved.rules==='object'?saved.rules:false),api=globalThis.DynastyGameEngineV2GameDay;for(const a of saved.actions){v2GameDayUIApply(api,session,a);v2InteractiveGameDay.actions.push(a)}v2InteractiveGameDay.integrity=v2GameDayUIDigest(ctx);universe.liveGameDay.actions=v2InteractiveGameDay.actions.slice();return true}
   catch(err){console.error(err);v2InteractiveGameDay=null;delete universe.liveGameDay;setStatus('The saved live game could not be rebuilt, so it was set aside.');return false}
 }
 // Finish a live game with the staff and record it. Used before anything else would play this week.
@@ -14966,6 +15758,11 @@ function v2GameDayUIEventText(event,names){
     return`COACH DECISION · ${chosen}`
   }
   return globalThis.DynastyGameEngineV2Lab?.eventText(event,names)||String(event?.type||'event').replaceAll('_',' ')
+}
+// The stadium and weather this game is being played in, with what they mean for the game.
+function v2GameDayUIConditions(session){
+  const d=v2ConditionsLine(session.state.rules?.conditions);if(!d)return'';
+  return`<div class="v2-gameday-conditions" data-severity="${d.severity}"><strong>${gameEscape(d.headline)}</strong>${d.notes.length?`<span>${gameEscape(d.notes.join(' · '))}</span>`:''}</div>`
 }
 function v2GameDayUIScoreboard(session){
   const s=session.state,lab=globalThis.DynastyGameEngineV2Lab,context=s.status==='final'?'Final':`${lab?.clockLabel(s)||''}${lab?.downLabel(s)?` · ${lab.downLabel(s)}`:''}`;
@@ -14997,7 +15794,7 @@ function renderV2InteractiveGameDay(){
     host.querySelector('[data-v2-gameday-start]').onclick=()=>{try{v2GameDayUIPrepare()}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}};return
   }
   const session=v2InteractiveGameDay.session,d=api.pendingDecision(session),final=session.state.status==='final';
-  host.innerHTML=`<div class="v2-gameday-head"><div><div class="eyebrow">LIVE GAME DAY${final?' · FINAL':''}</div><h3>${gameEscape(session.names.away)} at ${gameEscape(session.names.home)}</h3></div></div>${v2GameDayUIScoreboard(session)}${v2GameDayUIMomentum(session)}${v2GameDayUIDecision(session)}<div class="v2-gameday-controls button-row">${!final&&!d?'<button type="button" data-v2-gameday-next>Next Play</button><button type="button" data-v2-gameday-decision>Advance to Next Decision</button>':''}${!final?'<button type="button" data-v2-gameday-delegate>Delegate Rest</button>':''}${final?'<button type="button" data-v2-gameday-record class="recommended">Record Final</button>':''}</div><div class="v2-gameday-feed"><div class="v2-gameday-feed-head"><strong>Game feed</strong><span class="muted">Newest first</span></div>${v2GameDayUIFeed(session)}</div><div class="v2-shadow-safety"><strong>${final?'Final whistle.':'Live game.'}</strong> ${final?'Record the final to keep this result.':'Saved as you play. Advancing the week lets your staff finish this game.'}</div>`;
+  host.innerHTML=`<div class="v2-gameday-head"><div><div class="eyebrow">LIVE GAME DAY${final?' · FINAL':''}</div><h3>${gameEscape(session.names.away)} at ${gameEscape(session.names.home)}</h3></div></div>${v2GameDayUIScoreboard(session)}${v2GameDayUIConditions(session)}${v2GameDayUIMomentum(session)}${v2GameDayUIDecision(session)}<div class="v2-gameday-controls button-row">${!final&&!d?'<button type="button" data-v2-gameday-next>Next Play</button><button type="button" data-v2-gameday-decision>Advance to Next Decision</button>':''}${!final?'<button type="button" data-v2-gameday-delegate>Delegate Rest</button>':''}${final?'<button type="button" data-v2-gameday-record class="recommended">Record Final</button>':''}</div><div class="v2-gameday-feed"><div class="v2-gameday-feed-head"><strong>Game feed</strong><span class="muted">Newest first</span></div>${v2GameDayUIFeed(session)}</div><div class="v2-shadow-safety"><strong>${final?'Final whistle.':'Live game.'}</strong> ${final?'Record the final to keep this result.':'Saved as you play. Advancing the week lets your staff finish this game.'}</div>`;
   host.querySelector('[data-v2-gameday-next]')?.addEventListener('click',()=>{try{v2GameDayUIRun('next')}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}});
   host.querySelector('[data-v2-gameday-decision]')?.addEventListener('click',()=>{try{v2GameDayUIRun('decision')}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}});
   host.querySelector('[data-v2-gameday-delegate]')?.addEventListener('click',()=>{try{v2GameDayUIRun('delegate')}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}});
@@ -15032,11 +15829,11 @@ if(globalThis.__DL_TEST__){
 // v0.10.1 Interactive Game Day pregame bridge.
 // Replaces only the staged preparation step so preview kickoff profiles mirror the
 // permanent record path: recoverWeek() on cloned rosters, then beginGame() preparation wear.
-v2GameDayUIPrepare=function v2GameDayUIPrepareWithRecovery(playbook){
+v2GameDayUIPrepare=function v2GameDayUIPrepareWithRecovery(playbook,rules){
   const ctx=v2GameDayUILiveContext(),api=globalThis.DynastyGameEngineV2GameDay;if(!ctx||!api)throw new Error('No upcoming game is available for Interactive Game Day.');
   const before=v2GameDayUIDigest(ctx),prepared=v2GameDayPreparedTeams(ctx.home,ctx.away),hc=prepared.home,ac=prepared.away;
   const homeProfile=gameProfiles(hc,ac.name),awayProfile=gameProfiles(ac,hc.name),me=selected();
-  const session=api.createSession({gameId:`v0101-gameday-${ctx.key}`,seed:`v0101-gameday-${ctx.key}`,home:ctx.home,away:ctx.away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(ctx.home),controlledTeamId:me?.id??null,playbook});
+  const session=api.createSession({gameId:`v0101-gameday-${ctx.key}`,seed:`v0101-gameday-${ctx.key}`,home:ctx.home,away:ctx.away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(ctx.home),controlledTeamId:me?.id??null,playbook,year:universe.year,week:ctx.g.week??universe.week+1,rules});
   api.advanceOne(session);v2GameDayUIAssertUnchanged(before,ctx);
   v2InteractiveGameDay={key:ctx.key,session,integrity:before,actions:[]};v2GameDayUIPersist();renderV2InteractiveGameDay();return session
 };
@@ -15083,8 +15880,8 @@ function renderV2MatchupIntelligence(){
   const host=ensureV2MatchupHost();if(!host)return;const receipt=ensureV2PlanReceiptHost(host),team=selected(),g=findUserGame();if(receipt)receipt.innerHTML=v2MatchupReceiptHTML();
   if(!team||!g){host.hidden=true;return}
   const opp=T(g.home===team.name?g.away:g.home);if(!opp){host.hidden=true;return}host.hidden=false;
-  const m=gameMatchup(team,opp),P=m.teamProfile,O=m.opponentProfile,e=m.teamEdges,oe=m.opponentEdges,isHome=g.home===team.name,passMix=Math.round((OFF_SCHEMES[opp.offScheme]?.pass??.5)*100),homeText=isHome?`Home field +${homeFieldFor(team).toFixed(1)} pts`:`Road game · ${opp.name} receives home field`;
-  host.innerHTML=`<div class="v2-matchup-head"><div><div class="eyebrow">GAME DAY INTELLIGENCE</div><h3>Matchup breakdown</h3><div class="muted">Week ${g.week??universe.week+1} · ${gameEscape(v2MatchupStakes(team,opp))} · ${gameEscape(homeText)}</div></div></div><div class="v2-matchup-grid"><section><div class="v2-matchup-section-head"><strong>Where the game tilts</strong><span>Current kickoff profiles</span></div>${v2MatchupEdgeRow('Your passing game vs coverage',e.passGame)}${v2MatchupEdgeRow('Your run game vs front',e.runGame)}${v2MatchupEdgeRow('Your protection vs rush',e.passProtection)}${v2MatchupEdgeRow('Their passing game vs coverage',oe.passGame)}${v2MatchupEdgeRow('Their run game vs front',oe.runGame)}${v2MatchupEdgeRow('Their protection vs rush',oe.passProtection)}</section><section><div class="v2-matchup-section-head"><strong>Opponent identity</strong><span>${passMix}% pass tendency</span></div><div class="v2-matchup-tendency"><b>${passMix>=55?'Pass leaning':passMix<=45?'Run leaning':'Balanced'}</b><span>${passMix}% pass · ${100-passMix}% run</span></div><div class="v2-matchup-section-head minor"><strong>Availability</strong></div><div class="v2-matchup-availability"><span>You</span>${v2MatchupAvailability(team)}</div><div class="v2-matchup-availability"><span>Them</span>${v2MatchupAvailability(opp)}</div></section></div><div class="v2-matchup-grid players"><section><div class="v2-matchup-section-head"><strong>Your key players</strong></div>${v2MatchupPlayerHTML(team)}</section><section><div class="v2-matchup-section-head"><strong>Players to know</strong></div>${v2MatchupPlayerHTML(opp)}</section></div>${v2MatchupPlanHTML(team,opp,m)}<div class="small muted v2-matchup-note">Based on current health, fatigue, scheme and game plan.</div>`;
+  const m=gameMatchup(team,opp),P=m.teamProfile,O=m.opponentProfile,e=m.teamEdges,oe=m.opponentEdges,isHome=g.home===team.name,passMix=Math.round((OFF_SCHEMES[opp.offScheme]?.pass??.5)*100),homeText=isHome?`Home field +${homeFieldFor(team).toFixed(1)} pts`:`Road game · ${opp.name} receives home field`,forecast=v2ConditionsLine(v2ForecastFor(g));
+  host.innerHTML=`<div class="v2-matchup-head"><div><div class="eyebrow">GAME DAY INTELLIGENCE</div><h3>Matchup breakdown</h3><div class="muted">Week ${g.week??universe.week+1} · ${gameEscape(v2MatchupStakes(team,opp))} · ${gameEscape(homeText)}${forecast?` · <span class="v2-forecast" data-severity="${forecast.severity}">${gameEscape(forecast.headline)}</span>`:''}</div>${forecast?.notes?.length?`<div class="small muted v2-forecast-note">${gameEscape(forecast.notes.join(' · '))}</div>`:''}</div></div><div class="v2-matchup-grid"><section><div class="v2-matchup-section-head"><strong>Where the game tilts</strong><span>Current kickoff profiles</span></div>${v2MatchupEdgeRow('Your passing game vs coverage',e.passGame)}${v2MatchupEdgeRow('Your run game vs front',e.runGame)}${v2MatchupEdgeRow('Your protection vs rush',e.passProtection)}${v2MatchupEdgeRow('Their passing game vs coverage',oe.passGame)}${v2MatchupEdgeRow('Their run game vs front',oe.runGame)}${v2MatchupEdgeRow('Their protection vs rush',oe.passProtection)}</section><section><div class="v2-matchup-section-head"><strong>Opponent identity</strong><span>${passMix}% pass tendency</span></div><div class="v2-matchup-tendency"><b>${passMix>=55?'Pass leaning':passMix<=45?'Run leaning':'Balanced'}</b><span>${passMix}% pass · ${100-passMix}% run</span></div><div class="v2-matchup-section-head minor"><strong>Availability</strong></div><div class="v2-matchup-availability"><span>You</span>${v2MatchupAvailability(team)}</div><div class="v2-matchup-availability"><span>Them</span>${v2MatchupAvailability(opp)}</div></section></div><div class="v2-matchup-grid players"><section><div class="v2-matchup-section-head"><strong>Your key players</strong></div>${v2MatchupPlayerHTML(team)}</section><section><div class="v2-matchup-section-head"><strong>Players to know</strong></div>${v2MatchupPlayerHTML(opp)}</section></div>${v2MatchupPlanHTML(team,opp,m)}<div class="small muted v2-matchup-note">Based on current health, fatigue, scheme and game plan.</div>`;
   host.querySelector('[data-v2-open-coachs-desk]')?.addEventListener('click',()=>{document.querySelector('.tab-groups button[data-group="home"]')?.click();document.querySelector('.tabs button[data-tab="dashboard"]')?.click();document.querySelector('#weeklyDecisions')?.scrollIntoView({behavior:'smooth',block:'center'})})
 }
 extendRender('gamelab',renderV2MatchupIntelligence);
@@ -15094,7 +15891,7 @@ if(globalThis.__DL_TEST__)globalThis.__DL_TEST__.v2MatchupSummary=()=>{const h=d
 function v2GameDaySoakSession(g,me){
   const api=globalThis.DynastyGameEngineV2GameDay,home=T(g.home),away=T(g.away);if(!api||!home||!away)throw new Error('Interactive Game Day soak could not resolve matchup modules.');
   const integrity=v2LabIntegrity(g,home,away),prepared=v2GameDayPreparedTeams(home,away),homeProfile=gameProfiles(prepared.home,prepared.away.name),awayProfile=gameProfiles(prepared.away,prepared.home.name),key=v2GameLabKey(g);
-  const session=api.createSession({gameId:`v0101-gameday-${key}`,seed:`v0101-gameday-${key}`,home,away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(home),controlledTeamId:me.id});
+  const session=api.createSession({gameId:`v0101-gameday-${key}`,seed:`v0101-gameday-${key}`,home,away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(home),controlledTeamId:me.id,year:universe.year,week:g.week??universe.week+1});
   api.simulate(session,()=> 'delegate');return{session,integrity,home,away}
 }
 function v2InteractiveSeasonSoakProbe(){
@@ -16168,7 +16965,15 @@ function timeline(rows,meta={}){
   if(['scrimmage','interception','fumble','punt','field_goal'].includes(r.t)&&side&&(!drive||drive.side!==side))openDrive(side,r.p??spot,s.i);
   switch(r.t){
    case 'kickoff':
-    poss=side;spot=r.p??25;openDrive(side,spot,s.i);s.kind='cut';s.label='Touchback';s.text=`Kickoff through the end zone. ${team(side)} start at their own ${spot}.`;break;
+    poss=side;spot=r.p??25;openDrive(side,spot,s.i);s.kind='cut';
+    if(r.td){s.label='Kick return TD';s.text=`${nm(a.rt)||team(side)} takes the kickoff all the way back for a touchdown!`;s.big=true}
+    else if(r.rt>0){s.label='Kick return';s.text=`${nm(a.rt)||team(side)} returns the kickoff ${r.rt} yards to ${spotText(spot).toLowerCase()}.`}
+    else{s.label='Touchback';s.text=`Kickoff through the end zone. ${team(side)} start at their own ${spot}.`}
+    break;
+   case 'penalty':{
+    const against=sideKey(r.pa),y=Number(r.y)||0;poss=side||poss;spot=r.p??spot;s.kind='cut';s.label='Flag';s.key=true;
+    s.text=`Flag: ${r.pl||'penalty'} on ${nm(a.pn)||team(against)}, ${y} yard${y===1?'':'s'}${r.af?', automatic first down':''}. ${r.dn?`${ORD[r.dn]||r.dn} & ${r.ds||10}`:''}`.trim();
+    s.banner={text:'FLAG',side:against?other(against):side};break}
    case 'possession_change':
     {const ended=drive;poss=side;spot=r.p??spot;if(side&&(!drive||drive.side!==side))openDrive(side,spot,s.i);s.kind='cut';
     if(r.r==='turnover_on_downs'){s.text=`Turnover on downs. ${team(side)} take over at the ${spotText(spot).toLowerCase()}.`;s.key=true;s.banner={text:'TURNOVER ON DOWNS',side};if(ended&&ended!==drive)ended.result='DOWNS'}
@@ -16182,12 +16987,13 @@ function timeline(rows,meta={}){
     s.kind=r.t==='interception'?'int':r.t==='fumble'?'fumble':r.sk?'sack':r.k==='p'?(r.cp?'pass':'inc'):'run';
     Object.assign(s,{los:p,y,end,down:r.dn||1,toGo:r.ds||10,actors:a,k:r.k||null,sk:!!r.sk});
     const qb=nm(a.qb)||'The quarterback',tg=nm(a.tg),ca=nm(a.ca),tk=nm(a.tk);
-    if(s.kind==='run')s.text=`${ca||team(side)} ${a.ca&&a.ca===a.qb?'keeps':'runs'} ${yardsText(y)}${tk?`; tackle by ${tk}`:''}.`;
+    if(s.kind==='run')s.text=`${ca||team(side)} ${r.sr?'scrambles':a.ca&&a.ca===a.qb?'keeps':'runs'} ${yardsText(y)}${tk?`; tackle by ${tk}`:''}.`;
     else if(s.kind==='pass')s.text=`${qb} to ${tg||'a receiver'} ${yardsText(y)}${tk?`; tackle by ${tk}`:''}.`;
     else if(s.kind==='inc')s.text=`${qb} incomplete${tg?` for ${tg}`:''}${a.dr?' (dropped)':a.pb?`; broken up by ${nm(a.pb)||'the defense'}`:''}.`;
     else if(s.kind==='sack')s.text=`${nm(a.sb)||team(other(side))} sacks ${qb} ${yardsText(y)}.`;
     else if(s.kind==='int')s.text=`INTERCEPTED. ${nm(a.ib)||team(other(side))} picks off ${qb}${tg?` targeting ${tg}`:''}.`;
     else s.text=`FUMBLE. ${ca||qb} loses it; ${nm(a.ff)||team(other(side))} forces it and ${team(other(side))} recover.`;
+    if(a.pr&&(r.pr||r.sr))s.text+=` Pressure from ${nm(a.pr)}.`;
     if(drive){drive.plays++;drive.yards+=s.kind==='int'?0:y;drive.snaps.push(s.i)}
     const turnover=s.kind==='int'||s.kind==='fumble';
     if(turnover){s.big=true;s.banner={text:s.kind==='int'?'INTERCEPTION':'FUMBLE',side:other(side)};if(drive)drive.result=s.kind==='int'?'INT':'FUMBLE'}
@@ -16197,13 +17003,13 @@ function timeline(rows,meta={}){
     spot=end;lastSnap=s.i;break}
    case 'punt':{
     const p=r.p??spot,n=Number(r.n)||40;Object.assign(s,{kind:'punt',los:p,net:n,tb:!!r.tb,down:r.dn||4,toGo:r.ds||10,actors:a});
-    s.text=`${nm(a.pt)||team(side)} punts ${n} yards${r.tb?' into the end zone for a touchback':''}.`;if(drive){drive.result='PUNT';drive.snaps.push(s.i)}lastSnap=s.i;break}
+    s.text=`${nm(a.pt)||team(side)} punts ${n} yards${r.tb?' into the end zone for a touchback':''}.${r.td?` ${nm(a.rt)||team(other(side))} returns it for a touchdown!`:r.rt>0?` ${nm(a.rt)||team(other(side))} returns it ${r.rt}.`:r.fc?' Fair catch.':''}`;if(drive){drive.result='PUNT';drive.snaps.push(s.i)}lastSnap=s.i;break}
    case 'field_goal':{
     const p=r.p??spot;Object.assign(s,{kind:'fg',los:p,dist:Number(r.fd)||0,made:!!r.m,down:r.dn||4,toGo:r.ds||10,actors:a});
     s.text=`${nm(a.kk)||team(side)} ${s.dist}-yard field goal is ${s.made?'GOOD':'NO GOOD'}.`;
     s.banner={text:s.made?'FIELD GOAL':'NO GOOD',side:s.made?side:other(side)};if(!s.made)s.big=true;
     if(drive){drive.result=s.made?'FG':'MISS';if(s.made)drive.points+=3;drive.snaps.push(s.i)}lastSnap=s.i;break}
-   case 'touchdown':s.kind='score';s.from=lastSnap;s.big=true;s.banner={text:'TOUCHDOWN',side};s.text=`Touchdown, ${team(side)}.`;if(drive){drive.result='TD';drive.points+=6}spot=100;break;
+   case 'touchdown':if(r.rk&&side&&(!drive||drive.side!==side))openDrive(side,spot,s.i);s.kind='score';s.from=r.rk?null:lastSnap;s.big=true;s.banner={text:'TOUCHDOWN',side};s.text=`Touchdown, ${team(side)}.`;if(drive){drive.result='TD';drive.points+=6}spot=100;break;
    case 'extra_point':s.kind='after';s.from=lastSnap;s.text=`Extra point ${r.m?'good':'no good'}.`;if(drive&&r.m)drive.points+=1;break;
    case 'two_point':s.kind='after';s.from=lastSnap;s.text=`Two-point try ${r.m?'good':'fails'}.`;if(drive&&r.m)drive.points+=2;break;
    case 'safety':s.kind='score';s.from=lastSnap;s.big=true;s.banner={text:'SAFETY',side};s.text=`Safety. Two points for ${team(side)}.`;if(drive){drive.result='SAFETY'}break;
@@ -18811,7 +19617,7 @@ function renderGameDay(){
  const next=document.querySelector('#nextGameCard'),d=globalThis.DynastyLabGameDayPresentation?.snapshot?.();let host=document.querySelector('#gamedayEventHero');if(!next)return;if(!host){host=document.createElement('section');host.id='gamedayEventHero';host.className='gameday-event-hero';next.insertAdjacentElement('beforebegin',host)}
  if(!d){host.hidden=true;gameSig='';return}const isHome=!!d.isHome,user=d.user,opp=d.opponent,away=isHome?opp:user,home=isHome?user:opp,last=d.lastShowcase,sig=[d.postgame?'post':'pre',d.week,user?.id,opp?.id,user?.record,opp?.record,d.activePlan,d.recommendedPlan,d.userOut,d.opponentOut,last?.id,last?.userScore,last?.oppScore].join('|'),quickRow=document.querySelector('#detailedBox')?.closest('.two-col');if(last?.id&&quickRow?.querySelector('[data-game]'))host.insertAdjacentElement('afterend',quickRow);if(sig===gameSig&&!host.hidden)return;gameSig=sig;host.hidden=false;host.dataset.stakes=d.stakesTone||'standard';
  const kicker=d.postgame?`<div class="event-kicker"><span>POSTGAME REVIEW · WEEK ${esc(d.week)}</span><strong>${esc(d.stakes)}</strong></div>`:`<div class="event-kicker"><span>GAME DAY · WEEK ${esc(d.week)}</span><strong>${esc(d.stakes)}</strong></div>`;
- const center=`<div class="event-center"><span>${esc(d.venue)}</span><b>${d.postgame?'FINAL':isHome?'VS':'AT'}</b><small>${esc(d.homeEdge)}</small></div>`;
+ const center=`<div class="event-center"><span>${esc(d.venue)}</span><b>${d.postgame?'FINAL':isHome?'VS':'AT'}</b><small>${esc(d.homeEdge)}</small>${d.forecast&&!d.postgame?`<small class="event-forecast">${esc(d.forecast)}</small>`:''}</div>`;
  // The hero is the matchup itself; plan, edges and tendency live once, in the Matchup breakdown.
  const pregame='';
  host.innerHTML=`${kicker}<div class="event-matchup">${teamCard('away',away)}${center}${teamCard('home',home)}</div>${pregame}${recentShowcase(last)}`;

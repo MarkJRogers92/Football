@@ -2,7 +2,7 @@
 function v2GameDaySoakSession(g,me){
   const api=globalThis.DynastyGameEngineV2GameDay,home=T(g.home),away=T(g.away);if(!api||!home||!away)throw new Error('Interactive Game Day soak could not resolve matchup modules.');
   const integrity=v2LabIntegrity(g,home,away),prepared=v2GameDayPreparedTeams(home,away),homeProfile=gameProfiles(prepared.home,prepared.away.name),awayProfile=gameProfiles(prepared.away,prepared.home.name),key=v2GameLabKey(g);
-  const session=api.createSession({gameId:`v0101-gameday-${key}`,seed:`v0101-gameday-${key}`,home,away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(home),controlledTeamId:me.id});
+  const session=api.createSession({gameId:`v0101-gameday-${key}`,seed:`v0101-gameday-${key}`,home,away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(home),controlledTeamId:me.id,year:universe.year,week:g.week??universe.week+1});
   api.simulate(session,()=> 'delegate');return{session,integrity,home,away}
 }
 function v2InteractiveSeasonSoakProbe(){

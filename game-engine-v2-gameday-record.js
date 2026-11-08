@@ -38,7 +38,7 @@ function recordInteractiveV2GameDay(session,options={}){
     const preview={state:session.state,names:session.names},drives=v2RecordDriveArchive(preview),log=(session.state.events||[]).slice(-160).map(e=>globalThis.DynastyGameEngineV2Lab.eventText(e,session.names));
     const result=finishGame(before,home,away,{home:home.name,away:away.name,hp:candidate.hp,ap:candidate.ap,winner:win.name,box:candidate.box,detailed:true,drives,log,engine:'v2',transactionVersion:tx.VERSION});
     const record=(universe.gameArchive||[]).find(x=>x.id===result.gameId);if(!record)throw new Error('Interactive Game Day archive record was not created.');
-    record.engine='v2';record.transactionVersion=tx.VERSION;record.eventCount=candidate.eventCount;record.seed=candidate.seed;record.gameDayVersion=gameday.VERSION;record.coachingDecisionVersion=globalThis.DynastyGameEngineV2Decisions?.VERSION||1;record.coachingDecisions=v2GameDayDecisionReceipts(session.state);
+    record.engine='v2';record.transactionVersion=tx.VERSION;record.eventCount=candidate.eventCount;record.seed=candidate.seed;record.gameDayVersion=gameday.VERSION;record.conditions=session.state.rules?.conditions||null;record.coachingDecisionVersion=globalThis.DynastyGameEngineV2Decisions?.VERSION||1;record.coachingDecisions=v2GameDayDecisionReceipts(session.state);
     for(const side of ['home','away']){const drivePoints=drives.filter(d=>d.side===side).reduce((n,d)=>n+(Number(d.points)||0),0);record.scoreAdjustment[side]=record.score[side]-drivePoints}
     v2StorePlayLog(record.id,session.state,attribution);
     if(options.testFault==='afterArchive')throw new Error('Injected Interactive Game Day rollback fault after archive write.');
