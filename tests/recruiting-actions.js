@@ -6,7 +6,7 @@ const {loadEngine}=require('../tools/harness');
 const PRIORITIES=['Prestige','NIL','Development','Early Role','Coaching','Academics','Scheme Fit','Winning','Stay Close','Campus Life'];
 function fixture(over={}){
  const universe={year:2027,week:2,phase:'regular',recruits:[]};
- const calls={visit:0,grown:0};
+ const calls={visit:0,grown:0,commits:[]};
  const api=makeRecruitingActionSystem({
   getUniverse:()=>universe,
   clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),
@@ -17,7 +17,12 @@ function fixture(over={}){
   growRecruiterRelationship:()=>{calls.grown++},
   ensureTargeted:r=>{r.targeted=true},
   scheduleVisit:r=>{calls.visit++;r.visitWeek=universe.week+1;r.visit=true},
-  topRivals:(r,t,n)=>(over.rivals||['Kentucky Commonwealth','Texas Tech Plains','Ohio Valley']).slice(0,n)
+  topRivals:(r,t,n)=>(over.rivals||['Kentucky Commonwealth','Texas Tech Plains','Ohio Valley']).slice(0,n),
+  // Programs as he ranks them this week. Yours stands where `over.userScore` puts it before his interest is added.
+  rankTeams:(r,t)=>[['Kentucky Commonwealth',100],['Texas Tech Plains',95],['Ohio Valley',90],['Alpha State',85],['Beta Tech',80],['Gamma University',70],[t.name,over.userScore??60]]
+   .map(([name,score])=>({name,score})).sort((a,b)=>b.score-a.score),
+  canTake:name=>!(over.full||[]).includes(name),
+  commit:(r,name)=>{if((over.refuse||[]).includes(name))return false;r.committed=name;calls.commits.push(name);return true}
  });
  return{universe,api,calls};
 }
@@ -428,6 +433,178 @@ test('the history of rival moves is bounded',()=>{
  assert.ok(api.rivalMoves(r).length<=12);
 });
 
+// ---------- decision funnel ----------
+// A board recruit whose decision lands in the given week, so tests do not depend on luck.
+// `skip` picks a later match, so several distinct recruits can share a decision week. Never rename one
+// afterwards: the date is a hash of his id.
+function withDecision(api,week,over={},skip=0){
+ let seen=0;
+ for(let i=0;i<8000;i++){const r=recruit(`F${i}`,{targeted:true,interest:50,...over});if(api.decisionWeekFor(r)===week&&seen++===skip)return r}
+ throw new Error(`no recruit decides in week ${week}`);
+}
+const standing=(api,r,t)=>api.funnelStatus(r,t);
+
+test('every recruit has a fixed decision week, later for blue chips',()=>{
+ const {api}=fixture();let early=0,late=0;
+ for(let i=0;i<600;i++){
+  const plain=recruit(`D${i}`,{stars:3}),blue=recruit(`D${i}`,{stars:5}),a=api.decisionWeekFor(plain),b=api.decisionWeekFor(blue);
+  assert.equal(a,api.decisionWeekFor(plain),'stable');assert.ok(a>=5&&a<=10,`3-star ${a}`);assert.equal(b,Math.min(11,a+1));
+  if(a===5)early++;if(a===10)late++;
+ }
+ assert.ok(early>50&&late>50,'the dates are spread across the season');
+});
+
+test('he cuts to a Top 5 three weeks out and a Top 3 one week out, and not before',()=>{
+ const {api,universe}=fixture({userScore:80}),t=team(),r=withDecision(api,9,{interest:90});
+ universe.recruits.push(r);
+ for(const w of [1,5]){universe.week=w;api.runFunnel(universe.recruits,t);assert.equal(api.funnelState(r).top5,null,`week ${w}: no list yet`)}
+ universe.week=6;api.runFunnel(universe.recruits,t);
+ const f=api.funnelState(r);
+ assert.equal(f.top5.length,5);assert.equal(f.top3,null);
+ assert.ok(f.top5.includes(t.name),'interest at 90% lifts you into his Top 5');
+ universe.week=8;api.runFunnel(universe.recruits,t);
+ assert.equal(f.top3.length,3);assert.ok(f.top3.every(n=>f.top5.includes(n)),'the Top 3 comes out of the Top 5');
+ assert.equal(f.cut,null);
+});
+
+test('your standing includes the work you put in, so a warmer recruit ranks you higher',()=>{
+ const {api,universe}=fixture({userScore:70}),t=team();universe.week=6;
+ const cold=withDecision(api,9,{interest:30}),warm=withDecision(api,9,{interest:95},1);
+ api.runFunnel([cold],t);api.runFunnel([warm],t);
+ assert.equal(api.funnelState(cold).top5.includes(t.name),false);assert.equal(api.funnelState(warm).top5.includes(t.name),true);
+});
+
+test('being cut ends it for the season: no actions, no commit, and the offer no longer counts',()=>{
+ const {api,universe}=fixture({userScore:40}),t=team(),r=withDecision(api,8,{interest:40});
+ universe.recruits.push(r);universe.week=3;api.perform(r,t,'offer');assert.equal(api.offersOut(universe.recruits,t),1);
+ universe.week=5;api.runFunnel(universe.recruits,t);
+ const f=api.funnelState(r);
+ assert.deepEqual(f.cut,{week:5,at:'top5'});
+ const a=api.availability(r,t,'call');assert.equal(a.ok,false);assert.match(a.reason,/cut .* from his Top 5 in week 5/);
+ assert.equal(api.mayCommit(r,t),false);assert.equal(api.offersOut(universe.recruits,t),0);
+ assert.equal(api.status(r,t).cut,true);assert.equal(standing(api,r,t).stage,'cut');
+ // Staff do not keep working him.
+ api.staffPlan(universe.recruits,t);assert.equal(api.workedThisWeek(r,t),false);
+});
+
+test('a program he likes and that has offered keeps a place on his list even when its pitch ranks lower',()=>{
+ const {api,universe}=fixture({userScore:30}),t=team();universe.week=6;
+ const kept=withDecision(api,9,{interest:70}),notOffered=withDecision(api,9,{interest:70},1);
+ kept.recruitingActions={[String(t.id)]:{season:universe.year,offered:true,history:[],contacts:0,known:{secondary:false,dealbreaker:false}}};
+ api.runFunnel([kept],t);api.runFunnel([notOffered],t);
+ assert.ok(api.funnelState(kept).top5.includes(t.name));assert.equal(api.funnelState(kept).top5.length,5);
+ assert.equal(api.funnelState(notOffered).top5.includes(t.name),false,'a program with no offer gets no such favour');
+});
+
+test('he can cut you at the Top 3 as well',()=>{
+ const {api,universe}=fixture({userScore:70}),t=team(),r=withDecision(api,9,{interest:100});
+ // Strong enough for the Top 5 but not the Top 3 once the field is trimmed.
+ universe.week=6;api.runFunnel([r],t);assert.ok(api.funnelState(r).top5.includes(t.name));
+ r.interest=1;universe.week=8;api.runFunnel([r],t);
+ assert.deepEqual(api.funnelState(r).cut,{week:8,at:'top3'});
+});
+
+test('while he waits for his date he does not commit on the weekly roll, and afterwards he does',()=>{
+ const {api,universe}=fixture(),t=team(),r=withDecision(api,9,{interest:90});universe.recruits.push(r);
+ universe.week=5;api.runFunnel(universe.recruits,t);assert.equal(api.holds(r,t),true);
+ universe.week=9;api.runFunnel(universe.recruits,t);
+ assert.ok(r.committed,'he decided');assert.equal(api.holds(r,t),false);
+ assert.equal(api.holds(recruit('X',{targeted:false}),t),false,'recruits off your board are untouched');
+});
+
+test('he picks the best finalist, you only if you offered, and a team with no room is skipped',()=>{
+ const {api,universe}=fixture({userScore:200}),t=team();universe.week=9;
+ const offered=withDecision(api,9,{interest:90}),blind=withDecision(api,9,{interest:90},1);
+ offered.recruitingActions={[String(t.id)]:{season:universe.year,offered:true,history:[],contacts:0,known:{secondary:false,dealbreaker:false}}};
+ api.runFunnel([offered],t);api.runFunnel([blind],t);
+ assert.equal(offered.committed,t.name,'you stand first and you offered');
+ assert.notEqual(blind.committed,t.name,'without an offer you cannot be chosen however well you stand');
+ assert.ok(blind.committed,'he still picks somebody');
+ // Room matters too.
+ const {api:api2,universe:u2}=fixture({userScore:0,full:['Kentucky Commonwealth','Texas Tech Plains']}),r=withDecision(api2,9,{interest:100});u2.week=9;
+ api2.runFunnel([r],t);assert.ok(r.committed&&!['Kentucky Commonwealth','Texas Tech Plains'].includes(r.committed));
+});
+
+test('when none of his finalists has room he goes to the best program that does',()=>{
+ const {api,universe}=fixture({userScore:0,full:['Kentucky Commonwealth','Texas Tech Plains','Ohio Valley']}),t=team(),r=withDecision(api,9,{interest:20});
+ universe.week=9;const out=api.runFunnel([r],t);
+ assert.equal(out.decided[0].fallback,true);assert.equal(r.committed,'Alpha State');assert.equal(api.funnelState(r).decided.fallback,true);
+});
+
+test('decisions repeat exactly and respect a program that refuses the commitment',()=>{
+ const run=()=>{const {api,universe}=fixture({userScore:92,refuse:['Kentucky Commonwealth']}),t=team(),out=[];
+  for(let i=0;i<40;i++){const r=withDecision(api,9,{interest:60},i);universe.week=9;api.runFunnel([r],t);out.push(r.committed)}return out.join('|')};
+ assert.equal(run(),run());assert.ok(!run().includes('Kentucky Commonwealth'));
+});
+
+test('the funnel reads where you stand and what comes next, without changing anything',()=>{
+ const {api,universe}=fixture({userScore:80}),t=team(),r=withDecision(api,9,{interest:80});universe.week=3;
+ const before=JSON.stringify(r),st=standing(api,r,t);
+ assert.equal(JSON.stringify(r),before,'reading the funnel writes nothing');
+ assert.equal(st.stage,'open');assert.equal(st.decisionWeek,9);assert.equal(st.weeksLeft,6);
+ assert.deepEqual(st.next,{kind:'top5',week:6,size:5});assert.ok(st.rank>=1&&st.cushion!=null);
+});
+
+test('decisions due lists the recruits about to pick, soonest first, and skips the cut and the committed',()=>{
+ const {api,universe}=fixture(),t=team();universe.week=7;
+ const a=withDecision(api,8),b=withDecision(api,7),far=withDecision(api,10),cut=withDecision(api,8,{},1),done=withDecision(api,8,{},2);
+ api.runFunnel([cut],t);api.funnelState(cut).cut={week:6,at:'top5'};done.committed='Other U';
+ const rows=api.decisionsDue([a,b,far,cut,done],t,1);
+ assert.deepEqual(rows.map(x=>x.recruit.id),[b.id,a.id]);
+});
+
+test('saves from before the desk have no funnel at all',()=>{
+ const {api,universe}=fixture({userScore:0}),t=team(),r=withDecision(api,6,{interest:10});
+ universe.recruitingActions={migrated:true};universe.week=6;
+ assert.equal(api.funnelOn(),false);assert.deepEqual(api.runFunnel([r],t),{decided:[],cut:[]});
+ assert.equal(api.holds(r,t),false);assert.equal(r.committed,null);assert.equal(standing(api,r,t).on,false);
+});
+
+// ---------- flip defense ----------
+test('a check-in is only for your own commitments, and only once flip season opens',()=>{
+ const {api,universe}=fixture(),t=team(),mine=recruit('M',{committed:t.name}),theirs=recruit('T',{committed:'Other U'}),open=recruit('O');
+ universe.week=3;assert.match(api.availability(mine,t,'keep').reason,/Flip season opens in week 5/);
+ universe.week=6;assert.equal(api.availability(mine,t,'keep').ok,true);
+ assert.match(api.availability(theirs,t,'keep').reason,/committed to you/);assert.match(api.availability(open,t,'keep').reason,/committed to you/);
+ assert.equal(api.availability(mine,t,'call').ok,false,'everything else is still closed to a commit');
+});
+
+test('a check-in costs two hours, answers every move aimed at him, and holds him for two weeks',()=>{
+ const {api,universe}=fixture(),t=team(),r=recruit('M',{committed:t.name,targeted:true});universe.week=6;
+ api.record(r,t,true).lastWorkedWeek=2;
+ api.addRivalEvent(r,t,'Kentucky Commonwealth','offer');api.addRivalEvent(r,t,'Texas Tech Plains','visit');api.addRivalEvent(r,t,'Ohio Valley','inhome');
+ assert.equal(api.liveMoves(r).length,3,'rivals\' moves on a commitment are never born answered');
+ assert.deepEqual(api.liveMoves(r)[0].answerWith,['keep']);
+ const hours=api.hoursLeft(t),out=api.perform(r,t,'keep');
+ assert.equal(out.ok,true);assert.equal(out.cost,2);assert.equal(api.hoursLeft(t),hours-2);assert.equal(out.answered,3);assert.equal(api.liveMoves(r).length,0);
+ universe.week=7;assert.equal(api.keepBoost(r,t),8);
+ universe.week=8;assert.equal(api.keepBoost(r,t),4);
+ universe.week=9;assert.equal(api.keepBoost(r,t),0,'it fades');
+});
+
+test('rivals start working on your commitments in flip season, and only on yours',()=>{
+ const {api,universe}=fixture(),t=team();
+ const mine=[],theirs=[];
+ for(let i=0;i<200;i++){
+  const a=recruit(`C${i}`,{committed:t.name,stars:4}),b=recruit(`E${i}`,{committed:'Other U',stars:4});
+  api.record(a,t,true).lastWorkedWeek=1;api.record(b,t,true).lastWorkedWeek=1;mine.push(a);theirs.push(b);
+ }
+ for(let w=1;w<=4;w++){universe.week=w;api.generateRivals([...mine,...theirs],t)}
+ assert.equal(mine.filter(r=>api.rivalMoves(r).length).length,0,'nothing before week 5');
+ for(let w=5;w<=11;w++){universe.week=w;api.generateRivals([...mine,...theirs],t)}
+ assert.ok(mine.filter(r=>api.rivalMoves(r).length).length>20,'a real share of commitments get approached');
+ assert.equal(theirs.filter(r=>api.rivalMoves(r).length).length,0);
+ assert.ok(api.unansweredMoves(mine,t).length>0);assert.equal(api.workload(mine,t).rivals,api.unansweredMoves(mine,t).reduce((n,x)=>n+x.moves.length,0));
+});
+
+test('staff check in on a commitment under pressure before anything else',()=>{
+ const {api,universe}=fixture(),t=team(),threatened=recruit('M',{committed:t.name,targeted:true}),calm=recruit('Q',{committed:t.name,targeted:true});universe.week=7;
+ api.record(threatened,t,true).lastWorkedWeek=2;api.record(calm,t,true).lastWorkedWeek=2;
+ api.addRivalEvent(threatened,t,'Kentucky Commonwealth','visit');
+ const out=api.staffPlan([threatened,calm],t);
+ assert.equal(out.keeps,1);assert.equal(api.liveMoves(threatened).length,0);assert.equal(api.keepBoost(calm,t),0,'no spend on a commitment nobody is chasing');
+});
+
 test('handing recruiting to the staff is a saved setting that defaults to off',()=>{
  const {api,universe}=fixture();
  assert.equal(api.isAuto(universe),false);
@@ -561,7 +738,7 @@ test('an unanswered rival move raises that rival\'s pitch in the real race, and 
 test('rival moves show up in the desk, on the card, in the sidebar and in the weekly reminder',async()=>{
  const {e,A,team}=await engine(7111),u=e.universe,t=team(),D=globalThis.DynastyRecruitingDesk;
  const r=u.recruits.filter(x=>!x.committed)[0];r.targeted=true;A.perform(r,t,'call');
- assert.equal(D.badge(r.id),'');assert.doesNotMatch(D.html(r.id),/RIVAL WATCH/);assert.equal(globalThis.DynastyRecruitingRivals(t).count,0);
+ assert.doesNotMatch(D.badge(r.id),/ra-rival-badge/,'no rival flag yet');assert.doesNotMatch(D.html(r.id),/RIVAL WATCH/);assert.equal(globalThis.DynastyRecruitingRivals(t).count,0);
  const rival=u.teams.find(x=>x.name!==t.name);
  A.addRivalEvent(r,t,rival.name,'visit');
  const desk=D.html(r.id);
@@ -583,6 +760,54 @@ test('the same seed and the same choices give the same rival moves',async()=>{
   return JSON.stringify(pool.map(r=>A.rivalMoves(r)));
  };
  const a=await run(),b=await run();assert.equal(a,b);assert.ok(JSON.parse(a).some(x=>x.length),'something happened');
+});
+
+test('on a real board nobody commits before his date, and everybody has chosen by the end of the season',async()=>{
+ const {e,A,team}=await engine(7120),u=e.universe,t=team();
+ const board=u.recruits.filter(r=>!r.committed).slice(0,30);board.forEach(r=>{r.targeted=true});
+ for(let w=1;w<=11;w++){
+  for(const r of board)if(!r.committed&&!A.funnelState(r)?.cut)A.perform(r,t,'call');
+  e.simWeek();
+  for(const r of board){
+   const dw=A.decisionWeekFor(r);
+   if(dw>u.week)assert.ok(!r.committed,`${r.name} committed in week ${u.week}, before his week ${dw}`);
+   else assert.ok(r.committed,`${r.name} should have decided by week ${u.week} (his date was ${dw})`);
+  }
+ }
+ const f=t.recruitingLastWeek.funnel;assert.ok(f&&Array.isArray(f.won)&&Array.isArray(f.lost)&&Array.isArray(f.cut));
+});
+
+test('the funnel is deterministic on a real board',async()=>{
+ const run=async()=>{
+  const {e,A,team}=await engine(7121),u=e.universe,t=team();
+  const board=u.recruits.filter(r=>!r.committed).slice(0,25);board.forEach(r=>{r.targeted=true});
+  for(let w=0;w<10;w++){for(const r of board)if(!r.committed&&!A.funnelState(r)?.cut){A.perform(r,t,'call');if(r.interest>=50)A.perform(r,t,'offer')}e.simWeek()}
+  return JSON.stringify(board.map(r=>[r.committed,A.funnelState(r)?.cut,A.funnelState(r)?.top3]));
+ };
+ assert.equal(await run(),await run());
+});
+
+test('the desk, the commitment panel, the sidebar and the card all show the funnel',async()=>{
+ const {e,A,team}=await engine(7122),u=e.universe,t=team(),D=globalThis.DynastyRecruitingDesk;
+ const [a,b,c]=u.recruits.filter(r=>!r.committed);a.targeted=true;A.perform(a,t,'call');
+ const dw=A.decisionWeekFor(a);
+ const desk=D.html(a.id);
+ assert.match(desk,/class="ra-funnel"/);assert.match(desk,new RegExp(`week ${dw}`));assert.match(desk,/Next cut/);assert.match(desk,/cannot choose you without a scholarship offer/);
+ A.perform(a,t,'offer');assert.doesNotMatch(D.html(a.id),/cannot choose you without/);
+ assert.match(D.badge(a.id),new RegExp(`Decides week ${dw}`));
+ // A recruit decides soon: he shows in the sidebar and the reminder.
+ u.week=dw-1;
+ assert.match(D.nav(),/DECIDING SOON/);assert.match(D.nav(),new RegExp(`data-rwid="${a.id}"`));
+ assert.ok(globalThis.DynastyRecruitingDecisions(t).count>=1);
+ // Cut: the card and desk say so.
+ A.funnelState(a)??(a.funnel={season:u.year,decisionWeek:dw,top5:null,top3:null,cut:null,decided:null});
+ a.funnel.cut={week:u.week,at:'top5'};
+ assert.match(D.badge(a.id),/Cut you/);assert.match(D.html(a.id),/Cut you from his Top 5/);
+ // A commitment to you gets the care panel; to anyone else, nothing.
+ b.committed=t.name;u.week=6;A.record(b,t,true);
+ const care=D.html(b.id);
+ assert.match(care,/COMMITMENT/);assert.match(care,/Check in · 2h/);assert.match(care,/data-ra-action="keep"/);assert.doesNotMatch(care,/data-ra-action="call"/);
+ c.committed='Some Other University';assert.equal(D.html(c.id),'');
 });
 
 test('simulating the season hands the board to the staff instead of letting it cool',async()=>{

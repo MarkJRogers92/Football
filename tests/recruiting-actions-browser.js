@@ -42,6 +42,9 @@ const hoursLeft=async page=>{await page.waitForFunction(()=>/^\d+\s*\/\s*\d+/.te
   check(`[${label}] a pitch spends three more hours`,(await hoursLeft(page)).left===strip.left-5);
   const m2=await motives();
   check(`[${label}] two contacts uncover his second priority and say what is left`,!/Second priority\s*not yet/i.test(m2)&&/Dealbreaker\s*not yet — 2 more contacts/i.test(m2),m2.replace(/\s+/g,' '));
+  const fn=await page.locator('.recruit-workspace-dossier .ra-funnel').innerText();
+  check(`[${label}] the desk shows when he decides and when his next cut comes`,/Decides\s*week \d+/i.test(fn)&&/Next cut\s*Top 5 in week \d+/i.test(fn),fn.replace(/\s+/g,' '));
+  check(`[${label}] the card carries a decision badge and the desk says an offer is needed`,await page.locator('.recruit-workspace-card.active .ra-decision-badge').count()===1&&/cannot choose you without a scholarship offer/.test(await page.locator('.recruit-workspace-dossier').innerText()));
   const status2=await page.evaluate(()=>document.body.innerText);
   check(`[${label}] the status line announces what was learned`,/Learned: His second priority is/.test(status2));
 
@@ -116,6 +119,12 @@ const hoursLeft=async page=>{await page.waitForFunction(()=>/^\d+\s*\/\s*\d+/.te
   await page.waitForSelector('.recruit-workspace-dossier .ra-rivals');
   const stress=await page.evaluate(()=>({sw:document.documentElement.scrollWidth,iw:innerWidth}));
   check(`[${label}] wide text and long rival names do not push the page sideways`,stress.sw<=stress.iw+1,`${stress.sw}px of ${stress.iw}px`);
+  // A recruit who has committed to you gets a commitment panel instead of the board actions.
+  await page.evaluate(i=>{const D=window.DynastyRecruitingDesk;D.recruit(i).committed=D.team().name},id);
+  await page.locator('[data-ra-auto]:visible').first().click();// any repaint will do; the desk is replaced, so do not wait on the box
+  await page.waitForSelector('.recruit-workspace-dossier .ra-care');
+  const care=await page.locator('.recruit-workspace-dossier .ra-care').innerText();
+  check(`[${label}] a commitment to you shows the check-in panel, closed until flip season`,/Committed to you/.test(care)&&/Check in/.test(care)&&await page.locator('.recruit-workspace-dossier .ra-care [data-ra-action="keep"]').isDisabled()&&await page.locator('.recruit-workspace-dossier [data-ra-action="call"]').count()===0,care.replace(/\s+/g,' ').slice(0,200));
   check(`[${label}] no console errors`,errors.length===0,errors.slice(0,2).join(' | '));await page.close();
  }
  await browser.close();console.log(out.join('\n'));console.log(`\n${pass} passed, ${fail} failed`);process.exit(fail?1:0);

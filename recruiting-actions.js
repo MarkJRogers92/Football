@@ -8,8 +8,8 @@
 // existing recruitPitch / advanceRecruiting / scheduleVisit functions) and adds the desk UI.
 function makeRecruitingActionSystem(env){
  'use strict';
- const COSTS={call:2,pitch:3,offer:2,visit:5,inhome:8};
- const LABELS={call:'Call',pitch:'Pitch',offer:'Offer',visit:'Campus Visit',inhome:'In-Home Visit'};
+ const COSTS={call:2,pitch:3,offer:2,visit:5,inhome:8,keep:2};
+ const LABELS={call:'Call',pitch:'Pitch',offer:'Offer',visit:'Campus Visit',inhome:'In-Home Visit',keep:'Check-in'};
  // Calibrated against full seasons: a board that is only called and offered when ripe lands about what
  // passive targeting used to, an idle board lands a little less, and a board worked with pitches and
  // in-homes on the winnable targets lands clearly more. Calls and pitches shrink inside a single week
@@ -25,6 +25,20 @@ function makeRecruitingActionSystem(env){
  // uncovers them. They are derived from a hash of the recruit, so they draw no gameplay randomness.
  const SECOND_AT=2,DEALBREAKER_AT=4,DEALBREAKER_RATE=30,DEALBREAKER_FLOOR=50,SECOND_FIT=.7,DEALBREAKER_PITCH=-6;
  function hash(v){let h=2166136261>>>0;for(const ch of String(v??'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+ // Decision funnel. Every recruit on your board has a decision week, fixed by a hash of the recruit: weeks
+ // 5 to 10, one later for blue chips. He cuts his list to a Top 5 three weeks before, a Top 3 one week
+ // before, and decides among those at the decision week. A program that is not in the list at a cut is
+ // out for the season. Between cuts he does not commit on the weekly roll.
+ const FUNNEL_FROM=5,FUNNEL_SPREAD=6,FUNNEL_STAR_DELAY=1,FUNNEL_MAX=11,TOP_WIDE=5,TOP_NARROW=3,CUT_WIDE_BEFORE=3,CUT_NARROW_BEFORE=1,DECIDE_NOISE=4;
+ // Flip defense: a check-in on a recruit who has committed to you answers the moves aimed at him and holds him for two weeks.
+ const KEEP={relationship:2,boost:8,boostFade:4,fromWeek:5};
+ // Rival programs stand with him on the strength of their pitch. You also stand on the work you have put
+ // in, which is what his interest measures: well above 40% it counts for you, well below it against you.
+ const INTEREST_PIVOT=55,INTEREST_WEIGHT=.45;
+ // A recruit keeps a program that has offered and that he truly likes on his list, whatever its rank.
+ const SAFETY_INTEREST=65;
+ // Staff send an offer once a target is this warm, so a target they are working still has a place on his list.
+ const STAFF_OFFER_AT=55;
  function universe(){return env.getUniverse()}
  const clamp=(v,a,b)=>env.clamp(v,a,b);
 
@@ -67,7 +81,7 @@ function makeRecruitingActionSystem(env){
  function offerLimit(t){return Math.max(10,Math.round(env.scholarshipCapacity(t)*1.6))}
  function offersOut(recruits,t){
   const u=universe(),key=String(t.id);let n=0;
-  for(const r of recruits||[]){const x=r?.recruitingActions?.[key];if(x&&x.season===u.year&&x.offered&&!r.committed)n++}
+  for(const r of recruits||[]){const x=r?.recruitingActions?.[key];if(x&&x.season===u.year&&x.offered&&!r.committed&&!(r.funnel&&r.funnel.season===u.year&&r.funnel.cut))n++}
   return n;
  }
  function hasOffer(r,t){return!!record(r,t,false).offered}
@@ -155,7 +169,12 @@ function makeRecruitingActionSystem(env){
   if(!r||!t)return{ok:false,reason:'No recruit selected.'};
   const u=universe();
   if(!isActive())return{ok:false,reason:'Recruiting hours are available during the season and the preseason.'};
-  if(r.committed)return{ok:false,reason:`${r.name} has already committed${r.committed===t.name?' to you':' elsewhere'}.`};
+  if(kind==='keep'){
+   if(r.committed!==t.name)return{ok:false,reason:'Check-ins are for recruits who have committed to you.'};
+   if(u.week<KEEP.fromWeek)return{ok:false,reason:`Flip season opens in week ${KEEP.fromWeek}; there is nothing to defend yet.`};
+  }else if(r.committed)return{ok:false,reason:`${r.name} has already committed${r.committed===t.name?' to you':' elsewhere'}.`};
+  const f=funnelState(r);
+  if(kind!=='keep'&&f&&f.cut)return{ok:false,reason:`${r.name} cut ${t.name} from his Top ${f.cut.at==='top5'?TOP_WIDE:TOP_NARROW} in week ${f.cut.week}.`};
   if(env.recruitBlocked&&env.recruitBlocked(t,r))return{ok:false,reason:`${r.name} will not consider ${t.name} again.`};
   const rec=record(r,t,false),cost=COSTS[kind],left=hoursLeft(t);
   if(kind==='offer'){
@@ -178,7 +197,7 @@ function makeRecruitingActionSystem(env){
  function perform(r,t,kind,opts={}){
   const check=availability(r,t,kind,opts);if(!check.ok)return check;
   const u=universe();
-  env.ensureTargeted(r,t);
+  if(kind!=='keep')env.ensureTargeted(r,t);
   const rec=record(r,t,true),wk=weekState(rec);
   let dI=0,dR=0,topic=null,note='';
   if(kind==='call'){
@@ -196,6 +215,8 @@ function makeRecruitingActionSystem(env){
    rec.inHome=true;dI=INHOME.interest;dR=INHOME.relationship;note='The family hosted your staff.';
   }else if(kind==='visit'){
    env.scheduleVisit(r);dR=2;note=`Visit set for week ${r.visitWeek}.`;
+  }else if(kind==='keep'){
+   rec.keptWeek=u.week;dR=KEEP.relationship;note='He knows you are still in his corner.';
   }
   if(dI)r.interest=clamp(Math.round((r.interest||0)+dI),1,100);
   if(dR){r.relationship=clamp((r.relationship||0)+dR,0,100);if(dR>0&&env.growRecruiterRelationship)env.growRecruiterRelationship(r,t,dR)}
@@ -237,7 +258,12 @@ function makeRecruitingActionSystem(env){
  // The same question asked now: what happens to him if the week were played as it stands?
  function previewEffort(r,t){return effortFromSince(weeksSinceWorked(r,t,universe().week))}
  // An offer is necessary, and so is clearing his dealbreaker if he has one, told or not.
- function mayCommit(r,t){return!!t&&hasOffer(r,t)&&!dealbreakerUnmet(r,t)}
+ function mayCommit(r,t){return!!t&&hasOffer(r,t)&&!dealbreakerUnmet(r,t)&&!funnelState(r)?.cut}
+ // How hard a recent check-in holds a commitment against a flip: full the weeks right after, half after that.
+ function keepBoost(r,t){
+  const k=record(r,t,false).keptWeek;if(k==null)return 0;
+  const age=universe().week-k;return age<=1?KEEP.boost:age===2?KEEP.boostFade:0;
+ }
  // Standing bonus to the pitch the program makes, so offers and visits compete against rival programs.
  // An unmet dealbreaker drags it down for as long as it stands.
  function pitchBoost(r,t){
@@ -256,7 +282,7 @@ function makeRecruitingActionSystem(env){
  const RIVAL_BASE={offer:3,visit:4,inhome:4},RIVAL_MIN_WEEK={offer:1,visit:3,inhome:6},RIVAL_LOOKS=3,RIVAL_MATCH_BONUS=5,RIVAL_STAR_BONUS=4;
  const RIVAL_FULL_AGE=1,RIVAL_FADE_AGE=3,RIVAL_KEEP=12;
  // What answers what: your offer answers theirs, a visit (or in-home) answers a visit, only an in-home answers an in-home.
- const ANSWERS={offer:['offer'],visit:['visit','inhome'],inhome:['inhome']};
+ const ANSWERS={offer:['offer','keep'],visit:['visit','inhome','keep'],inhome:['inhome','keep']};
  const RIVAL_VERB={offer:'offered',visit:'is hosting him',inhome:'is visiting the family'};
  function rivalState(r){const w=r?.rivalWatch;return w&&w.season===universe().year?w:null}
  function rivalEnsure(r){const u=universe();if(!r.rivalWatch||r.rivalWatch.season!==u.year)r.rivalWatch={season:u.year,stages:{},events:[]};return r.rivalWatch}
@@ -285,7 +311,7 @@ function makeRecruitingActionSystem(env){
  function addRivalEvent(r,t,team,kind){
   const u=universe(),w=rivalEnsure(r),idx=RIVAL_KINDS.indexOf(kind);if(idx<0)return null;
   w.stages[team]=Math.max(w.stages[team]||0,idx+1);
-  const ev={id:`${r.id}|${team}|${kind}`,team,kind,week:u.week,heat:RIVAL_HEAT[kind],answered:answeredAlready(r,t,kind)?u.week:false};
+  const ev={id:`${r.id}|${team}|${kind}`,team,kind,week:u.week,heat:RIVAL_HEAT[kind],answered:!r.committed&&answeredAlready(r,t,kind)?u.week:false};
   w.events.push(ev);
   while(w.events.length>RIVAL_KEEP){
    const i=w.events.findIndex(e=>isAnswered(e)||eventAge(e)>RIVAL_FADE_AGE);w.events.splice(i>=0?i:0,1);
@@ -296,7 +322,8 @@ function makeRecruitingActionSystem(env){
  function generateRivals(recruits,t){
   const u=universe(),made=[];
   for(const r of recruits||[]){
-   if(!r.targeted||r.committed)continue;
+   // Your own commitments draw interest from rivals once flip season opens.
+   if(r.committed){if(r.committed!==t.name||u.week<KEEP.fromWeek)continue}else if(!r.targeted)continue;
    const rec=record(r,t,false);if(rec.lastWorkedWeek==null)continue;
    const top=env.topRivals(r,t,RIVAL_LOOKS);if(!top.length)continue;
    const w=rivalEnsure(r);
@@ -319,14 +346,109 @@ function makeRecruitingActionSystem(env){
  // Newest first, with where each one stands.
  function rivalMoves(r){
   const w=rivalState(r);if(!w)return[];
-  return w.events.map(ev=>({team:ev.team,kind:ev.kind,week:ev.week,heat:ev.heat,verb:RIVAL_VERB[ev.kind],answerWith:ANSWERS[ev.kind],
+  return w.events.map(ev=>({team:ev.team,kind:ev.kind,week:ev.week,heat:ev.heat,verb:RIVAL_VERB[ev.kind],answerWith:r.committed?['keep']:ANSWERS[ev.kind].filter(k=>k!=='keep'),
    state:isAnswered(ev)?'answered':eventAge(ev)>RIVAL_FADE_AGE?'lapsed':'live',cost:Math.round(ev.heat*eventWeight(ev)*10)/10})).reverse();
  }
  function liveMoves(r){return rivalMoves(r).filter(m=>m.state==='live')}
  function unansweredMoves(recruits,t){
   const out=[];
-  for(const r of recruits||[]){if(!r.targeted||r.committed)continue;const m=liveMoves(r);if(m.length)out.push({recruit:r,moves:m})}
+  for(const r of recruits||[]){if(r.committed?r.committed!==t.name:!r.targeted)continue;const m=liveMoves(r);if(m.length)out.push({recruit:r,moves:m})}
   return out;
+ }
+
+ // ---------- decision funnel ----------
+ function funnelOn(){return!universe().recruitingActions?.migrated}
+ function decisionWeekFor(r){return Math.min(FUNNEL_MAX,FUNNEL_FROM+hash(`${r.id}|decide`)%FUNNEL_SPREAD+((r.stars||3)>=4?FUNNEL_STAR_DELAY:0))}
+ function funnelState(r){const f=r?.funnel;return f&&f.season===universe().year?f:null}
+ function ensureFunnel(r){
+  const u=universe();
+  if(!r.funnel||r.funnel.season!==u.year)r.funnel={season:u.year,decisionWeek:decisionWeekFor(r),top5:null,top3:null,cut:null,decided:null};
+  return r.funnel;
+ }
+ function standings(r,t){
+  const bonus=((r.interest||0)-INTEREST_PIVOT)*INTEREST_WEIGHT;
+  return env.rankTeams(r,t).map(x=>x.name===t.name?{...x,score:x.score+bonus}:x).sort((a,b)=>b.score-a.score);
+ }
+ const cutWeek=(f,kind)=>f.decisionWeek-(kind==='top5'?CUT_WIDE_BEFORE:CUT_NARROW_BEFORE);
+ // He cuts his list when the week arrives, on how every program stands with him that week.
+ function applyCuts(r,t){
+  const f=ensureFunnel(r),w=universe().week;let ranked=null;
+  const rank=()=>ranked??=standings(r,t);
+  const note=(kind)=>{if(!f.cut&&!f[kind].includes(t.name))f.cut={week:w,at:kind}};
+  // The last slot goes to you if you offered and he likes you, even when your pitch ranks lower.
+  const keepsYou=()=>hasOffer(r,t)&&(r.interest||0)>=SAFETY_INTEREST&&!dealbreakerUnmet(r,t);
+  const pick=(names,size)=>{const list=names.slice(0,size);if(!list.includes(t.name)&&names.includes(t.name)&&keepsYou())list[size-1]=t.name;return list};
+  if(!f.top5&&w>=cutWeek(f,'top5')){const all=rank().map(x=>x.name),list=all.slice(0,TOP_WIDE);if(!list.includes(t.name)&&keepsYou())list[TOP_WIDE-1]=t.name;f.top5=list;note('top5')}
+  if(!f.top3&&f.top5&&w>=cutWeek(f,'top3')){f.top3=pick(rank().map(x=>x.name).filter(n=>f.top5.includes(n)),TOP_NARROW);note('top3')}
+  return f;
+ }
+ // Among his finalists, the best-standing program that can take him wins; you only count if you offered
+ // and clear any dealbreaker. A little hash noise keeps close races from being foregone.
+ function decide(r,t){
+  const f=ensureFunnel(r),u=universe(),finalists=f.top3||f.top5||[];
+  const ranked=standings(r,t),score=n=>ranked.find(x=>x.name===n)?.score??-1e9;
+  const noise=n=>(hash(`${r.id}|${u.year}|${n}|decide`)%(DECIDE_NOISE*2+1))-DECIDE_NOISE;
+  const eligible=n=>env.canTake(n)&&(n!==t.name||mayCommit(r,t));
+  const order=finalists.filter(eligible).sort((a,b)=>(score(b)+noise(b))-(score(a)+noise(a)));
+  for(const team of order){
+   if(env.commit(r,team)){f.decided={team,week:u.week};return{team,won:team===t.name,finalists}}
+  }
+  // None of his finalists has a place for him. He takes the best program that does, which can be you
+  // only if you offered.
+  for(const {name} of ranked){
+   if(finalists.includes(name)||!eligible(name))continue;
+   if(env.commit(r,name)){f.decided={team:name,week:u.week,fallback:true};return{team:name,won:name===t.name,finalists,fallback:true}}
+  }
+  return null;
+ }
+ // Run once a week before the pass: cuts first, then the decisions that have come due.
+ function runFunnel(recruits,t){
+  const out={decided:[],cut:[]};if(!funnelOn()||!t)return out;
+  const w=universe().week;
+  for(const r of recruits||[]){
+   if(!r.targeted||r.committed)continue;
+   const had=funnelState(r)?.cut,f=applyCuts(r,t);
+   if(!had&&f.cut&&f.cut.week===w)out.cut.push(r);
+   if(f.decided||w<f.decisionWeek)continue;
+   const res=decide(r,t);if(res)out.decided.push({recruit:r,...res});
+  }
+  return out;
+ }
+ // The weekly roll skips a recruit who is still waiting for his decision week.
+ function holds(r,t){
+  if(!funnelOn()||!r.targeted||r.committed)return false;
+  const f=funnelState(r);return!!f&&!f.decided&&universe().week<f.decisionWeek;
+ }
+ // Where he stands, for the desk. Read-only; the ranking is cached until something that moves it changes.
+ const rankCache=new WeakMap();
+ function liveRank(r,t){
+  const rec=record(r,t,false),sig=[universe().week,r.interest,r.relationship,rec.offered?1:0,rec.inHome?1:0,(r.rivalWatch?.events||[]).map(e=>isAnswered(e)?1:0).join('')].join('|');
+  const hit=rankCache.get(r);if(hit&&hit.sig===sig)return hit.ranked;
+  const ranked=standings(r,t);rankCache.set(r,{sig,ranked});return ranked;
+ }
+ function funnelStatus(r,t){
+  if(!funnelOn())return{on:false};
+  const f=funnelState(r),dw=f?f.decisionWeek:decisionWeekFor(r),w=universe().week;
+  const base={on:true,decisionWeek:dw,weeksLeft:Math.max(0,dw-w),top5:f?.top5||null,top3:f?.top3||null,cut:f?.cut||null,
+   cutWeeks:{top5:dw-CUT_WIDE_BEFORE,top3:dw-CUT_NARROW_BEFORE}};
+  if(r.committed)return{...base,stage:'decided'};
+  if(f?.cut)return{...base,stage:'cut'};
+  const stage=f?.top3?'top3':f?.top5?'top5':'open',next=stage==='open'?'top5':stage==='top5'?'top3':null;
+  if(!r.targeted)return{...base,stage:'open',next:null};
+  const ranked=liveRank(r,t),idx=ranked.findIndex(x=>x.name===t.name),size=next==='top5'?TOP_WIDE:next==='top3'?TOP_NARROW:null;
+  let cushion=null;
+  if(size&&idx>=0)cushion=Math.round((ranked[idx].score-(idx<size?ranked[size]?.score??0:ranked[size-1].score))*10)/10;
+  return{...base,stage,next:next?{kind:next,week:next==='top5'?base.cutWeeks.top5:base.cutWeeks.top3,size}:null,rank:idx>=0?idx+1:null,cushion};
+ }
+ function decisionsDue(recruits,t,within=1){
+  if(!funnelOn())return[];
+  const w=universe().week,out=[];
+  for(const r of recruits||[]){
+   if(!r.targeted||r.committed)continue;
+   const f=funnelState(r);if(f?.cut||f?.decided)continue;
+   const dw=f?f.decisionWeek:decisionWeekFor(r);if(dw-w<=within&&dw>=w)out.push({recruit:r,decisionWeek:dw});
+  }
+  return out.sort((a,b)=>a.decisionWeek-b.decisionWeek);
  }
 
  // ---------- board status ----------
@@ -334,7 +456,7 @@ function makeRecruitingActionSystem(env){
   const rec=record(r,t,false),u=universe(),open=!r.committed;
   const worked=rec.lastWorkedWeek===u.week,pe=open&&r.targeted?previewEffort(r,t):null,blocked=knownBlock(r,t);
   return{
-   offered:!!rec.offered,inHome:!!rec.inHome,worked,blocked,rivals:open?liveMoves(r):[],
+   offered:!!rec.offered,inHome:!!rec.inHome,worked,blocked,rivals:open||r.committed===t.name?liveMoves(r):[],cut:!!funnelState(r)?.cut,
    cooling:!!pe&&!worked&&pe.state==='cooling',
    warm:!!pe&&!worked&&pe.state==='warm',
    ready:open&&r.targeted&&!rec.offered&&!blocked&&(r.interest||0)>=68,
@@ -345,6 +467,8 @@ function makeRecruitingActionSystem(env){
   const targets=(recruits||[]).filter(r=>r?.targeted&&!r.committed);
   let worked=0,cooling=0,ready=0,rivals=0;
   for(const r of targets){const s=status(r,t);if(s.worked)worked++;if(s.cooling)cooling++;if(s.ready)ready++;rivals+=s.rivals.length}
+  // A commitment under pressure is part of the same list: it is the one you cannot afford to ignore.
+  for(const r of recruits||[])if(r?.committed===t.name)rivals+=liveMoves(r).length;
   return{targets:targets.length,worked,cooling,ready,rivals,offersOut:offersOut(recruits,t),offerLimit:offerLimit(t),left:hoursLeft(t),budget:hoursBudgetFor(t)};
  }
 
@@ -352,15 +476,17 @@ function makeRecruitingActionSystem(env){
  // What the staff does when told to work the board: warm everyone, hand out the offers that are ripe,
  // then spend what is left on the best-fitting pitches. It never books visits or in-homes; those are
  // yours to call. Fully deterministic, so it consumes no gameplay randomness.
- function staffPlan(recruits,t,{maxOffers=3,maxPitches=3}={}){
-  const targets=(recruits||[]).filter(r=>r?.targeted&&!r.committed).sort((a,b)=>(a.nationalRank||1e9)-(b.nationalRank||1e9));
-  const done={calls:0,pitches:0,offers:0,hours:0};
-  const run=(r,kind,opts)=>{const out=perform(r,t,kind,opts);if(out.ok){done.hours+=out.cost;if(kind==='call')done.calls++;else if(kind==='pitch')done.pitches++;else if(kind==='offer')done.offers++}return out.ok};
+ function staffPlan(recruits,t,{maxOffers=4,maxPitches=3}={}){
+  const targets=(recruits||[]).filter(r=>r?.targeted&&!r.committed&&!funnelState(r)?.cut).sort((a,b)=>(a.nationalRank||1e9)-(b.nationalRank||1e9));
+  const done={calls:0,pitches:0,offers:0,keeps:0,hours:0};
+  const run=(r,kind,opts)=>{const out=perform(r,t,kind,opts);if(out.ok){done.hours+=out.cost;if(kind==='call')done.calls++;else if(kind==='keep')done.keeps++;else if(kind==='pitch')done.pitches++;else if(kind==='offer')done.offers++}return out.ok};
+  // A commitment with a rival circling is the first thing worth two hours.
+  for(const r of recruits||[])if(r?.committed===t.name&&liveMoves(r).length)run(r,'keep');
   let n=0;
   // Staff do not offer a recruit who has told them they cannot clear his dealbreaker.
   // A rival's offer is worth answering sooner than an interest threshold would suggest.
   const rivalOffered=r=>liveMoves(r).some(m=>m.kind==='offer');
-  for(const r of targets){if(n>=maxOffers)break;if(!hasOffer(r,t)&&!knownBlock(r,t)&&((r.interest||0)>=60||((r.interest||0)>=40&&rivalOffered(r)))&&run(r,'offer'))n++}
+  for(const r of targets){if(n>=maxOffers)break;if(!hasOffer(r,t)&&!knownBlock(r,t)&&((r.interest||0)>=STAFF_OFFER_AT||((r.interest||0)>=40&&rivalOffered(r)))&&run(r,'offer'))n++}
   for(const r of targets)if(!workedThisWeek(r,t))run(r,'call');
   let p=0;
   for(const r of targets){
@@ -397,7 +523,7 @@ function makeRecruitingActionSystem(env){
 
  return{COSTS,LABELS,INHOME,OFFER,hoursBudgetFor,weekInfo,ensureWeek,hoursLeft,isActive,record,weekState,workedThisWeek,
   offerLimit,offersOut,hasOffer,topicStrength,motivesFor,dealbreakerUnmet,intel,knownBlock,pitchProjection,pitchOptions,availability,perform,withdrawOffer,
-  effort,previewEffort,effortFromSince,weeksSinceWorked,mayCommit,pitchBoost,status,workload,staffPlan,isAuto,setAuto,rivalHeat,rivalPressure,addRivalEvent,generateRivals,answerRivals,rivalMoves,liveMoves,unansweredMoves,grandfather};
+  effort,previewEffort,effortFromSince,weeksSinceWorked,mayCommit,pitchBoost,status,workload,staffPlan,isAuto,setAuto,funnelOn,decisionWeekFor,funnelState,funnelStatus,runFunnel,holds,decisionsDue,keepBoost,rivalHeat,rivalPressure,addRivalEvent,generateRivals,answerRivals,rivalMoves,liveMoves,unansweredMoves,grandfather};
 }
 
 if(typeof module==='object'&&module.exports){
@@ -413,6 +539,12 @@ if(typeof module==='object'&&module.exports){
   growRecruiterRelationship:(r,t,gain)=>growRecruiterRelationship(r,t,gain),
   ensureTargeted:(r,t)=>{if(!r.targeted)r.targeted=true;firstRecruitEvaluation(r,t)},
   scheduleVisit:r=>scheduleVisitBeforeRecruitingActions(r),
+  // Every program ranked by how it stands with him this week: the pitch it makes (rival heat and your own
+  // offers and visits included), plus the pull a recruit on your board feels toward you.
+  rankTeams:(r,t)=>universe.teams.filter(x=>!recruitBlocked(x,r))
+   .map(x=>({name:x.name,score:recruitPitch(x,r)+(x.id===t.id&&r.targeted?10+(r.relationship||0)*.12:0)})).sort((a,b)=>b.score-a.score),
+  canTake:name=>canTakeCommit(name),
+  commit:(r,name)=>commitRecruit(r,name),
   // The programs closest to winning him, other than yours, by the pitch they would make on their own.
   topRivals:(r,t,n)=>universe.teams.filter(x=>x.id!==t.id&&!recruitBlocked(x,r)&&canTakeCommit(x.name))
    .map(x=>({name:x.name,score:recruitPitchBeforeRecruitingActions(x,r)})).sort((a,b)=>b.score-a.score).slice(0,n).map(x=>x.name)
@@ -425,6 +557,12 @@ if(typeof module==='object'&&module.exports){
   const rows=recruitingActions.unansweredMoves(universe.recruits,t);
   return{count:rows.reduce((n,x)=>n+x.moves.length,0),names:rows.slice(0,3).map(x=>x.recruit.name)};
  };
+ // Recruits who pick a school on this advance or the next.
+ globalThis.DynastyRecruitingDecisions=t=>{
+  if(!t||!universe?.recruits)return null;
+  const rows=recruitingActions.decisionsDue(universe.recruits,t,1);
+  return{count:rows.length,names:rows.slice(0,3).map(x=>x.recruit.name),unoffered:rows.filter(x=>!recruitingActions.hasOffer(x.recruit,t)).length};
+ };
  globalThis.DynastyRecruitingWeek=t=>t&&!recruitingActions.isAuto(universe)?recruitingActions.weekInfo(t):null;
 
  // --- engine hooks ---
@@ -435,6 +573,8 @@ if(typeof module==='object'&&module.exports){
   return pressure?{...e,cool:e.cool+pressure}:e;
  };
  userMayCommit=function(r,t){return recruitingActions.mayCommit(r,t)};
+ recruitHolds=function(r,u){return recruitingActions.holds(r,u)};
+ recruitKeepBoost=function(r,u){return recruitingActions.keepBoost(r,u)};
  let passCooled=[];
  const recruitPitchBeforeRecruitingActions=recruitPitch;
  recruitPitch=function(t,r){
@@ -454,12 +594,16 @@ if(typeof module==='object'&&module.exports){
  const advanceRecruitingBeforeRecruitingActions=advanceRecruiting;
  advanceRecruiting=function(){
   const t=selected(),playedWeek=universe.week-1;passCooled=[];
+  // Cuts and decisions come due before the weekly pass, so the pass sees who has already chosen.
+  const funnel=recruitingActions.runFunnel(universe.recruits,t);
   const out=advanceRecruitingBeforeRecruitingActions();
   if(t){
    const rivalMoves=recruitingActions.generateRivals(universe.recruits,t).length;
    // The hours ledger still describes the week just played, because the counter has already moved on.
    const w=t.recruitingWeek&&t.recruitingWeek.year===universe.year&&t.recruitingWeek.week===playedWeek?t.recruitingWeek:null;
-   t.recruitingLastWeek={year:universe.year,week:playedWeek,spent:w?w.spent:0,budget:recruitingActions.hoursBudgetFor(t),cooled:passCooled.slice(0,12),cooledCount:passCooled.length,rivalMoves};
+   t.recruitingLastWeek={year:universe.year,week:playedWeek,spent:w?w.spent:0,budget:recruitingActions.hoursBudgetFor(t),cooled:passCooled.slice(0,12),cooledCount:passCooled.length,rivalMoves,
+    // What the funnel did this week, for the board and the status line.
+    funnel:{won:funnel.decided.filter(x=>x.won).map(x=>x.recruit.name).slice(0,6),lost:funnel.decided.filter(x=>!x.won).map(x=>({name:x.recruit.name,team:x.team})).slice(0,6),cut:funnel.cut.map(r=>r.name).slice(0,6)}};
   }
   return out;
  };
@@ -531,9 +675,35 @@ if(typeof module==='object'&&module.exports){
   else{const d=i.dealbreaker;warn=!d.met;deal=`${raEsc(d.topic)} — your ${d.strength}, he needs ${d.floor}${d.met?' (you clear it)':' (you do not)'}`}
   return`<div class="ra-motives"><span><b>Cares most about</b>${raEsc(i.primary)}</span><span><b>Second priority</b>${i.secondary?raEsc(i.secondary):more(i.secondaryIn)}</span><span class="${warn?'ra-warn-text':''}"><b>Dealbreaker</b>${deal}</span></div>`;
  }
+ // When he decides, who is on his list, and where you stand. Read-only.
+ function funnelHTML(r,t){
+  const f=recruitingActions.funnelStatus(r,t);if(!f.on)return'';
+  const names=list=>list.map(n=>n===t.name?'<b class="ra-you">You</b>':raEsc(n)).join(' · ');
+  const cells=[`<span><b>Decides</b>week ${f.decisionWeek}${f.weeksLeft?` · ${f.weeksLeft} week${f.weeksLeft===1?'':'s'} away`:' · this week'}</span>`];
+  if(f.cut)cells.push(`<span class="ra-warn-text"><b>His list</b>Cut you from his Top ${f.cut.at==='top5'?5:3} in week ${f.cut.week}</span>`);
+  else{
+   if(f.top3)cells.push(`<span><b>His Top 3</b>${names(f.top3)}</span>`);
+   else if(f.top5)cells.push(`<span><b>His Top 5</b>${names(f.top5)}</span>`);
+   if(f.next){
+    const line=f.rank?`you rank #${f.rank}${f.cushion==null?'':f.cushion>=0?` · ${f.cushion} inside the line`:` · ${-f.cushion} short of the line`}`:'';
+    cells.push(`<span class="${f.cushion!=null&&f.cushion<0?'ra-warn-text':''}"><b>Next cut</b>Top ${f.next.size} in week ${f.next.week}${line?` · ${line}`:''}</span>`);
+   }else if(!f.top5)cells.push('<span><b>His list</b>not cut yet</span>');
+  }
+  const offer=!f.cut&&r.targeted&&!recruitingActions.hasOffer(r,t)?'<small class="ra-warn-text">He cannot choose you without a scholarship offer.</small>':'';
+  return`<div class="ra-funnel">${cells.join('')}</div>${offer}`;
+ }
+ // A recruit who has committed to you: rivals work on him in flip season, and a check-in holds him.
+ function careHTML(r,t){
+  const w=recruitingActions.weekInfo(t),left=recruitingActions.hoursLeft(t),a=recruitingActions.availability(r,t,'keep');
+  const kept=recruitingActions.record(r,t,false).keptWeek,recent=kept!=null&&universe.week-kept<=2,live=recruitingActions.liveMoves(r).length>0;
+  const chips=[r.challenger?`<span class="ra-chip ra-warn">Wavering — ${raEsc(r.challenger)} is closing</span>`:'<span class="ra-chip ra-ok">Solid</span>',recent?`<span class="ra-chip ra-ok">Checked in week ${kept}</span>`:''].join('');
+  const open=universe.week>=5;
+  return`<section class="recruiting-desk ra-care" data-recruiting-desk="${raEsc(r.id)}"><div class="ra-head"><div><span class="eyebrow">COMMITMENT</span><strong>Committed to you · ${left} / ${w.budget} hours left</strong></div><div class="ra-chips">${chips}</div></div>${rivalHTML(r)}<div class="ra-actions"><button type="button" class="${a.ok&&live?'ra-answer':''}" data-ra-action="keep" data-ra-recruit="${raEsc(r.id)}" ${a.ok?'':`disabled title="${raEsc(a.reason)}"`}>Check in · ${recruitingActions.COSTS.keep}h</button></div><small class="muted">${open?'Flip season is on: rivals keep working on committed players. A check-in answers every move aimed at him and holds him for two weeks.':'Flip season opens in week 5; there is nothing to defend yet.'}</small></section>`;
+ }
  function deskHTML(id){
   if(!universe?.teams)return'';
   const r=raRecruit(id),t=selected();if(!r||!t)return'';
+  if(r.committed)return r.committed===t.name?careHTML(r,t):'';
   const w=recruitingActions.weekInfo(t),left=recruitingActions.hoursLeft(t),A=kind=>recruitingActions.availability(r,t,kind);
   const live=recruitingActions.liveMoves(r),answers=kind=>live.some(m=>m.answerWith.includes(kind));
   const btn=(kind,label)=>{const a=A(kind),ans=a.ok&&answers(kind);return`<button type="button" class="${ans?'ra-answer':''}" data-ra-action="${kind}" data-ra-recruit="${raEsc(r.id)}" ${a.ok?(ans?'title="Answers a rival move"':''):`disabled title="${raEsc(a.reason)}"`}>${label} · ${recruitingActions.COSTS[kind]}h</button>`};
@@ -543,7 +713,7 @@ if(typeof module==='object'&&module.exports){
   const rec=recruitingActions.record(r,t,false);
   const withdraw=rec.offered&&!r.committed?`<button type="button" class="ra-quiet" data-ra-action="withdraw" data-ra-recruit="${raEsc(r.id)}" title="Takes the offer back. He cools toward you.">Withdraw offer</button>`:'';
   const hist=recruitingActions.status(r,t).history.map(h=>`<span>W${h.week}: ${raEsc(h.kind==='withdraw'?'Offer withdrawn':recruitingActions.LABELS[h.kind]+(h.topic?' · '+h.topic:''))}${h.dI?` · ${h.dI>0?'+':''}${h.dI} interest`:''}</span>`).join('');
-  return`<section class="recruiting-desk" data-recruiting-desk="${raEsc(r.id)}"><div class="ra-head"><div><span class="eyebrow">RECRUITING DESK</span><strong>${left} / ${w.budget} hours left this week</strong></div><div class="ra-chips">${chipsHTML(r,t)}</div></div>${motivesHTML(r,t)}${rivalHTML(r)}<div class="ra-actions">${btn('call','Call')}<span class="ra-pitch">${select}${btn('pitch','Pitch')}</span>${btn('offer','Offer')}${btn('visit','Visit')}${btn('inhome','In-Home')}${withdraw}</div>${hist?`<div class="ra-history">${hist}</div>`:''}<small class="muted">Sell what he cares about, and only what you can back up: a weak topic costs you interest. He needs an offer before he can commit to you.</small><div class="ra-desk-staff">${staffControlsHTML(recruitingActions.workload(universe.recruits,t))}</div></section>`;
+  return`<section class="recruiting-desk" data-recruiting-desk="${raEsc(r.id)}"><div class="ra-head"><div><span class="eyebrow">RECRUITING DESK</span><strong>${left} / ${w.budget} hours left this week</strong></div><div class="ra-chips">${chipsHTML(r,t)}</div></div>${motivesHTML(r,t)}${funnelHTML(r,t)}${rivalHTML(r)}<div class="ra-actions">${btn('call','Call')}<span class="ra-pitch">${select}${btn('pitch','Pitch')}</span>${btn('offer','Offer')}${btn('visit','Visit')}${btn('inhome','In-Home')}${withdraw}</div>${hist?`<div class="ra-history">${hist}</div>`:''}<small class="muted">Sell what he cares about, and only what you can back up: a weak topic costs you interest. He needs an offer before he can commit to you.</small><div class="ra-desk-staff">${staffControlsHTML(recruitingActions.workload(universe.recruits,t))}</div></section>`;
  }
  function announce(res,r){
   const t=selected();
@@ -578,26 +748,43 @@ if(typeof module==='object'&&module.exports){
  // Up to four recruits with a live rival move, each one a button that opens his card.
  function rivalListHTML(){
   const rows=recruitingActions.unansweredMoves(universe.recruits,selected()).slice(0,4);if(!rows.length)return'';
-  return`<div class="ra-nav-rivals"><span class="eyebrow">RIVAL MOVES</span>${rows.map(x=>`<button type="button" class="ra-rival-row" data-rwid="${raEsc(x.recruit.id)}"><b>${raEsc(x.recruit.name)}</b><small>${raEsc(x.moves[0].team)} ${raEsc(x.moves[0].verb)}${x.moves.length>1?` +${x.moves.length-1}`:''}</small></button>`).join('')}</div>`;
+  return`<div class="ra-nav-rivals"><span class="eyebrow">RIVAL MOVES</span>${rows.map(x=>`<button type="button" class="ra-rival-row" data-rwid="${raEsc(x.recruit.id)}"><b>${raEsc(x.recruit.name)}</b><small>${x.recruit.committed?'Committed · ':''}${raEsc(x.moves[0].team)} ${raEsc(x.moves[0].verb)}${x.moves.length>1?` +${x.moves.length-1}`:''}</small></button>`).join('')}</div>`;
+ }
+ // Recruits about to pick a school, each one a button that opens his card.
+ function decisionListHTML(){
+  const t=selected(),rows=recruitingActions.decisionsDue(universe.recruits,t,1).slice(0,4);if(!rows.length)return'';
+  return`<div class="ra-nav-rivals"><span class="eyebrow">DECIDING SOON</span>${rows.map(x=>{const r=x.recruit,offered=recruitingActions.hasOffer(r,t);return`<button type="button" class="ra-rival-row" data-rwid="${raEsc(r.id)}"><b>${raEsc(r.name)}</b><small>Decides week ${x.decisionWeek}${offered?'':' · no offer from you yet'}</small></button>`}).join('')}</div>`;
  }
  function navHTML(){
   // The workspace paints once at page load, before any dynasty exists.
   if(!universe?.teams)return'';
   const t=selected();if(!t||!recruitingActions.isActive())return'';
   const work=recruitingActions.workload(universe.recruits,t),auto=recruitingActions.isAuto(universe);
-  return`<div class="ra-nav"><span class="eyebrow">RECRUITING HOURS</span><strong>${work.left} / ${work.budget} left</strong><small>${work.targets} on the board · ${work.worked} worked · ${auto?'staff cover the rest':`${work.cooling} cooling`} · ${work.ready} ready for an offer · ${work.offersOut}/${work.offerLimit} offers out</small>${rivalListHTML()}${staffControlsHTML(work)}${auto?'<small>Each week the staff spend what you leave: calls for everyone, ripe offers, a few pitches. They never book visits or in-homes.</small>':''}</div>`;
+  return`<div class="ra-nav"><span class="eyebrow">RECRUITING HOURS</span><strong>${work.left} / ${work.budget} left</strong><small>${work.targets} on the board · ${work.worked} worked · ${auto?'staff cover the rest':`${work.cooling} cooling`} · ${work.ready} ready for an offer · ${work.offersOut}/${work.offerLimit} offers out</small>${decisionListHTML()}${rivalListHTML()}${staffControlsHTML(work)}${auto?'<small>Each week the staff spend what you leave: calls for everyone, ripe offers, a few pitches. They never book visits or in-homes.</small>':''}</div>`;
  }
  // A short line for a prospect card when a rival has made a move he has not been answered on.
  function badgeHTML(id){
   if(!universe?.teams)return'';
-  const r=raRecruit(id);if(!r||r.committed)return'';
+  const r=raRecruit(id),t=selected();if(!r||!t||(r.committed&&r.committed!==t.name))return'';
   const m=recruitingActions.liveMoves(r)[0];
-  return m?`<small class="ra-rival-badge">⚑ ${raEsc(m.team)} ${raEsc(m.verb)}</small>`:'';
+  if(m)return`<small class="ra-rival-badge">⚑ ${r.committed?'Committed · ':''}${raEsc(m.team)} ${raEsc(m.verb)}</small>`;
+  if(r.committed||!r.targeted||!recruitingActions.funnelOn())return'';
+  const f=recruitingActions.funnelState(r);
+  return f?.cut?'<small class="ra-rival-badge">✂ Cut you from his list</small>':`<small class="ra-decision-badge">⏱ Decides week ${f?f.decisionWeek:recruitingActions.decisionWeekFor(r)}</small>`;
  }
  globalThis.DynastyRecruitingDesk={html:deskHTML,nav:navHTML,badge:badgeHTML,recruit:raRecruit,team:()=>selected(),bind:root=>{bindDesk(root);bindStaff(root)}};
+ // What the funnel did last week: who chose you, who chose someone else, who cut you.
+ function funnelLine(last){
+  const f=last?.funnel;if(!f)return'';
+  const bits=[];
+  if(f.won?.length)bits.push(`${raEsc(f.won.join(', '))} committed to you`);
+  if(f.lost?.length)bits.push(`${f.lost.map(x=>`${raEsc(x.name)} chose ${raEsc(x.team)}`).join(', ')}`);
+  if(f.cut?.length)bits.push(`${raEsc(f.cut.join(', '))} cut you from his list`);
+  return bits.length?` Decisions: ${bits.join('; ')}.`:'';
+ }
  function stripHTML(t){
   const w=recruitingActions.weekInfo(t),work=recruitingActions.workload(universe.recruits,t),last=t.recruitingLastWeek;
-  const lastWeek=last&&last.year===universe.year?`<small>Last week: ${last.spent} of ${last.budget} hours spent${last.cooledCount?` · ${last.cooledCount} target${last.cooledCount===1?'':'s'} cooled (${last.cooled.map(id=>raEsc(raRecruit(id)?.name||'')).filter(Boolean).slice(0,4).join(', ')}${last.cooledCount>4?'…':''})`:' · nobody cooled'}.</small>`:'';
+  const lastWeek=last&&last.year===universe.year?`<small>Last week: ${last.spent} of ${last.budget} hours spent${last.cooledCount?` · ${last.cooledCount} target${last.cooledCount===1?'':'s'} cooled (${last.cooled.map(id=>raEsc(raRecruit(id)?.name||'')).filter(Boolean).slice(0,4).join(', ')}${last.cooledCount>4?'…':''})`:' · nobody cooled'}.${funnelLine(last)}</small>`:'';
   return`<div class="recruiting-hours-strip"><strong>Recruiting Hours</strong><span>${work.left} / ${w.budget} left this week</span><small>${work.targets} active target${work.targets===1?'':'s'} · ${work.worked} worked this week · ${work.cooling} cooling · ${work.ready} ready for an offer · ${work.offersOut}/${work.offerLimit} offers out</small><small>Call ${recruitingActions.COSTS.call} · Pitch ${recruitingActions.COSTS.pitch} · Offer ${recruitingActions.COSTS.offer} · Visit ${recruitingActions.COSTS.visit} · In-Home ${recruitingActions.COSTS.inhome} hours. Unused hours do not carry over. A target nobody works for two weeks starts to cool.</small>${lastWeek}${staffControlsHTML(work)}</div>`;
  }
  function staffWorkBoard(){
@@ -631,6 +818,6 @@ if(typeof module==='object'&&module.exports){
  showRecruitProfile=function(id){
   showRecruitProfileBeforeRecruitingActions(id);
   const body=$('#recruitDialogBody'),r=raRecruit(id);
-  if(r&&body&&!body.querySelector?.('.recruiting-desk')&&!r.committed){body.insertAdjacentHTML?.('afterbegin',deskHTML(id));bindDesk(body)}
+  if(r&&body&&!body.querySelector?.('.recruiting-desk')){const html=deskHTML(id);if(html){body.insertAdjacentHTML?.('afterbegin',html);bindDesk(body)}}
  };
 }
