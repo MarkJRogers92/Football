@@ -1,8 +1,15 @@
 # Latest Session Work
 
-## v0.15.2 — Portal, weekly simulation and player history
+## v0.15.2 published — 2026-11-08
 
-Portal commitments survive the transition to spring. The staff shortlist compares players for one vacancy. Successful desk edits queue a management save. Weekly simulation uses a custom playbook for the controlled team. The Program tab loads alumni for class reports, and the postgame recap can recognize a homegrown player’s first college start.
+All four reviewed fixes and three upgrades are merged and published. Portal commitments survive resolution; returned entrants regain a roster spot; successful desk edits autosave; custom playbooks affect the controlled team's weekly simulation; class reports load alumni and use appearances/starts; staff recommend portal prospects on a compact scouting board; first college starts can produce a factual recruiting callback.
+
+- PR #42 merged at `b12699e7441cdc480ea53cda08c300f115094bcb`. The final head `2d64a84b975a03b6ab1b040dc4300cc26455b98c` adds the recovered blocked-commitment regression to candidate `7afa20c`. Its test-file blob `f6e427d9ce887aafa7e87cf4453227a9d06a9558` exactly matches the handoff patch. The merged tree has no file differences from the tested head.
+- Final PR validation `42458989643` and merge validation `42459719832` passed, including engine/presentation, both browser suites, IndexedDB, audit, and packaged Mac/Windows checks.
+- Production publisher `42459730687` passed. Pages deployment `42461642777` passed at `78123d697f162bdf2632b3aad38885b8c30f8ef9`. Root HTML blob `cf4712aeaa8ece14fda1b4efef4cdb2599e6aa59` matches the merged source exactly. The plain live URL displayed v0.15.2 in the title and main menu: https://markjrogers92.github.io/Football/
+- Release workflow `42459758170` created tag `v0.15.2` at the merge commit. Attachment workflow `42460608890` published Mac ARM64 and Windows x64 ZIPs plus SHA256SUMS from merge validation. Release: https://github.com/MarkJRogers92/Football/releases/tag/v0.15.2
+- Mac ZIP SHA-256: `df4618140da8bcf88543d299a5c12f07063e4441928c055064156adcef221497`. Windows ZIP SHA-256: `220222c55d0b37fd6b6642cf7dbae02ced6c2bafb1a023548b6f537e8cdd85d4`.
+- Existing local checkouts, installed apps and real saves were not changed. No local v0.15.2 checkout was established in this continuation; resume from the GitHub tag or current default branch. No remaining release gate is known; a long-dynasty soak beyond the completed suites was not run in this continuation.
 
 ## v0.15.1 — Portal Desk, player arcs, staff assignments, playbook, tour, long-dynasty speed (2026-11-08, PR #41)
 
