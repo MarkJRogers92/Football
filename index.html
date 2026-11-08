@@ -1002,6 +1002,26 @@ tr[hidden]{display:none!important}
 .sa-vacated{color:var(--warn)}
 @media(max-width:700px){.sa-controls{width:100%}.sa-controls select{flex:1 1 140px;max-width:none}}
 
+.situational-playbook{display:grid;gap:8px}
+.situational-playbook>p{margin:0}
+.pb-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--line)}
+.pb-row>span{display:grid;gap:2px;min-width:0;flex:1 1 260px}
+.pb-row small{color:var(--muted);line-height:1.35}
+.pb-row select{font-size:.8rem;padding:6px;min-width:170px}
+@media(max-width:700px){.pb-row select{width:100%}}
+
+.tour-layer{position:fixed;inset:0;z-index:9000;pointer-events:none}
+.tour-spot{position:fixed;border-radius:12px;box-shadow:0 0 0 9999px rgba(4,8,16,.62);outline:2px solid var(--accent);transition:top .18s,left .18s,width .18s,height .18s}
+.tour-card{position:fixed;pointer-events:auto;width:min(380px,calc(100vw - 24px));display:grid;gap:8px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--panel);box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.tour-card h3{margin:0}
+.tour-card p{margin:0;line-height:1.45;font-size:.9rem}
+.tour-actions{display:flex;gap:6px;align-items:center}
+.tour-actions span{flex:1}
+.tour-offer{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;border-left:3px solid var(--accent)}
+.tour-offer>div:first-child{display:grid;gap:2px;min-width:0;flex:1 1 240px}
+.tour-offer-actions{display:flex;gap:6px;flex-wrap:wrap}
+@media (prefers-reduced-motion:reduce){.tour-spot{transition:none}}
+
 .development-plan-board{grid-column:1/-1;margin-top:10px;border-top:1px solid var(--line);padding-top:10px}.development-plan-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:5px}.development-plan-head>div{display:flex;flex-direction:column}.development-plan-head small,.development-plan-head>span{color:var(--muted);font-size:11px}.development-plan-attribution{max-width:90ch;margin:4px 0 8px;color:var(--muted);font-size:11px;line-height:1.4}.development-plan-row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}.development-plan-player{display:flex;flex-direction:column;gap:3px;min-width:0}.development-plan-player>span{font-size:12px;color:var(--muted)}.development-plan-player .development-plan-outcome{color:var(--text)}.development-plan-outcome.good b{color:var(--good)}.development-plan-outcome.bad b{color:var(--bad)}.development-plan-outcome.mixed b{color:var(--warn)}.development-plan-support{max-width:80ch}.development-plan-coaching{margin-top:2px;font-size:11px;color:var(--muted)}.development-plan-coaching summary{cursor:pointer;color:var(--accent)}.development-plan-coaching p{max-width:72ch;margin:5px 0}.development-plan-coach-rows{max-width:80ch;line-height:1.45}.development-plan-row button{flex:0 0 auto}.development-feature-btn{display:block;margin-top:6px;padding:5px 8px;font-size:11px}.development-feature-btn.active{border-color:var(--good);color:var(--good)}@media(max-width:640px){.development-plan-row{gap:7px}.development-plan-player>span{line-height:1.4}.development-plan-support{font-size:11px}.development-plan-coaching{max-width:100%;overflow-wrap:anywhere}}
 .development-coaching-support{margin-top:12px;padding:10px;border:1px solid var(--line);border-radius:8px}.development-coaching-support>strong{display:block}.development-coaching-support>p{margin:5px 0 8px;color:var(--muted);font-size:12px;line-height:1.45}.development-coach-row{display:grid;grid-template-columns:minmax(120px,.7fr) minmax(0,1.3fr);gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:11px}.development-coach-row span{color:var(--muted)}@media(max-width:640px){.development-coach-row{grid-template-columns:1fr;gap:2px}}
 
@@ -4785,9 +4805,57 @@ function applyScrimmage(state,outcome={}){
 
 function touchdown(state,side){
   addPoints(state,side,6,'touchdown',{});
-  const rng=rngFor(state);const made=rng.next()<.965;finishRng(state,rng);
-  if(made)addPoints(state,side,1,'extra_point',{made:true});else pushEvent(state,'extra_point',{team:side,points:0,made:false});
+  // One draw either way, so a playbook choice never shifts the rest of the game's randomness.
+  const rng=rngFor(state),roll=rng.next();finishRng(state,rng);
+  if(playbookTwoPoint(state,side)){
+    if(roll<TWO_POINT_RATE)addPoints(state,side,2,'two_point',{made:true,playbook:true});else pushEvent(state,'two_point',{team:side,points:0,made:false,playbook:true});
+  }else if(roll<.965)addPoints(state,side,1,'extra_point',{made:true});else pushEvent(state,'extra_point',{team:side,points:0,made:false});
   kickoffAfterScore(state,other(side),'post_touchdown');
+}
+
+// v0.15.1 situational playbook. A program can set how its staff call fourth downs, conversions and the late
+// clock in games it does not coach live. With no playbook on the state these return null/false and the
+// engine plays exactly as before.
+const PLAYBOOK_OPTIONS={fourthDown:['standard','conservative','aggressive'],twoPoint:['kick','chart'],clock:['standard','manage']};
+const TWO_POINT_RATE=.47,TWO_POINT_CHART=[-10,-5,-2,1,5,12],LATE_SECONDS=240;
+function playbookFor(state,side){const p=state?.playbook?.[side];return p&&typeof p==='object'?p:null}
+function marginFor(state,side){return(state.score[side]||0)-(state.score[other(side)]||0)}
+// Returns 'play', 'punt' or 'field_goal', or null to leave the call to the default policy.
+function playbookFourthDown(state){
+  if(!state||state.down!==4||state.period>4)return null;
+  const side=state.possession,p=playbookFor(state,side);if(!p||!p.fourthDown||p.fourthDown==='standard')return null;
+  const margin=marginFor(state,side),fgRange=state.fieldPosition>=58;
+  // Late and behind, a field goal only when it ties or takes the lead; otherwise keep the ball.
+  if(state.period===4&&state.clock<=LATE_SECONDS&&margin<0)return fgRange&&margin>=-3?'field_goal':'play';
+  if(p.fourthDown==='aggressive'){
+    if(state.distance<=2&&state.fieldPosition>=35)return'play';
+    if(state.distance<=4&&state.fieldPosition>=55&&state.fieldPosition<70)return'play';
+    if(state.distance<=3&&state.fieldPosition>=90)return'play';
+    return fgRange?'field_goal':'punt';
+  }
+  if(state.distance<=1&&state.fieldPosition>=60)return'play';
+  return fgRange?'field_goal':'punt';
+}
+// Go for two after a touchdown when the chart says so: second half only, by the margin after the six points.
+function playbookTwoPoint(state,side){
+  const p=playbookFor(state,side);
+  return!!(p&&p.twoPoint==='chart'&&state.period>=3&&state.period<=4&&TWO_POINT_CHART.includes(marginFor(state,side)));
+}
+// Clock: in the fourth quarter a leading offense that runs or completes a pass bleeds 6 more seconds; a trailing
+// offense in the last five minutes gets out of bounds and saves 8. Applied after the play is drawn.
+function playbookClock(state,outcome){
+  if(!state||state.period!==4||!outcome||outcome.turnover)return outcome;
+  const side=state.possession,p=playbookFor(state,side);if(!p||p.clock!=='manage')return outcome;
+  const margin=marginFor(state,side),moving=outcome.kind==='rush'||outcome.completed===true;
+  if(!moving||!Number.isFinite(outcome.clock))return outcome;
+  if(margin>0)return{...outcome,clock:Math.min(45,outcome.clock+6),playbookClock:'bleed'};
+  if(margin<0&&state.clock<=300)return{...outcome,clock:Math.max(5,outcome.clock-8),playbookClock:'hurry'};
+  return outcome;
+}
+function sanitizePlaybook(value){
+  if(!value||typeof value!=='object')return null;
+  const out={};for(const [k,opts] of Object.entries(PLAYBOOK_OPTIONS))out[k]=opts.includes(value[k])?value[k]:opts[0];
+  return out;
 }
 function attemptFieldGoal(state){
   requireStatus(state,'live');if(state.period>4)throw new Error('Use overtime resolution for overtime field goals.');
@@ -4827,7 +4895,7 @@ function chooseFourthDown(state){
 function step(state){
   requireStatus(state,'live');
   if(state.period>4)return stepOvertime(state);
-  const decision=chooseFourthDown(state);
+  const decision=playbookFourthDown(state)||chooseFourthDown(state);
   if(decision==='field_goal')attemptFieldGoal(state);else if(decision==='punt')punt(state);else applyScrimmage(state,generateOutcome(state));
   return state;
 }
@@ -4927,7 +4995,7 @@ function validateGame(state){
   return true;
 }
 
-return{ENGINE_VERSION,QUARTER_SECONDS,createGame,startGame,step,simulate,applyScrimmage,attemptFieldGoal,punt,snapshot,restore,scoringTotals,validateState,validateGame,generateOutcome};
+return{ENGINE_VERSION,QUARTER_SECONDS,PLAYBOOK_OPTIONS,TWO_POINT_CHART,playbookFourthDown,playbookTwoPoint,playbookClock,sanitizePlaybook,createGame,startGame,step,simulate,applyScrimmage,attemptFieldGoal,punt,snapshot,restore,scoringTotals,validateState,validateGame,generateOutcome};
 });
 (function(root,factory){
   const engine=(typeof module==='object'&&module.exports)?require('./game-engine-v2.js'):root.DynastyGameEngineV2;
@@ -5144,8 +5212,15 @@ function shadowDecision(state){
   if(state.fieldPosition<60&&state.distance>1)return'punt';
   return'play';
 }
+// Situational playbooks by side ({home, away}); a side without one plays the default policy.
+function attachPlaybook(state,playbook){
+  if(!playbook||typeof playbook!=='object')return state;
+  const out={};for(const side of ['home','away']){const p=GameEngineV2.sanitizePlaybook(playbook[side]);if(p)out[side]=p}
+  if(Object.keys(out).length)state.playbook=out;return state;
+}
 function simulateShadow(options={}){
-  const {state,homeInput,awayInput}=createShadowGame(options),homeFieldRating=clamp(finite(options.homeFieldRating,0),0,12);GameEngineV2.startGame(state);
+  const {state,homeInput,awayInput}=createShadowGame(options),homeFieldRating=clamp(finite(options.homeFieldRating,0),0,12);
+  attachPlaybook(state,options.playbook);GameEngineV2.startGame(state);
   let steps=0;while(state.status!=='final'){
     if(++steps>500)throw new Error('Shadow Game Engine 2 step limit exceeded.');
     if(state.period>4){
@@ -5153,11 +5228,11 @@ function simulateShadow(options={}){
       const outcome=profileOutcome(state,homeInput,awayInput,homeFieldRating),start=state.events.length;
       GameEngineV2.applyScrimmage(state,outcome);annotateOutcomeEvent(state,start,outcome);continue;
     }
-    const decision=shadowDecision(state);
+    const decision=GameEngineV2.playbookFourthDown(state)||shadowDecision(state);
     if(decision==='field_goal')GameEngineV2.attemptFieldGoal(state);
     else if(decision==='punt')GameEngineV2.punt(state);
     else{
-      const outcome=profileOutcome(state,homeInput,awayInput,homeFieldRating),start=state.events.length;
+      const outcome=GameEngineV2.playbookClock(state,profileOutcome(state,homeInput,awayInput,homeFieldRating)),start=state.events.length;
       GameEngineV2.applyScrimmage(state,outcome);annotateOutcomeEvent(state,start,outcome);
     }
   }
@@ -5170,7 +5245,7 @@ function aggregate(samples){
   for(const k of ['points','plays','yards','turnovers','overtime','homeWins'])result[k]/=result.games;
   return result;
 }
-return{profileTeam,eventSummary,createShadowGame,profileOutcome,annotateOutcomeEvent,shadowDecision,simulateShadow,aggregate};
+return{attachPlaybook,profileTeam,eventSummary,createShadowGame,profileOutcome,annotateOutcomeEvent,shadowDecision,simulateShadow,aggregate};
 });
 
 (function(root,factory){
@@ -5215,8 +5290,11 @@ function validateSession(session){
   if(session.pendingConversion&& !['home','away'].includes(session.pendingConversion.side))throw new Error('Invalid pending touchdown conversion.');
   engine.validateState(session.state);return true
 }
+// The staff's call follows the program's situational playbook when it has one (v0.15.1), else the default policy.
+function staffFourthDown(state){return engine.playbookFourthDown(state)||adapter.shadowDecision(state)}
+function staffConversion(session){const p=session.pendingConversion;return p&&engine.playbookTwoPoint(session.state,p.side)?'two_point':'extra_point'}
 function createSession(options={}){
-  const made=adapter.createShadowGame(options),homeFieldRating=clamp(finite(options.homeFieldRating,0),0,12),controlledSide=controlledSideFor(options,made);
+  const made=adapter.createShadowGame(options);adapter.attachPlaybook(made.state,options.playbook);const homeFieldRating=clamp(finite(options.homeFieldRating,0),0,12),controlledSide=controlledSideFor(options,made);
   const session={
     version:VERSION,status:'pregame',gameId:String(options.gameId??made.state.gameId),seed:String(options.seed??made.state.seed),
     state:made.state,inputs:{home:made.homeInput,away:made.awayInput},homeFieldRating,controlledSide,
@@ -5291,12 +5369,12 @@ function executeAction(session,action,state){
   const normalized=normalizeFourth(action);if(normalized==='field_goal')engine.attemptFieldGoal(state);else if(normalized==='punt')engine.punt(state);else if(normalized==='go')playOutcome(session,state);else throw new Error(`Unknown Game Day action: ${action}`)
 }
 function stepSession(session,state){
-  if(session.pendingConversion){resolvePendingConversion(session,'extra_point');return}
+  if(session.pendingConversion){resolvePendingConversion(session,staffConversion(session));return}
   if(state.period>4){if(state.ot?.period>=3||(state.down===4&&state.fieldPosition>=55)){engine.step(state);return}playOutcome(session,state);return}
-  if(state.down===4){if(isControlled(session,state.possession))throw new Error('Game Day runner attempted to step through an unresolved fourth-down decision.');executeAction(session,adapter.shadowDecision(state),state);return}
+  if(state.down===4){if(isControlled(session,state.possession))throw new Error('Game Day runner attempted to step through an unresolved fourth-down decision.');executeAction(session,staffFourthDown(state),state);return}
   playOutcome(session,state)
 }
-function hooks(session){return{policyId:POLICY_ID,defaultAction:state=>adapter.shadowDecision(state),executeAction:(action,state)=>executeAction(session,action,state),step:state=>stepSession(session,state)}}
+function hooks(session){return{policyId:POLICY_ID,defaultAction:state=>staffFourthDown(state),executeAction:(action,state)=>executeAction(session,action,state),step:state=>stepSession(session,state)}}
 function nextDecisionId(state){if(!Number.isInteger(state.coachingDecisionCounter)||state.coachingDecisionCounter<0)state.coachingDecisionCounter=0;return`GD-${state.gameId}-${++state.coachingDecisionCounter}`}
 function conversionWindow(session){
   const state=session.state,p=session.pendingConversion;if(!p||state.status!=='live'||state.period!==4||state.clock>600||!isControlled(session,p.side))return false;
@@ -5305,7 +5383,7 @@ function conversionWindow(session){
 function createConversionDecision(session){
   if(!conversionWindow(session))return null;if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);
   const state=session.state,side=session.pendingConversion.side,team=state[side]?.name||session.names[side],mine=state.score[side],theirs=state.score[other(side)],min=Math.floor(state.clock/60),sec=String(state.clock%60).padStart(2,'0');
-  const decision={id:nextDecisionId(state),type:'two_point_decision',policyId:CONVERSION_POLICY_ID,team:side,teamId:state[side]?.id??null,contextKey:`conversion:${state.period}:${state.clock}:${side}:${mine}:${theirs}`,situation:`Q4 ${min}:${sec} · TOUCHDOWN ${team} · ${mine}–${theirs}`,context:{period:state.period,clock:state.clock,possession:side,fieldPosition:100,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},options:[{id:'extra_point',label:'Kick PAT'},{id:'two_point',label:'Go for two'},{id:'delegate',label:'Delegate to staff'}],staffRecommendation:'extra_point',defaultOption:'extra_point',createdAfterEventSeq:state.events?.length||0};
+  const decision={id:nextDecisionId(state),type:'two_point_decision',policyId:CONVERSION_POLICY_ID,team:side,teamId:state[side]?.id??null,contextKey:`conversion:${state.period}:${state.clock}:${side}:${mine}:${theirs}`,situation:`Q4 ${min}:${sec} · TOUCHDOWN ${team} · ${mine}–${theirs}`,context:{period:state.period,clock:state.clock,possession:side,fieldPosition:100,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},options:[{id:'extra_point',label:'Kick PAT'},{id:'two_point',label:'Go for two'},{id:'delegate',label:'Delegate to staff'}],staffRecommendation:staffConversion(session),defaultOption:staffConversion(session),createdAfterEventSeq:state.events?.length||0};
   session.pendingStrategyDecision=decision;return clone(decision)
 }
 function halftimeWindow(session){
@@ -5329,7 +5407,7 @@ function createTempoDecision(session){
 function appendStrategyReceipt(session,decision,selectedOption,resolvedAction){const state=session.state,event={seq:(state.events?.length||0)+1,type:'coaching_decision',decisionId:decision.id,decisionType:decision.type,policyId:decision.policyId,team:decision.team,selectedOption,resolvedAction,staffRecommendation:decision.staffRecommendation,situation:decision.situation,state:eventState(state)};state.events.push(event);return event}
 function currentDecision(session){
   if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);const state=session.state;
-  if(session.pendingConversion){const conversion=createConversionDecision(session);if(conversion)return conversion;resolvePendingConversion(session,'extra_point');if(state.status==='final')return null}
+  if(session.pendingConversion){const conversion=createConversionDecision(session);if(conversion)return conversion;resolvePendingConversion(session,staffConversion(session));if(state.status==='final')return null}
   const existing=decisions.pendingDecision(state);if(existing){if(isControlled(session,existing.team))return clone(existing);state.pendingCoachingDecision=null}
   if(state.status==='live'&&state.period<=4&&state.down===4&&state.possession&&isControlled(session,state.possession))return decisions.ensureDecision(state,hooks(session));
   return createHalftimeDecision(session)||createTempoDecision(session)
@@ -13447,6 +13525,222 @@ if(typeof module==='object'&&module.exports){
  // A reminder on This Week when a departure has left an assignment open.
  globalThis.DynastyStaffAssignmentNews=t=>staffAssignments.vacancies(t).map(r=>({type:'alert',tab:'staff',kicker:'STAFF',importance:52,
   main:`${r.vacated.name}'s assignment is open`,sub:`${[r.vacated.region,r.vacated.group&&staffAssignments.GROUPS[r.vacated.group]?.label].filter(Boolean).join(' and ')} ha${r.vacated.region&&r.vacated.group?'ve':'s'} no coach. Reassign it on Staff.`}));
+}
+
+// Situational playbook (v0.15.1). How your staff call fourth downs, conversions and the late clock in the
+// games you do not coach live, and what they recommend when you do. The rules live in Game Engine 2
+// (playbookFourthDown, playbookTwoPoint, playbookClock) so a simulated game and a live one decide the same
+// way. Only the controlled program has a playbook; "Standard / Kick / Standard" is the engine's default, so
+// a program that never opens the card plays exactly as before.
+function makePlaybookSystem(env){
+ 'use strict';
+ const OPTIONS={
+  fourthDown:[
+   {id:'standard',label:'Standard',note:'Go on short yardage near midfield, kick field goals in range, punt otherwise.'},
+   {id:'conservative',label:'Conservative',note:'Go only on 4th and 1 inside the 40; otherwise kick or punt.'},
+   {id:'aggressive',label:'Aggressive',note:'Go on 4th and 2 or less from your own 35, 4th and 4 or less between midfield and the 30, and 4th and 3 or less inside the 10.'}],
+  twoPoint:[
+   {id:'kick',label:'Always kick',note:'Kick the extra point after every touchdown.'},
+   {id:'chart',label:'Use the chart',note:'In the second half, go for two when the margin after the touchdown is −10, −5, −2, +1, +5 or +12.'}],
+  clock:[
+   {id:'standard',label:'Standard',note:'Play at the normal pace all game.'},
+   {id:'manage',label:'Manage the clock',note:'In the fourth quarter, leading: runs and completions take 6 more seconds. Trailing in the last five minutes: get out of bounds and save 8.'}]
+ };
+ const DEFAULTS={fourthDown:'standard',twoPoint:'kick',clock:'standard'};
+ function get(t){
+  const p=t?.playbook;if(!p||typeof p!=='object')return{...DEFAULTS};
+  const out={};for(const k of Object.keys(DEFAULTS))out[k]=OPTIONS[k].some(o=>o.id===p[k])?p[k]:DEFAULTS[k];
+  return out;
+ }
+ function isDefault(p){return Object.keys(DEFAULTS).every(k=>p[k]===DEFAULTS[k])}
+ function set(t,key,value){
+  if(!t||!OPTIONS[key])return{ok:false,reason:'Unknown playbook setting.'};
+  if(!OPTIONS[key].some(o=>o.id===value))return{ok:false,reason:`Unknown option "${value}".`};
+  const next={...get(t),[key]:value};
+  if(isDefault(next))delete t.playbook;else t.playbook=next;
+  return{ok:true,playbook:next};
+ }
+ // {home, away} for a game, with the controlled side's playbook only; null when neither side has one.
+ function forMatch(home,away,controlledName){
+  const out={};
+  for(const [side,t] of [['home',home],['away',away]])if(t&&t.name===controlledName){const p=get(t);if(!isDefault(p))out[side]=p}
+  return Object.keys(out).length?out:null;
+ }
+ // What the staff did with the playbook in one game, from the engine's own events.
+ function tally(state,side){
+  const out={fourthTries:0,fourthConverted:0,twoTries:0,twoMade:0,bleed:0,hurry:0};
+  for(const e of state?.events||[]){
+   if(e.team!==side)continue;
+   if(e.type==='scrimmage'&&e.from?.down===4){out.fourthTries++;if((e.yards||0)>=(e.from.distance||99)||e.touchdown)out.fourthConverted++}
+   if(e.type==='two_point'&&e.playbook){out.twoTries++;if(e.made)out.twoMade++}
+  }
+  return out;
+ }
+ return{OPTIONS,DEFAULTS,get,set,isDefault,forMatch,tally};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makePlaybookSystem};
+}else{
+ const playbook=makePlaybookSystem({});
+ globalThis.DynastyPlaybook=playbook;
+ const pbEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const controlled=()=>$('#userTeam')?.value||null;
+
+ // Recorded and live games pick up the controlled program's playbook without changing their callers.
+ const lab=globalThis.DynastyGameEngineV2Lab;
+ if(lab&&typeof lab.simulate==='function'){
+  const simulateBeforePlaybook=lab.simulate;
+  lab.simulate=function(options={}){
+   const pb=options.playbook===undefined?playbook.forMatch(options.home,options.away,controlled()):options.playbook;
+   const out=simulateBeforePlaybook(pb?{...options,playbook:pb}:options);
+   // A recorded game (not a shadow preview) adds to the season's playbook log, once per game id.
+   const id=String(options.gameId||'');
+   if(pb&&(/^v0101-(?!shadow-|gameday-)/.test(id)||id.startsWith('v0102-post-')))noteGame(id,out.state,pb);
+   return out;
+  };
+ }
+ const gameDay=globalThis.DynastyGameEngineV2GameDay;
+ if(gameDay&&typeof gameDay.createSession==='function'){
+  const createSessionBeforePlaybook=gameDay.createSession;
+  gameDay.createSession=function(options={}){
+   const pb=options.playbook===undefined?playbook.forMatch(options.home,options.away,controlled()):options.playbook;
+   return createSessionBeforePlaybook(pb?{...options,playbook:pb}:options);
+  };
+ }
+ function noteGame(id,state,pb){
+  const t=universe.teams.find(x=>x.name===controlled());if(!t)return;
+  const side=pb.home?'home':'away',log=(t.playbookLog&&t.playbookLog.year===universe.year)?t.playbookLog:(t.playbookLog={year:universe.year,games:[],totals:{fourthTries:0,fourthConverted:0,twoTries:0,twoMade:0}});
+  if(log.games.includes(id))return;
+  log.games.push(id);if(log.games.length>30)log.games.splice(0,log.games.length-30);
+  const x=playbook.tally(state,side);for(const k of Object.keys(log.totals))log.totals[k]+=x[k]||0;
+ }
+
+ function cardHTML(t){
+  const p=playbook.get(t),log=t.playbookLog&&t.playbookLog.year===universe.year?t.playbookLog:null;
+  const row=(key,title)=>`<label class="pb-row"><span><strong>${title}</strong><small>${pbEsc(playbook.OPTIONS[key].find(o=>o.id===p[key]).note)}</small></span><select data-pb="${key}">${playbook.OPTIONS[key].map(o=>`<option value="${o.id}" ${o.id===p[key]?'selected':''}>${pbEsc(o.label)}</option>`).join('')}</select></label>`;
+  const tot=log?.totals;
+  return`<div class="card situational-playbook" id="situationalPlaybook"><h3>Situational Playbook</h3>
+   <p class="small muted">How your staff call it in games you sim or watch, and what they recommend when you coach live. Late in the fourth quarter and behind, every setting except Standard keeps the ball on fourth down unless a field goal ties or takes the lead.</p>
+   ${row('fourthDown','Fourth down')}${row('twoPoint','Two-point tries')}${row('clock','Late clock')}
+   ${tot?`<p class="small">This season: ${tot.fourthTries} fourth-down tr${tot.fourthTries===1?'y':'ies'} (${tot.fourthConverted} converted) · ${tot.twoTries} two-point tr${tot.twoTries===1?'y':'ies'} (${tot.twoMade} good) in ${log.games.length} game${log.games.length===1?'':'s'} with this playbook.</p>`:''}
+  </div>`;
+ }
+ function bind(root,t){
+  root.querySelectorAll?.('[data-pb]').forEach(s=>s.onchange=()=>{
+   const r=playbook.set(t,s.dataset.pb,s.value);
+   setStatus(r.ok?`Playbook: ${playbook.OPTIONS[s.dataset.pb].find(o=>o.id===s.value).label} ${{fourthDown:'on fourth down',twoPoint:'after touchdowns',clock:'late clock'}[s.dataset.pb]}.`:r.reason);
+   renderActiveTab();
+  });
+ }
+ extendRender('gamelab',()=>{
+  const t=selected(),anchor=$('#nextGameCard');if(!t||!anchor)return;
+  $('#situationalPlaybook')?.remove();
+  anchor.insertAdjacentHTML?.('afterend',cardHTML(t));
+  const card=$('#situationalPlaybook');if(card)bind(card,t);
+ });
+}
+
+// Guided tour (v0.15.1). A short, optional walk through the desks: weekly reminders, recruiting hours and the
+// Recruiting Desk, staff assignments, the situational playbook, class report cards and the Portal Desk. It is
+// offered from a card on This Week during a new dynasty's first weeks, can be restarted from that card, and
+// never blocks anything: Escape or "End tour" closes it at any step.
+function makeTutorialSystem(){
+ 'use strict';
+ const STEPS=[
+  {tab:'dashboard',target:['#weeklyHub:not(:empty)','.card:has(#hubTitle)','#hubTitle'],title:'This Week',body:'Every week starts here: decisions that need you, reminders worth doing, and news. Recruiting results (who chose you, who cut you, who flipped) and PAYOFF stories about players you recruited show up in this list.'},
+  {tab:'recruiting',target:['.ra-nav','#raStrip','#rwSwitch'],title:'Recruiting hours',body:'Your staff get a budget of recruiting hours each week, from your recruiting coordinator, head coach and resources. Unused hours do not carry over. Turn on "Staff handle recruiting" if you would rather they spend them for you.'},
+  {tab:'recruiting',target:['.recruiting-desk','#recruitingWorkspace','#recruiting'],title:'The Recruiting Desk',body:'Open a prospect to work him: call, pitch a topic (the desk shows how well it will land before you spend), offer, host a visit, or visit the family. Each recruit cuts his list to a Top 5 and a Top 3 before his decision week, and rival programs answer what you do.'},
+  {tab:'staff',target:['#staffAssignments'],title:'Staff assignments',body:'Give each coach a recruiting territory and a position group. A strong recruiter makes every contact in his territory count for more; a strong developer lifts his room at camp. When a coach leaves, his territory and room stay open until you reassign them.'},
+  {tab:'gamelab',target:['#situationalPlaybook'],title:'Situational playbook',body:'Choose how your staff call fourth downs, two-point tries and the late clock in games you sim or watch. When you coach live, their recommendation follows the same playbook.'},
+  {tab:'program',target:['#arcClasses','#programHistory'],title:'How your classes turned out',body:'Every class you sign gets a report card here once it has played: starters, honors, draft picks, the best player, a steal and a miss, graded against the rest of the league. Each player\'s profile tells the story of how you won him.'},
+  {tab:'offseason',target:['#portalDesk','#portalPanels','#offseason'],title:'The Portal Desk',body:'In the offseason the transfer portal gets its own desk: portal hours each round, a playing-time pitch with an honest read, your real odds with each target, and rival programs that counter when you get close.'}
+ ];
+ function seen(u){return!!u?.tutorial?.done}
+ function markDone(u,how='finished'){if(u){u.tutorial={done:true,how,year:u.year,week:u.week}}}
+ // Offer the tour in a new dynasty's first season, early on, until it is finished or dismissed.
+ function shouldOffer(u){return!!u&&!seen(u)&&u.phase!=='complete'&&(u.week||0)<=3&&(u.history||[]).filter(h=>h.type==='season').length===0}
+ return{STEPS,seen,markDone,shouldOffer};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeTutorialSystem};
+}else{
+ const tour=makeTutorialSystem();
+ globalThis.DynastyTutorial=tour;
+ const tEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ let index=-1,returnFocus=null;
+ // The first visible match with some size; an empty list spotlights the card around it instead.
+ function targetFor(step){
+  for(const sel of step.target){
+   let el=document.querySelector(sel);if(!el||!el.getClientRects?.().length)continue;
+   if(el.getBoundingClientRect().height<8)el=el.closest?.('.card,section')||null;
+   if(el&&el.getBoundingClientRect().height>=8)return el;
+  }
+  return null;
+ }
+ function close(how){
+  document.getElementById('tourLayer')?.remove();document.removeEventListener('keydown',onKey,true);window.removeEventListener('resize',place);
+  if(index>=0)tour.markDone(universe,how);index=-1;
+  if(typeof render==='function')render();
+  returnFocus?.focus?.();returnFocus=null;
+ }
+ function onKey(e){
+  if(e.key==='Escape'){e.preventDefault();close('ended')}
+  else if(e.key==='ArrowRight'){e.preventDefault();show(index+1)}
+  else if(e.key==='ArrowLeft'){e.preventDefault();show(index-1)}
+ }
+ function place(){
+  const layer=document.getElementById('tourLayer');if(!layer||index<0)return;
+  const el=targetFor(tour.STEPS[index]),spot=layer.querySelector('.tour-spot'),card=layer.querySelector('.tour-card');
+  const vw=window.innerWidth,vh=window.innerHeight;
+  if(!el){spot.hidden=true;card.style.left=`${Math.max(12,(vw-card.offsetWidth)/2)}px`;card.style.top=`${Math.max(12,(vh-card.offsetHeight)/2)}px`;return}
+  const r=el.getBoundingClientRect(),pad=6,top=Math.max(4,r.top-pad),left=Math.max(4,r.left-pad),h=Math.min(r.height+pad*2,vh-top-4),w=Math.min(r.width+pad*2,vw-left-4);
+  Object.assign(spot.style,{top:`${top}px`,left:`${left}px`,width:`${w}px`,height:`${h}px`});spot.hidden=false;
+  // The card sits below the target when it fits, else above, else over the bottom of the screen.
+  const ch=card.offsetHeight,cw=Math.min(card.offsetWidth,vw-24);
+  let y=top+h+10;if(y+ch>vh-12)y=top-ch-10;if(y<12||y+ch>vh-12)y=vh-ch-12;
+  card.style.top=`${Math.max(12,Math.min(y,vh-ch-12))}px`;card.style.left=`${Math.min(Math.max(12,left),vw-cw-12)}px`;
+ }
+ function show(i){
+  if(i<0)return;if(i>=tour.STEPS.length){close('finished');return}
+  index=i;const step=tour.STEPS[i];
+  if(typeof goToTab==='function')goToTab(step.tab);
+  let layer=document.getElementById('tourLayer');
+  if(!layer){
+   layer=document.createElement('div');layer.id='tourLayer';layer.className='tour-layer';
+   layer.innerHTML=`<div class="tour-spot" aria-hidden="true"></div><section class="tour-card" role="dialog" aria-modal="false" aria-labelledby="tourTitle"><div class="eyebrow" data-tour-count></div><h3 id="tourTitle"></h3><p data-tour-body></p><div class="tour-actions"><button type="button" class="ghost" data-tour-end>End tour</button><span></span><button type="button" class="ghost" data-tour-back>Back</button><button type="button" data-tour-next>Next</button></div></section>`;
+   document.body.appendChild(layer);
+   layer.querySelector('[data-tour-end]').onclick=()=>close('ended');
+   layer.querySelector('[data-tour-back]').onclick=()=>show(index-1);
+   layer.querySelector('[data-tour-next]').onclick=()=>show(index+1);
+   document.addEventListener('keydown',onKey,true);window.addEventListener('resize',place);
+  }
+  layer.querySelector('[data-tour-count]').textContent=`TOUR · ${i+1} OF ${tour.STEPS.length}`;
+  layer.querySelector('#tourTitle').textContent=step.title;
+  layer.querySelector('[data-tour-body]').textContent=step.body;
+  layer.querySelector('[data-tour-back]').disabled=i===0;
+  layer.querySelector('[data-tour-next]').textContent=i===tour.STEPS.length-1?'Finish':'Next';
+  // Let the tab render, bring the target into view, then draw the spotlight around it.
+  setTimeout(()=>{const el=targetFor(step);el?.scrollIntoView?.({block:'center',behavior:'instant'});setTimeout(()=>{place();layer.querySelector('[data-tour-next]')?.focus?.()},30)},30);
+ }
+ function start(){returnFocus=document.activeElement;show(0)}
+ globalThis.DynastyTutorial.start=start;
+ globalThis.DynastyTutorial.close=close;
+
+ function offerHTML(){
+  return`<div class="card tour-offer" id="tourOffer"><div><strong>New desks this season</strong><span class="small muted">A two-minute tour of recruiting hours, the desks, staff assignments and the playbook.</span></div><div class="tour-offer-actions"><button type="button" data-tour-start>Take the tour</button><button type="button" class="ghost" data-tour-dismiss>Not now</button></div></div>`;
+ }
+ extendRender('dashboard',()=>{
+  document.getElementById('tourOffer')?.remove();
+  if(index>=0||!tour.shouldOffer(universe))return;
+  const hub=document.getElementById('weeklyHub'),host=hub?.closest?.('.card')||hub;if(!host)return;
+  host.insertAdjacentHTML?.('beforebegin',offerHTML());
+  const card=document.getElementById('tourOffer');if(!card)return;
+  card.querySelector('[data-tour-start]').onclick=()=>start();
+  card.querySelector('[data-tour-dismiss]').onclick=()=>{tour.markDone(universe,'dismissed');card.remove();setStatus('Tour dismissed. You can always find each desk from its tab.')};
+ });
+ if(globalThis.__DL_TEST__)Object.assign(globalThis.__DL_TEST__,{tourStart:start,tourClose:close,tourState:()=>({index,seen:tour.seen(universe)})});
 }
 
 // Read-only presentation adapter for the premium recruiting workspace.

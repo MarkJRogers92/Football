@@ -5,7 +5,7 @@
 function makeTutorialSystem(){
  'use strict';
  const STEPS=[
-  {tab:'dashboard',target:['#weeklyHub'],title:'This Week',body:'Every week starts here: decisions that need you, reminders worth doing, and news. Recruiting results (who chose you, who cut you, who flipped) and PAYOFF stories about players you recruited show up in this list.'},
+  {tab:'dashboard',target:['#weeklyHub:not(:empty)','.card:has(#hubTitle)','#hubTitle'],title:'This Week',body:'Every week starts here: decisions that need you, reminders worth doing, and news. Recruiting results (who chose you, who cut you, who flipped) and PAYOFF stories about players you recruited show up in this list.'},
   {tab:'recruiting',target:['.ra-nav','#raStrip','#rwSwitch'],title:'Recruiting hours',body:'Your staff get a budget of recruiting hours each week, from your recruiting coordinator, head coach and resources. Unused hours do not carry over. Turn on "Staff handle recruiting" if you would rather they spend them for you.'},
   {tab:'recruiting',target:['.recruiting-desk','#recruitingWorkspace','#recruiting'],title:'The Recruiting Desk',body:'Open a prospect to work him: call, pitch a topic (the desk shows how well it will land before you spend), offer, host a visit, or visit the family. Each recruit cuts his list to a Top 5 and a Top 3 before his decision week, and rival programs answer what you do.'},
   {tab:'staff',target:['#staffAssignments'],title:'Staff assignments',body:'Give each coach a recruiting territory and a position group. A strong recruiter makes every contact in his territory count for more; a strong developer lifts his room at camp. When a coach leaves, his territory and room stay open until you reassign them.'},
@@ -27,7 +27,15 @@ if(typeof module==='object'&&module.exports){
  globalThis.DynastyTutorial=tour;
  const tEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  let index=-1,returnFocus=null;
- function targetFor(step){for(const sel of step.target){const el=document.querySelector(sel);if(el&&el.getClientRects?.().length)return el}return null}
+ // The first visible match with some size; an empty list spotlights the card around it instead.
+ function targetFor(step){
+  for(const sel of step.target){
+   let el=document.querySelector(sel);if(!el||!el.getClientRects?.().length)continue;
+   if(el.getBoundingClientRect().height<8)el=el.closest?.('.card,section')||null;
+   if(el&&el.getBoundingClientRect().height>=8)return el;
+  }
+  return null;
+ }
  function close(how){
   document.getElementById('tourLayer')?.remove();document.removeEventListener('keydown',onKey,true);window.removeEventListener('resize',place);
   if(index>=0)tour.markDone(universe,how);index=-1;
@@ -48,8 +56,8 @@ if(typeof module==='object'&&module.exports){
   Object.assign(spot.style,{top:`${top}px`,left:`${left}px`,width:`${w}px`,height:`${h}px`});spot.hidden=false;
   // The card sits below the target when it fits, else above, else over the bottom of the screen.
   const ch=card.offsetHeight,cw=Math.min(card.offsetWidth,vw-24);
-  let y=top+h+10;if(y+ch>vh-12)y=top-ch-10;if(y<12)y=vh-ch-12;
-  card.style.top=`${Math.max(12,y)}px`;card.style.left=`${Math.min(Math.max(12,left),vw-cw-12)}px`;
+  let y=top+h+10;if(y+ch>vh-12)y=top-ch-10;if(y<12||y+ch>vh-12)y=vh-ch-12;
+  card.style.top=`${Math.max(12,Math.min(y,vh-ch-12))}px`;card.style.left=`${Math.min(Math.max(12,left),vw-cw-12)}px`;
  }
  function show(i){
   if(i<0)return;if(i>=tour.STEPS.length){close('finished');return}
