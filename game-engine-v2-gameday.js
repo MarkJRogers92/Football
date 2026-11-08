@@ -40,8 +40,11 @@ function validateSession(session){
   if(session.pendingConversion&& !['home','away'].includes(session.pendingConversion.side))throw new Error('Invalid pending touchdown conversion.');
   engine.validateState(session.state);return true
 }
+// The staff's call follows the program's situational playbook when it has one (v0.15.1), else the default policy.
+function staffFourthDown(state){return engine.playbookFourthDown(state)||adapter.shadowDecision(state)}
+function staffConversion(session){const p=session.pendingConversion;return p&&engine.playbookTwoPoint(session.state,p.side)?'two_point':'extra_point'}
 function createSession(options={}){
-  const made=adapter.createShadowGame(options),homeFieldRating=clamp(finite(options.homeFieldRating,0),0,12),controlledSide=controlledSideFor(options,made);
+  const made=adapter.createShadowGame(options);adapter.attachPlaybook(made.state,options.playbook);const homeFieldRating=clamp(finite(options.homeFieldRating,0),0,12),controlledSide=controlledSideFor(options,made);
   const session={
     version:VERSION,status:'pregame',gameId:String(options.gameId??made.state.gameId),seed:String(options.seed??made.state.seed),
     state:made.state,inputs:{home:made.homeInput,away:made.awayInput},homeFieldRating,controlledSide,
@@ -116,12 +119,12 @@ function executeAction(session,action,state){
   const normalized=normalizeFourth(action);if(normalized==='field_goal')engine.attemptFieldGoal(state);else if(normalized==='punt')engine.punt(state);else if(normalized==='go')playOutcome(session,state);else throw new Error(`Unknown Game Day action: ${action}`)
 }
 function stepSession(session,state){
-  if(session.pendingConversion){resolvePendingConversion(session,'extra_point');return}
+  if(session.pendingConversion){resolvePendingConversion(session,staffConversion(session));return}
   if(state.period>4){if(state.ot?.period>=3||(state.down===4&&state.fieldPosition>=55)){engine.step(state);return}playOutcome(session,state);return}
-  if(state.down===4){if(isControlled(session,state.possession))throw new Error('Game Day runner attempted to step through an unresolved fourth-down decision.');executeAction(session,adapter.shadowDecision(state),state);return}
+  if(state.down===4){if(isControlled(session,state.possession))throw new Error('Game Day runner attempted to step through an unresolved fourth-down decision.');executeAction(session,staffFourthDown(state),state);return}
   playOutcome(session,state)
 }
-function hooks(session){return{policyId:POLICY_ID,defaultAction:state=>adapter.shadowDecision(state),executeAction:(action,state)=>executeAction(session,action,state),step:state=>stepSession(session,state)}}
+function hooks(session){return{policyId:POLICY_ID,defaultAction:state=>staffFourthDown(state),executeAction:(action,state)=>executeAction(session,action,state),step:state=>stepSession(session,state)}}
 function nextDecisionId(state){if(!Number.isInteger(state.coachingDecisionCounter)||state.coachingDecisionCounter<0)state.coachingDecisionCounter=0;return`GD-${state.gameId}-${++state.coachingDecisionCounter}`}
 function conversionWindow(session){
   const state=session.state,p=session.pendingConversion;if(!p||state.status!=='live'||state.period!==4||state.clock>600||!isControlled(session,p.side))return false;
@@ -130,7 +133,7 @@ function conversionWindow(session){
 function createConversionDecision(session){
   if(!conversionWindow(session))return null;if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);
   const state=session.state,side=session.pendingConversion.side,team=state[side]?.name||session.names[side],mine=state.score[side],theirs=state.score[other(side)],min=Math.floor(state.clock/60),sec=String(state.clock%60).padStart(2,'0');
-  const decision={id:nextDecisionId(state),type:'two_point_decision',policyId:CONVERSION_POLICY_ID,team:side,teamId:state[side]?.id??null,contextKey:`conversion:${state.period}:${state.clock}:${side}:${mine}:${theirs}`,situation:`Q4 ${min}:${sec} · TOUCHDOWN ${team} · ${mine}–${theirs}`,context:{period:state.period,clock:state.clock,possession:side,fieldPosition:100,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},options:[{id:'extra_point',label:'Kick PAT'},{id:'two_point',label:'Go for two'},{id:'delegate',label:'Delegate to staff'}],staffRecommendation:'extra_point',defaultOption:'extra_point',createdAfterEventSeq:state.events?.length||0};
+  const decision={id:nextDecisionId(state),type:'two_point_decision',policyId:CONVERSION_POLICY_ID,team:side,teamId:state[side]?.id??null,contextKey:`conversion:${state.period}:${state.clock}:${side}:${mine}:${theirs}`,situation:`Q4 ${min}:${sec} · TOUCHDOWN ${team} · ${mine}–${theirs}`,context:{period:state.period,clock:state.clock,possession:side,fieldPosition:100,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},options:[{id:'extra_point',label:'Kick PAT'},{id:'two_point',label:'Go for two'},{id:'delegate',label:'Delegate to staff'}],staffRecommendation:staffConversion(session),defaultOption:staffConversion(session),createdAfterEventSeq:state.events?.length||0};
   session.pendingStrategyDecision=decision;return clone(decision)
 }
 function halftimeWindow(session){
@@ -154,7 +157,7 @@ function createTempoDecision(session){
 function appendStrategyReceipt(session,decision,selectedOption,resolvedAction){const state=session.state,event={seq:(state.events?.length||0)+1,type:'coaching_decision',decisionId:decision.id,decisionType:decision.type,policyId:decision.policyId,team:decision.team,selectedOption,resolvedAction,staffRecommendation:decision.staffRecommendation,situation:decision.situation,state:eventState(state)};state.events.push(event);return event}
 function currentDecision(session){
   if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);const state=session.state;
-  if(session.pendingConversion){const conversion=createConversionDecision(session);if(conversion)return conversion;resolvePendingConversion(session,'extra_point');if(state.status==='final')return null}
+  if(session.pendingConversion){const conversion=createConversionDecision(session);if(conversion)return conversion;resolvePendingConversion(session,staffConversion(session));if(state.status==='final')return null}
   const existing=decisions.pendingDecision(state);if(existing){if(isControlled(session,existing.team))return clone(existing);state.pendingCoachingDecision=null}
   if(state.status==='live'&&state.period<=4&&state.down===4&&state.possession&&isControlled(session,state.possession))return decisions.ensureDecision(state,hooks(session));
   return createHalftimeDecision(session)||createTempoDecision(session)
