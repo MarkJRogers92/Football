@@ -1,5 +1,5 @@
+const {testPageURL}=require('./helpers/browser-url');
 const assert=require('node:assert/strict');
-const path=require('path');
 const {chromium}=require('playwright-core');
 const {chromiumPath}=require('./helpers/chromium-path');
 const TAB_GROUP={dashboard:'home',gamelab:'season'};
@@ -10,16 +10,22 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
   const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});
   const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
   try{
-    await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);
+    await page.goto(testPageURL());await startNewDynasty(page);
     const ready=await page.evaluate(()=>window.__DL_TEST__.v2PrepareDetailedGame());assert.equal(ready.career,false);assert.equal(ready.ready,true,`matchup fixture should resolve/delegate weekly blockers before Game Day: ${JSON.stringify(ready)}`);
     await goTab(page,'gamelab');
     await page.waitForSelector('#v2MatchupIntelligence',{state:'visible',timeout:15000});const pre=await page.evaluate(()=>window.__DL_TEST__.v2MatchupSummary());assert.equal(pre.matchup.visible,true);
     for(const phrase of ['GAME DAY INTELLIGENCE','Where the game tilts','Opponent identity','Staff recommendation','Your key players','Players to know'])assert.match(pre.matchup.text,new RegExp(phrase,'i'));
     assert.match(pre.matchup.text,/% pass/i);assert.match(pre.matchup.text,/Active plan/i);
+    const activePlan=(await page.locator('#v2MatchupIntelligence .v2-matchup-plan > div strong').first().innerText()).trim();assert.ok(activePlan,'the pregame plan label is present');console.log('MATCHUP FIXTURE',JSON.stringify({ready,activePlan}));
     await page.waitForSelector('[data-v2-gameday-start]',{timeout:10000});await page.click('[data-v2-gameday-start]');await page.click('[data-v2-gameday-delegate]');
     /* the live game records itself at the final whistle */
     await page.waitForFunction(()=>/GAME PLAN REVIEW/i.test(window.__DL_TEST__.v2MatchupSummary()?.receipt||''),{timeout:30000});const post=await page.evaluate(()=>window.__DL_TEST__.v2MatchupSummary());
-    assert.match(post.receipt,/GAME PLAN REVIEW/i);assert.match(post.receipt,/Standard week/i);assert.match(post.receipt,/Baseline/i);assert.match(post.receipt,/other factors also affect the outcome/i);
+    assert.match(post.receipt,/GAME PLAN REVIEW/i);
+    assert.equal((await page.locator('#v2PlanReceipt h3').innerText()).trim(),activePlan,'the archived review must name the actual pregame plan');
+    const verdict=(await page.locator('#v2PlanReceipt .pill').innerText()).trim();
+    if(activePlan==='Standard week')assert.equal(verdict,'Baseline');
+    else assert.ok(['Worked','Mixed','Missed'].includes(verdict),'a real preparation plan receives its recorded outcome');
+    assert.match(post.receipt,/other factors also affect the outcome/i);
     assert.deepEqual(errors,[],`matchup intelligence browser emitted errors: ${errors.join('\n')}`);console.log('PASS v0.10.2 matchup intelligence: weekly blockers resolved before Game Day; pregame intelligence and archived postgame receipt remain intact');
   }finally{await browser.close()}
 })().catch(err=>{console.error(err);process.exit(1)});
