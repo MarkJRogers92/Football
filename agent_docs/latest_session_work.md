@@ -1,5 +1,10 @@
 # Latest Session Work
 
+## Unreleased isolated handoff candidate — 2026-11-08
+
+The local `codex/dynasty-lab-correctness-current-20261108` worktree builds on Claude's merged PR #43 (`6e226c2`) and retains the D1–D4 correctness repairs. Its next stage adds factual, persistent homegrown first-start history; a three-stop first-Saturday tour plus optional full tour; saved medical delegation instructions; optional big-moments coaching with deterministic saved-action replay; and preparation/yearbook accessibility. This is an unpushed candidate, not a new release. See `docs/DYNASTY_ENGAGEMENT_2026-11-08.md` for final test results and the working native Chromium/loopback-HTTP validation route.
+
+
 ## Unreleased on top of v0.15.2 — deeper play model, facilities and boosters (2026-11-08, branch `claude/cool-knuth-aomwcv`)
 
 Not released: the version is still 0.15.2 and the CHANGELOG entry is "Unreleased". Release only on the owner's explicit say-so.

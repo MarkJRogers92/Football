@@ -5,19 +5,42 @@ globalThis.DynastyLabShowPlayer=id=>showPlayerProfile(id);
 const STORYLINE_RECORD_STATS={QB:['passYds','passing yards'],RB:['rushYds','rushing yards'],WR:['recYds','receiving yards'],TE:['recYds','receiving yards'],EDGE:['sacks','sacks'],DT:['sacks','sacks'],LB:['tackles','tackles'],CB:['intDef','interceptions'],S:['intDef','interceptions']};
 let storylineCache={key:null,value:null};
 function storylineSchoolRecords(){
- // Best career total per school and stat across archived players (career totals are final for them).
- const best={};
- for(const a of universe.playerArchive||[]){const def=STORYLINE_RECORD_STATS[a.pos];if(!def||!a.lastTeam)continue;const [k]=def,v=(a.career?.[k]||0);const key=`${a.lastTeam}|${k}`;if(v>(best[key]?.value||0))best[key]={value:v,holder:a.name}}
- return best;
+ // Only recorded school/year lines establish a school's totals. Career totals cannot be assigned to the last school.
+ const stats=[...new Set(Object.values(STORYLINE_RECORD_STATS).map(d=>d[0]))],bySchool={},totals=new Map(),incomplete=new Set();
+ const seenPlayers=new Set(),deferred=typeof archiveIsDeferred==='function'&&archiveIsDeferred();
+ const addPlayer=(p,currentSchool,currentYear)=>{
+  if(seenPlayers.has(p.id))return;seenPlayers.add(p.id);
+  const seasons=new Map();for(const line of p.seasonHistory||[])if(line.team&&Number.isFinite(line.year))seasons.set(`${line.team}|${line.year}`,line);
+  for(const k of stats){
+   const schoolTotals={},historyTotal=[...seasons.values()].reduce((n,line)=>n+(Number(line[k])||0),0);
+   if((Number(p.career?.[k])||0)>historyTotal)incomplete.add(k);
+   for(const line of seasons.values())schoolTotals[line.team]=(schoolTotals[line.team]||0)+(Number(line[k])||0);
+   if(currentSchool&&Number.isFinite(currentYear)&&!seasons.has(`${currentSchool}|${currentYear}`))schoolTotals[currentSchool]=(schoolTotals[currentSchool]||0)+(Number(p.stats?.[k])||0);
+   for(const [school,value] of Object.entries(schoolTotals)){
+    const key=`${school}|${k}`;totals.set(`${p.id}|${key}`,value);
+    if(value>0)(bySchool[key]??=[]).push({id:p.id,value,holder:p.name});
+   }
+  }
+ };
+ for(const t of universe.teams||[])for(const p of t.roster||[])addPlayer(p,t.name,universe.year);
+ for(const entry of universe.transferPortal||[])if(entry.p)addPlayer(entry.p,entry.from,entry.enteredSeason);
+ for(const p of universe.playerArchive||[])addPlayer(p,p.lastTeam,p.retiredYear);
+ for(const list of Object.values(bySchool))list.sort((a,b)=>b.value-a.value||String(a.id).localeCompare(String(b.id)));
+ return {bySchool,totals,incomplete,deferred};
 }
+
 function storylinePlayer(p,t,ctx){
  const P=globalThis.DynastyPlayerStories,prod=x=>P?.productionScore?.(x)||0;
  const stars=Number((String(p.origin||'').match(/^(\d)-star/)||[])[1])||null;
  const seasons=(p.seasonHistory||[]).slice().sort((a,b)=>a.year-b.year).map(s=>({year:s.year,team:s.team,rating:Number.isFinite(Number(s.rating))?Number(s.rating):null,games:s.games||0,starts:s.starts||0,production:prod({pos:s.pos||p.pos,stats:s})}));
  const tr=(p.transferHistory||[]).filter(h=>h.toSchoolId===t.id).at(-1);
  const def=STORYLINE_RECORD_STATS[p.pos];let record=null;
- if(def){const [k,label]=def,total=(p.career?.[k]||0)+(p.stats?.[k]||0),r=ctx.records[`${t.name}|${k}`];if(r&&total>0)record={label,total,value:r.value,holder:r.holder}}
- return{id:p.id,name:p.name,pos:p.pos,team:t.name,teamId:t.id,eligibility:eligibilityLabel(p),stars,redshirtUsed:!!p.redshirtUsed,injuryWeeks:p.injuryWeeks||0,
+ if(def){
+  const [k,label]=def,key=`${t.name}|${k}`,total=ctx.records.totals.get(`${p.id}|${key}`)||0;
+  const rival=ctx.records.bySchool[key]?.find(r=>r.id!==p.id);
+  if(total>0)record={label,total,value:rival?.value||0,holder:rival?.holder||null,knownOnly:ctx.records.deferred||ctx.records.incomplete.has(k)};
+ }
+ return{id:p.id,name:p.name,pos:p.pos,team:t.name,teamId:t.id,eligibility:eligibilityLabel(p),stars,redshirtUsed:!!p.redshirtUsed,redshirtSeason:p.redshirtSeason??null,injuryWeeks:p.injuryWeeks||0,
   seasons,current:{year:universe.year,games:p.stats?.games||0,starts:p.stats?.starts||0,production:prod(p),line:P?.statLine?.(p)||'',rating:Number.isFinite(Number(p.perceived))?Number(p.perceived):null},
   injuries:(p.injuryHistory||[]).map(i=>({year:i.year,week:i.week,weeks:i.weeks,type:i.type})),
   transfer:tr?{season:tr.season,from:tr.fromSchool}:null,record,teamPosRank:ctx.posRank.get(p.id)||null,nationalPosRank:ctx.national?.get(p.id)||null,award:ctx.awards.get(p.id)||null};
@@ -38,7 +61,7 @@ globalThis.DynastyStorylineSnapshot=Object.freeze({
  read(){
   try{
    if(!universe?.teams)return null;const u=selected();if(!u)return null;
-   const key=[universe.year,universe.week,universe.phase,u.id,universe.gameCounter||0,(universe.playerArchive||[]).length].join(':');
+   const key=[universe.year,universe.week,universe.phase,u.id,universe.gameCounter||0,(universe.playerArchive||[]).length,typeof archiveIsDeferred==='function'&&archiveIsDeferred()].join(':');
    if(storylineCache.key===key)return storylineCache.value;
    const P=globalThis.DynastyPlayerStories,records=storylineSchoolRecords(),race=storylineAwardRace(u),awards=new Map();
    for(const a of race)for(const c of a.top)if(!awards.has(c.id)||awards.get(c.id).rank>c.rank)awards.set(c.id,{name:a.name,rank:c.rank,move:c.move});

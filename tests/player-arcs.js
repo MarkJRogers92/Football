@@ -181,3 +181,24 @@ test('a browser checkpoint preserves the recruiting receipt and the archived cla
  await e.ensureGamesLoaded();const game=e.universe.gameArchive.find(g=>g.id===scheduled.gameId);
  assert.deepEqual(game.firstStart,receipt);assert.match(e.gameRecap(game).body,/first college start/);
 });
+
+test('a real homegrown first start remains linked in the profile and school history after skipping and reload',async()=>{
+ for(const detailed of [false,true]){
+  global.__DL_TEST__={};const {IDBFactory}=require('fake-indexeddb');const e=loadEngine({seed:5220,fullRuntime:true,indexedDB:new IDBFactory()});e.setUserTeam(USER);await e.loadSchools();e.initUniverse();
+  const t=e.T(USER),p=e.roleStarter(t,'QB1');p.recruitingMemory={schoolId:t.id,season:e.universe.year-1,stars:3,desk:{hours:14}};
+  assert.equal(global.__DL_TEST__.playerStoryEvents(p).filter(x=>x.metadata.storyType==='FIRST_COLLEGE_START').length,0,'a depth position alone is not a recorded start');
+  const scheduled=e.findUserGame();if(detailed){e.delegateWeeklyDecisions(t);e.simulateUserDetailed()}else e.simWeek(true);
+  let events=e.universe.events.filter(x=>x.metadata?.storyType==='FIRST_COLLEGE_START'&&x.playerIds.includes(p.id));assert.equal(events.length,1);
+  assert.deepEqual(events[0].gameIds,[scheduled.gameId]);assert.equal(events[0].week,1);assert.match(e.careerChronologyHTML(p),/FIRST COLLEGE START/);assert.match(e.careerChronologyHTML(p),new RegExp(scheduled.gameId));
+  if(detailed)e.simWeek(true);e.simWeek(true);await e.saveBrowser();await e.loadBrowser();
+  const restored=e.T(USER).roster.find(x=>x.id===p.id);events=global.__DL_TEST__.playerStoryEvents(restored).filter(x=>x.metadata.storyType==='FIRST_COLLEGE_START');assert.equal(events.length,1);assert.equal(events[0].gameIds[0],scheduled.gameId);
+  global.__DL_TEST__.renderSelectedSchoolStories();assert.match(global.document.querySelector('#playerStoryHistory').innerHTML,/FIRST COLLEGE START/);assert.match(global.document.querySelector('#playerStoryHistory').innerHTML,new RegExp(scheduled.gameId));
+  e.universe.year+=5;e.compactHistoryArchive();assert.equal(global.__DL_TEST__.playerStoryEvents(restored).filter(x=>x.metadata.storyType==='FIRST_COLLEGE_START').length,1,'a career milestone survives later seasons');
+ }
+});
+
+test('first-start history rolls back with a failed game and is recorded once on retry',async()=>{
+ global.__DL_TEST__={};const e=loadEngine({seed:5221,fullRuntime:true});e.setUserTeam(USER);await e.loadSchools();e.initUniverse();const t=e.T(USER),p=e.roleStarter(t,'QB1');p.recruitingMemory={schoolId:t.id,season:e.universe.year-1,stars:3};
+ global.__DL_TEST__.v2PrepareDetailedGame();const before=JSON.stringify(e.universe.events),probe=global.__DL_TEST__.v2RollbackProbe('afterArchive');assert.equal(probe.ok,true);assert.equal(JSON.stringify(e.universe.events),before);
+ e.delegateWeeklyDecisions(t);e.simulateUserDetailed();assert.equal(e.universe.events.filter(x=>x.metadata?.storyType==='FIRST_COLLEGE_START'&&x.playerIds.includes(p.id)).length,1);
+});

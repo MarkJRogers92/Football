@@ -10,23 +10,25 @@
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=n=>Number(n||0).toLocaleString('en-US');
 const ARCS={
- record_chase:'Record chase',award:'Award race',underdog:'Underdog',redshirt_payoff:'Redshirt payoff',
+ record_chase:'Record chase',record_production:'Recorded production',award:'Award race',underdog:'Underdog',redshirt_payoff:'Redshirt payoff',
  breakout:'Breakout',national_leader:'National leader',freshman:'Freshman impact',comeback:'Comeback',fresh_start:'Fresh start',climber:'Development story',last_ride:'Last ride'
 };
 // All arcs a player's evidence supports, strongest first. `pl` is a plain player record (see adapter).
 function detect(pl){
  const out=[],cur=pl.current||{},seasons=pl.seasons||[],add=(type,score,title,summary)=>out.push({type,label:ARCS[type],score:Math.round(score*10)/10,title,summary});
  const rec=pl.record;
- if(rec&&rec.value>0&&rec.total>=.8*rec.value&&rec.total>0){
+ if(rec?.knownOnly&&rec.total>0)add('record_production',50,'Recorded school production',`${fmt(rec.total)} recorded career ${rec.label} at ${pl.team}. School leadership is unavailable from the saved history.`);
+ if(rec&&!rec.knownOnly&&rec.value>0&&rec.total>=.8*rec.value&&rec.total>0){
   if(rec.total>rec.value)add('record_chase',110+Math.min(20,(rec.total/rec.value-1)*100),'Owns the school record',`${fmt(rec.total)} career ${rec.label}, past ${rec.holder}'s ${fmt(rec.value)}.`);
+  else if(rec.total===rec.value)add('record_chase',105,'Tied for the school record',`${fmt(rec.total)} career ${rec.label} at ${pl.team}, tied with ${rec.holder}.`);
   else add('record_chase',80+25*(rec.total/rec.value),'Chasing the school record',`${fmt(rec.total)} career ${rec.label}, ${fmt(rec.value-rec.total)} short of ${rec.holder}'s ${fmt(rec.value)}.`);
  }
  if(pl.award&&pl.award.rank<=3)add('award',92-pl.award.rank*6,`${pl.award.rank===1?'Leads':'In'} the ${pl.award.name} race`,`#${pl.award.rank} in the ${pl.award.name} standings${pl.award.move>0?`, up ${pl.award.move} this week`:pl.award.move<0?`, down ${-pl.award.move} this week`:''}.`);
  if(pl.stars&&pl.stars<=3&&(cur.games||0)>=2&&pl.teamPosRank===1&&(cur.production||0)>=4)add('underdog',58+(4-pl.stars)*12+Math.min(20,cur.production),`${pl.stars}-star recruit, now the lead ${pl.pos}`,`Signed as a ${pl.stars}-star; leads ${pl.team}'s ${pl.pos} room in production this year (${cur.line}).`);
  if(pl.nationalPosRank&&pl.nationalPosRank<=10&&(cur.games||0)>=2)add('national_leader',82-pl.nationalPosRank*2.5,`#${pl.nationalPosRank} ${pl.pos} in the country`,`Ranks #${pl.nationalPosRank} nationally among ${pl.pos}s in production: ${cur.line}.`);
  if(/^(FR|RS FR)/.test(pl.eligibility||'')&&pl.teamPosRank===1&&(cur.games||0)>=3&&(cur.production||0)>=4)add('freshman',52+Math.min(14,cur.production),`Freshman leading the ${pl.pos} room`,`${pl.eligibility} and already ${pl.team}'s most productive ${pl.pos}: ${cur.line}.`);
- const redshirtYear=seasons.find(s=>s.games<=4&&pl.redshirtUsed);
- if(redshirtYear&&(cur.production||0)>=6)add('redshirt_payoff',62+Math.min(20,cur.production),'The redshirt is paying off',`Played ${redshirtYear.games} game${redshirtYear.games===1?'':'s'} in ${redshirtYear.year} to save the year; now ${cur.line}.`);
+ const redshirtYear=pl.redshirtUsed&&pl.redshirtSeason!=null?seasons.find(s=>s.year===pl.redshirtSeason&&s.games<=4):null;
+ if(redshirtYear&&(cur.production||0)>=6)add('redshirt_payoff',62+Math.min(20,cur.production),'The redshirt is paying off',`Played ${redshirtYear.games} game${redshirtYear.games===1?'':'s'} in the recorded redshirt season, ${redshirtYear.year}; now ${cur.line}.`);
  const prev=seasons.at(-1);
  if(prev&&prev.games>=3&&(cur.games||0)>=3){const before=prev.production/prev.games,now=cur.production/cur.games;if(now>=before*1.8&&now-before>=.8)add('breakout',55+Math.min(30,(now-before)*10),'Breakout season',`Production per game is up from ${before.toFixed(1)} to ${now.toFixed(1)} on the staff scale since ${prev.year}.`)}
  const hurt=(pl.injuries||[]).filter(i=>i.weeks>=4).at(-1);

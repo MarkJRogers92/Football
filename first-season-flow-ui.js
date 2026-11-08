@@ -60,9 +60,13 @@ function currentContext(){
     week:Number(universe?.week)||0,
     opponent:opponent?.name||'',
     carryForward,
+    players:firstSeasonIndex()===0&&Number(universe?.week)===0&&team?[
+      ...ROLE_DEFS.filter(r=>r.id==='QB1'||(r.base&&r.side==='Defense')).map(r=>{const p=roleStarter(team,r.id);return p?{id:p.id,name:p.name,pos:p.pos,role:r.label}:null})
+    ].filter(Boolean):[],
     agenda,
     scout:report?.observations||[],
     texture,
+    receipts:typeof weeklyDecisionReceipts==='function'?weeklyDecisionReceipts(team):[],
     next
   });
   const personnelPending=(model?.items||[]).some(item=>item.category==='roster_management'&&['must_resolve','decision_due'].includes(item.meaning));
@@ -91,9 +95,10 @@ function renderBriefing(state){
   const host=ensureBriefingHost();if(!host)return;
   const briefing=state.briefing;
   const modeLabel=state.mode==='explicit'?'Guided':state.mode==='concise'?'Condensed':'Coach view';
-  const bullets=(briefing.bullets||[]).map(item=>`<li class="first-season-briefing-item first-season-${esc(item.kind)}"><span aria-hidden="true"></span><p>${esc(item.text)}</p></li>`).join('');
+  const bullets=(briefing.bullets||[]).map(item=>`<li class="first-season-briefing-item first-season-${esc(item.kind)}"><span aria-hidden="true"></span><p>${item.kind==='players'?item.players.map(p=>`<button type="button" class="player-button" data-player="${esc(p.id)}">${esc(p.pos)} ${esc(p.name)}</button>${p.role?` <small>· ${esc(p.role)}</small>`:''}`).join(' · '):esc(item.text)}</p></li>`).join('');
   const next=briefing.next?.label?`<div class="first-season-next"><span>Next</span><strong>${esc(briefing.next.label)}</strong>${briefing.next.id?`<button type="button" data-first-season-next="${esc(briefing.next.id)}">Open</button>`:''}</div>`:'';
   host.innerHTML=`<div class="first-season-briefing-head"><div><div class="eyebrow">WEEK OPENING</div><h3>${esc(briefing.title)}</h3></div><span class="pill">${esc(modeLabel)}</span></div><p class="first-season-briefing-summary">${esc(briefing.summary)}</p>${bullets?`<ul>${bullets}</ul>`:''}${next}`;
+  host.querySelectorAll('[data-player]').forEach(button=>button.onclick=()=>showPlayerProfile(button.dataset.player));
   host.querySelector('[data-first-season-next]')?.addEventListener('click',event=>window.openGuidanceItem?.(event.currentTarget.dataset.firstSeasonNext))
 }
 

@@ -66,9 +66,11 @@ function buildCarryForward({record=null,feedback=null,teamId=null,teamName=''}={
   };
 }
 
-function buildBriefing({mode='normal',week=0,opponent='',carryForward=null,agenda=null,scout=[],texture=[],next=null}={}){
+function buildBriefing({mode='normal',week=0,opponent='',carryForward=null,agenda=null,scout=[],texture=[],receipts=[],players=[],next=null}={}){
   const resolvedMode=MODES.has(mode)?mode:'normal';
-  const bullets=[];
+  const bullets=[],seenPlayers=new Set();
+  const introductions=(Array.isArray(players)?players:[]).filter(p=>p?.id!=null&&text(p.name)&&!seenPlayers.has(String(p.id))&&seenPlayers.add(String(p.id))).slice(0,2).map(p=>({id:p.id,name:text(p.name),pos:text(p.pos),role:text(p.role)}));
+  if(!carryForward&&introductions.length)bullets.push({kind:'players',players:introductions,text:`Players to know: ${introductions.map(p=>`${p.pos} ${p.name}`).join(' and ')}.`});
   if(carryForward&&text(carryForward.result)){
     const evidence=text(carryForward.headline);
     bullets.push({kind:'last_game',text:evidence?`${text(carryForward.result)} — ${evidence}`:text(carryForward.result),verdict:text(carryForward.verdict)||null});
@@ -83,6 +85,13 @@ function buildBriefing({mode='normal',week=0,opponent='',carryForward=null,agend
     const firstTitle=text(required[0]?.title)||'Required decision';
     bullets.push({kind:'required',text:required.length===1?firstTitle:`${required.length} required items — first: ${firstTitle}`,count:required.length});
   }
+  const receipt=Array.isArray(receipts)?receipts.find(r=>text(r?.text)):null;
+  if(receipt){
+    // Keep required work visible; use the remaining slot for the staff's recorded choice.
+    const at=bullets.findIndex(b=>b.kind==='opponent');
+    bullets.splice(at<0?bullets.length:at,0,{kind:'staff',text:text(receipt.text)});
+    if(bullets.length>3){const opponent=bullets.findIndex(b=>b.kind==='opponent');if(opponent>=0)bullets.splice(opponent,1)}
+  }
   const textureFacts=Array.isArray(texture)?texture:[];
   if(textureFacts.length){
     const fact=textureFacts[0];
@@ -95,7 +104,7 @@ function buildBriefing({mode='normal',week=0,opponent='',carryForward=null,agend
     // Twelve regular-season weeks; after the last one the next briefing is the postseason, not Week 13.
     title:finite(week)>=12?'Postseason briefing':`Week ${Math.max(0,finite(week))+1} briefing`,
     summary:text(opponent)?`Prepare for ${text(opponent)}.`:(bullets[0]?.text||'Review the week ahead.'),
-    bullets,
+    bullets:bullets.slice(0,3),
     next:nextStep||null
   };
 }

@@ -42,5 +42,6 @@ test('playing-time and recruiting resolutions reuse rotation, promises and visit
 test('simulating the whole season delegates cards instead of stopping the calendar',async()=>{
  const {e,u,t}=await setup(1406),p=e.importantStarters(t)[0];Object.assign(p,{health:70,wear:75,injuryWeeks:0,redshirtActive:false});
  assert.ok(e.ensureWeeklyDecisions(t).length);e.simSeason();assert.equal(u.phase,'confReady');
- assert.ok(u.weeklyDecisions.some(d=>d.resolvedOptionId==='delegate'));
+ assert.ok(u.weeklyDecisions.some(d=>d.selectedBy==='staff'));
+ assert.ok(u.weeklyDecisions.every(d=>d.options.some(o=>o.id===d.resolvedOptionId)));
 });

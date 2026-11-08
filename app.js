@@ -2666,7 +2666,7 @@ function simWeek(skipDecisions=false){
 // kept showing the Week 12 final through championship weekend, bowls and the playoff.
 function announceUserPostseason(fromIndex){const u=selected(),games=universe.gameArchive||[];if(!u)return;let r=null;for(let i=games.length-1;i>=Math.max(0,fromIndex);i--){const g=games[i];if(g?.home?.id===u.id||g?.away?.id===u.id){r=g;break}}if(!r?.label)return;const home=r.home?.id===u.id,us=Number(r.score?.[home?'home':'away'])||0,them=Number(r.score?.[home?'away':'home'])||0,opp=(home?r.away:r.home)?.name||'opponent',won=us>them;setStatus(`${r.label} final: ${won?'W':'L'} ${us}-${them} ${home||r.venue==='Neutral site'?'vs':'at'} ${opp}.${won&&r.label==='National Championship'?' National champions!':''}`)}
 function weekResultStatus(week,u,g){if(!g?.score)return `Week ${week} complete.`;const home=g.home===u.name,us=home?g.score[1]:g.score[0],them=home?g.score[0]:g.score[1];return `Week ${week} final: ${g.winner===u.name?'W':'L'} ${us}-${them} ${home?'vs':'at'} ${home?g.away:g.home}.`}
-function simSeason(){const gate=guidanceActionEligibility('simulate-season');if(!gate.allowed){if(gate.blockers[0])setStatus(gate.blockers[0].message);return}while(universe.phase==='regular'){delegateWeeklyDecisions(selected());simWeek(true)}render()}
+function simSeason(){const gate=guidanceActionEligibility('simulate-season');if(!gate.allowed){if(gate.blockers[0])setStatus(gate.blockers[0].message);return}while(universe.phase==='regular'){if(!delegateWeeklyDecisions(selected())){autosaveAfter('management');render();return}const week=universe.week;simWeek(true);if(universe.week===week)break}render()}
 function confStand(c){return universe.teams.filter(t=>t.conference===c).map(t=>({t,s:rankingScore(t)})).sort((a,b)=>b.t.cw-a.t.cw||b.t.w-a.t.w||b.s-a.s).map(x=>x.t)}
 function simConferenceChampionships(){if(universe.phase!=='confReady')return;const archiveStart=(universe.gameArchive||[]).length;universe.latest=[];universe.confChamps=[];universe.playoffFieldIds=[];universe.playoffFieldUnavailable=false;allConfs().forEach(c=>{let s=confStand(c);if(s.length<2)return;let r=gameSim(s[0],s[1],true,false,{week:13,label:c+' Championship'}),w=T(r.winner);w.champ=true;universe.confChamps.push(w.id);universe.latest.push({...r,label:c+' Championship'})});ranked();freezePlayoffField();universe.phase='bowlReady';buildWeeklyHub();announceUserPostseason(archiveStart);autosaveAfter('postseason');render()}
 function seedField(){if(universe.playoffFieldUnavailable)return [];const frozen=playoffFieldFromIds();return frozen.length===16?frozen:selectPlayoffField()}
@@ -3496,7 +3496,7 @@ function careerChronologyHTML(p){
  for(const i of p.injuryHistory||[])rows.push({year:i.year,rank:4,kicker:'INJURY',
   main:i.type,sub:`Week ${i.week} · ${i.weeks} week${i.weeks===1?'':'s'} out`});
  if(p.draftResult)rows.push({year:p.draftResult.year,rank:5,kicker:'DRAFT',main:p.draftResult.label,sub:''});
- for(const [eventIndex,e] of (Array.isArray(universe?.events)?universe.events:[]).entries()){if(!Array.isArray(e?.playerIds)||!e.playerIds.some(id=>String(id)===String(p.id))||!['BREAKOUT','ROLE_BATTLE','COLLEGE_CAREER_ENDED'].includes(e?.metadata?.storyType))continue;const phase=String(e.metadata?.phase||'').toUpperCase(),phaseLabel=['SPRING','FALL'].includes(phase)?`${phase} CAMP · `:'';rows.push({story:e.metadata.storyType,year:e.season,rank:-1,eventWeek:Number.isFinite(e.week)?e.week:null,eventOrder:Number.isFinite(e.timestampOrder)?e.timestampOrder:null,eventIndex,kicker:`${phaseLabel}WEEK ${e.week??'—'} · ${String(e.metadata.storyType).replaceAll('_',' ')}`,main:gameEscape(e.summary||'Recorded player milestone'),sub:e.gameIds?.[0]?gameLink(e.gameIds[0],'Open game record'):''})}
+ for(const [eventIndex,e] of (Array.isArray(universe?.events)?universe.events:[]).entries()){if(!Array.isArray(e?.playerIds)||!e.playerIds.some(id=>String(id)===String(p.id))||!['BREAKOUT','ROLE_BATTLE','COLLEGE_CAREER_ENDED','FIRST_COLLEGE_START'].includes(e?.metadata?.storyType))continue;const phase=String(e.metadata?.phase||'').toUpperCase(),phaseLabel=['SPRING','FALL'].includes(phase)?`${phase} CAMP · `:'';rows.push({story:e.metadata.storyType,year:e.season,rank:-1,eventWeek:Number.isFinite(e.week)?e.week:null,eventOrder:Number.isFinite(e.timestampOrder)?e.timestampOrder:null,eventIndex,kicker:`${phaseLabel}WEEK ${e.week??'—'} · ${String(e.metadata.storyType).replaceAll('_',' ')}`,main:gameEscape(e.summary||'Recorded player milestone'),sub:e.gameIds?.[0]?gameLink(e.gameIds[0],'Open game record'):''})}
  // Older seasons' career-ended stories are compacted away (compactHistoryArchive); the record itself still says it.
  if(p.exitReason==='Eligibility exhausted'&&Number.isFinite(p.retiredYear)&&!rows.some(r=>r.story==='COLLEGE_CAREER_ENDED'))
   rows.push({year:p.retiredYear,rank:6,kicker:'COLLEGE CAREER ENDED',main:gameEscape(`${p.name} completed his college eligibility at ${p.lastTeam||'his school'}.`),sub:''});
@@ -3504,7 +3504,7 @@ function careerChronologyHTML(p){
  return rows.sort((a,b)=>{const yearDiff=(Number(b.year)||0)-(Number(a.year)||0);if(yearDiff)return yearDiff;if(a.eventWeek!=null&&b.eventWeek!=null){const weekDiff=b.eventWeek-a.eventWeek;if(weekDiff)return weekDiff;if(a.eventOrder!=null&&b.eventOrder!=null&&a.eventOrder!==b.eventOrder)return b.eventOrder-a.eventOrder;return b.eventIndex-a.eventIndex}return a.rank-b.rank}).map(r=>
   `<div class="timeline-row"><div class="small muted">${r.year} · ${r.kicker}</div><strong>${r.main}</strong>${r.sub?`<div class="muted">${r.sub}</div>`:''}</div>`).join('');
 }
-function orderPlayerStoryEvents(events=universe?.events||[]){return(Array.isArray(events)?events:[]).map((event,index)=>({event,index})).filter(({event})=>['BREAKOUT','ROLE_BATTLE','COLLEGE_CAREER_ENDED'].includes(event?.metadata?.storyType)).sort((a,b)=>{const year=(Number(b.event.season)||0)-(Number(a.event.season)||0);if(year)return year;const aw=Number.isFinite(a.event.week)?a.event.week:null,bw=Number.isFinite(b.event.week)?b.event.week:null;if(aw!=null&&bw!=null&&aw!==bw)return bw-aw;if(a.event.timestampOrder!=null&&b.event.timestampOrder!=null&&a.event.timestampOrder!==b.event.timestampOrder)return b.event.timestampOrder-a.event.timestampOrder;return b.index-a.index}).map(x=>x.event)}
+function orderPlayerStoryEvents(events=universe?.events||[]){return(Array.isArray(events)?events:[]).map((event,index)=>({event,index})).filter(({event})=>['BREAKOUT','ROLE_BATTLE','COLLEGE_CAREER_ENDED','FIRST_COLLEGE_START'].includes(event?.metadata?.storyType)).sort((a,b)=>{const year=(Number(b.event.season)||0)-(Number(a.event.season)||0);if(year)return year;const aw=Number.isFinite(a.event.week)?a.event.week:null,bw=Number.isFinite(b.event.week)?b.event.week:null;if(aw!=null&&bw!=null&&aw!==bw)return bw-aw;if(a.event.timestampOrder!=null&&b.event.timestampOrder!=null&&a.event.timestampOrder!==b.event.timestampOrder)return b.event.timestampOrder-a.event.timestampOrder;return b.index-a.index}).map(x=>x.event)}
 function transferHistoryHTML(p){const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));return '<h3 style="margin-top:14px">Transfer History</h3>'+((p.transferHistory||[]).map(h=>`<div class="timeline-row"><strong>${esc(h.season)} · ${esc(h.fromSchool)} → ${esc(h.toSchool)}</strong><div>${esc(transferReasonLabel(h.reason))}</div></div>`).join('')||'<div class="muted">No transfers recorded.</div>')}
 
 const TRANSFER_MORALE_PIVOT=70,TRANSFER_ENTRY_DIVISOR=360;
@@ -3697,11 +3697,62 @@ function hasPendingWeeklyDecisions(t=selected()){return !!t&&(universe.weeklyDec
 function promoteRotationPlayer(t,p){ensureDepth(t);ensureRoleDepth(t);const bump=arr=>{const i=arr.indexOf(p.id);if(i>0)[arr[i-1],arr[i]]=[arr[i],arr[i-1]]};bump(t.depthChart[p.pos]||[]);for(const role of ROLE_DEFS)if(role.eligible.includes(p.pos))bump(t.roleDepth[role.id]||[])}
 function promisePlayerOpportunity(t,p,note){let q=activePromise(p,'EARLY_ROLE');if(q)return q;promiseState();q={id:`PR_${universe.nextPromiseId++}`,type:'EARLY_ROLE',schoolId:t.id,coachId:t.staff.HC.id,coachName:t.staff.HC.name,seasonMade:universe.year,madeWeek:universe.week,firstSeason:universe.year,expectedGames:Math.min(4,(p.stats?.games||0)+Math.max(1,12-universe.week)),status:'ACTIVE',resolvedSeason:null,result:null,severity:0,notes:[note],trainingPhases:[]};p.promises??=[];p.promises.push(q);p.promise='Early Role';addDynastyEvent('PROMISE_MADE',p,t,q);return q}
 function applyRequestedPositionChange(t,p,to){if(!to||to===p.pos||!positionOptions(p).includes(to))return false;recordPromisePositionChange(p,to,true);const old=p.pos;p.formerPositions??=[];p.formerPositions.push({pos:old,year:universe.year});p.positionFamiliarity??={[old]:100};p.positionFamiliarity[to]=Math.max(p.positionFamiliarity[to]||0,38+Math.round((p.versatility??60)*.25));p.pos=to;p.trainingFocus='Position Transition';p.role='Development';p.requestedPositionChange={season:universe.year,week:universe.week,from:old,to,status:'APPROVED'};ensureDepth(t);autoRoleDepth(t,true);return true}
-function addWeeklyDecisionEvent(d,option,t){promiseState();const order=universe.nextEventId++;universe.events.push({id:`EVT_${order}`,season:universe.year,week:universe.week,timestampOrder:order,type:'WEEKLY_DECISION_RESOLVED',importance:d.source==='PLAYER'?55:45,schoolIds:[t.id],playerIds:d.playerId?[d.playerId]:[],coachIds:d.coachId?[d.coachId]:[],recruitIds:d.recruitIds||[d.recruitId].filter(Boolean),gameIds:[],summary:`${d.title} — ${option.label}.`,metadata:{decisionId:d.id,decisionType:d.type,decisionSource:d.source||'STAFF',optionId:option.id,optionLabel:option.label}})}
-function delegateWeeklyDecisions(t=selected()){for(const d of ensureWeeklyDecisions(t).filter(x=>!x.resolved)){const option={id:'delegate',label:'Delegated to staff'};d.resolved=true;d.resolvedOptionId=option.id;d.resolvedSeason=universe.year;d.resolvedWeek=universe.week;addWeeklyDecisionEvent(d,option,t)}}
-function resolveWeeklyDecision(id,optionId){const d=(universe.weeklyDecisions||[]).find(x=>x.id===id),t=d&&universe.teams.find(x=>x.id===d.teamId),option=d?.options.find(x=>x.id===optionId);if(!d||d.resolved||!t||!option)return false;const p=d.playerId?t.roster.find(x=>x.id===d.playerId):null;
+function addWeeklyDecisionEvent(d,option,t){promiseState();const order=universe.nextEventId++;universe.events.push({id:`EVT_${order}`,season:universe.year,week:universe.week,timestampOrder:order,type:'WEEKLY_DECISION_RESOLVED',importance:d.source==='PLAYER'?55:45,schoolIds:[t.id],playerIds:d.playerId?[d.playerId]:[],coachIds:d.coachId?[d.coachId]:[],recruitIds:d.recruitIds||[d.recruitId].filter(Boolean),gameIds:[],summary:`${d.title} — ${option.label}.`,metadata:{decisionId:d.id,decisionType:d.type,decisionSource:d.source||'STAFF',optionId:option.id,optionLabel:option.label,selectedBy:d.selectedBy||'coach',selectedByCoachId:d.selectedByCoachId??null}})}
+// Staff policy is explicit: recommendations for routine choices, no new promises or in-season position moves.
+function delegatedWeeklyOption(d,t){
+ if(d.type==='INJURED_STARTER'&&t?.weeklyStaffInstructions?.medical==='sit')return d.options?.find(o=>o.id==='sit')||null;
+ const policy={INJURED_STARTER:['limited'],ACADEMIC_WATCH:['balance'],REDSHIRT_DECISION:['continue','preserve'],
+  PLAYING_TIME_CONCERN:['rotation','keep'],PLAYER_PLAYING_TIME_COMPLAINT:['rotation','keep'],PLAYER_TRANSFER_CONCERN:['reassure','no_guarantees'],
+  PLAYER_ROLE_REQUEST:['rotation','decline'],PLAYER_REDSHIRT_DISCUSSION:['continue','preserve'],PLAYER_POSITION_CHANGE_REQUEST:['defer','decline'],
+  RECRUITING_PRIORITY:['hold'],WEEKLY_GAMEPLAN:['standard'],STARTER_CHALLENGE:['stay','split','promote']};
+ let allowed=policy[d.type];if(!Array.isArray(allowed))return null;
+ if(d.type==='RECRUITING_PRIORITY')allowed=[...(d.recruitIds||[]).map(id=>`prioritize_${id}`),'hold'];
+ if(d.type==='WEEKLY_GAMEPLAN')allowed=['standard',...Object.keys(GAMEPLAN_TIERS)];
+ return d.options?.find(o=>allowed.includes(o.id)&&o.recommended)||allowed.map(id=>d.options?.find(o=>o.id===id)).find(Boolean)||null;
+}
+function weeklyDecisionReceipts(t=selected()){
+ return (universe.events||[]).filter(e=>e.type==='WEEKLY_DECISION_RESOLVED'&&e.metadata?.selectedBy==='staff'&&e.season===universe.year&&
+  (e.week===universe.week||e.week===universe.week-1)&&e.schoolIds?.includes(t?.id)).slice().reverse().map(e=>({kind:'staff',text:`Staff: ${e.summary}`,decisionId:e.metadata.decisionId}));
+}
+function delegateWeeklyDecisions(t=selected()){
+ if(!t||t.id!==selected()?.id||!t.staff?.HC?.id)return false;
+ for(const d of ensureWeeklyDecisions(t).filter(x=>guidanceDecisionIsLive(t,x))){
+  const option=delegatedWeeklyOption(d,t);
+  if(!option||!applyWeeklyDecision(d.id,option.id,{selectedBy:'staff',coachId:t.staff.HC.id})){
+   setStatus(`Staff could not resolve ${d.title}. Review this decision before advancing.`);return false;
+  }
+ }
+ return true;
+}
+function weeklyDecisionContext(id,optionId,{selectedBy='coach',coachId=null}={}){
+ const d=(universe.weeklyDecisions||[]).find(x=>x.id===id),t=d&&universe.teams.find(x=>x.id===d.teamId),option=d?.options?.find(x=>x.id===optionId);
+ if(!d||!t||t.id!==selected()?.id||!option||!guidanceDecisionIsLive(t,d)||universe.phase!=='regular')return null;
+ if(selectedBy==='staff'&&(!coachId||t.staff?.HC?.id!==coachId))return null;
+ const p=d.playerId?t.roster.find(x=>x.id===d.playerId):null;if(d.playerId&&!p)return null;
+ return {d,t,option,p};
+}
+function finishWeeklyDecision(d,option,t,{selectedBy='coach',coachId=null}={}){
+ d.resolved=true;d.resolvedOptionId=option.id;d.resolvedSeason=universe.year;d.resolvedWeek=universe.week;
+ d.selectedBy=selectedBy;d.selectedByCoachId=coachId||t.staff?.HC?.id||null;addWeeklyDecisionEvent(d,option,t);return true;
+}
+function resolveWeeklyDecision(id,optionId){
+ if(!applyWeeklyDecision(id,optionId))return false;
+ const d=universe.weeklyDecisions.find(x=>x.id===id),option=d.options.find(x=>x.id===optionId);
+ autosaveAfter('management');setStatus(`Decision recorded: ${option.label}.`);render();return true;
+}
+// Effects only: both interactive choices and unattended batches use this path; the caller owns save/render.
+function applyWeeklyDecision(id,optionId,actor={}){
+ const ctx=weeklyDecisionContext(id,optionId,actor);if(!ctx)return false;const {d,t,option,p}=ctx;
+ const allowed={ACADEMIC_WATCH:['study','balance','practice'],INJURED_STARTER:['full','limited','sit'],REDSHIRT_DECISION:['preserve','continue'],
+  PLAYING_TIME_CONCERN:['keep','rotation','promise'],PLAYER_PLAYING_TIME_COMPLAINT:['keep','rotation','opportunity'],PLAYER_TRANSFER_CONCERN:['reassure','opportunity','no_guarantees'],
+  PLAYER_ROLE_REQUEST:['grant','rotation','decline'],PLAYER_REDSHIRT_DISCUSSION:['preserve','continue','revisit'],PLAYER_POSITION_CHANGE_REQUEST:['approve','defer','decline'],
+  WEEKLY_GAMEPLAN:Object.keys(GAMEPLAN_TIERS),RECRUITING_PRIORITY:['hold',...(d.recruitIds||[]).map(rid=>`prioritize_${rid}`)]};
+ if(!Array.isArray(allowed[d.type])||!allowed[d.type].includes(option.id))return false;
+ if(d.type!=='WEEKLY_GAMEPLAN'&&d.type!=='RECRUITING_PRIORITY'&&!p)return false;
+ if(['REDSHIRT_DECISION','PLAYER_REDSHIRT_DISCUSSION'].includes(d.type)&&option.id==='preserve'&&!canRedshirt(p))return false;
+ if(d.type==='PLAYER_POSITION_CHANGE_REQUEST'&&option.id==='approve'&&(!positionOptions(p).includes(d.requestedPosition)||p.pos===d.requestedPosition))return false;
  if(d.type==='ACADEMIC_WATCH'&&p)applyAcademicDecision(p,t,option.id);
- else if(d.type==='WEEKLY_GAMEPLAN'&&t)applyGameplanDecision(t,option);
+ else if(d.type==='WEEKLY_GAMEPLAN'&&!applyGameplanDecision(t,option))return false;
  else if(d.type==='INJURED_STARTER'&&p)p.weeklyAvailability={season:d.season,week:d.week,role:option.id};
  else if(d.type==='REDSHIRT_DECISION'&&p)p.redshirtActive=option.id==='preserve';
  else if(d.type==='PLAYING_TIME_CONCERN'&&p){if(option.id==='keep'){p.morale=clamp(p.morale-1,15,99);p.staffTrust=clamp((p.staffTrust??70)-1,0,100)}else if(option.id==='rotation'){p.role='Rotation';p.morale=clamp(p.morale+5,15,99);p.staffTrust=clamp((p.staffTrust??70)+3,0,100);promoteRotationPlayer(t,p)}else if(option.id==='promise'){promisePlayerOpportunity(t,p,'Made at the Coach\'s Desk after a playing-time concern.');p.morale=clamp(p.morale+3,15,99);p.staffTrust=clamp((p.staffTrust??70)+4,0,100)}}
@@ -3710,8 +3761,8 @@ function resolveWeeklyDecision(id,optionId){const d=(universe.weeklyDecisions||[
  else if(d.type==='PLAYER_ROLE_REQUEST'&&p){if(option.id==='grant'){p.role='Starter mix';promoteRotationPlayer(t,p);promoteRotationPlayer(t,p);p.morale=clamp(p.morale+4,15,99);p.staffTrust=clamp((p.staffTrust??70)+2,0,100)}else if(option.id==='rotation'){p.role='Rotation';promoteRotationPlayer(t,p);p.morale=clamp(p.morale+3,15,99);p.staffTrust=clamp((p.staffTrust??70)+2,0,100)}else{p.morale=clamp(p.morale-3,15,99);p.staffTrust=clamp((p.staffTrust??70)-2,0,100)}}
  else if(d.type==='PLAYER_REDSHIRT_DISCUSSION'&&p){if(option.id==='preserve'){p.redshirtActive=true;p.staffTrust=clamp((p.staffTrust??70)+2,0,100)}else if(option.id==='continue'){p.redshirtActive=false;p.morale=clamp(p.morale+2,15,99)}else p.staffTrust=clamp((p.staffTrust??70)-2,0,100)}
  else if(d.type==='PLAYER_POSITION_CHANGE_REQUEST'&&p){if(option.id==='approve'&&applyRequestedPositionChange(t,p,d.requestedPosition)){p.morale=clamp(p.morale+4,15,99);p.staffTrust=clamp((p.staffTrust??70)+3,0,100)}else if(option.id==='defer')p.requestedPositionChange={season:universe.year,week:universe.week,from:p.pos,to:d.requestedPosition,status:'DEFERRED'};else if(option.id==='decline'){p.requestedPositionChange={season:universe.year,week:universe.week,from:p.pos,to:d.requestedPosition,status:'DECLINED'};p.morale=clamp(p.morale-4,15,99);p.staffTrust=clamp((p.staffTrust??70)-3,0,100)}}
- else if(d.type==='RECRUITING_PRIORITY'&&option.id.startsWith('prioritize_')){const rid=option.id.slice(11),r=universe.recruits.find(x=>String(x.id)===rid);if(r){scheduleVisit(r);growRecruiterRelationship(r,t,3)}}
- d.resolved=true;d.resolvedOptionId=option.id;d.resolvedSeason=universe.year;d.resolvedWeek=universe.week;addWeeklyDecisionEvent(d,option,t);autosaveAfter('management');setStatus(`Decision recorded: ${option.label}.`);render();return true}
+ else if(d.type==='RECRUITING_PRIORITY'&&option.id.startsWith('prioritize_')){const rid=option.id.slice(11),r=universe.recruits.find(x=>String(x.id)===rid);if(!r||r.committed||!r.targeted||r.visitWeek)return false;scheduleVisit(r);growRecruiterRelationship(r,t,3)}
+ return finishWeeklyDecision(d,option,t,actor);}
 // A face for every named player: portrait, jersey and position, linking to the canonical profile.
 function playerFaceChip(id,role=''){const f=id!=null&&findPlayer(id);if(!f?.p)return'';const p=ensurePortrait(f.p);return `<button type="button" class="face-chip" data-player="${gameEscape(p.id)}">${portraitTag(p,36,'list')}<span><b>${gameEscape(p.name)}</b><small>#${gameEscape(p.jerseyNumber??'')} · ${gameEscape(p.pos)}${role?` · ${gameEscape(role)}`:''}</small></span></button>`}
 function decisionFacesHTML(d){const faces=d.starterId&&d.playerId?[playerFaceChip(d.starterId,'Starter'),playerFaceChip(d.playerId,'Challenger')]:[playerFaceChip(d.playerId)];const html=faces.filter(Boolean).join(faces.length>1?'<span class="face-vs">vs</span>':'');return html?`<div class="decision-faces">${html}</div>`:''}

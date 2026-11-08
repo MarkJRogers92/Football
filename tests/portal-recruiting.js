@@ -371,17 +371,29 @@ test('portal commitments spread across the league rather than piling onto one pr
  assert.ok(biggest<=Math.max(4,portal.length*0.25),`one program took ${biggest} of ${portal.length} — the field is not competitive`);
 });
 
-test('a program that works the portal signs more than one that ignores it',async()=>{
- // Same seed, same league, one difference: whether the user spends attention at all.
- const active=await setup(4722),passive=await setup(4722);
- for(const e of [active,passive]){e.simSeason();e.simConferenceChampionships();e.simPlayoff()}
- const got=runInteractivePortal(active,active.PORTAL_ATTENTION_MAX).signed.length;
- const ignoredUser=passive.T('Chicago Metropolitan');
- passive.offseasonReview();passive.offseasonDepartures();
- passive.openPortalCycle();
- for(let r=0;r<passive.PORTAL_ROUNDS;r++)passive.advancePortalRound();
- const ignored=passive.resolvePortalCommitments().placed.filter(x=>x.schoolId===ignoredUser.id).length;
- assert.ok(got>=ignored,`working the portal (${got}) should not do worse than ignoring it (${ignored})`);
+test('attention improves signings when league state, finalists and random draws are held equal',async()=>{
+ const e=await setup(4722);e.simSeason();e.simConferenceChampionships();e.simPlayoff();
+ e.offseasonReview();e.offseasonDepartures();e.openPortalCycle();e.normalizeUniverse();
+ const user=e.T('Chicago Metropolitan'),targets=(e.universe.transferPortal||[])
+  .filter(x=>x.fromSchoolId!==user.id&&e.portalFit(x,user)&&x.finalists.includes(user.id)).slice(0,e.PORTAL_TARGET_CAP).map(x=>x.candidateId);
+ assert.ok(targets.length>0,'real candidates already consider the user program');
+ const snapshot=JSON.parse(JSON.stringify(e.packUniverse(e.universe)));
+ const run=active=>{
+  e.universe=JSON.parse(JSON.stringify(snapshot));e.normalizeUniverse();
+  if(active)for(const id of targets){
+   const attention=Math.min(e.PORTAL_ATTENTION_MAX,e.portalAttentionLeft());if(!attention)break;
+   assert.equal(e.targetPortalCandidate(id,attention),null);
+  }
+  // Adding a new finalist consumes extra random draws in later rounds. Keeping the field equal
+  // couples the same draws, so this counterfactual measures attention rather than a different lottery.
+  for(let r=0;r<e.PORTAL_ROUNDS;r++)e.advancePortalRound();
+  e.syncGameplayRng();const rng=JSON.stringify(e.universe.rng),rounds=(e.universe.transferPortal||[]).map(x=>[x.candidateId,x.decision?.round]);
+  return {signed:e.resolvePortalCommitments().placed.filter(x=>x.schoolId===user.id).length,rng,rounds};
+ };
+ const got=run(true),ignored=run(false);
+ assert.equal(got.rng,ignored.rng,'the commitment comparison uses identical random draws before placement');
+ assert.deepEqual(got.rounds,ignored.rounds,'attention does not change commitment timing');
+ assert.ok(got.signed>ignored.signed,`attention (${got.signed}) should improve on the identical passive league (${ignored.signed})`);
 });
 
 test('portal state and its results survive save/load in the middle of a live cycle',async()=>{

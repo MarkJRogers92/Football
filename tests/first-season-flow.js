@@ -74,7 +74,7 @@ test('briefing prioritizes last game, opponent, required work, then factual text
   });
   assert.equal(briefing.mode,'explicit');
   assert.equal(briefing.title,'Week 2 briefing');
-  assert.deepEqual(briefing.bullets.map(x=>x.kind),['last_game','opponent','required','program']);
+  assert.deepEqual(briefing.bullets.map(x=>x.kind),['last_game','opponent','required']);
   assert.equal(briefing.next.label,'Answer player role concern');
 });
 
@@ -140,4 +140,17 @@ test('pure flow builders do not mutate supplied data',()=>{
   const before=JSON.stringify(input);
   Flow.buildBriefing(input);
   assert.equal(JSON.stringify(input),before);
+});
+
+test('staff receipts show the real choice inside a three-item optional briefing',()=>{
+ const Flow=flow(),briefing=Flow.buildBriefing({week:1,opponent:'Next U',carryForward:{result:'Won 20–10 vs Old U'},agenda:{required:[{title:'Answer role concern'}]},receipts:[{text:'Staff chose Limited role for Reed — QB.'}],texture:[{text:'Another fact'}]});
+ assert.equal(briefing.bullets.length,3);assert.ok(briefing.bullets.some(x=>x.kind==='staff'&&x.text.includes('Limited role')));assert.ok(briefing.bullets.some(x=>x.kind==='required'));
+});
+
+
+test('the first briefing introduces two real players with profile identities and keeps required work in three items',()=>{
+ const players=[{id:'qb',name:'A Quarterback',pos:'QB',role:'Starting QB'},{id:'qb',name:'A Quarterback',pos:'QB'},{id:'lb',name:'B Linebacker',pos:'LB',role:'Middle linebacker'},{name:'No identity',pos:'WR'}];
+ const before=JSON.stringify(players),b=flow().buildBriefing({week:0,opponent:'Rival U',players,agenda:{required:[{title:'Choose a role'}]},receipts:[{text:'Staff chose Limited role for Reed'}]});
+ assert.equal(b.bullets.length,3);assert.ok(b.bullets.some(x=>x.kind==='required'));const intro=b.bullets.find(x=>x.kind==='players');assert.ok(intro);assert.deepEqual(intro.players.map(x=>x.id),['qb','lb']);assert.match(intro.text,/A Quarterback.*B Linebacker/);assert.equal(JSON.stringify(players),before);
+ const after=flow().buildBriefing({week:1,players,carryForward:{result:'Won 17–10 vs Rival U'},opponent:'Next U'});assert.equal(after.bullets.some(x=>x.kind==='players'),false);assert.equal(after.bullets[0].kind,'last_game');
 });
