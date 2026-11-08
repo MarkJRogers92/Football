@@ -339,6 +339,64 @@
       : row);
   }
 
+  // One bridge call carrying a whole long dynasty takes many minutes (hundreds of megabytes, hundreds of thousands of
+  // small objects, in a single message), so a save with many archive rows sends them, and the large parts of the core,
+  // first in small staged messages and then commits once. Ordinary saves carry a few thousand rows at most and go
+  // straight through, unchanged. See desktop/staging.js.
+  const STAGE_AT_ROWS = 6000, STAGE_BATCH_ROWS = 2000, CORE_PART_OBJECTS = 40000;
+  function countObjects(value, cap) {
+    let n = 0;
+    const stack = [value];
+    while (stack.length) {
+      const v = stack.pop();
+      if (v && typeof v === 'object') {
+        if (++n > cap) return n;
+        if (Array.isArray(v)) for (let i = 0; i < v.length; i++) stack.push(v[i]);
+        else for (const key in v) stack.push(v[key]);
+      }
+    }
+    return n;
+  }
+  // Which top-level sections of the core go in the save message, and how the rest is cut into staged parts of bounded
+  // size. The archives are not part of the core: storage saves them from `additions` and drops them from the universe.
+  function planCoreParts(universe, limit = CORE_PART_OBJECTS) {
+    const keys = [], remainder = {}, parts = [];
+    let budget = limit;
+    for (const key of Object.keys(universe || {})) {
+      if (key === 'playerArchive' || key === 'gameArchive') continue;
+      keys.push(key);
+      const value = universe[key], size = countObjects(value, budget);
+      if (size <= budget) { remainder[key] = value; budget -= size; continue; }
+      if (!Array.isArray(value)) { parts.push({key, value}); continue; }
+      let batch = [], weight = 0;
+      for (const item of value) {
+        const w = countObjects(item, limit);
+        if (batch.length && (weight + w > limit || batch.length >= STAGE_BATCH_ROWS)) { parts.push({key, array: batch}); batch = []; weight = 0; }
+        batch.push(item); weight += w;
+      }
+      parts.push({key, array: batch});   // an empty array still creates the key
+    }
+    return {keys, remainder, parts};
+  }
+  async function saveInBatches(bridge, slot, snapshot, options) {
+    const additions = Array.isArray(options.additions) ? options.additions : [];
+    const gameAdditions = Array.isArray(options.gameAdditions) ? options.gameAdditions : [];
+    if (additions.length + gameAdditions.length < STAGE_AT_ROWS) return bridge.save({slot, snapshot, options});
+    const plan = planCoreParts(snapshot && snapshot.universe);
+    const {token} = await bridge.save({stage: 'begin'});
+    try {
+      for (const [kind, rows] of [['additions', additions], ['gameAdditions', gameAdditions]])
+        for (let i = 0; i < rows.length; i += STAGE_BATCH_ROWS)
+          await bridge.save({stage: 'add', token, kind, rows: rows.slice(i, i + STAGE_BATCH_ROWS)});
+      for (const part of plan.parts) await bridge.save({stage: 'core', token, ...part});
+    } catch (error) {
+      await bridge.save({stage: 'discard', token}).catch(() => {});
+      throw error;
+    }
+    const {additions: _additions, gameAdditions: _gameAdditions, ...rest} = options;
+    return bridge.save({slot, snapshot: {...snapshot, universe: plan.remainder}, options: {...rest, stagedToken: token, universeKeys: plan.keys}});
+  }
+
   function createDesktop(bridge, slot) {
     if (typeof slot !== 'string' || !SLOT_IDS.includes(slot))
       throw new Error(`Invalid save slot "${slot}".`);
@@ -347,7 +405,7 @@
       load: () => afterMigration(() => bridge.load({slot})),
       readArchive: ref => afterMigration(() => bridge.readArchive({slot, ref})),
       readGames: ref => afterMigration(() => bridge.readGames({slot, ref})),
-      save: (snapshot, options = {}) => afterMigration(() => bridge.save({slot, snapshot, options})),
+      save: (snapshot, options = {}) => afterMigration(() => saveInBatches(bridge, slot, snapshot, options)),
       listSlots: () => listDesktopSlots(bridge),
       rename: label => afterMigration(() => bridge.rename({slot, label})),
       slot,
@@ -365,6 +423,7 @@
     create,
     createBrowser,
     revisionOf,
+    planCoreParts,
     SLOT_IDS,
     get kind() { return root.DynastyDesktopStorage ? 'desktop' : 'browser'; },
   };

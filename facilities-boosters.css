@@ -22,3 +22,4 @@
 .facilities-boosters .fb-log{margin-top:10px}
 .facilities-boosters .fb-log ul{margin:6px 0 0;padding-left:18px}
 @media (max-width:560px){.facilities-boosters .fb-tracks{grid-template-columns:1fr}.facilities-boosters .fb-money{flex-direction:column;align-items:flex-start}}
+.facilities-boosters .fb-risky{border-color:#d9a441;color:#e8c27a}

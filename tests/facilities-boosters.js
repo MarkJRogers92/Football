@@ -314,3 +314,20 @@ test('buildings cost upkeep, so a big program can keep more than a small one, an
   assert.equal(F.facilityGain(90), 1);
   assert.equal(F.facilityGain(98), 1);
 });
+
+test('the major ask shows its real odds, and the UI warns when the base is unhappy', async () => {
+  const {e, F, t} = await setup(6113);
+  const p = F.state(t), host = document.querySelector('#facilitiesBoosters');
+  for (const [goodwill, odds] of [[100, 75], [90, 67], [60, 41], [20, 15], [5, 15]]) assert.equal((p.goodwill = goodwill, F.askChance(t)), odds);
+  p.goodwill = 20; e.TAB_RENDERERS.program();
+  assert.match(host.innerHTML, /Major Gift Ask → Facilities · 15%/);
+  assert.match(host.innerHTML, /fb-risky/);
+  assert.match(host.innerHTML, /long shot/);
+  p.goodwill = 80; e.TAB_RENDERERS.program();
+  assert.match(host.innerHTML, /Major Gift Ask → Facilities · 58%/);
+  assert.doesNotMatch(host.innerHTML, /fb-risky|long shot/);
+  // The number shown is the number used.
+  const before = p.goodwill;
+  const r = F.campaign(t, 'ask', 'facilities');
+  if (r.success) assert.equal(p.goodwill, before, 'a yes costs nothing'); else assert.equal(p.goodwill, before - 4, 'a refusal costs 4 goodwill');
+});

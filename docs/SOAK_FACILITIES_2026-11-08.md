@@ -58,9 +58,53 @@ The same soak with the engaged-player policy, 20 seasons, after the upkeep chang
 - An idle weak program banks gifts to the 40-unit cap and wastes them. A fund-idle nudge already appears in the offseason hub.
 - A mid-tier program that invests fully climbs from rank about 60 to rank 12 in facilities.
 
+## A 20-season save in a real browser and the real desktop shell
+
+`tests/long-save-browser.js` and `tests/long-save-desktop.js` (both skip without `LONG_SAVE=<file>`; the save comes from
+`SAVE_OUT=<file> SEASONS=20 node tools/facilities-soak.js`). Seed 7, Chicago Metropolitan, 227.7 MB packed, 46,495
+archived players and 15,454 archived games.
+
+| Real Chromium, IndexedDB (desktop and phone width) | |
+| --- | --- |
+| Import through the app's file input | 6 s |
+| Save to the browser slot / load it back | 4.6 s / 1.2 s |
+| Program page with the facilities card | 0.1 s |
+| Game Day starts with its conditions strip, history search opens | yes; 1.6 to 2.0 s |
+| Facility plan, goodwill and year after the reload | intact |
+| Console errors | none |
+
+| Real Electron shell, native storage (disposable profile) | |
+| --- | --- |
+| Import / native save of the whole dynasty | 6 s / 13 s after the fix below (373 to 769 s before) |
+| On disk | 247 MB in 488 files; the core is 65.5 MB against the 256 MB limit |
+| Quit, relaunch, Continue | 3.6 s; facility plan, year, Program page and Game Day intact |
+| Second save of the loaded dynasty | 20.5 s (312.7 MB on disk with the prior core kept as a backup) |
+| Renderer errors | none |
+
+**Finding, fixed: the first native save of a very large imported dynasty took 6 to 13 minutes.** The soak's 228 MB
+save took 373 s, then 355 s and 769 s on reruns (the variation is itself a sign of memory pressure). Native storage
+writes the same data in 6 s when called directly, and the preload bridge moves 65 MB of archive rows or 25 MB core
+sections in a few seconds each. The cost was one very large message: a Chrome CPU profile put 334 of 355 seconds in
+native frames under the bridge call, and timestamps in the main process showed the commit message arriving 100 s after
+the renderer sent it and then being handled in 5.7 s. So it was neither the disk nor the storage code. A plain
+`structuredClone` before the call made no difference; moving the batching into the preload made it worse, because the
+copy across the context bridge happens before the preload runs.
+
+What fixed it: the renderer (`storage.js`) sends a large save as small staged messages (archive rows in batches of
+2,000, and the large parts of the core, each under about 40,000 objects), then makes one commit that uses them. The
+main process (`desktop/staging.js`, wired in `desktop/main.js`) holds the pieces in memory only, so a save is still all
+or nothing and nothing is written to disk until the commit. The staging is a payload of the existing `save` call, so the
+bridge's exposed keys do not change. Ordinary autosaves (under 6,000 archive rows) take the exact path they always did.
+Result on the same save: **13 s** (was 373 to 769 s), with the identical 247.2 MB, 488 files and 65.5 MB core on disk,
+and the same reload. Unit tests in `tests/desktop-storage.js` check that a staged save equals a direct save key for key,
+that only one commit is made, that no message is large, and that a failure part-way discards the stage and writes nothing.
+
+The ordinary-save path still sends the core as one message (the second save above: 21 s at season 20). That is
+acceptable today, but the core grows with the dynasty (about 3 MB a season), so it is the next thing to watch.
+
 ## Not covered
 
-- Real Chromium and desktop-packaged saves at season 20 (the soak uses the Node harness and the packed save shape).
+- A packaged (not development) desktop app at season 20, and a Mac or Windows run; the long-save desktop test ran the development Electron on Linux.
 - A weak program that is fired (none was, in these runs).
 - Whether 7.6 average levels is the right long-run feel. The numbers are tunable in `facilities-boosters.js`
   (`UPKEEP_PER_LEVEL`, `LEVEL_COST`, income) and `tools/facilities-soak.js` prints the table to tune against.

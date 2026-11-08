@@ -7,6 +7,7 @@
 //   AI=off           no AI investment (baseline for comparison)
 //   ROUNDTRIP=5      pack, JSON round-trip and normalize the universe after that season, then keep playing
 //   OUT=file.json    also write the per-season rows
+//   SAVE_OUT=file    also write the final save (packed shape)
 //
 // Prints a tab-separated season table, then a summary of what grew, what pinned at a cap and what drifted.
 const fs = require('fs');
@@ -145,6 +146,8 @@ const f1 = n => Number(n).toFixed(1), mb = n => (n / 1048576).toFixed(1);
   console.log(`national titles: ${[...titles].sort((a, b) => b[1] - a[1]).map(([n, c]) => `${n} ${c}`).slice(0, 6).join(', ')} | distinct champions ${titles.size} in ${rows.length} seasons`);
   if (posts.length > 1) console.log(`posts held: ${posts.join(' -> ')}`);
   console.log(problems.length ? `\nPROBLEMS (${problems.length}):\n  ${problems.slice(0, 25).join('\n  ')}` : '\nno invariant problems');
+  // SAVE_OUT=file.json writes the final universe in the packed save shape, for loading it in a real browser or desktop shell.
+  if (process.env.SAVE_OUT) fs.writeFileSync(process.env.SAVE_OUT, JSON.stringify({userTeam: me().name, universe: e.packUniverse(u)}));
   if (process.env.OUT) fs.writeFileSync(process.env.OUT, JSON.stringify({seed: SEED, policy: POLICY, rows, problems}, null, 1));
   process.exitCode = problems.length ? 1 : 0;
 })().catch(err => { console.error(err); process.exit(1); });

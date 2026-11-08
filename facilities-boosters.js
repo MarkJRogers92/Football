@@ -122,6 +122,8 @@ function makeFacilitySystem(env){
   return{ok:true,refund:project.paid};
  }
 
+ // The odds that a major ask lands, in percent: a happy base says yes, an unhappy one almost never does.
+ function askChance(t){return clamp(Math.round(goodwillOf(t)*.85-10),15,90)}
  // Gifts. A dinner is steady; an ask is large when the base is happy and costs goodwill when it is not.
  function campaign(t,kind,destination='facilities'){
   if(!CAMPAIGNS[kind])return{ok:false,reason:'Unknown campaign.'};
@@ -133,7 +135,7 @@ function makeFacilitySystem(env){
   let units=0,success=true,goodwillDelta=0;
   if(kind==='dinner'){units=clamp(Math.round(1+g/40),1,3);goodwillDelta=1}
   else{
-   const chance=clamp(Math.round(g*.85-10),15,90);
+   const chance=askChance(t);
    success=roll<chance;units=success?clamp(3+Math.round(g/25),4,7):0;goodwillDelta=success?0:-4;
   }
   p.campaigns={year:u.year,used:used+1};
@@ -281,7 +283,7 @@ function makeFacilitySystem(env){
  }
 
  return{TRACKS,TRACK_IDS,CAMPAIGNS,DESTINATIONS,MAX_LEVEL,LEVEL_COST,BUILD_SEASONS,FACILITY_POINTS,FUND_CAP,MAX_PROJECTS,CAMPAIGNS_PER_SEASON,
-  state,level,fundOf,goodwillOf,goodwillLabel,totalLevels,annualIncome,upkeep,netIncome,facilityGain,UPKEEP_PER_LEVEL,nextCost,activeProjects,projectFor,status,opensIn,startProject,fundProject,cancelProject,
+  state,level,fundOf,goodwillOf,askChance,goodwillLabel,totalLevels,annualIncome,upkeep,netIncome,facilityGain,UPKEEP_PER_LEVEL,nextCost,activeProjects,projectFor,status,opensIn,startProject,fundProject,cancelProject,
   aiSeason,campaign,campaignsLeft,campaignsUsed,nilBonus,divertNil,newSeason,goodwillShift,hoursBonus,effectsText,trackRows,summary,newsItems};
 }
 
@@ -334,13 +336,14 @@ if(typeof module==='object'&&module.exports){
  function cardHTML(t){
   const s=facilities.summary(t),rows=facilities.trackRows(t),nilLeft=nilRemaining(t),nilTotal=nilBudgetFor(t),left=s.campaignsLeft;
   const effects=facilities.effectsText(t);
-  const camp=(kind,dest)=>CTL(`${facilities.CAMPAIGNS[kind].label} → ${dest==='nil'?'NIL':'Facilities'}`,`data-fb-campaign="${kind}" data-fb-dest="${dest}"`,{disabled:left<=0,title:facilities.CAMPAIGNS[kind].blurb});
+  const odds=facilities.askChance(t),risky=odds<40;
+  const camp=(kind,dest)=>CTL(`${facilities.CAMPAIGNS[kind].label} → ${dest==='nil'?'NIL':'Facilities'}${kind==='ask'?` · ${odds}%`:''}`,`data-fb-campaign="${kind}" data-fb-dest="${dest}"`,{disabled:left<=0,cls:kind==='ask'&&risky?'fb-risky':'',title:kind==='ask'?`${odds}% chance. ${risky?'A refusal costs 4 goodwill, and goodwill is low. Winning brings it back.':'A refusal costs 4 goodwill.'}`:facilities.CAMPAIGNS[kind].blurb});
   const log=s.log.length?`<details class="fb-log"><summary>Recent activity</summary><ul>${s.log.slice().reverse().map(x=>`<li><span class="muted">${x.year}</span> ${fbEsc(x.text)}</li>`).join('')}</ul></details>`:'';
   return`<div class="section-head"><div><div class="eyebrow">FACILITIES &amp; BOOSTERS</div><h3>Build the program</h3><div class="muted">Boosters give money. You decide whether it becomes buildings or NIL.</div></div></div>
   <div class="fb-summary"><div><span class="small muted">Facilities rating</span><strong>${s.facilities??'—'}</strong></div><div><span class="small muted">Booster fund</span><strong>${s.fund}<small> units</small></strong></div><div><span class="small muted">Goodwill</span><strong>${s.goodwill}<small> ${fbEsc(s.goodwillLabel)}</small></strong></div><div><span class="small muted">Gifts next offseason</span><strong>+${s.income}<small>${s.upkeep?` (${s.gross} − ${Math.min(s.gross,s.upkeep)} upkeep)`:''}</small></strong></div><div><span class="small muted">NIL this season</span><strong>${nilLeft}<small> of ${nilTotal}</small></strong></div></div>
   ${effects.length?`<div class="small fb-effects">${effects.map(fbEsc).join(' · ')}</div>`:''}
   <div class="fb-tracks">${rows.map(r=>trackHTML(t,r)).join('')}</div>
-  <div class="fb-money"><div><strong>Raise money</strong><div class="small muted">${left} of ${facilities.CAMPAIGNS_PER_SEASON} campaigns left in ${universe.year}. Choose where the gift goes before you ask.</div></div><div class="fb-actions">${camp('dinner','facilities')}${camp('dinner','nil')}${camp('ask','facilities')}${camp('ask','nil')}</div></div>
+  <div class="fb-money"><div><strong>Raise money</strong><div class="small muted">${left} of ${facilities.CAMPAIGNS_PER_SEASON} campaigns left in ${universe.year}. Choose where the gift goes before you ask.${risky?' Boosters are not in a giving mood, so a major ask is a long shot.':''}</div></div><div class="fb-actions">${camp('dinner','facilities')}${camp('dinner','nil')}${camp('ask','facilities')}${camp('ask','nil')}</div></div>
   <div class="fb-money"><div><strong>Redirect NIL</strong><div class="small muted">Move unspent NIL into the fund. It cannot be moved back this season.</div></div><div class="fb-actions">${CTL('Move 1 NIL to facilities','data-fb-divert="1"',{disabled:nilLeft<1})}${CTL('Move 3','data-fb-divert="3"',{disabled:nilLeft<3})}</div></div>${log}`;
  }
  function bind(root,t){
