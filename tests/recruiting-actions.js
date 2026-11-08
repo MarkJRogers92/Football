@@ -427,6 +427,18 @@ test('staff answer a rival offer sooner than an ordinary one, but leave visits t
  assert.ok(!visited.visitWeek);
 });
 
+test('staff make an offer to a recruit who has put you on his list, however warm he is',()=>{
+ const {api,universe}=fixture({userScore:100}),t=team();universe.week=6;
+ const listed=withDecision(api,9,{interest:30,nationalRank:1}),unlisted=withDecision(api,9,{interest:30,nationalRank:2},1);
+ universe.recruits.push(listed,unlisted);
+ api.runFunnel(universe.recruits,t);// both reach their Top 5 cut
+ const f=api.funnelState(listed);assert.ok(f.top5.includes(t.name),'precondition: the first one lists you');
+ api.funnelState(unlisted).top5=['Kentucky Commonwealth','Texas Tech Plains','Ohio Valley','Alpha State','Beta Tech'];
+ api.staffPlan(universe.recruits,t);
+ assert.equal(api.hasOffer(listed,t),true,'he cannot choose you without it');
+ assert.equal(api.hasOffer(unlisted,t),false,'a recruit who left you off his list is not worth the hours');
+});
+
 test('the history of rival moves is bounded',()=>{
  const {api,universe}=fixture(),t=team(),r=worked(api,recruit('A'),t);
  for(let i=0;i<30;i++){universe.week=1+i%11;api.addRivalEvent(r,t,`Team ${i}`,'offer')}
@@ -603,6 +615,86 @@ test('staff check in on a commitment under pressure before anything else',()=>{
  api.addRivalEvent(threatened,t,'Kentucky Commonwealth','visit');
  const out=api.staffPlan([threatened,calm],t);
  assert.equal(out.keeps,1);assert.equal(api.liveMoves(threatened).length,0);assert.equal(api.keepBoost(calm,t),0,'no spend on a commitment nobody is chasing');
+});
+
+// ---------- news and the season ledger ----------
+const decidedFor=(r,over={})=>({recruit:r,team:'Kentucky Commonwealth',won:false,finalists:[],listed:true,offered:true,...over});
+function weekOf(api,universe,t,input){
+ // What the weekly pass does: record the week, then keep it as last week's news.
+ const week=api.noteWeek(t,input);
+ universe.week++;
+ t.recruitingLastWeek={year:universe.year,week:universe.week-1,funnel:{won:week.won,lost:week.lost,cut:week.cut},flipped:week.flipped};
+ return week;
+}
+
+test('spending is recorded in the season ledger and nothing is reported before the desk has done anything',()=>{
+ const {api,universe}=fixture(),t=team(),r=recruit('A',{interest:60});
+ assert.equal(api.deskSummary(t),null);
+ api.perform(r,t,'call');api.perform(r,t,'pitch');api.perform(r,t,'offer');
+ const d=api.deskSummary(t);
+ assert.equal(d.hours,2+3+2);assert.deepEqual(d.actions,{call:1,pitch:1,offer:1});
+ universe.year++;assert.equal(api.deskSummary(t),null,'the ledger belongs to its season');
+});
+
+test('lost recruits are explained from the records: no room, not listed, never offered, or simply beaten',()=>{
+ const {api,universe}=fixture(),t=team();universe.week=7;
+ const r=(id,stars=4)=>recruit(id,{stars,pos:'QB'});
+ weekOf(api,universe,t,{decided:[
+  decidedFor(r('a'),{fallback:true}),decidedFor(r('b'),{listed:false,offered:false}),decidedFor(r('c'),{listed:true,offered:false}),decidedFor(r('d'),{listed:true,offered:true})]});
+ const items=api.newsItems(t),lost=items.filter(x=>x.kicker==='LOST');
+ assert.equal(lost.length,4);
+ const by=name=>lost.find(x=>x.main.includes(`Recruit ${name}`)).sub;
+ assert.match(by('a'),/had room/);assert.match(by('b'),/not on his final list/);assert.match(by('c'),/never made him an offer/);assert.match(by('d'),/chose Kentucky Commonwealth/);
+ assert.match(lost[0].main,/★★★★ QB Recruit/,'stars and position lead the headline');
+ assert.ok(lost.every(x=>x.type==='bad-news'&&x.tab==='recruiting'&&x.recruit));
+});
+
+test('a cut names who made his list, and a flip names where he went',()=>{
+ const {api,universe}=fixture({userScore:0}),t=team();
+ const r=withDecision(api,9,{interest:5,stars:5,pos:'WR'});universe.week=6;
+ const out=api.runFunnel([r],t);assert.equal(out.cut.length,1);
+ const f=recruit('F',{stars:3,pos:'CB'});
+ weekOf(api,universe,t,{cut:out.cut,flipped:[{recruit:f,to:'Texas Tech Plains'}]});
+ const items=api.newsItems(t);
+ const cut=items.find(x=>x.kicker==='CUT'),flip=items.find(x=>x.kicker==='FLIPPED');
+ assert.match(cut.main,/cut you from his Top 5/);assert.match(cut.sub,/His list: Kentucky Commonwealth/);assert.doesNotMatch(cut.sub,/Chicago Metropolitan/,'you are not listed among those who made it');
+ assert.match(flip.main,/CB .* flipped to Texas Tech Plains/);assert.equal(flip.type,'bad-news');
+ assert.ok(flip.importance>cut.importance,'losing a commitment outranks being cut');
+});
+
+test('news is only for the week just played, and a quiet week has none',()=>{
+ const {api,universe}=fixture(),t=team();universe.week=7;
+ assert.deepEqual(api.newsItems(t),[]);
+ weekOf(api,universe,t,{decided:[decidedFor(recruit('a'))]});
+ assert.equal(api.newsItems(t).length,1);
+ universe.week++;assert.deepEqual(api.newsItems(t),[],'it does not linger into the next week');
+ weekOf(api,universe,t,{});assert.deepEqual(api.newsItems(t),[]);
+});
+
+test('commitments to you are left to the existing commitment item, not repeated as news',()=>{
+ const {api,universe}=fixture(),t=team();universe.week=7;
+ weekOf(api,universe,t,{decided:[decidedFor(recruit('a'),{won:true,team:t.name})]});
+ assert.deepEqual(api.newsItems(t),[]);assert.equal(api.deskSummary(t).won,1,'but the year still counts it');
+});
+
+test('the season summary finds the biggest win and loss and counts the offers that never came',()=>{
+ const {api,universe}=fixture(),t=team();universe.week=7;
+ weekOf(api,universe,t,{decided:[
+  decidedFor(recruit('w1',{stars:3}),{won:true,team:t.name}),decidedFor(recruit('w2',{stars:5}),{won:true,team:t.name}),
+  decidedFor(recruit('l1',{stars:2}),{offered:true}),decidedFor(recruit('l2',{stars:4}),{listed:true,offered:false}),decidedFor(recruit('l3',{stars:3}),{listed:false,offered:false})],
+  flipped:[{recruit:recruit('f'),to:'Ohio Valley'}],rivalMoves:6});
+ api.perform(recruit('x',{interest:50}),t,'call');
+ const d=api.deskSummary(t);
+ assert.equal(d.won,2);assert.equal(d.lost,3);assert.equal(d.flipped,1);
+ assert.equal(d.biggestWin.stars,5);assert.equal(d.biggestLoss.stars,4);assert.match(d.biggestLoss.why,/never made him an offer/);
+ assert.equal(d.neverOffered,1,'only recruits who had you on a final list count');
+ assert.ok(d.answered<=d.rivalMoves,'answered can never exceed what happened');assert.equal(d.rivalMoves,6);
+});
+
+test('the ledger keeps only the most recent entries',()=>{
+ const {api,universe}=fixture(),t=team();universe.week=7;
+ for(let i=0;i<60;i++)api.noteWeek(t,{decided:[decidedFor(recruit(`l${i}`))]});
+ assert.equal(t.recruitingSeason.lost.length,40);assert.equal(t.recruitingSeason.lost.at(-1).name,'Recruit l59');
 });
 
 test('handing recruiting to the staff is a saved setting that defaults to off',()=>{
@@ -808,6 +900,32 @@ test('the desk, the commitment panel, the sidebar and the card all show the funn
  const care=D.html(b.id);
  assert.match(care,/COMMITMENT/);assert.match(care,/Check in · 2h/);assert.match(care,/data-ra-action="keep"/);assert.doesNotMatch(care,/data-ra-action="call"/);
  c.committed='Some Other University';assert.equal(D.html(c.id),'');
+});
+
+test('over a real season the This Week list reports what happened, and the review totals match',async()=>{
+ const {e,A,team}=await engine(7130),u=e.universe,t=team();
+ const board=u.recruits.filter(r=>!r.committed).slice(0,30);board.forEach(r=>{r.targeted=true});
+ const seen={LOST:0,CUT:0,FLIPPED:0};
+ A.setAuto(u,true);
+ for(let w=1;w<=12;w++){
+  e.simWeek();
+  for(const item of u.weeklyHub||[])if(seen[item.kicker]!==undefined){
+   seen[item.kicker]++;
+   assert.ok(item.recruit&&item.main&&item.sub,'every item says who, what and why');
+   assert.ok(u.recruits.some(r=>String(r.id)===String(item.recruit)),'and points at a real recruit');
+  }
+ }
+ const d=A.deskSummary(t);
+ assert.ok(d&&d.hours>0&&d.budget>=d.hours,'the staff worked the board and the year records it');
+ assert.equal(d.won+d.lost,board.filter(r=>A.funnelState(r)?.decided).length,'every decision is counted exactly once');
+ assert.equal(d.cut,board.filter(r=>A.funnelState(r)?.cut).length);
+ assert.ok(seen.LOST+seen.CUT>0,`something was worth reporting (${JSON.stringify(seen)})`);
+ e.simConferenceChampionships();e.simBowls();e.simPlayoff();
+ const m=globalThis.DynastySeasonReview.model();
+ assert.ok(m&&m.desk,'the season review carries the desk');
+ assert.equal(m.desk.hours,d.hours);
+ const html=globalThis.DynastySeasonReview.html(m);
+ assert.match(html,/RECRUITING DESK/);assert.match(html,/hours spent/);assert.match(html,/chose you/);
 });
 
 test('simulating the season hands the board to the staff instead of letting it cool',async()=>{
