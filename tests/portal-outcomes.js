@@ -61,3 +61,18 @@ test('portal outcomes stay deterministic for a seed',async()=>{
   const r=e.universe.offseason.reports.portal;return [r.placed,r.returned||0,r.exited||0].join(',')};
  assert.equal(await run(),await run());
 });
+
+test('a blocked commitment falls back without losing or duplicating an entrant already at home',async()=>{
+ const e=await setup(9705),u=readyForPortal(e),home=u.teams[0],full=u.teams[1];
+ for(const team of u.teams.slice(1)){
+  while(team.roster.length<105)team.roster.push({...team.roster[0],id:`CAP_${team.id}_${team.roster.length}`});
+ }
+ // Legacy entries can still reference a player already present on his origin roster.
+ const players=home.roster.slice(0,12);
+ u.transferPortal=players.map(p=>e.ensurePortalEntry({p,from:home.name,fromSchoolId:home.id,reason:'PLAYING_TIME',enteredSeason:u.year,decision:{schoolId:full.id,round:3}}));
+ e.offseasonPortal();
+ assert.equal(full.roster.length,105);
+ assert.ok(u.offseason.reports.portal.returned>0);
+ assert.equal(new Set(home.roster.map(p=>p.id)).size,home.roster.length);
+ for(const p of players)assert.equal(home.roster.filter(x=>x.id===p.id).length+u.playerArchive.filter(x=>x.id===p.id).length,1);
+});
