@@ -141,11 +141,13 @@ It exits 1 on any violation. `tests/recruiting-calibration-tools.js` runs two sh
   class survives, and no number leaves its range.
 - **The staff use about 70% of the budget** (464 of 657 hours a season) and the classes stay a healthy 14 to 24, with
   3.1 blue chips on average.
-- **The save grows 11 MB a season, linearly (30 MB to 356 MB), with or without the desk.** A game with the desk
-  removed produces byte-identical saves (30.4, 45.2 and 60.6 MB after three seasons with and without it), so this is
-  the existing archive growth described in `docs/SAVE_SIZE_MEASUREMENT.md`. It matters because the portable save
-  passes 256 MiB at about season 22, the size of the native snapshot guard named in
-  `agent_docs/OPENCODE_LONG_RUN_HANDOFF.md`. Browser storage defers part of this, so the same number does not apply
-  there.
-- **Memory and speed follow the same growth:** the heap climbs to about 4 GB (and is collected back down), and a
-  season takes 6.6 s at the start and 31 s by season 30. Run a 30-season soak with `--max-old-space-size=6144`.
+- **The portable export grows 11 MB a season, linearly (30 MB to 356 MB), with or without the desk.** A game with the
+  desk removed produces byte-identical saves (30.4, 45.2 and 60.6 MB after three seasons with and without it), so
+  this is the existing archive growth described in `docs/SAVE_SIZE_MEASUREMENT.md`. Most of it is the player and game
+  archives, which browser and desktop saves both write in separate chunks; the 256 MB desktop limit applies to the
+  rest (the core). The core grew about 3 MB a season, mostly old events; since the history compaction added after
+  v0.15.0 it grows about 1.6 MB a season, which keeps it under the limit for well over a hundred seasons.
+- **Memory and speed followed the same growth:** the heap climbs to about 4 GB (and is collected back down), and a
+  season took 6.6 s at the start and 31 s by season 30. Most of that slowdown was the postseason copying the whole
+  dynasty (archives included) before each stage; it no longer copies the archives. Run a 30-season soak with
+  `--max-old-space-size=6144`.

@@ -3033,11 +3033,60 @@ function repairRosterShape(t,receipt){
   const added=generateFreshman(t,need);t.roster.push(added);recordRosterMove(t,added,'walkOns',receipt);
  }
 }
+// v0.15.1 — events are the one part of the core save that grows without limit (about 2 MB a season, 80% of it two
+// story types written for every player in the league). Past the horizon those stories keep everything a reader
+// shows (id, season, week, type, school, player, game, story id and summary) and drop metadata that only repeats
+// the summary or the player record. The camp report kept for each season is never read back; past the horizon it
+// keeps the rows and drops the zero deltas.
+const EVENT_DETAIL_HORIZON=3,SLIM_EVENT_TYPES=new Set(['COLLEGE_CAREER_ENDED','PLAYER_BREAKOUT']);
+function slimEvent(e){
+ if(!e||e.slim||!SLIM_EVENT_TYPES.has(e.type)||!e.metadata)return false;
+ const keep={storyType:e.metadata.storyType};if(e.metadata.phase!=null)keep.phase=e.metadata.phase;
+ if(e.storyId==null&&e.metadata.storyId!=null)e.storyId=e.metadata.storyId;
+ e.metadata=keep;e.slim=true;return true;
+}
+function slimCampReport(rows){
+ let n=0;
+ for(const r of Array.isArray(rows)?rows:[]){
+  if(!r||typeof r!=='object')continue;
+  for(const [k,v] of Object.entries(r)){
+   if(v===0){delete r[k];n++}
+   else if(v&&typeof v==='object'&&!Array.isArray(v)){for(const [a,x] of Object.entries(v))if(x===0){delete v[a];n++}}
+  }
+ }
+ return n;
+}
+function compactHistoryArchive({horizon=EVENT_DETAIL_HORIZON}={}){
+ const cutoff=universe.year-horizon;let events=0,dropped=0,camps=0;
+ // A finished career is already on the archived record (name, last team, exit reason, year), and the career
+ // timeline draws the line from there when the event is gone. Programs the coach has led keep theirs, so the
+ // school's story history stays whole wherever the coach has been.
+ const led=new Set([$('#userTeam')?.value,universe.tenure?.school,...(universe.careerHistory||[]).map(x=>x.school)].filter(Boolean));
+ const ledIds=new Set(universe.teams.filter(t=>led.has(t.name)).map(t=>t.id));
+ if(Array.isArray(universe.events)){
+  const kept=[];
+  for(const e of universe.events){
+   if((e?.season??universe.year)<=cutoff){
+    if(e?.type==='COLLEGE_CAREER_ENDED'&&!(e.schoolIds||[]).some(id=>ledIds.has(id))){dropped++;continue}
+    if(slimEvent(e))events++;
+   }
+   kept.push(e);
+  }
+  if(dropped)universe.events=kept;
+ }
+ for(const [year,ds] of Object.entries(universe.campHistory||{})){
+  if(Number(year)>cutoff||!ds||ds.slim)continue;
+  slimCampReport(ds.springReport);slimCampReport(ds.fallReport);ds.slim=true;camps++;
+ }
+ return {events,dropped,camps};
+}
 function offseasonPreseason(){
  const os=normalizeOffseasonState(),ds=ensureDevelopmentState();
  if(!offseasonPhaseDone('spring')||!offseasonPhaseDone('fall')){setStatus('Complete spring development and fall camp first.');return false}
  universe.campHistory[universe.year]=JSON.parse(JSON.stringify(ds));
  const compacted=compactGameArchive();
+ const historyCompacted=compactHistoryArchive();
+ if(historyCompacted.events||historyCompacted.dropped){universe.compactionManifest??=[];const last=universe.compactionManifest.at(-1);const row=last?.at===universe.year?last:(universe.compactionManifest.push({at:universe.year,cutoff:universe.year-EVENT_DETAIL_HORIZON,games:0,dropped:0}),universe.compactionManifest.at(-1));row.events=historyCompacted.events;row.eventsDropped=historyCompacted.dropped}
  if(compacted.games&&currentArchiveState())currentArchiveState().gamesDirty=true;
  const latePool=(universe.recruits||[]).filter(r=>!r.committed),lateControlled=$('#userTeam').value,latePoolSize=latePool.length;
  universe.year++;universe.week=0;resetNilSeason();universe.recoveredWeek=-1;universe.phase='regular';universe.latest=[];universe.confChamps=[];universe.playoffFieldIds=[];universe.playoffFieldUnavailable=false;universe.academicProgression={season:universe.year,week:0,teamIds:[]};universe.champion=null;universe.lastDetailedGame=null;universe.playLogs={};rollRecruitClass();universe.recruitClassCounts={};
@@ -3403,7 +3452,10 @@ function careerChronologyHTML(p){
  for(const i of p.injuryHistory||[])rows.push({year:i.year,rank:4,kicker:'INJURY',
   main:i.type,sub:`Week ${i.week} · ${i.weeks} week${i.weeks===1?'':'s'} out`});
  if(p.draftResult)rows.push({year:p.draftResult.year,rank:5,kicker:'DRAFT',main:p.draftResult.label,sub:''});
- for(const [eventIndex,e] of (Array.isArray(universe?.events)?universe.events:[]).entries()){if(!Array.isArray(e?.playerIds)||!e.playerIds.some(id=>String(id)===String(p.id))||!['BREAKOUT','ROLE_BATTLE','COLLEGE_CAREER_ENDED'].includes(e?.metadata?.storyType))continue;const phase=String(e.metadata?.phase||'').toUpperCase(),phaseLabel=['SPRING','FALL'].includes(phase)?`${phase} CAMP · `:'';rows.push({year:e.season,rank:-1,eventWeek:Number.isFinite(e.week)?e.week:null,eventOrder:Number.isFinite(e.timestampOrder)?e.timestampOrder:null,eventIndex,kicker:`${phaseLabel}WEEK ${e.week??'—'} · ${String(e.metadata.storyType).replaceAll('_',' ')}`,main:gameEscape(e.summary||'Recorded player milestone'),sub:e.gameIds?.[0]?gameLink(e.gameIds[0],'Open game record'):''})}
+ for(const [eventIndex,e] of (Array.isArray(universe?.events)?universe.events:[]).entries()){if(!Array.isArray(e?.playerIds)||!e.playerIds.some(id=>String(id)===String(p.id))||!['BREAKOUT','ROLE_BATTLE','COLLEGE_CAREER_ENDED'].includes(e?.metadata?.storyType))continue;const phase=String(e.metadata?.phase||'').toUpperCase(),phaseLabel=['SPRING','FALL'].includes(phase)?`${phase} CAMP · `:'';rows.push({story:e.metadata.storyType,year:e.season,rank:-1,eventWeek:Number.isFinite(e.week)?e.week:null,eventOrder:Number.isFinite(e.timestampOrder)?e.timestampOrder:null,eventIndex,kicker:`${phaseLabel}WEEK ${e.week??'—'} · ${String(e.metadata.storyType).replaceAll('_',' ')}`,main:gameEscape(e.summary||'Recorded player milestone'),sub:e.gameIds?.[0]?gameLink(e.gameIds[0],'Open game record'):''})}
+ // Older seasons' career-ended stories are compacted away (compactHistoryArchive); the record itself still says it.
+ if(p.exitReason==='Eligibility exhausted'&&Number.isFinite(p.retiredYear)&&!rows.some(r=>r.story==='COLLEGE_CAREER_ENDED'))
+  rows.push({year:p.retiredYear,rank:6,kicker:'COLLEGE CAREER ENDED',main:gameEscape(`${p.name} completed his college eligibility at ${p.lastTeam||'his school'}.`),sub:''});
  if(!rows.length)return '<div class="muted">No career history recorded yet.</div>';
  return rows.sort((a,b)=>{const yearDiff=(Number(b.year)||0)-(Number(a.year)||0);if(yearDiff)return yearDiff;if(a.eventWeek!=null&&b.eventWeek!=null){const weekDiff=b.eventWeek-a.eventWeek;if(weekDiff)return weekDiff;if(a.eventOrder!=null&&b.eventOrder!=null&&a.eventOrder!==b.eventOrder)return b.eventOrder-a.eventOrder;return b.eventIndex-a.eventIndex}return a.rank-b.rank}).map(r=>
   `<div class="timeline-row"><div class="small muted">${r.year} · ${r.kicker}</div><strong>${r.main}</strong>${r.sub?`<div class="muted">${r.sub}</div>`:''}</div>`).join('');

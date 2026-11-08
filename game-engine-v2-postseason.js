@@ -1,8 +1,26 @@
 // v0.10.2 development extension: user-controlled postseason games use the same transactional Game Engine 2 path.
 let v2PostseasonInjectedFault=null;
 function v2PostseasonUserMatch(a,b){const me=selected();return !!me&&(a?.id===me.id||b?.id===me.id)}
-function v2PostseasonStageCapture(){syncGameplayRng();return v2RecordClone(universe)}
-function v2PostseasonStageRestore(snapshot){universe=v2RecordClone(snapshot);rebuildIndexes();activateGameplayRng(universe.rng,universe);render()}
+// The two archives are append-only during a postseason stage (games are added, nothing already recorded changes), and
+// together they are most of a long dynasty's save. Cloning them made every postseason stage slower each season (1.8 s
+// to 8 s over twelve seasons), so the stage keeps their lengths and rolls back by trimming instead of copying.
+const V2_STAGE_APPEND_ONLY=['playerArchive','gameArchive'];
+function v2PostseasonStageCapture(){
+  syncGameplayRng();const core={},kept={};
+  for(const [key,value] of Object.entries(universe)){
+    if(V2_STAGE_APPEND_ONLY.includes(key)&&Array.isArray(value))kept[key]={rows:value,length:value.length};else core[key]=value;
+  }
+  return{core:v2RecordClone(core),kept,order:Object.keys(universe)};
+}
+function v2PostseasonStageRestore(snapshot){
+  const core=v2RecordClone(snapshot.core),next={};
+  for(const key of snapshot.order){
+    const kept=snapshot.kept[key];
+    if(kept){kept.rows.length=Math.min(kept.rows.length,kept.length);next[key]=kept.rows}else if(key in core)next[key]=core[key];
+  }
+  universe=next;
+  rebuildIndexes();activateGameplayRng(universe.rng,universe);render()
+}
 function v2PostseasonRecordMatch(home,away,options={}){
   const api=globalThis.DynastyGameEngineV2Lab,actors=globalThis.DynastyGameEngineV2Attribution,tx=globalThis.DynastyGameEngineV2Transaction;
   if(!api||!actors||!tx)throw new Error('Game Engine 2 development modules are unavailable.');
