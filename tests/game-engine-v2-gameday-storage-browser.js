@@ -1,3 +1,4 @@
+const {testPageURL}=require('./helpers/browser-url');
 const assert=require('node:assert/strict');
 const path=require('path');
 const {chromium}=require('playwright-core');
@@ -13,7 +14,7 @@ const waitStatus=(page,pattern)=>page.waitForFunction(src=>new RegExp(src).test(
   const page=await browser.newPage({viewport:{width:390,height:844}}),errors=[];
   page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
   try{
-    await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);
+    await page.goto(testPageURL());await startNewDynasty(page);
     // Coach's Desk decisions block official records (added after this test); let staff settle them first.
     const ready=await page.evaluate(()=>window.__DL_TEST__.v2PrepareDetailedGame());assert.equal(ready.ready,true,`Game Day fixture should be ready to record: ${JSON.stringify(ready)}`);
     await goTab(page,'gamelab');

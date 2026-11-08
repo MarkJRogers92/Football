@@ -1,3 +1,4 @@
+const {testPageURL}=require('./helpers/browser-url');
 'use strict';
 
 const assert=require('node:assert/strict');
@@ -19,7 +20,7 @@ const goTab=async(page,id)=>page.evaluate(({id,group})=>{
   page.on('console',message=>{if(message.type()==='error')errors.push(message.text())});
   page.on('pageerror',error=>errors.push(String(error)));
   try{
-    await page.goto('file://'+path.join(__dirname,'..','index.html'));
+    await page.goto(testPageURL());
     await startNewDynasty(page);
     await page.click('#weeklyDeskDetails > summary');
 

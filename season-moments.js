@@ -41,10 +41,23 @@ function yearbookHTML(y){
   (y.picks.length?`<section><h3>Draft</h3><ul class="yb-list">${y.picks.map(p=>`<li><b>${esc(p.name)}</b> <small>${esc(p.pos)}</small><span>${esc(p.label)}</span></li>`).join('')}</ul></section>`:'')+
   `<footer class="yb-foot">Head coach ${esc(y.coach)} · Dynasty Lab</footer></article><div class="yb-controls"><button type="button" class="bi-primary" data-yb-print>Print or save as PDF</button><button type="button" data-yb-close>Close</button></div></div>`;
 }
+let closeYearbook=null;
 function openYearbook(){
  const y=globalThis.DynastySeasonMoments?.yearbook?.();if(!y)return false;
- document.querySelector('.yearbook')?.remove();document.body.insertAdjacentHTML('beforeend',yearbookHTML(y));
- const el=document.querySelector('.yearbook'),close=()=>{el.remove();document.removeEventListener('keydown',key,true)},key=e=>{if(e.key==='Escape'){e.preventDefault();close()}};
+ closeYearbook?.();const returnFocus=document.activeElement;
+ document.body.insertAdjacentHTML('beforeend',yearbookHTML(y));
+ const el=document.querySelector('.yearbook'),close=()=>{
+  el.remove();document.removeEventListener('keydown',key,true);if(closeYearbook===close)closeYearbook=null;
+  const target=returnFocus?.isConnected?returnFocus:document.querySelector('[data-yearbook]');target?.focus?.({preventScroll:true});
+ },key=e=>{
+  if(e.key==='Escape'){e.preventDefault();close();return}
+  if(e.key!=='Tab')return;
+  const controls=[...el.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')].filter(x=>!x.disabled),first=controls[0],last=controls.at(-1);
+  if(!first)return;
+  if(e.shiftKey&&(document.activeElement===first||!el.contains(document.activeElement))){e.preventDefault();last.focus()}
+  else if(!e.shiftKey&&(document.activeElement===last||!el.contains(document.activeElement))){e.preventDefault();first.focus()}
+ };
+ closeYearbook=close;
  el.querySelector('[data-yb-close]').addEventListener('click',close);el.querySelector('[data-yb-print]').addEventListener('click',()=>window.print());
  document.addEventListener('keydown',key,true);el.querySelector('[data-yb-print]').focus();return true;
 }

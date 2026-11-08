@@ -95,3 +95,19 @@ test('a dynasty without assignments plays exactly as before',async()=>{
  const a=await run(),b=await run();
  assert.equal(a,b);
 });
+
+test('repeated suggestions preserve learned coach-territory pairs across reload; real moves relearn',async()=>{
+ const {e,S,t}=await setup(5307);t.staff.RC.recruiting=99;
+ for(const r of e.universe.recruits)r.targeted=r.homeRegion==='Gulf';
+ S.applySuggestion(t);assert.equal(S.rows(t).find(r=>r.slot==='RC').region,'Gulf');
+ e.universe.week+=2;const since={...t.staffAssignments.slots.RC.regionSince};
+ assert.equal(S.recruitBonus({homeRegion:'Gulf'},t),2);
+ S.applySuggestion(t);S.applySuggestion(t);assert.deepEqual(t.staffAssignments.slots.RC.regionSince,since);assert.equal(S.recruitBonus({homeRegion:'Gulf'},t),2);
+ e.universe=JSON.parse(JSON.stringify(e.universe));e.normalizeUniverse();const reloaded=e.T(USER);S.applySuggestion(reloaded);assert.equal(S.recruitBonus({homeRegion:'Gulf'},reloaded),2);
+ // Changing the board swaps territories, which really does restart learning.
+ for(const r of e.universe.recruits)r.targeted=r.homeRegion==='Pacific';
+ S.applySuggestion(reloaded);assert.equal(S.rows(reloaded).find(r=>r.slot==='RC').region,'Pacific');assert.equal(S.recruitBonus({homeRegion:'Pacific'},reloaded),0);
+ const regions=S.rows(reloaded).map(r=>r.region).filter(Boolean);assert.equal(new Set(regions).size,regions.length);
+ assert.equal(S.assign(reloaded,'RC',{region:null}).ok,true);assert.equal(reloaded.staffAssignments.slots.RC.regionSince,null);
+ assert.equal(S.assign(reloaded,'RC',{region:'Pacific'}).ok,true);assert.equal(S.recruitBonus({homeRegion:'Pacific'},reloaded),0);
+});

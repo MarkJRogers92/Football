@@ -2,9 +2,10 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const {makeTutorialSystem}=require('../tutorial.js');
 
-test('the tour covers each desk, in order, with a tab and a target for every step',()=>{
+test('the default first-Saturday tour has three stops and the full desk tour remains optional',()=>{
  const T=makeTutorialSystem();
- assert.deepEqual(T.STEPS.map(s=>s.tab),['dashboard','recruiting','recruiting','staff','gamelab','program','offseason']);
+ assert.deepEqual(T.STEPS.map(s=>s.tab),['dashboard','gamelab','dashboard']);
+ assert.deepEqual(T.DESK_STEPS.map(s=>s.tab),['dashboard','recruiting','recruiting','staff','gamelab','program','offseason']);
  for(const s of T.STEPS){assert.ok(s.target.length&&s.title&&s.body.length>40)}
 });
 

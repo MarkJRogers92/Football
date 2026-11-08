@@ -1,3 +1,4 @@
+const {testPageURL}=require('./helpers/browser-url');
 'use strict';
 // Sound, storylines, legacy, highlights, Rivalry Week and the yearbook, played through real weeks.
 // None of it may advance time, draw gameplay randomness or write into the dynasty save.
@@ -10,7 +11,7 @@ const simWeek=async page=>{for(let i=0;i<12;i++){const before=await page.evaluat
   const label=width>700?'desktop':'phone';
   const page=await browser.newPage({viewport:{width,height:900},reducedMotion:'reduce'}),errors=[];
   page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
-  await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);
+  await page.goto(testPageURL());await startNewDynasty(page);
 
   // Sound: silent by default under automation, every cue renders when enabled, a win plays the sting.
   assert.equal(await page.locator('#soundToggle').count(),1,`[${label}] sound toggle in the top bar`);
@@ -47,10 +48,10 @@ const simWeek=async page=>{for(let i=0;i<12;i++){const before=await page.evaluat
   assert.ok(await page.evaluate(()=>!!JSON.parse(localStorage.getItem('dynastyLabLegacy')||'null')?.achievements),`[${label}] legacy lives outside the save`);
 
   // Yearbook opens with the real record and closes.
-  await page.evaluate(()=>window.DynastySeasonMomentsUI.openYearbook());
+  await page.evaluate(()=>{const b=document.createElement('button');b.id='yearbookTestOpener';b.textContent='Open yearbook';document.body.append(b);b.focus();window.DynastySeasonMomentsUI.openYearbook()});
   const t=await page.evaluate(()=>{const x=window.__DL_TEST__.selected();return`${x.w}-${x.l}`});
   assert.match(await page.locator('.yearbook .yb-facts').innerText(),new RegExp(t),`[${label}] yearbook prints the real record`);
-  await page.click('[data-yb-close]');assert.equal(await page.locator('.yearbook').count(),0);
+  await page.click('[data-yb-close]');assert.equal(await page.locator('.yearbook').count(),0);assert.equal(await page.evaluate(()=>document.activeElement.id),'yearbookTestOpener');await page.evaluate(()=>document.querySelector('#yearbookTestOpener').remove());
 
   // Rivalry Week ribbon appears exactly when the next game is the rival.
   await page.evaluate(()=>document.querySelector('.tabs [data-tab="dashboard"]').click());await page.waitForTimeout(300);

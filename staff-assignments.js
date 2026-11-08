@@ -91,10 +91,15 @@ function makeStaffAssignmentSystem(env){
   return plan;
  }
  function applySuggestion(t){
-  const plan=suggest(t),s=state(t);
+  const plan=suggest(t),s=state(t),previous=rows(t).filter(r=>r.coach&&r.region).map(r=>({...s.slots[r.slot]}));
   // Clear first so a swap between two coaches is not refused as a duplicate.
   for(const slot of SLOTS){const c=coachIn(t,slot);if(c&&s.slots[slot]?.coachId===c.id){s.slots[slot].region=null;s.slots[slot].group=null}}
   for(const [slot,p] of Object.entries(plan))assign(t,slot,p);
+  // Compare the original and final pairs, not the temporary clearing used to allow swaps.
+  for(const a of Object.values(s.slots)){
+   const kept=previous.find(old=>old.coachId===a.coachId&&old.region===a.region);
+   if(kept)a.regionSince=kept.regionSince;
+  }
   return rows(t);
  }
  function vacancies(t){return rows(t).filter(r=>r.vacated)}
@@ -134,9 +139,10 @@ if(typeof module==='object'&&module.exports){
  }
  function cardHTML(t){
   const rows=staffAssignments.rows(t);
-  return`<div class="card staff-assignments" id="staffAssignments"><div class="section-head"><div><h3>Staff Assignments</h3><div class="small muted">Each coach takes one recruiting territory, and every coach but the recruiting coordinator takes a position group to develop. Each territory and room gets one coach.</div></div><button type="button" class="ghost" data-sa-suggest>Let the staff suggest</button></div>${rows.map(r=>rowHTML(t,r)).join('')}</div>`;
+  return`<div class="card staff-assignments" id="staffAssignments"><div class="section-head"><div><h3>Staff Assignments</h3><div class="small muted">Each coach takes one recruiting territory, and every coach but the recruiting coordinator takes a position group to develop. Each territory and room gets one coach.</div></div><button type="button" class="ghost" data-sa-suggest>Let the staff suggest</button></div>${rows.map(r=>rowHTML(t,r)).join('')}<label class="sa-row"><span><strong>Staff instruction: worn starters</strong><span class="small muted">When weekly decisions are delegated, limit their role or rest them. Your manual choice always takes precedence.</span></span><select data-sa-medical aria-label="Delegated medical decisions"><option value="limited" ${t.weeklyStaffInstructions?.medical!=='sit'?'selected':''}>Limit their role</option><option value="sit" ${t.weeklyStaffInstructions?.medical==='sit'?'selected':''}>Rest them this week</option></select></label></div>`;
  }
  function bind(root,t){
+  root.querySelectorAll?.('[data-sa-medical]').forEach(s=>s.onchange=()=>{if(!['limited','sit'].includes(s.value))return;t.weeklyStaffInstructions??={};t.weeklyStaffInstructions.medical=s.value;autosaveAfter('management');setStatus(s.value==='sit'?'Staff will rest worn starters when decisions are delegated.':'Staff will limit worn starters when decisions are delegated.')});
   root.querySelectorAll?.('[data-sa-region]').forEach(s=>s.onchange=()=>{const r=staffAssignments.assign(t,s.dataset.saRegion,{region:s.value||null});if(r.ok)autosaveAfter('management');setStatus(r.ok?(s.value?`${r.row.coach.name} now recruits the ${s.value}.`:'Territory cleared.'):r.reason);renderStaff()});
   root.querySelectorAll?.('[data-sa-group]').forEach(s=>s.onchange=()=>{const r=staffAssignments.assign(t,s.dataset.saGroup,{group:s.value||null});if(r.ok)autosaveAfter('management');setStatus(r.ok?(s.value?`${r.row.coach.name} now coaches the ${staffAssignments.GROUPS[s.value].label.toLowerCase()}.`:'Position group cleared.'):r.reason);renderStaff()});
   root.querySelectorAll?.('[data-sa-suggest]').forEach(b=>b.onclick=e=>{e.preventDefault();staffAssignments.applySuggestion(t);autosaveAfter('management');setStatus('Staff assignments set from your board and your roster needs.');renderStaff()});

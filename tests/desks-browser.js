@@ -1,3 +1,4 @@
+const {testPageURL}=require('./helpers/browser-url');
 const {chromium}=require('playwright-core');
 const assert=require('node:assert/strict');
 const path=require('path');
@@ -23,7 +24,7 @@ async function reopenAfterSave(page){
    const page=await browser.newPage({viewport});
    page.on('pageerror',e=>errors.push(`${label}: ${e}`));
    page.on('console',m=>{if(m.type()==='error')errors.push(`${label} console: ${m.text()}`)});
-   await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);
+   await page.goto(testPageURL());await startNewDynasty(page);
    const T=fn=>page.evaluate(fn);
    const noOverflow=async where=>assert.equal(await T(()=>document.documentElement.scrollWidth>window.innerWidth+1),false,`${label}: ${where} overflows the page`);
 
@@ -33,6 +34,11 @@ async function reopenAfterSave(page){
    await page.click('[data-tour-start]');
    await page.waitForSelector('#tourLayer .tour-card');
    assert.match(await page.textContent('#tourTitle'),/This Week/);
+   assert.equal(await page.locator('#firstSeasonBriefing').isVisible(),true,'the short tour reveals the briefing it introduces');
+   await page.click('[data-tour-next]');await page.click('[data-tour-next]');
+   assert.match(await page.textContent('#tourTitle'),/first Saturday/);await page.click('[data-tour-next]');
+   assert.equal(await page.$('#tourLayer'),null,'the first-Saturday introduction ends after three stops');
+   await page.evaluate(()=>window.__DL_TEST__.tourStart('desks'));
    for(let i=0;i<6;i++)await page.click('[data-tour-next]');
    assert.match(await page.textContent('#tourTitle'),/Portal Desk/);
    await page.click('[data-tour-next]');

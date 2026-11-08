@@ -1,0 +1,63 @@
+Dynasty Lab correctness validation — 2026-11-08
+
+Source
+  Original handoff base: ad84ec444b4b06ddaa30538b6b9d61ce46bc4e45 (0.15.2)
+  Current-source base, including Claude PR43: 6e226c2260b5106c4113218e98c65b813ecd9434
+  Frozen product source tested: e207c3d4d47c561c802b0e40783664f01fdd4772
+  Branch: codex/dynasty-lab-correctness-current-20261108
+  Worktree: /workspace/scratch/46c24ac297cd/dynasty-lab-current-20261108
+  State: local, unpushed, unmerged, undeployed. Final documentation-only commit follows the tested product source.
+
+Final results
+  Complete npm test sequence, with Node test concurrency capped at 4:
+    tests/version.js: PASS (version 0.15.2, build order, strict bootstrap)
+    tests/smoke.js: 53 passed, 0 failed
+    Every test listed in package.json scripts.test: 830 passed, 0 failed, 0 skipped
+    Final Node runner duration: 396279.698804 ms
+  npm run verify:release: PASS (clean source and byte-identical standalone rebuild)
+  git diff --check against the current-source base: PASS
+  Final delegation group: 8 passed, 0 failed
+  Corrected portal counterfactual: PASS, actual signings 3 active versus 2 passive,
+    with equal pre-placement RNG and commitment timing.
+
+Reproduce the complete resource-bounded test sequence
+  node <<'JS'
+  const {spawnSync}=require('node:child_process');
+  const files=require('./package.json').scripts.test.split('node --test ')[1].trim().split(/\s+/);
+  for(const args of [['tests/version.js'],['tests/smoke.js'],['--test','--test-concurrency=4',...files]]){
+    const r=spawnSync(process.execPath,args,{stdio:'inherit'});
+    if(r.status!==0)process.exit(r.status||1);
+  }
+  JS
+
+  The ordinary npm test command also completed with 830/830 Node tests and
+  53/53 smoke checks during the preceding run. The bounded run above is the
+  canonical run on the frozen final product commit.
+
+Prior failures investigated
+  Pinned-base full suite: 796/797 Node tests passed; portal outcome comparison failed
+    (active 1 versus passive 2). Fixed the counterfactual, without changing portal gameplay.
+  An overlapping current-source run had two file workers exit without individual assertions:
+    tests/portal-desk.js and tests/portal-recruiting.js. Reduced concurrency for the final
+    run; all registered cases passed. No definitive worker-exit cause was established.
+  Before-fix focused fixtures reproduced missing delegation effects, forgotten territory
+    learning, absent/wrong school record models, ties and the incorrect redshirt year.
+  Reviewer-found completed-game optional-prep stall: reproduced red, then verified green.
+  Inherited imported decision names: reproduced a policy lookup error, then verified green.
+
+Validation limits
+  tests/correctness-browser.js: BLOCKED at Chromium launch, before page execution:
+    socket() failed: Operation not permitted; Chromium exited with SIGABRT.
+  No automated browser pass, disk-backed browser reload, native packaging, deployed-site
+    playthrough, installed desktop validation or physical-device testing is claimed.
+  Packed-save normalization/restoration and legacy-event preservation pass in synthetic tests.
+  No real save, installed package, media, schedule, live service or remote branch was modified.
+
+Final product SHA-256
+  app.js:     83d56829ee1a05b1a12520797b7cc3f0812366e5cae63ca769b1b1f1afaba4f0
+  index.html: 5e41641ff0dc803eb4153fc53d7e05fb5313fc39e1fa5555e7474d73b3832dda
+
+Scope
+  D1-D4 and actual staff receipts in the three-item briefing are implemented.
+  Longer-term engagement proposals remain the next stage, as described in the handoff.
+  See DYNASTY_CORRECTNESS_2026-11-08.md for behavior, review, data safety and rollback notes.

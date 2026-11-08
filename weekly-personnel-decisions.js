@@ -23,15 +23,16 @@ ensureWeeklyDecisions=function ensureWeeklyDecisionsWithPersonnel(t=selected()){
   if(decisionRecent('STARTER_CHALLENGE',key,2)||current.some(d=>[challenge.starterId,challenge.challengerId].includes(d.playerId)))return current;
   const d=v0102StarterChallengeDecision(t,challenge);universe.weeklyDecisions.push(d);return[...current,d]
 };
-const resolveWeeklyDecisionBeforePersonnelV0102=resolveWeeklyDecision;
-resolveWeeklyDecision=function resolveWeeklyDecisionWithPersonnel(id,optionId){
-  const d=(universe.weeklyDecisions||[]).find(x=>x.id===id);if(d?.type!=='STARTER_CHALLENGE')return resolveWeeklyDecisionBeforePersonnelV0102(id,optionId);
-  const t=universe.teams.find(x=>x.id===d.teamId),option=d.options?.find(x=>x.id===optionId),challenger=t?.roster.find(x=>x.id===d.playerId),starter=t?.roster.find(x=>x.id===d.starterId);if(!t||!option||!challenger||!starter||d.resolved)return false;
+const applyWeeklyDecisionBeforePersonnelV0102=applyWeeklyDecision;
+applyWeeklyDecision=function applyWeeklyDecisionWithPersonnel(id,optionId,actor={}){
+  const d=(universe.weeklyDecisions||[]).find(x=>x.id===id);if(d?.type!=='STARTER_CHALLENGE')return applyWeeklyDecisionBeforePersonnelV0102(id,optionId,actor);
+  const ctx=weeklyDecisionContext(id,optionId,actor);if(!ctx)return false;const {t,option,p:challenger}=ctx,starter=t.roster.find(x=>x.id===d.starterId);
+  if(!challenger||!starter||!['stay','split','promote'].includes(option.id)||starter.pos!==d.pos||challenger.pos!==d.pos)return false;
   d.roleBattle={position:d.pos,incumbent:{id:starter.id,name:starter.name,roleBefore:starter.role||'Unassigned'},challenger:{id:challenger.id,name:challenger.name,roleBefore:challenger.role||'Unassigned'}};
   if(option.id==='stay'){starter.staffTrust=clamp((starter.staffTrust??70)+1,0,100);challenger.morale=clamp((challenger.morale??70)-1,15,99)}
   else if(option.id==='split'){challenger.role='Rotation';challenger.morale=clamp((challenger.morale??70)+3,15,99);challenger.staffTrust=clamp((challenger.staffTrust??70)+2,0,100);v0102BumpRolePackage(t,challenger)}
   else if(option.id==='promote'){starter.role='Rotation';challenger.role='Starter';promoteRotationPlayer(t,challenger);challenger.morale=clamp((challenger.morale??70)+5,15,99);challenger.staffTrust=clamp((challenger.staffTrust??70)+3,0,100);starter.morale=clamp((starter.morale??70)-3,15,99)}
-  d.resolved=true;d.resolvedOptionId=option.id;d.resolvedSeason=universe.year;d.resolvedWeek=universe.week;addWeeklyDecisionEvent(d,option,t);setStatus(`Personnel decision recorded: ${option.label}.`);render();return true
+  return finishWeeklyDecision(d,option,t,actor)
 };
 if(globalThis.__DL_TEST__){
   globalThis.__DL_TEST__.weeklyPersonnelDebug=()=>{const t=selected(),c=t?v0102StarterChallenge(t):null;return{candidate:c,decision:(universe.weeklyDecisions||[]).find(d=>d.season===universe.year&&d.week===universe.week&&d.teamId===t?.id&&d.type==='STARTER_CHALLENGE')||null}};

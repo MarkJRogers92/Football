@@ -1,0 +1,75 @@
+Dynasty Lab engagement validation — 2026-11-08
+
+Status: local, unreleased candidate. No push, merge, deployment or user-app install.
+Branch: codex/dynasty-lab-correctness-current-20261108
+Tested code: e83a98cc2cf5d8a5a4c4eec0eed02ff4338f0eaa
+Engagement base: 9b8728dc1b967ef4e21c5806d8ffd7ef4f2b58be
+Claude/upstream base: 6e226c2260b5106c4113218e98c65b813ecd9434
+A final read-only git ls-remote confirmed upstream HEAD and the named default branch
+still point to that Claude merge. The delivery adds only documentation after the
+frozen tested code. The final documentation commit is listed in DELIVERY_COMMIT.txt.
+
+Complete registered Node sequence: PASS
+Runtime: v22.23.3; native desktop terminal.
+node tests/version.js: PASS
+node tests/smoke.js: 53 passed, 0 failed.
+All 128 files registered in package.json's test command: 842 passed, 0 failed,
+0 cancelled, 0 skipped. Four contiguous batches of 35/35/35/23 files use
+node --test --test-concurrency=4; counts by batch: 170, 237, 299, 136.
+The same per-file Node isolation is retained; no registered file is omitted.
+Durable evidence: node-results.json, full-tests.log, version.log, smoke.log,
+and node-batch-1.log through node-batch-4.log. The native runner is included.
+
+Selected real Chromium sequence: PASS, 8/8 suites, every process exit 0.
+Runtime: /usr/lib/chromium/chromium, Chromium 156.0.8078.79.
+Route: native desktop terminal + loopback HTTP 127.0.0.1:18767.
+Suites:
+- correctness-browser
+- first-season-flow-browser
+- desks-browser (desktop and phone)
+- season-features-browser (including yearbook keyboard focus/restoration)
+- weekly-coaching-loop-browser
+- weekly-personnel-browser
+- game-engine-v2-gameday-storage-browser
+- engagement-browser (medical Save/Load; big-moments choice/advance; exact paused
+  session and action reconstruction after page reload; final recording)
+Evidence: browser-results.json, browser-validation.log and per-suite logs.
+The visible local Dynasty Lab preview was also opened in Chromium and left open.
+Automated browser contexts are disposable; the visible preview uses a newly
+created synthetic Chicago Metropolitan dynasty. No real user save was opened.
+
+Build verification: npm run verify:release PASS (verification only, no publication).
+git diff --check PASS.
+SHA-256 app.js: 14f5b36c2e35607641c868be2f36f91c5976de79eccbed98c2a9f31e4ee41097
+SHA-256 index.html: bb746d262b5373dcc22bc1fd92dbe7cb3ae2bbeb21231d425a20f81ae8e05cf6
+
+Review: independent read-only correctness/engagement review found no remaining
+substantive issues. Earlier duplicate profile binding was repaired and tested.
+Live Chromium inspection then exposed the collapsed tour target. The new browser
+visibility assertion failed before the fix and passes at desktop and phone widths
+after the tour reveals containing details elements. Tests keep error assertions.
+
+Environment diagnosis and discarded attempts:
+The ordinary command runner denies Unix-domain socket creation, aborting Chromium
+before page execution. The native desktop terminal supports it. Browser policy
+also denies file URLs, so a local HTTP preview serves the same candidate. The
+optional favicon route returns 204. No browser policy was disabled or site published.
+An ordinary command-runner Node rerun disappeared without a final summary; its
+interrupted-command-runner.log is diagnostic only and excluded from pass totals.
+The earlier pre-tour-full-tests.log records 839 passes before the final small tour
+repair and HTTP test additions; the complete native 842-test run supersedes it.
+
+Deliverables:
+dynasty-lab-engagement.patch: engagement-only changes from the engagement base.
+dynasty-lab-all-improvements.patch: correctness and engagement changes from Claude's
+merge, preserving that completed source. Both are local review artifacts.
+DYNASTY_ENGAGEMENT_2026-11-08.md: implementation, data compatibility and scope.
+CHROMIUM_LAUNCH_NOTES.txt: working runtime/server/test commands.
+
+Remaining validation limits:
+The complete repository browser matrix, other browser engines, packaged desktop
+builds/installers and physical devices were not run in this stage. No production
+save or deployed site was exercised. Transfer/rivalry reunion stories, additional
+career milestones and broader staff policy semantics remain later extensions.
+No implementation blocker remains for the delivered local scope. Keep this branch
+and worktree; integration and release require separate authorization.

@@ -1,3 +1,4 @@
+const {testPageURL}=require('./helpers/browser-url');
 const assert=require('node:assert/strict');
 const path=require('path');
 const {chromium}=require('playwright-core');
@@ -10,7 +11,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
   const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});
   const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('pageerror',e=>errors.push(String(e)));
   try{
-    await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);
+    await page.goto(testPageURL());await startNewDynasty(page);
     const ready=await page.evaluate(()=>window.__DL_TEST__.v2PrepareDetailedGame());assert.equal(ready.career,false);assert.equal(ready.ready,true,`weekly coaching fixture should be ready for Game Day: ${JSON.stringify(ready)}`);
     await goTab(page,'gamelab');await page.waitForSelector('#v0102WeeklyCoaching',{state:'visible',timeout:15000});
     const text=await page.locator('#v0102WeeklyCoaching').textContent();for(const phrase of ['WEEKLY COACHING','Opponent scout','Preparation board','prep points used','Delegate to Staff','Coordinator advice','Offensive coordinator','Defensive coordinator','Split the Room'])assert.match(text,new RegExp(phrase,'i'));

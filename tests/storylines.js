@@ -24,8 +24,8 @@ test('breakout compares production per game against last season, and redshirt pa
  const pl=base({seasons:[{year:2027,team:'Home U',games:10,production:6,rating:62}],current:{year:2028,games:4,production:9,line:'x',rating:70}});
  assert.ok(S.detect(pl).some(a=>a.type==='breakout'));
  assert.equal(S.detect({...pl,current:{...pl.current,production:3}}).some(a=>a.type==='breakout'),false);
- const rs=base({redshirtUsed:true,seasons:[{year:2027,team:'Home U',games:3,production:1,rating:60}],current:{year:2028,games:6,production:10,line:'y',rating:72}});
- assert.match(S.detect(rs).find(a=>a.type==='redshirt_payoff').summary,/Played 3 games in 2027/);
+ const rs=base({redshirtUsed:true,redshirtSeason:2027,seasons:[{year:2027,team:'Home U',games:3,production:1,rating:60}],current:{year:2028,games:6,production:10,line:'y',rating:72}});
+ assert.match(S.detect(rs).find(a=>a.type==='redshirt_payoff').summary,/Played 3 games in the recorded redshirt season, 2027/);
 });
 
 test('comeback, fresh start, development, senior and national-leader arcs cite their evidence',()=>{
