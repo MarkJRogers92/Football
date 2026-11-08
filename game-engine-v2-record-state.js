@@ -7,12 +7,13 @@ function v2RecordRestoreObject(target,snapshot){
 }
 function v2RecordSnapshotTeam(team){return{
   scalars:{w:team.w,l:team.l,cw:team.cw,cl:team.cl,pf:team.pf,pa:team.pa,sos:team.sos,rank:team.rank,fan_support:team.fan_support},
-  gameplan:v2RecordClone(team.gameplan),rivalry:v2RecordClone(team.rivalry),
+  gameplan:v2RecordClone(team.gameplan),rivalry:v2RecordClone(team.rivalry),playbookLog:v2RecordClone(team.playbookLog),
   players:(team.roster||[]).map(p=>({id:p.id,state:v2RecordClone(p)}))
 }}
 function v2RecordRestoreTeam(team,snapshot){
   Object.assign(team,snapshot.scalars);
   if(snapshot.gameplan==null)delete team.gameplan;else team.gameplan=v2RecordClone(snapshot.gameplan);
+  if(snapshot.playbookLog==null)delete team.playbookLog;else team.playbookLog=v2RecordClone(snapshot.playbookLog);
   if(snapshot.rivalry==null)delete team.rivalry;else team.rivalry=v2RecordClone(snapshot.rivalry);
   const current=new Map((team.roster||[]).map(p=>[String(p.id),p]));
   for(const row of snapshot.players){const p=current.get(String(row.id));if(!p)throw new Error(`Rollback could not find ${team.name} player ${row.id}.`);v2RecordRestoreObject(p,row.state)}
@@ -120,5 +121,5 @@ function v2StorePlayLog(gameId,state,attribution){
   if(gameId==null||!state)return null;
   universe.playLogs??={};
   const rows=v2PlayLogProjection(state,attribution);
-  universe.playLogs[gameId]=rows;return rows;
+  universe.playLogs[gameId]=rows;globalThis.DynastyPlaybook?.noteGame(state);return rows;
 }

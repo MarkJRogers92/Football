@@ -70,7 +70,7 @@ globalThis.DynastySeasonMoments=Object.freeze({
    const impact=x=>{const t=x.stats||{};return(t.passYds||0)*.035+(t.passTD||0)*5-(t.int||0)*3+(t.rushYds||0)*.08+(t.rushTD||0)*5+(t.recYds||0)*.08+(t.recTD||0)*5+(t.tackles||0)*.8+(t.tfl||0)*1.6+(t.sacks||0)*3.5+(t.intDef||0)*4.5+(t.forcedFumbles||0)*3};
    const line=x=>{const t=x.stats||{},o=[];if(t.passYds)o.push(`${t.passYds} pass yd`);if(t.passTD)o.push(`${t.passTD} pass TD`);if(t.rushYds)o.push(`${t.rushYds} rush yd`);if(t.rushTD)o.push(`${t.rushTD} rush TD`);if(t.recYds)o.push(`${t.recYds} rec yd`);if(t.recTD)o.push(`${t.recTD} rec TD`);if(t.sacks)o.push(`${t.sacks} sacks`);if(t.intDef)o.push(`${t.intDef} INT`);if(t.tackles&&o.length<2)o.push(`${t.tackles} tackles`);return o.slice(0,3).join(' · ')};
    const performers=(g.playerStats?.[side]||[]).slice().sort((a,b)=>impact(b)-impact(a)).filter(x=>impact(x)>0&&x.name&&line(x)).slice(0,3).map(x=>{const f=typeof findPlayer==='function'?findPlayer(x.id):null;return{id:x.id,name:x.name,pos:x.pos||'',line:line(x),face:!!f?.p}});
-   return{gameId:g.id,season:g.season,week:g.week,label:g.label||'Final',opponent:names[opp],outcome,won:outcome==='W',us,them,hasBoxScore:!g.scheduleOnly,hasReplay:!!rows?.length,plays:top,performers,consequence:momentsConsequence(g,side,u,outcome)};
+   return{gameId:g.id,season:g.season,week:g.week,label:g.label||'Final',opponent:names[opp],outcome,won:outcome==='W',us,them,hasBoxScore:!g.scheduleOnly,hasReplay:!!rows?.length,plays:top,performers,firstStart:g.firstStart?.schoolId===u.id?g.firstStart.text:null,consequence:momentsConsequence(g,side,u,outcome)};
   }catch(e){return null}
  },
  weeklyRhythm(){

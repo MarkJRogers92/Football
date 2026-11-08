@@ -34,7 +34,7 @@ function validateSession(session){
   if(!session.inputs?.home||!session.inputs?.away)throw new Error('Game Day session is missing calibrated team inputs.');
   if(session.controlledSide!==null&&session.controlledSide!=='home'&&session.controlledSide!=='away')throw new Error('Invalid Game Day controlled side.');
   for(const side of ['home','away']){
-    if(!['normal','hurry','drain'].includes(session.tempo?.[side]))throw new Error(`Invalid ${side} tempo strategy.`);
+    if(!['normal','hurry','drain','staff'].includes(session.tempo?.[side]))throw new Error(`Invalid ${side} tempo strategy.`);
     if(!['balanced','aggressive','ball_control'].includes(session.halftimeApproach?.[side]))throw new Error(`Invalid ${side} halftime approach.`);
   }
   if(session.pendingConversion&& !['home','away'].includes(session.pendingConversion.side))throw new Error('Invalid pending touchdown conversion.');
@@ -109,8 +109,11 @@ function deferredTouchdown(session,state,outcome){
   session.pendingConversion={side:offense,createdAfterEventSeq:state.events.length,period:state.period,clock:state.clock};engine.validateState(state);return state
 }
 function playOutcome(session,state){
-  const outcome=adapter.profileOutcome(state,session.inputs.home,session.inputs.away,session.homeFieldRating),start=state.events.length,beforeField=state.fieldPosition;
-  halftimeAdjustedOutcome(session,state,outcome);outcome.clock=tempoAdjustedClock(session,state,outcome.clock);
+  const start=state.events.length,beforeField=state.fieldPosition,side=state.possession;
+  let outcome=adapter.profileOutcome(state,session.inputs.home,session.inputs.away,session.homeFieldRating);
+  halftimeAdjustedOutcome(session,state,outcome);
+  if(!session.tempoDecisionMade[side]||session.tempo[side]==='staff')outcome=engine.playbookClock(state,outcome);
+  else outcome.clock=tempoAdjustedClock(session,state,outcome.clock);
   const yards=clamp(Math.round(outcome.yards??0),-99,99),touchdown=state.period<=4&&!outcome.turnover&&beforeField+yards>=100;
   if(touchdown)deferredTouchdown(session,state,outcome);else engine.applyScrimmage(state,outcome);
   adapter.annotateOutcomeEvent(state,start,outcome);return outcome
@@ -151,7 +154,8 @@ function tempoWindow(session){
 function createTempoDecision(session){
   if(!tempoWindow(session))return null;if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);
   const state=session.state,side=state.possession,min=Math.floor(state.clock/60),sec=String(state.clock%60).padStart(2,'0'),team=state[side]?.name||session.names[side],margin=(state.score[side]||0)-(state.score[other(side)]||0);
-  const decision={id:nextDecisionId(state),type:'late_game_tempo',policyId:TEMPO_POLICY_ID,team:side,teamId:state[side]?.id??null,contextKey:`tempo:${state.period}:${state.clock}:${side}:${state.fieldPosition}:${state.score.home}:${state.score.away}`,situation:`Q4 ${min}:${sec} · ${team} ball · ${margin===0?'tie game':margin>0?`leading by ${margin}`:`trailing by ${Math.abs(margin)}`}`,context:{period:state.period,clock:state.clock,possession:side,fieldPosition:state.fieldPosition,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},options:[{id:'hurry',label:'Hurry-up'},{id:'normal',label:'Normal tempo'},{id:'drain',label:'Drain clock'},{id:'delegate',label:'Delegate to staff'}],staffRecommendation:'normal',defaultOption:'normal',createdAfterEventSeq:state.events?.length||0};
+  const staffTempo=engine.playbookTempo(state);
+  const decision={id:nextDecisionId(state),type:'late_game_tempo',policyId:TEMPO_POLICY_ID,team:side,teamId:state[side]?.id??null,contextKey:`tempo:${state.period}:${state.clock}:${side}:${state.fieldPosition}:${state.score.home}:${state.score.away}`,situation:`Q4 ${min}:${sec} · ${team} ball · ${margin===0?'tie game':margin>0?`leading by ${margin}`:`trailing by ${Math.abs(margin)}`}`,context:{period:state.period,clock:state.clock,possession:side,fieldPosition:state.fieldPosition,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},options:[{id:'hurry',label:'Hurry-up'},{id:'normal',label:'Normal tempo'},{id:'drain',label:'Drain clock'},{id:'delegate',label:'Delegate to staff'}],staffRecommendation:staffTempo,defaultOption:staffTempo,createdAfterEventSeq:state.events?.length||0};
   session.pendingStrategyDecision=decision;return clone(decision)
 }
 function appendStrategyReceipt(session,decision,selectedOption,resolvedAction){const state=session.state,event={seq:(state.events?.length||0)+1,type:'coaching_decision',decisionId:decision.id,decisionType:decision.type,policyId:decision.policyId,team:decision.team,selectedOption,resolvedAction,staffRecommendation:decision.staffRecommendation,situation:decision.situation,state:eventState(state)};state.events.push(event);return event}
@@ -167,7 +171,7 @@ function resolveStrategy(session,optionId){
   if(decision.type==='two_point_decision'){
     if(!['extra_point','two_point'].includes(action))throw new Error(`Unknown conversion action: ${action}`);appendStrategyReceipt(session,decision,selected,action);resolvePendingConversion(session,action)
   }else if(decision.type==='late_game_tempo'){
-    if(!['normal','hurry','drain'].includes(action))throw new Error(`Unknown tempo action: ${action}`);session.tempo[decision.team]=action;session.tempoDecisionMade[decision.team]=true;appendStrategyReceipt(session,decision,selected,action)
+    if(!['normal','hurry','drain'].includes(action))throw new Error(`Unknown tempo action: ${action}`);session.tempo[decision.team]=selected==='delegate'?'staff':action;session.tempoDecisionMade[decision.team]=true;appendStrategyReceipt(session,decision,selected,action)
   }else if(decision.type==='halftime_adjustment'){
     if(!['balanced','aggressive','ball_control'].includes(action))throw new Error(`Unknown halftime action: ${action}`);session.halftimeApproach[decision.team]=action;session.halftimeDecisionMade=true;appendStrategyReceipt(session,decision,selected,action)
   }else throw new Error(`Unknown strategy decision type: ${decision.type}`);

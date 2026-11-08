@@ -27,3 +27,41 @@
 .pd-actions button:disabled{opacity:.45}
 .pd-actions button.pd-answer{border-color:var(--warn);box-shadow:0 0 0 1px var(--warn) inset}
 @media(max-width:700px){.pd-actions button{flex:1 1 auto}}
+
+.pd-shortlist{border-top:2px solid var(--accent);padding:12px 0}
+.pd-shortlist-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.pd-shortlist-head h4,.pd-shortlist-head p,.pd-prospect p{margin:2px 0}
+.pd-shortlist-head small,.pd-prospect header small{font-size:.7rem;font-weight:700;letter-spacing:.07em;color:var(--accent)}
+.pd-shortlist-head p,.pd-prospect header span{font-size:.8rem;color:var(--muted)}
+.pd-compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));margin-top:10px;gap:10px}
+.pd-prospect{display:flex;min-width:0;flex-direction:column;align-items:flex-start;gap:8px;padding:10px;border:1px solid var(--line)}
+.pd-prospect header,.pd-prospect dl{display:grid;gap:3px}
+.pd-prospect dl{width:100%;margin:0}
+.pd-prospect dl div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding:3px 0}
+.pd-prospect dt,.pd-prospect dd,.pd-prospect p{font-size:.8rem}
+.pd-prospect dt{color:var(--muted)}
+.pd-prospect dd{text-align:right;margin:0}
+.pd-prospect button{margin-top:auto}
+#portalBoard .pd-disclose{display:none}
+@media(max-width:700px){
+ .pd-compare{grid-template-columns:1fr}
+ #portalBoard .pd-disclose{display:inline-block;margin-left:auto}
+ #portalBoard tr:not(.pd-expanded)>td[data-label]:not([data-label="Player"]):not([data-label="Pos"]):not([data-label="Rating"]){display:none}
+}
+.pd-target-body,.pd-pick-notes{display:grid;gap:7px;width:100%}
+.pd-target-toggle,.pd-pick-toggle{display:none}
+@media(max-width:700px){
+ .pd-target{padding:0}
+ .pd-target-toggle{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;text-align:left;color:inherit;background:transparent;border:0;white-space:normal}
+ .pd-target-toggle b,.pd-target-toggle small{display:block}
+ .pd-target-toggle small{color:var(--muted);font-weight:400}
+ .pd-target-toggle .pd-rival-line{color:var(--warn)}
+ .pd-target:not(.pd-open) .pd-target-body,.pd-prospect:not(.pd-open) .pd-pick-notes{display:none}
+ .pd-target-body{box-sizing:border-box;padding:0 12px 10px}
+ .pd-compare{gap:4px}
+ .pd-prospect{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:5px}
+ .pd-prospect header{grid-row:span 2}
+ .pd-pick-toggle{display:block;grid-column:2;font-size:.75rem;min-height:30px}
+ .pd-pick-notes{grid-column:1/-1;grid-row:3}
+ .pd-prospect button[data-pd-pursue]{grid-column:2;grid-row:2;margin:0}
+}

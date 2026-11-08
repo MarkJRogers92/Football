@@ -137,9 +137,9 @@ if(typeof module==='object'&&module.exports){
   return`<div class="card staff-assignments" id="staffAssignments"><div class="section-head"><div><h3>Staff Assignments</h3><div class="small muted">Each coach takes one recruiting territory, and every coach but the recruiting coordinator takes a position group to develop. Each territory and room gets one coach.</div></div><button type="button" class="ghost" data-sa-suggest>Let the staff suggest</button></div>${rows.map(r=>rowHTML(t,r)).join('')}</div>`;
  }
  function bind(root,t){
-  root.querySelectorAll?.('[data-sa-region]').forEach(s=>s.onchange=()=>{const r=staffAssignments.assign(t,s.dataset.saRegion,{region:s.value||null});setStatus(r.ok?(s.value?`${r.row.coach.name} now recruits the ${s.value}.`:'Territory cleared.'):r.reason);renderStaff()});
-  root.querySelectorAll?.('[data-sa-group]').forEach(s=>s.onchange=()=>{const r=staffAssignments.assign(t,s.dataset.saGroup,{group:s.value||null});setStatus(r.ok?(s.value?`${r.row.coach.name} now coaches the ${staffAssignments.GROUPS[s.value].label.toLowerCase()}.`:'Position group cleared.'):r.reason);renderStaff()});
-  root.querySelectorAll?.('[data-sa-suggest]').forEach(b=>b.onclick=e=>{e.preventDefault();staffAssignments.applySuggestion(t);setStatus('Staff assignments set from your board and your roster needs.');renderStaff()});
+  root.querySelectorAll?.('[data-sa-region]').forEach(s=>s.onchange=()=>{const r=staffAssignments.assign(t,s.dataset.saRegion,{region:s.value||null});if(r.ok)autosaveAfter('management');setStatus(r.ok?(s.value?`${r.row.coach.name} now recruits the ${s.value}.`:'Territory cleared.'):r.reason);renderStaff()});
+  root.querySelectorAll?.('[data-sa-group]').forEach(s=>s.onchange=()=>{const r=staffAssignments.assign(t,s.dataset.saGroup,{group:s.value||null});if(r.ok)autosaveAfter('management');setStatus(r.ok?(s.value?`${r.row.coach.name} now coaches the ${staffAssignments.GROUPS[s.value].label.toLowerCase()}.`:'Position group cleared.'):r.reason);renderStaff()});
+  root.querySelectorAll?.('[data-sa-suggest]').forEach(b=>b.onclick=e=>{e.preventDefault();staffAssignments.applySuggestion(t);autosaveAfter('management');setStatus('Staff assignments set from your board and your roster needs.');renderStaff()});
  }
  extendRender('staff',()=>{
   const t=selected(),host=$('#staffList');if(!t||!host)return;

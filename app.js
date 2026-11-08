@@ -2,7 +2,7 @@
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.15.1';
+const APP_VERSION='0.15.2';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -1156,6 +1156,11 @@ function finishGame(before,home,away,result){
  const record={id,...before,final:true,score:{home:result.hp,away:result.ap},teamStats:JSON.parse(JSON.stringify(result.box)),playerStats:players,injuries,drives:result.drives||[],detailed:!!result.detailed};
  record.scoreAdjustment={};for(const s of ['home','away']){const b=record.teamStats[s];record.scoreAdjustment[s]=record.score[s]-((b.passTD+b.rushTD)*7+b.fgMade*3)}
  record.formerPlayers=[];for(const [side,t,opp] of [['home',home,away],['away',away,home]])for(const p of t.roster)if(record.playerStats[side].some(x=>x.id===p.id)&&(p.transferHistory||[]).some(x=>x.fromSchoolId===opp.id))record.formerPlayers.push({id:p.id,name:p.name,school:t.name,formerSchool:opp.name});
+ const controlled=selected(),side=controlled===home?'home':controlled===away?'away':null;
+ if(side&&globalThis.DynastyPlayerArcs){
+  const first=DynastyPlayerArcs.firstStart(controlled,players[side]);
+  if(first)record.firstStart=result.firstStart=first;
+ }
  universe.gameArchive.push(record);result.gameId=id;
  // Compact ledger reference; boxes, names and scores have one canonical snapshot.
  universe.events??=[];universe.events.push({id:`EVT_${id}`,type:before.label==='National Championship'?'CHAMPIONSHIP_WON':'GAME_COMPLETED',season:before.season,week:before.week,schoolIds:[home.id,away.id],playerIds:record.formerPlayers.map(p=>p.id),coachIds:[],gameIds:[id],importance:before.label==='National Championship'?95:30,summary:`${result.away} ${result.ap} – ${result.hp} ${result.home}`});
@@ -1299,7 +1304,7 @@ function gameRecap(g,{short=false}={}){
  const f=recapFacts(g),pick=recapPicker(g.id||`${g.season}_${g.week}_${g.home?.name}`);
  const result=recapResultLine(g,f,pick);
  if(short)return {headline:result,body:result};
- const body=[result,recapHowLine(g,f,pick),recapStarLine(g,f,pick),recapColorLine(g,f,pick)].filter(Boolean).join(' ');
+ const body=[result,recapHowLine(g,f,pick),recapStarLine(g,f,pick),recapColorLine(g,f,pick),g.firstStart?.text&&gameEscape(g.firstStart.text)].filter(Boolean).join(' ');
  return {headline:result,body};
 }
 // --- v0.9.7: weekly newsletter ---------------------------------------------
@@ -2632,12 +2637,27 @@ function simulateUserDetailed(){const g=findUserGame();if(!g)return;const gate=g
 function completeScheduledGame(g,r,detailed=false){
  if(g.played)return;
  g.gameId=r.gameId;g.played=true;g.score=[r.ap,r.hp];g.winner=r.winner;
+ if(r.firstStart)g.firstStart=r.firstStart; // The schedule is available before saved box scores load.
  if(detailed)g.detailed=true;
  settleRivalryGame(g);
 }
 function watchUserDetailed(){const before=universe.lastDetailedGame?.gameId;simulateUserDetailed();const id=universe.lastDetailedGame?.gameId;if(id&&id!==before)showGameCenter(id,'Watch')}
 function hasPendingCareerChoice(){return !!(universe.jobOffers||[]).length}
-function simWeek(skipDecisions=false){const gate=guidanceActionEligibility(skipDecisions===true?'simulate-season':'advance-week');if(!gate.allowed){if(gate.blockers[0])setStatus(gate.blockers[0].message);return}recoverWeek();const u=selected(),beforeRank=u.rank;advanceAcademicsForWeek(u);let results=[];for(const g of universe.schedule[universe.week]){if(g.played){settleRivalryGame(g);continue;}let r=gameSim(T(g.home),T(g.away),false,g.conf);completeScheduledGame(g,r);results.push(r);if(g.home===u.name||g.away===u.name)universe.lastDetailedGame=null}const userGame=universe.schedule[universe.week].find(g=>g.played&&(g.home===u.name||g.away===u.name));universe.week++;if(results.length)universe.latest=results;ranked();advanceRecruiting();buildWeeklyHub(beforeRank);if(universe.week===12)universe.phase='confReady';setStatus(weekResultStatus(universe.week,u,userGame));autosaveAfter('week');render()}
+function simWeek(skipDecisions=false){
+ const gate=guidanceActionEligibility(skipDecisions===true?'simulate-season':'advance-week');
+ if(!gate.allowed){if(gate.blockers[0])setStatus(gate.blockers[0].message);return}
+ recoverWeek();const u=selected(),beforeRank=u.rank;advanceAcademicsForWeek(u);
+ const results=[],pb=globalThis.DynastyPlaybook;
+ // Record the controlled game first so a failed transaction can be retried before other matchups settle.
+ const customGame=u.playbook&&pb&&!pb.isDefault(pb.get(u))?findUserGame():null;
+ const customResult=customGame?recordV2GameLabResult({advancingWeek:true}).result:null;
+ for(const g of universe.schedule[universe.week]){
+  if(g===customGame){results.push(customResult);continue}
+  if(g.played){settleRivalryGame(g);continue}
+  const r=gameSim(T(g.home),T(g.away),false,g.conf);completeScheduledGame(g,r);results.push(r);
+  if(g.home===u.name||g.away===u.name)universe.lastDetailedGame=null;
+ }
+ const userGame=universe.schedule[universe.week].find(g=>g.played&&(g.home===u.name||g.away===u.name));universe.week++;if(results.length)universe.latest=results;ranked();advanceRecruiting();buildWeeklyHub(beforeRank);if(universe.week===12)universe.phase='confReady';setStatus(weekResultStatus(universe.week,u,userGame));autosaveAfter('week');render()}
 // Postseason games never reach weekResultStatus, so the status line (and the ticker that mirrors it)
 // kept showing the Week 12 final through championship weekend, bowls and the playoff.
 function announceUserPostseason(fromIndex){const u=selected(),games=universe.gameArchive||[];if(!u)return;let r=null;for(let i=games.length-1;i>=Math.max(0,fromIndex);i--){const g=games[i];if(g?.home?.id===u.id||g?.away?.id===u.id){r=g;break}}if(!r?.label)return;const home=r.home?.id===u.id,us=Number(r.score?.[home?'home':'away'])||0,them=Number(r.score?.[home?'away':'home'])||0,opp=(home?r.away:r.home)?.name||'opponent',won=us>them;setStatus(`${r.label} final: ${won?'W':'L'} ${us}-${them} ${home||r.venue==='Neutral site'?'vs':'at'} ${opp}.${won&&r.label==='National Championship'?' National champions!':''}`)}
@@ -2971,7 +2991,9 @@ const PORTAL_RETURN_CHANCE=.65;
 function resolveUnplacedPortal(entry){
  const {p}=entry,from=universe.teams.find(t=>t.id===entry.fromSchoolId)||T(entry.from);
  if(!from)return null;
- if(gameplayRandom()<PORTAL_RETURN_CHANCE&&from.roster.length<105){
+ const alreadyHome=from.roster.some(player=>player.id===p.id);
+ if(gameplayRandom()<PORTAL_RETURN_CHANCE&&(alreadyHome||from.roster.length<105)){
+  if(!alreadyHome){from.roster.push(p);recordRosterMove(from,p,'portalIn')}
   p.morale=clamp((p.morale??70)-8,20,99);p.staffTrust=clamp((p.staffTrust??70)-5,0,99);
   return {outcome:'returned',team:from};
  }
@@ -2982,10 +3004,15 @@ function resolveUnplacedPortal(entry){
 function offseasonPortal(){
  const os=normalizeOffseasonState();
  if(offseasonPhaseDone('portal')){if(os.phase==='portal')os.phase='spring';return true}
+ // Place announced decisions before the draft or any fallback draws, exactly as the Finalize button does.
+ if((universe.transferPortal||[]).some(x=>x.decision)){
+  const {blocked}=resolvePortalCommitments();
+  for(const b of blocked)portalLog(`Commitment reopened (${b.reason}): ${portalEntry(b.candidateId)?.p.name||'transfer'} returns to the available field.`);
+ }
  const controlled=$('#userTeam').value,movement=[...(os.reports.movement||[])];
  const draftPool=(os.reports.departures?.draftPool||[]).map(d=>({...d,t:universe.teams.find(x=>x.id===d.teamId)||d.t}));runDraft(draftPool);
  const portal=[...(universe.transferPortal||[])];universe.transferPortal=[];
- let placedCount=0,returnedCount=0,exitedCount=0;
+ let placedCount=universe.portalCycle?.year===universe.year?(universe.portalCycle.finalizedCount||0):0,returnedCount=0,exitedCount=0;
  portal.forEach(x=>{x.p.stats=newStats();x.p.year=CLASS_NAMES[Math.min(3,eligibilityBase(x.p))]||'SR';const dest=placeTransfer(x);
   if(dest){placedCount++;if(x.from===controlled||dest.name===controlled)movement.push(`${x.p.pos} ${x.p.name}: ${x.from} → ${dest.name} (${transferReasonLabel(x.reason)})`);return}
   const outcome=resolveUnplacedPortal(x);
@@ -2993,6 +3020,10 @@ function offseasonPortal(){
   if(outcome.outcome==='returned'){returnedCount++;if(x.from===controlled)movement.push(`${x.p.pos} ${x.p.name}: no landing spot, returned to ${x.from}`)}
   else{exitedCount++;if(x.from===controlled)movement.push(`${x.p.pos} ${x.p.name}: no landing spot, left the program`)}
  });
+ if(universe.portalCycle?.year===universe.year&&universe.portalCycle.status==='open'){
+  universe.portalCycle.status='resolved';
+  portalLog('Offseason advanced. Remaining transfers resolved.');
+ }
  updateCareerRecords();
  movement.push(...(os.reports.review?.carouselLog||[]).filter(x=>x.includes(controlled)));
  universe.movementLog=movement.slice(0,100);
@@ -3330,10 +3361,14 @@ function resolvePortalCommitments(){
   if(!landed){blocked.push({candidateId:entry.candidateId,reason:'placement refused'});continue}
   entry.placed=true;
   attachPortalPromise(entry,landed);
+  const os=universe.offseason,controlled=$('#userTeam').value;
+  if(os?.reports&&(entry.from===controlled||landed.name===controlled)){
+   (os.reports.movement??=[]).push(`${entry.p.pos} ${entry.p.name}: ${entry.from} → ${landed.name} (${transferReasonLabel(entry.reason)})`);
+  }
   placed.push({candidateId:entry.candidateId,playerId:entry.p.id,schoolId:landed.id});
  }
  universe.transferPortal=(universe.transferPortal||[]).filter(x=>!x.placed);
- if(placed.length){autosaveAfter('portal');portalLog(`${placed.length} portal commitment${placed.length===1?'':'s'} finalized.`)}
+ if(placed.length){const c=ensurePortalCycle();c.finalizedCount=(c.finalizedCount||0)+placed.length;autosaveAfter('portal');portalLog(`${placed.length} portal commitment${placed.length===1?'':'s'} finalized.`)}
  return {placed,blocked};
 }
 
@@ -3360,6 +3395,11 @@ function advancePortalRound(){
     portalLog(`${entry.p.pos} ${entry.p.name} committed to ${school?.name||'a program'}.`);
    }
   }
+ }
+ if(resolutions.length){
+  const decided=new Set(resolutions.map(x=>x.candidateId));
+  for(const target of c.targets)if(decided.has(target.candidateId))portalEntry(target.candidateId).wasPortalTarget=true;
+  c.targets=c.targets.filter(target=>!decided.has(target.candidateId));
  }
  c.resolutions.push(...resolutions);
  if(c.round>=PORTAL_ROUNDS){c.status='resolved';portalLog('Portal closed.')}
@@ -3929,7 +3969,7 @@ function portalSyncFilterOptions(){
  fill('#portalElig',[...new Set(rows.map(x=>x.p.year))].sort(),'All');
  fill('#portalConf',[...new Set(rows.map(x=>universe.teams.find(t=>t.id===x.fromSchoolId)?.conference).filter(Boolean))].sort(),'All conferences');
 }
-var PORTAL_PAGE=40,portalRowLimit=40;
+var PORTAL_PAGE=40,portalRowLimit=40,portalExpandedId=null;
 function renderPortal(){
  if(!$('#portalBoard'))return;
  const c=ensurePortalCycle(),u=portalUserTeam();
@@ -3957,8 +3997,9 @@ function renderPortal(){
   const field=x.finalists.map(id=>universe.teams.find(t=>t.id===id)?.name).filter(Boolean).slice(0,3).join(', ')||'—';
   const decided=x.decision?universe.teams.find(t=>t.id===x.decision.schoolId):null;
   const status=decided?(decided.id===u?.id?'<span class="pill pill--commit">COMMITTED TO YOU</span>':`<span class="muted">Chose ${decided.name}</span>`):open?'<span class="muted">Deciding</span>':'<span class="muted">Available</span>';
-  return `<tr class="${target?'target':''}">
-   <td data-label="Player"><div class="player-cell">${portraitTag(x.p,64,'list')}<div class="player-cell-text"><button class="player-button" data-player="${x.p.id}">${x.p.name}</button><div class="small muted">${x.p.style||''}</div></div></div></td>
+  const expanded=portalExpandedId===x.candidateId;
+  return `<tr class="${target?'target ':''}${expanded?'pd-expanded':''}">
+   <td data-label="Player"><div class="player-cell">${portraitTag(x.p,64,'list')}<div class="player-cell-text"><button class="player-button" data-player="${x.p.id}">${x.p.name}</button><div class="small muted">${x.p.style||''}</div></div><button type="button" class="pd-disclose" data-portal-expand="${esc(x.candidateId)}" aria-expanded="${expanded}" aria-label="${expanded?'Hide':'Show'} scouting details for ${esc(x.p.name)}">${expanded?'Close':'Scout'}</button></div></td>
    <td data-label="Pos">${x.p.pos}</td>
    <td data-label="Class">${x.p.year}</td>
    <td data-label="From">${from?.name||x.from}<div class="small muted">${from?.conference||''}</div></td>
@@ -3979,6 +4020,11 @@ function renderPortal(){
 // setStatus carries every refusal, so a rule the engine enforces is never silently swallowed.
 function bindPortalControls(){
  const act=(res,ok)=>{if(res)setStatus(res);else if(ok)setStatus(ok);renderPortal()};
+ $$('[data-portal-expand]').forEach(b=>b.onclick=()=>{
+  portalExpandedId=portalExpandedId===b.dataset.portalExpand?null:b.dataset.portalExpand;
+  renderPortal();
+  [...$$('[data-portal-expand]')].find(button=>button.dataset.portalExpand===b.dataset.portalExpand)?.focus();
+ });
  $$('[data-portal-more]').forEach(b=>b.onclick=()=>{portalRowLimit+=PORTAL_PAGE;renderPortal()});
  $$('[data-portal-attention]').forEach(s=>s.onchange=()=>{
   const id=s.dataset.portalAttention,n=Number(s.value);

@@ -175,13 +175,18 @@ function playbookTwoPoint(state,side){
 }
 // Clock: in the fourth quarter a leading offense that runs or completes a pass bleeds 6 more seconds; a trailing
 // offense in the last five minutes gets out of bounds and saves 8. Applied after the play is drawn.
+function playbookTempo(state){
+  if(state?.period!==4||playbookFor(state,state.possession)?.clock!=='manage')return 'normal';
+  const margin=marginFor(state,state.possession);
+  if(margin>0)return 'drain';
+  return margin<0&&state.clock<=300?'hurry':'normal';
+}
 function playbookClock(state,outcome){
-  if(!state||state.period!==4||!outcome||outcome.turnover)return outcome;
-  const side=state.possession,p=playbookFor(state,side);if(!p||p.clock!=='manage')return outcome;
-  const margin=marginFor(state,side),moving=outcome.kind==='rush'||outcome.completed===true;
-  if(!moving||!Number.isFinite(outcome.clock))return outcome;
-  if(margin>0)return{...outcome,clock:Math.min(45,outcome.clock+6),playbookClock:'bleed'};
-  if(margin<0&&state.clock<=300)return{...outcome,clock:Math.max(5,outcome.clock-8),playbookClock:'hurry'};
+  if(!outcome||outcome.turnover||!Number.isFinite(outcome.clock))return outcome;
+  if(outcome.kind!=='rush'&&outcome.completed!==true)return outcome;
+  const tempo=playbookTempo(state);
+  if(tempo==='drain')return{...outcome,clock:Math.min(45,outcome.clock+6),playbookClock:'bleed'};
+  if(tempo==='hurry')return{...outcome,clock:Math.max(5,outcome.clock-8),playbookClock:'hurry'};
   return outcome;
 }
 function sanitizePlaybook(value){
@@ -228,7 +233,7 @@ function step(state){
   requireStatus(state,'live');
   if(state.period>4)return stepOvertime(state);
   const decision=playbookFourthDown(state)||chooseFourthDown(state);
-  if(decision==='field_goal')attemptFieldGoal(state);else if(decision==='punt')punt(state);else applyScrimmage(state,generateOutcome(state));
+  if(decision==='field_goal')attemptFieldGoal(state);else if(decision==='punt')punt(state);else applyScrimmage(state,playbookClock(state,generateOutcome(state)));
   return state;
 }
 function simulate(state,maxSteps=500){
@@ -327,5 +332,5 @@ function validateGame(state){
   return true;
 }
 
-return{ENGINE_VERSION,QUARTER_SECONDS,PLAYBOOK_OPTIONS,TWO_POINT_CHART,playbookFourthDown,playbookTwoPoint,playbookClock,sanitizePlaybook,createGame,startGame,step,simulate,applyScrimmage,attemptFieldGoal,punt,snapshot,restore,scoringTotals,validateState,validateGame,generateOutcome};
+return{ENGINE_VERSION,QUARTER_SECONDS,PLAYBOOK_OPTIONS,TWO_POINT_CHART,playbookFourthDown,playbookTwoPoint,playbookTempo,playbookClock,sanitizePlaybook,createGame,startGame,step,simulate,applyScrimmage,attemptFieldGoal,punt,snapshot,restore,scoringTotals,validateState,validateGame,generateOutcome};
 });

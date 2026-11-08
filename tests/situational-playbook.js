@@ -92,3 +92,73 @@ test('settings are validated, default to the engine, and only the controlled pro
  assert.equal(t.playbook,undefined,'back to the defaults leaves nothing in the save');
  assert.equal(P.forMatch(o,t,'Mine'),null);
 });
+
+test('delegating live tempo follows the clock plan as the score changes and an explicit call overrides it',()=>{
+ const session=GameDay.createSession({gameId:'clock-plan',seed:'clock-plan',home:team('H',70,70),away:team('A',70,70),controlledSide:'home',playbook:{home:{clock:'manage'}}});
+ E.startGame(session.state);
+ Object.assign(session.state,{period:4,clock:250,down:1,distance:10,fieldPosition:35,possession:'home',score:{home:21,away:14}});
+ const pending=GameDay.advanceOne(session).decision;
+ assert.equal(pending.staffRecommendation,'drain');
+ const manual=GameDay.restore(GameDay.snapshot(session));
+ assert.equal(GameDay.resolve(session,'delegate').resolvedAction,'drain');
+ GameDay.resolve(manual,'normal');
+ for(const [home,away,delta] of [[21,14,6],[14,21,-8],[21,21,0]]){
+  const delegated=GameDay.restore(GameDay.snapshot(session)),explicit=GameDay.restore(GameDay.snapshot(manual));
+  // Same seeded moving-clock snap for both teams, with only the margin changed.
+  for(const game of [delegated,explicit])Object.assign(game.state,{score:{home,away},clock:210});
+  GameDay.advanceOne(delegated);GameDay.advanceOne(explicit);
+  const elapsed=210-explicit.state.clock;
+  assert.equal(210-delegated.state.clock,Math.min(45,Math.max(5,elapsed+delta)));
+  assert.deepEqual(delegated.state.rng,explicit.state.rng);
+ }
+});
+
+test('regulation fourth-down turnovers are failed attempts and manual two-point tries count',()=>{
+ const P=makePlaybookSystem({}),from={down:4,distance:2};
+ const events=[{type:'interception',from,yards:11},{type:'fumble',from,yards:5},{type:'scrimmage',from,yards:2},{type:'two_point',made:true},{type:'two_point',made:true,ot:true}].map(e=>({...e,team:'away'}));
+ assert.deepEqual(P.tally({events},'away'),{fourthTries:3,fourthConverted:1,twoTries:1,twoMade:1});
+});
+
+test('Advance Week and Sim Season record only the controlled custom playbook matchup through Engine 2',async()=>{
+ const {loadEngine}=require('../tools/harness');
+ const e=loadEngine({seed:72918,fullRuntime:true});await e.loadSchools();e.setUserTeam('Chicago Metropolitan');e.initUniverse();
+ const user=e.T('Chicago Metropolitan'),pb=globalThis.DynastyPlaybook,bridge=globalThis.DynastyGameEngineV2LabBridge;
+ pb.set(user,'fourthDown','aggressive');pb.set(user,'twoPoint','chart');pb.set(user,'clock','manage');
+ e.delegateWeeklyDecisions(user);
+ assert.throws(()=>bridge.recordCurrent({testFault:'afterArchive'}),/Injected v2 rollback/);
+ assert.equal(user.playbookLog,undefined);
+ const game=e.findUserGame();e.simWeek();
+ const record=e.universe.gameArchive.find(r=>r.id===game.gameId),preview=bridge.getPreview(),side=game.home===user.name?'home':'away';
+ assert.equal(record.engine,'v2');
+ assert.deepEqual(preview.state.playbook,{[side]:pb.get(user)});
+ assert.deepEqual(user.playbookLog.totals,pb.tally(preview.state,side));
+ assert.equal(user.playbookLog.games.length,1);
+ assert.equal(user.w+user.l,1);
+ assert.equal(e.universe.latest.filter(r=>r.gameId===record.id).length,1);
+ assert.deepEqual(game.score,[record.score.away,record.score.home]);
+ for(const row of record.playerStats[side]){
+  const player=user.roster.find(p=>p.id===row.id);
+  for(const [key,value] of Object.entries(row.stats))assert.equal(player.stats[key],value);
+ }
+ // Restore defaults for one week. That game stays on the original fast path.
+ for(const [key,value] of Object.entries(pb.DEFAULTS))pb.set(user,key,value);
+ e.delegateWeeklyDecisions(user);const defaultGame=e.findUserGame();e.simWeek();
+ assert.notEqual(e.universe.gameArchive.find(r=>r.id===defaultGame.gameId).engine,'v2');
+ assert.equal(user.playbookLog.games.length,1);
+ pb.set(user,'clock','manage');
+ e.delegateWeeklyDecisions(user);
+ const liveSession=bridge.interactive.start(),kickoff=structuredClone(liveSession.state);
+ pb.set(user,'clock','standard');
+ globalThis.__DL_TEST__.v2GameDayForget();bridge.interactive.render();
+ assert.deepEqual(bridge.interactive.getSession().state,kickoff,'reloading uses the kickoff playbook even after settings are edited');
+ const liveGame=e.findUserGame();e.simWeek();
+ assert.equal(e.universe.gameArchive.find(r=>r.id===liveGame.gameId).gameDayVersion,2);
+ assert.equal(user.playbookLog.games.length,2,'a completed live game counts once when advancing');
+ pb.set(user,'clock','manage');
+ e.simSeason();
+ const records=e.universe.gameArchive.filter(r=>r.engine==='v2');
+ assert.equal(user.w+user.l,12);assert.equal(records.length,11);
+ assert.ok(records.every(r=>r.home.id===user.id||r.away.id===user.id));
+ assert.equal(new Set(user.playbookLog.games).size,11);
+ assert.equal(e.universe.phase,'confReady');
+});

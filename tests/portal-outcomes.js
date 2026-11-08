@@ -33,10 +33,15 @@ test('a destination needs a reason, not just roster room',async()=>{
 
 test('unplaced entrants return or leave, never linger',async()=>{
  const e=await setup(9702),u=readyForPortal(e);
- u.offseason.reports=u.offseason.reports||{};
+ const entrants=u.transferPortal.map(x=>({id:x.p.id,origin:x.fromSchoolId}));
  e.offseasonPortal();
  const report=u.offseason.reports.portal;
  assert.ok(report,'the phase records what happened');
+ const rosters=new Map(u.teams.flatMap(t=>t.roster.map(p=>[p.id,t.id])));
+ const returned=entrants.filter(x=>rosters.get(x.id)===x.origin);
+ assert.ok(returned.length>0);
+ assert.equal(returned.length,report.returned,'every reported return is back on its original roster');
+ for(const x of entrants)assert.ok(rosters.has(x.id)||u.playerArchive.some(p=>p.id===x.id),'each entrant has a roster or an archived exit');
  const outcome=(report.returned||0)+(report.exited||0);
  assert.ok(outcome>0,'some entrants find no home across 120 programs');
  assert.equal(u.transferPortal.length,0,'nobody is left pending forever');
@@ -55,4 +60,19 @@ test('portal outcomes stay deterministic for a seed',async()=>{
  const run=async()=>{const e=await setup(9704);readyForPortal(e);e.offseasonPortal();
   const r=e.universe.offseason.reports.portal;return [r.placed,r.returned||0,r.exited||0].join(',')};
  assert.equal(await run(),await run());
+});
+
+test('a blocked commitment falls back without losing or duplicating an entrant already at home',async()=>{
+ const e=await setup(9705),u=readyForPortal(e),home=u.teams[0],full=u.teams[1];
+ for(const team of u.teams.slice(1)){
+  while(team.roster.length<105)team.roster.push({...team.roster[0],id:`CAP_${team.id}_${team.roster.length}`});
+ }
+ // Legacy entries can still reference a player already present on his origin roster.
+ const players=home.roster.slice(0,12);
+ u.transferPortal=players.map(p=>e.ensurePortalEntry({p,from:home.name,fromSchoolId:home.id,reason:'PLAYING_TIME',enteredSeason:u.year,decision:{schoolId:full.id,round:3}}));
+ e.offseasonPortal();
+ assert.equal(full.roster.length,105);
+ assert.ok(u.offseason.reports.portal.returned>0);
+ assert.equal(new Set(home.roster.map(p=>p.id)).size,home.roster.length);
+ for(const p of players)assert.equal(home.roster.filter(x=>x.id===p.id).length+u.playerArchive.filter(x=>x.id===p.id).length,1);
 });

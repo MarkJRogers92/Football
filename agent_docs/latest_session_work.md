@@ -1,5 +1,9 @@
 # Latest Session Work
 
+## v0.15.2 — Portal, weekly simulation and player history
+
+Portal commitments survive the transition to spring. The staff shortlist compares players for one vacancy. Successful desk edits queue a management save. Weekly simulation uses a custom playbook for the controlled team. The Program tab loads alumni for class reports, and the postgame recap can recognize a homegrown player’s first college start.
+
 ## v0.15.1 — Portal Desk, player arcs, staff assignments, playbook, tour, long-dynasty speed (2026-11-08, PR #41)
 
 - `portal-desk.js` (portal hours, actions, odds, rival counters by hash), `player-arcs.js` (desk summary on `recruitingMemory.desk`, class cards graded vs same-year league classes, PAYOFF hub items), `staff-assignments.js` (`team.staffAssignments`; territory bonus via `territoryBonus` env hook in recruiting-actions, camp bonus via a `resolveDevelopmentCoaching` wrapper), `situational-playbook.js` (rules in `game-engine-v2.js`: `playbookFourthDown`/`playbookTwoPoint`/`playbookClock`; inert without `state.playbook`), `tutorial.js` (`universe.tutorial`).

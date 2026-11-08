@@ -803,8 +803,8 @@ if(typeof module==='object'&&module.exports){
     const dialog=b.closest?.('#recruitDialog');
     let res;
     if(kind==='withdraw'){if(!confirm(`Withdraw the scholarship offer to ${r.name}? He will cool toward your program.`))return;res=recruitingActions.withdrawOffer(r,t)}
-    else if(kind==='visit'){scheduleVisit(r);renderRecruiting();if(dialog){const d=$('#recruitDialog');if(d?.open)d.close();showRecruitProfile(r.id)}return}
     else{const topic=kind==='pitch'?b.parentElement?.querySelector('select')?.value:undefined;res=recruitingActions.perform(r,t,kind,{topic})}
+    if(res.ok)autosaveAfter('management');
     announce(res,r);
     renderRecruiting();
     if(dialog&&res.ok){const d=$('#recruitDialog');if(d?.open)d.close();showRecruitProfile(r.id)}
@@ -860,11 +860,13 @@ if(typeof module==='object'&&module.exports){
  }
  function staffWorkBoard(){
   const out=recruitingActions.staffPlan(universe.recruits,selected());
+  if(out.hours)autosaveAfter('management');
   setStatus(out.hours?`Staff worked the board: ${out.calls} call${out.calls===1?'':'s'}, ${out.pitches} pitch${out.pitches===1?'':'es'}, ${out.offers} offer${out.offers===1?'':'s'} (${hoursText(out.hours)}).`:'The staff had nothing to add this week.');
   renderRecruiting();
  }
  function toggleAuto(on){
   recruitingActions.setAuto(universe,on);
+  autosaveAfter('management');
   setStatus(on?'Staff now handle recruiting. Each week they spend any hours you leave unused; you can still act first.':'Recruiting is back in your hands. Targets nobody works will cool.');
   renderRecruiting();
  }

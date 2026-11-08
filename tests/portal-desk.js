@@ -143,3 +143,47 @@ test('a portal nobody works resolves exactly as it did without the desk',async()
  };
  assert.equal(await run(false),await run(true));
 });
+
+test('advancing the offseason honors the same commitments as Finalize, including the offered promise',async()=>{
+ async function run(finalizeFirst){
+  const e=await setup(5105),t=me(e);
+  e.offseasonEnrollment();e.openPortalCycle();
+  const entries=e.portalCandidates().filter(x=>e.portalFit(x,t));
+  const pick=entries[0],id=pick.p.id;
+  e.targetPortalCandidate(pick.candidateId,1);
+  const promise='Early Role';
+  assert.equal(e.promisePortalCandidate(pick.candidateId,promise),null);
+  assert.equal(e.offerPortalNil(pick.candidateId),null);
+  // Fix his finalist so the test exercises placement independently of winning the lottery.
+  pick.finalists=[t.id];
+  while(e.ensurePortalCycle().status==='open')e.advancePortalRound();
+  const transfers=e.portalCandidates().map(x=>[x.p.id,x.decision.schoolId]);
+  assert.equal(e.portalAttentionSpent(),0);
+  if(finalizeFirst)e.resolvePortalCommitments();
+  e.runOffseason();
+  const player=t.roster.find(p=>p.id===id);
+  assert.ok(player,'the chosen school lands its commit');
+  assert.ok(player.promises.some(q=>q.schoolId===t.id&&q.seasonMade===e.universe.year));
+  assert.ok(e.nilDealActive(player,t));
+  const rosters=new Map(e.universe.teams.flatMap(team=>team.roster.map(p=>[p.id,team.id])));
+  return {actual:transfers.map(([id])=>[id,rosters.get(id)]),report:e.universe.offseason.reports.portal};
+ }
+ assert.deepEqual(await run(false),await run(true));
+});
+
+test('staff nominate real vacancies from visible grades and delegate an empty board',async()=>{
+ const e=await setup(5111),{t}=openWithCandidate(e),d=D();
+ const s=d.shortlist(t);
+ assert.ok(s&&s.options.length>=2&&s.options.length<=3);
+ assert.ok(s.need.depth<s.need.want);
+ const ids=s.options.map(o=>o.entry.candidateId);
+ assert.equal(new Set(ids).size,ids.length);
+ assert.ok(s.options.every(o=>o.entry.p.pos===s.need.pos&&o.entry.fromSchoolId!==t.id));
+ assert.equal(e.portalAttentionSpent(),0,'previewing the shortlist costs nothing');
+ for(const x of e.portalCandidates()){x.p.trueNow=1;x.p.upside=1}
+ assert.deepEqual(d.shortlist(t).options.map(o=>o.entry.candidateId),ids,'hidden ratings never rank suggestions');
+ d.setAuto(true);const plan=d.staffPlan(t);
+ assert.ok(plan.calls>0);assert.ok(e.portalAttentionSpent()>0);
+ for(const id of ids)assert.ok(e.portalTargetFor(id));
+ assert.ok(e.portalAttentionSpent()<=e.PORTAL_ATTENTION_POOL);
+});

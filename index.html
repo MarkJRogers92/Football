@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.15.1</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.15.2</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -981,6 +981,44 @@ tr[hidden]{display:none!important}
 .pd-actions button:disabled{opacity:.45}
 .pd-actions button.pd-answer{border-color:var(--warn);box-shadow:0 0 0 1px var(--warn) inset}
 @media(max-width:700px){.pd-actions button{flex:1 1 auto}}
+
+.pd-shortlist{border-top:2px solid var(--accent);padding:12px 0}
+.pd-shortlist-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.pd-shortlist-head h4,.pd-shortlist-head p,.pd-prospect p{margin:2px 0}
+.pd-shortlist-head small,.pd-prospect header small{font-size:.7rem;font-weight:700;letter-spacing:.07em;color:var(--accent)}
+.pd-shortlist-head p,.pd-prospect header span{font-size:.8rem;color:var(--muted)}
+.pd-compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));margin-top:10px;gap:10px}
+.pd-prospect{display:flex;min-width:0;flex-direction:column;align-items:flex-start;gap:8px;padding:10px;border:1px solid var(--line)}
+.pd-prospect header,.pd-prospect dl{display:grid;gap:3px}
+.pd-prospect dl{width:100%;margin:0}
+.pd-prospect dl div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding:3px 0}
+.pd-prospect dt,.pd-prospect dd,.pd-prospect p{font-size:.8rem}
+.pd-prospect dt{color:var(--muted)}
+.pd-prospect dd{text-align:right;margin:0}
+.pd-prospect button{margin-top:auto}
+#portalBoard .pd-disclose{display:none}
+@media(max-width:700px){
+ .pd-compare{grid-template-columns:1fr}
+ #portalBoard .pd-disclose{display:inline-block;margin-left:auto}
+ #portalBoard tr:not(.pd-expanded)>td[data-label]:not([data-label="Player"]):not([data-label="Pos"]):not([data-label="Rating"]){display:none}
+}
+.pd-target-body,.pd-pick-notes{display:grid;gap:7px;width:100%}
+.pd-target-toggle,.pd-pick-toggle{display:none}
+@media(max-width:700px){
+ .pd-target{padding:0}
+ .pd-target-toggle{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;text-align:left;color:inherit;background:transparent;border:0;white-space:normal}
+ .pd-target-toggle b,.pd-target-toggle small{display:block}
+ .pd-target-toggle small{color:var(--muted);font-weight:400}
+ .pd-target-toggle .pd-rival-line{color:var(--warn)}
+ .pd-target:not(.pd-open) .pd-target-body,.pd-prospect:not(.pd-open) .pd-pick-notes{display:none}
+ .pd-target-body{box-sizing:border-box;padding:0 12px 10px}
+ .pd-compare{gap:4px}
+ .pd-prospect{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:5px}
+ .pd-prospect header{grid-row:span 2}
+ .pd-pick-toggle{display:block;grid-column:2;font-size:.75rem;min-height:30px}
+ .pd-pick-notes{grid-column:1/-1;grid-row:3}
+ .pd-prospect button[data-pd-pursue]{grid-column:2;grid-row:2;margin:0}
+}
 
 .arc-story{display:grid;gap:3px;padding:10px 12px;margin:0 0 10px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:9px;background:var(--panel2)}
 .arc-story p{margin:0;line-height:1.4}
@@ -3278,7 +3316,7 @@ button.lw-follow[aria-pressed="true"]{color:var(--text);border-color:var(--team-
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.15.1</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.15.2</b></span></footer>
   </div>
 </section>
 
@@ -3305,7 +3343,7 @@ button.lw-follow[aria-pressed="true"]{color:var(--text);border-color:var(--team-
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.15.1</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.15.2</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -4843,13 +4881,18 @@ function playbookTwoPoint(state,side){
 }
 // Clock: in the fourth quarter a leading offense that runs or completes a pass bleeds 6 more seconds; a trailing
 // offense in the last five minutes gets out of bounds and saves 8. Applied after the play is drawn.
+function playbookTempo(state){
+  if(state?.period!==4||playbookFor(state,state.possession)?.clock!=='manage')return 'normal';
+  const margin=marginFor(state,state.possession);
+  if(margin>0)return 'drain';
+  return margin<0&&state.clock<=300?'hurry':'normal';
+}
 function playbookClock(state,outcome){
-  if(!state||state.period!==4||!outcome||outcome.turnover)return outcome;
-  const side=state.possession,p=playbookFor(state,side);if(!p||p.clock!=='manage')return outcome;
-  const margin=marginFor(state,side),moving=outcome.kind==='rush'||outcome.completed===true;
-  if(!moving||!Number.isFinite(outcome.clock))return outcome;
-  if(margin>0)return{...outcome,clock:Math.min(45,outcome.clock+6),playbookClock:'bleed'};
-  if(margin<0&&state.clock<=300)return{...outcome,clock:Math.max(5,outcome.clock-8),playbookClock:'hurry'};
+  if(!outcome||outcome.turnover||!Number.isFinite(outcome.clock))return outcome;
+  if(outcome.kind!=='rush'&&outcome.completed!==true)return outcome;
+  const tempo=playbookTempo(state);
+  if(tempo==='drain')return{...outcome,clock:Math.min(45,outcome.clock+6),playbookClock:'bleed'};
+  if(tempo==='hurry')return{...outcome,clock:Math.max(5,outcome.clock-8),playbookClock:'hurry'};
   return outcome;
 }
 function sanitizePlaybook(value){
@@ -4896,7 +4939,7 @@ function step(state){
   requireStatus(state,'live');
   if(state.period>4)return stepOvertime(state);
   const decision=playbookFourthDown(state)||chooseFourthDown(state);
-  if(decision==='field_goal')attemptFieldGoal(state);else if(decision==='punt')punt(state);else applyScrimmage(state,generateOutcome(state));
+  if(decision==='field_goal')attemptFieldGoal(state);else if(decision==='punt')punt(state);else applyScrimmage(state,playbookClock(state,generateOutcome(state)));
   return state;
 }
 function simulate(state,maxSteps=500){
@@ -4995,7 +5038,7 @@ function validateGame(state){
   return true;
 }
 
-return{ENGINE_VERSION,QUARTER_SECONDS,PLAYBOOK_OPTIONS,TWO_POINT_CHART,playbookFourthDown,playbookTwoPoint,playbookClock,sanitizePlaybook,createGame,startGame,step,simulate,applyScrimmage,attemptFieldGoal,punt,snapshot,restore,scoringTotals,validateState,validateGame,generateOutcome};
+return{ENGINE_VERSION,QUARTER_SECONDS,PLAYBOOK_OPTIONS,TWO_POINT_CHART,playbookFourthDown,playbookTwoPoint,playbookTempo,playbookClock,sanitizePlaybook,createGame,startGame,step,simulate,applyScrimmage,attemptFieldGoal,punt,snapshot,restore,scoringTotals,validateState,validateGame,generateOutcome};
 });
 (function(root,factory){
   const engine=(typeof module==='object'&&module.exports)?require('./game-engine-v2.js'):root.DynastyGameEngineV2;
@@ -5284,7 +5327,7 @@ function validateSession(session){
   if(!session.inputs?.home||!session.inputs?.away)throw new Error('Game Day session is missing calibrated team inputs.');
   if(session.controlledSide!==null&&session.controlledSide!=='home'&&session.controlledSide!=='away')throw new Error('Invalid Game Day controlled side.');
   for(const side of ['home','away']){
-    if(!['normal','hurry','drain'].includes(session.tempo?.[side]))throw new Error(`Invalid ${side} tempo strategy.`);
+    if(!['normal','hurry','drain','staff'].includes(session.tempo?.[side]))throw new Error(`Invalid ${side} tempo strategy.`);
     if(!['balanced','aggressive','ball_control'].includes(session.halftimeApproach?.[side]))throw new Error(`Invalid ${side} halftime approach.`);
   }
   if(session.pendingConversion&& !['home','away'].includes(session.pendingConversion.side))throw new Error('Invalid pending touchdown conversion.');
@@ -5359,8 +5402,11 @@ function deferredTouchdown(session,state,outcome){
   session.pendingConversion={side:offense,createdAfterEventSeq:state.events.length,period:state.period,clock:state.clock};engine.validateState(state);return state
 }
 function playOutcome(session,state){
-  const outcome=adapter.profileOutcome(state,session.inputs.home,session.inputs.away,session.homeFieldRating),start=state.events.length,beforeField=state.fieldPosition;
-  halftimeAdjustedOutcome(session,state,outcome);outcome.clock=tempoAdjustedClock(session,state,outcome.clock);
+  const start=state.events.length,beforeField=state.fieldPosition,side=state.possession;
+  let outcome=adapter.profileOutcome(state,session.inputs.home,session.inputs.away,session.homeFieldRating);
+  halftimeAdjustedOutcome(session,state,outcome);
+  if(!session.tempoDecisionMade[side]||session.tempo[side]==='staff')outcome=engine.playbookClock(state,outcome);
+  else outcome.clock=tempoAdjustedClock(session,state,outcome.clock);
   const yards=clamp(Math.round(outcome.yards??0),-99,99),touchdown=state.period<=4&&!outcome.turnover&&beforeField+yards>=100;
   if(touchdown)deferredTouchdown(session,state,outcome);else engine.applyScrimmage(state,outcome);
   adapter.annotateOutcomeEvent(state,start,outcome);return outcome
@@ -5401,7 +5447,8 @@ function tempoWindow(session){
 function createTempoDecision(session){
   if(!tempoWindow(session))return null;if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);
   const state=session.state,side=state.possession,min=Math.floor(state.clock/60),sec=String(state.clock%60).padStart(2,'0'),team=state[side]?.name||session.names[side],margin=(state.score[side]||0)-(state.score[other(side)]||0);
-  const decision={id:nextDecisionId(state),type:'late_game_tempo',policyId:TEMPO_POLICY_ID,team:side,teamId:state[side]?.id??null,contextKey:`tempo:${state.period}:${state.clock}:${side}:${state.fieldPosition}:${state.score.home}:${state.score.away}`,situation:`Q4 ${min}:${sec} · ${team} ball · ${margin===0?'tie game':margin>0?`leading by ${margin}`:`trailing by ${Math.abs(margin)}`}`,context:{period:state.period,clock:state.clock,possession:side,fieldPosition:state.fieldPosition,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},options:[{id:'hurry',label:'Hurry-up'},{id:'normal',label:'Normal tempo'},{id:'drain',label:'Drain clock'},{id:'delegate',label:'Delegate to staff'}],staffRecommendation:'normal',defaultOption:'normal',createdAfterEventSeq:state.events?.length||0};
+  const staffTempo=engine.playbookTempo(state);
+  const decision={id:nextDecisionId(state),type:'late_game_tempo',policyId:TEMPO_POLICY_ID,team:side,teamId:state[side]?.id??null,contextKey:`tempo:${state.period}:${state.clock}:${side}:${state.fieldPosition}:${state.score.home}:${state.score.away}`,situation:`Q4 ${min}:${sec} · ${team} ball · ${margin===0?'tie game':margin>0?`leading by ${margin}`:`trailing by ${Math.abs(margin)}`}`,context:{period:state.period,clock:state.clock,possession:side,fieldPosition:state.fieldPosition,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},options:[{id:'hurry',label:'Hurry-up'},{id:'normal',label:'Normal tempo'},{id:'drain',label:'Drain clock'},{id:'delegate',label:'Delegate to staff'}],staffRecommendation:staffTempo,defaultOption:staffTempo,createdAfterEventSeq:state.events?.length||0};
   session.pendingStrategyDecision=decision;return clone(decision)
 }
 function appendStrategyReceipt(session,decision,selectedOption,resolvedAction){const state=session.state,event={seq:(state.events?.length||0)+1,type:'coaching_decision',decisionId:decision.id,decisionType:decision.type,policyId:decision.policyId,team:decision.team,selectedOption,resolvedAction,staffRecommendation:decision.staffRecommendation,situation:decision.situation,state:eventState(state)};state.events.push(event);return event}
@@ -5417,7 +5464,7 @@ function resolveStrategy(session,optionId){
   if(decision.type==='two_point_decision'){
     if(!['extra_point','two_point'].includes(action))throw new Error(`Unknown conversion action: ${action}`);appendStrategyReceipt(session,decision,selected,action);resolvePendingConversion(session,action)
   }else if(decision.type==='late_game_tempo'){
-    if(!['normal','hurry','drain'].includes(action))throw new Error(`Unknown tempo action: ${action}`);session.tempo[decision.team]=action;session.tempoDecisionMade[decision.team]=true;appendStrategyReceipt(session,decision,selected,action)
+    if(!['normal','hurry','drain'].includes(action))throw new Error(`Unknown tempo action: ${action}`);session.tempo[decision.team]=selected==='delegate'?'staff':action;session.tempoDecisionMade[decision.team]=true;appendStrategyReceipt(session,decision,selected,action)
   }else if(decision.type==='halftime_adjustment'){
     if(!['balanced','aggressive','ball_control'].includes(action))throw new Error(`Unknown halftime action: ${action}`);session.halftimeApproach[decision.team]=action;session.halftimeDecisionMade=true;appendStrategyReceipt(session,decision,selected,action)
   }else throw new Error(`Unknown strategy decision type: ${decision.type}`);
@@ -6488,7 +6535,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.15.1';
+const APP_VERSION='0.15.2';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -7642,6 +7689,11 @@ function finishGame(before,home,away,result){
  const record={id,...before,final:true,score:{home:result.hp,away:result.ap},teamStats:JSON.parse(JSON.stringify(result.box)),playerStats:players,injuries,drives:result.drives||[],detailed:!!result.detailed};
  record.scoreAdjustment={};for(const s of ['home','away']){const b=record.teamStats[s];record.scoreAdjustment[s]=record.score[s]-((b.passTD+b.rushTD)*7+b.fgMade*3)}
  record.formerPlayers=[];for(const [side,t,opp] of [['home',home,away],['away',away,home]])for(const p of t.roster)if(record.playerStats[side].some(x=>x.id===p.id)&&(p.transferHistory||[]).some(x=>x.fromSchoolId===opp.id))record.formerPlayers.push({id:p.id,name:p.name,school:t.name,formerSchool:opp.name});
+ const controlled=selected(),side=controlled===home?'home':controlled===away?'away':null;
+ if(side&&globalThis.DynastyPlayerArcs){
+  const first=DynastyPlayerArcs.firstStart(controlled,players[side]);
+  if(first)record.firstStart=result.firstStart=first;
+ }
  universe.gameArchive.push(record);result.gameId=id;
  // Compact ledger reference; boxes, names and scores have one canonical snapshot.
  universe.events??=[];universe.events.push({id:`EVT_${id}`,type:before.label==='National Championship'?'CHAMPIONSHIP_WON':'GAME_COMPLETED',season:before.season,week:before.week,schoolIds:[home.id,away.id],playerIds:record.formerPlayers.map(p=>p.id),coachIds:[],gameIds:[id],importance:before.label==='National Championship'?95:30,summary:`${result.away} ${result.ap} – ${result.hp} ${result.home}`});
@@ -7785,7 +7837,7 @@ function gameRecap(g,{short=false}={}){
  const f=recapFacts(g),pick=recapPicker(g.id||`${g.season}_${g.week}_${g.home?.name}`);
  const result=recapResultLine(g,f,pick);
  if(short)return {headline:result,body:result};
- const body=[result,recapHowLine(g,f,pick),recapStarLine(g,f,pick),recapColorLine(g,f,pick)].filter(Boolean).join(' ');
+ const body=[result,recapHowLine(g,f,pick),recapStarLine(g,f,pick),recapColorLine(g,f,pick),g.firstStart?.text&&gameEscape(g.firstStart.text)].filter(Boolean).join(' ');
  return {headline:result,body};
 }
 // --- v0.9.7: weekly newsletter ---------------------------------------------
@@ -9118,12 +9170,27 @@ function simulateUserDetailed(){const g=findUserGame();if(!g)return;const gate=g
 function completeScheduledGame(g,r,detailed=false){
  if(g.played)return;
  g.gameId=r.gameId;g.played=true;g.score=[r.ap,r.hp];g.winner=r.winner;
+ if(r.firstStart)g.firstStart=r.firstStart; // The schedule is available before saved box scores load.
  if(detailed)g.detailed=true;
  settleRivalryGame(g);
 }
 function watchUserDetailed(){const before=universe.lastDetailedGame?.gameId;simulateUserDetailed();const id=universe.lastDetailedGame?.gameId;if(id&&id!==before)showGameCenter(id,'Watch')}
 function hasPendingCareerChoice(){return !!(universe.jobOffers||[]).length}
-function simWeek(skipDecisions=false){const gate=guidanceActionEligibility(skipDecisions===true?'simulate-season':'advance-week');if(!gate.allowed){if(gate.blockers[0])setStatus(gate.blockers[0].message);return}recoverWeek();const u=selected(),beforeRank=u.rank;advanceAcademicsForWeek(u);let results=[];for(const g of universe.schedule[universe.week]){if(g.played){settleRivalryGame(g);continue;}let r=gameSim(T(g.home),T(g.away),false,g.conf);completeScheduledGame(g,r);results.push(r);if(g.home===u.name||g.away===u.name)universe.lastDetailedGame=null}const userGame=universe.schedule[universe.week].find(g=>g.played&&(g.home===u.name||g.away===u.name));universe.week++;if(results.length)universe.latest=results;ranked();advanceRecruiting();buildWeeklyHub(beforeRank);if(universe.week===12)universe.phase='confReady';setStatus(weekResultStatus(universe.week,u,userGame));autosaveAfter('week');render()}
+function simWeek(skipDecisions=false){
+ const gate=guidanceActionEligibility(skipDecisions===true?'simulate-season':'advance-week');
+ if(!gate.allowed){if(gate.blockers[0])setStatus(gate.blockers[0].message);return}
+ recoverWeek();const u=selected(),beforeRank=u.rank;advanceAcademicsForWeek(u);
+ const results=[],pb=globalThis.DynastyPlaybook;
+ // Record the controlled game first so a failed transaction can be retried before other matchups settle.
+ const customGame=u.playbook&&pb&&!pb.isDefault(pb.get(u))?findUserGame():null;
+ const customResult=customGame?recordV2GameLabResult({advancingWeek:true}).result:null;
+ for(const g of universe.schedule[universe.week]){
+  if(g===customGame){results.push(customResult);continue}
+  if(g.played){settleRivalryGame(g);continue}
+  const r=gameSim(T(g.home),T(g.away),false,g.conf);completeScheduledGame(g,r);results.push(r);
+  if(g.home===u.name||g.away===u.name)universe.lastDetailedGame=null;
+ }
+ const userGame=universe.schedule[universe.week].find(g=>g.played&&(g.home===u.name||g.away===u.name));universe.week++;if(results.length)universe.latest=results;ranked();advanceRecruiting();buildWeeklyHub(beforeRank);if(universe.week===12)universe.phase='confReady';setStatus(weekResultStatus(universe.week,u,userGame));autosaveAfter('week');render()}
 // Postseason games never reach weekResultStatus, so the status line (and the ticker that mirrors it)
 // kept showing the Week 12 final through championship weekend, bowls and the playoff.
 function announceUserPostseason(fromIndex){const u=selected(),games=universe.gameArchive||[];if(!u)return;let r=null;for(let i=games.length-1;i>=Math.max(0,fromIndex);i--){const g=games[i];if(g?.home?.id===u.id||g?.away?.id===u.id){r=g;break}}if(!r?.label)return;const home=r.home?.id===u.id,us=Number(r.score?.[home?'home':'away'])||0,them=Number(r.score?.[home?'away':'home'])||0,opp=(home?r.away:r.home)?.name||'opponent',won=us>them;setStatus(`${r.label} final: ${won?'W':'L'} ${us}-${them} ${home||r.venue==='Neutral site'?'vs':'at'} ${opp}.${won&&r.label==='National Championship'?' National champions!':''}`)}
@@ -9457,7 +9524,9 @@ const PORTAL_RETURN_CHANCE=.65;
 function resolveUnplacedPortal(entry){
  const {p}=entry,from=universe.teams.find(t=>t.id===entry.fromSchoolId)||T(entry.from);
  if(!from)return null;
- if(gameplayRandom()<PORTAL_RETURN_CHANCE&&from.roster.length<105){
+ const alreadyHome=from.roster.some(player=>player.id===p.id);
+ if(gameplayRandom()<PORTAL_RETURN_CHANCE&&(alreadyHome||from.roster.length<105)){
+  if(!alreadyHome){from.roster.push(p);recordRosterMove(from,p,'portalIn')}
   p.morale=clamp((p.morale??70)-8,20,99);p.staffTrust=clamp((p.staffTrust??70)-5,0,99);
   return {outcome:'returned',team:from};
  }
@@ -9468,10 +9537,15 @@ function resolveUnplacedPortal(entry){
 function offseasonPortal(){
  const os=normalizeOffseasonState();
  if(offseasonPhaseDone('portal')){if(os.phase==='portal')os.phase='spring';return true}
+ // Place announced decisions before the draft or any fallback draws, exactly as the Finalize button does.
+ if((universe.transferPortal||[]).some(x=>x.decision)){
+  const {blocked}=resolvePortalCommitments();
+  for(const b of blocked)portalLog(`Commitment reopened (${b.reason}): ${portalEntry(b.candidateId)?.p.name||'transfer'} returns to the available field.`);
+ }
  const controlled=$('#userTeam').value,movement=[...(os.reports.movement||[])];
  const draftPool=(os.reports.departures?.draftPool||[]).map(d=>({...d,t:universe.teams.find(x=>x.id===d.teamId)||d.t}));runDraft(draftPool);
  const portal=[...(universe.transferPortal||[])];universe.transferPortal=[];
- let placedCount=0,returnedCount=0,exitedCount=0;
+ let placedCount=universe.portalCycle?.year===universe.year?(universe.portalCycle.finalizedCount||0):0,returnedCount=0,exitedCount=0;
  portal.forEach(x=>{x.p.stats=newStats();x.p.year=CLASS_NAMES[Math.min(3,eligibilityBase(x.p))]||'SR';const dest=placeTransfer(x);
   if(dest){placedCount++;if(x.from===controlled||dest.name===controlled)movement.push(`${x.p.pos} ${x.p.name}: ${x.from} → ${dest.name} (${transferReasonLabel(x.reason)})`);return}
   const outcome=resolveUnplacedPortal(x);
@@ -9479,6 +9553,10 @@ function offseasonPortal(){
   if(outcome.outcome==='returned'){returnedCount++;if(x.from===controlled)movement.push(`${x.p.pos} ${x.p.name}: no landing spot, returned to ${x.from}`)}
   else{exitedCount++;if(x.from===controlled)movement.push(`${x.p.pos} ${x.p.name}: no landing spot, left the program`)}
  });
+ if(universe.portalCycle?.year===universe.year&&universe.portalCycle.status==='open'){
+  universe.portalCycle.status='resolved';
+  portalLog('Offseason advanced. Remaining transfers resolved.');
+ }
  updateCareerRecords();
  movement.push(...(os.reports.review?.carouselLog||[]).filter(x=>x.includes(controlled)));
  universe.movementLog=movement.slice(0,100);
@@ -9816,10 +9894,14 @@ function resolvePortalCommitments(){
   if(!landed){blocked.push({candidateId:entry.candidateId,reason:'placement refused'});continue}
   entry.placed=true;
   attachPortalPromise(entry,landed);
+  const os=universe.offseason,controlled=$('#userTeam').value;
+  if(os?.reports&&(entry.from===controlled||landed.name===controlled)){
+   (os.reports.movement??=[]).push(`${entry.p.pos} ${entry.p.name}: ${entry.from} → ${landed.name} (${transferReasonLabel(entry.reason)})`);
+  }
   placed.push({candidateId:entry.candidateId,playerId:entry.p.id,schoolId:landed.id});
  }
  universe.transferPortal=(universe.transferPortal||[]).filter(x=>!x.placed);
- if(placed.length){autosaveAfter('portal');portalLog(`${placed.length} portal commitment${placed.length===1?'':'s'} finalized.`)}
+ if(placed.length){const c=ensurePortalCycle();c.finalizedCount=(c.finalizedCount||0)+placed.length;autosaveAfter('portal');portalLog(`${placed.length} portal commitment${placed.length===1?'':'s'} finalized.`)}
  return {placed,blocked};
 }
 
@@ -9846,6 +9928,11 @@ function advancePortalRound(){
     portalLog(`${entry.p.pos} ${entry.p.name} committed to ${school?.name||'a program'}.`);
    }
   }
+ }
+ if(resolutions.length){
+  const decided=new Set(resolutions.map(x=>x.candidateId));
+  for(const target of c.targets)if(decided.has(target.candidateId))portalEntry(target.candidateId).wasPortalTarget=true;
+  c.targets=c.targets.filter(target=>!decided.has(target.candidateId));
  }
  c.resolutions.push(...resolutions);
  if(c.round>=PORTAL_ROUNDS){c.status='resolved';portalLog('Portal closed.')}
@@ -10415,7 +10502,7 @@ function portalSyncFilterOptions(){
  fill('#portalElig',[...new Set(rows.map(x=>x.p.year))].sort(),'All');
  fill('#portalConf',[...new Set(rows.map(x=>universe.teams.find(t=>t.id===x.fromSchoolId)?.conference).filter(Boolean))].sort(),'All conferences');
 }
-var PORTAL_PAGE=40,portalRowLimit=40;
+var PORTAL_PAGE=40,portalRowLimit=40,portalExpandedId=null;
 function renderPortal(){
  if(!$('#portalBoard'))return;
  const c=ensurePortalCycle(),u=portalUserTeam();
@@ -10443,8 +10530,9 @@ function renderPortal(){
   const field=x.finalists.map(id=>universe.teams.find(t=>t.id===id)?.name).filter(Boolean).slice(0,3).join(', ')||'—';
   const decided=x.decision?universe.teams.find(t=>t.id===x.decision.schoolId):null;
   const status=decided?(decided.id===u?.id?'<span class="pill pill--commit">COMMITTED TO YOU</span>':`<span class="muted">Chose ${decided.name}</span>`):open?'<span class="muted">Deciding</span>':'<span class="muted">Available</span>';
-  return `<tr class="${target?'target':''}">
-   <td data-label="Player"><div class="player-cell">${portraitTag(x.p,64,'list')}<div class="player-cell-text"><button class="player-button" data-player="${x.p.id}">${x.p.name}</button><div class="small muted">${x.p.style||''}</div></div></div></td>
+  const expanded=portalExpandedId===x.candidateId;
+  return `<tr class="${target?'target ':''}${expanded?'pd-expanded':''}">
+   <td data-label="Player"><div class="player-cell">${portraitTag(x.p,64,'list')}<div class="player-cell-text"><button class="player-button" data-player="${x.p.id}">${x.p.name}</button><div class="small muted">${x.p.style||''}</div></div><button type="button" class="pd-disclose" data-portal-expand="${esc(x.candidateId)}" aria-expanded="${expanded}" aria-label="${expanded?'Hide':'Show'} scouting details for ${esc(x.p.name)}">${expanded?'Close':'Scout'}</button></div></td>
    <td data-label="Pos">${x.p.pos}</td>
    <td data-label="Class">${x.p.year}</td>
    <td data-label="From">${from?.name||x.from}<div class="small muted">${from?.conference||''}</div></td>
@@ -10465,6 +10553,11 @@ function renderPortal(){
 // setStatus carries every refusal, so a rule the engine enforces is never silently swallowed.
 function bindPortalControls(){
  const act=(res,ok)=>{if(res)setStatus(res);else if(ok)setStatus(ok);renderPortal()};
+ $$('[data-portal-expand]').forEach(b=>b.onclick=()=>{
+  portalExpandedId=portalExpandedId===b.dataset.portalExpand?null:b.dataset.portalExpand;
+  renderPortal();
+  [...$$('[data-portal-expand]')].find(button=>button.dataset.portalExpand===b.dataset.portalExpand)?.focus();
+ });
  $$('[data-portal-more]').forEach(b=>b.onclick=()=>{portalRowLimit+=PORTAL_PAGE;renderPortal()});
  $$('[data-portal-attention]').forEach(s=>s.onchange=()=>{
   const id=s.dataset.portalAttention,n=Number(s.value);
@@ -12789,8 +12882,8 @@ if(typeof module==='object'&&module.exports){
     const dialog=b.closest?.('#recruitDialog');
     let res;
     if(kind==='withdraw'){if(!confirm(`Withdraw the scholarship offer to ${r.name}? He will cool toward your program.`))return;res=recruitingActions.withdrawOffer(r,t)}
-    else if(kind==='visit'){scheduleVisit(r);renderRecruiting();if(dialog){const d=$('#recruitDialog');if(d?.open)d.close();showRecruitProfile(r.id)}return}
     else{const topic=kind==='pitch'?b.parentElement?.querySelector('select')?.value:undefined;res=recruitingActions.perform(r,t,kind,{topic})}
+    if(res.ok)autosaveAfter('management');
     announce(res,r);
     renderRecruiting();
     if(dialog&&res.ok){const d=$('#recruitDialog');if(d?.open)d.close();showRecruitProfile(r.id)}
@@ -12846,11 +12939,13 @@ if(typeof module==='object'&&module.exports){
  }
  function staffWorkBoard(){
   const out=recruitingActions.staffPlan(universe.recruits,selected());
+  if(out.hours)autosaveAfter('management');
   setStatus(out.hours?`Staff worked the board: ${out.calls} call${out.calls===1?'':'s'}, ${out.pitches} pitch${out.pitches===1?'':'es'}, ${out.offers} offer${out.offers===1?'':'s'} (${hoursText(out.hours)}).`:'The staff had nothing to add this week.');
   renderRecruiting();
  }
  function toggleAuto(on){
   recruitingActions.setAuto(universe,on);
+  autosaveAfter('management');
   setStatus(on?'Staff now handle recruiting. Each week they spend any hours you leave unused; you can still act first.':'Recruiting is back in your hands. Targets nobody works will cool.');
   renderRecruiting();
  }
@@ -12960,6 +13055,47 @@ function makePortalDeskSystem(env){
   if((entry.p.perceived||0)>r.best)out.push('Would start');
   return out;
  }
+ // Compare candidates for the same vacancy. Grades and eligibility are visible to the coach.
+ function shortlist(t){
+  if(!t||cycle().status!=='open')return null;
+  const entries=env.entries(),incoming=entries.filter(e=>e.decision?.schoolId===t.id&&!e.placed);
+  if(t.roster.length+incoming.length>=105)return null;
+  const available=entries.filter(e=>!e.decision&&e.fromSchoolId!==t.id&&!e.placed);
+  const vacancies=Object.keys(env.posCounts).map(pos=>{
+   const r=room(t,pos),signed=incoming.filter(e=>e.p.pos===pos).length;
+   return{pos,...r,signed,short:r.want-r.depth-signed};
+  }).filter(n=>n.short>0).sort((a,b)=>b.short-a.short||a.best-b.best);
+  let need,pool;
+  for(const vacancy of vacancies){
+   const matches=available.filter(e=>e.p.pos===vacancy.pos);
+   if(matches.length>=2){need=vacancy;pool=matches;break}
+   if(matches.length&&!need){need=vacancy;pool=matches}
+  }
+  if(!need)return null;
+  const options=[];
+  for(const [label,score] of [
+   ['Immediate help',p=>p.perceived||0],
+   ['Development',p=>p.perceivedUpside||p.perceived||0],
+   ['Eligibility',p=>4-env.eligibilityUsed(p)],
+  ]){
+   if(!pool.length)break;
+   pool.sort((a,b)=>score(b.p)-score(a.p)||(b.p.perceived||0)-(a.p.perceived||0)||String(a.candidateId).localeCompare(String(b.candidateId)));
+   options.push({entry:pool.shift(),label});
+  }
+  return{need,options};
+ }
+ function pursue(id){
+  if(cycle().status!=='open')return 'The portal is closed.';
+  if(env.targetFor(id))return 'Already on your board.';
+  return env.target(id,1);
+ }
+ function takeList(t){
+  const list=shortlist(t);
+  let added=0;
+  for(const o of list?.options||[])if(!pursue(o.entry.candidateId))added++;
+  return added;
+ }
+
  // Where you stand: the decision is a weighted choice over finalists, weight exp((interest - best) / 7).
  // The same formula gives the coach his real odds if the player decided now.
  function standing(entry,t){
@@ -13075,7 +13211,8 @@ function makePortalDeskSystem(env){
  // used), then call every target, then pitch where the read is Good or better. They never spend the host or
  // head coach visit on their own initiative except to answer a move.
  function staffPlan(t){
-  const out={hours:0,calls:0,pitches:0,answers:0};if(!t||cycle().status!=='open')return out;
+  const out={hours:0,calls:0,pitches:0,answers:0,added:0};if(!t||cycle().status!=='open')return out;
+  if(!env.entries().some(e=>!e.decision&&env.targetFor(e.candidateId)))out.added=takeList(t);
   const targets=env.entries().filter(e=>!e.decision&&env.targetFor(e.candidateId)).sort((a,b)=>(b.interest?.[t.id]??0)-(a.interest?.[t.id]??0));
   const go=(e,a)=>{const r=perform(e,t,a);if(r.ok)out.hours+=r.cost;return r.ok};
   for(const e of targets)if(liveRivals(e).length){for(const a of ['host','coach']){if(liveRivals(e).some(m=>ANSWERS[m.kind].includes(a))&&go(e,a)){out.answers++;break}}}
@@ -13084,7 +13221,7 @@ function makePortalDeskSystem(env){
   return out;
  }
 
- return{COSTS,LABELS,RIVAL,ANSWERS,hoursFor,roundInfo,isAuto,setAuto,record,pitchRead,needs,tags,standing,availability,perform,noteNil,liveRivals,settleRound,counter,watch,staffPlan,workedThisRound,hash};
+ return{COSTS,LABELS,RIVAL,ANSWERS,RIVAL_LABELS,hoursFor,roundInfo,isAuto,setAuto,record,pitchRead,needs,tags,shortlist,pursue,takeList,standing,availability,perform,noteNil,liveRivals,settleRound,counter,watch,staffPlan,workedThisRound,hash};
 }
 
 if(typeof module==='object'&&module.exports){
@@ -13094,7 +13231,7 @@ if(typeof module==='object'&&module.exports){
   getUniverse:()=>universe,clamp,posCounts:POS_COUNTS,rounds:PORTAL_ROUNDS,
   cycle:()=>ensurePortalCycle(),entries:()=>portalCandidates(),
   fit:(entry,t)=>portalFit(entry,t),setInterest:(entry,id,v)=>portalSetInterest(entry,id,v),
-  targetFor:id=>portalTargetFor(id),commitChance:round=>portalCommitChance(round)
+  target:(id,attention)=>targetPortalCandidate(id,attention),targetFor:id=>portalTargetFor(id),eligibilityUsed:p=>eligibilityBase(p),commitChance:round=>portalCommitChance(round)
  });
  globalThis.DynastyPortalDesk=portalDesk;
  const pdEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -13125,6 +13262,7 @@ if(typeof module==='object'&&module.exports){
   const read=action==='pitch'?` · ${portalDesk.pitchRead(entry,t).label}`:'';
   return`<button type="button" class="${answers?'pd-answer':''}" data-pd-act="${action}" data-pd-id="${pdEsc(entry.candidateId)}" ${a.ok?'':`disabled title="${pdEsc(a.reason)}"`}>${portalDesk.LABELS[action]} <small>${portalDesk.COSTS[action]}h${read}</small></button>`;
  }
+ let expandedTarget=null,expandedPick=null;
  function targetCard(entry,t){
   const s=portalDesk.standing(entry,t),read=portalDesk.pitchRead(entry,t),live=portalDesk.liveRivals(entry),tags=portalDesk.tags(entry,t);
   const decided=entry.decision?universe.teams.find(x=>x.id===entry.decision.schoolId):null;
@@ -13133,25 +13271,45 @@ if(typeof module==='object'&&module.exports){
   if(decided)return`<article class="pd-card pd-card--done">${head}<p>${decided.id===t.id?'<strong>Committed to you.</strong>':`Chose ${pdEsc(decided.name)}.`}</p></article>`;
   const where=s.rank==null?'You are not in his running yet.':s.rank===1?`You lead. If he decided now: ${pct(s.odds)} you.`:`You are ${s.rank}${['','st','nd','rd'][s.rank]||'th'}, ${s.field[0].interest-s.mine} behind ${pdEsc(s.field[0].name)}. If he decided now: ${pct(s.odds)} you.`;
   const rivals=live.map(m=>`<li>${pdEsc(m.school)} ${pdEsc(m.kind==='visit'?'hosted him':'made him an NIL offer')} (round ${m.round}). Answer with ${m.kind==='visit'?'a host visit or the head coach':'an NIL offer or the head coach'}.</li>`).join('');
-  return`<article class="pd-card">${head}
+  const expanded=expandedTarget===entry.candidateId,id=pdEsc(entry.candidateId),latest=live.at(-1);
+  const fit=tags.includes('Would start')?'Starter grade':tags.includes('Fills a need')?'Fills a need':`${read.label} pitch`;
+  return`<article class="pd-card pd-target${expanded?' pd-open':''}"><button type="button" class="pd-target-toggle" data-pd-expand="${id}" aria-expanded="${expanded}" aria-controls="pd-body-${id}">
+   <span><b>${pdEsc(entry.p.name)}</b><small>${pdEsc(entry.p.pos)} · ${pdEsc(fit)} · ${pct(s.odds)} if deciding now</small>${latest?`<small class="pd-rival-line">${pdEsc(latest.school)} · ${pdEsc(portalDesk.RIVAL_LABELS[latest.kind])}</small>`:''}</span><span aria-hidden="true">${expanded?'−':'+'}</span></button>
+   <div class="pd-target-body" id="pd-body-${id}">${head}
    <p class="pd-where">${where} <span class="muted">${pct(s.decideChance)} chance he decides this round.</span></p>
    <ul class="pd-field">${field}</ul>
    ${rivals?`<ul class="pd-rivals">${rivals}</ul>`:''}
    <p class="small muted">Playing-time read: <strong>${read.label}</strong> (${pdEsc(read.why)}).</p>
    <div class="pd-actions">${['call','pitch','host','coach'].map(a=>actionButton(entry,t,a)).join('')}</div>
-  </article>`;
+  </div></article>`;
+ }
+ function staffBoardHTML(t){
+  const list=portalDesk.shortlist(t);if(!list)return '';
+  const {need,options}=list;
+  const cards=options.map(({entry,label})=>{
+   const p=entry.p,id=pdEsc(entry.candidateId),target=portalTargetFor(entry.candidateId),s=portalDesk.standing(entry,t);
+   const seasons=Math.max(0,4-eligibilityBase(p)),role=portalDesk.pitchRead(entry,t).why;
+   const odds=s.mine==null?'Outside his finalists':`${pct(s.odds)} if he chose now`;
+   const expanded=expandedPick===entry.candidateId;
+   return `<article class="pd-prospect${expanded?' pd-open':''}"><header><small>${pdEsc(label)}</small><b>${pdEsc(p.name)}</b><span>${pdEsc(entry.from)} · ${pdEsc(p.pos)}</span></header>
+    <button type="button" class="pd-pick-toggle" data-pd-pick="${id}" aria-expanded="${expanded}" aria-controls="pd-notes-${id}">${expanded?'Hide grades':'Compare grades'}</button>
+    <div class="pd-pick-notes" id="pd-notes-${id}"><dl><div><dt>Current / upside</dt><dd>${grade(p.perceived)} / ${grade(p.perceivedUpside??p.perceived)}</dd></div><div><dt>Eligibility</dt><dd>${seasons} season${seasons===1?'':'s'} left</dd></div><div><dt>Standing</dt><dd>${odds}</dd></div></dl>
+    <p>${pdEsc(role)}.</p></div><button type="button" data-pd-pursue="${id}" ${target?'disabled':''}>${target?'On your board':'Pursue · 1 attention'}</button></article>`;
+  }).join('');
+  return `<section class="pd-shortlist" aria-label="Staff shortlist"><div class="pd-shortlist-head"><div><small>STAFF SHORTLIST</small><h4>${pdEsc(need.pos)} room · ${need.short} opening${need.short===1?'':'s'}</h4><p>${need.depth} rostered${need.signed?`, ${need.signed} committed`:''} against a depth target of ${need.want}.</p></div>
+   <button type="button" data-pd-delegate>Delegate shortlist</button></div><div class="pd-compare">${cards}</div></section>`;
  }
  function deskHTML(){
   const c=ensurePortalCycle(),t=portalUserTeam();if(!t||c.status==='idle')return needsOnlyHTML(t);
-  const info=portalDesk.roundInfo(t),targets=portalCandidates().filter(e=>portalTargetFor(e.candidateId)||(e.decision&&e.decision.schoolId===t.id&&!e.placed));
+  const info=portalDesk.roundInfo(t),targets=portalCandidates().filter(e=>portalTargetFor(e.candidateId)||e.wasPortalTarget||(e.decision&&e.decision.schoolId===t.id&&!e.placed));
   const needs=portalDesk.needs(t),watch=portalDesk.watch();
   return`<section class="portal-desk card" id="portalDesk">
    <div class="section-head"><div><div class="eyebrow">PORTAL DESK</div><h3>${c.status==='open'?`Round ${info.round} of ${info.rounds}`:'Portal closed'}</h3></div>
     ${c.status==='open'?`<div class="pd-hours"><strong>${info.left}</strong> / ${info.budget} portal hours left this round</div>`:''}</div>
-   ${needsLine(needs)}
+   ${needsLine(needs)}${c.status==='open'?staffBoardHTML(t):''}
    ${watch.length?`<p class="pd-watch"><strong>Rival Watch:</strong> ${watch.map(m=>`${pdEsc(m.school)} on ${pdEsc(m.name)}`).join(' · ')}</p>`:''}
    ${c.status==='open'?`<div class="pd-staff"><label><input type="checkbox" data-pd-auto ${portalDesk.isAuto()?'checked':''}> Staff handle the portal</label><button type="button" class="ghost" data-pd-staff>Work the portal now</button></div>`:''}
-   <div class="pd-cards">${targets.length?targets.map(e=>targetCard(e,t)).join(''):'<p class="muted">Give a player attention in the board below to work him here.</p>'}</div>
+   <div class="pd-cards">${targets.length?targets.map(e=>targetCard(e,t)).join(''):'<p class="muted">No active targets. Pursue a staff pick or give a player attention below.</p>'}</div>
   </section>`;
  }
  function needsLine(needs){return needs.length?`<p class="pd-needs"><strong>Roster needs:</strong> ${needs.map(n=>`<span class="pd-need">${pdEsc(n.pos)} <small>${n.depth}/${n.want}</small></span>`).join(' ')}</p>`:'<p class="pd-needs muted">No position is below its designed depth.</p>'}
@@ -13161,13 +13319,34 @@ if(typeof module==='object'&&module.exports){
  }
  function bindDesk(root){
   const t=portalUserTeam();
+  for(const which of ['expand','pick']){
+   root.querySelectorAll?.(`[data-pd-${which}]`).forEach(b=>b.onclick=()=>{
+    const id=b.getAttribute(`data-pd-${which}`);
+    if(which==='expand')expandedTarget=expandedTarget===id?null:id;
+    else expandedPick=expandedPick===id?null:id;
+    renderPortal();
+    [...(document.querySelectorAll(`[data-pd-${which}]`))].find(el=>el.getAttribute(`data-pd-${which}`)===id)?.focus();
+   });
+  }
   root.querySelectorAll?.('[data-pd-act]').forEach(b=>b.onclick=e=>{
    e.preventDefault();const entry=portalEntry(b.dataset.pdId),r=portalDesk.perform(entry,t,b.dataset.pdAct);
    setStatus(r.ok?`${portalDesk.LABELS[b.dataset.pdAct]}: ${entry.p.name} ${r.delta>=0?'+':''}${r.delta} interest (now ${r.interest}%).${r.answered?' Rival move answered.':''}`:r.reason);
+   if(r.ok)autosaveAfter('management');
    renderPortal();
   });
-  root.querySelectorAll?.('[data-pd-auto]').forEach(b=>b.onchange=()=>{portalDesk.setAuto(b.checked);setStatus(b.checked?'Staff now spend unused portal hours before each round.':'The portal is back in your hands.');renderPortal()});
-  root.querySelectorAll?.('[data-pd-staff]').forEach(b=>b.onclick=e=>{e.preventDefault();const s=portalDesk.staffPlan(t);setStatus(s.hours?`Staff worked the portal: ${s.calls} calls, ${s.pitches} pitches, ${s.answers} answers (${s.hours}h).`:'The staff had nothing to add this round.');renderPortal()});
+  root.querySelectorAll?.('[data-pd-pursue]').forEach(b=>b.onclick=()=>{
+   const reason=portalDesk.pursue(b.dataset.pdPursue);
+   if(!reason)autosaveAfter('management');
+   setStatus(reason||'Added to the portal board with one attention.');renderPortal();
+  });
+  root.querySelectorAll?.('[data-pd-delegate]').forEach(b=>b.onclick=()=>{
+   const added=portalDesk.takeList(t),wasAuto=portalDesk.isAuto();
+   portalDesk.setAuto(true);
+   if(!wasAuto||added)autosaveAfter('management');
+   setStatus(`Staff handle the portal. ${added} added to your board.`);renderPortal();
+  });
+  root.querySelectorAll?.('[data-pd-auto]').forEach(b=>b.onchange=()=>{portalDesk.setAuto(b.checked);autosaveAfter('management');setStatus(b.checked?'Staff now spend unused portal hours before each round.':'The portal is back in your hands.');renderPortal()});
+  root.querySelectorAll?.('[data-pd-staff]').forEach(b=>b.onclick=e=>{e.preventDefault();const s=portalDesk.staffPlan(t);if(s.hours||s.added)autosaveAfter('management');setStatus(s.hours?`Staff worked the portal: ${s.calls} calls, ${s.pitches} pitches, ${s.answers} answers (${s.hours}h).`:'The staff had nothing to add this round.');renderPortal()});
  }
  const renderPortalBeforeDesk=renderPortal;
  renderPortal=function(){
@@ -13195,14 +13374,12 @@ if(typeof window!=='undefined'&&globalThis.__DL_TEST__){
 
 // Player arcs (v0.15.1). The players you recruit become a story you can follow: how you won him (the hours,
 // the pitch, the visit, who you beat), what he became (starter, honors, the draft) and how each class turned
-// out. Everything is read from what the game already keeps (recruitingMemory, seasonHistory, awards,
-// draftResult, transferHistory). The one addition is a short desk summary saved on the memory of recruits
-// who sign with the controlled program, written when he commits.
+// out. Signing memories and recorded game/season statistics supply the facts.
 function makePlayerArcSystem(env){
  'use strict';
  const universe=()=>env.getUniverse();
  const starsText=n=>n?'★'.repeat(n):'Unrated';
- const MAJOR=/All-America|Heisman|Player of the Year|National/i,CONF=/All-Conference|Conference/i;
+ const MAJOR=/All-America|Heisman|of the Year|National/i,CONF=/All-Conference|Conference/i;
 
  // ---------- at signing ----------
  // A compact record of the work behind a commitment: hours, the most-pitched topic, visits, the offer
@@ -13235,70 +13412,88 @@ function makePlayerArcSystem(env){
   }
   return line;
  }
- function seasonsStarted(p){return(p?.seasonHistory||[]).filter(s=>(s.starts||0)>=6)}
+ function seasonsStarted(p){
+  const history=p.seasonHistory||[],year=p.retiredYear??universe().year;
+  const started=history.filter(s=>s.starts>=6);
+  if(p.stats?.starts>=6&&!history.some(s=>s.year===year))started.push({year,starts:p.stats.starts});
+  return started;
+ }
+ function hasPlayed(p){return p.career?.games>0||p.career?.starts>0||p.stats?.games>0||p.stats?.starts>0||(p.seasonHistory||[]).some(s=>s.games>0||s.starts>0)}
  // The best thing he became, as a short label and a rank used to sort a class.
- function peak(p){
+ function peak(p,starts=seasonsStarted(p).length){
   const awards=p?.awards||[];
   if(p?.draftResult?.round===1)return{rank:6,label:'First-round pick'};
   if(awards.some(a=>MAJOR.test(a.name)))return{rank:5,label:awards.find(a=>MAJOR.test(a.name)).name};
   if(p?.draftResult&&p.draftResult.round)return{rank:4,label:`Drafted, round ${p.draftResult.round}`};
   if(awards.some(a=>CONF.test(a.name)))return{rank:3,label:awards.find(a=>CONF.test(a.name)).name};
-  const starts=seasonsStarted(p).length;
   if(starts)return{rank:2,label:`Starter, ${starts} season${starts===1?'':'s'}`};
-  if((p?.career?.games||0)>0)return{rank:1,label:'Contributor'};
+  if(hasPlayed(p))return{rank:1,label:'Contributor'};
   return{rank:0,label:'Did not play'};
  }
 
  // ---------- a class ----------
- function allPlayers(){
-  const u=universe(),out=[];
-  for(const t of u.teams)for(const p of t.roster||[])out.push({p,active:true,team:t});
-  for(const p of u.playerArchive||[])out.push({p,active:false,team:null});
-  return out;
+ // Index once per render. During departures, portal entrants and draft prospects temporarily
+ // live outside both rosters and the archive; the draft report can outlive the move to the archive.
+ function classIndex(){
+  const u=universe(),years=new Map(),seen=new Set();
+  function add(p,active,team=null){
+   const m=p?.recruitingMemory;
+   if(!Number.isFinite(m?.season)||m.schoolId==null||seen.has(p.id))return;
+   seen.add(p.id);
+   if(!years.has(m.season))years.set(m.season,new Map());
+   const schools=years.get(m.season);
+   if(!schools.has(m.schoolId))schools.set(m.schoolId,[]);
+   schools.get(m.schoolId).push({p,active,team});
+  }
+  for(const t of u.teams)for(const p of t.roster||[])add(p,true,t);
+  for(const p of u.playerArchive||[])add(p,false);
+  for(const x of u.transferPortal||[])add(x.p,true);
+  for(const x of u.offseason?.reports?.departures?.draftPool||[])add(x.p,true);
+  return years;
  }
- function classOf(t,season){
-  return allPlayers().filter(x=>x.p.recruitingMemory?.schoolId===t.id&&x.p.recruitingMemory?.season===season);
+ function classOf(t,season,index=classIndex()){return index.get(season)?.get(t.id)||[]}
+ function classSeasons(t,index=classIndex()){return [...index.keys()].filter(y=>index.get(y).has(t.id)).sort((a,b)=>b-a)}
+ function outcomePoints(p,starts=seasonsStarted(p).length){
+  return (starts?2:0)+(p.awards?.length?3:0)+(p.draftResult?.round?3:0);
  }
- function classSeasons(t){
-  const seen=new Set();for(const x of allPlayers())if(x.p.recruitingMemory?.schoolId===t.id&&Number.isFinite(x.p.recruitingMemory.season))seen.add(x.p.recruitingMemory.season);
-  return[...seen].sort((a,b)=>b-a);
- }
- function scoreOf(players){
-  if(!players.length)return 0;
-  let n=0;for(const p of players){const pk=peak(p).rank;n+=(pk>=2?2:0)+((p.awards||[]).length?3:0)+(p.draftResult?.round?3:0)}
-  return n/players.length;
- }
- // Every program's class score for one signing year (programs that signed at least five).
- const leagueCache={key:null,scores:null};
- function leagueScores(season){
-  const u=universe(),key=`${season}|${u.year}|${(u.playerArchive||[]).length}`;
-  if(leagueCache.key===key)return leagueCache.scores;
-  const by=new Map();
-  for(const x of allPlayers()){const m=x.p.recruitingMemory;if(m?.season!==season||m.schoolId==null)continue;if(!by.has(m.schoolId))by.set(m.schoolId,[]);by.get(m.schoolId).push(x.p)}
-  const scores=[...by.values()].filter(list=>list.length>=5).map(scoreOf);
-  leagueCache.key=key;leagueCache.scores=scores;return scores;
- }
- function classReport(t,season){
-  const rows=classOf(t,season);if(!rows.length)return null;
-  const peaks=rows.map(x=>({...x,peak:peak(x.p),stars:x.p.recruitingMemory.stars||0}));
-  const left=peaks.filter(x=>(x.p.transferHistory||[]).some(h=>h.fromSchool===t.name)).length;
+ function classReport(t,season,index=classIndex()){
+  const rows=classOf(t,season,index);if(!rows.length)return null;
+  const peaks=rows.map(x=>{const starts=seasonsStarted(x.p).length;return{...x,starts,peak:peak(x.p,starts),stars:x.p.recruitingMemory.stars||0}});
+  const left=peaks.filter(x=>(x.p.transferHistory||[]).some(h=>h.fromSchoolId!=null?h.fromSchoolId===t.id:h.fromSchool===t.name)).length;
   const stay=peaks.filter(x=>x.active&&x.team?.id===t.id).length;
-  const starters=peaks.filter(x=>x.peak.rank>=2).length,honors=peaks.filter(x=>(x.p.awards||[]).length).length,drafted=peaks.filter(x=>x.p.draftResult?.round).length;
-  const steals=peaks.filter(x=>x.stars<=3&&x.peak.rank>=3),misses=peaks.filter(x=>x.stars>=4&&x.peak.rank<=1&&!x.active);
-  const years=universe().year-season;
-  // Graded against every program's class from the same year (points for starters, honors and draft picks
-  // per signee), and only once the class has had two years: A is the top 15%, then B, C, D, F.
-  const score=scoreOf(peaks.map(x=>x.p));
-  const pool=years<2?null:leagueScores(season),league=pool&&pool.length>=10?pool:null,beat=league?league.filter(x=>x<score).length/league.length:null;
-  const grade=beat==null?null:beat>=.85?'A':beat>=.6?'B':beat>=.35?'C':beat>=.15?'D':'F';
+  const starters=peaks.filter(x=>x.starts>0).length,honors=peaks.filter(x=>x.p.awards?.length).length,drafted=peaks.filter(x=>x.p.draftResult?.round).length;
+  const steals=peaks.filter(x=>x.stars>0&&x.stars<=3&&x.peak.rank>=3),misses=peaks.filter(x=>x.stars>=4&&x.peak.rank===0&&!x.active);
+  const years=universe().year-season,score=peaks.reduce((n,x)=>n+outcomePoints(x.p,x.starts),0)/peaks.length;
+  // Compare eligible classes from the same year. Tied classes split the percentile positions they occupy.
+  const peers=[];
+  if(years>=2&&rows.length>=5)for(const [school,list] of index.get(season)){
+   if(school!==t.id&&list.length>=5)peers.push(list.reduce((n,x)=>n+outcomePoints(x.p),0)/list.length);
+  }
+  const percentile=peers.length>=9?peers.reduce((n,x)=>n+(x<score?1:(x===score?0.5:0)),0)/peers.length:null;
+  const grade=percentile==null?null:percentile>=.85?'A':percentile>=.6?'B':percentile>=.35?'C':percentile>=.15?'D':'F';
   const best=peaks.slice().sort((a,b)=>b.peak.rank-a.peak.rank||b.stars-a.stars)[0];
   return{season,count:peaks.length,avgStars:peaks.reduce((n,x)=>n+x.stars,0)/peaks.length,stay,left,starters,honors,drafted,
    steals:steals.map(x=>({id:x.p.id,name:x.p.name,stars:x.stars,peak:x.peak.label})),misses:misses.map(x=>({id:x.p.id,name:x.p.name,stars:x.stars})),
    best:best?{id:best.p.id,name:best.p.name,pos:best.p.pos,stars:best.stars,peak:best.peak.label}:null,grade,years,score,
-   percentile:beat==null?null:Math.round(beat*100),classes:league?.length||0};
+   percentile:percentile==null?null:Math.round(percentile*100),classes:percentile==null?0:peers.length+1};
  }
 
  // ---------- payoffs ----------
+ // Called at the final whistle, after the engine applies this game's recorded player deltas.
+ function firstStart(t,lines){
+  const started=new Set(lines.filter(x=>x.stats?.starts===1).map(x=>x.id));
+  const candidates=(t.roster||[]).filter(p=>{
+   const m=p.recruitingMemory;
+   return m?.schoolId===t.id&&Number.isFinite(m.season)&&started.has(p.id)&&p.stats?.starts===1&&
+    (p.career?.starts??0)===0&&!(p.seasonHistory||[]).some(s=>s.starts>0);
+  });
+  // If multiple signees debut together, feature the recruitment the desk spent the most time on.
+  const p=candidates.sort((a,b)=>(b.recruitingMemory.desk?.hours||0)-(a.recruitingMemory.desk?.hours||0))[0];
+  if(!p)return null;
+  const m=p.recruitingMemory,d=m.desk;
+  const detail=d?.beat?` over ${d.beat}`:d?.topic?` after pitching him on ${d.topic}`:'';
+  return{schoolId:t.id,playerId:p.id,text:`${p.name} made his first college start. ${t.name} signed the ${m.stars?`${m.stars}-star `:''}${p.pos} in ${m.season}${detail}.`};
+ }
  // This season's honors for players the program recruited, told as the recruiting story they finish.
  function payoffs(t,year=universe().year){
   if(!t)return[];
@@ -13314,7 +13509,7 @@ function makePlayerArcSystem(env){
   return out.sort((a,b)=>b.importance-a.importance).slice(0,3);
  }
 
- return{deskStory,signedLine,peak,seasonsStarted,classOf,classSeasons,classReport,payoffs};
+ return{deskStory,signedLine,peak,seasonsStarted,firstStart,classIndex,classOf,classSeasons,classReport,payoffs};
 }
 
 if(typeof module==='object'&&module.exports){
@@ -13345,9 +13540,9 @@ if(typeof module==='object'&&module.exports){
   const stars=c.avgStars.toFixed(1);
   const steal=c.steals[0],miss=c.misses[0];
   return`<article class="arc-class">
-   <div class="arc-class-head"><strong>Class of ${c.season}</strong>${c.grade?`<span class="arc-grade arc-grade--${c.grade}" title="Better than ${c.percentile}% of the ${c.classes} classes signed that year">${c.grade}</span>`:`<span class="small muted">${c.years<2?'Too early to grade':'Not enough classes to compare'}</span>`}</div>
+   <div class="arc-class-head"><strong>Class of ${c.season}</strong>${c.grade?`<span class="arc-grade arc-grade--${c.grade}" title="League percentile among ${c.classes} classes, with ties sharing a rank">${c.grade}</span>`:`<span class="small muted">${c.years<2?'Too early to grade':c.count<5?'Five signees needed to grade':'Not enough classes to compare'}</span>`}</div>
    <div class="small muted">${c.count} signed · ${stars}★ average · ${c.stay} still here${c.left?` · ${c.left} transferred out`:''}</div>
-   ${c.grade?`<div class="small muted">Better than ${c.percentile}% of that year's classes</div>`:''}
+   ${c.grade?`<div class="small muted">League percentile: ${c.percentile} · ${c.classes} classes</div>`:''}
    <div class="arc-class-stats"><span><strong>${c.starters}</strong> starters</span><span><strong>${c.honors}</strong> honored</span><span><strong>${c.drafted}</strong> drafted</span></div>
    ${c.best&&c.best.peak!=='Did not play'?`<div class="small">Best: <button class="player-button" data-player="${paEsc(c.best.id)}">${paEsc(c.best.name)}</button> (${'★'.repeat(c.best.stars)||'Unrated'} ${paEsc(c.best.pos)}) — ${paEsc(c.best.peak)}</div>`:''}
    ${steal?`<div class="small">Steal: <button class="player-button" data-player="${paEsc(steal.id)}">${paEsc(steal.name)}</button>, a ${'★'.repeat(steal.stars)||'unrated'} recruit — ${paEsc(steal.peak)}</div>`:''}
@@ -13355,19 +13550,30 @@ if(typeof module==='object'&&module.exports){
   </article>`;
  }
  function classesHTML(t){
-  const seasons=playerArcs.classSeasons(t).slice(0,6),cards=seasons.map(s=>playerArcs.classReport(t,s)).filter(Boolean);
+  const index=playerArcs.classIndex(),seasons=playerArcs.classSeasons(t,index).slice(0,6),cards=seasons.map(s=>playerArcs.classReport(t,s,index)).filter(Boolean);
   if(!cards.length)return'';
   return`<section class="card arc-classes" id="arcClasses"><div class="eyebrow">RECRUITING CLASSES</div><h3>How your classes turned out</h3><div class="arc-class-grid">${cards.map(classCardHTML).join('')}</div></section>`;
  }
  // The Program view has no render-extension hook, so the class cards follow its own render.
  const renderProgramBeforeArcs=renderProgram;
+ let classRequest=0;
  renderProgram=function(){
   renderProgramBeforeArcs();
-  const t=selected(),host=$('#programHistory');if(!t||!host)return;
+  const request=++classRequest,t=selected(),world=universe,host=$('#programHistory')?.closest?.('.two-col');
   $('#arcClasses')?.remove();
-  const html=classesHTML(t);if(!html)return;
-  host.closest?.('.two-col')?.insertAdjacentHTML?.('afterend',html);
-  attachPlayerLinks();
+  if(!t||!host)return;
+  function showClasses(){
+   const html=classesHTML(t);if(!html)return;
+   host.insertAdjacentHTML('afterend',html);attachPlayerLinks();
+  }
+  if(!archiveIsDeferred()){showClasses();return}
+  host.insertAdjacentHTML('afterend','<section class="card" id="arcClasses" role="status">Loading recruiting classes…</section>');
+  const current=()=>request===classRequest&&universe===world&&selected()===t&&activeTab==='program';
+  ensureArchiveLoaded().then(()=>{
+   if(!current())return;
+   if(archiveIsDeferred()){renderProgram();return} // A save can replace the archive reference during the read.
+   $('#arcClasses')?.remove();showClasses();
+  }).catch(()=>{if(current())$('#arcClasses').textContent='Recruiting classes could not be loaded. Reopen Program to retry.'});
  };
  // The tab map captured the original function when app.js ran.
  if(typeof TAB_RENDERERS==='object'&&TAB_RENDERERS)TAB_RENDERERS.program=renderProgram;
@@ -13512,9 +13718,9 @@ if(typeof module==='object'&&module.exports){
   return`<div class="card staff-assignments" id="staffAssignments"><div class="section-head"><div><h3>Staff Assignments</h3><div class="small muted">Each coach takes one recruiting territory, and every coach but the recruiting coordinator takes a position group to develop. Each territory and room gets one coach.</div></div><button type="button" class="ghost" data-sa-suggest>Let the staff suggest</button></div>${rows.map(r=>rowHTML(t,r)).join('')}</div>`;
  }
  function bind(root,t){
-  root.querySelectorAll?.('[data-sa-region]').forEach(s=>s.onchange=()=>{const r=staffAssignments.assign(t,s.dataset.saRegion,{region:s.value||null});setStatus(r.ok?(s.value?`${r.row.coach.name} now recruits the ${s.value}.`:'Territory cleared.'):r.reason);renderStaff()});
-  root.querySelectorAll?.('[data-sa-group]').forEach(s=>s.onchange=()=>{const r=staffAssignments.assign(t,s.dataset.saGroup,{group:s.value||null});setStatus(r.ok?(s.value?`${r.row.coach.name} now coaches the ${staffAssignments.GROUPS[s.value].label.toLowerCase()}.`:'Position group cleared.'):r.reason);renderStaff()});
-  root.querySelectorAll?.('[data-sa-suggest]').forEach(b=>b.onclick=e=>{e.preventDefault();staffAssignments.applySuggestion(t);setStatus('Staff assignments set from your board and your roster needs.');renderStaff()});
+  root.querySelectorAll?.('[data-sa-region]').forEach(s=>s.onchange=()=>{const r=staffAssignments.assign(t,s.dataset.saRegion,{region:s.value||null});if(r.ok)autosaveAfter('management');setStatus(r.ok?(s.value?`${r.row.coach.name} now recruits the ${s.value}.`:'Territory cleared.'):r.reason);renderStaff()});
+  root.querySelectorAll?.('[data-sa-group]').forEach(s=>s.onchange=()=>{const r=staffAssignments.assign(t,s.dataset.saGroup,{group:s.value||null});if(r.ok)autosaveAfter('management');setStatus(r.ok?(s.value?`${r.row.coach.name} now coaches the ${staffAssignments.GROUPS[s.value].label.toLowerCase()}.`:'Position group cleared.'):r.reason);renderStaff()});
+  root.querySelectorAll?.('[data-sa-suggest]').forEach(b=>b.onclick=e=>{e.preventDefault();staffAssignments.applySuggestion(t);autosaveAfter('management');setStatus('Staff assignments set from your board and your roster needs.');renderStaff()});
  }
  extendRender('staff',()=>{
   const t=selected(),host=$('#staffList');if(!t||!host)return;
@@ -13568,11 +13774,14 @@ function makePlaybookSystem(env){
  }
  // What the staff did with the playbook in one game, from the engine's own events.
  function tally(state,side){
-  const out={fourthTries:0,fourthConverted:0,twoTries:0,twoMade:0,bleed:0,hurry:0};
+  const out={fourthTries:0,fourthConverted:0,twoTries:0,twoMade:0};
   for(const e of state?.events||[]){
-   if(e.team!==side)continue;
-   if(e.type==='scrimmage'&&e.from?.down===4){out.fourthTries++;if((e.yards||0)>=(e.from.distance||99)||e.touchdown)out.fourthConverted++}
-   if(e.type==='two_point'&&e.playbook){out.twoTries++;if(e.made)out.twoMade++}
+   if(e.team!==side||e.ot)continue;
+   if(e.from?.down===4&&['scrimmage','interception','fumble'].includes(e.type)){
+    out.fourthTries++;
+    if(e.type==='scrimmage'&&e.yards>=e.from.distance)out.fourthConverted++;
+   }
+   if(e.type==='two_point'){out.twoTries++;if(e.made)out.twoMade++}
   }
   return out;
  }
@@ -13583,7 +13792,7 @@ if(typeof module==='object'&&module.exports){
  module.exports={makePlaybookSystem};
 }else{
  const playbook=makePlaybookSystem({});
- globalThis.DynastyPlaybook=playbook;
+ globalThis.DynastyPlaybook={...playbook,noteGame};
  const pbEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const controlled=()=>$('#userTeam')?.value||null;
 
@@ -13593,11 +13802,7 @@ if(typeof module==='object'&&module.exports){
   const simulateBeforePlaybook=lab.simulate;
   lab.simulate=function(options={}){
    const pb=options.playbook===undefined?playbook.forMatch(options.home,options.away,controlled()):options.playbook;
-   const out=simulateBeforePlaybook(pb?{...options,playbook:pb}:options);
-   // A recorded game (not a shadow preview) adds to the season's playbook log, once per game id.
-   const id=String(options.gameId||'');
-   if(pb&&(/^v0101-(?!shadow-|gameday-)/.test(id)||id.startsWith('v0102-post-')))noteGame(id,out.state,pb);
-   return out;
+   return simulateBeforePlaybook(pb?{...options,playbook:pb}:options);
   };
  }
  const gameDay=globalThis.DynastyGameEngineV2GameDay;
@@ -13608,9 +13813,10 @@ if(typeof module==='object'&&module.exports){
    return createSessionBeforePlaybook(pb?{...options,playbook:pb}:options);
   };
  }
- function noteGame(id,state,pb){
-  const t=universe.teams.find(x=>x.name===controlled());if(!t)return;
-  const side=pb.home?'home':'away',log=(t.playbookLog&&t.playbookLog.year===universe.year)?t.playbookLog:(t.playbookLog={year:universe.year,games:[],totals:{fourthTries:0,fourthConverted:0,twoTries:0,twoMade:0}});
+ function noteGame(state){
+  const side=state.playbook?.home?'home':state.playbook?.away?'away':null;
+  if(!side)return;
+  const id=state.gameId,t=T(state[side].name),log=(t.playbookLog&&t.playbookLog.year===universe.year)?t.playbookLog:(t.playbookLog={year:universe.year,games:[],totals:{fourthTries:0,fourthConverted:0,twoTries:0,twoMade:0}});
   if(log.games.includes(id))return;
   log.games.push(id);if(log.games.length>30)log.games.splice(0,log.games.length-30);
   const x=playbook.tally(state,side);for(const k of Object.keys(log.totals))log.totals[k]+=x[k]||0;
@@ -13623,12 +13829,13 @@ if(typeof module==='object'&&module.exports){
   return`<div class="card situational-playbook" id="situationalPlaybook"><h3>Situational Playbook</h3>
    <p class="small muted">How your staff call it in games you sim or watch, and what they recommend when you coach live. Late in the fourth quarter and behind, every setting except Standard keeps the ball on fourth down unless a field goal ties or takes the lead.</p>
    ${row('fourthDown','Fourth down')}${row('twoPoint','Two-point tries')}${row('clock','Late clock')}
-   ${tot?`<p class="small">This season: ${tot.fourthTries} fourth-down tr${tot.fourthTries===1?'y':'ies'} (${tot.fourthConverted} converted) · ${tot.twoTries} two-point tr${tot.twoTries===1?'y':'ies'} (${tot.twoMade} good) in ${log.games.length} game${log.games.length===1?'':'s'} with this playbook.</p>`:''}
+   ${tot?`<p class="small">Regulation totals this season: ${tot.fourthTries} fourth-down tr${tot.fourthTries===1?'y':'ies'} (${tot.fourthConverted} converted) · ${tot.twoTries} two-point tr${tot.twoTries===1?'y':'ies'} (${tot.twoMade} good) in ${log.games.length} game${log.games.length===1?'':'s'} with custom settings.</p>`:''}
   </div>`;
  }
  function bind(root,t){
   root.querySelectorAll?.('[data-pb]').forEach(s=>s.onchange=()=>{
    const r=playbook.set(t,s.dataset.pb,s.value);
+   if(r.ok)autosaveAfter('management');
    setStatus(r.ok?`Playbook: ${playbook.OPTIONS[s.dataset.pb].find(o=>o.id===s.value).label} ${{fourthDown:'on fourth down',twoPoint:'after touchdowns',clock:'late clock'}[s.dataset.pb]}.`:r.reason);
    renderActiveTab();
   });
@@ -14189,12 +14396,13 @@ function v2RecordRestoreObject(target,snapshot){
 }
 function v2RecordSnapshotTeam(team){return{
   scalars:{w:team.w,l:team.l,cw:team.cw,cl:team.cl,pf:team.pf,pa:team.pa,sos:team.sos,rank:team.rank,fan_support:team.fan_support},
-  gameplan:v2RecordClone(team.gameplan),rivalry:v2RecordClone(team.rivalry),
+  gameplan:v2RecordClone(team.gameplan),rivalry:v2RecordClone(team.rivalry),playbookLog:v2RecordClone(team.playbookLog),
   players:(team.roster||[]).map(p=>({id:p.id,state:v2RecordClone(p)}))
 }}
 function v2RecordRestoreTeam(team,snapshot){
   Object.assign(team,snapshot.scalars);
   if(snapshot.gameplan==null)delete team.gameplan;else team.gameplan=v2RecordClone(snapshot.gameplan);
+  if(snapshot.playbookLog==null)delete team.playbookLog;else team.playbookLog=v2RecordClone(snapshot.playbookLog);
   if(snapshot.rivalry==null)delete team.rivalry;else team.rivalry=v2RecordClone(snapshot.rivalry);
   const current=new Map((team.roster||[]).map(p=>[String(p.id),p]));
   for(const row of snapshot.players){const p=current.get(String(row.id));if(!p)throw new Error(`Rollback could not find ${team.name} player ${row.id}.`);v2RecordRestoreObject(p,row.state)}
@@ -14302,7 +14510,7 @@ function v2StorePlayLog(gameId,state,attribution){
   if(gameId==null||!state)return null;
   universe.playLogs??={};
   const rows=v2PlayLogProjection(state,attribution);
-  universe.playLogs[gameId]=rows;return rows;
+  universe.playLogs[gameId]=rows;globalThis.DynastyPlaybook?.noteGame(state);return rows;
 }
 
 // v0.10.1 development-only recorded Game Engine 2 transaction runner.
@@ -14332,7 +14540,7 @@ function recordV2GameLabResult(options={}){
   if(universe.phase!=='regular')throw new Error('The v0.10.1 recorded v2 gate is limited to regular-season scheduled games.');
   if(g.played)throw new Error('This scheduled game is already complete.');
   if(hasPendingCareerChoice())throw new Error('Choose your next job before playing this week.');
-  if(hasPendingWeeklyDecisions())throw new Error('Resolve the Coach’s Desk decisions before playing this week.');
+  if(!options.advancingWeek&&hasPendingWeeklyDecisions())throw new Error('Resolve the Coach’s Desk decisions before playing this week.');
   recoverWeek();const home=T(g.home),away=T(g.away);if(!home||!away)throw new Error('Scheduled teams could not be resolved.');const rollback=v2RecordCapture(g,home,away);
   try{
     advanceAcademicsForWeek(selected());const before=beginGame(home,away,false,{week:g.week,label:'Regular season'}),homeProfile=gameProfiles(home,away.name),awayProfile=gameProfiles(away,home.name),prepared=v2RecordPrepared(g,home,away,homeProfile,awayProfile),preview=prepared.preview,candidate=prepared.candidate;
@@ -14350,7 +14558,7 @@ function recordV2GameLabResult(options={}){
     completeScheduledGame(g,result,true);if(options.testFault==='afterSchedule')throw new Error('Injected v2 rollback fault after schedule settlement.');
     universe.lastDetailedGame={...result,season:universe.year,week:g.week,engine:'v2',transactionVersion:prepared.tx.VERSION};universe.latest=[result];
     const validation=v2RecordValidate(candidate,record,home,away,rollback,g);if(!validation.ok)throw new Error(`Recorded v2 game failed post-commit validation: ${validation.errors.join('; ')}`);
-    ranked();if(options.testFault==='afterRank')throw new Error('Injected v2 rollback fault after rankings.');syncGameplayRng();v2GameLabPreview={key:prepared.key,...preview,recorded:true,gameId:result.gameId};autosaveAfter('game');return{ok:true,result,record,candidate,validation,preview};
+    if(!options.advancingWeek)ranked();if(options.testFault==='afterRank')throw new Error('Injected v2 rollback fault after rankings.');syncGameplayRng();v2GameLabPreview={key:prepared.key,...preview,recorded:true,gameId:result.gameId};if(!options.advancingWeek)autosaveAfter('game');return{ok:true,result,record,candidate,validation,preview};
   }catch(err){v2RecordRestore(rollback,g,home,away);throw err}
 }
 
@@ -14709,26 +14917,29 @@ function v2GameDayUILiveContext(){
 }
 function v2GameDayUIDigest(ctx=v2GameDayUILiveContext()){return ctx?v2LabIntegrity(ctx.g,ctx.home,ctx.away):null}
 function v2GameDayUIAssertUnchanged(before,ctx){const after=v2GameDayUIDigest(ctx);if(before!==after)throw new Error('Game Day preview mutated live dynasty state.')}
-function v2GameDayUIPrepare(){
+function v2GameDayUIPrepare(playbook){
   const ctx=v2GameDayUILiveContext(),api=globalThis.DynastyGameEngineV2GameDay;if(!ctx||!api)throw new Error('No upcoming game is available for Game Day.');
   const before=v2GameDayUIDigest(ctx),hc=v2LabClone(ctx.home),ac=v2LabClone(ctx.away);
   applyGameplanWear(hc,ac.name);applyGameplanWear(ac,hc.name);
   const homeProfile=gameProfiles(hc,ac.name),awayProfile=gameProfiles(ac,hc.name);
-  const session=api.createSession({gameId:`v0101-gameday-${ctx.key}`,seed:`v0101-gameday-${ctx.key}`,home:ctx.home,away:ctx.away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(ctx.home)});
+  const session=api.createSession({gameId:`v0101-gameday-${ctx.key}`,seed:`v0101-gameday-${ctx.key}`,home:ctx.home,away:ctx.away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(ctx.home),playbook});
   api.advanceOne(session);v2GameDayUIAssertUnchanged(before,ctx);
   v2InteractiveGameDay={key:ctx.key,session,integrity:before,actions:[]};v2GameDayUIPersist();renderV2InteractiveGameDay();return session
 }
-// A coached game is locked in. The session is seeded by its fixture, so the list of coaching actions
-// is enough to rebuild it exactly: it is kept in the save while the game is live, the result is
-// recorded at the final whistle, and advancing the week finishes this game rather than simulating
-// a different one.
+// A fixture seed, its kickoff playbook and the coaching actions reproduce a paused game.
 let v2GameDayHoldFinal=false;
-function v2GameDayUIPersist(){if(!universe)return;if(!v2InteractiveGameDay){if(universe.liveGameDay){delete universe.liveGameDay;autosaveAfter('game')}return}universe.liveGameDay={version:1,key:v2InteractiveGameDay.key,actions:v2InteractiveGameDay.actions.slice()};autosaveAfter('game')}
+function v2GameDayUIPersist(){
+  if(!universe)return;
+  if(!v2InteractiveGameDay){if(universe.liveGameDay){delete universe.liveGameDay;autosaveAfter('game')}return}
+  const {key,session,actions}=v2InteractiveGameDay;
+  universe.liveGameDay={version:1,key,playbook:session.state.playbook??null,actions:actions.slice()};
+  autosaveAfter('game')
+}
 function v2GameDayUIApply(api,session,action){if(action==='next')return api.advanceOne(session);if(action==='decision')return api.advance(session);if(action==='delegate')return api.simulate(session,()=> 'delegate');if(typeof action==='string'&&action.startsWith('choice:'))return api.resolve(session,action.slice(7));throw new Error(`Unknown Game Day action ${action}`)}
 function v2GameDayUIRestore(){
   if(v2InteractiveGameDay||!universe?.liveGameDay)return false;const saved=universe.liveGameDay,ctx=v2GameDayUILiveContext();
   if(!ctx||saved.key!==ctx.key||!Array.isArray(saved.actions)){delete universe.liveGameDay;return false}
-  try{const session=v2GameDayUIPrepare(),api=globalThis.DynastyGameEngineV2GameDay;for(const a of saved.actions){v2GameDayUIApply(api,session,a);v2InteractiveGameDay.actions.push(a)}v2InteractiveGameDay.integrity=v2GameDayUIDigest(ctx);universe.liveGameDay={version:1,key:ctx.key,actions:v2InteractiveGameDay.actions.slice()};return true}
+  try{const session=v2GameDayUIPrepare(saved.playbook),api=globalThis.DynastyGameEngineV2GameDay;for(const a of saved.actions){v2GameDayUIApply(api,session,a);v2InteractiveGameDay.actions.push(a)}v2InteractiveGameDay.integrity=v2GameDayUIDigest(ctx);universe.liveGameDay.actions=v2InteractiveGameDay.actions.slice();return true}
   catch(err){console.error(err);v2InteractiveGameDay=null;delete universe.liveGameDay;setStatus('The saved live game could not be rebuilt, so it was set aside.');return false}
 }
 // Finish a live game with the staff and record it. Used before anything else would play this week.
@@ -14821,11 +15032,11 @@ if(globalThis.__DL_TEST__){
 // v0.10.1 Interactive Game Day pregame bridge.
 // Replaces only the staged preparation step so preview kickoff profiles mirror the
 // permanent record path: recoverWeek() on cloned rosters, then beginGame() preparation wear.
-v2GameDayUIPrepare=function v2GameDayUIPrepareWithRecovery(){
+v2GameDayUIPrepare=function v2GameDayUIPrepareWithRecovery(playbook){
   const ctx=v2GameDayUILiveContext(),api=globalThis.DynastyGameEngineV2GameDay;if(!ctx||!api)throw new Error('No upcoming game is available for Interactive Game Day.');
   const before=v2GameDayUIDigest(ctx),prepared=v2GameDayPreparedTeams(ctx.home,ctx.away),hc=prepared.home,ac=prepared.away;
   const homeProfile=gameProfiles(hc,ac.name),awayProfile=gameProfiles(ac,hc.name),me=selected();
-  const session=api.createSession({gameId:`v0101-gameday-${ctx.key}`,seed:`v0101-gameday-${ctx.key}`,home:ctx.home,away:ctx.away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(ctx.home),controlledTeamId:me?.id??null});
+  const session=api.createSession({gameId:`v0101-gameday-${ctx.key}`,seed:`v0101-gameday-${ctx.key}`,home:ctx.home,away:ctx.away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(ctx.home),controlledTeamId:me?.id??null,playbook});
   api.advanceOne(session);v2GameDayUIAssertUnchanged(before,ctx);
   v2InteractiveGameDay={key:ctx.key,session,integrity:before,actions:[]};v2GameDayUIPersist();renderV2InteractiveGameDay();return session
 };
@@ -16921,7 +17132,7 @@ globalThis.DynastySeasonMoments=Object.freeze({
    const impact=x=>{const t=x.stats||{};return(t.passYds||0)*.035+(t.passTD||0)*5-(t.int||0)*3+(t.rushYds||0)*.08+(t.rushTD||0)*5+(t.recYds||0)*.08+(t.recTD||0)*5+(t.tackles||0)*.8+(t.tfl||0)*1.6+(t.sacks||0)*3.5+(t.intDef||0)*4.5+(t.forcedFumbles||0)*3};
    const line=x=>{const t=x.stats||{},o=[];if(t.passYds)o.push(`${t.passYds} pass yd`);if(t.passTD)o.push(`${t.passTD} pass TD`);if(t.rushYds)o.push(`${t.rushYds} rush yd`);if(t.rushTD)o.push(`${t.rushTD} rush TD`);if(t.recYds)o.push(`${t.recYds} rec yd`);if(t.recTD)o.push(`${t.recTD} rec TD`);if(t.sacks)o.push(`${t.sacks} sacks`);if(t.intDef)o.push(`${t.intDef} INT`);if(t.tackles&&o.length<2)o.push(`${t.tackles} tackles`);return o.slice(0,3).join(' · ')};
    const performers=(g.playerStats?.[side]||[]).slice().sort((a,b)=>impact(b)-impact(a)).filter(x=>impact(x)>0&&x.name&&line(x)).slice(0,3).map(x=>{const f=typeof findPlayer==='function'?findPlayer(x.id):null;return{id:x.id,name:x.name,pos:x.pos||'',line:line(x),face:!!f?.p}});
-   return{gameId:g.id,season:g.season,week:g.week,label:g.label||'Final',opponent:names[opp],outcome,won:outcome==='W',us,them,hasBoxScore:!g.scheduleOnly,hasReplay:!!rows?.length,plays:top,performers,consequence:momentsConsequence(g,side,u,outcome)};
+   return{gameId:g.id,season:g.season,week:g.week,label:g.label||'Final',opponent:names[opp],outcome,won:outcome==='W',us,them,hasBoxScore:!g.scheduleOnly,hasReplay:!!rows?.length,plays:top,performers,firstStart:g.firstStart?.schoolId===u.id?g.firstStart.text:null,consequence:momentsConsequence(g,side,u,outcome)};
   }catch(e){return null}
  },
  weeklyRhythm(){
@@ -18233,7 +18444,7 @@ function highlightsHTML(h,rhythm,status){
  const weekly=rhythm?`<div class="hl-week"><p class="hl-next">${rhythm.bye?`Week ${esc(rhythm.week)} is a bye. `:''}${esc(note)}</p><p class="hl-choices">${esc(choices)}</p></div>`:'';
  const more=h&&(performers.length>1||plays.length||h.hasReplay)?`<details class="hl-more"><summary data-hl-focus="more">More from this game</summary>${performers.length>1?`<div class="hl-stars">${performers.slice(1).map(p=>performerHTML(p,'Contributor')).join('')}</div>`:''}${plays.length?`<ol class="hl-plays">${plays.map(p=>`<li class="${p.ours?'is-ours':'is-theirs'}"><span>${esc(p.clock)}</span>${esc(p.text)}</li>`).join('')}</ol>`:''}${h.hasReplay?'<div class="hl-actions"><button type="button" data-hl-watch data-hl-focus="watch">Watch highlights</button></div>':''}</details>`:'';
  const stop=rhythm?.stop?`<p class="hl-stop">${esc(rhythm.stop)}</p>`:'';
- return`<section id="highlightsCard" data-hl-game="${esc(h?.gameId||'')}" class="card highlights${outcome?` is-${outcome==='W'?'win':outcome==='L'?'loss':'tie'}`:''}" aria-label="Weekly rhythm and game result">${result}${payoff}${weekly}${stop}${saveStatusHTML(status,rhythm?.context)}${more}</section>`;
+ return`<section id="highlightsCard" data-hl-game="${esc(h?.gameId||'')}" class="card highlights${outcome?` is-${outcome==='W'?'win':outcome==='L'?'loss':'tie'}`:''}" aria-label="Weekly rhythm and game result">${result}${payoff}${h.firstStart?`<p class="hl-next"><b>Signing class</b> · ${esc(h.firstStart)}</p>`:''}${weekly}${stop}${saveStatusHTML(status,rhythm?.context)}${more}</section>`;
 }
 function yearbookHTML(y){
  const t=y.team,headline=y.champ?'National Champions':y.confChamp?`${esc(t.conference)} Champions`:y.bowl?.won?`${esc(y.bowl.label)} Champions`:`${t.w}-${t.l}`;
