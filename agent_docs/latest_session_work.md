@@ -1,6 +1,13 @@
 # Latest Session Work
 
-## Unreleased: recruiting news and tooling (branch `claude/pensive-gates-g6e24q`, after v0.15.0)
+## v0.15.1 — Portal Desk, player arcs, staff assignments, playbook, tour, long-dynasty speed (2026-11-08, PR #41)
+
+- `portal-desk.js` (portal hours, actions, odds, rival counters by hash), `player-arcs.js` (desk summary on `recruitingMemory.desk`, class cards graded vs same-year league classes, PAYOFF hub items), `staff-assignments.js` (`team.staffAssignments`; territory bonus via `territoryBonus` env hook in recruiting-actions, camp bonus via a `resolveDevelopmentCoaching` wrapper), `situational-playbook.js` (rules in `game-engine-v2.js`: `playbookFourthDown`/`playbookTwoPoint`/`playbookClock`; inert without `state.playbook`), `tutorial.js` (`universe.tutorial`).
+- Postseason stage snapshots no longer clone `playerArchive`/`gameArchive` (trim on rollback, key order kept). `compactHistoryArchive` runs at rollover (horizon 3). The 256 MB desktop limit applies to the core only; archives are chunked.
+- `TAB_RENDERERS` captures render functions at app.js time; a wrapper must also update the map (see player-arcs).
+- Engine edits need the calibration fingerprint re-stamped (`tools/game-engine-v2-calibration-stamp.js`); `npm run calibrate:game-engine-v2` rebaselines the legacy `old` row too, which has drifted since 0.9.56.
+
+## Recruiting news and tooling (branch `claude/pensive-gates-g6e24q`, after v0.15.0, included in v0.15.1)
 
 - News: `recruiting-actions.js` keeps a per-season ledger on the controlled program (`team.recruitingSeason`: hours, actions, won/lost/cut/flipped entries, rival moves, answered), written by `perform` (`noteSpend`) and the weekly pass (`noteWeek`). `newsItems` turns the week just played (`team.recruitingLastWeek.funnel` / `.flipped`, now objects not names) into LOST / CUT / FLIPPED hub items via `DynastyRecruitingNews`, wired into `buildWeeklyHub` in `app.js`; `deskSummary` feeds the season review (`DynastyRecruitingSeason`, `season-review.js`). Decisions carry `listed` and `offered` so the explanation is built from records, never guessed.
 - Staff plan: offers now also go to any target whose Top 5 or Top 3 includes the program (`onHisList`).

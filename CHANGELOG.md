@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — Portal Desk, player arcs, staff assignments, situational playbook, guided tour and long-dynasty speed
+## v0.15.1 — Portal Desk, player arcs, staff assignments, situational playbook, guided tour and long-dynasty speed
 
 - **Recruiting news on This Week.** The week's recruiting results now appear in the weekly list: **LOST** (a target chose another program, with the reason in plain terms: you were not on his final list, you were on it but never made him an offer, none of his finalists had room, or he simply chose someone else), **CUT** (a target cut you from his Top 5 or Top 3, with who made his list) and **FLIPPED** (a commitment left for a rival). Commitments to you keep their existing item.
 - **The season review tells the desk's year.** A Recruiting Desk block shows hours spent against the budget, how many targets chose you, went elsewhere or cut you, your biggest win and loss (with why), how many recruits had you on a final list and never got an offer, commitments that flipped away, and rival moves answered.
