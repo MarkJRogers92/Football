@@ -41,9 +41,26 @@ Two changes, measured over the same seeds:
 An engaged player (three campaigns a season, every gift to buildings) reaches 12 to 13 levels with an empty fund: it is
 a real budget, not a free upgrade. An idle player stays at the league average, 7.6.
 
+## Weak and mid-tier programs
+
+The same soak with the engaged-player policy, 20 seasons, after the upkeep change. Vermont State (prestige 28, seed 7) and Gulf Plains University (prestige 31, seed 11) are two of the weakest programs; Cape Fear State (prestige 67) is mid-table. No stalls and no invariant problems in any run.
+
+| | Levels built | Facilities rating | Rank of 120 | Booster goodwill |
+| --- | --- | --- | --- | --- |
+| Weak, seed 7, active | 7 (stadium 3, training 2, ops 2) | 35 to 49 | 111 | 10 to 31 |
+| Weak, seed 11, active | 6 (2, 2, 2) | 25 to 37 | 117 | 18 to 36 |
+| Weak, seed 7, idle | 0 | 35 | 118 | 30 to 45; fund sits at the 40 cap |
+| Mid, seed 7, active | 13 (5, 4, 4) | 56 to 98 | 12 | 94 to 100 |
+| League mean, every run | 7.6 to 7.7 | | | |
+
+- A weak program is **not locked out**: it builds 6 to 7 levels, about the league average, so it keeps pace with the AI programs rather than falling behind. It cannot catch up, because its gifts are small and its goodwill is low from losing (these coaches won 2 to 4 games a year).
+- The Major Gift Ask is a trap for an unhappy donor base: the floor is a 15% chance, and a failure costs 4 goodwill. The scripted policy asks anyway and stays near 10 to 30 goodwill; a player should skip the ask until winning restores it.
+- An idle weak program banks gifts to the 40-unit cap and wastes them. A fund-idle nudge already appears in the offseason hub.
+- A mid-tier program that invests fully climbs from rank about 60 to rank 12 in facilities.
+
 ## Not covered
 
 - Real Chromium and desktop-packaged saves at season 20 (the soak uses the Node harness and the packed save shape).
-- A weak or mid-tier controlled program (both seeds are Chicago Metropolitan, a top program).
+- A weak program that is fired (none was, in these runs).
 - Whether 7.6 average levels is the right long-run feel. The numbers are tunable in `facilities-boosters.js`
   (`UPKEEP_PER_LEVEL`, `LEVEL_COST`, income) and `tools/facilities-soak.js` prints the table to tune against.

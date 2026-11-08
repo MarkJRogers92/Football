@@ -19,7 +19,7 @@ Not released: the version is still 0.15.2 and the CHANGELOG entry is "Unreleased
 
 **Verification run so far** (Node 22 here, CI uses 24): full `npm test` 802/802 before the facilities tests were added (these pass separately: 10/10), the Game Day / recording / postseason / cast / weekly-desk browser suites, `one-more-saturday-browser`, `gameday-season-presentation-browser`, and the new `facilities-boosters-browser` at desktop and phone width. Not yet run: the complete `test:browser-extended` matrix, storage, audit, long-run/soak with the new systems, desktop packaging.
 
-**Soak done** (`tools/facilities-soak.js`, 20 seasons, seeds 7 and 11): no stalls or invariant problems, no save growth beyond the existing archive growth, faithful reload, play-model rates on target. It found AI facility saturation, fixed with upkeep and diminishing returns. Remaining: a weak or mid-tier controlled program, real-browser and packaged-desktop saves at season 20, and the Electron advisory bump.
+**Soak done** (`tools/facilities-soak.js`, 20 seasons, seeds 7 and 11): no stalls or invariant problems, no save growth beyond the existing archive growth, faithful reload, play-model rates on target. It found AI facility saturation, fixed with upkeep and diminishing returns. Weak and mid-tier controlled programs were also soaked (not locked out; they keep pace with the league). Electron is 44.10.2; the remaining `npm audit` items are in Electron Forge (build tooling, needs a major upgrade). Remaining: real-browser and packaged-desktop saves at season 20, and packaged Mac/Windows smoke on CI.
 
 ## v0.15.2 published — 2026-11-08
 

@@ -27,7 +27,9 @@ const f1 = n => Number(n).toFixed(1), mb = n => (n / 1048576).toFixed(1);
   const F = globalThis.DynastyFacilities;
   if (process.env.AI === 'off') globalThis.__FACILITIES_AI_OFF = true;   // baseline: only the controlled program builds
   if (!F) throw new Error('The full runtime did not load facilities-boosters.js');
-  const me = () => e.T(PROGRAM);
+  // A weak program can be fired; the controlled program is whichever post is held now.
+  const me = () => e.T(document.querySelector('#userTeam')?.value || PROGRAM);
+  const posts = [PROGRAM];
   const start = {facilities: new Map(u.teams.map(t => [t.id, t.facilities])), fan: new Map(u.teams.map(t => [t.id, t.fan_support])), dev: new Map(u.teams.map(t => [t.id, t.development]))};
   const rows = [], titles = new Map(), problems = [];
   const flag = (year, text) => { problems.push(`${year}: ${text}`); };
@@ -97,6 +99,7 @@ const f1 = n => Number(n).toFixed(1), mb = n => (n / 1048576).toFixed(1);
     const stats = gameStats(), record = `${me().w}-${me().l}`;
     e.runSpringCamp(); e.runFallCamp();
     finishOffseason();
+    if (me().name !== posts.at(-1)) posts.push(me().name);
     if (u.year !== startedAt + 1) throw new Error(`season ${startedAt} did not advance exactly one year (now ${u.year}, phase ${u.phase})`);
     if (ROUNDTRIP && i + 1 === ROUNDTRIP && !roundTripped) {
       const packed = JSON.parse(JSON.stringify({userTeam: PROGRAM, universe: e.packUniverse(u)}));
@@ -140,6 +143,7 @@ const f1 = n => Number(n).toFixed(1), mb = n => (n / 1048576).toFixed(1);
   const flags = rows.filter(r => r.g), tot = k => flags.reduce((n, r) => n + r[k] * r.g, 0) / Math.max(1, flags.reduce((n, r) => n + r.g, 0));
   console.log(`play model over ${flags.reduce((n, r) => n + r.g, 0)} user games: ${f1(tot('flagsPerGame'))} flags/team, ${f1(tot('retPerGame'))} return yds/team, ${f1(tot('prsPerGame'))} pressures allowed/team, ${f1(tot('ptsPerGame'))} pts/game`);
   console.log(`national titles: ${[...titles].sort((a, b) => b[1] - a[1]).map(([n, c]) => `${n} ${c}`).slice(0, 6).join(', ')} | distinct champions ${titles.size} in ${rows.length} seasons`);
+  if (posts.length > 1) console.log(`posts held: ${posts.join(' -> ')}`);
   console.log(problems.length ? `\nPROBLEMS (${problems.length}):\n  ${problems.slice(0, 25).join('\n  ')}` : '\nno invariant problems');
   if (process.env.OUT) fs.writeFileSync(process.env.OUT, JSON.stringify({seed: SEED, policy: POLICY, rows, problems}, null, 1));
   process.exitCode = problems.length ? 1 : 0;
