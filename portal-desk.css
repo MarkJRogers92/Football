@@ -1,0 +1,29 @@
+.portal-desk{display:grid;gap:10px;margin:12px 0}
+.portal-desk .section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.pd-hours{font-size:.86rem;color:var(--muted)}
+.pd-hours strong{font-size:1.2rem;color:var(--text,inherit)}
+.pd-needs,.pd-watch{margin:0;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:.84rem}
+.pd-need,.pd-tag{font-size:.7rem;border:1px solid var(--line);border-radius:999px;padding:3px 8px;white-space:nowrap}
+.pd-need small{color:var(--muted)}
+.pd-tag{border-color:var(--good);color:var(--good)}
+.pd-watch{color:var(--warn)}
+.pd-staff{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:.8rem}
+.pd-staff label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+.pd-staff input{margin:0;accent-color:var(--accent)}
+.pd-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:10px}
+.pd-card{display:grid;gap:7px;padding:11px;border:1px solid var(--line);border-radius:11px;background:var(--panel2);min-width:0}
+.pd-card--done{opacity:.8}
+.pd-card p{margin:0;font-size:.84rem;line-height:1.4}
+.pd-card-head{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.pd-field{list-style:none;margin:0;padding:0;display:grid;gap:3px}
+.pd-field li{display:grid;grid-template-columns:minmax(0,1fr) auto 3.2em;gap:8px;font-size:.8rem;align-items:baseline}
+.pd-field li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pd-field li small{color:var(--muted);text-align:right}
+.pd-field li.pd-you{font-weight:700;color:var(--accent)}
+.pd-rivals{margin:0;padding-left:18px;font-size:.8rem;color:var(--warn)}
+.pd-actions{display:flex;gap:6px;flex-wrap:wrap}
+.pd-actions button{font-size:.76rem;padding:6px 9px;white-space:nowrap}
+.pd-actions button small{opacity:.75}
+.pd-actions button:disabled{opacity:.45}
+.pd-actions button.pd-answer{border-color:var(--warn);box-shadow:0 0 0 1px var(--warn) inset}
+@media(max-width:700px){.pd-actions button{flex:1 1 auto}}

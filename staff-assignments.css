@@ -1,0 +1,8 @@
+.staff-assignments{margin-top:12px}
+.staff-assignments .section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.sa-row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:9px 0;border-top:1px solid var(--line)}
+.sa-row>div:first-child{min-width:0;flex:1 1 260px;display:grid;gap:2px}
+.sa-controls{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.sa-controls select{font-size:.78rem;padding:5px;max-width:220px}
+.sa-vacated{color:var(--warn)}
+@media(max-width:700px){.sa-controls{width:100%}.sa-controls select{flex:1 1 140px;max-width:none}}

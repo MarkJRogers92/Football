@@ -218,10 +218,13 @@ function makeRecruitingActionSystem(env){
   }else if(kind==='keep'){
    rec.keptWeek=u.week;dR=KEEP.relationship;note='He knows you are still in his corner.';
   }
+  // Staff assignments: a contact that gains interest gains more in the territory of a strong recruiter.
+  const territory=dI>0&&env.territoryBonus?env.territoryBonus(r,t)||0:0;
+  if(territory){dI+=territory;note=`${note?note+' ':''}Territory bonus from your ${r.homeRegion} recruiter.`}
   if(dI)r.interest=clamp(Math.round((r.interest||0)+dI),1,100);
   if(dR){r.relationship=clamp((r.relationship||0)+dR,0,100);if(dR>0&&env.growRecruiterRelationship)env.growRecruiterRelationship(r,t,dR)}
   const week=ensureWeek(t);week.spent+=check.cost;
-  rec.lastWorkedWeek=u.week;wk.hours+=check.cost;
+  rec.lastWorkedWeek=u.week;wk.hours+=check.cost;rec.hours=(rec.hours||0)+check.cost;
   const reveals=learn(rec,r,kind,topic);
   const answered=answerRivals(r,kind);
   noteSpend(t,kind,check.cost,answered);
@@ -604,6 +607,7 @@ if(typeof module==='object'&&module.exports){
   rankTeams:(r,t)=>universe.teams.filter(x=>!recruitBlocked(x,r))
    .map(x=>({name:x.name,score:recruitPitch(x,r)+(x.id===t.id&&r.targeted?10+(r.relationship||0)*.12:0)})).sort((a,b)=>b.score-a.score),
   canTake:name=>canTakeCommit(name),
+  territoryBonus:(r,t)=>t?.name===$('#userTeam')?.value?globalThis.DynastyStaffAssignments?.recruitBonus(r,t)||0:0,
   commit:(r,name)=>commitRecruit(r,name),
   // The programs closest to winning him, other than yours, by the pitch they would make on their own.
   topRivals:(r,t,n)=>universe.teams.filter(x=>x.id!==t.id&&!recruitBlocked(x,r)&&canTakeCommit(x.name))
