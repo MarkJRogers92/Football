@@ -2,7 +2,7 @@
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.15.0';
+const APP_VERSION='0.15.1';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -2422,7 +2422,7 @@ function applyGameplanDecision(t,option){
  }
  return true;
 }
-function buildWeeklyHub(beforeRank=selected()?.rank||null){const u=selected(),items=[...pulledOfferHubItems(u),...coachOpeningHubItems(u),...coachFalloutHubItems(u),...promiseHubItems(u),...recordChaseHubItems(u),...rivalryHubItems(u),...adminHubItems(u),...careerHubItems(u),...(typeof milestoneHubItems==='function'?milestoneHubItems(u):[]),...bowlHubItems(u),...signingDayHubItems(),...academicHubItems(u),...coachTreeHubItems(u),...newsHeadlineHubItem(u)],res=userWeekResult(u);if(res)items.push({type:res.win?'good-news':'bad-news',tab:'season',kicker:'FINAL',importance:res.win?50:60,gameId:res.gameId,main:`${res.win?'Win':'Loss'} ${res.userPts}–${res.oppPts} ${res.loc} ${res.opp}`,sub:res.label?`${res.label} · ${u.w}-${u.l} overall`:`${u.w}-${u.l} overall · ${u.cw}-${u.cl} conference`});if(beforeRank&&u.rank!==beforeRank)items.push({type:u.rank<beforeRank?'good-news':'alert',tab:'season',kicker:'RANKINGS',importance:45,main:`${u.rank<beforeRank?'Up':'Down'} to #${u.rank}`,sub:`Previous ranking: #${beforeRank}`});let inj=u.roster.filter(p=>(p.injuryHistory||[]).some(x=>x.year===universe.year&&x.week===universe.week)).slice(0,2);for(const p of inj)items.push({type:'bad-news',tab:'roster',player:p.id,kicker:'MEDICAL',importance:55,main:`${p.name}: ${p.injury}`,sub:`Expected absence: ${p.injuryWeeks} week${p.injuryWeeks===1?'':'s'}`});let commits=universe.recruits.filter(r=>r.committed===u.name&&r.commitWeek===universe.week).slice(0,3);for(const r of commits)items.push({type:'good-news',tab:'recruiting',recruit:r.id,kicker:'COMMITMENT',importance:40+r.stars*3,main:`${'★'.repeat(r.stars)} ${r.pos} ${r.name}`,sub:`#${r.nationalRank} nationally · ${r.homeCity}, ${r.homeState}`});let next=findUserGame();if(next){let opp=T(next.home===u.name?next.away:next.home);items.push({type:'action',tab:'gamelab',kicker:'NEXT UP',importance:48,main:`Week ${universe.week+1}: ${next.home===u.name?'vs':'@'} ${opp.name}`,sub:`${opp.w}-${opp.l} · #${opp.rank<=25?opp.rank:'—'} · ${opp.offScheme}`})}let risk=u.roster.map(p=>({p,r:transferRisk(p)})).sort((a,b)=>b.r-a.r)[0];if(risk?.r>=42)items.push({type:'alert',tab:'roster',player:risk.p.id,kicker:'LOCKER ROOM',importance:Math.min(80,Math.round(risk.r)),main:`${risk.p.name} transfer risk: ${Math.round(risk.r)}`,sub:`${risk.p.role} · morale ${risk.p.morale}`});for(const e of (universe.decommitLog||[]).filter(e=>e.year===universe.year&&e.week===universe.week&&(e.from===u.name||e.to===u.name)).slice(0,3))items.push(e.from===u.name?{type:'bad-news',tab:'recruiting',recruit:e.id,kicker:'DECOMMIT',importance:50+e.stars*3,main:`${'★'.repeat(e.stars)} ${e.pos} ${e.name}`,sub:e.to?`Flipped to ${e.to}`:'Reopened his recruitment'}:{type:'good-news',tab:'recruiting',recruit:e.id,kicker:'FLIP',importance:45+e.stars*3,main:`${'★'.repeat(e.stars)} ${e.pos} ${e.name}`,sub:`Flipped from ${e.from}`});let waver=universe.recruits.filter(r=>r.committed===u.name&&r.challenger&&r.pressure>0).sort((a,b)=>b.pressure-a.pressure)[0];if(waver)items.push({type:'alert',tab:'recruiting',recruit:waver.id,kicker:'WAVERING',importance:52,main:`${waver.name} hearing from ${waver.challenger}`,sub:`${'★'.repeat(waver.stars)} ${waver.pos} commit · target, visit or promise to hold him`});let hot=universe.recruits.filter(r=>r.targeted&&!r.committed).sort((a,b)=>b.interest-a.interest)[0];if(hot)items.push({type:'action',tab:'recruiting',recruit:hot.id,kicker:'TOP TARGET',importance:35,main:`${hot.name} · ${hot.interest}%`,sub:`#${hot.nationalRank} ${hot.pos} · ${hot.trend>0?'↑ '+hot.trend:hot.trend<0?'↓ '+Math.abs(hot.trend):'steady'}`});universe.weeklyHub=items.sort((a,b)=>(b.importance??40)-(a.importance??40)).slice(0,9)}
+function buildWeeklyHub(beforeRank=selected()?.rank||null){const u=selected(),items=[...pulledOfferHubItems(u),...coachOpeningHubItems(u),...coachFalloutHubItems(u),...promiseHubItems(u),...recordChaseHubItems(u),...rivalryHubItems(u),...adminHubItems(u),...careerHubItems(u),...(typeof milestoneHubItems==='function'?milestoneHubItems(u):[]),...bowlHubItems(u),...signingDayHubItems(),...(globalThis.DynastyRecruitingNews?.(u)||[]),...(globalThis.DynastyPlayerArcNews?.(u)||[]),...(globalThis.DynastyStaffAssignmentNews?.(u)||[]),...academicHubItems(u),...coachTreeHubItems(u),...newsHeadlineHubItem(u)],res=userWeekResult(u);if(res)items.push({type:res.win?'good-news':'bad-news',tab:'season',kicker:'FINAL',importance:res.win?50:60,gameId:res.gameId,main:`${res.win?'Win':'Loss'} ${res.userPts}–${res.oppPts} ${res.loc} ${res.opp}`,sub:res.label?`${res.label} · ${u.w}-${u.l} overall`:`${u.w}-${u.l} overall · ${u.cw}-${u.cl} conference`});if(beforeRank&&u.rank!==beforeRank)items.push({type:u.rank<beforeRank?'good-news':'alert',tab:'season',kicker:'RANKINGS',importance:45,main:`${u.rank<beforeRank?'Up':'Down'} to #${u.rank}`,sub:`Previous ranking: #${beforeRank}`});let inj=u.roster.filter(p=>(p.injuryHistory||[]).some(x=>x.year===universe.year&&x.week===universe.week)).slice(0,2);for(const p of inj)items.push({type:'bad-news',tab:'roster',player:p.id,kicker:'MEDICAL',importance:55,main:`${p.name}: ${p.injury}`,sub:`Expected absence: ${p.injuryWeeks} week${p.injuryWeeks===1?'':'s'}`});let commits=universe.recruits.filter(r=>r.committed===u.name&&r.commitWeek===universe.week).slice(0,3);for(const r of commits)items.push({type:'good-news',tab:'recruiting',recruit:r.id,kicker:'COMMITMENT',importance:40+r.stars*3,main:`${'★'.repeat(r.stars)} ${r.pos} ${r.name}`,sub:`#${r.nationalRank} nationally · ${r.homeCity}, ${r.homeState}`});let next=findUserGame();if(next){let opp=T(next.home===u.name?next.away:next.home);items.push({type:'action',tab:'gamelab',kicker:'NEXT UP',importance:48,main:`Week ${universe.week+1}: ${next.home===u.name?'vs':'@'} ${opp.name}`,sub:`${opp.w}-${opp.l} · #${opp.rank<=25?opp.rank:'—'} · ${opp.offScheme}`})}let risk=u.roster.map(p=>({p,r:transferRisk(p)})).sort((a,b)=>b.r-a.r)[0];if(risk?.r>=42)items.push({type:'alert',tab:'roster',player:risk.p.id,kicker:'LOCKER ROOM',importance:Math.min(80,Math.round(risk.r)),main:`${risk.p.name} transfer risk: ${Math.round(risk.r)}`,sub:`${risk.p.role} · morale ${risk.p.morale}`});for(const e of (universe.decommitLog||[]).filter(e=>e.year===universe.year&&e.week===universe.week&&(e.from===u.name||e.to===u.name)).slice(0,3))items.push(e.from===u.name?{type:'bad-news',tab:'recruiting',recruit:e.id,kicker:'DECOMMIT',importance:50+e.stars*3,main:`${'★'.repeat(e.stars)} ${e.pos} ${e.name}`,sub:e.to?`Flipped to ${e.to}`:'Reopened his recruitment'}:{type:'good-news',tab:'recruiting',recruit:e.id,kicker:'FLIP',importance:45+e.stars*3,main:`${'★'.repeat(e.stars)} ${e.pos} ${e.name}`,sub:`Flipped from ${e.from}`});let waver=universe.recruits.filter(r=>r.committed===u.name&&r.challenger&&r.pressure>0).sort((a,b)=>b.pressure-a.pressure)[0];if(waver)items.push({type:'alert',tab:'recruiting',recruit:waver.id,kicker:'WAVERING',importance:52,main:`${waver.name} hearing from ${waver.challenger}`,sub:`${'★'.repeat(waver.stars)} ${waver.pos} commit · target, visit or promise to hold him`});let hot=universe.recruits.filter(r=>r.targeted&&!r.committed).sort((a,b)=>b.interest-a.interest)[0];if(hot)items.push({type:'action',tab:'recruiting',recruit:hot.id,kicker:'TOP TARGET',importance:35,main:`${hot.name} · ${hot.interest}%`,sub:`#${hot.nationalRank} ${hot.pos} · ${hot.trend>0?'↑ '+hot.trend:hot.trend<0?'↓ '+Math.abs(hot.trend):'steady'}`});universe.weeklyHub=items.sort((a,b)=>(b.importance??40)-(a.importance??40)).slice(0,9)}
 
 const GUIDANCE_STATE_VERSION=1,GUIDANCE_FAMILIARITY_MAX=3,GUIDANCE_RETURN_AFTER_MS=15*60*1000;
 const GUIDANCE_CATEGORIES=new Set(['career','coach_desk','game_plan','roster_management','staffing','recruiting','monitoring']);
@@ -3033,11 +3033,60 @@ function repairRosterShape(t,receipt){
   const added=generateFreshman(t,need);t.roster.push(added);recordRosterMove(t,added,'walkOns',receipt);
  }
 }
+// v0.15.1 — events are the one part of the core save that grows without limit (about 2 MB a season, 80% of it two
+// story types written for every player in the league). Past the horizon those stories keep everything a reader
+// shows (id, season, week, type, school, player, game, story id and summary) and drop metadata that only repeats
+// the summary or the player record. The camp report kept for each season is never read back; past the horizon it
+// keeps the rows and drops the zero deltas.
+const EVENT_DETAIL_HORIZON=3,SLIM_EVENT_TYPES=new Set(['COLLEGE_CAREER_ENDED','PLAYER_BREAKOUT']);
+function slimEvent(e){
+ if(!e||e.slim||!SLIM_EVENT_TYPES.has(e.type)||!e.metadata)return false;
+ const keep={storyType:e.metadata.storyType};if(e.metadata.phase!=null)keep.phase=e.metadata.phase;
+ if(e.storyId==null&&e.metadata.storyId!=null)e.storyId=e.metadata.storyId;
+ e.metadata=keep;e.slim=true;return true;
+}
+function slimCampReport(rows){
+ let n=0;
+ for(const r of Array.isArray(rows)?rows:[]){
+  if(!r||typeof r!=='object')continue;
+  for(const [k,v] of Object.entries(r)){
+   if(v===0){delete r[k];n++}
+   else if(v&&typeof v==='object'&&!Array.isArray(v)){for(const [a,x] of Object.entries(v))if(x===0){delete v[a];n++}}
+  }
+ }
+ return n;
+}
+function compactHistoryArchive({horizon=EVENT_DETAIL_HORIZON}={}){
+ const cutoff=universe.year-horizon;let events=0,dropped=0,camps=0;
+ // A finished career is already on the archived record (name, last team, exit reason, year), and the career
+ // timeline draws the line from there when the event is gone. Programs the coach has led keep theirs, so the
+ // school's story history stays whole wherever the coach has been.
+ const led=new Set([$('#userTeam')?.value,universe.tenure?.school,...(universe.careerHistory||[]).map(x=>x.school)].filter(Boolean));
+ const ledIds=new Set(universe.teams.filter(t=>led.has(t.name)).map(t=>t.id));
+ if(Array.isArray(universe.events)){
+  const kept=[];
+  for(const e of universe.events){
+   if((e?.season??universe.year)<=cutoff){
+    if(e?.type==='COLLEGE_CAREER_ENDED'&&!(e.schoolIds||[]).some(id=>ledIds.has(id))){dropped++;continue}
+    if(slimEvent(e))events++;
+   }
+   kept.push(e);
+  }
+  if(dropped)universe.events=kept;
+ }
+ for(const [year,ds] of Object.entries(universe.campHistory||{})){
+  if(Number(year)>cutoff||!ds||ds.slim)continue;
+  slimCampReport(ds.springReport);slimCampReport(ds.fallReport);ds.slim=true;camps++;
+ }
+ return {events,dropped,camps};
+}
 function offseasonPreseason(){
  const os=normalizeOffseasonState(),ds=ensureDevelopmentState();
  if(!offseasonPhaseDone('spring')||!offseasonPhaseDone('fall')){setStatus('Complete spring development and fall camp first.');return false}
  universe.campHistory[universe.year]=JSON.parse(JSON.stringify(ds));
  const compacted=compactGameArchive();
+ const historyCompacted=compactHistoryArchive();
+ if(historyCompacted.events||historyCompacted.dropped){universe.compactionManifest??=[];const last=universe.compactionManifest.at(-1);const row=last?.at===universe.year?last:(universe.compactionManifest.push({at:universe.year,cutoff:universe.year-EVENT_DETAIL_HORIZON,games:0,dropped:0}),universe.compactionManifest.at(-1));row.events=historyCompacted.events;row.eventsDropped=historyCompacted.dropped}
  if(compacted.games&&currentArchiveState())currentArchiveState().gamesDirty=true;
  const latePool=(universe.recruits||[]).filter(r=>!r.committed),lateControlled=$('#userTeam').value,latePoolSize=latePool.length;
  universe.year++;universe.week=0;resetNilSeason();universe.recoveredWeek=-1;universe.phase='regular';universe.latest=[];universe.confChamps=[];universe.playoffFieldIds=[];universe.playoffFieldUnavailable=false;universe.academicProgression={season:universe.year,week:0,teamIds:[]};universe.champion=null;universe.lastDetailedGame=null;universe.playLogs={};rollRecruitClass();universe.recruitClassCounts={};
@@ -3403,7 +3452,10 @@ function careerChronologyHTML(p){
  for(const i of p.injuryHistory||[])rows.push({year:i.year,rank:4,kicker:'INJURY',
   main:i.type,sub:`Week ${i.week} · ${i.weeks} week${i.weeks===1?'':'s'} out`});
  if(p.draftResult)rows.push({year:p.draftResult.year,rank:5,kicker:'DRAFT',main:p.draftResult.label,sub:''});
- for(const [eventIndex,e] of (Array.isArray(universe?.events)?universe.events:[]).entries()){if(!Array.isArray(e?.playerIds)||!e.playerIds.some(id=>String(id)===String(p.id))||!['BREAKOUT','ROLE_BATTLE','COLLEGE_CAREER_ENDED'].includes(e?.metadata?.storyType))continue;const phase=String(e.metadata?.phase||'').toUpperCase(),phaseLabel=['SPRING','FALL'].includes(phase)?`${phase} CAMP · `:'';rows.push({year:e.season,rank:-1,eventWeek:Number.isFinite(e.week)?e.week:null,eventOrder:Number.isFinite(e.timestampOrder)?e.timestampOrder:null,eventIndex,kicker:`${phaseLabel}WEEK ${e.week??'—'} · ${String(e.metadata.storyType).replaceAll('_',' ')}`,main:gameEscape(e.summary||'Recorded player milestone'),sub:e.gameIds?.[0]?gameLink(e.gameIds[0],'Open game record'):''})}
+ for(const [eventIndex,e] of (Array.isArray(universe?.events)?universe.events:[]).entries()){if(!Array.isArray(e?.playerIds)||!e.playerIds.some(id=>String(id)===String(p.id))||!['BREAKOUT','ROLE_BATTLE','COLLEGE_CAREER_ENDED'].includes(e?.metadata?.storyType))continue;const phase=String(e.metadata?.phase||'').toUpperCase(),phaseLabel=['SPRING','FALL'].includes(phase)?`${phase} CAMP · `:'';rows.push({story:e.metadata.storyType,year:e.season,rank:-1,eventWeek:Number.isFinite(e.week)?e.week:null,eventOrder:Number.isFinite(e.timestampOrder)?e.timestampOrder:null,eventIndex,kicker:`${phaseLabel}WEEK ${e.week??'—'} · ${String(e.metadata.storyType).replaceAll('_',' ')}`,main:gameEscape(e.summary||'Recorded player milestone'),sub:e.gameIds?.[0]?gameLink(e.gameIds[0],'Open game record'):''})}
+ // Older seasons' career-ended stories are compacted away (compactHistoryArchive); the record itself still says it.
+ if(p.exitReason==='Eligibility exhausted'&&Number.isFinite(p.retiredYear)&&!rows.some(r=>r.story==='COLLEGE_CAREER_ENDED'))
+  rows.push({year:p.retiredYear,rank:6,kicker:'COLLEGE CAREER ENDED',main:gameEscape(`${p.name} completed his college eligibility at ${p.lastTeam||'his school'}.`),sub:''});
  if(!rows.length)return '<div class="muted">No career history recorded yet.</div>';
  return rows.sort((a,b)=>{const yearDiff=(Number(b.year)||0)-(Number(a.year)||0);if(yearDiff)return yearDiff;if(a.eventWeek!=null&&b.eventWeek!=null){const weekDiff=b.eventWeek-a.eventWeek;if(weekDiff)return weekDiff;if(a.eventOrder!=null&&b.eventOrder!=null&&a.eventOrder!==b.eventOrder)return b.eventOrder-a.eventOrder;return b.eventIndex-a.eventIndex}return a.rank-b.rank}).map(r=>
   `<div class="timeline-row"><div class="small muted">${r.year} · ${r.kicker}</div><strong>${r.main}</strong>${r.sub?`<div class="muted">${r.sub}</div>`:''}</div>`).join('');

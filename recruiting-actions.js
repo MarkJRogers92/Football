@@ -218,12 +218,16 @@ function makeRecruitingActionSystem(env){
   }else if(kind==='keep'){
    rec.keptWeek=u.week;dR=KEEP.relationship;note='He knows you are still in his corner.';
   }
+  // Staff assignments: a contact that gains interest gains more in the territory of a strong recruiter.
+  const territory=dI>0&&env.territoryBonus?env.territoryBonus(r,t)||0:0;
+  if(territory){dI+=territory;note=`${note?note+' ':''}Territory bonus from your ${r.homeRegion} recruiter.`}
   if(dI)r.interest=clamp(Math.round((r.interest||0)+dI),1,100);
   if(dR){r.relationship=clamp((r.relationship||0)+dR,0,100);if(dR>0&&env.growRecruiterRelationship)env.growRecruiterRelationship(r,t,dR)}
   const week=ensureWeek(t);week.spent+=check.cost;
-  rec.lastWorkedWeek=u.week;wk.hours+=check.cost;
+  rec.lastWorkedWeek=u.week;wk.hours+=check.cost;rec.hours=(rec.hours||0)+check.cost;
   const reveals=learn(rec,r,kind,topic);
   const answered=answerRivals(r,kind);
+  noteSpend(t,kind,check.cost,answered);
   pushHistory(rec,{week:u.week,kind,cost:check.cost,topic,dI,dR});
   return{ok:true,kind,label:LABELS[kind],cost:check.cost,remaining:hoursLeft(t),dI,dR,topic,note,reveals,answered};
  }
@@ -391,13 +395,13 @@ function makeRecruitingActionSystem(env){
   const eligible=n=>env.canTake(n)&&(n!==t.name||mayCommit(r,t));
   const order=finalists.filter(eligible).sort((a,b)=>(score(b)+noise(b))-(score(a)+noise(a)));
   for(const team of order){
-   if(env.commit(r,team)){f.decided={team,week:u.week};return{team,won:team===t.name,finalists}}
+   if(env.commit(r,team)){f.decided={team,week:u.week};return{team,won:team===t.name,finalists,listed:finalists.includes(t.name),offered:hasOffer(r,t)}}
   }
   // None of his finalists has a place for him. He takes the best program that does, which can be you
   // only if you offered.
   for(const {name} of ranked){
    if(finalists.includes(name)||!eligible(name))continue;
-   if(env.commit(r,name)){f.decided={team:name,week:u.week,fallback:true};return{team:name,won:name===t.name,finalists,fallback:true}}
+   if(env.commit(r,name)){f.decided={team:name,week:u.week,fallback:true};return{team:name,won:name===t.name,finalists,fallback:true,listed:finalists.includes(t.name),offered:hasOffer(r,t)}}
   }
   return null;
  }
@@ -451,6 +455,63 @@ function makeRecruitingActionSystem(env){
   return out.sort((a,b)=>a.decisionWeek-b.decisionWeek);
  }
 
+ // ---------- the season's ledger and the week's news ----------
+ // What the desk did over the year, kept on the program so the season review can tell it straight.
+ const LEDGER_KEEP=40;
+ function readLedger(t){const l=t?.recruitingSeason;return l&&l.year===universe().year?l:null}
+ function ledger(t){
+  const y=universe().year;
+  if(!t.recruitingSeason||t.recruitingSeason.year!==y)t.recruitingSeason={year:y,hours:0,budget:0,actions:{},won:[],lost:[],cut:[],flipped:[],rivalMoves:0,answered:0};
+  return t.recruitingSeason;
+ }
+ const who=r=>({id:r.id,name:r.name,pos:r.pos,stars:r.stars||0});
+ const keepLast=(list,x)=>{list.push(x);if(list.length>LEDGER_KEEP)list.splice(0,list.length-LEDGER_KEEP)};
+ function noteSpend(t,kind,cost,answered){const l=ledger(t);l.hours+=cost;l.actions[kind]=(l.actions[kind]||0)+1;l.answered+=answered||0}
+ // One weekly pass: what the funnel did, which commitments flipped away, how many rival moves appeared.
+ // Returns this week's entries so the news can be built from exactly what was recorded.
+ function noteWeek(t,{decided=[],cut=[],flipped=[],rivalMoves=0}={}){
+  const l=ledger(t),w=universe().week,out={won:[],lost:[],cut:[],flipped:[]};
+  l.budget+=hoursBudgetFor(t);l.rivalMoves+=rivalMoves;
+  for(const d of decided){
+   const base={...who(d.recruit),week:w};
+   if(d.won){keepLast(l.won,base);out.won.push(base)}
+   else{const x={...base,team:d.team,listed:!!d.listed,offered:!!d.offered,fallback:!!d.fallback};keepLast(l.lost,x);out.lost.push(x)}
+  }
+  for(const r of cut){
+   const f=funnelState(r),at=f?.cut?.at||'top5';
+   const x={...who(r),week:w,at,list:(f?.[at]||[]).filter(n=>n!==t.name).slice(0,5)};keepLast(l.cut,x);out.cut.push(x);
+  }
+  for(const {recruit,to} of flipped){const x={...who(recruit),week:w,team:to||null};keepLast(l.flipped,x);out.flipped.push(x)}
+  return out;
+ }
+ // Why a recruit went elsewhere, in the plainest terms the records support.
+ function lostWhy(x){
+  if(x.fallback)return'None of his finalists had room, so he took the best program that did.';
+  if(!x.listed)return'You were not on his final list.';
+  if(!x.offered)return'You were on his final list, but you never made him an offer.';
+  return`You were on his final list and he chose ${x.team}.`;
+ }
+ const starsOf=x=>'★'.repeat(x.stars||0);
+ // Hub items for the week just played. Commitments to you already have their own "COMMITMENT" item.
+ function newsItems(t){
+  const last=t?.recruitingLastWeek,u=universe();
+  if(!last||last.year!==u.year||last.week!==u.week-1||!last.funnel)return[];
+  const f=last.funnel,items=[],label=x=>`${starsOf(x)} ${x.pos} ${x.name}`.trim();
+  for(const x of f.lost||[])items.push({type:'bad-news',tab:'recruiting',recruit:x.id,kicker:'LOST',importance:46+(x.stars||0)*4,main:`${label(x)} chose ${x.team}`,sub:lostWhy(x)});
+  for(const x of f.cut||[])items.push({type:'alert',tab:'recruiting',recruit:x.id,kicker:'CUT',importance:40+(x.stars||0)*3,main:`${label(x)} cut you from his Top ${x.at==='top3'?3:5}`,sub:x.list?.length?`His list: ${x.list.join(', ')}`:'You are out for the season.'});
+  for(const x of last.flipped||[])items.push({type:'bad-news',tab:'recruiting',recruit:x.id,kicker:'FLIPPED',importance:64+(x.stars||0)*3,main:`${label(x)} flipped${x.team?` to ${x.team}`:''}`,sub:'A rival moved on a commitment. Check in on commitments from week 5.'});
+  return items;
+ }
+ // The year in one place, for the season review. Null when the desk did nothing.
+ function deskSummary(t){
+  const l=readLedger(t);if(!l||(!l.hours&&!l.won.length&&!l.lost.length&&!l.cut.length&&!l.flipped.length))return null;
+  const best=list=>list.slice().sort((a,b)=>b.stars-a.stars||a.week-b.week)[0]||null;
+  const bw=best(l.won),bl=best(l.lost);
+  return{hours:l.hours,budget:l.budget,actions:{...l.actions},won:l.won.length,lost:l.lost.length,cut:l.cut.length,flipped:l.flipped.length,
+   rivalMoves:l.rivalMoves,answered:Math.min(l.answered,l.rivalMoves),neverOffered:l.lost.filter(x=>x.listed&&!x.offered).length,
+   biggestWin:bw,biggestLoss:bl?{...bl,why:lostWhy(bl)}:null};
+ }
+
  // ---------- board status ----------
  function status(r,t){
   const rec=record(r,t,false),u=universe(),open=!r.committed;
@@ -486,7 +547,9 @@ function makeRecruitingActionSystem(env){
   // Staff do not offer a recruit who has told them they cannot clear his dealbreaker.
   // A rival's offer is worth answering sooner than an interest threshold would suggest.
   const rivalOffered=r=>liveMoves(r).some(m=>m.kind==='offer');
-  for(const r of targets){if(n>=maxOffers)break;if(!hasOffer(r,t)&&!knownBlock(r,t)&&((r.interest||0)>=STAFF_OFFER_AT||((r.interest||0)>=40&&rivalOffered(r)))&&run(r,'offer'))n++}
+  // A recruit who has put you on his list cannot choose you without an offer, and two hours is cheap for that.
+  const onHisList=r=>{const f=funnelState(r);return!!f&&!f.cut&&(f.top3||f.top5||[]).includes(t.name)};
+  for(const r of targets){if(n>=maxOffers)break;if(!hasOffer(r,t)&&!knownBlock(r,t)&&((r.interest||0)>=STAFF_OFFER_AT||((r.interest||0)>=40&&rivalOffered(r))||onHisList(r))&&run(r,'offer'))n++}
   for(const r of targets)if(!workedThisWeek(r,t))run(r,'call');
   let p=0;
   for(const r of targets){
@@ -523,7 +586,7 @@ function makeRecruitingActionSystem(env){
 
  return{COSTS,LABELS,INHOME,OFFER,hoursBudgetFor,weekInfo,ensureWeek,hoursLeft,isActive,record,weekState,workedThisWeek,
   offerLimit,offersOut,hasOffer,topicStrength,motivesFor,dealbreakerUnmet,intel,knownBlock,pitchProjection,pitchOptions,availability,perform,withdrawOffer,
-  effort,previewEffort,effortFromSince,weeksSinceWorked,mayCommit,pitchBoost,status,workload,staffPlan,isAuto,setAuto,funnelOn,decisionWeekFor,funnelState,funnelStatus,runFunnel,holds,decisionsDue,keepBoost,rivalHeat,rivalPressure,addRivalEvent,generateRivals,answerRivals,rivalMoves,liveMoves,unansweredMoves,grandfather};
+  effort,previewEffort,effortFromSince,weeksSinceWorked,mayCommit,pitchBoost,status,workload,staffPlan,isAuto,setAuto,funnelOn,decisionWeekFor,funnelState,funnelStatus,runFunnel,holds,decisionsDue,keepBoost,noteWeek,newsItems,deskSummary,rivalHeat,rivalPressure,addRivalEvent,generateRivals,answerRivals,rivalMoves,liveMoves,unansweredMoves,grandfather};
 }
 
 if(typeof module==='object'&&module.exports){
@@ -544,6 +607,7 @@ if(typeof module==='object'&&module.exports){
   rankTeams:(r,t)=>universe.teams.filter(x=>!recruitBlocked(x,r))
    .map(x=>({name:x.name,score:recruitPitch(x,r)+(x.id===t.id&&r.targeted?10+(r.relationship||0)*.12:0)})).sort((a,b)=>b.score-a.score),
   canTake:name=>canTakeCommit(name),
+  territoryBonus:(r,t)=>t?.name===$('#userTeam')?.value?globalThis.DynastyStaffAssignments?.recruitBonus(r,t)||0:0,
   commit:(r,name)=>commitRecruit(r,name),
   // The programs closest to winning him, other than yours, by the pitch they would make on their own.
   topRivals:(r,t,n)=>universe.teams.filter(x=>x.id!==t.id&&!recruitBlocked(x,r)&&canTakeCommit(x.name))
@@ -557,6 +621,9 @@ if(typeof module==='object'&&module.exports){
   const rows=recruitingActions.unansweredMoves(universe.recruits,t);
   return{count:rows.reduce((n,x)=>n+x.moves.length,0),names:rows.slice(0,3).map(x=>x.recruit.name)};
  };
+ // The week's recruiting news for the This Week list, and the year's summary for the season review.
+ globalThis.DynastyRecruitingNews=t=>t?recruitingActions.newsItems(t):[];
+ globalThis.DynastyRecruitingSeason=t=>t?recruitingActions.deskSummary(t):null;
  // Recruits who pick a school on this advance or the next.
  globalThis.DynastyRecruitingDecisions=t=>{
   if(!t||!universe?.recruits)return null;
@@ -596,14 +663,18 @@ if(typeof module==='object'&&module.exports){
   const t=selected(),playedWeek=universe.week-1;passCooled=[];
   // Cuts and decisions come due before the weekly pass, so the pass sees who has already chosen.
   const funnel=recruitingActions.runFunnel(universe.recruits,t);
+  const held=t?new Set(universe.recruits.filter(r=>r.committed===t.name).map(r=>r.id)):null;
   const out=advanceRecruitingBeforeRecruitingActions();
   if(t){
    const rivalMoves=recruitingActions.generateRivals(universe.recruits,t).length;
    // The hours ledger still describes the week just played, because the counter has already moved on.
    const w=t.recruitingWeek&&t.recruitingWeek.year===universe.year&&t.recruitingWeek.week===playedWeek?t.recruitingWeek:null;
    t.recruitingLastWeek={year:universe.year,week:playedWeek,spent:w?w.spent:0,budget:recruitingActions.hoursBudgetFor(t),cooled:passCooled.slice(0,12),cooledCount:passCooled.length,rivalMoves,
-    // What the funnel did this week, for the board and the status line.
-    funnel:{won:funnel.decided.filter(x=>x.won).map(x=>x.recruit.name).slice(0,6),lost:funnel.decided.filter(x=>!x.won).map(x=>({name:x.recruit.name,team:x.team})).slice(0,6),cut:funnel.cut.map(r=>r.name).slice(0,6)}};
+    funnel:null,flipped:[]};
+   // Your commitments that left during the pass, then everything the week did, recorded once.
+   const flipped=universe.recruits.filter(r=>held.has(r.id)&&r.committed!==t.name).map(r=>({recruit:r,to:r.committed}));
+   const week=recruitingActions.noteWeek(t,{decided:funnel.decided,cut:funnel.cut,flipped,rivalMoves});
+   t.recruitingLastWeek.funnel={won:week.won,lost:week.lost,cut:week.cut};t.recruitingLastWeek.flipped=week.flipped;
   }
   return out;
  };
@@ -776,10 +847,10 @@ if(typeof module==='object'&&module.exports){
  // What the funnel did last week: who chose you, who chose someone else, who cut you.
  function funnelLine(last){
   const f=last?.funnel;if(!f)return'';
-  const bits=[];
-  if(f.won?.length)bits.push(`${raEsc(f.won.join(', '))} committed to you`);
-  if(f.lost?.length)bits.push(`${f.lost.map(x=>`${raEsc(x.name)} chose ${raEsc(x.team)}`).join(', ')}`);
-  if(f.cut?.length)bits.push(`${raEsc(f.cut.join(', '))} cut you from his list`);
+  const bits=[],name=x=>raEsc(typeof x==='string'?x:x.name);
+  if(f.won?.length)bits.push(`${f.won.map(name).join(', ')} committed to you`);
+  if(f.lost?.length)bits.push(`${f.lost.map(x=>`${name(x)} chose ${raEsc(x.team)}`).join(', ')}`);
+  if(f.cut?.length)bits.push(`${f.cut.map(name).join(', ')} cut you from his list`);
   return bits.length?` Decisions: ${bits.join('; ')}.`:'';
  }
  function stripHTML(t){

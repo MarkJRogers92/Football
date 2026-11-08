@@ -328,3 +328,46 @@ twenty-season saves later become a problem, the growth to attack is `gameArchive
 (34.3 MB, about +3 MB per season even after compaction), not this archive.
 
 
+
+## After v0.15.0: the core save and postseason speed
+
+Measured on seed 7 with the full runtime, splitting the portable export the way
+browser and desktop saves are written: the **core** snapshot, the chunked
+`playerArchive` and the chunked `gameArchive`. The 256 MB desktop limit applies
+to the core.
+
+| Season | Core | of which events | playerArchive | gameArchive |
+|---|---|---|---|---|
+| 1 | 22.6 MB | 1.4 | 1.7 | 6.1 |
+| 4 | 37.9 MB | 7.1 | 11.4 | 20.7 |
+| 8 | 49.3 MB | 15.3 | 34.1 | 30.6 |
+| 12 | 61.9 MB | 23.0 | 54.6 | 40.8 |
+
+Events were about two thirds of the core's growth (+2 MB a season), and 80% of
+event bytes were two story types written for every player in the league:
+`COLLEGE_CAREER_ENDED` (about 2,100 a season) and `PLAYER_BREAKOUT`.
+`compactHistoryArchive` now runs at each season rollover, next to the game
+compaction, over seasons older than `EVENT_DETAIL_HORIZON` (3):
+
+- a career-ended story is dropped unless the player's school is one the coach
+  has led (the archived record keeps the same facts, and the career timeline
+  draws the line from it);
+- breakout stories keep everything a reader shows and drop metadata that only
+  repeats the summary;
+- old camp reports (written each season and never read back) drop zero deltas.
+
+Slimming alone saved 11% of event bytes, which is why the career-ended stories
+are dropped rather than slimmed. Result at season 8: events 9.7 MB (was 15.3),
+core 43.5 MB (was 49.3), core growth about 1.6 MB a season (was 3).
+
+The same run showed the postseason slowing every season (1.8 s to 8.1 s over
+twelve seasons) while the regular season stayed flat. A profile put 3.8 s of a
+6 s postseason in `v2RecordClone`: each postseason stage deep-copied the whole
+universe, archives included, as its rollback snapshot. The archives only grow
+during a stage, so the snapshot now keeps their lengths and a rollback trims
+back to them (key order preserved, so the state digest matches exactly). After
+eight seasons the postseason takes 2.8 s instead of 5.9 s.
+
+Not changed: `playerArchive` (about +5 MB a season, chunked, deferred in the
+browser) and `gameArchive` (about +2.5 MB a season after compaction). They cost
+memory and load time in long saves, not the desktop limit.

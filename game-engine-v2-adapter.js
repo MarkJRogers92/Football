@@ -84,8 +84,15 @@ function shadowDecision(state){
   if(state.fieldPosition<60&&state.distance>1)return'punt';
   return'play';
 }
+// Situational playbooks by side ({home, away}); a side without one plays the default policy.
+function attachPlaybook(state,playbook){
+  if(!playbook||typeof playbook!=='object')return state;
+  const out={};for(const side of ['home','away']){const p=GameEngineV2.sanitizePlaybook(playbook[side]);if(p)out[side]=p}
+  if(Object.keys(out).length)state.playbook=out;return state;
+}
 function simulateShadow(options={}){
-  const {state,homeInput,awayInput}=createShadowGame(options),homeFieldRating=clamp(finite(options.homeFieldRating,0),0,12);GameEngineV2.startGame(state);
+  const {state,homeInput,awayInput}=createShadowGame(options),homeFieldRating=clamp(finite(options.homeFieldRating,0),0,12);
+  attachPlaybook(state,options.playbook);GameEngineV2.startGame(state);
   let steps=0;while(state.status!=='final'){
     if(++steps>500)throw new Error('Shadow Game Engine 2 step limit exceeded.');
     if(state.period>4){
@@ -93,11 +100,11 @@ function simulateShadow(options={}){
       const outcome=profileOutcome(state,homeInput,awayInput,homeFieldRating),start=state.events.length;
       GameEngineV2.applyScrimmage(state,outcome);annotateOutcomeEvent(state,start,outcome);continue;
     }
-    const decision=shadowDecision(state);
+    const decision=GameEngineV2.playbookFourthDown(state)||shadowDecision(state);
     if(decision==='field_goal')GameEngineV2.attemptFieldGoal(state);
     else if(decision==='punt')GameEngineV2.punt(state);
     else{
-      const outcome=profileOutcome(state,homeInput,awayInput,homeFieldRating),start=state.events.length;
+      const outcome=GameEngineV2.playbookClock(state,profileOutcome(state,homeInput,awayInput,homeFieldRating)),start=state.events.length;
       GameEngineV2.applyScrimmage(state,outcome);annotateOutcomeEvent(state,start,outcome);
     }
   }
@@ -110,5 +117,5 @@ function aggregate(samples){
   for(const k of ['points','plays','yards','turnovers','overtime','homeWins'])result[k]/=result.games;
   return result;
 }
-return{profileTeam,eventSummary,createShadowGame,profileOutcome,annotateOutcomeEvent,shadowDecision,simulateShadow,aggregate};
+return{attachPlaybook,profileTeam,eventSummary,createShadowGame,profileOutcome,annotateOutcomeEvent,shadowDecision,simulateShadow,aggregate};
 });

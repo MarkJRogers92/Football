@@ -137,9 +137,57 @@ function applyScrimmage(state,outcome={}){
 
 function touchdown(state,side){
   addPoints(state,side,6,'touchdown',{});
-  const rng=rngFor(state);const made=rng.next()<.965;finishRng(state,rng);
-  if(made)addPoints(state,side,1,'extra_point',{made:true});else pushEvent(state,'extra_point',{team:side,points:0,made:false});
+  // One draw either way, so a playbook choice never shifts the rest of the game's randomness.
+  const rng=rngFor(state),roll=rng.next();finishRng(state,rng);
+  if(playbookTwoPoint(state,side)){
+    if(roll<TWO_POINT_RATE)addPoints(state,side,2,'two_point',{made:true,playbook:true});else pushEvent(state,'two_point',{team:side,points:0,made:false,playbook:true});
+  }else if(roll<.965)addPoints(state,side,1,'extra_point',{made:true});else pushEvent(state,'extra_point',{team:side,points:0,made:false});
   kickoffAfterScore(state,other(side),'post_touchdown');
+}
+
+// v0.15.1 situational playbook. A program can set how its staff call fourth downs, conversions and the late
+// clock in games it does not coach live. With no playbook on the state these return null/false and the
+// engine plays exactly as before.
+const PLAYBOOK_OPTIONS={fourthDown:['standard','conservative','aggressive'],twoPoint:['kick','chart'],clock:['standard','manage']};
+const TWO_POINT_RATE=.47,TWO_POINT_CHART=[-10,-5,-2,1,5,12],LATE_SECONDS=240;
+function playbookFor(state,side){const p=state?.playbook?.[side];return p&&typeof p==='object'?p:null}
+function marginFor(state,side){return(state.score[side]||0)-(state.score[other(side)]||0)}
+// Returns 'play', 'punt' or 'field_goal', or null to leave the call to the default policy.
+function playbookFourthDown(state){
+  if(!state||state.down!==4||state.period>4)return null;
+  const side=state.possession,p=playbookFor(state,side);if(!p||!p.fourthDown||p.fourthDown==='standard')return null;
+  const margin=marginFor(state,side),fgRange=state.fieldPosition>=58;
+  // Late and behind, a field goal only when it ties or takes the lead; otherwise keep the ball.
+  if(state.period===4&&state.clock<=LATE_SECONDS&&margin<0)return fgRange&&margin>=-3?'field_goal':'play';
+  if(p.fourthDown==='aggressive'){
+    if(state.distance<=2&&state.fieldPosition>=35)return'play';
+    if(state.distance<=4&&state.fieldPosition>=55&&state.fieldPosition<70)return'play';
+    if(state.distance<=3&&state.fieldPosition>=90)return'play';
+    return fgRange?'field_goal':'punt';
+  }
+  if(state.distance<=1&&state.fieldPosition>=60)return'play';
+  return fgRange?'field_goal':'punt';
+}
+// Go for two after a touchdown when the chart says so: second half only, by the margin after the six points.
+function playbookTwoPoint(state,side){
+  const p=playbookFor(state,side);
+  return!!(p&&p.twoPoint==='chart'&&state.period>=3&&state.period<=4&&TWO_POINT_CHART.includes(marginFor(state,side)));
+}
+// Clock: in the fourth quarter a leading offense that runs or completes a pass bleeds 6 more seconds; a trailing
+// offense in the last five minutes gets out of bounds and saves 8. Applied after the play is drawn.
+function playbookClock(state,outcome){
+  if(!state||state.period!==4||!outcome||outcome.turnover)return outcome;
+  const side=state.possession,p=playbookFor(state,side);if(!p||p.clock!=='manage')return outcome;
+  const margin=marginFor(state,side),moving=outcome.kind==='rush'||outcome.completed===true;
+  if(!moving||!Number.isFinite(outcome.clock))return outcome;
+  if(margin>0)return{...outcome,clock:Math.min(45,outcome.clock+6),playbookClock:'bleed'};
+  if(margin<0&&state.clock<=300)return{...outcome,clock:Math.max(5,outcome.clock-8),playbookClock:'hurry'};
+  return outcome;
+}
+function sanitizePlaybook(value){
+  if(!value||typeof value!=='object')return null;
+  const out={};for(const [k,opts] of Object.entries(PLAYBOOK_OPTIONS))out[k]=opts.includes(value[k])?value[k]:opts[0];
+  return out;
 }
 function attemptFieldGoal(state){
   requireStatus(state,'live');if(state.period>4)throw new Error('Use overtime resolution for overtime field goals.');
@@ -179,7 +227,7 @@ function chooseFourthDown(state){
 function step(state){
   requireStatus(state,'live');
   if(state.period>4)return stepOvertime(state);
-  const decision=chooseFourthDown(state);
+  const decision=playbookFourthDown(state)||chooseFourthDown(state);
   if(decision==='field_goal')attemptFieldGoal(state);else if(decision==='punt')punt(state);else applyScrimmage(state,generateOutcome(state));
   return state;
 }
@@ -279,5 +327,5 @@ function validateGame(state){
   return true;
 }
 
-return{ENGINE_VERSION,QUARTER_SECONDS,createGame,startGame,step,simulate,applyScrimmage,attemptFieldGoal,punt,snapshot,restore,scoringTotals,validateState,validateGame,generateOutcome};
+return{ENGINE_VERSION,QUARTER_SECONDS,PLAYBOOK_OPTIONS,TWO_POINT_CHART,playbookFourthDown,playbookTwoPoint,playbookClock,sanitizePlaybook,createGame,startGame,step,simulate,applyScrimmage,attemptFieldGoal,punt,snapshot,restore,scoringTotals,validateState,validateGame,generateOutcome};
 });

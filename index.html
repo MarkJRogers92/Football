@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.15.0</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.15.1</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -951,6 +951,76 @@ tr[hidden]{display:none!important}
 .ra-funnel .ra-warn-text,.recruiting-desk>small.ra-warn-text{color:var(--warn)}
 .ra-care{border-color:var(--good)}
 .ra-decision-badge{display:block;color:var(--muted);font-size:.68rem;overflow-wrap:anywhere}
+
+.portal-desk{display:grid;gap:10px;margin:12px 0}
+.portal-desk .section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.pd-hours{font-size:.86rem;color:var(--muted)}
+.pd-hours strong{font-size:1.2rem;color:var(--text,inherit)}
+.pd-needs,.pd-watch{margin:0;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:.84rem}
+.pd-need,.pd-tag{font-size:.7rem;border:1px solid var(--line);border-radius:999px;padding:3px 8px;white-space:nowrap}
+.pd-need small{color:var(--muted)}
+.pd-tag{border-color:var(--good);color:var(--good)}
+.pd-watch{color:var(--warn)}
+.pd-staff{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:.8rem}
+.pd-staff label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+.pd-staff input{margin:0;accent-color:var(--accent)}
+.pd-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:10px}
+.pd-card{display:grid;gap:7px;padding:11px;border:1px solid var(--line);border-radius:11px;background:var(--panel2);min-width:0}
+.pd-card--done{opacity:.8}
+.pd-card p{margin:0;font-size:.84rem;line-height:1.4}
+.pd-card-head{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.pd-field{list-style:none;margin:0;padding:0;display:grid;gap:3px}
+.pd-field li{display:grid;grid-template-columns:minmax(0,1fr) auto 3.2em;gap:8px;font-size:.8rem;align-items:baseline}
+.pd-field li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pd-field li small{color:var(--muted);text-align:right}
+.pd-field li.pd-you{font-weight:700;color:var(--accent)}
+.pd-rivals{margin:0;padding-left:18px;font-size:.8rem;color:var(--warn)}
+.pd-actions{display:flex;gap:6px;flex-wrap:wrap}
+.pd-actions button{font-size:.76rem;padding:6px 9px;white-space:nowrap}
+.pd-actions button small{opacity:.75}
+.pd-actions button:disabled{opacity:.45}
+.pd-actions button.pd-answer{border-color:var(--warn);box-shadow:0 0 0 1px var(--warn) inset}
+@media(max-width:700px){.pd-actions button{flex:1 1 auto}}
+
+.arc-story{display:grid;gap:3px;padding:10px 12px;margin:0 0 10px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:9px;background:var(--panel2)}
+.arc-story p{margin:0;line-height:1.4}
+.arc-classes{margin-top:12px}
+.arc-class-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:10px;margin-top:8px}
+.arc-class{display:grid;gap:5px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);min-width:0}
+.arc-class-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.arc-class-stats{display:flex;gap:12px;flex-wrap:wrap;font-size:.82rem}
+.arc-grade{font-weight:800;border-radius:7px;padding:2px 9px;border:1px solid var(--line)}
+.arc-grade--A,.arc-grade--B{color:var(--good);border-color:var(--good)}
+.arc-grade--D,.arc-grade--F{color:var(--warn);border-color:var(--warn)}
+
+.staff-assignments{margin-top:12px}
+.staff-assignments .section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.sa-row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:9px 0;border-top:1px solid var(--line)}
+.sa-row>div:first-child{min-width:0;flex:1 1 260px;display:grid;gap:2px}
+.sa-controls{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.sa-controls select{font-size:.78rem;padding:5px;max-width:220px}
+.sa-vacated{color:var(--warn)}
+@media(max-width:700px){.sa-controls{width:100%}.sa-controls select{flex:1 1 140px;max-width:none}}
+
+.situational-playbook{display:grid;gap:8px}
+.situational-playbook>p{margin:0}
+.pb-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--line)}
+.pb-row>span{display:grid;gap:2px;min-width:0;flex:1 1 260px}
+.pb-row small{color:var(--muted);line-height:1.35}
+.pb-row select{font-size:.8rem;padding:6px;min-width:170px}
+@media(max-width:700px){.pb-row select{width:100%}}
+
+.tour-layer{position:fixed;inset:0;z-index:9000;pointer-events:none}
+.tour-spot{position:fixed;border-radius:12px;box-shadow:0 0 0 9999px rgba(4,8,16,.62);outline:2px solid var(--accent);transition:top .18s,left .18s,width .18s,height .18s}
+.tour-card{position:fixed;pointer-events:auto;width:min(380px,calc(100vw - 24px));display:grid;gap:8px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--panel);box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.tour-card h3{margin:0}
+.tour-card p{margin:0;line-height:1.45;font-size:.9rem}
+.tour-actions{display:flex;gap:6px;align-items:center}
+.tour-actions span{flex:1}
+.tour-offer{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;border-left:3px solid var(--accent)}
+.tour-offer>div:first-child{display:grid;gap:2px;min-width:0;flex:1 1 240px}
+.tour-offer-actions{display:flex;gap:6px;flex-wrap:wrap}
+@media (prefers-reduced-motion:reduce){.tour-spot{transition:none}}
 
 .development-plan-board{grid-column:1/-1;margin-top:10px;border-top:1px solid var(--line);padding-top:10px}.development-plan-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:5px}.development-plan-head>div{display:flex;flex-direction:column}.development-plan-head small,.development-plan-head>span{color:var(--muted);font-size:11px}.development-plan-attribution{max-width:90ch;margin:4px 0 8px;color:var(--muted);font-size:11px;line-height:1.4}.development-plan-row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}.development-plan-player{display:flex;flex-direction:column;gap:3px;min-width:0}.development-plan-player>span{font-size:12px;color:var(--muted)}.development-plan-player .development-plan-outcome{color:var(--text)}.development-plan-outcome.good b{color:var(--good)}.development-plan-outcome.bad b{color:var(--bad)}.development-plan-outcome.mixed b{color:var(--warn)}.development-plan-support{max-width:80ch}.development-plan-coaching{margin-top:2px;font-size:11px;color:var(--muted)}.development-plan-coaching summary{cursor:pointer;color:var(--accent)}.development-plan-coaching p{max-width:72ch;margin:5px 0}.development-plan-coach-rows{max-width:80ch;line-height:1.45}.development-plan-row button{flex:0 0 auto}.development-feature-btn{display:block;margin-top:6px;padding:5px 8px;font-size:11px}.development-feature-btn.active{border-color:var(--good);color:var(--good)}@media(max-width:640px){.development-plan-row{gap:7px}.development-plan-player>span{line-height:1.4}.development-plan-support{font-size:11px}.development-plan-coaching{max-width:100%;overflow-wrap:anywhere}}
 .development-coaching-support{margin-top:12px;padding:10px;border:1px solid var(--line);border-radius:8px}.development-coaching-support>strong{display:block}.development-coaching-support>p{margin:5px 0 8px;color:var(--muted);font-size:12px;line-height:1.45}.development-coach-row{display:grid;grid-template-columns:minmax(120px,.7fr) minmax(0,1.3fr);gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:11px}.development-coach-row span{color:var(--muted)}@media(max-width:640px){.development-coach-row{grid-template-columns:1fr;gap:2px}}
@@ -3208,7 +3278,7 @@ button.lw-follow[aria-pressed="true"]{color:var(--text);border-color:var(--team-
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.15.0</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.15.1</b></span></footer>
   </div>
 </section>
 
@@ -3235,7 +3305,7 @@ button.lw-follow[aria-pressed="true"]{color:var(--text);border-color:var(--team-
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.15.0</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.15.1</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -4735,9 +4805,57 @@ function applyScrimmage(state,outcome={}){
 
 function touchdown(state,side){
   addPoints(state,side,6,'touchdown',{});
-  const rng=rngFor(state);const made=rng.next()<.965;finishRng(state,rng);
-  if(made)addPoints(state,side,1,'extra_point',{made:true});else pushEvent(state,'extra_point',{team:side,points:0,made:false});
+  // One draw either way, so a playbook choice never shifts the rest of the game's randomness.
+  const rng=rngFor(state),roll=rng.next();finishRng(state,rng);
+  if(playbookTwoPoint(state,side)){
+    if(roll<TWO_POINT_RATE)addPoints(state,side,2,'two_point',{made:true,playbook:true});else pushEvent(state,'two_point',{team:side,points:0,made:false,playbook:true});
+  }else if(roll<.965)addPoints(state,side,1,'extra_point',{made:true});else pushEvent(state,'extra_point',{team:side,points:0,made:false});
   kickoffAfterScore(state,other(side),'post_touchdown');
+}
+
+// v0.15.1 situational playbook. A program can set how its staff call fourth downs, conversions and the late
+// clock in games it does not coach live. With no playbook on the state these return null/false and the
+// engine plays exactly as before.
+const PLAYBOOK_OPTIONS={fourthDown:['standard','conservative','aggressive'],twoPoint:['kick','chart'],clock:['standard','manage']};
+const TWO_POINT_RATE=.47,TWO_POINT_CHART=[-10,-5,-2,1,5,12],LATE_SECONDS=240;
+function playbookFor(state,side){const p=state?.playbook?.[side];return p&&typeof p==='object'?p:null}
+function marginFor(state,side){return(state.score[side]||0)-(state.score[other(side)]||0)}
+// Returns 'play', 'punt' or 'field_goal', or null to leave the call to the default policy.
+function playbookFourthDown(state){
+  if(!state||state.down!==4||state.period>4)return null;
+  const side=state.possession,p=playbookFor(state,side);if(!p||!p.fourthDown||p.fourthDown==='standard')return null;
+  const margin=marginFor(state,side),fgRange=state.fieldPosition>=58;
+  // Late and behind, a field goal only when it ties or takes the lead; otherwise keep the ball.
+  if(state.period===4&&state.clock<=LATE_SECONDS&&margin<0)return fgRange&&margin>=-3?'field_goal':'play';
+  if(p.fourthDown==='aggressive'){
+    if(state.distance<=2&&state.fieldPosition>=35)return'play';
+    if(state.distance<=4&&state.fieldPosition>=55&&state.fieldPosition<70)return'play';
+    if(state.distance<=3&&state.fieldPosition>=90)return'play';
+    return fgRange?'field_goal':'punt';
+  }
+  if(state.distance<=1&&state.fieldPosition>=60)return'play';
+  return fgRange?'field_goal':'punt';
+}
+// Go for two after a touchdown when the chart says so: second half only, by the margin after the six points.
+function playbookTwoPoint(state,side){
+  const p=playbookFor(state,side);
+  return!!(p&&p.twoPoint==='chart'&&state.period>=3&&state.period<=4&&TWO_POINT_CHART.includes(marginFor(state,side)));
+}
+// Clock: in the fourth quarter a leading offense that runs or completes a pass bleeds 6 more seconds; a trailing
+// offense in the last five minutes gets out of bounds and saves 8. Applied after the play is drawn.
+function playbookClock(state,outcome){
+  if(!state||state.period!==4||!outcome||outcome.turnover)return outcome;
+  const side=state.possession,p=playbookFor(state,side);if(!p||p.clock!=='manage')return outcome;
+  const margin=marginFor(state,side),moving=outcome.kind==='rush'||outcome.completed===true;
+  if(!moving||!Number.isFinite(outcome.clock))return outcome;
+  if(margin>0)return{...outcome,clock:Math.min(45,outcome.clock+6),playbookClock:'bleed'};
+  if(margin<0&&state.clock<=300)return{...outcome,clock:Math.max(5,outcome.clock-8),playbookClock:'hurry'};
+  return outcome;
+}
+function sanitizePlaybook(value){
+  if(!value||typeof value!=='object')return null;
+  const out={};for(const [k,opts] of Object.entries(PLAYBOOK_OPTIONS))out[k]=opts.includes(value[k])?value[k]:opts[0];
+  return out;
 }
 function attemptFieldGoal(state){
   requireStatus(state,'live');if(state.period>4)throw new Error('Use overtime resolution for overtime field goals.');
@@ -4777,7 +4895,7 @@ function chooseFourthDown(state){
 function step(state){
   requireStatus(state,'live');
   if(state.period>4)return stepOvertime(state);
-  const decision=chooseFourthDown(state);
+  const decision=playbookFourthDown(state)||chooseFourthDown(state);
   if(decision==='field_goal')attemptFieldGoal(state);else if(decision==='punt')punt(state);else applyScrimmage(state,generateOutcome(state));
   return state;
 }
@@ -4877,7 +4995,7 @@ function validateGame(state){
   return true;
 }
 
-return{ENGINE_VERSION,QUARTER_SECONDS,createGame,startGame,step,simulate,applyScrimmage,attemptFieldGoal,punt,snapshot,restore,scoringTotals,validateState,validateGame,generateOutcome};
+return{ENGINE_VERSION,QUARTER_SECONDS,PLAYBOOK_OPTIONS,TWO_POINT_CHART,playbookFourthDown,playbookTwoPoint,playbookClock,sanitizePlaybook,createGame,startGame,step,simulate,applyScrimmage,attemptFieldGoal,punt,snapshot,restore,scoringTotals,validateState,validateGame,generateOutcome};
 });
 (function(root,factory){
   const engine=(typeof module==='object'&&module.exports)?require('./game-engine-v2.js'):root.DynastyGameEngineV2;
@@ -5094,8 +5212,15 @@ function shadowDecision(state){
   if(state.fieldPosition<60&&state.distance>1)return'punt';
   return'play';
 }
+// Situational playbooks by side ({home, away}); a side without one plays the default policy.
+function attachPlaybook(state,playbook){
+  if(!playbook||typeof playbook!=='object')return state;
+  const out={};for(const side of ['home','away']){const p=GameEngineV2.sanitizePlaybook(playbook[side]);if(p)out[side]=p}
+  if(Object.keys(out).length)state.playbook=out;return state;
+}
 function simulateShadow(options={}){
-  const {state,homeInput,awayInput}=createShadowGame(options),homeFieldRating=clamp(finite(options.homeFieldRating,0),0,12);GameEngineV2.startGame(state);
+  const {state,homeInput,awayInput}=createShadowGame(options),homeFieldRating=clamp(finite(options.homeFieldRating,0),0,12);
+  attachPlaybook(state,options.playbook);GameEngineV2.startGame(state);
   let steps=0;while(state.status!=='final'){
     if(++steps>500)throw new Error('Shadow Game Engine 2 step limit exceeded.');
     if(state.period>4){
@@ -5103,11 +5228,11 @@ function simulateShadow(options={}){
       const outcome=profileOutcome(state,homeInput,awayInput,homeFieldRating),start=state.events.length;
       GameEngineV2.applyScrimmage(state,outcome);annotateOutcomeEvent(state,start,outcome);continue;
     }
-    const decision=shadowDecision(state);
+    const decision=GameEngineV2.playbookFourthDown(state)||shadowDecision(state);
     if(decision==='field_goal')GameEngineV2.attemptFieldGoal(state);
     else if(decision==='punt')GameEngineV2.punt(state);
     else{
-      const outcome=profileOutcome(state,homeInput,awayInput,homeFieldRating),start=state.events.length;
+      const outcome=GameEngineV2.playbookClock(state,profileOutcome(state,homeInput,awayInput,homeFieldRating)),start=state.events.length;
       GameEngineV2.applyScrimmage(state,outcome);annotateOutcomeEvent(state,start,outcome);
     }
   }
@@ -5120,7 +5245,7 @@ function aggregate(samples){
   for(const k of ['points','plays','yards','turnovers','overtime','homeWins'])result[k]/=result.games;
   return result;
 }
-return{profileTeam,eventSummary,createShadowGame,profileOutcome,annotateOutcomeEvent,shadowDecision,simulateShadow,aggregate};
+return{attachPlaybook,profileTeam,eventSummary,createShadowGame,profileOutcome,annotateOutcomeEvent,shadowDecision,simulateShadow,aggregate};
 });
 
 (function(root,factory){
@@ -5165,8 +5290,11 @@ function validateSession(session){
   if(session.pendingConversion&& !['home','away'].includes(session.pendingConversion.side))throw new Error('Invalid pending touchdown conversion.');
   engine.validateState(session.state);return true
 }
+// The staff's call follows the program's situational playbook when it has one (v0.15.1), else the default policy.
+function staffFourthDown(state){return engine.playbookFourthDown(state)||adapter.shadowDecision(state)}
+function staffConversion(session){const p=session.pendingConversion;return p&&engine.playbookTwoPoint(session.state,p.side)?'two_point':'extra_point'}
 function createSession(options={}){
-  const made=adapter.createShadowGame(options),homeFieldRating=clamp(finite(options.homeFieldRating,0),0,12),controlledSide=controlledSideFor(options,made);
+  const made=adapter.createShadowGame(options);adapter.attachPlaybook(made.state,options.playbook);const homeFieldRating=clamp(finite(options.homeFieldRating,0),0,12),controlledSide=controlledSideFor(options,made);
   const session={
     version:VERSION,status:'pregame',gameId:String(options.gameId??made.state.gameId),seed:String(options.seed??made.state.seed),
     state:made.state,inputs:{home:made.homeInput,away:made.awayInput},homeFieldRating,controlledSide,
@@ -5241,12 +5369,12 @@ function executeAction(session,action,state){
   const normalized=normalizeFourth(action);if(normalized==='field_goal')engine.attemptFieldGoal(state);else if(normalized==='punt')engine.punt(state);else if(normalized==='go')playOutcome(session,state);else throw new Error(`Unknown Game Day action: ${action}`)
 }
 function stepSession(session,state){
-  if(session.pendingConversion){resolvePendingConversion(session,'extra_point');return}
+  if(session.pendingConversion){resolvePendingConversion(session,staffConversion(session));return}
   if(state.period>4){if(state.ot?.period>=3||(state.down===4&&state.fieldPosition>=55)){engine.step(state);return}playOutcome(session,state);return}
-  if(state.down===4){if(isControlled(session,state.possession))throw new Error('Game Day runner attempted to step through an unresolved fourth-down decision.');executeAction(session,adapter.shadowDecision(state),state);return}
+  if(state.down===4){if(isControlled(session,state.possession))throw new Error('Game Day runner attempted to step through an unresolved fourth-down decision.');executeAction(session,staffFourthDown(state),state);return}
   playOutcome(session,state)
 }
-function hooks(session){return{policyId:POLICY_ID,defaultAction:state=>adapter.shadowDecision(state),executeAction:(action,state)=>executeAction(session,action,state),step:state=>stepSession(session,state)}}
+function hooks(session){return{policyId:POLICY_ID,defaultAction:state=>staffFourthDown(state),executeAction:(action,state)=>executeAction(session,action,state),step:state=>stepSession(session,state)}}
 function nextDecisionId(state){if(!Number.isInteger(state.coachingDecisionCounter)||state.coachingDecisionCounter<0)state.coachingDecisionCounter=0;return`GD-${state.gameId}-${++state.coachingDecisionCounter}`}
 function conversionWindow(session){
   const state=session.state,p=session.pendingConversion;if(!p||state.status!=='live'||state.period!==4||state.clock>600||!isControlled(session,p.side))return false;
@@ -5255,7 +5383,7 @@ function conversionWindow(session){
 function createConversionDecision(session){
   if(!conversionWindow(session))return null;if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);
   const state=session.state,side=session.pendingConversion.side,team=state[side]?.name||session.names[side],mine=state.score[side],theirs=state.score[other(side)],min=Math.floor(state.clock/60),sec=String(state.clock%60).padStart(2,'0');
-  const decision={id:nextDecisionId(state),type:'two_point_decision',policyId:CONVERSION_POLICY_ID,team:side,teamId:state[side]?.id??null,contextKey:`conversion:${state.period}:${state.clock}:${side}:${mine}:${theirs}`,situation:`Q4 ${min}:${sec} · TOUCHDOWN ${team} · ${mine}–${theirs}`,context:{period:state.period,clock:state.clock,possession:side,fieldPosition:100,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},options:[{id:'extra_point',label:'Kick PAT'},{id:'two_point',label:'Go for two'},{id:'delegate',label:'Delegate to staff'}],staffRecommendation:'extra_point',defaultOption:'extra_point',createdAfterEventSeq:state.events?.length||0};
+  const decision={id:nextDecisionId(state),type:'two_point_decision',policyId:CONVERSION_POLICY_ID,team:side,teamId:state[side]?.id??null,contextKey:`conversion:${state.period}:${state.clock}:${side}:${mine}:${theirs}`,situation:`Q4 ${min}:${sec} · TOUCHDOWN ${team} · ${mine}–${theirs}`,context:{period:state.period,clock:state.clock,possession:side,fieldPosition:100,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},options:[{id:'extra_point',label:'Kick PAT'},{id:'two_point',label:'Go for two'},{id:'delegate',label:'Delegate to staff'}],staffRecommendation:staffConversion(session),defaultOption:staffConversion(session),createdAfterEventSeq:state.events?.length||0};
   session.pendingStrategyDecision=decision;return clone(decision)
 }
 function halftimeWindow(session){
@@ -5279,7 +5407,7 @@ function createTempoDecision(session){
 function appendStrategyReceipt(session,decision,selectedOption,resolvedAction){const state=session.state,event={seq:(state.events?.length||0)+1,type:'coaching_decision',decisionId:decision.id,decisionType:decision.type,policyId:decision.policyId,team:decision.team,selectedOption,resolvedAction,staffRecommendation:decision.staffRecommendation,situation:decision.situation,state:eventState(state)};state.events.push(event);return event}
 function currentDecision(session){
   if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);const state=session.state;
-  if(session.pendingConversion){const conversion=createConversionDecision(session);if(conversion)return conversion;resolvePendingConversion(session,'extra_point');if(state.status==='final')return null}
+  if(session.pendingConversion){const conversion=createConversionDecision(session);if(conversion)return conversion;resolvePendingConversion(session,staffConversion(session));if(state.status==='final')return null}
   const existing=decisions.pendingDecision(state);if(existing){if(isControlled(session,existing.team))return clone(existing);state.pendingCoachingDecision=null}
   if(state.status==='live'&&state.period<=4&&state.down===4&&state.possession&&isControlled(session,state.possession))return decisions.ensureDecision(state,hooks(session));
   return createHalftimeDecision(session)||createTempoDecision(session)
@@ -6360,7 +6488,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.15.0';
+const APP_VERSION='0.15.1';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi'];
@@ -8780,7 +8908,7 @@ function applyGameplanDecision(t,option){
  }
  return true;
 }
-function buildWeeklyHub(beforeRank=selected()?.rank||null){const u=selected(),items=[...pulledOfferHubItems(u),...coachOpeningHubItems(u),...coachFalloutHubItems(u),...promiseHubItems(u),...recordChaseHubItems(u),...rivalryHubItems(u),...adminHubItems(u),...careerHubItems(u),...(typeof milestoneHubItems==='function'?milestoneHubItems(u):[]),...bowlHubItems(u),...signingDayHubItems(),...academicHubItems(u),...coachTreeHubItems(u),...newsHeadlineHubItem(u)],res=userWeekResult(u);if(res)items.push({type:res.win?'good-news':'bad-news',tab:'season',kicker:'FINAL',importance:res.win?50:60,gameId:res.gameId,main:`${res.win?'Win':'Loss'} ${res.userPts}–${res.oppPts} ${res.loc} ${res.opp}`,sub:res.label?`${res.label} · ${u.w}-${u.l} overall`:`${u.w}-${u.l} overall · ${u.cw}-${u.cl} conference`});if(beforeRank&&u.rank!==beforeRank)items.push({type:u.rank<beforeRank?'good-news':'alert',tab:'season',kicker:'RANKINGS',importance:45,main:`${u.rank<beforeRank?'Up':'Down'} to #${u.rank}`,sub:`Previous ranking: #${beforeRank}`});let inj=u.roster.filter(p=>(p.injuryHistory||[]).some(x=>x.year===universe.year&&x.week===universe.week)).slice(0,2);for(const p of inj)items.push({type:'bad-news',tab:'roster',player:p.id,kicker:'MEDICAL',importance:55,main:`${p.name}: ${p.injury}`,sub:`Expected absence: ${p.injuryWeeks} week${p.injuryWeeks===1?'':'s'}`});let commits=universe.recruits.filter(r=>r.committed===u.name&&r.commitWeek===universe.week).slice(0,3);for(const r of commits)items.push({type:'good-news',tab:'recruiting',recruit:r.id,kicker:'COMMITMENT',importance:40+r.stars*3,main:`${'★'.repeat(r.stars)} ${r.pos} ${r.name}`,sub:`#${r.nationalRank} nationally · ${r.homeCity}, ${r.homeState}`});let next=findUserGame();if(next){let opp=T(next.home===u.name?next.away:next.home);items.push({type:'action',tab:'gamelab',kicker:'NEXT UP',importance:48,main:`Week ${universe.week+1}: ${next.home===u.name?'vs':'@'} ${opp.name}`,sub:`${opp.w}-${opp.l} · #${opp.rank<=25?opp.rank:'—'} · ${opp.offScheme}`})}let risk=u.roster.map(p=>({p,r:transferRisk(p)})).sort((a,b)=>b.r-a.r)[0];if(risk?.r>=42)items.push({type:'alert',tab:'roster',player:risk.p.id,kicker:'LOCKER ROOM',importance:Math.min(80,Math.round(risk.r)),main:`${risk.p.name} transfer risk: ${Math.round(risk.r)}`,sub:`${risk.p.role} · morale ${risk.p.morale}`});for(const e of (universe.decommitLog||[]).filter(e=>e.year===universe.year&&e.week===universe.week&&(e.from===u.name||e.to===u.name)).slice(0,3))items.push(e.from===u.name?{type:'bad-news',tab:'recruiting',recruit:e.id,kicker:'DECOMMIT',importance:50+e.stars*3,main:`${'★'.repeat(e.stars)} ${e.pos} ${e.name}`,sub:e.to?`Flipped to ${e.to}`:'Reopened his recruitment'}:{type:'good-news',tab:'recruiting',recruit:e.id,kicker:'FLIP',importance:45+e.stars*3,main:`${'★'.repeat(e.stars)} ${e.pos} ${e.name}`,sub:`Flipped from ${e.from}`});let waver=universe.recruits.filter(r=>r.committed===u.name&&r.challenger&&r.pressure>0).sort((a,b)=>b.pressure-a.pressure)[0];if(waver)items.push({type:'alert',tab:'recruiting',recruit:waver.id,kicker:'WAVERING',importance:52,main:`${waver.name} hearing from ${waver.challenger}`,sub:`${'★'.repeat(waver.stars)} ${waver.pos} commit · target, visit or promise to hold him`});let hot=universe.recruits.filter(r=>r.targeted&&!r.committed).sort((a,b)=>b.interest-a.interest)[0];if(hot)items.push({type:'action',tab:'recruiting',recruit:hot.id,kicker:'TOP TARGET',importance:35,main:`${hot.name} · ${hot.interest}%`,sub:`#${hot.nationalRank} ${hot.pos} · ${hot.trend>0?'↑ '+hot.trend:hot.trend<0?'↓ '+Math.abs(hot.trend):'steady'}`});universe.weeklyHub=items.sort((a,b)=>(b.importance??40)-(a.importance??40)).slice(0,9)}
+function buildWeeklyHub(beforeRank=selected()?.rank||null){const u=selected(),items=[...pulledOfferHubItems(u),...coachOpeningHubItems(u),...coachFalloutHubItems(u),...promiseHubItems(u),...recordChaseHubItems(u),...rivalryHubItems(u),...adminHubItems(u),...careerHubItems(u),...(typeof milestoneHubItems==='function'?milestoneHubItems(u):[]),...bowlHubItems(u),...signingDayHubItems(),...(globalThis.DynastyRecruitingNews?.(u)||[]),...(globalThis.DynastyPlayerArcNews?.(u)||[]),...(globalThis.DynastyStaffAssignmentNews?.(u)||[]),...academicHubItems(u),...coachTreeHubItems(u),...newsHeadlineHubItem(u)],res=userWeekResult(u);if(res)items.push({type:res.win?'good-news':'bad-news',tab:'season',kicker:'FINAL',importance:res.win?50:60,gameId:res.gameId,main:`${res.win?'Win':'Loss'} ${res.userPts}–${res.oppPts} ${res.loc} ${res.opp}`,sub:res.label?`${res.label} · ${u.w}-${u.l} overall`:`${u.w}-${u.l} overall · ${u.cw}-${u.cl} conference`});if(beforeRank&&u.rank!==beforeRank)items.push({type:u.rank<beforeRank?'good-news':'alert',tab:'season',kicker:'RANKINGS',importance:45,main:`${u.rank<beforeRank?'Up':'Down'} to #${u.rank}`,sub:`Previous ranking: #${beforeRank}`});let inj=u.roster.filter(p=>(p.injuryHistory||[]).some(x=>x.year===universe.year&&x.week===universe.week)).slice(0,2);for(const p of inj)items.push({type:'bad-news',tab:'roster',player:p.id,kicker:'MEDICAL',importance:55,main:`${p.name}: ${p.injury}`,sub:`Expected absence: ${p.injuryWeeks} week${p.injuryWeeks===1?'':'s'}`});let commits=universe.recruits.filter(r=>r.committed===u.name&&r.commitWeek===universe.week).slice(0,3);for(const r of commits)items.push({type:'good-news',tab:'recruiting',recruit:r.id,kicker:'COMMITMENT',importance:40+r.stars*3,main:`${'★'.repeat(r.stars)} ${r.pos} ${r.name}`,sub:`#${r.nationalRank} nationally · ${r.homeCity}, ${r.homeState}`});let next=findUserGame();if(next){let opp=T(next.home===u.name?next.away:next.home);items.push({type:'action',tab:'gamelab',kicker:'NEXT UP',importance:48,main:`Week ${universe.week+1}: ${next.home===u.name?'vs':'@'} ${opp.name}`,sub:`${opp.w}-${opp.l} · #${opp.rank<=25?opp.rank:'—'} · ${opp.offScheme}`})}let risk=u.roster.map(p=>({p,r:transferRisk(p)})).sort((a,b)=>b.r-a.r)[0];if(risk?.r>=42)items.push({type:'alert',tab:'roster',player:risk.p.id,kicker:'LOCKER ROOM',importance:Math.min(80,Math.round(risk.r)),main:`${risk.p.name} transfer risk: ${Math.round(risk.r)}`,sub:`${risk.p.role} · morale ${risk.p.morale}`});for(const e of (universe.decommitLog||[]).filter(e=>e.year===universe.year&&e.week===universe.week&&(e.from===u.name||e.to===u.name)).slice(0,3))items.push(e.from===u.name?{type:'bad-news',tab:'recruiting',recruit:e.id,kicker:'DECOMMIT',importance:50+e.stars*3,main:`${'★'.repeat(e.stars)} ${e.pos} ${e.name}`,sub:e.to?`Flipped to ${e.to}`:'Reopened his recruitment'}:{type:'good-news',tab:'recruiting',recruit:e.id,kicker:'FLIP',importance:45+e.stars*3,main:`${'★'.repeat(e.stars)} ${e.pos} ${e.name}`,sub:`Flipped from ${e.from}`});let waver=universe.recruits.filter(r=>r.committed===u.name&&r.challenger&&r.pressure>0).sort((a,b)=>b.pressure-a.pressure)[0];if(waver)items.push({type:'alert',tab:'recruiting',recruit:waver.id,kicker:'WAVERING',importance:52,main:`${waver.name} hearing from ${waver.challenger}`,sub:`${'★'.repeat(waver.stars)} ${waver.pos} commit · target, visit or promise to hold him`});let hot=universe.recruits.filter(r=>r.targeted&&!r.committed).sort((a,b)=>b.interest-a.interest)[0];if(hot)items.push({type:'action',tab:'recruiting',recruit:hot.id,kicker:'TOP TARGET',importance:35,main:`${hot.name} · ${hot.interest}%`,sub:`#${hot.nationalRank} ${hot.pos} · ${hot.trend>0?'↑ '+hot.trend:hot.trend<0?'↓ '+Math.abs(hot.trend):'steady'}`});universe.weeklyHub=items.sort((a,b)=>(b.importance??40)-(a.importance??40)).slice(0,9)}
 
 const GUIDANCE_STATE_VERSION=1,GUIDANCE_FAMILIARITY_MAX=3,GUIDANCE_RETURN_AFTER_MS=15*60*1000;
 const GUIDANCE_CATEGORIES=new Set(['career','coach_desk','game_plan','roster_management','staffing','recruiting','monitoring']);
@@ -9391,11 +9519,60 @@ function repairRosterShape(t,receipt){
   const added=generateFreshman(t,need);t.roster.push(added);recordRosterMove(t,added,'walkOns',receipt);
  }
 }
+// v0.15.1 — events are the one part of the core save that grows without limit (about 2 MB a season, 80% of it two
+// story types written for every player in the league). Past the horizon those stories keep everything a reader
+// shows (id, season, week, type, school, player, game, story id and summary) and drop metadata that only repeats
+// the summary or the player record. The camp report kept for each season is never read back; past the horizon it
+// keeps the rows and drops the zero deltas.
+const EVENT_DETAIL_HORIZON=3,SLIM_EVENT_TYPES=new Set(['COLLEGE_CAREER_ENDED','PLAYER_BREAKOUT']);
+function slimEvent(e){
+ if(!e||e.slim||!SLIM_EVENT_TYPES.has(e.type)||!e.metadata)return false;
+ const keep={storyType:e.metadata.storyType};if(e.metadata.phase!=null)keep.phase=e.metadata.phase;
+ if(e.storyId==null&&e.metadata.storyId!=null)e.storyId=e.metadata.storyId;
+ e.metadata=keep;e.slim=true;return true;
+}
+function slimCampReport(rows){
+ let n=0;
+ for(const r of Array.isArray(rows)?rows:[]){
+  if(!r||typeof r!=='object')continue;
+  for(const [k,v] of Object.entries(r)){
+   if(v===0){delete r[k];n++}
+   else if(v&&typeof v==='object'&&!Array.isArray(v)){for(const [a,x] of Object.entries(v))if(x===0){delete v[a];n++}}
+  }
+ }
+ return n;
+}
+function compactHistoryArchive({horizon=EVENT_DETAIL_HORIZON}={}){
+ const cutoff=universe.year-horizon;let events=0,dropped=0,camps=0;
+ // A finished career is already on the archived record (name, last team, exit reason, year), and the career
+ // timeline draws the line from there when the event is gone. Programs the coach has led keep theirs, so the
+ // school's story history stays whole wherever the coach has been.
+ const led=new Set([$('#userTeam')?.value,universe.tenure?.school,...(universe.careerHistory||[]).map(x=>x.school)].filter(Boolean));
+ const ledIds=new Set(universe.teams.filter(t=>led.has(t.name)).map(t=>t.id));
+ if(Array.isArray(universe.events)){
+  const kept=[];
+  for(const e of universe.events){
+   if((e?.season??universe.year)<=cutoff){
+    if(e?.type==='COLLEGE_CAREER_ENDED'&&!(e.schoolIds||[]).some(id=>ledIds.has(id))){dropped++;continue}
+    if(slimEvent(e))events++;
+   }
+   kept.push(e);
+  }
+  if(dropped)universe.events=kept;
+ }
+ for(const [year,ds] of Object.entries(universe.campHistory||{})){
+  if(Number(year)>cutoff||!ds||ds.slim)continue;
+  slimCampReport(ds.springReport);slimCampReport(ds.fallReport);ds.slim=true;camps++;
+ }
+ return {events,dropped,camps};
+}
 function offseasonPreseason(){
  const os=normalizeOffseasonState(),ds=ensureDevelopmentState();
  if(!offseasonPhaseDone('spring')||!offseasonPhaseDone('fall')){setStatus('Complete spring development and fall camp first.');return false}
  universe.campHistory[universe.year]=JSON.parse(JSON.stringify(ds));
  const compacted=compactGameArchive();
+ const historyCompacted=compactHistoryArchive();
+ if(historyCompacted.events||historyCompacted.dropped){universe.compactionManifest??=[];const last=universe.compactionManifest.at(-1);const row=last?.at===universe.year?last:(universe.compactionManifest.push({at:universe.year,cutoff:universe.year-EVENT_DETAIL_HORIZON,games:0,dropped:0}),universe.compactionManifest.at(-1));row.events=historyCompacted.events;row.eventsDropped=historyCompacted.dropped}
  if(compacted.games&&currentArchiveState())currentArchiveState().gamesDirty=true;
  const latePool=(universe.recruits||[]).filter(r=>!r.committed),lateControlled=$('#userTeam').value,latePoolSize=latePool.length;
  universe.year++;universe.week=0;resetNilSeason();universe.recoveredWeek=-1;universe.phase='regular';universe.latest=[];universe.confChamps=[];universe.playoffFieldIds=[];universe.playoffFieldUnavailable=false;universe.academicProgression={season:universe.year,week:0,teamIds:[]};universe.champion=null;universe.lastDetailedGame=null;universe.playLogs={};rollRecruitClass();universe.recruitClassCounts={};
@@ -9761,7 +9938,10 @@ function careerChronologyHTML(p){
  for(const i of p.injuryHistory||[])rows.push({year:i.year,rank:4,kicker:'INJURY',
   main:i.type,sub:`Week ${i.week} · ${i.weeks} week${i.weeks===1?'':'s'} out`});
  if(p.draftResult)rows.push({year:p.draftResult.year,rank:5,kicker:'DRAFT',main:p.draftResult.label,sub:''});
- for(const [eventIndex,e] of (Array.isArray(universe?.events)?universe.events:[]).entries()){if(!Array.isArray(e?.playerIds)||!e.playerIds.some(id=>String(id)===String(p.id))||!['BREAKOUT','ROLE_BATTLE','COLLEGE_CAREER_ENDED'].includes(e?.metadata?.storyType))continue;const phase=String(e.metadata?.phase||'').toUpperCase(),phaseLabel=['SPRING','FALL'].includes(phase)?`${phase} CAMP · `:'';rows.push({year:e.season,rank:-1,eventWeek:Number.isFinite(e.week)?e.week:null,eventOrder:Number.isFinite(e.timestampOrder)?e.timestampOrder:null,eventIndex,kicker:`${phaseLabel}WEEK ${e.week??'—'} · ${String(e.metadata.storyType).replaceAll('_',' ')}`,main:gameEscape(e.summary||'Recorded player milestone'),sub:e.gameIds?.[0]?gameLink(e.gameIds[0],'Open game record'):''})}
+ for(const [eventIndex,e] of (Array.isArray(universe?.events)?universe.events:[]).entries()){if(!Array.isArray(e?.playerIds)||!e.playerIds.some(id=>String(id)===String(p.id))||!['BREAKOUT','ROLE_BATTLE','COLLEGE_CAREER_ENDED'].includes(e?.metadata?.storyType))continue;const phase=String(e.metadata?.phase||'').toUpperCase(),phaseLabel=['SPRING','FALL'].includes(phase)?`${phase} CAMP · `:'';rows.push({story:e.metadata.storyType,year:e.season,rank:-1,eventWeek:Number.isFinite(e.week)?e.week:null,eventOrder:Number.isFinite(e.timestampOrder)?e.timestampOrder:null,eventIndex,kicker:`${phaseLabel}WEEK ${e.week??'—'} · ${String(e.metadata.storyType).replaceAll('_',' ')}`,main:gameEscape(e.summary||'Recorded player milestone'),sub:e.gameIds?.[0]?gameLink(e.gameIds[0],'Open game record'):''})}
+ // Older seasons' career-ended stories are compacted away (compactHistoryArchive); the record itself still says it.
+ if(p.exitReason==='Eligibility exhausted'&&Number.isFinite(p.retiredYear)&&!rows.some(r=>r.story==='COLLEGE_CAREER_ENDED'))
+  rows.push({year:p.retiredYear,rank:6,kicker:'COLLEGE CAREER ENDED',main:gameEscape(`${p.name} completed his college eligibility at ${p.lastTeam||'his school'}.`),sub:''});
  if(!rows.length)return '<div class="muted">No career history recorded yet.</div>';
  return rows.sort((a,b)=>{const yearDiff=(Number(b.year)||0)-(Number(a.year)||0);if(yearDiff)return yearDiff;if(a.eventWeek!=null&&b.eventWeek!=null){const weekDiff=b.eventWeek-a.eventWeek;if(weekDiff)return weekDiff;if(a.eventOrder!=null&&b.eventOrder!=null&&a.eventOrder!==b.eventOrder)return b.eventOrder-a.eventOrder;return b.eventIndex-a.eventIndex}return a.rank-b.rank}).map(r=>
   `<div class="timeline-row"><div class="small muted">${r.year} · ${r.kicker}</div><strong>${r.main}</strong>${r.sub?`<div class="muted">${r.sub}</div>`:''}</div>`).join('');
@@ -12024,12 +12204,16 @@ function makeRecruitingActionSystem(env){
   }else if(kind==='keep'){
    rec.keptWeek=u.week;dR=KEEP.relationship;note='He knows you are still in his corner.';
   }
+  // Staff assignments: a contact that gains interest gains more in the territory of a strong recruiter.
+  const territory=dI>0&&env.territoryBonus?env.territoryBonus(r,t)||0:0;
+  if(territory){dI+=territory;note=`${note?note+' ':''}Territory bonus from your ${r.homeRegion} recruiter.`}
   if(dI)r.interest=clamp(Math.round((r.interest||0)+dI),1,100);
   if(dR){r.relationship=clamp((r.relationship||0)+dR,0,100);if(dR>0&&env.growRecruiterRelationship)env.growRecruiterRelationship(r,t,dR)}
   const week=ensureWeek(t);week.spent+=check.cost;
-  rec.lastWorkedWeek=u.week;wk.hours+=check.cost;
+  rec.lastWorkedWeek=u.week;wk.hours+=check.cost;rec.hours=(rec.hours||0)+check.cost;
   const reveals=learn(rec,r,kind,topic);
   const answered=answerRivals(r,kind);
+  noteSpend(t,kind,check.cost,answered);
   pushHistory(rec,{week:u.week,kind,cost:check.cost,topic,dI,dR});
   return{ok:true,kind,label:LABELS[kind],cost:check.cost,remaining:hoursLeft(t),dI,dR,topic,note,reveals,answered};
  }
@@ -12197,13 +12381,13 @@ function makeRecruitingActionSystem(env){
   const eligible=n=>env.canTake(n)&&(n!==t.name||mayCommit(r,t));
   const order=finalists.filter(eligible).sort((a,b)=>(score(b)+noise(b))-(score(a)+noise(a)));
   for(const team of order){
-   if(env.commit(r,team)){f.decided={team,week:u.week};return{team,won:team===t.name,finalists}}
+   if(env.commit(r,team)){f.decided={team,week:u.week};return{team,won:team===t.name,finalists,listed:finalists.includes(t.name),offered:hasOffer(r,t)}}
   }
   // None of his finalists has a place for him. He takes the best program that does, which can be you
   // only if you offered.
   for(const {name} of ranked){
    if(finalists.includes(name)||!eligible(name))continue;
-   if(env.commit(r,name)){f.decided={team:name,week:u.week,fallback:true};return{team:name,won:name===t.name,finalists,fallback:true}}
+   if(env.commit(r,name)){f.decided={team:name,week:u.week,fallback:true};return{team:name,won:name===t.name,finalists,fallback:true,listed:finalists.includes(t.name),offered:hasOffer(r,t)}}
   }
   return null;
  }
@@ -12257,6 +12441,63 @@ function makeRecruitingActionSystem(env){
   return out.sort((a,b)=>a.decisionWeek-b.decisionWeek);
  }
 
+ // ---------- the season's ledger and the week's news ----------
+ // What the desk did over the year, kept on the program so the season review can tell it straight.
+ const LEDGER_KEEP=40;
+ function readLedger(t){const l=t?.recruitingSeason;return l&&l.year===universe().year?l:null}
+ function ledger(t){
+  const y=universe().year;
+  if(!t.recruitingSeason||t.recruitingSeason.year!==y)t.recruitingSeason={year:y,hours:0,budget:0,actions:{},won:[],lost:[],cut:[],flipped:[],rivalMoves:0,answered:0};
+  return t.recruitingSeason;
+ }
+ const who=r=>({id:r.id,name:r.name,pos:r.pos,stars:r.stars||0});
+ const keepLast=(list,x)=>{list.push(x);if(list.length>LEDGER_KEEP)list.splice(0,list.length-LEDGER_KEEP)};
+ function noteSpend(t,kind,cost,answered){const l=ledger(t);l.hours+=cost;l.actions[kind]=(l.actions[kind]||0)+1;l.answered+=answered||0}
+ // One weekly pass: what the funnel did, which commitments flipped away, how many rival moves appeared.
+ // Returns this week's entries so the news can be built from exactly what was recorded.
+ function noteWeek(t,{decided=[],cut=[],flipped=[],rivalMoves=0}={}){
+  const l=ledger(t),w=universe().week,out={won:[],lost:[],cut:[],flipped:[]};
+  l.budget+=hoursBudgetFor(t);l.rivalMoves+=rivalMoves;
+  for(const d of decided){
+   const base={...who(d.recruit),week:w};
+   if(d.won){keepLast(l.won,base);out.won.push(base)}
+   else{const x={...base,team:d.team,listed:!!d.listed,offered:!!d.offered,fallback:!!d.fallback};keepLast(l.lost,x);out.lost.push(x)}
+  }
+  for(const r of cut){
+   const f=funnelState(r),at=f?.cut?.at||'top5';
+   const x={...who(r),week:w,at,list:(f?.[at]||[]).filter(n=>n!==t.name).slice(0,5)};keepLast(l.cut,x);out.cut.push(x);
+  }
+  for(const {recruit,to} of flipped){const x={...who(recruit),week:w,team:to||null};keepLast(l.flipped,x);out.flipped.push(x)}
+  return out;
+ }
+ // Why a recruit went elsewhere, in the plainest terms the records support.
+ function lostWhy(x){
+  if(x.fallback)return'None of his finalists had room, so he took the best program that did.';
+  if(!x.listed)return'You were not on his final list.';
+  if(!x.offered)return'You were on his final list, but you never made him an offer.';
+  return`You were on his final list and he chose ${x.team}.`;
+ }
+ const starsOf=x=>'★'.repeat(x.stars||0);
+ // Hub items for the week just played. Commitments to you already have their own "COMMITMENT" item.
+ function newsItems(t){
+  const last=t?.recruitingLastWeek,u=universe();
+  if(!last||last.year!==u.year||last.week!==u.week-1||!last.funnel)return[];
+  const f=last.funnel,items=[],label=x=>`${starsOf(x)} ${x.pos} ${x.name}`.trim();
+  for(const x of f.lost||[])items.push({type:'bad-news',tab:'recruiting',recruit:x.id,kicker:'LOST',importance:46+(x.stars||0)*4,main:`${label(x)} chose ${x.team}`,sub:lostWhy(x)});
+  for(const x of f.cut||[])items.push({type:'alert',tab:'recruiting',recruit:x.id,kicker:'CUT',importance:40+(x.stars||0)*3,main:`${label(x)} cut you from his Top ${x.at==='top3'?3:5}`,sub:x.list?.length?`His list: ${x.list.join(', ')}`:'You are out for the season.'});
+  for(const x of last.flipped||[])items.push({type:'bad-news',tab:'recruiting',recruit:x.id,kicker:'FLIPPED',importance:64+(x.stars||0)*3,main:`${label(x)} flipped${x.team?` to ${x.team}`:''}`,sub:'A rival moved on a commitment. Check in on commitments from week 5.'});
+  return items;
+ }
+ // The year in one place, for the season review. Null when the desk did nothing.
+ function deskSummary(t){
+  const l=readLedger(t);if(!l||(!l.hours&&!l.won.length&&!l.lost.length&&!l.cut.length&&!l.flipped.length))return null;
+  const best=list=>list.slice().sort((a,b)=>b.stars-a.stars||a.week-b.week)[0]||null;
+  const bw=best(l.won),bl=best(l.lost);
+  return{hours:l.hours,budget:l.budget,actions:{...l.actions},won:l.won.length,lost:l.lost.length,cut:l.cut.length,flipped:l.flipped.length,
+   rivalMoves:l.rivalMoves,answered:Math.min(l.answered,l.rivalMoves),neverOffered:l.lost.filter(x=>x.listed&&!x.offered).length,
+   biggestWin:bw,biggestLoss:bl?{...bl,why:lostWhy(bl)}:null};
+ }
+
  // ---------- board status ----------
  function status(r,t){
   const rec=record(r,t,false),u=universe(),open=!r.committed;
@@ -12292,7 +12533,9 @@ function makeRecruitingActionSystem(env){
   // Staff do not offer a recruit who has told them they cannot clear his dealbreaker.
   // A rival's offer is worth answering sooner than an interest threshold would suggest.
   const rivalOffered=r=>liveMoves(r).some(m=>m.kind==='offer');
-  for(const r of targets){if(n>=maxOffers)break;if(!hasOffer(r,t)&&!knownBlock(r,t)&&((r.interest||0)>=STAFF_OFFER_AT||((r.interest||0)>=40&&rivalOffered(r)))&&run(r,'offer'))n++}
+  // A recruit who has put you on his list cannot choose you without an offer, and two hours is cheap for that.
+  const onHisList=r=>{const f=funnelState(r);return!!f&&!f.cut&&(f.top3||f.top5||[]).includes(t.name)};
+  for(const r of targets){if(n>=maxOffers)break;if(!hasOffer(r,t)&&!knownBlock(r,t)&&((r.interest||0)>=STAFF_OFFER_AT||((r.interest||0)>=40&&rivalOffered(r))||onHisList(r))&&run(r,'offer'))n++}
   for(const r of targets)if(!workedThisWeek(r,t))run(r,'call');
   let p=0;
   for(const r of targets){
@@ -12329,7 +12572,7 @@ function makeRecruitingActionSystem(env){
 
  return{COSTS,LABELS,INHOME,OFFER,hoursBudgetFor,weekInfo,ensureWeek,hoursLeft,isActive,record,weekState,workedThisWeek,
   offerLimit,offersOut,hasOffer,topicStrength,motivesFor,dealbreakerUnmet,intel,knownBlock,pitchProjection,pitchOptions,availability,perform,withdrawOffer,
-  effort,previewEffort,effortFromSince,weeksSinceWorked,mayCommit,pitchBoost,status,workload,staffPlan,isAuto,setAuto,funnelOn,decisionWeekFor,funnelState,funnelStatus,runFunnel,holds,decisionsDue,keepBoost,rivalHeat,rivalPressure,addRivalEvent,generateRivals,answerRivals,rivalMoves,liveMoves,unansweredMoves,grandfather};
+  effort,previewEffort,effortFromSince,weeksSinceWorked,mayCommit,pitchBoost,status,workload,staffPlan,isAuto,setAuto,funnelOn,decisionWeekFor,funnelState,funnelStatus,runFunnel,holds,decisionsDue,keepBoost,noteWeek,newsItems,deskSummary,rivalHeat,rivalPressure,addRivalEvent,generateRivals,answerRivals,rivalMoves,liveMoves,unansweredMoves,grandfather};
 }
 
 if(typeof module==='object'&&module.exports){
@@ -12350,6 +12593,7 @@ if(typeof module==='object'&&module.exports){
   rankTeams:(r,t)=>universe.teams.filter(x=>!recruitBlocked(x,r))
    .map(x=>({name:x.name,score:recruitPitch(x,r)+(x.id===t.id&&r.targeted?10+(r.relationship||0)*.12:0)})).sort((a,b)=>b.score-a.score),
   canTake:name=>canTakeCommit(name),
+  territoryBonus:(r,t)=>t?.name===$('#userTeam')?.value?globalThis.DynastyStaffAssignments?.recruitBonus(r,t)||0:0,
   commit:(r,name)=>commitRecruit(r,name),
   // The programs closest to winning him, other than yours, by the pitch they would make on their own.
   topRivals:(r,t,n)=>universe.teams.filter(x=>x.id!==t.id&&!recruitBlocked(x,r)&&canTakeCommit(x.name))
@@ -12363,6 +12607,9 @@ if(typeof module==='object'&&module.exports){
   const rows=recruitingActions.unansweredMoves(universe.recruits,t);
   return{count:rows.reduce((n,x)=>n+x.moves.length,0),names:rows.slice(0,3).map(x=>x.recruit.name)};
  };
+ // The week's recruiting news for the This Week list, and the year's summary for the season review.
+ globalThis.DynastyRecruitingNews=t=>t?recruitingActions.newsItems(t):[];
+ globalThis.DynastyRecruitingSeason=t=>t?recruitingActions.deskSummary(t):null;
  // Recruits who pick a school on this advance or the next.
  globalThis.DynastyRecruitingDecisions=t=>{
   if(!t||!universe?.recruits)return null;
@@ -12402,14 +12649,18 @@ if(typeof module==='object'&&module.exports){
   const t=selected(),playedWeek=universe.week-1;passCooled=[];
   // Cuts and decisions come due before the weekly pass, so the pass sees who has already chosen.
   const funnel=recruitingActions.runFunnel(universe.recruits,t);
+  const held=t?new Set(universe.recruits.filter(r=>r.committed===t.name).map(r=>r.id)):null;
   const out=advanceRecruitingBeforeRecruitingActions();
   if(t){
    const rivalMoves=recruitingActions.generateRivals(universe.recruits,t).length;
    // The hours ledger still describes the week just played, because the counter has already moved on.
    const w=t.recruitingWeek&&t.recruitingWeek.year===universe.year&&t.recruitingWeek.week===playedWeek?t.recruitingWeek:null;
    t.recruitingLastWeek={year:universe.year,week:playedWeek,spent:w?w.spent:0,budget:recruitingActions.hoursBudgetFor(t),cooled:passCooled.slice(0,12),cooledCount:passCooled.length,rivalMoves,
-    // What the funnel did this week, for the board and the status line.
-    funnel:{won:funnel.decided.filter(x=>x.won).map(x=>x.recruit.name).slice(0,6),lost:funnel.decided.filter(x=>!x.won).map(x=>({name:x.recruit.name,team:x.team})).slice(0,6),cut:funnel.cut.map(r=>r.name).slice(0,6)}};
+    funnel:null,flipped:[]};
+   // Your commitments that left during the pass, then everything the week did, recorded once.
+   const flipped=universe.recruits.filter(r=>held.has(r.id)&&r.committed!==t.name).map(r=>({recruit:r,to:r.committed}));
+   const week=recruitingActions.noteWeek(t,{decided:funnel.decided,cut:funnel.cut,flipped,rivalMoves});
+   t.recruitingLastWeek.funnel={won:week.won,lost:week.lost,cut:week.cut};t.recruitingLastWeek.flipped=week.flipped;
   }
   return out;
  };
@@ -12582,10 +12833,10 @@ if(typeof module==='object'&&module.exports){
  // What the funnel did last week: who chose you, who chose someone else, who cut you.
  function funnelLine(last){
   const f=last?.funnel;if(!f)return'';
-  const bits=[];
-  if(f.won?.length)bits.push(`${raEsc(f.won.join(', '))} committed to you`);
-  if(f.lost?.length)bits.push(`${f.lost.map(x=>`${raEsc(x.name)} chose ${raEsc(x.team)}`).join(', ')}`);
-  if(f.cut?.length)bits.push(`${raEsc(f.cut.join(', '))} cut you from his list`);
+  const bits=[],name=x=>raEsc(typeof x==='string'?x:x.name);
+  if(f.won?.length)bits.push(`${f.won.map(name).join(', ')} committed to you`);
+  if(f.lost?.length)bits.push(`${f.lost.map(x=>`${name(x)} chose ${raEsc(x.team)}`).join(', ')}`);
+  if(f.cut?.length)bits.push(`${f.cut.map(name).join(', ')} cut you from his list`);
   return bits.length?` Decisions: ${bits.join('; ')}.`:'';
  }
  function stripHTML(t){
@@ -12626,6 +12877,870 @@ if(typeof module==='object'&&module.exports){
   const body=$('#recruitDialogBody'),r=raRecruit(id);
   if(r&&body&&!body.querySelector?.('.recruiting-desk')){const html=deskHTML(id);if(html){body.insertAdjacentHTML?.('afterbegin',html);bindDesk(body)}}
  };
+}
+
+// Portal Desk (v0.15.1). The transfer portal already had targets, attention, NIL and promises. The desk
+// makes each round a set of decisions the way the Recruiting Desk does for high schoolers: a budget of
+// portal hours per round spent on calls, a playing-time pitch, a host visit and a head coach visit; an
+// honest read of where you stand with each target (his decision rule is the engine's own); rival
+// programs that counter when you get close; and the roster holes you are trying to fill.
+//
+// Rules live in a pure factory (testable in Node). The browser branch wraps advancePortalRound and
+// offerPortalNil and adds the desk to the portal screen. With nobody using it, the portal is unchanged:
+// rival counters are decided by a hash, so no gameplay randomness is drawn.
+function makePortalDeskSystem(env){
+ 'use strict';
+ const COSTS={call:1,pitch:2,host:4,coach:6};
+ const LABELS={call:'Call',pitch:'Pitch playing time',host:'Host visit',coach:'Head coach visit'};
+ const CALL_INTEREST=2,HOST_INTEREST=6,COACH_INTEREST=5,COACH_RELATIONSHIP_STEP=25;
+ // A rival close to losing him counters once per round: the move adds to its interest at once, and every
+ // round it stays unanswered costs you interest. Answering takes the rival's gain back.
+ const RIVAL={within:8,chance:45,gain:5,penalty:3,life:2};
+ const ANSWERS={visit:['host','coach'],nil:['nil','coach']};
+ const RIVAL_LABELS={visit:'hosted him on a visit',nil:'made him an NIL offer'};
+ const universe=()=>env.getUniverse(),clamp=env.clamp;
+ function hash(v){let h=2166136261>>>0;for(const ch of String(v??'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+ const teamById=id=>universe().teams.find(t=>t.id===id)||null;
+
+ // ---------- hours ----------
+ function hoursFor(t){
+  const rc=t?.staff?.RC||{},hc=t?.staff?.HC||{};
+  return clamp(Math.round(8+(rc.recruiting||60)*.06+(hc.recruiting||60)*.04),10,16);
+ }
+ function cycle(){return env.cycle()}
+ function roundInfo(t){
+  const c=cycle(),budget=hoursFor(t),d=c.desk;
+  const spent=d&&d.round===c.round?clamp(Math.round(d.spent||0),0,budget):0;
+  return{round:c.round,rounds:env.rounds,status:c.status,budget,spent,left:budget-spent};
+ }
+ function spend(t,hours){
+  const c=cycle(),info=roundInfo(t);
+  c.desk={...(c.desk||{}),round:c.round,spent:info.spent+hours};
+ }
+ function isAuto(){return!!cycle().deskAuto}
+ function setAuto(on){cycle().deskAuto=!!on;return!!on}
+
+ // ---------- per-candidate record ----------
+ function record(entry){
+  entry.desk??={};
+  const d=entry.desk;d.rivals=Array.isArray(d.rivals)?d.rivals:[];
+  return d;
+ }
+ function workedThisRound(entry,r=cycle().round){
+  const d=entry.desk;
+  return!!d&&(d.call===r||d.pitch===r||d.hostRound===r||d.coachRound===r);
+ }
+
+ // ---------- what you can see ----------
+ // Playing time is the portal's currency. The read uses perceived ratings only (what your staff can see),
+ // never his hidden true rating, so it is the same information the coach has.
+ function room(t,pos){
+  const depth=(t?.roster||[]).filter(p=>p.pos===pos);
+  const best=depth.length?Math.max(...depth.map(p=>p.perceived||0)):0;
+  return{depth:depth.length,want:env.posCounts[pos]||4,best};
+ }
+ function pitchRead(entry,t){
+  const r=room(t,entry.p.pos),gap=(entry.p.perceived||0)-(r.best||50);
+  const short=r.want-r.depth;
+  const delta=clamp(Math.round(2+gap*.35+(short>0?2:0)-Math.max(0,-short)*1.5),-3,6);
+  const label=delta>=5?'Strong':delta>=3?'Good':delta>=1?'Modest':delta===0?'Flat':'Risky';
+  const pos=entry.p.pos,lead=gap>0?`he would be your best ${pos}`:gap>-6?'he would compete for the job':`your ${pos} starter is well ahead of him`;
+  const why=short>0?`${lead}${gap>-6?', and':', though'} your ${pos} room is short`:lead;
+  return{delta,label,why};
+ }
+ function needs(t){
+  if(!t)return[];
+  return Object.keys(env.posCounts).map(pos=>({pos,...room(t,pos)})).map(x=>({...x,short:x.want-x.depth}))
+   .filter(x=>x.short>0).sort((a,b)=>b.short-a.short||a.best-b.best).slice(0,5);
+ }
+ function tags(entry,t){
+  if(!t)return[];
+  const r=room(t,entry.p.pos),out=[];
+  if(r.want>r.depth)out.push('Fills a need');
+  if((entry.p.perceived||0)>r.best)out.push('Would start');
+  return out;
+ }
+ // Where you stand: the decision is a weighted choice over finalists, weight exp((interest - best) / 7).
+ // The same formula gives the coach his real odds if the player decided now.
+ function standing(entry,t){
+  const pool=(entry.finalists||[]).map(id=>({id,team:teamById(id),interest:entry.interest?.[id]??0})).filter(x=>x.team);
+  if(!pool.length)return{field:[],mine:null,rank:null,odds:0,decideChance:env.commitChance(cycle().round)};
+  const best=Math.max(...pool.map(x=>x.interest));let total=0;
+  for(const x of pool){x.weight=Math.exp((x.interest-best)/7);total+=x.weight}
+  for(const x of pool)x.odds=x.weight/total;
+  pool.sort((a,b)=>b.interest-a.interest);
+  const mine=t?pool.find(x=>x.id===t.id)||null:null;
+  return{field:pool.map(x=>({id:x.id,name:x.team.name,interest:x.interest,odds:x.odds,you:!!mine&&x.id===mine.id})),
+   mine:mine?mine.interest:null,rank:mine?pool.indexOf(mine)+1:null,odds:mine?mine.odds:0,
+   leader:pool.find(x=>!mine||x.id!==mine.id)||null,decideChance:env.commitChance(cycle().round)};
+ }
+
+ // ---------- actions ----------
+ function availability(entry,t,action){
+  const c=cycle();
+  if(!entry||!t)return{ok:false,reason:'No such portal candidate.'};
+  if(!COSTS[action])return{ok:false,reason:'Unknown action.'};
+  if(c.status!=='open')return{ok:false,reason:'Open the portal first.'};
+  if(entry.decision)return{ok:false,reason:`${entry.p.name} has already decided.`};
+  if(!(entry.finalists||[]).includes(t.id)&&!env.fit(entry,t))return{ok:false,reason:`${entry.p.name} is not considering your program (no roster room or no fit).`};
+  const d=entry.desk||{};
+  if(action==='call'&&d.call===c.round)return{ok:false,reason:'Already called him this round.'};
+  if(action==='pitch'&&d.pitch===c.round)return{ok:false,reason:'Already pitched him this round.'};
+  if(action==='host'&&d.hostRound!=null)return{ok:false,reason:'He has already visited.'};
+  if(action==='host'&&!env.targetFor(entry.candidateId))return{ok:false,reason:'Target him first (give him attention).'};
+  if(action==='coach'&&d.coachRound!=null)return{ok:false,reason:'Your head coach has already visited him.'};
+  const left=roundInfo(t).left;
+  if(left<COSTS[action])return{ok:false,reason:`Not enough portal hours (${left} left, needs ${COSTS[action]}).`};
+  return{ok:true};
+ }
+ function join(entry,t){
+  if(!(entry.finalists||[]).includes(t.id)){
+   const fit=env.fit(entry,t);if(!fit)return false;
+   entry.finalists.push(t.id);env.setInterest(entry,t.id,fit.score);
+  }
+  return true;
+ }
+ function bump(entry,id,delta){return env.setInterest(entry,id,(entry.interest?.[id]??0)+delta)}
+ function answerRivals(entry,how){
+  const d=record(entry),r=cycle().round,answered=[];
+  for(const m of d.rivals){
+   if(m.answered!=null||r-m.round>RIVAL.life)continue;
+   if(!(ANSWERS[m.kind]||[]).includes(how))continue;
+   m.answered=r;answered.push(m);
+   if((entry.finalists||[]).includes(m.schoolId))bump(entry,m.schoolId,-RIVAL.gain);
+  }
+  return answered;
+ }
+ function perform(entry,t,action){
+  const ok=availability(entry,t,action);if(!ok.ok)return{ok:false,reason:ok.reason};
+  if(!join(entry,t))return{ok:false,reason:`${entry.p.name} is not considering your program.`};
+  const c=cycle(),d=record(entry);let delta=0;
+  if(action==='call'){delta=CALL_INTEREST;d.call=c.round}
+  if(action==='pitch'){delta=pitchRead(entry,t).delta;d.pitch=c.round}
+  if(action==='host'){delta=HOST_INTEREST;d.hostRound=c.round}
+  if(action==='coach'){
+   const rel=env.fit(entry,t)?.relationship||20;
+   delta=COACH_INTEREST+Math.floor(rel/COACH_RELATIONSHIP_STEP);d.coachRound=c.round;
+  }
+  spend(t,COSTS[action]);
+  const after=bump(entry,t.id,delta),answered=answerRivals(entry,action);
+  d.log=[...(d.log||[]),{round:c.round,action,delta}].slice(-8);
+  return{ok:true,delta,interest:after,answered:answered.length,cost:COSTS[action]};
+ }
+ // NIL is the portal's existing lever; an offer answers a rival's NIL counter.
+ function noteNil(entry){return entry?answerRivals(entry,'nil').length:0}
+
+ // ---------- rivals ----------
+ function liveRivals(entry){
+  const r=cycle().round;
+  return(entry?.desk?.rivals||[]).filter(m=>m.answered==null&&r-m.round<=RIVAL.life&&!entry.decision);
+ }
+ // After a round plays: every program still unanswered costs you interest; then rivals close to losing a
+ // player you worked this round may counter. Called before the round number advances.
+ function settleRound(t){
+  const c=cycle();if(!t||c.status!=='open')return{penalties:0,moves:[]};
+  let penalties=0;const moves=[];
+  for(const entry of env.entries()){
+   if(entry.decision||!entry.desk)continue;
+   const live=liveRivals(entry).filter(m=>m.round<c.round);
+   if(live.length&&(entry.finalists||[]).includes(t.id)){bump(entry,t.id,-RIVAL.penalty*live.length);penalties+=live.length}
+  }
+  return{penalties,moves};
+ }
+ // Runs after a round's decisions, for the round just played, so a counter lands on players still deciding.
+ function counter(t,round=cycle().round){
+  const c=cycle(),moves=[];if(!t||c.status!=='open')return moves;
+  for(const entry of env.entries()){
+   if(entry.decision||!entry.desk||!workedThisRound(entry,round))continue;
+   const mine=entry.interest?.[t.id];if(mine==null)continue;
+   const rivals=(entry.finalists||[]).filter(id=>id!==t.id).map(id=>({id,interest:entry.interest?.[id]??0})).sort((a,b)=>b.interest-a.interest);
+   const lead=rivals[0];if(!lead||mine<lead.interest-RIVAL.within)continue;
+   const h=hash(`${entry.candidateId}|${round}|${lead.id}`);
+   if(h%100>=RIVAL.chance)continue;
+   const kind=(h>>>8)%2?'nil':'visit',school=teamById(lead.id);
+   bump(entry,lead.id,RIVAL.gain);
+   const m={schoolId:lead.id,school:school?.name||'A rival',kind,round,answered:null};
+   record(entry).rivals.push(m);moves.push({candidateId:entry.candidateId,name:entry.p.name,...m});
+  }
+  return moves;
+ }
+ function watch(){
+  const out=[];
+  for(const entry of env.entries())for(const m of liveRivals(entry))out.push({candidateId:entry.candidateId,name:entry.p.name,pos:entry.p.pos,...m,label:RIVAL_LABELS[m.kind],answerWith:ANSWERS[m.kind]});
+  return out;
+ }
+
+ // ---------- staff ----------
+ // The staff spend what is left: answer rival moves first (a host visit, then the head coach if the visit is
+ // used), then call every target, then pitch where the read is Good or better. They never spend the host or
+ // head coach visit on their own initiative except to answer a move.
+ function staffPlan(t){
+  const out={hours:0,calls:0,pitches:0,answers:0};if(!t||cycle().status!=='open')return out;
+  const targets=env.entries().filter(e=>!e.decision&&env.targetFor(e.candidateId)).sort((a,b)=>(b.interest?.[t.id]??0)-(a.interest?.[t.id]??0));
+  const go=(e,a)=>{const r=perform(e,t,a);if(r.ok)out.hours+=r.cost;return r.ok};
+  for(const e of targets)if(liveRivals(e).length){for(const a of ['host','coach']){if(liveRivals(e).some(m=>ANSWERS[m.kind].includes(a))&&go(e,a)){out.answers++;break}}}
+  for(const e of targets)if(go(e,'call'))out.calls++;
+  for(const e of targets)if(pitchRead(e,t).delta>=3&&go(e,'pitch'))out.pitches++;
+  return out;
+ }
+
+ return{COSTS,LABELS,RIVAL,ANSWERS,hoursFor,roundInfo,isAuto,setAuto,record,pitchRead,needs,tags,standing,availability,perform,noteNil,liveRivals,settleRound,counter,watch,staffPlan,workedThisRound,hash};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makePortalDeskSystem};
+}else{
+ const portalDesk=makePortalDeskSystem({
+  getUniverse:()=>universe,clamp,posCounts:POS_COUNTS,rounds:PORTAL_ROUNDS,
+  cycle:()=>ensurePortalCycle(),entries:()=>portalCandidates(),
+  fit:(entry,t)=>portalFit(entry,t),setInterest:(entry,id,v)=>portalSetInterest(entry,id,v),
+  targetFor:id=>portalTargetFor(id),commitChance:round=>portalCommitChance(round)
+ });
+ globalThis.DynastyPortalDesk=portalDesk;
+ const pdEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const pct=x=>`${Math.round((x||0)*100)}%`;
+
+ const advancePortalRoundBeforeDesk=advancePortalRound;
+ advancePortalRound=function(){
+  const c=ensurePortalCycle(),t=portalUserTeam();
+  if(c.status!=='open'||!t)return advancePortalRoundBeforeDesk();
+  let staffNote='';
+  if(portalDesk.isAuto()){const s=portalDesk.staffPlan(t);if(s.hours)staffNote=`Staff worked the portal: ${s.calls} call${s.calls===1?'':'s'}, ${s.pitches} pitch${s.pitches===1?'':'es'}, ${s.answers} answer${s.answers===1?'':'s'} (${s.hours}h).`}
+  const settled=portalDesk.settleRound(t),played=c.round;
+  if(staffNote)portalLog(staffNote);
+  if(settled.penalties)portalLog(`${settled.penalties} rival move${settled.penalties===1?'':'s'} went unanswered.`);
+  const out=advancePortalRoundBeforeDesk();
+  for(const m of portalDesk.counter(t,played))portalLog(`${m.school} ${m.kind==='visit'?'hosted':'made an NIL offer to'} ${m.name}.`);
+  return out;
+ };
+ const offerPortalNilBeforeDesk=offerPortalNil;
+ offerPortalNil=function(candidateId){
+  const res=offerPortalNilBeforeDesk(candidateId);
+  if(!res)portalDesk.noteNil(portalEntry(candidateId));
+  return res;
+ };
+
+ function actionButton(entry,t,action){
+  const a=portalDesk.availability(entry,t,action),answers=portalDesk.liveRivals(entry).some(m=>portalDesk.ANSWERS[m.kind].includes(action));
+  const read=action==='pitch'?` · ${portalDesk.pitchRead(entry,t).label}`:'';
+  return`<button type="button" class="${answers?'pd-answer':''}" data-pd-act="${action}" data-pd-id="${pdEsc(entry.candidateId)}" ${a.ok?'':`disabled title="${pdEsc(a.reason)}"`}>${portalDesk.LABELS[action]} <small>${portalDesk.COSTS[action]}h${read}</small></button>`;
+ }
+ function targetCard(entry,t){
+  const s=portalDesk.standing(entry,t),read=portalDesk.pitchRead(entry,t),live=portalDesk.liveRivals(entry),tags=portalDesk.tags(entry,t);
+  const decided=entry.decision?universe.teams.find(x=>x.id===entry.decision.schoolId):null;
+  const field=s.field.slice(0,4).map(x=>`<li class="${x.you?'pd-you':''}"><span>${pdEsc(x.you?'You':x.name)}</span><strong>${x.interest}%</strong><small>${pct(x.odds)}</small></li>`).join('');
+  const head=`<div class="pd-card-head"><button class="player-button" data-player="${pdEsc(entry.p.id)}">${pdEsc(entry.p.name)}</button><span class="small muted">${pdEsc(entry.p.pos)} · ${pdEsc(entry.p.year)} · ${grade(entry.p.perceived)}</span>${tags.map(x=>`<span class="pd-tag">${pdEsc(x)}</span>`).join('')}</div>`;
+  if(decided)return`<article class="pd-card pd-card--done">${head}<p>${decided.id===t.id?'<strong>Committed to you.</strong>':`Chose ${pdEsc(decided.name)}.`}</p></article>`;
+  const where=s.rank==null?'You are not in his running yet.':s.rank===1?`You lead. If he decided now: ${pct(s.odds)} you.`:`You are ${s.rank}${['','st','nd','rd'][s.rank]||'th'}, ${s.field[0].interest-s.mine} behind ${pdEsc(s.field[0].name)}. If he decided now: ${pct(s.odds)} you.`;
+  const rivals=live.map(m=>`<li>${pdEsc(m.school)} ${pdEsc(m.kind==='visit'?'hosted him':'made him an NIL offer')} (round ${m.round}). Answer with ${m.kind==='visit'?'a host visit or the head coach':'an NIL offer or the head coach'}.</li>`).join('');
+  return`<article class="pd-card">${head}
+   <p class="pd-where">${where} <span class="muted">${pct(s.decideChance)} chance he decides this round.</span></p>
+   <ul class="pd-field">${field}</ul>
+   ${rivals?`<ul class="pd-rivals">${rivals}</ul>`:''}
+   <p class="small muted">Playing-time read: <strong>${read.label}</strong> (${pdEsc(read.why)}).</p>
+   <div class="pd-actions">${['call','pitch','host','coach'].map(a=>actionButton(entry,t,a)).join('')}</div>
+  </article>`;
+ }
+ function deskHTML(){
+  const c=ensurePortalCycle(),t=portalUserTeam();if(!t||c.status==='idle')return needsOnlyHTML(t);
+  const info=portalDesk.roundInfo(t),targets=portalCandidates().filter(e=>portalTargetFor(e.candidateId)||(e.decision&&e.decision.schoolId===t.id&&!e.placed));
+  const needs=portalDesk.needs(t),watch=portalDesk.watch();
+  return`<section class="portal-desk card" id="portalDesk">
+   <div class="section-head"><div><div class="eyebrow">PORTAL DESK</div><h3>${c.status==='open'?`Round ${info.round} of ${info.rounds}`:'Portal closed'}</h3></div>
+    ${c.status==='open'?`<div class="pd-hours"><strong>${info.left}</strong> / ${info.budget} portal hours left this round</div>`:''}</div>
+   ${needsLine(needs)}
+   ${watch.length?`<p class="pd-watch"><strong>Rival Watch:</strong> ${watch.map(m=>`${pdEsc(m.school)} on ${pdEsc(m.name)}`).join(' · ')}</p>`:''}
+   ${c.status==='open'?`<div class="pd-staff"><label><input type="checkbox" data-pd-auto ${portalDesk.isAuto()?'checked':''}> Staff handle the portal</label><button type="button" class="ghost" data-pd-staff>Work the portal now</button></div>`:''}
+   <div class="pd-cards">${targets.length?targets.map(e=>targetCard(e,t)).join(''):'<p class="muted">Give a player attention in the board below to work him here.</p>'}</div>
+  </section>`;
+ }
+ function needsLine(needs){return needs.length?`<p class="pd-needs"><strong>Roster needs:</strong> ${needs.map(n=>`<span class="pd-need">${pdEsc(n.pos)} <small>${n.depth}/${n.want}</small></span>`).join(' ')}</p>`:'<p class="pd-needs muted">No position is below its designed depth.</p>'}
+ function needsOnlyHTML(t){
+  if(!t)return'';
+  return`<section class="portal-desk card" id="portalDesk"><div class="section-head"><div><div class="eyebrow">PORTAL DESK</div><h3>Before the portal opens</h3></div></div>${needsLine(portalDesk.needs(t))}<p class="small muted">Open the portal to get ${portalDesk.hoursFor(t)} portal hours a round for calls, pitches and visits.</p></section>`;
+ }
+ function bindDesk(root){
+  const t=portalUserTeam();
+  root.querySelectorAll?.('[data-pd-act]').forEach(b=>b.onclick=e=>{
+   e.preventDefault();const entry=portalEntry(b.dataset.pdId),r=portalDesk.perform(entry,t,b.dataset.pdAct);
+   setStatus(r.ok?`${portalDesk.LABELS[b.dataset.pdAct]}: ${entry.p.name} ${r.delta>=0?'+':''}${r.delta} interest (now ${r.interest}%).${r.answered?' Rival move answered.':''}`:r.reason);
+   renderPortal();
+  });
+  root.querySelectorAll?.('[data-pd-auto]').forEach(b=>b.onchange=()=>{portalDesk.setAuto(b.checked);setStatus(b.checked?'Staff now spend unused portal hours before each round.':'The portal is back in your hands.');renderPortal()});
+  root.querySelectorAll?.('[data-pd-staff]').forEach(b=>b.onclick=e=>{e.preventDefault();const s=portalDesk.staffPlan(t);setStatus(s.hours?`Staff worked the portal: ${s.calls} calls, ${s.pitches} pitches, ${s.answers} answers (${s.hours}h).`:'The staff had nothing to add this round.');renderPortal()});
+ }
+ const renderPortalBeforeDesk=renderPortal;
+ renderPortal=function(){
+  renderPortalBeforeDesk();
+  const board=$('#portalBoard');if(!board||!universe?.teams)return;
+  const anchor=$('#portalPanels');if(!anchor)return;
+  $('#portalDesk')?.remove();
+  anchor.insertAdjacentHTML?.('afterend',deskHTML());
+  const host=$('#portalDesk');if(host){bindDesk(host);attachPlayerLinks()}
+ };
+}
+// Browser tests: play to the portal, open it and target the first players who would consider the program.
+if(typeof window!=='undefined'&&globalThis.__DL_TEST__){
+ globalThis.__DL_TEST__.portalDeskPrepare=(targets=3)=>{
+  if(universe.phase!=='complete'){simSeason();simConferenceChampionships();simBowls();simPlayoff()}
+  offseasonReview();offseasonDepartures();openPortalCycle();
+  const t=portalUserTeam(),list=portalCandidates().filter(x=>!x.decision&&portalFit(x,t)).slice(0,targets);
+  list.forEach(x=>targetPortalCandidate(x.candidateId,2));
+  goToTab('offseason');renderPortal();
+  return list.map(x=>x.candidateId);
+ };
+ globalThis.__DL_TEST__.showPlayer=id=>showPlayerProfile(id);
+ globalThis.__DL_TEST__.goToTab=tab=>goToTab(tab);
+}
+
+// Player arcs (v0.15.1). The players you recruit become a story you can follow: how you won him (the hours,
+// the pitch, the visit, who you beat), what he became (starter, honors, the draft) and how each class turned
+// out. Everything is read from what the game already keeps (recruitingMemory, seasonHistory, awards,
+// draftResult, transferHistory). The one addition is a short desk summary saved on the memory of recruits
+// who sign with the controlled program, written when he commits.
+function makePlayerArcSystem(env){
+ 'use strict';
+ const universe=()=>env.getUniverse();
+ const starsText=n=>n?'★'.repeat(n):'Unrated';
+ const MAJOR=/All-America|Heisman|Player of the Year|National/i,CONF=/All-Conference|Conference/i;
+
+ // ---------- at signing ----------
+ // A compact record of the work behind a commitment: hours, the most-pitched topic, visits, the offer
+ // week and the program he chose you over. Null when the desk never touched him.
+ function deskStory(r,t){
+  const rec=r?.recruitingActions?.[String(t?.id)];
+  if(!rec||rec.season!==universe().year)return null;
+  const hist=Array.isArray(rec.history)?rec.history:[];
+  // History keeps the last ten actions; the running total is kept beside it.
+  const hours=Number.isFinite(rec.hours)?rec.hours:hist.reduce((n,x)=>n+(Number(x.cost)||0),0);
+  const topics={};for(const x of hist)if(x.kind==='pitch'&&x.topic)topics[x.topic]=(topics[x.topic]||0)+1;
+  const topic=Object.entries(topics).sort((a,b)=>b[1]-a[1])[0]?.[0]||null;
+  const f=r.funnel&&r.funnel.season===universe().year?r.funnel:null;
+  const finalists=(f?.top3||f?.top5||[]).filter(n=>n!==t.name);
+  const out={hours,topic,inHome:!!rec.inHome||hist.some(x=>x.kind==='inhome'),visit:hist.some(x=>x.kind==='visit'),
+   offerWeek:rec.offerWeek??null,beat:finalists[0]||null,decisionWeek:f?.decisionWeek??null};
+  return out.hours||out.offerWeek!=null||out.beat?out:null;
+ }
+
+ // ---------- one player ----------
+ function signedLine(p){
+  const m=p?.recruitingMemory;if(!m?.season)return null;
+  const school=universe().teams.find(t=>t.id===m.schoolId)?.name||p.seasonHistory?.[0]?.team||null;
+  let line=`Signed in ${m.season} as a ${starsText(m.stars)} ${p.pos}${m.homeRegion?` out of the ${m.homeRegion}`:''}${school?` with ${school}`:''}.`;
+  const d=m.desk;
+  if(d){
+   const how=[d.inHome&&'an in-home visit',d.visit&&!d.inHome&&'a campus visit',d.topic&&`pitches on ${d.topic}`].filter(Boolean);
+   const beat=d.beat?` over ${d.beat}`:'';
+   if(how.length||beat)line+=` You won him${beat}${how.length?` with ${how.join(' and ')}`:''}${d.hours?` (${d.hours} hours)`:''}.`;
+  }
+  return line;
+ }
+ function seasonsStarted(p){return(p?.seasonHistory||[]).filter(s=>(s.starts||0)>=6)}
+ // The best thing he became, as a short label and a rank used to sort a class.
+ function peak(p){
+  const awards=p?.awards||[];
+  if(p?.draftResult?.round===1)return{rank:6,label:'First-round pick'};
+  if(awards.some(a=>MAJOR.test(a.name)))return{rank:5,label:awards.find(a=>MAJOR.test(a.name)).name};
+  if(p?.draftResult&&p.draftResult.round)return{rank:4,label:`Drafted, round ${p.draftResult.round}`};
+  if(awards.some(a=>CONF.test(a.name)))return{rank:3,label:awards.find(a=>CONF.test(a.name)).name};
+  const starts=seasonsStarted(p).length;
+  if(starts)return{rank:2,label:`Starter, ${starts} season${starts===1?'':'s'}`};
+  if((p?.career?.games||0)>0)return{rank:1,label:'Contributor'};
+  return{rank:0,label:'Did not play'};
+ }
+
+ // ---------- a class ----------
+ function allPlayers(){
+  const u=universe(),out=[];
+  for(const t of u.teams)for(const p of t.roster||[])out.push({p,active:true,team:t});
+  for(const p of u.playerArchive||[])out.push({p,active:false,team:null});
+  return out;
+ }
+ function classOf(t,season){
+  return allPlayers().filter(x=>x.p.recruitingMemory?.schoolId===t.id&&x.p.recruitingMemory?.season===season);
+ }
+ function classSeasons(t){
+  const seen=new Set();for(const x of allPlayers())if(x.p.recruitingMemory?.schoolId===t.id&&Number.isFinite(x.p.recruitingMemory.season))seen.add(x.p.recruitingMemory.season);
+  return[...seen].sort((a,b)=>b-a);
+ }
+ function scoreOf(players){
+  if(!players.length)return 0;
+  let n=0;for(const p of players){const pk=peak(p).rank;n+=(pk>=2?2:0)+((p.awards||[]).length?3:0)+(p.draftResult?.round?3:0)}
+  return n/players.length;
+ }
+ // Every program's class score for one signing year (programs that signed at least five).
+ const leagueCache={key:null,scores:null};
+ function leagueScores(season){
+  const u=universe(),key=`${season}|${u.year}|${(u.playerArchive||[]).length}`;
+  if(leagueCache.key===key)return leagueCache.scores;
+  const by=new Map();
+  for(const x of allPlayers()){const m=x.p.recruitingMemory;if(m?.season!==season||m.schoolId==null)continue;if(!by.has(m.schoolId))by.set(m.schoolId,[]);by.get(m.schoolId).push(x.p)}
+  const scores=[...by.values()].filter(list=>list.length>=5).map(scoreOf);
+  leagueCache.key=key;leagueCache.scores=scores;return scores;
+ }
+ function classReport(t,season){
+  const rows=classOf(t,season);if(!rows.length)return null;
+  const peaks=rows.map(x=>({...x,peak:peak(x.p),stars:x.p.recruitingMemory.stars||0}));
+  const left=peaks.filter(x=>(x.p.transferHistory||[]).some(h=>h.fromSchool===t.name)).length;
+  const stay=peaks.filter(x=>x.active&&x.team?.id===t.id).length;
+  const starters=peaks.filter(x=>x.peak.rank>=2).length,honors=peaks.filter(x=>(x.p.awards||[]).length).length,drafted=peaks.filter(x=>x.p.draftResult?.round).length;
+  const steals=peaks.filter(x=>x.stars<=3&&x.peak.rank>=3),misses=peaks.filter(x=>x.stars>=4&&x.peak.rank<=1&&!x.active);
+  const years=universe().year-season;
+  // Graded against every program's class from the same year (points for starters, honors and draft picks
+  // per signee), and only once the class has had two years: A is the top 15%, then B, C, D, F.
+  const score=scoreOf(peaks.map(x=>x.p));
+  const pool=years<2?null:leagueScores(season),league=pool&&pool.length>=10?pool:null,beat=league?league.filter(x=>x<score).length/league.length:null;
+  const grade=beat==null?null:beat>=.85?'A':beat>=.6?'B':beat>=.35?'C':beat>=.15?'D':'F';
+  const best=peaks.slice().sort((a,b)=>b.peak.rank-a.peak.rank||b.stars-a.stars)[0];
+  return{season,count:peaks.length,avgStars:peaks.reduce((n,x)=>n+x.stars,0)/peaks.length,stay,left,starters,honors,drafted,
+   steals:steals.map(x=>({id:x.p.id,name:x.p.name,stars:x.stars,peak:x.peak.label})),misses:misses.map(x=>({id:x.p.id,name:x.p.name,stars:x.stars})),
+   best:best?{id:best.p.id,name:best.p.name,pos:best.p.pos,stars:best.stars,peak:best.peak.label}:null,grade,years,score,
+   percentile:beat==null?null:Math.round(beat*100),classes:league?.length||0};
+ }
+
+ // ---------- payoffs ----------
+ // This season's honors for players the program recruited, told as the recruiting story they finish.
+ function payoffs(t,year=universe().year){
+  if(!t)return[];
+  const out=[];
+  for(const p of t.roster||[]){
+   const m=p.recruitingMemory;if(m?.schoolId!==t.id)continue;
+   const won=(p.awards||[]).filter(a=>a.year===year);if(!won.length)continue;
+   const a=won.sort((x,y)=>(MAJOR.test(y.name)?1:0)-(MAJOR.test(x.name)?1:0))[0];
+   const how=m.desk?.beat?` you beat ${m.desk.beat} for`:m.desk?.topic?` you pitched on ${m.desk.topic}`:' you signed';
+   out.push({type:'good-news',tab:'roster',player:p.id,kicker:'PAYOFF',importance:MAJOR.test(a.name)?78:60,
+    main:`${p.name}: ${a.name}`,sub:`The ${starsText(m.stars)} ${p.pos}${how} in ${m.season}.`});
+  }
+  return out.sort((a,b)=>b.importance-a.importance).slice(0,3);
+ }
+
+ return{deskStory,signedLine,peak,seasonsStarted,classOf,classSeasons,classReport,payoffs};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makePlayerArcSystem};
+}else{
+ const playerArcs=makePlayerArcSystem({getUniverse:()=>universe});
+ globalThis.DynastyPlayerArcs=playerArcs;
+ const paEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+ // The desk summary rides on the memory written at commit, for the controlled program only.
+ const captureRecruitmentBeforeArcs=captureRecruitment;
+ captureRecruitment=function(r,t){
+  const m=captureRecruitmentBeforeArcs(r,t);
+  if(m&&t&&t.name===$('#userTeam')?.value){const d=playerArcs.deskStory(r,t);if(d)m.desk=d}
+  return m;
+ };
+ // Season-complete honors as This Week items.
+ globalThis.DynastyPlayerArcNews=t=>universe.phase==='complete'&&universe.awards?.[universe.year]?playerArcs.payoffs(t):[];
+
+ const careerChronologyBeforeArcs=careerChronologyHTML;
+ careerChronologyHTML=function(p){
+  const html=careerChronologyBeforeArcs(p),line=playerArcs.signedLine(p),pk=p?.recruitingMemory?playerArcs.peak(p):null;
+  if(!line)return html;
+  return`<div class="arc-story"><div class="eyebrow">PLAYER ARC</div><p>${paEsc(line)}</p>${pk&&pk.rank>0?`<p class="small muted">Became: <strong>${paEsc(pk.label)}</strong></p>`:''}</div>${html}`;
+ };
+
+ function classCardHTML(c){
+  const stars=c.avgStars.toFixed(1);
+  const steal=c.steals[0],miss=c.misses[0];
+  return`<article class="arc-class">
+   <div class="arc-class-head"><strong>Class of ${c.season}</strong>${c.grade?`<span class="arc-grade arc-grade--${c.grade}" title="Better than ${c.percentile}% of the ${c.classes} classes signed that year">${c.grade}</span>`:`<span class="small muted">${c.years<2?'Too early to grade':'Not enough classes to compare'}</span>`}</div>
+   <div class="small muted">${c.count} signed · ${stars}★ average · ${c.stay} still here${c.left?` · ${c.left} transferred out`:''}</div>
+   ${c.grade?`<div class="small muted">Better than ${c.percentile}% of that year's classes</div>`:''}
+   <div class="arc-class-stats"><span><strong>${c.starters}</strong> starters</span><span><strong>${c.honors}</strong> honored</span><span><strong>${c.drafted}</strong> drafted</span></div>
+   ${c.best&&c.best.peak!=='Did not play'?`<div class="small">Best: <button class="player-button" data-player="${paEsc(c.best.id)}">${paEsc(c.best.name)}</button> (${'★'.repeat(c.best.stars)||'Unrated'} ${paEsc(c.best.pos)}) — ${paEsc(c.best.peak)}</div>`:''}
+   ${steal?`<div class="small">Steal: <button class="player-button" data-player="${paEsc(steal.id)}">${paEsc(steal.name)}</button>, a ${'★'.repeat(steal.stars)||'unrated'} recruit — ${paEsc(steal.peak)}</div>`:''}
+   ${miss?`<div class="small muted">Miss: ${paEsc(miss.name)}, a ${'★'.repeat(miss.stars)} recruit who never played</div>`:''}
+  </article>`;
+ }
+ function classesHTML(t){
+  const seasons=playerArcs.classSeasons(t).slice(0,6),cards=seasons.map(s=>playerArcs.classReport(t,s)).filter(Boolean);
+  if(!cards.length)return'';
+  return`<section class="card arc-classes" id="arcClasses"><div class="eyebrow">RECRUITING CLASSES</div><h3>How your classes turned out</h3><div class="arc-class-grid">${cards.map(classCardHTML).join('')}</div></section>`;
+ }
+ // The Program view has no render-extension hook, so the class cards follow its own render.
+ const renderProgramBeforeArcs=renderProgram;
+ renderProgram=function(){
+  renderProgramBeforeArcs();
+  const t=selected(),host=$('#programHistory');if(!t||!host)return;
+  $('#arcClasses')?.remove();
+  const html=classesHTML(t);if(!html)return;
+  host.closest?.('.two-col')?.insertAdjacentHTML?.('afterend',html);
+  attachPlayerLinks();
+ };
+ // The tab map captured the original function when app.js ran.
+ if(typeof TAB_RENDERERS==='object'&&TAB_RENDERERS)TAB_RENDERERS.program=renderProgram;
+}
+
+// Staff assignments (v0.15.1). Every coach on your staff takes a recruiting territory, and the head coach,
+// coordinators and strength coach each take a position group to develop. Hiring then matters week to week:
+// a strong recruiter makes every contact in his territory count for more, a strong developer lifts his room
+// at camp, and losing a coach leaves a specific hole (his territory and his room) until you reassign.
+//
+// Only the controlled program has assignments, so the rest of the league plays exactly as before, and no
+// effect draws gameplay randomness. A save without assignments behaves as it always did.
+function makeStaffAssignmentSystem(env){
+ 'use strict';
+ const universe=()=>env.getUniverse(),clamp=env.clamp;
+ const GROUPS={QB:{label:'Quarterbacks',pos:['QB'],side:'off'},RB:{label:'Running backs',pos:['RB'],side:'off'},REC:{label:'Receivers & tight ends',pos:['WR','TE'],side:'off'},OL:{label:'Offensive line',pos:['OT','OG','C'],side:'off'},
+  DL:{label:'Defensive line',pos:['EDGE','DT'],side:'def'},LB:{label:'Linebackers',pos:['LB'],side:'def'},DB:{label:'Secondary',pos:['CB','S'],side:'def'},ST:{label:'Specialists',pos:['K','P'],side:'any'}};
+ const SLOTS=['HC','OC','DC','RC','SC'];
+ const SLOT_LABELS={HC:'Head Coach',OC:'Offensive Coordinator',DC:'Defensive Coordinator',RC:'Recruiting Coordinator',SC:'Strength & Performance'};
+ // Who may develop what. The recruiting coordinator recruits only.
+ const MAY_DEVELOP={HC:()=>true,SC:()=>true,OC:g=>GROUPS[g].side!=='def',DC:g=>GROUPS[g].side!=='off',RC:()=>false};
+ // A new territory takes two weeks to learn before contacts there pay the bonus.
+ const LEARN_WEEKS=2;
+ const groupOf=pos=>Object.keys(GROUPS).find(g=>GROUPS[g].pos.includes(pos))||null;
+
+ function state(t,create=true){
+  if(!t)return null;
+  if(!t.staffAssignments&&!create)return null;
+  t.staffAssignments??={version:1,slots:{}};t.staffAssignments.slots??={};
+  return t.staffAssignments;
+ }
+ function coachIn(t,slot){return t?.staff?.[slot]||null}
+ // One row per staff slot: who holds it, what he is assigned, and whether the assignment is still his.
+ function rows(t){
+  const s=state(t,false),u=universe();
+  return SLOTS.map(slot=>{
+   const c=coachIn(t,slot),a=s?.slots?.[slot]||null,valid=!!(a&&c&&a.coachId===c.id);
+   const learning=valid&&a.region&&a.regionSince&&a.regionSince.year===u.year&&u.week-a.regionSince.week<LEARN_WEEKS;
+   return{slot,label:SLOT_LABELS[slot],coach:c,region:valid?a.region:null,group:valid?a.group:null,
+    vacated:a&&!valid&&(a.region||a.group)?{name:a.coachName||'A coach',region:a.region,group:a.group}:null,learning:!!learning};
+  });
+ }
+ function assign(t,slot,{region,group}={}){
+  if(!t||!SLOTS.includes(slot))return{ok:false,reason:'Unknown staff slot.'};
+  const c=coachIn(t,slot);if(!c)return{ok:false,reason:'That position on the staff is empty.'};
+  if(region!==undefined&&region!==null&&!env.regions.includes(region))return{ok:false,reason:`Unknown region "${region}".`};
+  if(group!==undefined&&group!==null){
+   if(!GROUPS[group])return{ok:false,reason:`Unknown position group "${group}".`};
+   if(!MAY_DEVELOP[slot](group))return{ok:false,reason:`The ${SLOT_LABELS[slot].toLowerCase()} cannot coach ${GROUPS[group].label.toLowerCase()}.`};
+  }
+  const s=state(t),others=rows(t).filter(r=>r.slot!==slot);
+  if(region&&others.some(r=>r.region===region))return{ok:false,reason:`${region} already has a coach. Each territory gets one.`};
+  if(group&&others.some(r=>r.group===group))return{ok:false,reason:`${GROUPS[group].label} already have a coach.`};
+  const old=s.slots[slot],kept=old&&old.coachId===c.id?old:{};
+  const next={coachId:c.id,coachName:c.name,region:kept.region??null,group:kept.group??null,regionSince:kept.regionSince??null};
+  const u=universe();
+  if(region!==undefined&&region!==next.region){next.region=region||null;next.regionSince=region?{year:u.year,week:u.week}:null}
+  if(group!==undefined)next.group=group||null;
+  s.slots[slot]=next;
+  return{ok:true,row:rows(t).find(r=>r.slot===slot)};
+ }
+
+ // ---------- effects ----------
+ // Interest added to a contact that already gained interest, for a recruit in the coach's territory:
+ // (recruiting - 50) / 20, capped at 2 (a 70 recruiter adds 1, a 90 adds 2).
+ function territoryCoach(r,t){
+  if(!r?.homeRegion||!t)return null;
+  const row=rows(t).find(x=>x.region===r.homeRegion);
+  return row&&!row.learning?row:null;
+ }
+ function recruitBonus(r,t){
+  const row=territoryCoach(r,t);if(!row)return 0;
+  return clamp(((row.coach.recruiting||50)-50)/20,0,2);
+ }
+ // Added to the camp growth modifier for a player in the coach's room: (development - 50) / 200, capped at .2.
+ function developBonus(p,t){
+  const g=groupOf(p?.pos);if(!g)return null;
+  const row=rows(t).find(x=>x.group===g);if(!row)return null;
+  return{amount:clamp(((row.coach.development||50)-50)/200,0,.2),coach:row.coach,group:g,slot:row.slot};
+ }
+
+ // ---------- staff suggestion ----------
+ // Territories where your board is (targets by region), best recruiter first; rooms by need (fewest
+ // players against the designed depth, then weakest), best developer first. A starting point, not a rule.
+ function suggest(t){
+  const u=universe(),plan={};
+  const board={};for(const r of u.recruits||[])if(r.targeted&&!r.committed&&r.homeRegion)board[r.homeRegion]=(board[r.homeRegion]||0)+1+(r.stars||0)*.25;
+  const regions=env.regions.slice().sort((a,b)=>(board[b]||0)-(board[a]||0));
+  const byRecruiting=SLOTS.filter(s=>coachIn(t,s)).sort((a,b)=>(coachIn(t,b).recruiting||0)-(coachIn(t,a).recruiting||0));
+  byRecruiting.forEach((slot,i)=>{plan[slot]={region:regions[i]||null,group:null}});
+  const need=g=>{const pos=GROUPS[g].pos,depth=(t.roster||[]).filter(p=>pos.includes(p.pos));const want=pos.reduce((n,x)=>n+(env.posCounts[x]||2),0);return(want-depth.length)*3+(70-(depth.length?depth.reduce((n,p)=>n+(p.perceived||0),0)/depth.length:50))/5};
+  const groups=Object.keys(GROUPS).filter(g=>g!=='ST').sort((a,b)=>need(b)-need(a)),taken=new Set();
+  for(const slot of SLOTS.filter(s=>s!=='RC'&&coachIn(t,s)).sort((a,b)=>(coachIn(t,b).development||0)-(coachIn(t,a).development||0))){
+   const g=groups.find(x=>!taken.has(x)&&MAY_DEVELOP[slot](x));if(g){taken.add(g);plan[slot].group=g}
+  }
+  return plan;
+ }
+ function applySuggestion(t){
+  const plan=suggest(t),s=state(t);
+  // Clear first so a swap between two coaches is not refused as a duplicate.
+  for(const slot of SLOTS){const c=coachIn(t,slot);if(c&&s.slots[slot]?.coachId===c.id){s.slots[slot].region=null;s.slots[slot].group=null}}
+  for(const [slot,p] of Object.entries(plan))assign(t,slot,p);
+  return rows(t);
+ }
+ function vacancies(t){return rows(t).filter(r=>r.vacated)}
+
+ return{GROUPS,SLOTS,SLOT_LABELS,LEARN_WEEKS,MAY_DEVELOP,groupOf,state,rows,assign,recruitBonus,territoryCoach,developBonus,suggest,applySuggestion,vacancies};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeStaffAssignmentSystem};
+}else{
+ const staffAssignments=makeStaffAssignmentSystem({getUniverse:()=>universe,clamp,posCounts:POS_COUNTS,
+  regions:['Atlantic','Great Lakes','Gulf','Heartland','Metro','Mountain','Northeast','Pacific','Southeastern','Southwest']});
+ globalThis.DynastyStaffAssignments=staffAssignments;
+ const saEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const isMine=t=>t&&t.name===$('#userTeam')?.value;
+
+ // Camp growth: the assigned coach adds to the modifier for his room (controlled program only).
+ const resolveDevelopmentCoachingBeforeAssignments=resolveDevelopmentCoaching;
+ resolveDevelopmentCoaching=function(t,p){
+  const out=resolveDevelopmentCoachingBeforeAssignments(t,p);
+  if(!isMine(t))return out;
+  const b=staffAssignments.developBonus(p,t);if(!b||!b.amount)return out;
+  const modifier=Math.max(-.5,Math.min(.95,out.modifier+b.amount));
+  return{...out,modifier:Math.round(modifier*1000)/1000,assignment:{coachName:b.coach.name,group:staffAssignments.GROUPS[b.group].label,support:Math.round(b.amount*1000)/1000},
+   summary:`${out.summary} ${b.coach.name} is assigned to coach the ${staffAssignments.GROUPS[b.group].label.toLowerCase()}.`};
+ };
+
+ function rowHTML(t,row){
+  const regionSel=`<select data-sa-region="${row.slot}" aria-label="${saEsc(row.label)} territory"><option value="">No territory</option>${['Atlantic','Great Lakes','Gulf','Heartland','Metro','Mountain','Northeast','Pacific','Southeastern','Southwest'].map(r=>`<option ${row.region===r?'selected':''}>${r}</option>`).join('')}</select>`;
+  const groups=Object.entries(staffAssignments.GROUPS).filter(([g])=>staffAssignments.MAY_DEVELOP[row.slot](g));
+  const groupSel=groups.length?`<select data-sa-group="${row.slot}" aria-label="${saEsc(row.label)} position group"><option value="">No position group</option>${groups.map(([g,x])=>`<option value="${g}" ${row.group===g?'selected':''}>${x.label}</option>`).join('')}</select>`:'<span class="small muted">Recruits only</span>';
+  const c=row.coach;
+  const effect=[row.region&&`${row.learning?'Learning the territory (2 weeks), then ':''}+${Math.min(2,Math.max(0,((c.recruiting||50)-50)/20)).toFixed(1)} interest per contact in ${row.region}`,row.group&&`+${Math.min(.2,Math.max(0,((c.development||50)-50)/200)).toFixed(2)} camp growth for the ${staffAssignments.GROUPS[row.group].label.toLowerCase()}`].filter(Boolean).join(' · ');
+  return`<div class="sa-row"><div><strong>${saEsc(c?.name||'Vacant')}</strong><div class="small muted">${saEsc(row.label)} · Recruiting ${c?.recruiting??'—'} · Development ${c?.development??'—'}</div>
+   ${row.vacated?`<div class="small sa-vacated">${saEsc(row.vacated.name)} left${row.vacated.region?` (${saEsc(row.vacated.region)})`:''}${row.vacated.group?` (${saEsc(staffAssignments.GROUPS[row.vacated.group]?.label||'')})`:''}. That assignment is open until you reassign it.</div>`:''}
+   ${effect?`<div class="small">${saEsc(effect)}</div>`:''}</div><div class="sa-controls">${regionSel}${groupSel}</div></div>`;
+ }
+ function cardHTML(t){
+  const rows=staffAssignments.rows(t);
+  return`<div class="card staff-assignments" id="staffAssignments"><div class="section-head"><div><h3>Staff Assignments</h3><div class="small muted">Each coach takes one recruiting territory, and every coach but the recruiting coordinator takes a position group to develop. Each territory and room gets one coach.</div></div><button type="button" class="ghost" data-sa-suggest>Let the staff suggest</button></div>${rows.map(r=>rowHTML(t,r)).join('')}</div>`;
+ }
+ function bind(root,t){
+  root.querySelectorAll?.('[data-sa-region]').forEach(s=>s.onchange=()=>{const r=staffAssignments.assign(t,s.dataset.saRegion,{region:s.value||null});setStatus(r.ok?(s.value?`${r.row.coach.name} now recruits the ${s.value}.`:'Territory cleared.'):r.reason);renderStaff()});
+  root.querySelectorAll?.('[data-sa-group]').forEach(s=>s.onchange=()=>{const r=staffAssignments.assign(t,s.dataset.saGroup,{group:s.value||null});setStatus(r.ok?(s.value?`${r.row.coach.name} now coaches the ${staffAssignments.GROUPS[s.value].label.toLowerCase()}.`:'Position group cleared.'):r.reason);renderStaff()});
+  root.querySelectorAll?.('[data-sa-suggest]').forEach(b=>b.onclick=e=>{e.preventDefault();staffAssignments.applySuggestion(t);setStatus('Staff assignments set from your board and your roster needs.');renderStaff()});
+ }
+ extendRender('staff',()=>{
+  const t=selected(),host=$('#staffList');if(!t||!host)return;
+  $('#staffAssignments')?.remove();
+  host.closest?.('.two-col')?.insertAdjacentHTML?.('afterend',cardHTML(t));
+  const card=$('#staffAssignments');if(card)bind(card,t);
+ });
+ // A reminder on This Week when a departure has left an assignment open.
+ globalThis.DynastyStaffAssignmentNews=t=>staffAssignments.vacancies(t).map(r=>({type:'alert',tab:'staff',kicker:'STAFF',importance:52,
+  main:`${r.vacated.name}'s assignment is open`,sub:`${[r.vacated.region,r.vacated.group&&staffAssignments.GROUPS[r.vacated.group]?.label].filter(Boolean).join(' and ')} ha${r.vacated.region&&r.vacated.group?'ve':'s'} no coach. Reassign it on Staff.`}));
+}
+
+// Situational playbook (v0.15.1). How your staff call fourth downs, conversions and the late clock in the
+// games you do not coach live, and what they recommend when you do. The rules live in Game Engine 2
+// (playbookFourthDown, playbookTwoPoint, playbookClock) so a simulated game and a live one decide the same
+// way. Only the controlled program has a playbook; "Standard / Kick / Standard" is the engine's default, so
+// a program that never opens the card plays exactly as before.
+function makePlaybookSystem(env){
+ 'use strict';
+ const OPTIONS={
+  fourthDown:[
+   {id:'standard',label:'Standard',note:'Go on short yardage near midfield, kick field goals in range, punt otherwise.'},
+   {id:'conservative',label:'Conservative',note:'Go only on 4th and 1 inside the 40; otherwise kick or punt.'},
+   {id:'aggressive',label:'Aggressive',note:'Go on 4th and 2 or less from your own 35, 4th and 4 or less between midfield and the 30, and 4th and 3 or less inside the 10.'}],
+  twoPoint:[
+   {id:'kick',label:'Always kick',note:'Kick the extra point after every touchdown.'},
+   {id:'chart',label:'Use the chart',note:'In the second half, go for two when the margin after the touchdown is −10, −5, −2, +1, +5 or +12.'}],
+  clock:[
+   {id:'standard',label:'Standard',note:'Play at the normal pace all game.'},
+   {id:'manage',label:'Manage the clock',note:'In the fourth quarter, leading: runs and completions take 6 more seconds. Trailing in the last five minutes: get out of bounds and save 8.'}]
+ };
+ const DEFAULTS={fourthDown:'standard',twoPoint:'kick',clock:'standard'};
+ function get(t){
+  const p=t?.playbook;if(!p||typeof p!=='object')return{...DEFAULTS};
+  const out={};for(const k of Object.keys(DEFAULTS))out[k]=OPTIONS[k].some(o=>o.id===p[k])?p[k]:DEFAULTS[k];
+  return out;
+ }
+ function isDefault(p){return Object.keys(DEFAULTS).every(k=>p[k]===DEFAULTS[k])}
+ function set(t,key,value){
+  if(!t||!OPTIONS[key])return{ok:false,reason:'Unknown playbook setting.'};
+  if(!OPTIONS[key].some(o=>o.id===value))return{ok:false,reason:`Unknown option "${value}".`};
+  const next={...get(t),[key]:value};
+  if(isDefault(next))delete t.playbook;else t.playbook=next;
+  return{ok:true,playbook:next};
+ }
+ // {home, away} for a game, with the controlled side's playbook only; null when neither side has one.
+ function forMatch(home,away,controlledName){
+  const out={};
+  for(const [side,t] of [['home',home],['away',away]])if(t&&t.name===controlledName){const p=get(t);if(!isDefault(p))out[side]=p}
+  return Object.keys(out).length?out:null;
+ }
+ // What the staff did with the playbook in one game, from the engine's own events.
+ function tally(state,side){
+  const out={fourthTries:0,fourthConverted:0,twoTries:0,twoMade:0,bleed:0,hurry:0};
+  for(const e of state?.events||[]){
+   if(e.team!==side)continue;
+   if(e.type==='scrimmage'&&e.from?.down===4){out.fourthTries++;if((e.yards||0)>=(e.from.distance||99)||e.touchdown)out.fourthConverted++}
+   if(e.type==='two_point'&&e.playbook){out.twoTries++;if(e.made)out.twoMade++}
+  }
+  return out;
+ }
+ return{OPTIONS,DEFAULTS,get,set,isDefault,forMatch,tally};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makePlaybookSystem};
+}else{
+ const playbook=makePlaybookSystem({});
+ globalThis.DynastyPlaybook=playbook;
+ const pbEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const controlled=()=>$('#userTeam')?.value||null;
+
+ // Recorded and live games pick up the controlled program's playbook without changing their callers.
+ const lab=globalThis.DynastyGameEngineV2Lab;
+ if(lab&&typeof lab.simulate==='function'){
+  const simulateBeforePlaybook=lab.simulate;
+  lab.simulate=function(options={}){
+   const pb=options.playbook===undefined?playbook.forMatch(options.home,options.away,controlled()):options.playbook;
+   const out=simulateBeforePlaybook(pb?{...options,playbook:pb}:options);
+   // A recorded game (not a shadow preview) adds to the season's playbook log, once per game id.
+   const id=String(options.gameId||'');
+   if(pb&&(/^v0101-(?!shadow-|gameday-)/.test(id)||id.startsWith('v0102-post-')))noteGame(id,out.state,pb);
+   return out;
+  };
+ }
+ const gameDay=globalThis.DynastyGameEngineV2GameDay;
+ if(gameDay&&typeof gameDay.createSession==='function'){
+  const createSessionBeforePlaybook=gameDay.createSession;
+  gameDay.createSession=function(options={}){
+   const pb=options.playbook===undefined?playbook.forMatch(options.home,options.away,controlled()):options.playbook;
+   return createSessionBeforePlaybook(pb?{...options,playbook:pb}:options);
+  };
+ }
+ function noteGame(id,state,pb){
+  const t=universe.teams.find(x=>x.name===controlled());if(!t)return;
+  const side=pb.home?'home':'away',log=(t.playbookLog&&t.playbookLog.year===universe.year)?t.playbookLog:(t.playbookLog={year:universe.year,games:[],totals:{fourthTries:0,fourthConverted:0,twoTries:0,twoMade:0}});
+  if(log.games.includes(id))return;
+  log.games.push(id);if(log.games.length>30)log.games.splice(0,log.games.length-30);
+  const x=playbook.tally(state,side);for(const k of Object.keys(log.totals))log.totals[k]+=x[k]||0;
+ }
+
+ function cardHTML(t){
+  const p=playbook.get(t),log=t.playbookLog&&t.playbookLog.year===universe.year?t.playbookLog:null;
+  const row=(key,title)=>`<label class="pb-row"><span><strong>${title}</strong><small>${pbEsc(playbook.OPTIONS[key].find(o=>o.id===p[key]).note)}</small></span><select data-pb="${key}">${playbook.OPTIONS[key].map(o=>`<option value="${o.id}" ${o.id===p[key]?'selected':''}>${pbEsc(o.label)}</option>`).join('')}</select></label>`;
+  const tot=log?.totals;
+  return`<div class="card situational-playbook" id="situationalPlaybook"><h3>Situational Playbook</h3>
+   <p class="small muted">How your staff call it in games you sim or watch, and what they recommend when you coach live. Late in the fourth quarter and behind, every setting except Standard keeps the ball on fourth down unless a field goal ties or takes the lead.</p>
+   ${row('fourthDown','Fourth down')}${row('twoPoint','Two-point tries')}${row('clock','Late clock')}
+   ${tot?`<p class="small">This season: ${tot.fourthTries} fourth-down tr${tot.fourthTries===1?'y':'ies'} (${tot.fourthConverted} converted) · ${tot.twoTries} two-point tr${tot.twoTries===1?'y':'ies'} (${tot.twoMade} good) in ${log.games.length} game${log.games.length===1?'':'s'} with this playbook.</p>`:''}
+  </div>`;
+ }
+ function bind(root,t){
+  root.querySelectorAll?.('[data-pb]').forEach(s=>s.onchange=()=>{
+   const r=playbook.set(t,s.dataset.pb,s.value);
+   setStatus(r.ok?`Playbook: ${playbook.OPTIONS[s.dataset.pb].find(o=>o.id===s.value).label} ${{fourthDown:'on fourth down',twoPoint:'after touchdowns',clock:'late clock'}[s.dataset.pb]}.`:r.reason);
+   renderActiveTab();
+  });
+ }
+ extendRender('gamelab',()=>{
+  const t=selected(),anchor=$('#nextGameCard');if(!t||!anchor)return;
+  $('#situationalPlaybook')?.remove();
+  anchor.insertAdjacentHTML?.('afterend',cardHTML(t));
+  const card=$('#situationalPlaybook');if(card)bind(card,t);
+ });
+}
+
+// Guided tour (v0.15.1). A short, optional walk through the desks: weekly reminders, recruiting hours and the
+// Recruiting Desk, staff assignments, the situational playbook, class report cards and the Portal Desk. It is
+// offered from a card on This Week during a new dynasty's first weeks, can be restarted from that card, and
+// never blocks anything: Escape or "End tour" closes it at any step.
+function makeTutorialSystem(){
+ 'use strict';
+ const STEPS=[
+  {tab:'dashboard',target:['#weeklyHub:not(:empty)','.card:has(#hubTitle)','#hubTitle'],title:'This Week',body:'Every week starts here: decisions that need you, reminders worth doing, and news. Recruiting results (who chose you, who cut you, who flipped) and PAYOFF stories about players you recruited show up in this list.'},
+  {tab:'recruiting',target:['.ra-nav','#raStrip','#rwSwitch'],title:'Recruiting hours',body:'Your staff get a budget of recruiting hours each week, from your recruiting coordinator, head coach and resources. Unused hours do not carry over. Turn on "Staff handle recruiting" if you would rather they spend them for you.'},
+  {tab:'recruiting',target:['.recruiting-desk','#recruitingWorkspace','#recruiting'],title:'The Recruiting Desk',body:'Open a prospect to work him: call, pitch a topic (the desk shows how well it will land before you spend), offer, host a visit, or visit the family. Each recruit cuts his list to a Top 5 and a Top 3 before his decision week, and rival programs answer what you do.'},
+  {tab:'staff',target:['#staffAssignments'],title:'Staff assignments',body:'Give each coach a recruiting territory and a position group. A strong recruiter makes every contact in his territory count for more; a strong developer lifts his room at camp. When a coach leaves, his territory and room stay open until you reassign them.'},
+  {tab:'gamelab',target:['#situationalPlaybook'],title:'Situational playbook',body:'Choose how your staff call fourth downs, two-point tries and the late clock in games you sim or watch. When you coach live, their recommendation follows the same playbook.'},
+  {tab:'program',target:['#arcClasses','#programHistory'],title:'How your classes turned out',body:'Every class you sign gets a report card here once it has played: starters, honors, draft picks, the best player, a steal and a miss, graded against the rest of the league. Each player\'s profile tells the story of how you won him.'},
+  {tab:'offseason',target:['#portalDesk','#portalPanels','#offseason'],title:'The Portal Desk',body:'In the offseason the transfer portal gets its own desk: portal hours each round, a playing-time pitch with an honest read, your real odds with each target, and rival programs that counter when you get close.'}
+ ];
+ function seen(u){return!!u?.tutorial?.done}
+ function markDone(u,how='finished'){if(u){u.tutorial={done:true,how,year:u.year,week:u.week}}}
+ // Offer the tour in a new dynasty's first season, early on, until it is finished or dismissed.
+ function shouldOffer(u){return!!u&&!seen(u)&&u.phase!=='complete'&&(u.week||0)<=3&&(u.history||[]).filter(h=>h.type==='season').length===0}
+ return{STEPS,seen,markDone,shouldOffer};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeTutorialSystem};
+}else{
+ const tour=makeTutorialSystem();
+ globalThis.DynastyTutorial=tour;
+ const tEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ let index=-1,returnFocus=null;
+ // The first visible match with some size; an empty list spotlights the card around it instead.
+ function targetFor(step){
+  for(const sel of step.target){
+   let el=document.querySelector(sel);if(!el||!el.getClientRects?.().length)continue;
+   if(el.getBoundingClientRect().height<8)el=el.closest?.('.card,section')||null;
+   if(el&&el.getBoundingClientRect().height>=8)return el;
+  }
+  return null;
+ }
+ function close(how){
+  document.getElementById('tourLayer')?.remove();document.removeEventListener('keydown',onKey,true);window.removeEventListener('resize',place);
+  if(index>=0)tour.markDone(universe,how);index=-1;
+  if(typeof render==='function')render();
+  returnFocus?.focus?.();returnFocus=null;
+ }
+ function onKey(e){
+  if(e.key==='Escape'){e.preventDefault();close('ended')}
+  else if(e.key==='ArrowRight'){e.preventDefault();show(index+1)}
+  else if(e.key==='ArrowLeft'){e.preventDefault();show(index-1)}
+ }
+ function place(){
+  const layer=document.getElementById('tourLayer');if(!layer||index<0)return;
+  const el=targetFor(tour.STEPS[index]),spot=layer.querySelector('.tour-spot'),card=layer.querySelector('.tour-card');
+  const vw=window.innerWidth,vh=window.innerHeight;
+  if(!el){spot.hidden=true;card.style.left=`${Math.max(12,(vw-card.offsetWidth)/2)}px`;card.style.top=`${Math.max(12,(vh-card.offsetHeight)/2)}px`;return}
+  const r=el.getBoundingClientRect(),pad=6,top=Math.max(4,r.top-pad),left=Math.max(4,r.left-pad),h=Math.min(r.height+pad*2,vh-top-4),w=Math.min(r.width+pad*2,vw-left-4);
+  Object.assign(spot.style,{top:`${top}px`,left:`${left}px`,width:`${w}px`,height:`${h}px`});spot.hidden=false;
+  // The card sits below the target when it fits, else above, else over the bottom of the screen.
+  const ch=card.offsetHeight,cw=Math.min(card.offsetWidth,vw-24);
+  let y=top+h+10;if(y+ch>vh-12)y=top-ch-10;if(y<12||y+ch>vh-12)y=vh-ch-12;
+  card.style.top=`${Math.max(12,Math.min(y,vh-ch-12))}px`;card.style.left=`${Math.min(Math.max(12,left),vw-cw-12)}px`;
+ }
+ function show(i){
+  if(i<0)return;if(i>=tour.STEPS.length){close('finished');return}
+  index=i;const step=tour.STEPS[i];
+  if(typeof goToTab==='function')goToTab(step.tab);
+  let layer=document.getElementById('tourLayer');
+  if(!layer){
+   layer=document.createElement('div');layer.id='tourLayer';layer.className='tour-layer';
+   layer.innerHTML=`<div class="tour-spot" aria-hidden="true"></div><section class="tour-card" role="dialog" aria-modal="false" aria-labelledby="tourTitle"><div class="eyebrow" data-tour-count></div><h3 id="tourTitle"></h3><p data-tour-body></p><div class="tour-actions"><button type="button" class="ghost" data-tour-end>End tour</button><span></span><button type="button" class="ghost" data-tour-back>Back</button><button type="button" data-tour-next>Next</button></div></section>`;
+   document.body.appendChild(layer);
+   layer.querySelector('[data-tour-end]').onclick=()=>close('ended');
+   layer.querySelector('[data-tour-back]').onclick=()=>show(index-1);
+   layer.querySelector('[data-tour-next]').onclick=()=>show(index+1);
+   document.addEventListener('keydown',onKey,true);window.addEventListener('resize',place);
+  }
+  layer.querySelector('[data-tour-count]').textContent=`TOUR · ${i+1} OF ${tour.STEPS.length}`;
+  layer.querySelector('#tourTitle').textContent=step.title;
+  layer.querySelector('[data-tour-body]').textContent=step.body;
+  layer.querySelector('[data-tour-back]').disabled=i===0;
+  layer.querySelector('[data-tour-next]').textContent=i===tour.STEPS.length-1?'Finish':'Next';
+  // Let the tab render, bring the target into view, then draw the spotlight around it.
+  setTimeout(()=>{const el=targetFor(step);el?.scrollIntoView?.({block:'center',behavior:'instant'});setTimeout(()=>{place();layer.querySelector('[data-tour-next]')?.focus?.()},30)},30);
+ }
+ function start(){returnFocus=document.activeElement;show(0)}
+ globalThis.DynastyTutorial.start=start;
+ globalThis.DynastyTutorial.close=close;
+
+ function offerHTML(){
+  return`<div class="card tour-offer" id="tourOffer"><div><strong>New desks this season</strong><span class="small muted">A two-minute tour of recruiting hours, the desks, staff assignments and the playbook.</span></div><div class="tour-offer-actions"><button type="button" data-tour-start>Take the tour</button><button type="button" class="ghost" data-tour-dismiss>Not now</button></div></div>`;
+ }
+ extendRender('dashboard',()=>{
+  document.getElementById('tourOffer')?.remove();
+  if(index>=0||!tour.shouldOffer(universe))return;
+  const hub=document.getElementById('weeklyHub'),host=hub?.closest?.('.card')||hub;if(!host)return;
+  host.insertAdjacentHTML?.('beforebegin',offerHTML());
+  const card=document.getElementById('tourOffer');if(!card)return;
+  card.querySelector('[data-tour-start]').onclick=()=>start();
+  card.querySelector('[data-tour-dismiss]').onclick=()=>{tour.markDone(universe,'dismissed');card.remove();setStatus('Tour dismissed. You can always find each desk from its tab.')};
+ });
+ if(globalThis.__DL_TEST__)Object.assign(globalThis.__DL_TEST__,{tourStart:start,tourClose:close,tourState:()=>({index,seen:tour.seen(universe)})});
 }
 
 // Read-only presentation adapter for the premium recruiting workspace.
@@ -13315,8 +14430,26 @@ if(globalThis.__DL_TEST__){globalThis.__DL_TEST__.v2DetailedSeasonSoakProbe=v2De
 // v0.10.2 development extension: user-controlled postseason games use the same transactional Game Engine 2 path.
 let v2PostseasonInjectedFault=null;
 function v2PostseasonUserMatch(a,b){const me=selected();return !!me&&(a?.id===me.id||b?.id===me.id)}
-function v2PostseasonStageCapture(){syncGameplayRng();return v2RecordClone(universe)}
-function v2PostseasonStageRestore(snapshot){universe=v2RecordClone(snapshot);rebuildIndexes();activateGameplayRng(universe.rng,universe);render()}
+// The two archives are append-only during a postseason stage (games are added, nothing already recorded changes), and
+// together they are most of a long dynasty's save. Cloning them made every postseason stage slower each season (1.8 s
+// to 8 s over twelve seasons), so the stage keeps their lengths and rolls back by trimming instead of copying.
+const V2_STAGE_APPEND_ONLY=['playerArchive','gameArchive'];
+function v2PostseasonStageCapture(){
+  syncGameplayRng();const core={},kept={};
+  for(const [key,value] of Object.entries(universe)){
+    if(V2_STAGE_APPEND_ONLY.includes(key)&&Array.isArray(value))kept[key]={rows:value,length:value.length};else core[key]=value;
+  }
+  return{core:v2RecordClone(core),kept,order:Object.keys(universe)};
+}
+function v2PostseasonStageRestore(snapshot){
+  const core=v2RecordClone(snapshot.core),next={};
+  for(const key of snapshot.order){
+    const kept=snapshot.kept[key];
+    if(kept){kept.rows.length=Math.min(kept.rows.length,kept.length);next[key]=kept.rows}else if(key in core)next[key]=core[key];
+  }
+  universe=next;
+  rebuildIndexes();activateGameplayRng(universe.rng,universe);render()
+}
 function v2PostseasonRecordMatch(home,away,options={}){
   const api=globalThis.DynastyGameEngineV2Lab,actors=globalThis.DynastyGameEngineV2Attribution,tx=globalThis.DynastyGameEngineV2Transaction;
   if(!api||!actors||!tx)throw new Error('Game Engine 2 development modules are unavailable.');
@@ -14454,7 +15587,8 @@ function seasonReviewModel(t=selected()){
   games,moments:seasonReviewMoments(t,games),leaders:seasonReviewLeaders(t),
   awards:(universe.awards?.[universe.year]||[]).filter(a=>a.team===t.name).map(a=>({name:a.name,playerId:a.playerId,playerName:a.playerName,pos:a.pos})),
   goals:goals.results.map(g=>({label:g.label,weight:g.weight||g.tier,state:g.state,progress:g.progress})),
-  recruiting:{signees:signees.length,blueChips:signees.filter(r=>(r.stars||0)>=4).length,avgStars:Math.round(stars*10)/10,rank:recruitingClassRank(t)}
+  recruiting:{signees:signees.length,blueChips:signees.filter(r=>(r.stars||0)>=4).length,avgStars:Math.round(stars*10)/10,rank:recruitingClassRank(t)},
+  desk:globalThis.DynastyRecruitingSeason?.(t)||null
  };
 }
 function seasonReviewChipLabel(g){
@@ -14467,7 +15601,9 @@ function seasonReviewChipLabel(g){
 function seasonReviewHTML(m){
  const game=g=>`<button type="button" class="sr-game ${g.win?'win':'loss'}${g.postseason?' post':''}" data-game="${esc(g.id)}" title="${esc(`${g.label}: ${g.win?'W':'L'} ${g.us}–${g.them} ${g.loc} ${g.opp}`)}"><b>${g.win?'W':'L'}</b><span>${esc(seasonReviewChipLabel(g))}</span><small>${g.us}–${g.them}</small></button>`;
  const goalIcon={complete:'✓',failed:'✕',at_risk:'!'};
- const r=m.recruiting;
+ const r=m.recruiting,d=m.desk;
+ const star=x=>'★'.repeat(x.stars||0);
+ const deskBlock=d?`<div class="eyebrow" style="margin-top:12px">RECRUITING DESK</div><div class="lineitem"><span>${esc(d.hours)} of ${esc(d.budget)} hours spent</span><span>${d.budget?Math.round(d.hours/d.budget*100):0}%</span></div><div class="lineitem"><span>Decisions</span><span>${esc(d.won)} chose you · ${esc(d.lost)} went elsewhere · ${esc(d.cut)} cut you</span></div>${d.biggestWin?`<div class="lineitem"><span>Biggest win</span><span>${esc(star(d.biggestWin))} ${esc(d.biggestWin.pos)} ${esc(d.biggestWin.name)}</span></div>`:''}${d.biggestLoss?`<div class="lineitem"><span>Biggest loss</span><span>${esc(star(d.biggestLoss))} ${esc(d.biggestLoss.pos)} ${esc(d.biggestLoss.name)} → ${esc(d.biggestLoss.team)}</span></div><p class="small muted">${esc(d.biggestLoss.why)}</p>`:''}${d.neverOffered?`<p class="small warn">${esc(d.neverOffered)} recruit${d.neverOffered===1?'':'s'} had you on a final list and never got an offer.</p>`:''}${d.flipped?`<div class="lineitem"><span>Commitments that flipped away</span><span>${esc(d.flipped)}</span></div>`:''}${d.rivalMoves?`<div class="lineitem"><span>Rival moves answered</span><span>${esc(d.answered)} of ${esc(d.rivalMoves)}</span></div>`:''}`:'';
  return `<div class="section-head"><div><div class="eyebrow">${esc(m.year)} SEASON IN REVIEW</div><h2>${esc(m.outcome)}</h2><div class="muted">${esc(m.record)} · ${esc(m.conference)} · Final ranking ${esc(m.rank)}</div></div>${m.champion?'<img class="sr-trophy" src="assets/trophy-still-v3.png" alt="National championship trophy" width="480" height="720" decoding="async">':''}</div>
  <div class="sr-strip" aria-label="Season results">${m.games.map(game).join('')}</div>
  <div class="sr-grid">
@@ -14475,7 +15611,7 @@ function seasonReviewHTML(m){
   <div class="sr-block"><div class="eyebrow">TEAM LEADERS</div>${m.leaders.map(x=>`<div class="lineitem"><span><span class="muted">${esc(x.label)}</span> <button type="button" class="player-button" data-player="${esc(x.playerId)}">${esc(x.name)}</button> <span class="muted">${esc(x.pos)}</span></span><span>${esc(x.line)}</span></div>`).join('')}
    ${m.awards.length?`<div class="sr-awards">${m.awards.map(a=>`<span class="pill">🏆 ${esc(a.name)}: ${esc(a.playerName)}</span>`).join('')}</div>`:''}</div>
   <div class="sr-block"><div class="eyebrow">SEASON GOALS</div>${m.goals.map(g=>`<div class="lineitem"><span>${goalIcon[g.state]||'•'} ${esc(g.label)}</span><span class="${g.state==='complete'?'good':g.state==='failed'?'bad':'muted'}">${esc(g.state==='complete'||g.state==='failed'?seasonGoalStatusLabel(g.state):'Signing day pending')}</span></div>`).join('')}
-   <div class="eyebrow" style="margin-top:12px">RECRUITING CLASS</div><div class="lineitem"><span>${r.signees} commits${r.blueChips?` · ${r.blueChips} blue-chip${r.blueChips===1?'':'s'}`:''} · ${r.avgStars||'—'}★ average</span><span>${r.rank?`#${r.rank} class`:'Unranked'}</span></div></div>
+   <div class="eyebrow" style="margin-top:12px">RECRUITING CLASS</div><div class="lineitem"><span>${r.signees} commits${r.blueChips?` · ${r.blueChips} blue-chip${r.blueChips===1?'':'s'}`:''} · ${r.avgStars||'—'}★ average</span><span>${r.rank?`#${r.rank} class`:'Unranked'}</span></div>${deskBlock}</div>
  </div>`;
 }
 function renderSeasonReview(){

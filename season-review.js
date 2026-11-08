@@ -53,7 +53,8 @@ function seasonReviewModel(t=selected()){
   games,moments:seasonReviewMoments(t,games),leaders:seasonReviewLeaders(t),
   awards:(universe.awards?.[universe.year]||[]).filter(a=>a.team===t.name).map(a=>({name:a.name,playerId:a.playerId,playerName:a.playerName,pos:a.pos})),
   goals:goals.results.map(g=>({label:g.label,weight:g.weight||g.tier,state:g.state,progress:g.progress})),
-  recruiting:{signees:signees.length,blueChips:signees.filter(r=>(r.stars||0)>=4).length,avgStars:Math.round(stars*10)/10,rank:recruitingClassRank(t)}
+  recruiting:{signees:signees.length,blueChips:signees.filter(r=>(r.stars||0)>=4).length,avgStars:Math.round(stars*10)/10,rank:recruitingClassRank(t)},
+  desk:globalThis.DynastyRecruitingSeason?.(t)||null
  };
 }
 function seasonReviewChipLabel(g){
@@ -66,7 +67,9 @@ function seasonReviewChipLabel(g){
 function seasonReviewHTML(m){
  const game=g=>`<button type="button" class="sr-game ${g.win?'win':'loss'}${g.postseason?' post':''}" data-game="${esc(g.id)}" title="${esc(`${g.label}: ${g.win?'W':'L'} ${g.us}–${g.them} ${g.loc} ${g.opp}`)}"><b>${g.win?'W':'L'}</b><span>${esc(seasonReviewChipLabel(g))}</span><small>${g.us}–${g.them}</small></button>`;
  const goalIcon={complete:'✓',failed:'✕',at_risk:'!'};
- const r=m.recruiting;
+ const r=m.recruiting,d=m.desk;
+ const star=x=>'★'.repeat(x.stars||0);
+ const deskBlock=d?`<div class="eyebrow" style="margin-top:12px">RECRUITING DESK</div><div class="lineitem"><span>${esc(d.hours)} of ${esc(d.budget)} hours spent</span><span>${d.budget?Math.round(d.hours/d.budget*100):0}%</span></div><div class="lineitem"><span>Decisions</span><span>${esc(d.won)} chose you · ${esc(d.lost)} went elsewhere · ${esc(d.cut)} cut you</span></div>${d.biggestWin?`<div class="lineitem"><span>Biggest win</span><span>${esc(star(d.biggestWin))} ${esc(d.biggestWin.pos)} ${esc(d.biggestWin.name)}</span></div>`:''}${d.biggestLoss?`<div class="lineitem"><span>Biggest loss</span><span>${esc(star(d.biggestLoss))} ${esc(d.biggestLoss.pos)} ${esc(d.biggestLoss.name)} → ${esc(d.biggestLoss.team)}</span></div><p class="small muted">${esc(d.biggestLoss.why)}</p>`:''}${d.neverOffered?`<p class="small warn">${esc(d.neverOffered)} recruit${d.neverOffered===1?'':'s'} had you on a final list and never got an offer.</p>`:''}${d.flipped?`<div class="lineitem"><span>Commitments that flipped away</span><span>${esc(d.flipped)}</span></div>`:''}${d.rivalMoves?`<div class="lineitem"><span>Rival moves answered</span><span>${esc(d.answered)} of ${esc(d.rivalMoves)}</span></div>`:''}`:'';
  return `<div class="section-head"><div><div class="eyebrow">${esc(m.year)} SEASON IN REVIEW</div><h2>${esc(m.outcome)}</h2><div class="muted">${esc(m.record)} · ${esc(m.conference)} · Final ranking ${esc(m.rank)}</div></div>${m.champion?'<img class="sr-trophy" src="assets/trophy-still-v3.png" alt="National championship trophy" width="480" height="720" decoding="async">':''}</div>
  <div class="sr-strip" aria-label="Season results">${m.games.map(game).join('')}</div>
  <div class="sr-grid">
@@ -74,7 +77,7 @@ function seasonReviewHTML(m){
   <div class="sr-block"><div class="eyebrow">TEAM LEADERS</div>${m.leaders.map(x=>`<div class="lineitem"><span><span class="muted">${esc(x.label)}</span> <button type="button" class="player-button" data-player="${esc(x.playerId)}">${esc(x.name)}</button> <span class="muted">${esc(x.pos)}</span></span><span>${esc(x.line)}</span></div>`).join('')}
    ${m.awards.length?`<div class="sr-awards">${m.awards.map(a=>`<span class="pill">🏆 ${esc(a.name)}: ${esc(a.playerName)}</span>`).join('')}</div>`:''}</div>
   <div class="sr-block"><div class="eyebrow">SEASON GOALS</div>${m.goals.map(g=>`<div class="lineitem"><span>${goalIcon[g.state]||'•'} ${esc(g.label)}</span><span class="${g.state==='complete'?'good':g.state==='failed'?'bad':'muted'}">${esc(g.state==='complete'||g.state==='failed'?seasonGoalStatusLabel(g.state):'Signing day pending')}</span></div>`).join('')}
-   <div class="eyebrow" style="margin-top:12px">RECRUITING CLASS</div><div class="lineitem"><span>${r.signees} commits${r.blueChips?` · ${r.blueChips} blue-chip${r.blueChips===1?'':'s'}`:''} · ${r.avgStars||'—'}★ average</span><span>${r.rank?`#${r.rank} class`:'Unranked'}</span></div></div>
+   <div class="eyebrow" style="margin-top:12px">RECRUITING CLASS</div><div class="lineitem"><span>${r.signees} commits${r.blueChips?` · ${r.blueChips} blue-chip${r.blueChips===1?'':'s'}`:''} · ${r.avgStars||'—'}★ average</span><span>${r.rank?`#${r.rank} class`:'Unranked'}</span></div>${deskBlock}</div>
  </div>`;
 }
 function renderSeasonReview(){
