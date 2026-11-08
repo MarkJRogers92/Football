@@ -99,8 +99,11 @@ Result on the same save: **13 s** (was 373 to 769 s), with the identical 247.2 M
 and the same reload. Unit tests in `tests/desktop-storage.js` check that a staged save equals a direct save key for key,
 that only one commit is made, that no message is large, and that a failure part-way discards the stage and writes nothing.
 
-The ordinary-save path still sends the core as one message (the second save above: 21 s at season 20). That is
-acceptable today, but the core grows with the dynasty (about 3 MB a season), so it is the next thing to watch.
+An ordinary save of a mature dynasty (the second save above: about 21 s at season 20) still sends the core as one
+message, but that is not where its time goes: splitting the core there too was measured and gave no gain (24.5 s). It is
+main-process work (backing up the prior 65 MB core, writing, and pruning old generations). The core grows about 3 MB a
+season, so that cost grows with the dynasty; it is a background checkpoint, but worth a profile if desktop autosaves
+start to feel slow late in a long dynasty.
 
 ## Not covered
 
