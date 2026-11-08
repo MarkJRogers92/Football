@@ -79,6 +79,47 @@ function makePortalDeskSystem(env){
   if((entry.p.perceived||0)>r.best)out.push('Would start');
   return out;
  }
+ // Compare candidates for the same vacancy. Grades and eligibility are visible to the coach.
+ function shortlist(t){
+  if(!t||cycle().status!=='open')return null;
+  const entries=env.entries(),incoming=entries.filter(e=>e.decision?.schoolId===t.id&&!e.placed);
+  if(t.roster.length+incoming.length>=105)return null;
+  const available=entries.filter(e=>!e.decision&&e.fromSchoolId!==t.id&&!e.placed);
+  const vacancies=Object.keys(env.posCounts).map(pos=>{
+   const r=room(t,pos),signed=incoming.filter(e=>e.p.pos===pos).length;
+   return{pos,...r,signed,short:r.want-r.depth-signed};
+  }).filter(n=>n.short>0).sort((a,b)=>b.short-a.short||a.best-b.best);
+  let need,pool;
+  for(const vacancy of vacancies){
+   const matches=available.filter(e=>e.p.pos===vacancy.pos);
+   if(matches.length>=2){need=vacancy;pool=matches;break}
+   if(matches.length&&!need){need=vacancy;pool=matches}
+  }
+  if(!need)return null;
+  const options=[];
+  for(const [label,score] of [
+   ['Immediate help',p=>p.perceived||0],
+   ['Development',p=>p.perceivedUpside||p.perceived||0],
+   ['Eligibility',p=>4-env.eligibilityUsed(p)],
+  ]){
+   if(!pool.length)break;
+   pool.sort((a,b)=>score(b.p)-score(a.p)||(b.p.perceived||0)-(a.p.perceived||0)||String(a.candidateId).localeCompare(String(b.candidateId)));
+   options.push({entry:pool.shift(),label});
+  }
+  return{need,options};
+ }
+ function pursue(id){
+  if(cycle().status!=='open')return 'The portal is closed.';
+  if(env.targetFor(id))return 'Already on your board.';
+  return env.target(id,1);
+ }
+ function takeList(t){
+  const list=shortlist(t);
+  let added=0;
+  for(const o of list?.options||[])if(!pursue(o.entry.candidateId))added++;
+  return added;
+ }
+
  // Where you stand: the decision is a weighted choice over finalists, weight exp((interest - best) / 7).
  // The same formula gives the coach his real odds if the player decided now.
  function standing(entry,t){
@@ -194,7 +235,8 @@ function makePortalDeskSystem(env){
  // used), then call every target, then pitch where the read is Good or better. They never spend the host or
  // head coach visit on their own initiative except to answer a move.
  function staffPlan(t){
-  const out={hours:0,calls:0,pitches:0,answers:0};if(!t||cycle().status!=='open')return out;
+  const out={hours:0,calls:0,pitches:0,answers:0,added:0};if(!t||cycle().status!=='open')return out;
+  if(!env.entries().some(e=>!e.decision&&env.targetFor(e.candidateId)))out.added=takeList(t);
   const targets=env.entries().filter(e=>!e.decision&&env.targetFor(e.candidateId)).sort((a,b)=>(b.interest?.[t.id]??0)-(a.interest?.[t.id]??0));
   const go=(e,a)=>{const r=perform(e,t,a);if(r.ok)out.hours+=r.cost;return r.ok};
   for(const e of targets)if(liveRivals(e).length){for(const a of ['host','coach']){if(liveRivals(e).some(m=>ANSWERS[m.kind].includes(a))&&go(e,a)){out.answers++;break}}}
@@ -203,7 +245,7 @@ function makePortalDeskSystem(env){
   return out;
  }
 
- return{COSTS,LABELS,RIVAL,ANSWERS,hoursFor,roundInfo,isAuto,setAuto,record,pitchRead,needs,tags,standing,availability,perform,noteNil,liveRivals,settleRound,counter,watch,staffPlan,workedThisRound,hash};
+ return{COSTS,LABELS,RIVAL,ANSWERS,RIVAL_LABELS,hoursFor,roundInfo,isAuto,setAuto,record,pitchRead,needs,tags,shortlist,pursue,takeList,standing,availability,perform,noteNil,liveRivals,settleRound,counter,watch,staffPlan,workedThisRound,hash};
 }
 
 if(typeof module==='object'&&module.exports){
@@ -213,7 +255,7 @@ if(typeof module==='object'&&module.exports){
   getUniverse:()=>universe,clamp,posCounts:POS_COUNTS,rounds:PORTAL_ROUNDS,
   cycle:()=>ensurePortalCycle(),entries:()=>portalCandidates(),
   fit:(entry,t)=>portalFit(entry,t),setInterest:(entry,id,v)=>portalSetInterest(entry,id,v),
-  targetFor:id=>portalTargetFor(id),commitChance:round=>portalCommitChance(round)
+  target:(id,attention)=>targetPortalCandidate(id,attention),targetFor:id=>portalTargetFor(id),eligibilityUsed:p=>eligibilityBase(p),commitChance:round=>portalCommitChance(round)
  });
  globalThis.DynastyPortalDesk=portalDesk;
  const pdEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -244,6 +286,7 @@ if(typeof module==='object'&&module.exports){
   const read=action==='pitch'?` · ${portalDesk.pitchRead(entry,t).label}`:'';
   return`<button type="button" class="${answers?'pd-answer':''}" data-pd-act="${action}" data-pd-id="${pdEsc(entry.candidateId)}" ${a.ok?'':`disabled title="${pdEsc(a.reason)}"`}>${portalDesk.LABELS[action]} <small>${portalDesk.COSTS[action]}h${read}</small></button>`;
  }
+ let expandedTarget=null,expandedPick=null;
  function targetCard(entry,t){
   const s=portalDesk.standing(entry,t),read=portalDesk.pitchRead(entry,t),live=portalDesk.liveRivals(entry),tags=portalDesk.tags(entry,t);
   const decided=entry.decision?universe.teams.find(x=>x.id===entry.decision.schoolId):null;
@@ -252,25 +295,45 @@ if(typeof module==='object'&&module.exports){
   if(decided)return`<article class="pd-card pd-card--done">${head}<p>${decided.id===t.id?'<strong>Committed to you.</strong>':`Chose ${pdEsc(decided.name)}.`}</p></article>`;
   const where=s.rank==null?'You are not in his running yet.':s.rank===1?`You lead. If he decided now: ${pct(s.odds)} you.`:`You are ${s.rank}${['','st','nd','rd'][s.rank]||'th'}, ${s.field[0].interest-s.mine} behind ${pdEsc(s.field[0].name)}. If he decided now: ${pct(s.odds)} you.`;
   const rivals=live.map(m=>`<li>${pdEsc(m.school)} ${pdEsc(m.kind==='visit'?'hosted him':'made him an NIL offer')} (round ${m.round}). Answer with ${m.kind==='visit'?'a host visit or the head coach':'an NIL offer or the head coach'}.</li>`).join('');
-  return`<article class="pd-card">${head}
+  const expanded=expandedTarget===entry.candidateId,id=pdEsc(entry.candidateId),latest=live.at(-1);
+  const fit=tags.includes('Would start')?'Starter grade':tags.includes('Fills a need')?'Fills a need':`${read.label} pitch`;
+  return`<article class="pd-card pd-target${expanded?' pd-open':''}"><button type="button" class="pd-target-toggle" data-pd-expand="${id}" aria-expanded="${expanded}" aria-controls="pd-body-${id}">
+   <span><b>${pdEsc(entry.p.name)}</b><small>${pdEsc(entry.p.pos)} · ${pdEsc(fit)} · ${pct(s.odds)} if deciding now</small>${latest?`<small class="pd-rival-line">${pdEsc(latest.school)} · ${pdEsc(portalDesk.RIVAL_LABELS[latest.kind])}</small>`:''}</span><span aria-hidden="true">${expanded?'−':'+'}</span></button>
+   <div class="pd-target-body" id="pd-body-${id}">${head}
    <p class="pd-where">${where} <span class="muted">${pct(s.decideChance)} chance he decides this round.</span></p>
    <ul class="pd-field">${field}</ul>
    ${rivals?`<ul class="pd-rivals">${rivals}</ul>`:''}
    <p class="small muted">Playing-time read: <strong>${read.label}</strong> (${pdEsc(read.why)}).</p>
    <div class="pd-actions">${['call','pitch','host','coach'].map(a=>actionButton(entry,t,a)).join('')}</div>
-  </article>`;
+  </div></article>`;
+ }
+ function staffBoardHTML(t){
+  const list=portalDesk.shortlist(t);if(!list)return '';
+  const {need,options}=list;
+  const cards=options.map(({entry,label})=>{
+   const p=entry.p,id=pdEsc(entry.candidateId),target=portalTargetFor(entry.candidateId),s=portalDesk.standing(entry,t);
+   const seasons=Math.max(0,4-eligibilityBase(p)),role=portalDesk.pitchRead(entry,t).why;
+   const odds=s.mine==null?'Outside his finalists':`${pct(s.odds)} if he chose now`;
+   const expanded=expandedPick===entry.candidateId;
+   return `<article class="pd-prospect${expanded?' pd-open':''}"><header><small>${pdEsc(label)}</small><b>${pdEsc(p.name)}</b><span>${pdEsc(entry.from)} · ${pdEsc(p.pos)}</span></header>
+    <button type="button" class="pd-pick-toggle" data-pd-pick="${id}" aria-expanded="${expanded}" aria-controls="pd-notes-${id}">${expanded?'Hide grades':'Compare grades'}</button>
+    <div class="pd-pick-notes" id="pd-notes-${id}"><dl><div><dt>Current / upside</dt><dd>${grade(p.perceived)} / ${grade(p.perceivedUpside??p.perceived)}</dd></div><div><dt>Eligibility</dt><dd>${seasons} season${seasons===1?'':'s'} left</dd></div><div><dt>Standing</dt><dd>${odds}</dd></div></dl>
+    <p>${pdEsc(role)}.</p></div><button type="button" data-pd-pursue="${id}" ${target?'disabled':''}>${target?'On your board':'Pursue · 1 attention'}</button></article>`;
+  }).join('');
+  return `<section class="pd-shortlist" aria-label="Staff shortlist"><div class="pd-shortlist-head"><div><small>STAFF SHORTLIST</small><h4>${pdEsc(need.pos)} room · ${need.short} opening${need.short===1?'':'s'}</h4><p>${need.depth} rostered${need.signed?`, ${need.signed} committed`:''} against a depth target of ${need.want}.</p></div>
+   <button type="button" data-pd-delegate>Delegate shortlist</button></div><div class="pd-compare">${cards}</div></section>`;
  }
  function deskHTML(){
   const c=ensurePortalCycle(),t=portalUserTeam();if(!t||c.status==='idle')return needsOnlyHTML(t);
-  const info=portalDesk.roundInfo(t),targets=portalCandidates().filter(e=>portalTargetFor(e.candidateId)||(e.decision&&e.decision.schoolId===t.id&&!e.placed));
+  const info=portalDesk.roundInfo(t),targets=portalCandidates().filter(e=>portalTargetFor(e.candidateId)||e.wasPortalTarget||(e.decision&&e.decision.schoolId===t.id&&!e.placed));
   const needs=portalDesk.needs(t),watch=portalDesk.watch();
   return`<section class="portal-desk card" id="portalDesk">
    <div class="section-head"><div><div class="eyebrow">PORTAL DESK</div><h3>${c.status==='open'?`Round ${info.round} of ${info.rounds}`:'Portal closed'}</h3></div>
     ${c.status==='open'?`<div class="pd-hours"><strong>${info.left}</strong> / ${info.budget} portal hours left this round</div>`:''}</div>
-   ${needsLine(needs)}
+   ${needsLine(needs)}${c.status==='open'?staffBoardHTML(t):''}
    ${watch.length?`<p class="pd-watch"><strong>Rival Watch:</strong> ${watch.map(m=>`${pdEsc(m.school)} on ${pdEsc(m.name)}`).join(' · ')}</p>`:''}
    ${c.status==='open'?`<div class="pd-staff"><label><input type="checkbox" data-pd-auto ${portalDesk.isAuto()?'checked':''}> Staff handle the portal</label><button type="button" class="ghost" data-pd-staff>Work the portal now</button></div>`:''}
-   <div class="pd-cards">${targets.length?targets.map(e=>targetCard(e,t)).join(''):'<p class="muted">Give a player attention in the board below to work him here.</p>'}</div>
+   <div class="pd-cards">${targets.length?targets.map(e=>targetCard(e,t)).join(''):'<p class="muted">No active targets. Pursue a staff pick or give a player attention below.</p>'}</div>
   </section>`;
  }
  function needsLine(needs){return needs.length?`<p class="pd-needs"><strong>Roster needs:</strong> ${needs.map(n=>`<span class="pd-need">${pdEsc(n.pos)} <small>${n.depth}/${n.want}</small></span>`).join(' ')}</p>`:'<p class="pd-needs muted">No position is below its designed depth.</p>'}
@@ -280,13 +343,34 @@ if(typeof module==='object'&&module.exports){
  }
  function bindDesk(root){
   const t=portalUserTeam();
+  for(const which of ['expand','pick']){
+   root.querySelectorAll?.(`[data-pd-${which}]`).forEach(b=>b.onclick=()=>{
+    const id=b.getAttribute(`data-pd-${which}`);
+    if(which==='expand')expandedTarget=expandedTarget===id?null:id;
+    else expandedPick=expandedPick===id?null:id;
+    renderPortal();
+    [...(document.querySelectorAll(`[data-pd-${which}]`))].find(el=>el.getAttribute(`data-pd-${which}`)===id)?.focus();
+   });
+  }
   root.querySelectorAll?.('[data-pd-act]').forEach(b=>b.onclick=e=>{
    e.preventDefault();const entry=portalEntry(b.dataset.pdId),r=portalDesk.perform(entry,t,b.dataset.pdAct);
    setStatus(r.ok?`${portalDesk.LABELS[b.dataset.pdAct]}: ${entry.p.name} ${r.delta>=0?'+':''}${r.delta} interest (now ${r.interest}%).${r.answered?' Rival move answered.':''}`:r.reason);
+   if(r.ok)autosaveAfter('management');
    renderPortal();
   });
-  root.querySelectorAll?.('[data-pd-auto]').forEach(b=>b.onchange=()=>{portalDesk.setAuto(b.checked);setStatus(b.checked?'Staff now spend unused portal hours before each round.':'The portal is back in your hands.');renderPortal()});
-  root.querySelectorAll?.('[data-pd-staff]').forEach(b=>b.onclick=e=>{e.preventDefault();const s=portalDesk.staffPlan(t);setStatus(s.hours?`Staff worked the portal: ${s.calls} calls, ${s.pitches} pitches, ${s.answers} answers (${s.hours}h).`:'The staff had nothing to add this round.');renderPortal()});
+  root.querySelectorAll?.('[data-pd-pursue]').forEach(b=>b.onclick=()=>{
+   const reason=portalDesk.pursue(b.dataset.pdPursue);
+   if(!reason)autosaveAfter('management');
+   setStatus(reason||'Added to the portal board with one attention.');renderPortal();
+  });
+  root.querySelectorAll?.('[data-pd-delegate]').forEach(b=>b.onclick=()=>{
+   const added=portalDesk.takeList(t),wasAuto=portalDesk.isAuto();
+   portalDesk.setAuto(true);
+   if(!wasAuto||added)autosaveAfter('management');
+   setStatus(`Staff handle the portal. ${added} added to your board.`);renderPortal();
+  });
+  root.querySelectorAll?.('[data-pd-auto]').forEach(b=>b.onchange=()=>{portalDesk.setAuto(b.checked);autosaveAfter('management');setStatus(b.checked?'Staff now spend unused portal hours before each round.':'The portal is back in your hands.');renderPortal()});
+  root.querySelectorAll?.('[data-pd-staff]').forEach(b=>b.onclick=e=>{e.preventDefault();const s=portalDesk.staffPlan(t);if(s.hours||s.added)autosaveAfter('management');setStatus(s.hours?`Staff worked the portal: ${s.calls} calls, ${s.pitches} pitches, ${s.answers} answers (${s.hours}h).`:'The staff had nothing to add this round.');renderPortal()});
  }
  const renderPortalBeforeDesk=renderPortal;
  renderPortal=function(){

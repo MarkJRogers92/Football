@@ -25,7 +25,7 @@ function recordV2GameLabResult(options={}){
   if(universe.phase!=='regular')throw new Error('The v0.10.1 recorded v2 gate is limited to regular-season scheduled games.');
   if(g.played)throw new Error('This scheduled game is already complete.');
   if(hasPendingCareerChoice())throw new Error('Choose your next job before playing this week.');
-  if(hasPendingWeeklyDecisions())throw new Error('Resolve the Coach’s Desk decisions before playing this week.');
+  if(!options.advancingWeek&&hasPendingWeeklyDecisions())throw new Error('Resolve the Coach’s Desk decisions before playing this week.');
   recoverWeek();const home=T(g.home),away=T(g.away);if(!home||!away)throw new Error('Scheduled teams could not be resolved.');const rollback=v2RecordCapture(g,home,away);
   try{
     advanceAcademicsForWeek(selected());const before=beginGame(home,away,false,{week:g.week,label:'Regular season'}),homeProfile=gameProfiles(home,away.name),awayProfile=gameProfiles(away,home.name),prepared=v2RecordPrepared(g,home,away,homeProfile,awayProfile),preview=prepared.preview,candidate=prepared.candidate;
@@ -43,6 +43,6 @@ function recordV2GameLabResult(options={}){
     completeScheduledGame(g,result,true);if(options.testFault==='afterSchedule')throw new Error('Injected v2 rollback fault after schedule settlement.');
     universe.lastDetailedGame={...result,season:universe.year,week:g.week,engine:'v2',transactionVersion:prepared.tx.VERSION};universe.latest=[result];
     const validation=v2RecordValidate(candidate,record,home,away,rollback,g);if(!validation.ok)throw new Error(`Recorded v2 game failed post-commit validation: ${validation.errors.join('; ')}`);
-    ranked();if(options.testFault==='afterRank')throw new Error('Injected v2 rollback fault after rankings.');syncGameplayRng();v2GameLabPreview={key:prepared.key,...preview,recorded:true,gameId:result.gameId};autosaveAfter('game');return{ok:true,result,record,candidate,validation,preview};
+    if(!options.advancingWeek)ranked();if(options.testFault==='afterRank')throw new Error('Injected v2 rollback fault after rankings.');syncGameplayRng();v2GameLabPreview={key:prepared.key,...preview,recorded:true,gameId:result.gameId};if(!options.advancingWeek)autosaveAfter('game');return{ok:true,result,record,candidate,validation,preview};
   }catch(err){v2RecordRestore(rollback,g,home,away);throw err}
 }

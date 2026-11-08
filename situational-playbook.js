@@ -39,11 +39,14 @@ function makePlaybookSystem(env){
  }
  // What the staff did with the playbook in one game, from the engine's own events.
  function tally(state,side){
-  const out={fourthTries:0,fourthConverted:0,twoTries:0,twoMade:0,bleed:0,hurry:0};
+  const out={fourthTries:0,fourthConverted:0,twoTries:0,twoMade:0};
   for(const e of state?.events||[]){
-   if(e.team!==side)continue;
-   if(e.type==='scrimmage'&&e.from?.down===4){out.fourthTries++;if((e.yards||0)>=(e.from.distance||99)||e.touchdown)out.fourthConverted++}
-   if(e.type==='two_point'&&e.playbook){out.twoTries++;if(e.made)out.twoMade++}
+   if(e.team!==side||e.ot)continue;
+   if(e.from?.down===4&&['scrimmage','interception','fumble'].includes(e.type)){
+    out.fourthTries++;
+    if(e.type==='scrimmage'&&e.yards>=e.from.distance)out.fourthConverted++;
+   }
+   if(e.type==='two_point'){out.twoTries++;if(e.made)out.twoMade++}
   }
   return out;
  }
@@ -54,7 +57,7 @@ if(typeof module==='object'&&module.exports){
  module.exports={makePlaybookSystem};
 }else{
  const playbook=makePlaybookSystem({});
- globalThis.DynastyPlaybook=playbook;
+ globalThis.DynastyPlaybook={...playbook,noteGame};
  const pbEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const controlled=()=>$('#userTeam')?.value||null;
 
@@ -64,11 +67,7 @@ if(typeof module==='object'&&module.exports){
   const simulateBeforePlaybook=lab.simulate;
   lab.simulate=function(options={}){
    const pb=options.playbook===undefined?playbook.forMatch(options.home,options.away,controlled()):options.playbook;
-   const out=simulateBeforePlaybook(pb?{...options,playbook:pb}:options);
-   // A recorded game (not a shadow preview) adds to the season's playbook log, once per game id.
-   const id=String(options.gameId||'');
-   if(pb&&(/^v0101-(?!shadow-|gameday-)/.test(id)||id.startsWith('v0102-post-')))noteGame(id,out.state,pb);
-   return out;
+   return simulateBeforePlaybook(pb?{...options,playbook:pb}:options);
   };
  }
  const gameDay=globalThis.DynastyGameEngineV2GameDay;
@@ -79,9 +78,10 @@ if(typeof module==='object'&&module.exports){
    return createSessionBeforePlaybook(pb?{...options,playbook:pb}:options);
   };
  }
- function noteGame(id,state,pb){
-  const t=universe.teams.find(x=>x.name===controlled());if(!t)return;
-  const side=pb.home?'home':'away',log=(t.playbookLog&&t.playbookLog.year===universe.year)?t.playbookLog:(t.playbookLog={year:universe.year,games:[],totals:{fourthTries:0,fourthConverted:0,twoTries:0,twoMade:0}});
+ function noteGame(state){
+  const side=state.playbook?.home?'home':state.playbook?.away?'away':null;
+  if(!side)return;
+  const id=state.gameId,t=T(state[side].name),log=(t.playbookLog&&t.playbookLog.year===universe.year)?t.playbookLog:(t.playbookLog={year:universe.year,games:[],totals:{fourthTries:0,fourthConverted:0,twoTries:0,twoMade:0}});
   if(log.games.includes(id))return;
   log.games.push(id);if(log.games.length>30)log.games.splice(0,log.games.length-30);
   const x=playbook.tally(state,side);for(const k of Object.keys(log.totals))log.totals[k]+=x[k]||0;
@@ -94,12 +94,13 @@ if(typeof module==='object'&&module.exports){
   return`<div class="card situational-playbook" id="situationalPlaybook"><h3>Situational Playbook</h3>
    <p class="small muted">How your staff call it in games you sim or watch, and what they recommend when you coach live. Late in the fourth quarter and behind, every setting except Standard keeps the ball on fourth down unless a field goal ties or takes the lead.</p>
    ${row('fourthDown','Fourth down')}${row('twoPoint','Two-point tries')}${row('clock','Late clock')}
-   ${tot?`<p class="small">This season: ${tot.fourthTries} fourth-down tr${tot.fourthTries===1?'y':'ies'} (${tot.fourthConverted} converted) · ${tot.twoTries} two-point tr${tot.twoTries===1?'y':'ies'} (${tot.twoMade} good) in ${log.games.length} game${log.games.length===1?'':'s'} with this playbook.</p>`:''}
+   ${tot?`<p class="small">Regulation totals this season: ${tot.fourthTries} fourth-down tr${tot.fourthTries===1?'y':'ies'} (${tot.fourthConverted} converted) · ${tot.twoTries} two-point tr${tot.twoTries===1?'y':'ies'} (${tot.twoMade} good) in ${log.games.length} game${log.games.length===1?'':'s'} with custom settings.</p>`:''}
   </div>`;
  }
  function bind(root,t){
   root.querySelectorAll?.('[data-pb]').forEach(s=>s.onchange=()=>{
    const r=playbook.set(t,s.dataset.pb,s.value);
+   if(r.ok)autosaveAfter('management');
    setStatus(r.ok?`Playbook: ${playbook.OPTIONS[s.dataset.pb].find(o=>o.id===s.value).label} ${{fourthDown:'on fourth down',twoPoint:'after touchdowns',clock:'late clock'}[s.dataset.pb]}.`:r.reason);
    renderActiveTab();
   });

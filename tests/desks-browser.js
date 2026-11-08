@@ -4,7 +4,15 @@ const path=require('path');
 const {chromiumPath}=require('./helpers/chromium-path');
 const {startNewDynasty}=require('./helpers/start-new-dynasty');
 
-// v0.15.1 desks in a real browser: staff assignments, the situational playbook, player arcs and class cards,
+const waitForSaved=page=>page.waitForFunction(()=>window.DynastySessionStatus?.read().state==='saved',null,{timeout:60000});
+async function reopenAfterSave(page){
+ await waitForSaved(page);
+ await page.reload();
+ await page.click('#titleContinue:enabled');
+ await page.waitForFunction(()=>!document.querySelector('#app').hidden,null,{timeout:60000});
+}
+
+// Management desks in a real browser: staff assignments, the situational playbook, player arcs and class cards,
 // the Portal Desk and the guided tour, at desktop and phone widths, with no console errors or page overflow.
 (async()=>{
  const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});
@@ -37,10 +45,15 @@ const {startNewDynasty}=require('./helpers/start-new-dynasty');
    // Staff assignments.
    await T(()=>window.__DL_TEST__.goToTab('staff'));
    await page.waitForSelector('#staffAssignments');
+   await waitForSaved(page);
    await page.click('[data-sa-suggest]');
+   await reopenAfterSave(page);
+   await T(()=>window.__DL_TEST__.goToTab('staff'));
    const assigned=await page.$$eval('#staffAssignments [data-sa-region]',s=>s.filter(x=>x.value).length);
    assert.equal(assigned,5,'every coach gets a territory');
    await page.selectOption('#staffAssignments [data-sa-region="RC"]','');
+   await reopenAfterSave(page);
+   await T(()=>window.__DL_TEST__.goToTab('staff'));
    assert.equal(await page.$eval('#staffAssignments [data-sa-region="RC"]',s=>s.value),'');
    await noOverflow('staff assignments');
    pass(`[${label}] staff assignments: suggestion, clearing a territory`);
@@ -49,6 +62,8 @@ const {startNewDynasty}=require('./helpers/start-new-dynasty');
    await T(()=>window.__DL_TEST__.goToTab('gamelab'));
    await page.waitForSelector('#situationalPlaybook');
    await page.selectOption('#situationalPlaybook [data-pb="fourthDown"]','aggressive');
+   await reopenAfterSave(page);
+   await T(()=>window.__DL_TEST__.goToTab('gamelab'));
    assert.equal(await page.$eval('#situationalPlaybook [data-pb="fourthDown"]',s=>s.value),'aggressive');
    assert.equal(await T(()=>window.__DL_TEST__.selected().playbook.fourthDown),'aggressive');
    await noOverflow('playbook');
@@ -67,17 +82,42 @@ const {startNewDynasty}=require('./helpers/start-new-dynasty');
    await noOverflow('class cards');
    pass(`[${label}] player arc on the profile and class report cards`);
 
-   // Portal Desk.
-   const targets=await T(()=>window.__DL_TEST__.portalDeskPrepare(2));
-   assert.ok(targets.length>0,'the portal has players to chase');
-   await page.waitForSelector('#portalDesk .pd-card');
-   const before=await page.textContent('#portalDesk .pd-hours');
-   await page.click('#portalDesk [data-pd-act="call"]:not([disabled])');
-   await page.waitForSelector('#portalDesk .pd-hours');
-   assert.notEqual(await page.textContent('#portalDesk .pd-hours'),before,'a call spends portal hours');
-   assert.ok(await page.$$eval('#portalDesk .pd-field li',x=>x.length)>0,'each card shows his field with odds');
+   // Begin with an empty board so the shortlist has to find a genuine roster vacancy.
+   await T(()=>window.__DL_TEST__.portalDeskPrepare(0));
+   const prospects=page.locator('.pd-shortlist .pd-prospect');
+   assert.ok(await prospects.count()>=2,'staff offer alternatives for the same vacancy');
+   if(label==='desktop'){
+    assert.equal(await prospects.nth(0).evaluate(el=>el.offsetTop),await prospects.nth(1).evaluate(el=>el.offsetTop));
+   }else{
+    const row=page.locator('#portalBoard tr').first(),expand=row.locator('[data-portal-expand]');
+    assert.ok(await row.locator('[data-label="Attention"]').isHidden());
+    await expand.click();
+    assert.ok(await row.locator('[data-label="Attention"]').isVisible());
+    await expand.click();
+    assert.equal(await expand.getAttribute('aria-expanded'),'false');
+   }
+   await page.locator('[data-pd-pursue]:enabled').first().click();
+   await page.locator('[data-pd-delegate]').click();
+   assert.ok(await page.locator('[data-pd-auto]').isChecked());
+   await waitForSaved(page);
+   const before=await page.textContent('.pd-hours');
+   if(label==='iphone'){
+    const target=page.locator('.pd-target').first();
+    assert.ok(await target.locator('.pd-actions').isHidden());
+    assert.ok((await target.boundingBox()).height<120,'a collapsed target takes one compact row');
+    await target.locator('[data-pd-expand]').click();
+    assert.ok(await target.locator('.pd-actions').isVisible());
+   }
+   await page.locator('[data-pd-act="call"]:enabled:visible').first().click();
+   const remaining=await page.textContent('.pd-hours');
+   assert.notEqual(remaining,before);
+   await reopenAfterSave(page);
+   await T(()=>window.__DL_TEST__.goToTab('offseason'));
+   assert.equal(await page.textContent('.pd-hours'),remaining,'the same slot retains the call without advancing');
+   assert.ok(await page.locator('[data-pd-auto]').isChecked());
+   assert.ok(await page.locator('[data-pd-pursue]:disabled').count()>=2,'pursued candidates remain targeted');
    await noOverflow('portal desk');
-   pass(`[${label}] Portal Desk: hours, a call, the field and odds`);
+   pass(`[${label}] portal scouting, delegation and hours survive Continue`);
    await page.close();
   }
   assert.deepEqual(errors,[],'no page or console errors');

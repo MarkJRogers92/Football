@@ -122,3 +122,13 @@ test('missing/partial facts and long untrusted names render without invented per
  const h=api.highlights(),html=ui.highlightsHTML(h,api.weeklyRhythm());
  assert.equal(h.consequence,null);assert.doesNotMatch(html,/class="hl-star"|<Away|<Next/);assert.match(html,/&lt;Away &amp; Co&gt;/);assert.match(html,/A very long &lt;Next &amp; Program&gt;/);
 });
+
+test('the completed game supplies one recruiting callback, including when its saved box is deferred',()=>{
+ const {u,home,game,api}=fixture(),firstStart={schoolId:home.id,playerId:'qb',text:'Perry <Jr> made his first college start.'};
+ game.firstStart=firstStart;home.schedule[0].firstStart=firstStart;
+ for(const archived of [true,false]){
+  if(!archived)u.gameArchive=[];
+  const html=ui.highlightsHTML(api.highlights());assert.match(html,/Perry &lt;Jr&gt;/);assert.equal(html.match(/first college start/g).length,1);
+ }
+ home.schedule[0].firstStart={...firstStart,schoolId:99};assert.equal(api.highlights().firstStart,null);
+});

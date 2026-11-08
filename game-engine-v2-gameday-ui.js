@@ -7,26 +7,29 @@ function v2GameDayUILiveContext(){
 }
 function v2GameDayUIDigest(ctx=v2GameDayUILiveContext()){return ctx?v2LabIntegrity(ctx.g,ctx.home,ctx.away):null}
 function v2GameDayUIAssertUnchanged(before,ctx){const after=v2GameDayUIDigest(ctx);if(before!==after)throw new Error('Game Day preview mutated live dynasty state.')}
-function v2GameDayUIPrepare(){
+function v2GameDayUIPrepare(playbook){
   const ctx=v2GameDayUILiveContext(),api=globalThis.DynastyGameEngineV2GameDay;if(!ctx||!api)throw new Error('No upcoming game is available for Game Day.');
   const before=v2GameDayUIDigest(ctx),hc=v2LabClone(ctx.home),ac=v2LabClone(ctx.away);
   applyGameplanWear(hc,ac.name);applyGameplanWear(ac,hc.name);
   const homeProfile=gameProfiles(hc,ac.name),awayProfile=gameProfiles(ac,hc.name);
-  const session=api.createSession({gameId:`v0101-gameday-${ctx.key}`,seed:`v0101-gameday-${ctx.key}`,home:ctx.home,away:ctx.away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(ctx.home)});
+  const session=api.createSession({gameId:`v0101-gameday-${ctx.key}`,seed:`v0101-gameday-${ctx.key}`,home:ctx.home,away:ctx.away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(ctx.home),playbook});
   api.advanceOne(session);v2GameDayUIAssertUnchanged(before,ctx);
   v2InteractiveGameDay={key:ctx.key,session,integrity:before,actions:[]};v2GameDayUIPersist();renderV2InteractiveGameDay();return session
 }
-// A coached game is locked in. The session is seeded by its fixture, so the list of coaching actions
-// is enough to rebuild it exactly: it is kept in the save while the game is live, the result is
-// recorded at the final whistle, and advancing the week finishes this game rather than simulating
-// a different one.
+// A fixture seed, its kickoff playbook and the coaching actions reproduce a paused game.
 let v2GameDayHoldFinal=false;
-function v2GameDayUIPersist(){if(!universe)return;if(!v2InteractiveGameDay){if(universe.liveGameDay){delete universe.liveGameDay;autosaveAfter('game')}return}universe.liveGameDay={version:1,key:v2InteractiveGameDay.key,actions:v2InteractiveGameDay.actions.slice()};autosaveAfter('game')}
+function v2GameDayUIPersist(){
+  if(!universe)return;
+  if(!v2InteractiveGameDay){if(universe.liveGameDay){delete universe.liveGameDay;autosaveAfter('game')}return}
+  const {key,session,actions}=v2InteractiveGameDay;
+  universe.liveGameDay={version:1,key,playbook:session.state.playbook??null,actions:actions.slice()};
+  autosaveAfter('game')
+}
 function v2GameDayUIApply(api,session,action){if(action==='next')return api.advanceOne(session);if(action==='decision')return api.advance(session);if(action==='delegate')return api.simulate(session,()=> 'delegate');if(typeof action==='string'&&action.startsWith('choice:'))return api.resolve(session,action.slice(7));throw new Error(`Unknown Game Day action ${action}`)}
 function v2GameDayUIRestore(){
   if(v2InteractiveGameDay||!universe?.liveGameDay)return false;const saved=universe.liveGameDay,ctx=v2GameDayUILiveContext();
   if(!ctx||saved.key!==ctx.key||!Array.isArray(saved.actions)){delete universe.liveGameDay;return false}
-  try{const session=v2GameDayUIPrepare(),api=globalThis.DynastyGameEngineV2GameDay;for(const a of saved.actions){v2GameDayUIApply(api,session,a);v2InteractiveGameDay.actions.push(a)}v2InteractiveGameDay.integrity=v2GameDayUIDigest(ctx);universe.liveGameDay={version:1,key:ctx.key,actions:v2InteractiveGameDay.actions.slice()};return true}
+  try{const session=v2GameDayUIPrepare(saved.playbook),api=globalThis.DynastyGameEngineV2GameDay;for(const a of saved.actions){v2GameDayUIApply(api,session,a);v2InteractiveGameDay.actions.push(a)}v2InteractiveGameDay.integrity=v2GameDayUIDigest(ctx);universe.liveGameDay.actions=v2InteractiveGameDay.actions.slice();return true}
   catch(err){console.error(err);v2InteractiveGameDay=null;delete universe.liveGameDay;setStatus('The saved live game could not be rebuilt, so it was set aside.');return false}
 }
 // Finish a live game with the staff and record it. Used before anything else would play this week.

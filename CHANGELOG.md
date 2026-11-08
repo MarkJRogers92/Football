@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.15.2 — Portal commitments, weekly playbooks and first starts
+
+- Resolving the portal honors announced commitments before placing undecided players. Finalizing commitments manually still works. A player who returns to his original school occupies a real roster spot.
+- The coordinator recommends candidates for a real roster need using the grades your staff can see. Pursue an individual or hand the shortlist to staff. Phone scouting rows expand on demand, and desktop scouting supports side-by-side comparison.
+- Successful recruiting, portal, staff assignment and playbook changes queue an autosave, so the desk can be your stopping point between weeks or rounds.
+- A custom situational playbook applies to the controlled team's game when advancing a week or simulating the regular season. Other schools keep the fast simulation.
+- Class reports include archived alumni after reopening a save and use recorded appearances and starts, including the current season.
+- A postgame recap can recognize a homegrown player's first college start with a detail from his recruitment.
+
 ## v0.15.1 — Portal Desk, player arcs, staff assignments, situational playbook, guided tour and long-dynasty speed
 
 - **Recruiting news on This Week.** The week's recruiting results now appear in the weekly list: **LOST** (a target chose another program, with the reason in plain terms: you were not on his final list, you were on it but never made him an offer, none of his finalists had room, or he simply chose someone else), **CUT** (a target cut you from his Top 5 or Top 3, with who made his list) and **FLIPPED** (a commitment left for a rival). Commitments to you keep their existing item.

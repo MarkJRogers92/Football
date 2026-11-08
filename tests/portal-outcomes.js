@@ -33,10 +33,15 @@ test('a destination needs a reason, not just roster room',async()=>{
 
 test('unplaced entrants return or leave, never linger',async()=>{
  const e=await setup(9702),u=readyForPortal(e);
- u.offseason.reports=u.offseason.reports||{};
+ const entrants=u.transferPortal.map(x=>({id:x.p.id,origin:x.fromSchoolId}));
  e.offseasonPortal();
  const report=u.offseason.reports.portal;
  assert.ok(report,'the phase records what happened');
+ const rosters=new Map(u.teams.flatMap(t=>t.roster.map(p=>[p.id,t.id])));
+ const returned=entrants.filter(x=>rosters.get(x.id)===x.origin);
+ assert.ok(returned.length>0);
+ assert.equal(returned.length,report.returned,'every reported return is back on its original roster');
+ for(const x of entrants)assert.ok(rosters.has(x.id)||u.playerArchive.some(p=>p.id===x.id),'each entrant has a roster or an archived exit');
  const outcome=(report.returned||0)+(report.exited||0);
  assert.ok(outcome>0,'some entrants find no home across 120 programs');
  assert.equal(u.transferPortal.length,0,'nobody is left pending forever');

@@ -96,3 +96,88 @@ test('a class is graded against the league\'s classes from the same year',()=>{
  assert.ok(['B','C','D'].includes(mid.grade));
  assert.equal(mid.classes,20);
 });
+
+test('class outcomes count current and closed seasons once and separate playing, starting, and honors',()=>{
+ const u=fakeUniverse(),A=makePlayerArcSystem({getUniverse:()=>u}),t=u.team;
+ const signed=(id,extra)=>({id,name:id,pos:'LB',recruitingMemory:{schoolId:t.id,season:2027,stars:4},...extra});
+ t.roster=[signed('fresh starter',{stats:{games:7,starts:7}}),signed('closed season',{stats:{games:7,starts:7},seasonHistory:[{year:u.year,games:7,starts:7}]}),
+  signed('trophy',{awards:[{name:'Lineman of the Year'}]})];
+ u.teams[1].roster=[];
+ const contributor=signed('rotation',{retiredYear:u.year-1,career:{games:12,starts:4},stats:{games:12,starts:4}});
+ u.playerArchive=[contributor,signed('never played',{})];
+ const report=A.classReport(t,2027);
+ assert.equal(A.peak(t.roster[0]).label,'Starter, 1 season');assert.equal(A.peak(t.roster[1]).label,'Starter, 1 season');
+ assert.equal(A.peak(contributor).label,'Contributor');assert.equal(A.peak(t.roster[2]).label,'Lineman of the Year');
+ assert.equal(report.starters,2);assert.equal(report.honors,1);assert.equal(report.score,7/5);
+ assert.deepEqual(report.misses.map(p=>p.name),['never played']);
+});
+
+test('classes retain pending portal and draft careers across departures without duplicate alumni',()=>{
+ const u=fakeUniverse(),A=makePlayerArcSystem({getUniverse:()=>u}),t=u.team;
+ t.roster=[];u.teams[1].roster=[];
+ u.transferPortal=[{p:u.bust}];u.offseason={reports:{departures:{draftPool:[{p:u.star}]}}};
+ const before=A.classReport(t,2027);assert.equal(before.count,2);assert.equal(before.stay,0);assert.equal(before.misses.length,0);
+ u.playerArchive.push({...u.star,draftResult:{round:2}});
+ const after=A.classReport(t,2027);assert.equal(after.count,2);assert.equal(after.drafted,1);
+});
+
+test('league grades share ties and reflect new starts even in the same week and archive length',()=>{
+ const u={year:2029,teams:[],playerArchive:[]},A=makePlayerArcSystem({getUniverse:()=>u});
+ for(let i=0;i<10;i++)u.teams.push({id:i,roster:Array.from({length:5},(_,j)=>({id:i+'-'+j,recruitingMemory:{schoolId:i,season:2027},stats:{}}))});
+ const t=u.teams[0];assert.equal(A.classReport(t,2027).percentile,50);
+ t.roster[0].stats={games:6,starts:6};
+ assert.equal(A.classReport(t,2027).percentile,100);assert.equal(A.classReport(u.teams[1],2027).percentile,44);
+ t.roster.pop();assert.equal(A.classReport(t,2027).grade,null);
+});
+
+test('only a recorded first college start earns a callback in quick and detailed finals',async()=>{
+ for(const detailed of [false,true]){
+  const e=loadEngine({seed:5204,fullRuntime:true});e.setUserTeam(USER);await e.loadSchools();e.initUniverse();
+  const u=e.universe,t=e.T(USER),qb=e.roleStarter(t,'QB1'),m={schoolId:t.id,season:u.year-1,stars:3,desk:{beat:'Rival State',hours:14}};
+  qb.recruitingMemory=m;
+  const first=e.findUserGame();if(detailed){e.delegateWeeklyDecisions(t);e.simulateUserDetailed()}else e.simWeek(true);
+  const game=u.gameArchive.find(g=>g.id===first.gameId),side=game.home.id===t.id?'home':'away';
+  assert.equal(game.playerStats[side].find(p=>p.id===qb.id).stats.starts,1);
+  assert.equal(game.firstStart.playerId,qb.id);assert.match(e.gameRecap(game).body,/first college start.*over Rival State/);
+  assert.deepEqual(first.firstStart,game.firstStart);
+  const snapshot=JSON.stringify(game.firstStart);e.gameRecap(game);assert.equal(JSON.stringify(game.firstStart),snapshot);
+  if(detailed)e.simWeek(true);e.simWeek(true);
+  assert.equal(u.gameArchive.find(g=>g.week===2&&(g.home.id===t.id||g.away.id===t.id)).firstStart,undefined);
+  assert.equal(globalThis.DynastyPlayerArcs.firstStart(t,[{id:qb.id,stats:{games:1}}]),null);
+  qb.stats.starts=1;qb.career.starts=1;assert.equal(globalThis.DynastyPlayerArcs.firstStart(t,[{id:qb.id,stats:{starts:1}}]),null);
+ }
+});
+
+test('Program waits for archived classes and ignores a late response after a dynasty switch',async()=>{
+ const fs=require('node:fs'),vm=require('node:vm'),u=fakeUniverse();
+ let deferred=true,finish,html='',selected=u.team;
+ const host={insertAdjacentHTML(_where,value){html=value}};
+ const ctx={universe:u,activeTab:'program',selected:()=>selected,captureRecruitment(){},careerChronologyHTML(){},renderProgram(){},
+  attachPlayerLinks(){},archiveIsDeferred:()=>deferred,ensureArchiveLoaded:()=>new Promise(resolve=>{finish=resolve}),
+  $:id=>id==='#programHistory'?{closest:()=>host}:{remove(){html=''}}};
+ vm.runInNewContext(fs.readFileSync(require.resolve('../player-arcs.js'),'utf8'),ctx);
+ ctx.renderProgram();assert.match(html,/Loading/);
+ const oldLoad=finish;ctx.universe={year:u.year,teams:[{id:42,name:'New',roster:[]}],playerArchive:[]};selected=ctx.universe.teams[0];
+ ctx.renderProgram();oldLoad();await new Promise(resolve=>setImmediate(resolve));assert.match(html,/Loading/);
+ ctx.universe.playerArchive.push({id:'alum',name:'Archived Name',pos:'WR',career:{games:2},recruitingMemory:{schoolId:42,season:2027,stars:3}});
+ deferred=false;finish();await new Promise(resolve=>setImmediate(resolve));
+ assert.match(html,/Archived Name/);assert.doesNotMatch(html,/Al Star|Loading/);
+});
+
+test('a browser checkpoint preserves the recruiting receipt and the archived class',async()=>{
+ const {IDBFactory}=require('fake-indexeddb');
+ const e=loadEngine({seed:5210,fullRuntime:true,indexedDB:new IDBFactory()});
+ e.setUserTeam(USER);await e.loadSchools();e.initUniverse();
+ const t=e.T(USER),year=e.universe.year,qb=e.roleStarter(t,'QB1'),alum=t.roster.pop(),A=globalThis.DynastyPlayerArcs;
+ qb.recruitingMemory={season:year-1,schoolId:t.id,stars:3};
+ alum.recruitingMemory={season:year-4,schoolId:t.id,stars:4};
+ alum.stats.games=12;alum.stats.starts=4;e.archivePlayerSeason(alum,t,year-1);e.addToArchive(alum,t,'Graduated');e.rebuildIndexes();
+ const before=A.classReport(t,year-4);
+ const scheduled=e.findUserGame();e.simWeek(true);const receipt=scheduled.firstStart;
+ assert.equal(receipt.playerId,qb.id);await e.saveBrowser();await e.loadBrowser();
+ assert.equal(e.archiveIsDeferred(),true);assert.equal(e.gamesAreDeferred(),true);
+ assert.deepEqual(e.T(USER).schedule.find(g=>g.gameId===scheduled.gameId).firstStart,receipt);
+ await e.ensureArchiveLoaded();assert.deepEqual(A.classReport(e.T(USER),year-4),before);
+ await e.ensureGamesLoaded();const game=e.universe.gameArchive.find(g=>g.id===scheduled.gameId);
+ assert.deepEqual(game.firstStart,receipt);assert.match(e.gameRecap(game).body,/first college start/);
+});

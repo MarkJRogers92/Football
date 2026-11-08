@@ -34,6 +34,16 @@ const hoursLeft=async page=>{await page.waitForFunction(()=>/^\d+\s*\/\s*\d+/.te
   check(`[${label}] a call spends two hours and keeps the same prospect selected`,(await hoursLeft(page)).left===strip.left-2&&await page.locator('.recruit-workspace-card.active').getAttribute('data-rwid')===id);
   check(`[${label}] the desk now says he was worked this week`,/Worked this week/.test(await page.locator('.recruit-workspace-dossier .recruiting-desk').innerText()));
 
+  // An ordinary phone/desktop quit after one call must preserve both the hours and the contact.
+  await page.waitForFunction(()=>window.DynastySessionStatus.read().state==='saved',null,{timeout:60000});
+  await page.reload();await page.click('#titleContinue:enabled');
+  await page.waitForFunction(()=>!document.querySelector('#app').hidden,null,{timeout:60000});
+  await goRecruiting(page);
+  const prospect=page.locator('.recruit-workspace-card[data-rwid="'+id+'"]');
+  if(await prospect.isVisible())await prospect.click();
+  await page.waitForSelector('.recruit-workspace-dossier .recruiting-desk');
+  check(`[${label}] a call survives quitting before the next week`,(await hoursLeft(page)).left===strip.left-2&&/Worked this week/.test(await desk.innerText()));
+
   const select=page.locator('.recruit-workspace-dossier .ra-pitch select');
   const options=await select.locator('option').allInnerTexts();
   check(`[${label}] the pitch menu lists every topic with an honest read`,options.length===10&&options.every(o=>/Strong|Good|Modest|Flat|Risky/.test(o))&&options.some(o=>/his priority/.test(o)),options.slice(0,3).join(' | '));
