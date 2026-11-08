@@ -1,9 +1,9 @@
 # Changelog
 
-## Unreleased — Recruiting Desk
+## v0.15.0 — Recruiting Desk
 
 Recruiting is now something you do each week, not a list you maintain. Scouting hours still tell you
-how good a prospect is; **recruiting hours** are how you win him. (Source version is unchanged until this is released.)
+how good a prospect is; **recruiting hours** are how you win him.
 
 - **Weekly recruiting hours** (30–60, from your recruiting coordinator, head coach and resources), separate from evaluation hours. Unused hours do not carry over.
 - **Five actions per recruit**, each with a cost: Call (2h), Pitch (3h), Offer (2h), Campus Visit (5h) and In-Home Visit (8h; needs an offer, an interested recruit and week 5). Calls and repeated pitches fade within a week, so one recruit cannot soak up the budget.

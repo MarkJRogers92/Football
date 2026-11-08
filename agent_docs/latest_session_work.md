@@ -1,6 +1,6 @@
 # Latest Session Work
 
-## Recruiting Desk (unreleased, branch `claude/pensive-gates-g6e24q`)
+## v0.15.0 — Recruiting Desk (2026-11-08, branch `claude/pensive-gates-g6e24q`, PR #40)
 
 - Goal from the owner: recruiting should be an active weekly decision like the NCAA games, not passive scouting. Scope agreed: Phase 1 = recruiting hours + action menu + neglect cooling, separate from evaluation hours; staff can run it. Not built yet: stage funnel / Top 5 cuts / decision dates, hidden motivations and dealbreakers, rival reactions, recruiter assignments (see the design in the CHANGELOG "Unreleased" entry's follow-ups below).
 - New `recruiting-actions.js` (pure factory `makeRecruitingActionSystem` + browser wiring) and `recruiting-actions.css`, registered in `tools/build.js` and `tools/harness.js`. `app.js` gained two overridable hooks (`recruitEffort`, `userMayCommit`) used by `advanceRecruiting`, `finalizeRecruiting` and `placeUnsignedElites`; with the module absent the engine is bit-identical to before (verified by hashing a seeded 11-week run before/after). The weekly pass keeps the original RNG draw order.
