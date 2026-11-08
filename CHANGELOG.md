@@ -21,11 +21,13 @@ Facilities was one number that only rose by one when the board was thrilled. It 
 - **Booster goodwill and a fund.** Boosters give money each offseason, more when goodwill is high, the stadium is bigger and the crowd is loud. Goodwill follows wins against expectation and titles. You can also run up to three campaigns a season: a **Booster Dinner** is a steady gift, a **Major Gift Ask** is large when the base is happy and costs goodwill when it is not. Results come from a hash of the program, season and campaign, not a random draw, so reloading never changes them.
 - **Three build tracks, five levels each.** **Stadium & Game Day** (+2 fan support a level, so a bigger home-field edge, and bigger gifts), **Training & Performance Center** (+1 development at levels 2 and 4) and **Football Operations Building** (+2 recruiting hours a week a level). Each level also raises the facilities rating. A project is paid for out of the fund (4, 7, 11, 16 and 22 units), then takes one to three seasons to build. Two at a time. A project that is not yet fully funded can be shelved for a full refund.
 - **The NIL trade-off.** A campaign's gift goes to the facilities fund or to this season's NIL budget, and unspent NIL can be redirected into the fund. Holding the starter and finishing the stadium are the same money.
-- **Everywhere else.** The weekly hub announces a building that opens and money left idle in the offseason. Only the controlled program has a plan; the rest of the league is unchanged, and saves without one behave as before.
+- **Upkeep and diminishing returns.** Each level costs 0.9 units a season out of the gifts, so a program with large gifts keeps more buildings than a poor one, and a finished level adds +1 to the rating (not +2) once it is 90 or more. Gifts are shown net of upkeep.
+- **The other programs build too.** Every program has a plan, on the same gifts, prices and upkeep. They spend by a fixed rule at the season rollover (finish what is underway, then break ground on their weakest track, one project at a time), with no campaigns, no NIL trade, no randomness and nothing in the news. Over twenty seasons the league averages about 7.6 of 15 levels (top programs 8.8, bottom 5.7); an engaged player reaches 12 to 13 with an empty fund.
+- **Everywhere else.** The weekly hub announces a building that opens and money left idle in the offseason. Saves without a plan get one at the next rollover.
 
 ### Tests
 
-New `tests/game-conditions.js`, `tests/play-model.js`, `tests/facilities-boosters.js` and `tests/facilities-boosters-browser.js`. The attribution digest test now proves the original guarantee on the legacy rules. The smoke test's player stat-key count is 36.
+New `tests/game-conditions.js`, `tests/play-model.js`, `tests/facilities-boosters.js` and `tests/facilities-boosters-browser.js`, and `tools/facilities-soak.js` (a 20-season full-runtime soak; results in `docs/SOAK_FACILITIES_2026-11-08.md`). The attribution digest test now proves the original guarantee on the legacy rules. The smoke test's player stat-key count is 36.
 
 ## v0.15.2 — Portal commitments, weekly playbooks and first starts
 

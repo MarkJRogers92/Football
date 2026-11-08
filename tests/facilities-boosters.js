@@ -53,7 +53,7 @@ test('a project is started, paid for out of the fund, built over seasons, and op
   const report = F.newSeason(t, {wins: 7, expected: 7});
   assert.deepEqual(report.opened, [{track: 'stadium', level: 1}]);
   assert.equal(F.level(t, 'stadium'), 1);
-  assert.equal(t.facilities, Math.min(99, facilitiesBefore + F.FACILITY_POINTS));
+  assert.equal(t.facilities, Math.min(99, facilitiesBefore + F.facilityGain(facilitiesBefore)));
   assert.equal(t.fan_support, Math.min(99, fanBefore + 2), 'a stadium makes the crowd louder');
   assert.equal(F.activeProjects(t).length, 0);
   assert.ok(u.events.some(x => x.type === 'FACILITY_OPENED' && x.metadata.track === 'stadium'));
@@ -248,4 +248,69 @@ test('the Program page renders the whole loop and its buttons work', async () =>
   e.TAB_RENDERERS.program();
   assert.match(host.innerHTML, /data-fb-fund=/);
   assert.match(host.innerHTML, /0 of 4 units paid|0 of 7 units paid/);
+});
+
+test('the other programs build too, on the same income and prices, by a fixed rule and without a sound', async () => {
+  const {e, F, u} = await setup(6110);
+  const ai = u.teams.find(t => t.name !== USER && t.prestige >= 80), rng = rngDigest(e), events = (u.events || []).length;
+  const last = {wins: 8, expected: 8};
+  assert.equal(ai.facilityPlan, undefined);
+  const levels = () => F.totalLevels(ai);
+  const facilities = ai.facilities, fan = ai.fan_support;
+  for (let season = 0; season < 12; season++) { u.year += 1; F.aiSeason(ai, last); }
+  const p = ai.facilityPlan;
+  assert.ok(levels() >= 3, `a rich program builds over twelve seasons (${levels()} levels)`);
+  assert.ok(ai.facilities > facilities, 'and its facilities rating rises');
+  assert.ok(ai.facilities <= 99 && ai.fan_support <= 99);
+  assert.ok(p.projects.length <= 1, 'one project at a time');
+  assert.equal(p.log.length, 0, 'its plan stays small: no activity log');
+  assert.equal(rngDigest(e), rng, 'no gameplay randomness');
+  assert.equal((u.events || []).length, events, 'nothing is written to the news');
+  assert.ok(ai.fan_support >= fan);
+  // Same program, same seasons, same choices.
+  const twin = JSON.parse(JSON.stringify({...ai, facilityPlan: undefined, facilities, fan_support: fan}));
+  u.year -= 12;
+  for (let season = 0; season < 12; season++) { u.year += 1; F.aiSeason(twin, last); }
+  assert.deepEqual(twin.facilityPlan, p, 'a fixed rule gives the same plan');
+  // The prices are the player's prices: nothing is built for free.
+  const paid = F.TRACK_IDS.reduce((n, id) => { let c = 0; for (let l = 0; l < F.level(ai, id); l++) c += F.LEVEL_COST[l]; return n + c; }, 0);
+  assert.ok(paid <= 2 + 12 * 10, 'spending is bounded by the gifts received');
+});
+
+test('a real rollover advances every program, and only yours writes to the news', async () => {
+  const {e, F, t, u} = await setup(6111);
+  if (u.phase === 'preseason') e.beginSeason();
+  e.simSeason(); e.simConferenceChampionships(); e.simBowls(); e.simPlayoff();
+  const before = u.events.filter(x => /^BOOSTER|^FACILITY/.test(x.type)).length;
+  let guard = 0;
+  while (u.phase === 'complete' && guard++ < 30) {
+    const phase = u.offseason?.phase;
+    if (phase === 'spring') e.runSpringCamp(); else if (phase === 'fall') e.runFallCamp(); else assert.ok(e.advanceOffseasonPhase());
+  }
+  const others = u.teams.filter(x => x !== t);
+  assert.ok(others.every(x => x.facilityPlan && x.facilityPlan.fund >= 0), 'every program has a plan after one season');
+  assert.ok(others.filter(x => x.facilityPlan.projects.length).length > 20, 'many programs have broken ground');
+  const news = u.events.filter(x => /^BOOSTER|^FACILITY/.test(x.type));
+  assert.ok(news.length - before >= 1 && news.every(x => x.schoolIds[0] === t.id), 'the news is about your program only');
+});
+
+test('buildings cost upkeep, so a big program can keep more than a small one, and a high rating gains less', async () => {
+  const {F, t} = await setup(6112);
+  const p = F.state(t);
+  assert.equal(F.upkeep(t), 0, 'nothing built, nothing to keep up');
+  p.levels = {stadium: 5, training: 5, football_ops: 5};
+  assert.equal(F.upkeep(t), Math.floor(15 * F.UPKEEP_PER_LEVEL));
+  assert.equal(F.netIncome(t), Math.max(0, F.annualIncome(t) - F.upkeep(t)));
+  p.levels = {stadium: 2, training: 0, football_ops: 0};
+  assert.equal(F.upkeep(t), 1);
+  // A season's gifts are net of upkeep, and never negative.
+  const poor = {id: 9, name: 'Poor U', fan_support: 20, prestige: 20, resources: 20, facilityPlan: {fund: 0, levels: {stadium: 5, training: 5, football_ops: 5}}};
+  const sys = makeFacilitySystem({getUniverse: () => ({year: 2030, week: 0, events: [], nextEventId: 1}), clamp: (v, lo, hi) => Math.max(lo, Math.min(hi, v))});
+  assert.equal(sys.netIncome(poor), 0, 'a poor program cannot afford fifteen levels');
+  sys.aiSeason(poor, {wins: 6, expected: 6});
+  assert.equal(poor.facilityPlan.fund, 0, 'and its fund stays empty');
+  assert.equal(F.facilityGain(60), F.FACILITY_POINTS);
+  assert.equal(F.facilityGain(89), F.FACILITY_POINTS);
+  assert.equal(F.facilityGain(90), 1);
+  assert.equal(F.facilityGain(98), 1);
 });

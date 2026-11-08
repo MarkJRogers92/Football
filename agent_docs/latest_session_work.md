@@ -15,11 +15,11 @@ Not released: the version is still 0.15.2 and the CHANGELOG entry is "Unreleased
 **Facilities and boosters** (`facilities-boosters.js`, `facilities-boosters.css`, host `#facilitiesBoosters` in `body.html`)
 - Pure factory `makeFacilitySystem(env)` plus browser wiring, modeled on `staff-assignments.js`. State on the controlled team only: `team.facilityPlan` (`fund`, `goodwill`, `levels`, `projects`, `campaigns`, `nilBonus`, `log`). Created lazily; sanitized on every read.
 - Wraps `resetNilSeason` (the season rollover hook: goodwill, completions, annual gifts), `nilBudgetFor` (campaign gifts sent to NIL), and `TAB_RENDERERS.program`. `recruiting-actions.js` takes an optional `env.hoursBonus` for Football Ops. Campaign outcomes are hash-based, never `gameplayRandom`.
-- AI programs have no plan and stay static, as before.
+- Every program has a plan. AI programs run `aiSeason` from the same `resetNilSeason` wrapper (fixed rule, hash-based tie-break, quiet: no events, no log). `globalThis.__FACILITIES_AI_OFF` disables it for soak baselines. Upkeep (`UPKEEP_PER_LEVEL=.9`) and `facilityGain` (+1 at rating 90+) came out of the soak: see `docs/SOAK_FACILITIES_2026-11-08.md`.
 
 **Verification run so far** (Node 22 here, CI uses 24): full `npm test` 802/802 before the facilities tests were added (these pass separately: 10/10), the Game Day / recording / postseason / cast / weekly-desk browser suites, `one-more-saturday-browser`, `gameday-season-presentation-browser`, and the new `facilities-boosters-browser` at desktop and phone width. Not yet run: the complete `test:browser-extended` matrix, storage, audit, long-run/soak with the new systems, desktop packaging.
 
-**Next (the owner asked for health work on the new systems):** a 20-season soak with facilities in use (save growth: each plan is small, `record.conditions` is about 90 bytes a game), league-health with the penalty/return model on, and a look at whether AI programs should invest too (they do not today).
+**Soak done** (`tools/facilities-soak.js`, 20 seasons, seeds 7 and 11): no stalls or invariant problems, no save growth beyond the existing archive growth, faithful reload, play-model rates on target. It found AI facility saturation, fixed with upkeep and diminishing returns. Remaining: a weak or mid-tier controlled program, real-browser and packaged-desktop saves at season 20, and the Electron advisory bump.
 
 ## v0.15.2 published — 2026-11-08
 

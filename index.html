@@ -14202,8 +14202,8 @@ if(typeof module==='object'&&module.exports){
 //   The NIL trade-off         a campaign's gift goes to the fund or to NIL, and unspent NIL can be redirected
 //                             into the fund. Holding the starter and finishing the stadium are the same money.
 //
-// Only the controlled program has any of this, so the rest of the league plays exactly as before, and nothing
-// here draws gameplay randomness: campaign results come from a hash of the program, season and campaign
+// Every program has a plan. The controlled program's is yours to run; the others run on a fixed rule at each
+// season rollover (see aiSeason), on the same income and costs. Nothing here draws gameplay randomness: campaign results come from a hash of the program, season and campaign
 // number, so reloading a save never changes an outcome. A save without a plan behaves as it always did.
 function makeFacilitySystem(env){
  'use strict';
@@ -14215,7 +14215,7 @@ function makeFacilitySystem(env){
  };
  const TRACK_IDS=Object.keys(TRACKS);
  const MAX_LEVEL=5,LEVEL_COST=[4,7,11,16,22],BUILD_SEASONS=[1,1,2,2,3];
- const FACILITY_POINTS=2,FUND_CAP=40,MAX_PROJECTS=2,CAMPAIGNS_PER_SEASON=3,LOG_LIMIT=14;
+ const FACILITY_POINTS=2,UPKEEP_PER_LEVEL=.9,FUND_CAP=40,MAX_PROJECTS=2,CAMPAIGNS_PER_SEASON=3,LOG_LIMIT=14;
  const STADIUM_FAN=2,TRAINING_DEV_LEVELS=[2,4],OPS_HOURS=2;
  const CAMPAIGNS={
   dinner:{label:'Booster Dinner',blurb:'A steady evening with the people who write the checks.'},
@@ -14260,6 +14260,12 @@ function makeFacilitySystem(env){
   const p=state(t,false),g=p?p.goodwill:startingGoodwill(t),stadium=level(t,'stadium');
   return clamp(Math.round(1.5+g/28+stadium*.6+((t?.fan_support??60)-60)/25+(t?.resources??60)/60),2,10);
  }
+ // Buildings cost money to keep up. Upkeep comes out of each offseason's gifts, so a program with big gifts can keep a
+ // lot of buildings and a poor one cannot; without it every program could afford every level.
+ function upkeep(t){return Math.floor(totalLevels(t)*UPKEEP_PER_LEVEL)}
+ function netIncome(t){return Math.max(0,annualIncome(t)-upkeep(t))}
+ // A rating near the top has less room to improve.
+ function facilityGain(rating){return(rating??60)>=90?1:FACILITY_POINTS}
  function nextCost(t,track){const l=level(t,track);return l>=MAX_LEVEL?null:LEVEL_COST[l]}
  function activeProjects(t){return state(t,false)?.projects||[]}
  function projectFor(t,track){return activeProjects(t).find(x=>x.track===track)||null}
@@ -14355,14 +14361,15 @@ function makeFacilitySystem(env){
   return{ok:true,moved,nilLeft:env.nilRemaining(t)};
  }
 
- function complete(t,project){
+ function complete(t,project,quiet=false){
   const p=state(t),track=TRACKS[project.track];
   p.levels[project.track]=Math.max(p.levels[project.track],project.level);
-  t.facilities=clamp((t.facilities||60)+FACILITY_POINTS,0,99);
+  t.facilities=clamp((t.facilities||60)+facilityGain(t.facilities),0,99);
   if(project.track==='stadium')t.fan_support=clamp((t.fan_support||60)+STADIUM_FAN,0,99);
   if(project.track==='training'&&TRAINING_DEV_LEVELS.includes(project.level))t.development=clamp((t.development||60)+1,0,99);
   p.goodwill=clamp(p.goodwill+3,0,100);
   p.completed=[...(p.completed||[]).filter(x=>x.year===universe().year),{year:universe().year,track:project.track,level:project.level}];
+  if(quiet)return;
   note(t,`${track.label} level ${project.level} opened.`);
   event(t,'FACILITY_OPENED',`${t.name} opened ${track.label}, level ${project.level}.`,project.level>=4?62:52,{track:project.track,level:project.level});
  }
@@ -14371,21 +14378,57 @@ function makeFacilitySystem(env){
   const delta=(wins-expected)*2.5+(champion?12:0)+(confChampion?4:0)+(bowlWin?2:0)-(wins<expected-2?4:0);
   return Math.round(delta);
  }
- // Called once as a new season begins, for the controlled program only. `last` describes the season just played.
- function newSeason(t,last={}){
-  if(!t)return null;
+ // Shared by every program: judge the season just played, open what has finished building, bank the gifts.
+ function advance(t,last,quiet){
   const p=state(t),u=universe(),report={year:u.year,income:0,opened:[],goodwill:{before:p.goodwill,after:p.goodwill}};
   const before=p.goodwill,delta=goodwillShift(t,{wins:last.wins??0,expected:last.expected??6,champion:!!last.champion,confChampion:!!last.confChampion,bowlWin:!!last.bowlWin});
   p.goodwill=clamp(Math.round(before*.9+55*.1+delta),5,100);
   const done=p.projects.filter(x=>x.completeYear!=null&&u.year>=x.completeYear);
-  for(const project of done){complete(t,project);report.opened.push({track:project.track,level:project.level})}
+  for(const project of done){complete(t,project,quiet);report.opened.push({track:project.track,level:project.level})}
   p.projects=p.projects.filter(x=>!done.includes(x));
   report.goodwill={before,after:p.goodwill};
-  const income=annualIncome(t);
-  p.fund=clamp(p.fund+income,0,FUND_CAP);report.income=income;
+  const gross=annualIncome(t),keep=upkeep(t),income=Math.max(0,gross-keep);
+  p.fund=clamp(p.fund+income,0,FUND_CAP);report.income=income;report.upkeep=Math.min(gross,keep);
   p.campaigns={year:u.year,used:0};
-  note(t,`Booster gifts for ${u.year}: ${income} units. Goodwill ${before} → ${p.goodwill}.`);
-  event(t,'BOOSTER_GIFTS',`${t.name} boosters gave ${income} units for ${u.year} (goodwill ${goodwillLabel(p.goodwill).toLowerCase()}).`,40,{income,goodwill:p.goodwill});
+  if(!quiet){
+   note(t,`Booster gifts for ${u.year}: ${gross} units${keep?`, ${Math.min(gross,keep)} to upkeep`:''}. Goodwill ${before} → ${p.goodwill}.`);
+   event(t,'BOOSTER_GIFTS',`${t.name} boosters gave ${gross} units for ${u.year}${keep?` (${Math.min(gross,keep)} went to upkeep)`:''}; goodwill is ${goodwillLabel(p.goodwill).toLowerCase()}.`,40,{income,gross,upkeep:keep,goodwill:p.goodwill});
+  }
+  return report;
+ }
+ // Called once as a new season begins, for the controlled program. `last` describes the season just played.
+ function newSeason(t,last={}){
+  if(!t)return null;
+  return advance(t,last,false);
+ }
+ // The other programs. They have the same gifts and the same prices, and spend by a fixed rule: finish what is
+ // underway, then break ground on the weakest track (ties go to a stable hash of the program and the year), one
+ // project at a time. No campaigns, no NIL trade, and nothing is written to the news.
+ function aiSeason(t,last={}){
+  if(!t)return null;
+  const report=advance(t,last,true),p=state(t);
+  for(const project of p.projects){
+   if(project.paid>=project.cost)continue;
+   const put=Math.min(project.cost-project.paid,p.fund);
+   if(put<=0)break;
+   p.fund-=put;project.paid+=put;
+   if(project.paid>=project.cost){project.fundedYear=universe().year;project.completeYear=project.fundedYear+BUILD_SEASONS[project.level-1]}
+  }
+  if(!p.projects.length){
+   const open=TRACK_IDS.filter(id=>level(t,id)<MAX_LEVEL);
+   if(open.length){
+    const low=Math.min(...open.map(id=>level(t,id))),ties=open.filter(id=>level(t,id)===low);
+    const track=ties[hash(t.id,universe().year,'track')%ties.length];
+    const started=startProject(t,track);
+    if(started.ok){
+     // startProject is the player's action and writes to the log; keep the other programs' plans small.
+     p.log.length=0;
+     const project=started.project,put=Math.min(project.cost,p.fund);
+     p.fund-=put;project.paid+=put;
+     if(project.paid>=project.cost){project.fundedYear=universe().year;project.completeYear=project.fundedYear+BUILD_SEASONS[project.level-1]}
+    }
+   }
+  }
   return report;
  }
 
@@ -14407,7 +14450,7 @@ function makeFacilitySystem(env){
  }
  function summary(t){
   const p=state(t,false);
-  return{fund:p?p.fund:2,goodwill:goodwillOf(t),goodwillLabel:goodwillLabel(goodwillOf(t)),income:annualIncome(t),campaignsLeft:campaignsLeft(t),
+  return{fund:p?p.fund:2,goodwill:goodwillOf(t),goodwillLabel:goodwillLabel(goodwillOf(t)),income:netIncome(t),gross:annualIncome(t),upkeep:upkeep(t),campaignsLeft:campaignsLeft(t),
    totalLevels:totalLevels(t),projects:activeProjects(t).length,facilities:t?.facilities??null,nilBonus:nilBonus(t),log:p?p.log.slice(-6):[]};
  }
  // Items for the weekly hub: a building that opened, and money sitting unused in the offseason.
@@ -14430,8 +14473,8 @@ function makeFacilitySystem(env){
  }
 
  return{TRACKS,TRACK_IDS,CAMPAIGNS,DESTINATIONS,MAX_LEVEL,LEVEL_COST,BUILD_SEASONS,FACILITY_POINTS,FUND_CAP,MAX_PROJECTS,CAMPAIGNS_PER_SEASON,
-  state,level,fundOf,goodwillOf,goodwillLabel,totalLevels,annualIncome,nextCost,activeProjects,projectFor,status,opensIn,startProject,fundProject,cancelProject,
-  campaign,campaignsLeft,campaignsUsed,nilBonus,divertNil,newSeason,goodwillShift,hoursBonus,effectsText,trackRows,summary,newsItems};
+  state,level,fundOf,goodwillOf,goodwillLabel,totalLevels,annualIncome,upkeep,netIncome,facilityGain,UPKEEP_PER_LEVEL,nextCost,activeProjects,projectFor,status,opensIn,startProject,fundProject,cancelProject,
+  aiSeason,campaign,campaignsLeft,campaignsUsed,nilBonus,divertNil,newSeason,goodwillShift,hoursBonus,effectsText,trackRows,summary,newsItems};
 }
 
 if(typeof module==='object'&&module.exports){
@@ -14446,14 +14489,18 @@ if(typeof module==='object'&&module.exports){
  const nilBudgetBeforeFacilities=nilBudgetFor;
  nilBudgetFor=function nilBudgetForWithBoosters(t){return nilBudgetBeforeFacilities(t)+(t&&isMine(t)?facilities.nilBonus(t):0)};
 
- // A new season: judge the one just played, open what was finished, and bank the gifts.
+ // A new season: judge the one just played, open what was finished, and bank the gifts. Every program does this;
+ // yours is the only one with the news and the choices.
  const resetNilSeasonBeforeFacilities=resetNilSeason;
  resetNilSeason=function resetNilSeasonWithFacilities(){
-  const t=selected();
-  // The calendar has already moved to the new year; the record on the team is still last season's.
-  const last=t?{wins:t.w||0,expected:seasonExpectation(t),champion:!!t.champ,confChampion:conferenceChampionIdsFor().includes(t.id),bowlWin:t.bowlResult?.won===true&&t.bowlResult?.year===universe.year-1}:null;
+  const me=selected(),champs=conferenceChampionIdsFor(),seasonYear=universe.year-1;
+  // The calendar has already moved to the new year; the record on each team is still last season's.
+  const lastOf=t=>({wins:t.w||0,expected:seasonExpectation(t),champion:!!t.champ,confChampion:champs.includes(t.id),bowlWin:t.bowlResult?.won===true&&t.bowlResult?.year===seasonYear});
   const out=resetNilSeasonBeforeFacilities.apply(this,arguments);
-  if(t)facilities.newSeason(t,last||{});
+  for(const t of universe.teams||[]){
+   if(me&&t===me)facilities.newSeason(t,lastOf(t));
+   else if(!globalThis.__FACILITIES_AI_OFF)facilities.aiSeason(t,lastOf(t));   // the switch is for soak comparisons
+  }
   return out;
  };
 
@@ -14482,7 +14529,7 @@ if(typeof module==='object'&&module.exports){
   const camp=(kind,dest)=>CTL(`${facilities.CAMPAIGNS[kind].label} → ${dest==='nil'?'NIL':'Facilities'}`,`data-fb-campaign="${kind}" data-fb-dest="${dest}"`,{disabled:left<=0,title:facilities.CAMPAIGNS[kind].blurb});
   const log=s.log.length?`<details class="fb-log"><summary>Recent activity</summary><ul>${s.log.slice().reverse().map(x=>`<li><span class="muted">${x.year}</span> ${fbEsc(x.text)}</li>`).join('')}</ul></details>`:'';
   return`<div class="section-head"><div><div class="eyebrow">FACILITIES &amp; BOOSTERS</div><h3>Build the program</h3><div class="muted">Boosters give money. You decide whether it becomes buildings or NIL.</div></div></div>
-  <div class="fb-summary"><div><span class="small muted">Facilities rating</span><strong>${s.facilities??'—'}</strong></div><div><span class="small muted">Booster fund</span><strong>${s.fund}<small> units</small></strong></div><div><span class="small muted">Goodwill</span><strong>${s.goodwill}<small> ${fbEsc(s.goodwillLabel)}</small></strong></div><div><span class="small muted">Gifts next offseason</span><strong>+${s.income}</strong></div><div><span class="small muted">NIL this season</span><strong>${nilLeft}<small> of ${nilTotal}</small></strong></div></div>
+  <div class="fb-summary"><div><span class="small muted">Facilities rating</span><strong>${s.facilities??'—'}</strong></div><div><span class="small muted">Booster fund</span><strong>${s.fund}<small> units</small></strong></div><div><span class="small muted">Goodwill</span><strong>${s.goodwill}<small> ${fbEsc(s.goodwillLabel)}</small></strong></div><div><span class="small muted">Gifts next offseason</span><strong>+${s.income}<small>${s.upkeep?` (${s.gross} − ${Math.min(s.gross,s.upkeep)} upkeep)`:''}</small></strong></div><div><span class="small muted">NIL this season</span><strong>${nilLeft}<small> of ${nilTotal}</small></strong></div></div>
   ${effects.length?`<div class="small fb-effects">${effects.map(fbEsc).join(' · ')}</div>`:''}
   <div class="fb-tracks">${rows.map(r=>trackHTML(t,r)).join('')}</div>
   <div class="fb-money"><div><strong>Raise money</strong><div class="small muted">${left} of ${facilities.CAMPAIGNS_PER_SEASON} campaigns left in ${universe.year}. Choose where the gift goes before you ask.</div></div><div class="fb-actions">${camp('dinner','facilities')}${camp('dinner','nil')}${camp('ask','facilities')}${camp('ask','nil')}</div></div>
