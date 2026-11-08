@@ -47,6 +47,10 @@ const hoursLeft=async page=>{await page.waitForFunction(()=>/^\d+\s*\/\s*\d+/.te
   const select=page.locator('.recruit-workspace-dossier .ra-pitch select');
   const options=await select.locator('option').allInnerTexts();
   check(`[${label}] the pitch menu lists every topic with an honest read`,options.length===10&&options.every(o=>/Strong|Good|Modest|Flat|Risky/.test(o))&&options.some(o=>/his priority/.test(o)),options.slice(0,3).join(' | '));
+  // Pitching a topic that is his hidden dealbreaker reveals it at once (the desk's `learn` rule), which would make
+  // this step depend on a random recruit. Pitch a topic that cannot reveal it, so exactly two contacts have been made.
+  const safeTopic=await page.evaluate(i=>{const r=window.DynastyRecruitingDesk.recruit(i),deal=window.DynastyRecruitingActions.motivesFor(r).dealbreaker;return [...document.querySelectorAll('.recruit-workspace-dossier .ra-pitch select option')].map(o=>o.value).find(v=>v!==deal)},id);
+  await select.selectOption(safeTopic);
   await page.locator('.recruit-workspace-dossier [data-ra-action="pitch"]').click();
   await page.waitForFunction(b=>{const m=window.__hoursText().match(/^(\d+)/);return m&&+m[1]===b-5},strip.left);
   check(`[${label}] a pitch spends three more hours`,(await hoursLeft(page)).left===strip.left-5);
