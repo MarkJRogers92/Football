@@ -32,31 +32,53 @@ function returnText(event){
   return n>0?`, returned ${n} yard${n===1?'':'s'}`:'';
 }
 function decisionActionLabel(value){return String(value||'decision').replaceAll('_',' ')}
+// Broadcast-style short name: "Gavin Kemp" -> "G. Kemp".
+function shortName(name){const parts=String(name||'').trim().split(/\s+/);return parts.length>1?`${parts[0][0]}. ${parts.slice(1).join(' ')}`:parts[0]||''}
+// The player recorded in a play role (qb, ca carrier, tg target, tk tackler, sb sacker, ib interceptor, ff forced
+// fumble, pb breakup, pr pressure, rt returner, kk kicker, pt punter, pn penalized) when attribution is available.
+function actorName(event,names,key){const id=names?.actors?.[event?.seq]?.[key];const n=id!=null?names?.players?.[id]:null;return n?shortName(n):null}
+// Names plus the per-play actors from a Game Engine 2 attribution, so eventText can say who made each play.
+function withActors(names={},attribution){
+  if(!attribution?.playActors)return names;const players={};
+  for(const c of Object.values(attribution.contexts||{})){if(!c)continue;
+    for(const p of [c.qb,c.kicker,c.punter,c.kickReturner,c.puntReturner])if(p?.id!=null)players[p.id]=p.name;
+    for(const list of [c.rushers,c.receivers,c.defenders,c.offensiveLine])for(const x of list||[]){const p=x?.player||x;if(p?.id!=null)players[p.id]=p.name}}
+  return{...names,actors:attribution.playActors,players}
+}
+const yardsPhrase=y=>y>0?`for ${y} yard${y===1?'':'s'}`:y<0?`for a loss of ${Math.abs(y)}`:'for no gain';
 function eventText(event={},names={}){
-  const state=event.state||{},team=teamName(event.team,names),receiver=teamName(event.receiver,names);
+  const state=event.state||{},team=teamName(event.team,names),receiver=teamName(event.receiver,names),who=key=>actorName(event,names,key);
   if(event.type==='game_start')return'Game begins.';
   if(event.type==='kickoff'){
-    if(event.td)return`${receiver} return the kickoff for a touchdown!`;
-    if(event.touchback===false&&Number(event.ret)>0)return`${receiver} return the kickoff ${event.ret} yards.`;
+    const rt=who('rt');
+    if(event.td)return`${rt?`${rt} (${receiver})`:receiver} return${rt?'s':''} the kickoff for a touchdown!`;
+    if(event.touchback===false&&Number(event.ret)>0)return`${rt?`${rt} returns`:`${receiver} return`} the kickoff ${event.ret} yards.`;
     return`${receiver} receives the kickoff.`;
   }
   if(event.type==='penalty'){
-    const against=teamName(event.against,names),yards=Number(event.yards)||0;
-    return`Flag: ${event.label||'penalty'} on ${against}, ${yards} yard${yards===1?'':'s'}${event.autoFirst?', automatic first down':''}.`;
+    const against=teamName(event.against,names),yards=Number(event.yards)||0,pn=who('pn');
+    return`Flag: ${event.label||'penalty'} on ${pn?`${pn} (${against})`:against}, ${yards} yard${yards===1?'':'s'}${event.autoFirst?', automatic first down':''}.`;
   }
-  if(event.type==='scrimmage'&&event.scramble){
-    const y=Number(event.yards)||0;
-    return`${team} quarterback scrambles ${y>0?`for ${y} yard${y===1?'':'s'}`:y<0?`and loses ${Math.abs(y)}`:'for no gain'}.`;
+  if(event.type==='scrimmage'){
+    const y=Number(event.yards)||0,qb=who('qb'),ca=who('ca'),tg=who('tg'),tk=who('tk'),sb=who('sb'),pb=who('pb'),pr=who('pr'),dropped=names?.actors?.[event.seq]?.dr;
+    const tackle=tk?`, tackled by ${tk}`:'',hurry=pr?` (hurried by ${pr})`:'';
+    if(event.scramble)return`${ca||qb||`${team} quarterback`} scrambles ${y>0?`for ${y} yard${y===1?'':'s'}`:y<0?`and loses ${Math.abs(y)}`:'for no gain'}${tackle}.`;
+    if(event.sack)return`${qb||`${team} quarterback`} sacked${sb?` by ${sb}`:''}${y<0?` for a loss of ${Math.abs(y)}`:''}.`;
+    if(event.kind==='pass'){
+      if(event.completed)return`${qb||team} pass complete${tg?` to ${tg}`:''} ${yardsPhrase(y)}${hurry}${tackle}.`;
+      if(event.completed===false)return`${qb||team} pass incomplete${tg?`, intended for ${tg}`:''}${dropped?' (dropped)':pb?`, broken up by ${pb}`:''}${hurry}.`;
+    }
+    if(event.kind==='rush')return`${ca||team} runs ${yardsPhrase(y)}${tackle}.`;
+    return y?`${team} ${signedYards(y)} yard${Math.abs(y)===1?'':'s'}.`:`${team} no gain.`;
   }
-  if(event.type==='scrimmage')return Number(event.yards)?`${team} ${signedYards(event.yards)} yard${Math.abs(Number(event.yards)||0)===1?'':'s'}.`:`${team} no gain.`;
-  if(event.type==='interception')return`${team} throws an interception.`;
-  if(event.type==='fumble')return`${team} loses a fumble.`;
+  if(event.type==='interception'){const qb=who('qb'),ib=who('ib'),tg=who('tg');return qb||ib?`${qb||team} pass${tg?` for ${tg}`:''} intercepted${ib?` by ${ib}`:''}.`:`${team} throws an interception.`}
+  if(event.type==='fumble'){const ca=who('ca'),ff=who('ff');return ca?`${ca} fumbles${ff?`, forced by ${ff}`:''}; ${teamName(event.team==='home'?'away':'home',names)} recover.`:`${team} loses a fumble.`}
   if(event.type==='possession_change')return`${teamName(event.to,names)} takes possession.`;
   if(event.type==='touchdown')return event.kind==='return'?`RETURN TOUCHDOWN ${team}.`:`TOUCHDOWN ${team}.`;
   if(event.type==='extra_point')return`${team} extra point ${event.made===false?'missed':'good'}.`;
   if(event.type==='two_point')return`${team} two-point try ${event.made?'good':'failed'}.`;
-  if(event.type==='field_goal')return`${team} ${event.distance||''}-yard field goal ${event.made?'good':'missed'}.`.replace('  -',' ');
-  if(event.type==='punt')return`${team} punts${event.touchback?' for a touchback':''}${event.touchback?'':returnText(event)}.`;
+  if(event.type==='field_goal'){const kk=who('kk');return`${kk?`${kk} (${team})`:team} ${event.distance||''}-yard field goal ${event.made?'good':'missed'}.`.replace('  -',' ')}
+  if(event.type==='punt'){const pt=who('pt'),rt=who('rt');return`${pt?`${pt} (${team})`:team} punts${event.touchback?' for a touchback':''}${event.touchback?'':returnText(event)}${rt&&!event.touchback&&(Number(event.ret)>0||event.td)?` by ${rt}`:''}.`}
   if(event.type==='safety')return`SAFETY for ${team}.`;
   if(event.type==='coaching_decision'){
     const choice=event.selectedOption==='delegate'?`delegates — staff chooses ${decisionActionLabel(event.resolvedAction)}`:`chooses ${decisionActionLabel(event.selectedOption)}`;
@@ -88,5 +110,5 @@ function eventsHTML(preview,limit=160){
   const rows=(preview.state.events||[]).slice(-Math.max(1,limit)).reverse();
   return rows.map(e=>eventRowHTML(e,preview.names)).join('');
 }
-return{clockLabel,fieldLabel,downLabel,eventText,eventRowHTML,simulate,summaryHTML,eventsHTML};
+return{clockLabel,fieldLabel,downLabel,eventText,withActors,shortName,eventRowHTML,simulate,summaryHTML,eventsHTML};
 });

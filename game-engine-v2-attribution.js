@@ -124,7 +124,8 @@ function noteActors(result,e,actors){
   if(!Number.isFinite(e?.seq))return;
   const row={};
   for(const [key,p] of Object.entries(actors))if(p&&p.id!=null)row[key]=p.id;
-  result.playActors[e.seq]=row;
+  // Merge: a punt records both the punter and the returner on the same play.
+  result.playActors[e.seq]={...(result.playActors[e.seq]||{}),...row};
 }
 // A hurry that stops short of a sack: the rusher is credited with a pressure and the line with one allowed.
 function addPressure(result,offSide,def,e,rng){

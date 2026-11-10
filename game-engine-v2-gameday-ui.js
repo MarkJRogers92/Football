@@ -63,6 +63,17 @@ function v2GameDayUIRecord(options={}){
   const out=recordInteractiveV2GameDay(v2InteractiveGameDay.session,{...options,expectedIntegrity:v2InteractiveGameDay.integrity});
   v2InteractiveGameDay=null;delete universe.liveGameDay;setStatus(`Game Day recorded: ${out.result.away} ${out.result.ap} – ${out.result.hp} ${out.result.home}.`);render();return out
 }
+// Live names with the players attributed to each play so far. Attribution is deterministic in event order, so the
+// names shown live are the ones the final box score records. Recomputed only when new events arrive.
+let v2GameDayUIActorCache=null;
+function v2GameDayUINames(session){
+  const lab=globalThis.DynastyGameEngineV2Lab,actors=globalThis.DynastyGameEngineV2Attribution,events=session?.state?.events||[];
+  if(!lab?.withActors||!actors||typeof v2AttributionContext!=='function')return session.names;
+  if(v2GameDayUIActorCache?.session===session&&v2GameDayUIActorCache.count===events.length)return v2GameDayUIActorCache.names;
+  let names=session.names;
+  try{const ctx=v2GameDayUILiveContext();if(ctx)names=lab.withActors(session.names,actors.attributeGame(session.state,{home:v2AttributionContext(ctx.home),away:v2AttributionContext(ctx.away)}))}catch(err){names=session.names}
+  v2GameDayUIActorCache={session,count:events.length,names};return names
+}
 function v2GameDayUIEventText(event,names){
   if(event?.type==='coaching_decision'){
     const chosen=event.selectedOption==='delegate'?`delegated (${event.resolvedAction.replaceAll('_',' ')})`:event.selectedOption.replaceAll('_',' ');
@@ -90,7 +101,8 @@ function v2GameDayUIDecision(session){
 }
 function v2GameDayUIFeed(session){
   const rows=(session.state.events||[]).slice(-18).reverse();if(!rows.length)return'<div class="muted">Kickoff is next.</div>';
-  return rows.map(e=>`<div class="v2-gameday-feed-row"><span>${gameEscape(globalThis.DynastyGameEngineV2Lab?.clockLabel(e.state)||'')}</span><strong>${gameEscape(v2GameDayUIEventText(e,session.names))}</strong><b>${e.state?.score?.away??0}–${e.state?.score?.home??0}</b></div>`).join('')
+  const feedNames=v2GameDayUINames(session);
+  return rows.map(e=>`<div class="v2-gameday-feed-row"><span>${gameEscape(globalThis.DynastyGameEngineV2Lab?.clockLabel(e.state)||'')}</span><strong>${gameEscape(v2GameDayUIEventText(e,feedNames))}</strong><b>${e.state?.score?.away??0}–${e.state?.score?.home??0}</b></div>`).join('')
 }
 function ensureV2InteractiveGameDayHost(){
   let host=document.querySelector('#v2InteractiveGameDay');if(host)return host;const next=document.querySelector('#nextGameCard');if(!next)return null;

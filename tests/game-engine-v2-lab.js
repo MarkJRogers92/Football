@@ -27,3 +27,16 @@ test('v2 lab summary and event feed escape team names and show core metrics',()=
  assert.match(summary,/Metro &lt;A&gt;/);assert.match(summary,/Lakes &amp; B/);assert.match(summary,/Total yards/);assert.match(summary,/Turnovers/);
  assert.ok(events.length>0);assert.doesNotMatch(events,/<script/i);
 });
+
+test('play-by-play names the players attribution recorded for each play',()=>{
+ const attribution={contexts:{home:{qb:{id:'q',name:'Malachi Voss'},rushers:[{player:{id:'r',name:'Gavin Kemp'},weight:1}],receivers:[{player:{id:'w',name:'Aaron Woods'},weight:1}],defenders:[],offensiveLine:[],kicker:{id:'k',name:'Roman Monroe'}},away:{defenders:[{player:{id:'d',name:'Darius Stone'},weight:1}],rushers:[],receivers:[],offensiveLine:[]}},
+  playActors:{1:{qb:'q',tg:'w',tk:'d'},2:{ca:'r',qb:'q',tk:'d'},3:{qb:'q',sb:'d'},4:{qb:'q',tg:'w',ib:'d'},5:{kk:'k'},6:{qb:'q',tg:'w',pb:'d'}}};
+ const names=lab.withActors({home:'Metro',away:'Lakes'},attribution),t=e=>lab.eventText({team:'home',...e},names);
+ assert.equal(t({seq:1,type:'scrimmage',kind:'pass',completed:true,yards:14}),'M. Voss pass complete to A. Woods for 14 yards, tackled by D. Stone.');
+ assert.equal(t({seq:2,type:'scrimmage',kind:'rush',yards:-2}),'G. Kemp runs for a loss of 2, tackled by D. Stone.');
+ assert.equal(t({seq:3,type:'scrimmage',kind:'pass',sack:true,completed:false,yards:-7}),'M. Voss sacked by D. Stone for a loss of 7.');
+ assert.equal(t({seq:4,type:'interception',kind:'pass'}),'M. Voss pass for A. Woods intercepted by D. Stone.');
+ assert.equal(t({seq:5,type:'field_goal',distance:42,made:true}),'R. Monroe (Metro) 42-yard field goal good.');
+ assert.equal(t({seq:6,type:'scrimmage',kind:'pass',completed:false,yards:0}),'M. Voss pass incomplete, intended for A. Woods, broken up by D. Stone.');
+ assert.equal(lab.eventText({seq:9,type:'scrimmage',team:'home',kind:'rush',yards:3},{home:'Metro'}),'Metro runs for 3 yards.','without attribution the team is named');
+});
