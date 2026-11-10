@@ -1,5 +1,41 @@
 # Changelog
 
+## v0.17.1 — Mac downloads for every Mac
+
+- **One Mac download for Apple silicon and Intel.** The desktop alpha is now a universal app, so it runs on every Mac that supports it; it was Apple silicon only.
+- **Update notices work.** The desktop app checks for a newer version on the title screen, but it asked GitHub only for full releases and every desktop build is a prerelease, so the notice never appeared. It now sees prereleases too. (Players on v0.17.0 or earlier need to download this version once by hand.)
+- **Install steps on every release page,** including the one-time step to open the unnotarised Mac app (Open Anyway in System Settings → Privacy & Security, or Control-click → Open on macOS 14 and earlier) and the Windows SmartScreen step.
+- **The web game links to the desktop app** from About Dynasty Lab.
+
+No gameplay changes; saves carry over.
+
+## v0.17.0 — Real football results, a living league and recruiting that rewards effort
+
+### Fixes
+- A live game could be played to the final whistle and then never count: with a Coach's Desk decision pending, the lower **Coach It Live** and **Coach big moments** buttons still started a game that could not be recorded. Both are disabled until the decisions are made.
+- Live win chance now accounts for team strength (about one point of margin per rating point, fading as the clock runs).
+- League games simulated in the background now have the same mix of close games and blowouts as coached games (mean margin about 14, roughly one game in ten decided by 28 or more). They used to be far tighter (9 points, almost no blowouts), so your games felt like a different sport.
+- The desktop formation view shows full names and role labels; the kickoff splash no longer clips long team names.
+
+### A league that stays a league
+- **Elite programs stay elite.** Recruits now choose among the programs that suit them best rather than a random handful, strong programs hold scholarships for the prospects they want, and leftover blue-chips go to programs on their list. The talent gap between the top and bottom of the league holds over decades instead of collapsing within five seasons.
+- **Rankings carry preseason expectations early.** A top-ten team that loses its opener falls into the twenties, not the eighties; from week ten on the poll, conference title races and the playoff field are computed exactly as before.
+
+### Recruiting effort matters
+- Prospects commit only to programs that recruit them. A program that recruits nobody fills its class on signing day with two-star late additions; an unoffered recruit can no longer flip to you on signing day.
+- **Staff handle recruiting** (and Sim Season) now builds a board as well as working it, signing roughly what a comparable program signs. Building your own board can do better.
+
+### Players and games
+- Play-by-play names the players: "B. Flores pass complete to A. Holt for 13 yards, tackled by B. Nakamura." Live, in the archived game and in postseason games, matching the box score.
+- Live games pause only for real fourth-down dilemmas (about 3.5 a game instead of 6). Routine punts and short field goals use the staff call.
+- About 48,000 possible names instead of 1,368: no duplicate names on a roster and no "Cole Cole". Every player's jersey number is unique on his side of the ball, by position band; existing saves are repaired on load.
+- New dynasties start with realistic class years and redshirt freshmen, so departures no longer swing between 6 and 26 a year.
+
+### Polish
+- One **Coach It Live** button per screen; the game-week path shows a single current stage; the season review and departures steps autosave; the Full Setup card has its own button.
+
+Existing saves load unchanged apart from jersey repairs. Live games saved mid-game before this version replay under the rules they started with. No save-schema version bump.
+
 ## v0.16.0 — Deeper football, facilities and first-Saturday coaching
 
 ### Weekly choices, player history and the first Saturday

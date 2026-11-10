@@ -1,6 +1,6 @@
 name: Attach desktop builds to release
 
-# Copies the macOS arm64 and Windows x64 ZIPs from a passed Validate run onto an existing GitHub
+# Copies the macOS (universal, or arm64 for older runs) and Windows x64 ZIPs from a passed Validate run onto an existing GitHub
 # Release, with SHA256SUMS. Cloud coding sessions cannot write release assets (HTTP 403), so this
 # runs with the repository's own Actions token. The Validate run must be for the release's commit.
 
@@ -54,11 +54,14 @@ jobs:
           done
           mkdir -p dl out
           gh run download "$RUN_ID" --dir dl --pattern "dynasty-lab-desktop-alpha-*-${run_sha}"
-          mac="$(find dl -name 'Dynasty-Lab-Desktop-Alpha-macOS-arm64.zip' | head -1)"
+          # Universal (Apple silicon + Intel) builds since v0.17.1; older runs carry the arm64-only ZIP.
+          mac="$(find dl -name 'Dynasty-Lab-Desktop-Alpha-macOS-universal.zip' | head -1)"
+          mac_arch=universal
+          if [ -z "$mac" ]; then mac="$(find dl -name 'Dynasty-Lab-Desktop-Alpha-macOS-arm64.zip' | head -1)"; mac_arch=arm64; fi
           win="$(find dl -name 'Dynasty-Lab-Desktop-Alpha-Windows-x64.zip' | head -1)"
           [ -n "$mac" ] && [ -n "$win" ] || { echo "desktop ZIPs missing from run $RUN_ID" >&2; ls -R dl; exit 1; }
           # The macOS ZIP keeps the .app bundle's symlinks and modes, so it is attached unchanged.
-          cp "$mac" "out/Dynasty-Lab-v${VERSION}-macOS-arm64.zip"
+          cp "$mac" "out/Dynasty-Lab-v${VERSION}-macOS-${mac_arch}.zip"
           # The Windows ZIP is built on Windows; rewrite any backslash entry names as portable paths.
           python3 - "$win" "out/Dynasty-Lab-v${VERSION}-Windows-x64.zip" <<'PY'
           import sys, zipfile
@@ -71,7 +74,7 @@ jobs:
           PY
           for z in out/*.zip; do unzip -tq "$z"; done
           # Capture listings instead of piping into grep -q, which would SIGPIPE unzip under pipefail.
-          mac_list="$(unzip -l "out/Dynasty-Lab-v${VERSION}-macOS-arm64.zip")"
+          mac_list="$(unzip -l "out/Dynasty-Lab-v${VERSION}-macOS-${mac_arch}.zip")"
           win_list="$(unzip -l "out/Dynasty-Lab-v${VERSION}-Windows-x64.zip")"
           grep -q 'Dynasty Lab.app/' <<<"$mac_list" || { echo "macOS ZIP has no app bundle" >&2; exit 1; }
           grep -qi 'Dynasty Lab.exe' <<<"$win_list" || { echo "Windows ZIP has no executable" >&2; exit 1; }

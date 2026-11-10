@@ -1,5 +1,13 @@
 # Latest Session Work
 
+## v0.17.1 Mac downloads — 2026-11-10
+
+v0.17.0 was published to production and released with desktop ZIPs (macOS arm64 + Windows). v0.17.1 changes only the desktop distribution and the web About panel: a universal macOS build (lipo-checked in CI), an update check that reads the releases list (GitHub's /releases/latest ignores prereleases), install steps appended to every release by `release.yml`, and a download link in About. Release with the same three workflows; the attach workflow now names the Mac ZIP `macOS-universal`.
+
+## v0.17.0 release preparation — 2026-11-10
+
+The owner asked for a version bump and publication after PR #45 merged at `83cb2216f9f34dd4014742df84f05a618afc6be6` (review fixes, quick-sim margin calibration, recruiting-driven league parity, early-season ranking prior, routine fourth downs, recruiting effort, play-by-play actor names, name/jersey/class-year generation and polish). This preparation changes only version metadata, release notes and the generated standalone build. Publish production with the Publish Dynasty Lab workflow, create the v0.17.0 prerelease with Create GitHub Release, and attach desktop ZIPs from the passed `[release-ci]` Validate run for the exact release commit.
+
 ## v0.16.0 release preparation — 2026-11-08
 
 The owner authorized production publication and macOS/Windows downloads after PR #44 merged at `4396e2c1360cd63ff40db93be1fb570c0a676016`. This release carries both Claude's merged play model/facilities/large-save work and the correctness/engagement improvements. The feature tree passed all seven PR CI jobs (run `42532996910`), including Node/build, main and extended browser suites, audit and packaged desktop smoke tests on both platforms.

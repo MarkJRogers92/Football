@@ -73,3 +73,5 @@
 @media(prefers-reduced-motion:reduce){
   .title-setting-toggle input[type=checkbox],.title-setting-toggle input[type=checkbox]::after{transition:none}
 }
+
+.title-about-link{display:inline-flex;align-items:center;min-height:34px;margin-top:8px;padding:0 13px;border:1px solid #4b719c;border-radius:7px;background:#14263a;color:#e6eef7;font-size:11.5px;font-weight:750;text-decoration:none}.title-about-link:hover{background:#1b3350}.title-about-link:focus-visible{outline:2px solid #8fb4dd;outline-offset:2px}
