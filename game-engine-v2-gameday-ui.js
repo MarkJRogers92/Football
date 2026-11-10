@@ -39,8 +39,14 @@ function v2GameDayUIFinishPending(){
   const session=v2InteractiveGameDay.session;if(session.state.status!=='final'){v2GameDayUIApply(api,session,'delegate');v2InteractiveGameDay.actions.push('delegate')}
   return v2GameDayUIRecord()
 }
+// A live game cannot be recorded while Coach's Desk decisions are pending, so refuse to start one rather than
+// let the player finish a game that then cannot count. Restoring a saved live game is deliberately not gated.
+function v2GameDayUIAssertStartable(){
+  if(hasPendingCareerChoice())throw new Error('Choose your next job before playing this week.');
+  if(hasPendingWeeklyDecisions())throw new Error('Resolve the Coach’s Desk decisions before playing this week.')
+}
 function v2GameDayUIStartBigMoments(){
- v2GameDayUIPrepare(undefined,undefined,'moments');v2GameDayUIRun('decision');return v2InteractiveGameDay?.session||null
+ v2GameDayUIAssertStartable();v2GameDayUIPrepare(undefined,undefined,'moments');v2GameDayUIRun('decision');return v2InteractiveGameDay?.session||null
 }
 function v2GameDayUIRun(action){
   const ctx=v2GameDayUILiveContext(),api=globalThis.DynastyGameEngineV2GameDay;if(!ctx||!api||!v2InteractiveGameDay)throw new Error('Game Day session is unavailable.');
@@ -95,9 +101,10 @@ function renderV2InteractiveGameDay(){
   if(!v2InteractiveGameDay&&ctx)v2GameDayUIRestore();
   if(!ctx||!api){host.innerHTML=`<div class="muted">${typeof openingPreseason==='function'&&openingPreseason()?'Choose Begin Season in This Week to open your first matchup.':'Your next scheduled game will appear here.'}</div>`;return}
   if(!v2InteractiveGameDay){
-    host.innerHTML=`<div class="section-head"><div><div class="eyebrow">LIVE GAME DAY</div><h3>Coach the next game live</h3><div class="muted">Make the big calls yourself. The result counts as soon as the game ends.</div></div><div class="button-row"><button type="button" data-v2-gameday-start class="bi-primary">Coach It Live</button><button type="button" data-v2-gameday-moments>Coach big moments</button></div></div>`;
+    const lockAttr=(hasPendingCareerChoice()||hasPendingWeeklyDecisions())?' disabled title="Resolve the Coach’s Desk decisions before playing this week."':'';
+    host.innerHTML=`<div class="section-head"><div><div class="eyebrow">LIVE GAME DAY</div><h3>Coach the next game live</h3><div class="muted">Make the big calls yourself. The result counts as soon as the game ends.</div></div><div class="button-row"><button type="button" data-v2-gameday-start class="bi-primary"${lockAttr}>Coach It Live</button><button type="button" data-v2-gameday-moments${lockAttr}>Coach big moments</button></div></div>`;
     host.querySelector('[data-v2-gameday-moments]').onclick=()=>{try{v2GameDayUIStartBigMoments()}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}};
-    host.querySelector('[data-v2-gameday-start]').onclick=()=>{try{v2GameDayUIPrepare()}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}};return
+    host.querySelector('[data-v2-gameday-start]').onclick=()=>{try{v2GameDayUIAssertStartable();v2GameDayUIPrepare()}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}};return
   }
   const session=v2InteractiveGameDay.session,d=api.pendingDecision(session),final=session.state.status==='final';
   host.innerHTML=`<div class="v2-gameday-head"><div><div class="eyebrow">LIVE GAME DAY${v2InteractiveGameDay.mode==='moments'?' · BIG MOMENTS':''}${final?' · FINAL':''}</div><h3>${gameEscape(session.names.away)} at ${gameEscape(session.names.home)}</h3></div></div>${v2GameDayUIScoreboard(session)}${v2GameDayUIConditions(session)}${v2GameDayUIMomentum(session)}${v2GameDayUIDecision(session)}<div class="v2-gameday-controls button-row">${!final&&!d?'<button type="button" data-v2-gameday-next>Next Play</button><button type="button" data-v2-gameday-decision>Advance to Next Decision</button>':''}${!final?'<button type="button" data-v2-gameday-delegate>Delegate Rest</button>':''}${final?'<button type="button" data-v2-gameday-record class="recommended">Record Final</button>':''}</div><div class="v2-gameday-feed"><div class="v2-gameday-feed-head"><strong>Game feed</strong><span class="muted">Newest first</span></div>${v2GameDayUIFeed(session)}</div><div class="v2-shadow-safety"><strong>${final?'Final whistle.':'Live game.'}</strong> ${final?'Record the final to keep this result.':'Saved as you play. Your staff can finish this game when you advance the week.'}</div>`;
@@ -117,7 +124,7 @@ if(typeof watchUserDetailed==='function')watchUserDetailed=v2GameDayUIGuard('wat
 // "Coach it live" from anywhere: open Game Day, start the live session if none is running, and bring it into view.
 function v2GameDayUICoachLive(){
   const tab=document.querySelector('.tabs button[data-tab="gamelab"]');if(tab&&!tab.classList.contains('active'))tab.click();
-  try{if(!v2InteractiveGameDay&&v2GameDayUILiveContext())v2GameDayUIPrepare();else renderV2InteractiveGameDay()}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}
+  try{if(!v2InteractiveGameDay&&v2GameDayUILiveContext()){v2GameDayUIAssertStartable();v2GameDayUIPrepare()}else renderV2InteractiveGameDay()}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}
   document.querySelector('#v2InteractiveGameDay')?.scrollIntoView({behavior:'smooth',block:'start'})
 }
 document.addEventListener('click',e=>{if(e.target.closest('[data-coach-live]'))v2GameDayUICoachLive()});
