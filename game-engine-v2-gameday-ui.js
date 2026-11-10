@@ -81,8 +81,9 @@ function v2GameDayUIScoreboard(session){
 }
 // Which side the coach is on, and the live win-chance estimate from that side (presentation only).
 function v2GameDayUIUserSide(session){return selected()?.name===session.names.home?'home':'away'}
-function v2GameDayUIWinChance(session){const m=globalThis.DynastyGameDayMomentum;return m?Math.round(m.winChance(session.state,v2GameDayUIUserSide(session),{homeEdge:Number(session.homeFieldRating)||0})*100):null}
-function v2GameDayUIMomentum(session){return globalThis.DynastyGameDayMomentum?.panelHTML(session,v2GameDayUIUserSide(session),{homeEdge:Number(session.homeFieldRating)||0})||''}
+function v2GameDayUIWinOptions(session){const m=globalThis.DynastyGameDayMomentum;return{homeEdge:Number(session.homeFieldRating)||0,strengthEdge:m?.strengthEdge?m.strengthEdge(session.inputs):0}}
+function v2GameDayUIWinChance(session){const m=globalThis.DynastyGameDayMomentum;return m?Math.round(m.winChance(session.state,v2GameDayUIUserSide(session),v2GameDayUIWinOptions(session))*100):null}
+function v2GameDayUIMomentum(session){return globalThis.DynastyGameDayMomentum?.panelHTML(session,v2GameDayUIUserSide(session),v2GameDayUIWinOptions(session))||''}
 function v2GameDayUIDecision(session){
   const d=globalThis.DynastyGameEngineV2GameDay?.pendingDecision(session);if(!d)return'';
   return`<div class="v2-gameday-decision"><div class="eyebrow">HEAD COACH DECISION</div><h3>${gameEscape(d.situation)}</h3><div class="muted">Staff recommendation: <strong>${gameEscape(d.staffRecommendation.replaceAll('_',' '))}</strong>${v2GameDayUIWinChance(session)!=null?` · Win chance now <strong>${v2GameDayUIWinChance(session)}%</strong>`:''}</div><div class="button-row">${d.options.map(o=>`<button type="button" data-v2-gameday-choice="${gameEscape(o.id)}" ${o.id===d.staffRecommendation?'class="recommended"':''}>${gameEscape(o.label)}</button>`).join('')}</div></div>`

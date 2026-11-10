@@ -14,13 +14,18 @@ const phi=z=>.5*(1+erf(z/Math.SQRT2));
 function secondsLeft(st){if(!st)return GAME;if(st.status==='final')return 0;const p=Number(st.period)||1;if(p>4||st.ot)return 300;return Math.max(0,(4-p)*QUARTER+(Number(st.clock)||0))}
 // Expected points of the current possession from field position (yards from the offense's own goal line).
 function possessionValue(fieldPosition){const f=Number(fieldPosition);if(!Number.isFinite(f))return 0;return Math.max(-1,Math.min(6,-1+.07*f))}
-// Chance that `side` wins from this state. homeEdge is a small pre-game edge in points for the home team.
-function winChance(st,side,{homeEdge=0}={}){
+// Expected points of margin per point of overall rating gap, measured on league games (a 10 point gap wins ~80%).
+const POINTS_PER_RATING=1;
+// Pre-game edge in points for the home team from the two teams' ratings, so a mismatch shows before a snap is played.
+function strengthEdge(inputs){const h=Number(inputs?.home?.rating),a=Number(inputs?.away?.rating);return Number.isFinite(h)&&Number.isFinite(a)?(h-a)*POINTS_PER_RATING:0}
+// Chance that `side` wins from this state. homeEdge is a small pre-game edge in points for the home team and
+// strengthEdge the team-rating edge in points for the home team; both fade as the clock runs down.
+function winChance(st,side,{homeEdge=0,strengthEdge=0}={}){
  if(!st?.score)return .5;const other=side==='home'?'away':'home';
  const margin=(Number(st.score[side])||0)-(Number(st.score[other])||0),left=secondsLeft(st);
  if(st.status==='final')return margin>0?1:margin<0?0:.5;
  const poss=st.possession===side?possessionValue(st.fieldPosition):st.possession===other?-possessionValue(st.fieldPosition):0;
- const edge=(side==='home'?1:-1)*homeEdge*(left/GAME);
+ const edge=(side==='home'?1:-1)*((Number(homeEdge)||0)+(Number(strengthEdge)||0))*(left/GAME);
  const sd=13.5*Math.sqrt(left/GAME)+.6;
  return Math.min(.995,Math.max(.005,phi((margin+poss+edge)/sd)));
 }
@@ -52,5 +57,5 @@ function panelHTML(session,side,opts={}){
  const tone=pct>=60?'is-up':pct<=40?'is-down':'is-even';
  return`<section class="gm-panel ${tone}" aria-label="Win chance"><div class="gm-head"><div><span class="eyebrow">WIN CHANCE · ESTIMATE</span><strong>${pct}%</strong>${swing?`<em class="${swing>0?'up':'down'}">${swing>0?'▲':'▼'} ${Math.abs(swing)}</em>`:''}</div><div class="gm-key"><span><i class="k-dec"></i>Your calls</span><span><i class="k-score"></i>Scores</span></div></div>${graphSVG(pts,{label:`${session?.names?.[side]||'Your'} win chance`})}<div class="gm-axis"><span>Q1</span><span>Q2</span><span>Q3</span><span>Q4</span></div></section>`;
 }
-return{secondsLeft,possessionValue,winChance,series,graphSVG,panelHTML,GAME};
+return{secondsLeft,possessionValue,strengthEdge,winChance,series,graphSVG,panelHTML,GAME};
 });
