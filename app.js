@@ -3219,8 +3219,10 @@ function advanceOffseasonPhase(){
  const os=normalizeOffseasonState();
  const gate=guidanceActionEligibility('offseason-phase');
  if(os.phase!=='review'&&!gate.allowed){setStatus(gate.blockers[0]?.message||'Choose your next job before advancing the offseason.');return false}
- if(os.phase==='review')return offseasonReview();
- if(os.phase==='departures')return offseasonDepartures();
+ // Review and departures change the calendar like every other phase, so they checkpoint too (they used to leave the
+ // desk reading 'Not saved' until the next phase).
+ if(os.phase==='review'){const ok=offseasonReview();if(ok)autosaveAfter('postseason');return ok}
+ if(os.phase==='departures'){const ok=offseasonDepartures();if(ok)autosaveAfter('postseason');return ok}
  if(os.phase==='signing')return offseasonEnrollment();
  if(os.phase==='portal')return offseasonPortal();
  if(os.phase==='preseason')return offseasonPreseason();

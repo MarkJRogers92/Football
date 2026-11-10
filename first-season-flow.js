@@ -124,7 +124,11 @@ function buildPrepPath({hasGame=false,opponentReviewed=false,requiredCount=0,pre
     {key:'personnel',label:'Review personnel',status:personnelStatus},
     {key:'gameday',label:'Game Day',status:gamedayStatus}
   ];
-  return{hasGame:true,stages,currentKey:stages.find(stage=>stage.status==='current')?.key||null};
+  // One stage is current at a time: the most binding one. Others that would also be "current" (an unreviewed
+  // opponent while decisions are pending or Game Day is open) are recommendations, so they read as optional.
+  const keep=['decisions','gameday','personnel','prep','opponent'].find(key=>stages.find(stage=>stage.key===key).status==='current');
+  for(const stage of stages)if(stage.status==='current'&&stage.key!==keep)stage.status='optional';
+  return{hasGame:true,stages,currentKey:keep||null};
 }
 
 return{guidanceMode,classifyAgenda,buildCarryForward,buildBriefing,buildPrepPath};

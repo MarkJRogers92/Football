@@ -3528,8 +3528,8 @@ button.lw-follow[aria-pressed="true"]{color:var(--text);border-color:var(--team-
 
     <section id="gamelab" class="panel tab">
       <div class="section-head">
-        <div><h2>Game Day</h2><div class="muted">Coach your next game live, watch it, or sim it.</div></div>
-        <div class="button-row"><button id="coachLiveGame" type="button" data-coach-live>Coach It Live</button><button id="watchDetailedGame">Watch</button><button id="simDetailedGame">Sim Instantly</button></div>
+        <div><h2>Game Day</h2><div class="muted">Coach your next game live below, or watch or sim it.</div></div>
+        <div class="button-row"><button id="watchDetailedGame">Watch</button><button id="simDetailedGame">Sim Instantly</button></div>
       </div>
       <p id="detailedGateNote" class="gate-note" role="status" hidden></p>
       <div class="card" id="nextGameCard"></div>
@@ -6880,7 +6880,11 @@ function buildPrepPath({hasGame=false,opponentReviewed=false,requiredCount=0,pre
     {key:'personnel',label:'Review personnel',status:personnelStatus},
     {key:'gameday',label:'Game Day',status:gamedayStatus}
   ];
-  return{hasGame:true,stages,currentKey:stages.find(stage=>stage.status==='current')?.key||null};
+  // One stage is current at a time: the most binding one. Others that would also be "current" (an unreviewed
+  // opponent while decisions are pending or Game Day is open) are recommendations, so they read as optional.
+  const keep=['decisions','gameday','personnel','prep','opponent'].find(key=>stages.find(stage=>stage.key===key).status==='current');
+  for(const stage of stages)if(stage.status==='current'&&stage.key!==keep)stage.status='optional';
+  return{hasGame:true,stages,currentKey:keep||null};
 }
 
 return{guidanceMode,classifyAgenda,buildCarryForward,buildBriefing,buildPrepPath};
@@ -10307,8 +10311,10 @@ function advanceOffseasonPhase(){
  const os=normalizeOffseasonState();
  const gate=guidanceActionEligibility('offseason-phase');
  if(os.phase!=='review'&&!gate.allowed){setStatus(gate.blockers[0]?.message||'Choose your next job before advancing the offseason.');return false}
- if(os.phase==='review')return offseasonReview();
- if(os.phase==='departures')return offseasonDepartures();
+ // Review and departures change the calendar like every other phase, so they checkpoint too (they used to leave the
+ // desk reading 'Not saved' until the next phase).
+ if(os.phase==='review'){const ok=offseasonReview();if(ok)autosaveAfter('postseason');return ok}
+ if(os.phase==='departures'){const ok=offseasonDepartures();if(ok)autosaveAfter('postseason');return ok}
  if(os.phase==='signing')return offseasonEnrollment();
  if(os.phase==='portal')return offseasonPortal();
  if(os.phase==='preseason')return offseasonPreseason();
@@ -17881,7 +17887,7 @@ function newDynastySetupWelcome(){
  const saves=titleSaveSlots.filter(s=>!s.empty).length;
  return `${newDynastySetupHeader('THE NEXT ERA STARTS HERE','Take the Job','Build a coach, choose the right program, set your football identity, and see exactly what you inherited before the first preseason meeting.')}
  <div class="setup-welcome-grid">
-  <section class="setup-feature"><span>FULL SETUP</span><h2>Make the program yours</h2><p>Choose your coach, school, and style of football.</p></section>
+  <section class="setup-feature"><span>FULL SETUP</span><h2>Make the program yours</h2><p>Choose your coach, school, and style of football.</p><button type="button" data-setup-full>Full Setup</button></section>
   <section class="setup-feature"><span>QUICK START</span><h2>Get to the briefing</h2><p>Use recommended settings, then meet your roster and staff before accepting the job.</p><button type="button" data-setup-quick>Quick Start</button></section>
  </div>
  <div class="setup-ledger">${newDynastySetupMetric('Starting season','2027 Preseason','Review your team before opening Week 1')}${newDynastySetupMetric('League','120 programs','Choose a contender or build a program from the ground up')}${newDynastySetupMetric('Existing saves',String(saves),'Continue and Load remain on the title screen')}</div>`;
@@ -18009,7 +18015,7 @@ function quickStartNewDynastySetup(){
 }
 function bindNewDynastySetup(){
  $('#setupExit').onclick=exitNewDynastySetup;$('#setupBack').onclick=backNewDynastySetup;$('#setupContinue').onclick=continueNewDynastySetup;
- $('#setupContent').addEventListener('click',e=>{const quick=e.target.closest('[data-setup-quick]');if(quick){quickStartNewDynastySetup();return}const program=e.target.closest('[data-setup-program]');if(program){newDynastySetupDraft.program=program.dataset.setupProgram;newDynastySetupDraft.quickStart=false;invalidateNewDynastySetupCandidate();writeNewDynastySetupDraft();renderNewDynastySetup()}});
+ $('#setupContent').addEventListener('click',e=>{const quick=e.target.closest('[data-setup-quick]');if(quick){quickStartNewDynastySetup();return}if(e.target.closest('[data-setup-full]')){continueNewDynastySetup();return}const program=e.target.closest('[data-setup-program]');if(program){newDynastySetupDraft.program=program.dataset.setupProgram;newDynastySetupDraft.quickStart=false;invalidateNewDynastySetupCandidate();writeNewDynastySetupDraft();renderNewDynastySetup()}});
  $('#setupContent').addEventListener('input',e=>{if(e.target.id==='setupCoachName'){newDynastySetupDraft.coachName=e.target.value.slice(0,40);newDynastySetupDraft.quickStart=false;invalidateNewDynastySetupCandidate();writeNewDynastySetupDraft();updateNewDynastySetupControls();$('#setupCoachError')?.classList.toggle('hidden',validNewDynastyCoachName(newDynastySetupDraft.coachName)||!newDynastySetupDraft.coachName)}else if(e.target.id==='setupProgramSearch'){newDynastySetupProgramView.query=e.target.value;filterNewDynastySetupPrograms()}});
  $('#setupContent').addEventListener('change',e=>{if(e.target.dataset.setupField)setNewDynastySetupField(e.target.dataset.setupField,e.target.value);else if(e.target.id==='setupProgramConference'){newDynastySetupProgramView.conference=e.target.value;filterNewDynastySetupPrograms()}else if(e.target.id==='setupProgramSort'){newDynastySetupProgramView.sort=e.target.value;filterNewDynastySetupPrograms()}});
  $('#dynastySetup').addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();exitNewDynastySetup()}else if(e.key==='Enter'&&e.target.tagName!=='BUTTON'&&e.target.tagName!=='TEXTAREA'&&!$('#setupContinue').disabled){e.preventDefault();continueNewDynastySetup()}});

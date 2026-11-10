@@ -154,3 +154,14 @@ test('the first briefing introduces two real players with profile identities and
  assert.equal(b.bullets.length,3);assert.ok(b.bullets.some(x=>x.kind==='required'));const intro=b.bullets.find(x=>x.kind==='players');assert.ok(intro);assert.deepEqual(intro.players.map(x=>x.id),['qb','lb']);assert.match(intro.text,/A Quarterback.*B Linebacker/);assert.equal(JSON.stringify(players),before);
  const after=flow().buildBriefing({week:1,players,carryForward:{result:'Won 17–10 vs Rival U'},opponent:'Next U'});assert.equal(after.bullets.some(x=>x.kind==='players'),false);assert.equal(after.bullets[0].kind,'last_game');
 });
+
+test('only one stage of the game-week path is current at a time',()=>{
+  const Flow=flow();
+  for(const input of [{opponentReviewed:false,requiredCount:2},{opponentReviewed:false,requiredCount:0,gamedayReady:true},{opponentReviewed:false,requiredCount:0,personnelPending:true,gamedayReady:true},{opponentReviewed:false,requiredCount:0}]){
+    const path=Flow.buildPrepPath({hasGame:true,...input}),current=path.stages.filter(x=>x.status==='current');
+    assert.equal(current.length,1,JSON.stringify(input));assert.equal(path.currentKey,current[0].key);
+  }
+  const pending=Flow.buildPrepPath({hasGame:true,opponentReviewed:false,requiredCount:2});
+  assert.equal(pending.currentKey,'decisions','a required decision outranks reviewing the opponent');
+  assert.equal(pending.stages.find(x=>x.key==='opponent').status,'optional');
+});
