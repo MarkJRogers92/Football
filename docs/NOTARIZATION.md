@@ -13,6 +13,15 @@ cannot be notarised. Checked on 2026-10-26:
 Nothing in the repo needs to change to unblock this; the missing pieces are account
 level.
 
+## What players see today (since v0.17.1)
+
+- One universal Mac download runs on Apple silicon and Intel Macs.
+- Every GitHub release's notes end with an **Installing the desktop alpha** section (added by `release.yml`): open once, choose Done, then System Settings → Privacy & Security → Open Anyway (Control-click → Open on macOS 14 and earlier).
+- The desktop app's update notice reads the releases list, so it sees prereleases (GitHub's `/releases/latest` ignores them, which hid every update before v0.17.1).
+- The web build's About panel links to the releases page.
+
+Notarisation removes the Gatekeeper step entirely; it still needs the account-level items below.
+
 ## What is required
 
 1. **Apple Developer Program membership** (paid, annual). A free Apple ID cannot

@@ -84,15 +84,15 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Build arm64 macOS desktop package
+      - name: Build universal macOS desktop package (Apple silicon and Intel)
         run: npm run desktop:make
       - name: Smoke test packaged desktop app
         run: node tests/desktop-smoke.js --packaged
-      - name: Upload arm64 macOS ZIP
+      - name: Upload universal macOS ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: dynasty-lab-desktop-alpha-macos-arm64-${{ github.sha }}
-          path: out/make/zip/darwin/arm64/Dynasty-Lab-Desktop-Alpha-macOS-arm64.zip
+          name: dynasty-lab-desktop-alpha-macos-universal-${{ github.sha }}
+          path: out/make/zip/darwin/universal/Dynasty-Lab-Desktop-Alpha-macOS-universal.zip
           if-no-files-found: error
           retention-days: 14
 

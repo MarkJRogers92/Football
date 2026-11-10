@@ -2230,6 +2230,8 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
   .title-setting-toggle input[type=checkbox],.title-setting-toggle input[type=checkbox]::after{transition:none}
 }
 
+.title-about-link{display:inline-flex;align-items:center;min-height:34px;margin-top:8px;padding:0 13px;border:1px solid #4b719c;border-radius:7px;background:#14263a;color:#e6eef7;font-size:11.5px;font-weight:750;text-decoration:none}.title-about-link:hover{background:#1b3350}.title-about-link:focus-visible{outline:2px solid #8fb4dd;outline-offset:2px}
+
 /* Take the Job — a focused front-office setup shell, separate from the game client. */
 .dynasty-setup{--program-primary:#234875;--program-secondary:#73a8ff;--program-accent:#d6b45e;position:fixed;inset:0;z-index:110;min-height:100dvh;overflow:auto;color:#eaf0f7;background:#070b10;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 .dynasty-setup[hidden]{display:none!important}
@@ -20933,6 +20935,7 @@ queue();
         <section class="title-about-card"><span>DYNASTY MODE</span><h3>One program, one career</h3><p>Control a single program and move only through career opportunities earned inside the dynasty.</p></section>
         <section class="title-about-card"><span>COMMISSIONER MODE</span><h3>Run the whole universe</h3><p>Switch programs and edit institutional details when you want broader sandbox control.</p></section>
         <section class="title-about-card title-about-card--wide"><span>YOUR SAVE DATA</span><h3>${storageSummary}</h3><p>${storageCopy}</p></section>
+        ${desktopStorage?'':`<section class="title-about-card title-about-card--wide" data-about-desktop><span>DESKTOP APP</span><h3>Play offline on Mac or Windows</h3><p>The desktop alpha runs on Apple silicon and Intel Macs and on Windows, with saves on your computer. Each release page explains the one-time step to open it on a Mac.</p><a class="title-about-link" href="https://github.com/MarkJRogers92/Football/releases" target="_blank" rel="noopener">Download the desktop app</a></section>`}
       </div>`;
     menuShell.appendChild(panel);
 

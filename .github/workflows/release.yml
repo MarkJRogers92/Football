@@ -73,6 +73,17 @@ jobs:
           git show "${target}:CHANGELOG.md" | awk -v h="## v${VERSION}" 'index($0,h)==1{f=1;next} /^## /{f=0} f' > notes.md
           [ -s notes.md ] || { echo "no CHANGELOG.md section for v${VERSION}" >&2; exit 1; }
           if [ -n "$NOTE" ]; then printf '\n%s\n' "$NOTE" >> notes.md; fi
+          # Every release carries the install steps, so the Mac download is never a dead end.
+          cat >> notes.md <<'INSTALL'
+
+          ### Installing the desktop alpha
+
+          **Mac (Apple silicon and Intel):** download the `macOS` ZIP, open it and drag **Dynasty Lab** into Applications. The alpha is not yet notarised by Apple, so the first launch is blocked: open it once, choose **Done** when macOS says it cannot verify the app, then go to **System Settings → Privacy & Security** and click **Open Anyway** next to Dynasty Lab. On macOS 14 or earlier you can instead Control-click the app and choose **Open**. After that it opens normally.
+
+          **Windows:** download the `Windows` ZIP, extract it and run **Dynasty Lab.exe**. If SmartScreen appears, choose **More info → Run anyway**.
+
+          Saves carry over between versions. `SHA256SUMS` lists the checksum of each download.
+          INSTALL
           args=(--target "$target" --title "Dynasty Lab v${VERSION} — ${TITLE}" --notes-file notes.md)
           if [ "$PRERELEASE" = "true" ]; then args+=(--prerelease); fi
           gh release create "v${VERSION}" "${args[@]}"

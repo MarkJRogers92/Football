@@ -7,6 +7,8 @@ const platform = process.argv[2] || 'darwin';
 const arch = process.argv[3] || 'arm64';
 const artifactNames = {
   'darwin-arm64': 'Dynasty-Lab-Desktop-Alpha-macOS-arm64.zip',
+  // One download for every Mac: Apple silicon and Intel slices in the same app.
+  'darwin-universal': 'Dynasty-Lab-Desktop-Alpha-macOS-universal.zip',
   'win32-x64': 'Dynasty-Lab-Desktop-Alpha-Windows-x64.zip',
 };
 const artifactName = artifactNames[`${platform}-${arch}`];

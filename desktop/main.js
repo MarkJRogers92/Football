@@ -6,6 +6,7 @@ const {fileURLToPath, pathToFileURL} = require('url');
 const { app, BrowserWindow, ipcMain, session, shell } = require('electron');
 const { createDesktopStorage } = require('./storage.js');
 const { createStagingArea, routeSave } = require('./staging.js');
+const { newestRelease } = require('./releases.js');
 
 const GAME_ENTRY = path.join(__dirname, '..', 'index.html');
 const GAME_URL = pathToFileURL(GAME_ENTRY).href;
@@ -53,18 +54,18 @@ function latestRelease() {
     const done = value => { if (!settled) { settled = true; resolve(value); } };
     const request = https.get({
       host: 'api.github.com',
-      path: '/repos/MarkJRogers92/Football/releases/latest',
+      // The list, not /releases/latest: that endpoint skips prereleases, and every desktop build is one.
+      path: '/repos/MarkJRogers92/Football/releases?per_page=15',
       headers: { 'User-Agent': 'Dynasty-Lab', Accept: 'application/vnd.github+json' },
       timeout: 4000,
     }, response => {
       if (response.statusCode !== 200) { response.resume(); return done(null); }
       let body = '';
       response.setEncoding('utf8');
-      response.on('data', chunk => { if (body.length < 200000) body += chunk; });
+      response.on('data', chunk => { if (body.length < 2000000) body += chunk; });
       response.on('end', () => {
         try {
-          const data = JSON.parse(body);
-          done(data.tag_name ? { tag: data.tag_name, url: data.html_url || null } : null);
+          done(newestRelease(JSON.parse(body)));
         } catch { done(null); }
       });
       response.on('error', () => done(null));

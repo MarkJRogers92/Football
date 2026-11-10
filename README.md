@@ -52,7 +52,7 @@ Desktop alpha:
 
 ```bash
 npm run desktop:dev           # build and launch in Electron
-npm run desktop:make          # macOS arm64 zip
+npm run desktop:make          # macOS universal zip (Apple silicon + Intel)
 npm run desktop:make:windows  # Windows x64 zip
 ```
 

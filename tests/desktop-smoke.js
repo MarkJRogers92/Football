@@ -15,7 +15,7 @@ const electronPath = require('electron');
 const packaged = process.argv.includes('--packaged');
 const packagedTarget = process.platform === 'win32'
   ? {platform: 'win32', arch: 'x64', name: 'Dynasty-Lab-Desktop-Alpha-Windows-x64.zip'}
-  : {platform: 'darwin', arch: 'arm64', name: 'Dynasty-Lab-Desktop-Alpha-macOS-arm64.zip'};
+  : {platform: 'darwin', arch: 'universal', name: 'Dynasty-Lab-Desktop-Alpha-macOS-universal.zip'};
 const artifact = path.join(root, 'out', 'make', 'zip', packagedTarget.platform,
   packagedTarget.arch, packagedTarget.name);
 const bridgeKeys = ['kind', 'listSlots', 'load', 'readArchive', 'readGames', 'rename', 'save'];
@@ -47,6 +47,11 @@ async function extractPackagedBundle(destinationRoot) {
   assert.equal(plistValue('CFBundleExecutable'), 'Dynasty Lab', 'packaged executable keeps its established name');
   assert.equal(plistValue('CFBundleIdentifier'), 'com.electron.dynasty-lab',
     'packaged app keeps its established bundle identity');
+  if (packagedTarget.arch === 'universal') {
+    // One download serves every Mac: the executable must carry both Apple silicon and Intel code.
+    const archs = execFileSync('lipo', ['-archs', executable], {encoding: 'utf8'}).trim().split(/\s+/);
+    assert.ok(archs.includes('arm64') && archs.includes('x86_64'), `universal app has both slices (got ${archs.join(' ')})`);
+  }
   execFileSync('codesign', ['--verify', '--deep', '--strict', bundle]);
   return bundle;
 }

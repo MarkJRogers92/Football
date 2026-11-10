@@ -8,7 +8,7 @@
 
 ## Frameworks and Libraries
 
-- Electron Forge packages macOS arm64 and Windows x64 ZIP artifacts through `@electron-forge/maker-zip`.
+- Electron Forge packages a macOS universal (arm64 + x86_64) ZIP and a Windows x64 ZIP through `@electron-forge/maker-zip`. The packaged smoke test checks both Mac slices with `lipo`.
 - Playwright Core drives Chromium browser checks; `fake-indexeddb` supports Node-side browser-storage tests; `extract-zip` supports desktop packaging tests.
 - Simulation and UI code use project-local modules rather than a server framework or external runtime service.
 
