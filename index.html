@@ -7862,14 +7862,19 @@ function generateCoach(role,school,tenure=null){
 }
 function generateStaff(s){return {HC:generateCoach('Head Coach',s),OC:generateCoach('Offensive Coordinator',s),DC:generateCoach('Defensive Coordinator',s),RC:generateCoach('Recruiting Coordinator',s),SC:generateCoach('Strength & Performance',s)}}
 function generatePositionAttributes(pos,trueNow){return {speed:clamp(Math.round(trueNow+gauss()*10+(['WR','CB','RB','S'].includes(pos)?7:['DT','OG','C'].includes(pos)?-11:0)),25,99),power:clamp(Math.round(trueNow+gauss()*9+(['DT','OG','C','OT','EDGE','TE'].includes(pos)?6:['CB','WR'].includes(pos)?-8:0)),25,99),technique:clamp(Math.round(trueNow+gauss()*9),25,99),iq:clamp(Math.round(trueNow+gauss()*11),20,99),composure:clamp(Math.round(66+gauss()*15),15,99),durability:clamp(Math.round(72+gauss()*14),20,99),versatility:clamp(Math.round(64+gauss()*17),15,99)}}
+// A generated roster looks like the steady state a program settles into: 35% freshmen (half of them redshirt
+// freshmen), then 25/20/20. Seniors used to be half as common, and with no redshirt freshmen nearly the whole first
+// freshman class redshirted at once, leaving about six sophomores a team the next season: an echo that thinned one
+// class in four and swung departures between 6 and 26 a year.
+const STARTING_CLASS_YEARS=['FR','FR','FR','FR','FR','FR','FR','SO','SO','SO','SO','SO','JR','JR','JR','JR','SR','SR','SR','SR'],STARTING_RS_FRESHMAN=.5;
 function generatePlayer(school,pos,idx){
- const [hr,wr]=BODY[pos],h=gi(hr[0],hr[1]),w=gi(wr[0],wr[1]),classYr=pick(['FR','FR','SO','SO','JR','JR','SR']);
+ const [hr,wr]=BODY[pos],h=gi(hr[0],hr[1]),w=gi(wr[0],wr[1]),classYr=pick(STARTING_CLASS_YEARS);
  const program=school.prestige*.48+school.resources*.16+school.development*.22+school.facilities*.14;
  const trueNow=clamp(Math.round(42+program*.38+gauss()*8+(classYr==='FR'?-5:classYr==='SO'?-2:classYr==='SR'?3:1)),38,97);
  const attrs=generatePositionAttributes(pos,trueNow),style=styleForTraits(pos,attrs);
  const dev=clamp(Math.round(61+school.development*.18+gauss()*16),20,99),work=clamp(Math.round(65+gauss()*18),15,99),coach=clamp(Math.round(68+gauss()*16),15,99),upside=clamp(Math.round(trueNow+(100-trueNow)*(dev/100)*rng(.34,.92)),trueNow,99);
  const scoutErr=gauss()*((100-school.development)/18+2.2),perceived=clamp(Math.round(trueNow+scoutErr),35,99),perceivedUpside=clamp(Math.round(upside+gauss()*6),perceived,99),morale=clamp(Math.round(72+gauss()*13),20,99);
- let role=idx<Math.ceil((POS_COUNTS[pos]||4)*.35)?'Starter mix':idx<Math.ceil((POS_COUNTS[pos]||4)*.7)?'Rotation':'Development';if(classYr==='FR'&&role==='Development')role='Redshirt candidate';let eligibilityUsed={FR:0,SO:1,JR:2,SR:3}[classYr],redshirtUsed=eligibilityUsed>0&&gameplayRandom()<.28;
+ let role=idx<Math.ceil((POS_COUNTS[pos]||4)*.35)?'Starter mix':idx<Math.ceil((POS_COUNTS[pos]||4)*.7)?'Rotation':'Development';if(classYr==='FR'&&role==='Development')role='Redshirt candidate';let eligibilityUsed={FR:0,SO:1,JR:2,SR:3}[classYr],redshirtUsed=eligibilityUsed>0?gameplayRandom()<.28:gameplayRandom()<STARTING_RS_FRESHMAN;
  let growthProfile=pick(GROWTH_PROFILE_KEYS),growthVolatility=clamp(Math.round(45+gauss()*22),10,95),framePotential=clamp(Math.round(58+gauss()*20),10,98),speedRetention=clamp(Math.round(70+gauss()*16),20,99),scoutConfidence=clamp(Math.round(38+eligibilityUsed*13+school.development*.18+gauss()*5),28,94);return {id:uid(),name:personName(),pos,year:classYr,eligibilityUsed,redshirtUsed,redshirtActive:false,redshirtSeason:null,height:h,weight:w,style,trueNow,upside,perceived,perceivedUpside,dev,work,coach,morale,role,...attrs,health:100,wear:gi(0,8),injury:null,injuryWeeks:0,injuryHistory:[],seasonHistory:[],awards:[],draftResult:null,promise:null,promiseBaseline:perceived,growthProfile,growthVolatility,framePotential,speedRetention,heightGrowthRemaining:eligibilityUsed===0&&gameplayRandom()<.24?1:0,trainingFocus:'Balanced',positionFamiliarity:{[pos]:100},formerPositions:[],scoutConfidence,lastDevelopmentDelta:0,lastPhysicalChange:'',campGrade:null,campHistory:[],stats:newStats(),career:newStats(),origin:'Initial roster',portraitSeed:portraitSeedFor(),portraitVersion:PORTRAIT_VERSION};
 }
 function packStats(o){if(!o)return{};let out={};for(const k in o)if(o[k])out[k]=o[k];return out}
