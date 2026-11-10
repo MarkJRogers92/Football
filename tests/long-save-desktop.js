@@ -10,6 +10,7 @@
 const assert = require('node:assert/strict'), fs = require('node:fs'), os = require('node:os'), path = require('node:path');
 const {_electron: electron} = require('playwright-core');
 const {startNewDynasty} = require('./helpers/start-new-dynasty');
+const {startLiveGame}=require('./helpers/start-live-game');
 const SAVE = process.env.LONG_SAVE;
 if (!SAVE || !fs.existsSync(SAVE)) { console.log('SKIP long-save desktop test: set LONG_SAVE to a packed save (see the header).'); process.exit(0); }
 const root = path.join(__dirname, '..'), electronPath = require('electron');
@@ -54,7 +55,7 @@ const goTab = (page, id) => page.evaluate(({id, group}) => { const g = document.
     assert.ok(world.levels && Object.values(world.levels).reduce((a, b) => a + b, 0) >= 10, `the facility plan survived the restart: ${JSON.stringify(world)}`);
     await goTab(page, 'program'); await page.waitForSelector('#facilitiesBoosters .fb-track', {timeout: 60000});
     await goTab(page, 'gamelab'); await page.waitForSelector('#v2InteractiveGameDay [data-v2-gameday-start]', {timeout: 60000});
-    await page.click('[data-v2-gameday-start]'); await page.waitForSelector('#v2InteractiveGameDay .v2-gameday-conditions', {timeout: 60000});
+    await startLiveGame(page); await page.waitForSelector('#v2InteractiveGameDay .v2-gameday-conditions', {timeout: 60000});
     // Save again and prove a second commit also works on a large dynasty (the replace-and-backup path).
     t0 = Date.now(); await page.locator('#saveBrowser').evaluate(b => b.click());
     await page.waitForFunction(() => /^(Saved|Could not|Save failed|This save)/.test(document.querySelector('#saveStatus')?.textContent || ''), null, {timeout: 600000});

@@ -4,6 +4,7 @@ const assert=require('node:assert/strict');
 const path=require('path');
 const {chromium}=require('playwright-core');
 const {chromiumPath}=require('./helpers/chromium-path');
+const {startLiveGame}=require('./helpers/start-live-game');
 const {startNewDynasty}=require('./helpers/start-new-dynasty');
 const goTab=async(page,id,group)=>page.evaluate(({id,group})=>{const g=document.querySelector(`.tab-groups button[data-group="${group}"]`);if(g&&!g.classList.contains('active'))g.click();document.querySelector(`.tabs button[data-tab="${id}"]`)?.click()},{id,group});
 const saved=page=>page.waitForFunction(()=>window.DynastySessionStatus?.read().state==='saved',null,{timeout:60000});
@@ -13,7 +14,7 @@ const live=page=>page.evaluate(()=>{const s=window.__DL_TEST__.v2GameDayPreviewS
 async function startLive(page){
   const ready=await page.evaluate(()=>window.__DL_TEST__.v2PrepareDetailedGame());assert.equal(ready.ready,true,JSON.stringify(ready));
   await goTab(page,'gamelab','season');await page.waitForSelector('[data-v2-gameday-start]',{timeout:15000});
-  await page.click('[data-v2-gameday-start]');await page.waitForSelector('.v2-gameday-scoreboard',{timeout:10000});
+  await startLiveGame(page);await page.waitForSelector('.v2-gameday-scoreboard',{timeout:10000});
   for(let i=0;i<6;i++)if(await page.locator('[data-v2-gameday-next]').count())await page.click('[data-v2-gameday-next]');
 }
 (async()=>{

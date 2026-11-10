@@ -1,4 +1,5 @@
 const {testPageURL}=require('./helpers/browser-url');
+const {startLiveGame}=require('./helpers/start-live-game');
 const assert=require('node:assert/strict');
 const path=require('path');
 const {chromium}=require('playwright-core');
@@ -19,7 +20,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
     await page.evaluate(()=>{const d=document.querySelector('details.v0102-staff-room');if(d)d.open=true});
     await page.click('[data-v0102-staff-plan="oc"]');const ocBacked=await page.evaluate(()=>window.__DL_TEST__.weeklyCoachingDebug());assert.equal(ocBacked.prep.source,'oc');assert.deepEqual(ocBacked.prep.focuses,ocBacked.staffRoom.oc.plan);assert.equal(ocBacked.prep.focuses.length,2);
     await page.click('[data-v0102-staff-plan="split"]');const chosen=await page.evaluate(()=>window.__DL_TEST__.weeklyCoachingDebug());assert.equal(chosen.prep.source,'split');assert.deepEqual(chosen.prep.focuses,chosen.staffRoom.split.plan);assert.notDeepEqual(chosen.profile.active,chosen.profile.base,'Staff Room plan must alter kickoff inputs');assert.match(await page.locator('#v0102WeeklyCoaching').textContent(),/2\/2 prep points used/i);
-    await page.click('[data-v2-gameday-start]');assert.equal(await page.locator('[data-v0102-prep-delegate]').isDisabled(),true,'prep should lock while staged Game Day is active');assert.equal(await page.locator('[data-v0102-staff-plan="split"]').isDisabled(),true,'Staff Room plan buttons should lock while staged Game Day is active');await page.click('[data-v2-gameday-delegate]');
+    await startLiveGame(page);assert.equal(await page.locator('[data-v0102-prep-delegate]').isDisabled(),true,'prep should lock while staged Game Day is active');assert.equal(await page.locator('[data-v0102-staff-plan="split"]').isDisabled(),true,'Staff Room plan buttons should lock while staged Game Day is active');await page.click('[data-v2-gameday-delegate]');
     /* the live game records itself at the final whistle */
     await page.waitForFunction(()=>window.__DL_TEST__.weeklyCoachingLastArchive()?.weeklyPrepVersion===2,{timeout:30000});const archived=await page.evaluate(()=>window.__DL_TEST__.weeklyCoachingLastArchive());const used=[archived.weeklyPrep?.home,archived.weeklyPrep?.away].find(Boolean);assert.ok(used,'permanent archive should retain the user weekly prep');assert.equal(used.source,'split');assert.deepEqual(used.focuses,chosen.staffRoom.split.plan);
     assert.deepEqual(errors,[],`weekly coaching browser emitted errors: ${errors.join('\n')}`);console.log(`PASS v0.10.2 weekly coaching browser: imperfect scout, Staff Room conflict/split, kickoff effect and permanent archive ${archived.id}`)

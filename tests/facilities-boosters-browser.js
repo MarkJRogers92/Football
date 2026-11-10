@@ -4,6 +4,7 @@
 // and never overflow the page.
 const assert = require('node:assert/strict'), path = require('node:path');
 const {chromium} = require('playwright-core'), {chromiumPath} = require('./helpers/chromium-path'), {startNewDynasty} = require('./helpers/start-new-dynasty');
+const {startLiveGame}=require('./helpers/start-live-game');
 
 const openProgram = page => page.evaluate(() => {
   const g = document.querySelector('.tab-groups button[data-group="program"]'); if (g && !g.classList.contains('active')) g.click();
@@ -91,7 +92,7 @@ const num = text => Number(String(text).match(/-?\d+/)?.[0]);
       // --- Game Day names the stadium and the weather before the first snap.
       await openGameDay(page);
       await page.waitForSelector('#v2InteractiveGameDay [data-v2-gameday-start]', {timeout: 15000});
-      await page.click('[data-v2-gameday-start]');
+      await startLiveGame(page);
       await page.waitForSelector('#v2InteractiveGameDay .v2-gameday-conditions', {timeout: 15000});
       const strip = await page.locator('#v2InteractiveGameDay .v2-gameday-conditions').textContent();
       assert.match(strip, /(Clear|Overcast|Indoors|Rain|Snow|Drizzle|Flurries)/, `[${label}] Game Day shows the sky: ${strip}`);

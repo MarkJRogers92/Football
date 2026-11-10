@@ -5767,9 +5767,22 @@ function createSession(options={}){
     state:made.state,inputs:{home:made.homeInput,away:made.awayInput},homeFieldRating,controlledSide,
     tempo:{home:'normal',away:'normal'},tempoDecisionMade:{home:false,away:false},
     halftimeApproach:{home:'balanced',away:'balanced'},halftimeDecisionMade:false,pendingConversion:null,pendingStrategyDecision:null,
-    names:{home:String(options.home?.name??made.homeInput.name??'Home'),away:String(options.away?.name??made.awayInput.name??'Away')}
+    names:{home:String(options.home?.name??made.homeInput.name??'Home'),away:String(options.away?.name??made.awayInput.name??'Away')},
+    skipRoutine:options.skipRoutine===true
   };
   validateSession(session);return session
+}
+// A fourth down no coach would agonise over: punting from your own side on 4th and 4 or more, or kicking a short
+// field goal, with the game not close and late. Sessions created with skipRoutine take the staff call on these
+// without stopping; short yardage, no-man's land, long kicks and tight or trailing fourth quarters still stop.
+function routineFourthDown(session,state){
+  if(!session.skipRoutine||state.down!==4||state.period>4)return false;
+  const side=state.possession,margin=(state.score?.[side]||0)-(state.score?.[other(side)]||0),lateClose=state.period===4&&(margin<0||(state.clock<=480&&Math.abs(margin)<=8));
+  if(lateClose||state.distance<4)return false;
+  const action=staffFourthDown(state),fg=Math.round(100-state.fieldPosition+17);
+  if(action==='punt')return state.fieldPosition<=50;
+  if(action==='field_goal')return fg<=40;
+  return false
 }
 function isControlled(session,side){return !session.controlledSide||session.controlledSide===side}
 function eventState(state){return{
@@ -5842,7 +5855,7 @@ function executeAction(session,action,state){
 function stepSession(session,state){
   if(session.pendingConversion){resolvePendingConversion(session,staffConversion(session));return}
   if(state.period>4){if(state.ot?.period>=3||(state.down===4&&state.fieldPosition>=55)){engine.step(state);return}playOutcome(session,state);return}
-  if(state.down===4){if(isControlled(session,state.possession))throw new Error('Game Day runner attempted to step through an unresolved fourth-down decision.');executeAction(session,staffFourthDown(state),state);return}
+  if(state.down===4){if(isControlled(session,state.possession)&&!routineFourthDown(session,state))throw new Error('Game Day runner attempted to step through an unresolved fourth-down decision.');executeAction(session,staffFourthDown(state),state);return}
   playOutcome(session,state)
 }
 function hooks(session){return{policyId:POLICY_ID,defaultAction:state=>staffFourthDown(state),executeAction:(action,state)=>executeAction(session,action,state),step:state=>stepSession(session,state)}}
@@ -5881,7 +5894,7 @@ function currentDecision(session){
   if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);const state=session.state;
   if(session.pendingConversion){const conversion=createConversionDecision(session);if(conversion)return conversion;resolvePendingConversion(session,staffConversion(session));if(state.status==='final')return null}
   const existing=decisions.pendingDecision(state);if(existing){if(isControlled(session,existing.team))return clone(existing);state.pendingCoachingDecision=null}
-  if(state.status==='live'&&state.period<=4&&state.down===4&&state.possession&&isControlled(session,state.possession))return decisions.ensureDecision(state,hooks(session));
+  if(state.status==='live'&&state.period<=4&&state.down===4&&state.possession&&isControlled(session,state.possession)&&!routineFourthDown(session,state))return decisions.ensureDecision(state,hooks(session));
   return createHalftimeDecision(session)||createTempoDecision(session)
 }
 function resolveStrategy(session,optionId){
@@ -15995,14 +16008,15 @@ function v2GameDayUIPersist(){
   if(!universe)return;
   if(!v2InteractiveGameDay){if(universe.liveGameDay){delete universe.liveGameDay;autosaveAfter('game')}return}
   const {key,session,actions}=v2InteractiveGameDay;
-  universe.liveGameDay={version:1,key,playbook:session.state.playbook??null,rules:session.state.rules??null,actions:actions.slice(),mode:v2InteractiveGameDay.mode||'plays'};
+  universe.liveGameDay={version:1,key,playbook:session.state.playbook??null,rules:session.state.rules??null,actions:actions.slice(),mode:v2InteractiveGameDay.mode||'plays',skipRoutine:session.skipRoutine===true};
   autosaveAfter('game')
 }
 function v2GameDayUIApply(api,session,action){if(action==='next')return api.advanceOne(session);if(action==='decision')return api.advance(session);if(action==='delegate')return api.simulate(session,()=> 'delegate');if(typeof action==='string'&&action.startsWith('choice:'))return api.resolve(session,action.slice(7));throw new Error(`Unknown Game Day action ${action}`)}
 function v2GameDayUIRestore(){
   if(v2InteractiveGameDay||!universe?.liveGameDay)return false;const saved=universe.liveGameDay,ctx=v2GameDayUILiveContext();
   if(!ctx||saved.key!==ctx.key||!Array.isArray(saved.actions)){delete universe.liveGameDay;return false}
-  try{const session=v2GameDayUIPrepare(saved.playbook,saved.rules&&typeof saved.rules==='object'?saved.rules:false,saved.mode==='moments'?'moments':'plays'),api=globalThis.DynastyGameEngineV2GameDay;for(const a of saved.actions){v2GameDayUIApply(api,session,a);v2InteractiveGameDay.actions.push(a)}v2InteractiveGameDay.integrity=v2GameDayUIDigest(ctx);universe.liveGameDay.actions=v2InteractiveGameDay.actions.slice();return true}
+  try{// A game saved before routine fourth downs were skipped replays under the rules it was played with.
+  const session=v2GameDayUIPrepare(saved.playbook,saved.rules&&typeof saved.rules==='object'?saved.rules:false,saved.mode==='moments'?'moments':'plays',saved.skipRoutine===true),api=globalThis.DynastyGameEngineV2GameDay;for(const a of saved.actions){v2GameDayUIApply(api,session,a);v2InteractiveGameDay.actions.push(a)}v2InteractiveGameDay.integrity=v2GameDayUIDigest(ctx);universe.liveGameDay.actions=v2InteractiveGameDay.actions.slice();return true}
   catch(err){console.error(err);v2InteractiveGameDay=null;delete universe.liveGameDay;setStatus('The saved live game could not be rebuilt, so it was set aside.');return false}
 }
 // Finish a live game with the staff and record it. Used before anything else would play this week.
@@ -16128,11 +16142,11 @@ if(globalThis.__DL_TEST__){
 // v0.10.1 Interactive Game Day pregame bridge.
 // Replaces only the staged preparation step so preview kickoff profiles mirror the
 // permanent record path: recoverWeek() on cloned rosters, then beginGame() preparation wear.
-v2GameDayUIPrepare=function v2GameDayUIPrepareWithRecovery(playbook,rules,mode='plays'){
+v2GameDayUIPrepare=function v2GameDayUIPrepareWithRecovery(playbook,rules,mode='plays',skipRoutine=true){
   const ctx=v2GameDayUILiveContext(),api=globalThis.DynastyGameEngineV2GameDay;if(!ctx||!api)throw new Error('No upcoming game is available for Interactive Game Day.');
   const before=v2GameDayUIDigest(ctx),prepared=v2GameDayPreparedTeams(ctx.home,ctx.away),hc=prepared.home,ac=prepared.away;
   const homeProfile=gameProfiles(hc,ac.name),awayProfile=gameProfiles(ac,hc.name),me=selected();
-  const session=api.createSession({gameId:`v0101-gameday-${ctx.key}`,seed:`v0101-gameday-${ctx.key}`,home:ctx.home,away:ctx.away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(ctx.home),controlledTeamId:me?.id??null,playbook,year:universe.year,week:ctx.g.week??universe.week+1,rules});
+  const session=api.createSession({gameId:`v0101-gameday-${ctx.key}`,seed:`v0101-gameday-${ctx.key}`,home:ctx.home,away:ctx.away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(ctx.home),controlledTeamId:me?.id??null,skipRoutine,playbook,year:universe.year,week:ctx.g.week??universe.week+1,rules});
   api.advanceOne(session);v2GameDayUIAssertUnchanged(before,ctx);
   v2InteractiveGameDay={key:ctx.key,session,integrity:before,actions:[],mode:mode==='moments'?'moments':'plays'};v2GameDayUIPersist();renderV2InteractiveGameDay();return session
 };
@@ -16290,6 +16304,7 @@ if(globalThis.DynastyGameEngineV2LabBridge)globalThis.DynastyGameEngineV2LabBrid
 if(globalThis.__DL_TEST__){
   globalThis.__DL_TEST__.weeklyCoachingDebug=()=>{const t=selected(),g=findUserGame(),opp=t&&g?T(g.home===t.name?g.away:g.home):null;if(!t||!opp)return null;const report=v0102WeeklyOpponentReport(t,opp),prep=v0102WeeklyPrepSnapshot(t,opp.name),base=gameProfilesBeforeWeeklyPrep(t,opp.name),active=gameProfiles(t,opp.name),staffRoom=v0102WeeklyStaffRoom(t,opp,report);return{opponent:opp.name,report,staffRoom,prep,profile:{base,active}}};
   globalThis.__DL_TEST__.weeklyCoachingSet=(focuses=[])=>{const t=selected(),g=findUserGame(),opp=t&&g?T(g.home===t.name?g.away:g.home):null;return!!(t&&opp&&v0102SetWeeklyPrep(t,opp,focuses,{source:'manual'}))};
+  globalThis.__DL_TEST__.resolvePendingWeeklyDecisions=()=>{const t=selected();if(!t)return 0;const pending=(universe.weeklyDecisions||[]).filter(d=>d.season===universe.year&&d.week===universe.week&&d.teamId===t.id&&!d.resolved&&d.type!=='WEEKLY_GAMEPLAN');for(const d of pending){const o=delegatedWeeklyOption(d,t);if(o)applyWeeklyDecision(d.id,o.id,{selectedBy:'staff',coachId:t.staff.HC.id})}if(pending.length)render();return pending.length};
   globalThis.__DL_TEST__.weeklyCoachingDelegate=()=>{const t=selected(),g=findUserGame(),opp=t&&g?T(g.home===t.name?g.away:g.home):null;return!!(t&&opp&&v0102DelegateWeeklyPrep(t,opp))};
   globalThis.__DL_TEST__.weeklyCoachingUseStaffPlan=(key='split')=>{const t=selected(),g=findUserGame(),opp=t&&g?T(g.home===t.name?g.away:g.home):null;return!!(t&&opp&&v0102UseStaffRoomPlan(t,opp,key))};
   globalThis.__DL_TEST__.weeklyCoachingLastArchive=()=>{const r=(universe.gameArchive||[]).at(-1);return r?{id:r.id,weeklyPrepVersion:r.weeklyPrepVersion||null,weeklyPrep:v2RecordClone(r.weeklyPrep||null)}:null};

@@ -22,14 +22,15 @@ function v2GameDayUIPersist(){
   if(!universe)return;
   if(!v2InteractiveGameDay){if(universe.liveGameDay){delete universe.liveGameDay;autosaveAfter('game')}return}
   const {key,session,actions}=v2InteractiveGameDay;
-  universe.liveGameDay={version:1,key,playbook:session.state.playbook??null,rules:session.state.rules??null,actions:actions.slice(),mode:v2InteractiveGameDay.mode||'plays'};
+  universe.liveGameDay={version:1,key,playbook:session.state.playbook??null,rules:session.state.rules??null,actions:actions.slice(),mode:v2InteractiveGameDay.mode||'plays',skipRoutine:session.skipRoutine===true};
   autosaveAfter('game')
 }
 function v2GameDayUIApply(api,session,action){if(action==='next')return api.advanceOne(session);if(action==='decision')return api.advance(session);if(action==='delegate')return api.simulate(session,()=> 'delegate');if(typeof action==='string'&&action.startsWith('choice:'))return api.resolve(session,action.slice(7));throw new Error(`Unknown Game Day action ${action}`)}
 function v2GameDayUIRestore(){
   if(v2InteractiveGameDay||!universe?.liveGameDay)return false;const saved=universe.liveGameDay,ctx=v2GameDayUILiveContext();
   if(!ctx||saved.key!==ctx.key||!Array.isArray(saved.actions)){delete universe.liveGameDay;return false}
-  try{const session=v2GameDayUIPrepare(saved.playbook,saved.rules&&typeof saved.rules==='object'?saved.rules:false,saved.mode==='moments'?'moments':'plays'),api=globalThis.DynastyGameEngineV2GameDay;for(const a of saved.actions){v2GameDayUIApply(api,session,a);v2InteractiveGameDay.actions.push(a)}v2InteractiveGameDay.integrity=v2GameDayUIDigest(ctx);universe.liveGameDay.actions=v2InteractiveGameDay.actions.slice();return true}
+  try{// A game saved before routine fourth downs were skipped replays under the rules it was played with.
+  const session=v2GameDayUIPrepare(saved.playbook,saved.rules&&typeof saved.rules==='object'?saved.rules:false,saved.mode==='moments'?'moments':'plays',saved.skipRoutine===true),api=globalThis.DynastyGameEngineV2GameDay;for(const a of saved.actions){v2GameDayUIApply(api,session,a);v2InteractiveGameDay.actions.push(a)}v2InteractiveGameDay.integrity=v2GameDayUIDigest(ctx);universe.liveGameDay.actions=v2InteractiveGameDay.actions.slice();return true}
   catch(err){console.error(err);v2InteractiveGameDay=null;delete universe.liveGameDay;setStatus('The saved live game could not be rebuilt, so it was set aside.');return false}
 }
 // Finish a live game with the staff and record it. Used before anything else would play this week.
