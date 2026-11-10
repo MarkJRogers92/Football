@@ -5,12 +5,12 @@ ability, role-based depth charts, recruiting with real geography, scouting and
 development, coaching careers, weekly game-day play and permanent program
 history. It ships as a standalone web build and as an Electron desktop alpha.
 
-Current version: **0.16.0** (see `VERSION.txt`). `CHANGELOG.md` has the
+Current version: **0.17.0** (see `VERSION.txt`). `CHANGELOG.md` has the
 version-by-version record.
 
 The game includes the **One More Saturday** experience pass: a compact weekly desk, factual postgame stopping points, quieter football presentation, personal history, and safe saved-state/re-entry feedback. See `agent_docs/ONE_MORE_SATURDAY_PLAN.md` for scope and `agent_docs/latest_session_work.md` for verified delivery status.
 
-v0.16.0 also adds permanent homegrown first-start entries in player profiles and school history, a three-stop first-Saturday introduction (with the full desk tour still available), a saved instruction for delegated medical decisions, and optional **Coach big moments** navigation. Preparation choices expose their selected state and point budget to assistive technology; the yearbook keeps keyboard focus inside and returns it when closed. See `docs/DYNASTY_ENGAGEMENT_2026-11-08.md` for scope and validation limits.
+v0.17.0 makes coached and simulated games play the same way, keeps elite programs elite through recruiting, names players in the play-by-play, gives rosters realistic names, numbers and class years, and makes recruiting effort matter. v0.16.0 added permanent homegrown first-start entries in player profiles and school history, a three-stop first-Saturday introduction (with the full desk tour still available), a saved instruction for delegated medical decisions, and optional **Coach big moments** navigation. Preparation choices expose their selected state and point budget to assistive technology; the yearbook keeps keyboard focus inside and returns it when closed. See `docs/DYNASTY_ENGAGEMENT_2026-11-08.md` for scope and validation limits.
 
 ## Source layout
 
