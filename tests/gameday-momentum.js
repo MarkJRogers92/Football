@@ -41,3 +41,12 @@ test('the series is time-ordered, marks coaching decisions and scores, and the p
  assert.match(html,new RegExp(`${Math.round(s.at(-1).p*100)}%`));
  assert.match(html,/aria-label="Home U win chance: \d+% now"/);
 });
+
+test('a rating mismatch moves the pre-game win chance and fades as time runs out',()=>{
+ const inputs={home:{rating:80},away:{rating:70}},edge=M.strengthEdge(inputs);
+ assert.equal(edge,10);assert.equal(M.strengthEdge({}),0);
+ const even=M.winChance(st({}),'home'),fav=M.winChance(st({}),'home',{strengthEdge:edge}),dog=M.winChance(st({}),'away',{strengthEdge:edge});
+ assert.equal(even,.5);assert.ok(fav>.7&&fav<.85,`ten-point favourite wins about 80%, got ${fav}`);assert.ok(Math.abs(fav+dog-1)<1e-9);
+ const late=M.winChance(st({period:4,clock:60,score:{home:0,away:0}}),'home',{strengthEdge:edge});
+ assert.ok(late<fav,'a rating edge matters less with a minute left');
+});

@@ -3,7 +3,7 @@ function v2RecordPrepared(g,home,away,homeProfile,awayProfile){
   const api=globalThis.DynastyGameEngineV2Lab,actors=globalThis.DynastyGameEngineV2Attribution,tx=globalThis.DynastyGameEngineV2Transaction;
   if(!api||!actors||!tx)throw new Error('Game Engine 2 development modules are unavailable.');
   const key=v2GameLabKey(g),preview=api.simulate({gameId:`v0101-${key}`,seed:`v0101-${key}`,home,away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(home),year:universe.year,week:g.week??universe.week+1});
-  const attribution=actors.attributeGame(preview.state,{home:v2AttributionContext(home),away:v2AttributionContext(away)});actors.attachEventSummary(attribution,preview.summary);preview.attribution=attribution;
+  const attribution=actors.attributeGame(preview.state,{home:v2AttributionContext(home),away:v2AttributionContext(away)});actors.attachEventSummary(attribution,preview.summary);preview.attribution=attribution;if(globalThis.DynastyGameEngineV2Lab?.withActors)preview.names=globalThis.DynastyGameEngineV2Lab.withActors(preview.names,attribution);
   const candidate=tx.buildCandidate({state:preview.state,attribution,homeTeam:home,awayTeam:away,starterIds:{home:v2StarterIds(home),away:v2StarterIds(away)},meta:{season:universe.year,week:g.week??universe.week+1,phase:universe.phase,label:'Regular season',venue:`${home.name} · ${home.city||''}`},conference:g.conf??home.conference===away.conference,homeOpponentOverall:awayProfile.overall,awayOpponentOverall:homeProfile.overall});
   return{api,tx,key,preview,candidate}
 }

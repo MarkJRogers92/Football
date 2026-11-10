@@ -2,6 +2,7 @@ const assert=require('node:assert/strict');
 const path=require('path');
 const {chromium}=require('playwright-core');
 const {chromiumPath}=require('./helpers/chromium-path');
+const {startLiveGame}=require('./helpers/start-live-game');
 const TAB_GROUP={dashboard:'home',program:'program',history:'world',roster:'program',depth:'program',development:'program',recruiting:'recruiting',gamelab:'season',season:'season',stats:'season',newsletter:'home',staff:'program',offseason:'program',records:'world'};
 const goTab=async(page,id)=>page.evaluate(({id,group})=>{const g=document.querySelector(`.tab-groups button[data-group="${group}"]`);if(g&&!g.classList.contains("active"))g.click();document.querySelector(`.tabs button[data-tab="${id}"]`)?.click()},{id,group:TAB_GROUP[id]});
 const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
@@ -24,7 +25,7 @@ async function waitButtonText(page,selector,pattern){await page.waitForFunction(
     await goTab(page,'history');if(await page.locator('#gameHistoryYear').count()){await page.selectOption('#gameHistoryYear',String(year1));await page.waitForTimeout(50)}await openGamePlayByPlay(page,firstYear1Id,'Year 1 opening Interactive Game Day');await openGamePlayByPlay(page,lastYear1Id,'Year 1 closing Interactive Game Day');
 
     await goTab(page,'gamelab');const prep=await page.evaluate(()=>window.__DL_TEST__.v2PrepareDetailedGame());assert.equal(prep.career,false,`Year 2 Game Day blocked by career choice: ${JSON.stringify(prep)}`);assert.equal(prep.ready,true,`Year 2 Game Day blockers not resolved: ${JSON.stringify(prep)}`);await page.waitForSelector('[data-v2-gameday-start]',{timeout:60000});
-    const before=await page.evaluate(()=>window.__DL_TEST__.v2GameDayCommitDebug().archiveLength);await page.click('[data-v2-gameday-start]');await page.click('[data-v2-gameday-delegate]');/* the live game records itself at the final whistle */await page.waitForFunction(n=>window.__DL_TEST__.v2GameDayCommitDebug().archiveLength===n+1,before,{timeout:60000});
+    const before=await page.evaluate(()=>window.__DL_TEST__.v2GameDayCommitDebug().archiveLength);await startLiveGame(page);await page.click('[data-v2-gameday-delegate]');/* the live game records itself at the final whistle */await page.waitForFunction(n=>window.__DL_TEST__.v2GameDayCommitDebug().archiveLength===n+1,before,{timeout:60000});
     const y2=await page.evaluate(()=>window.__DL_TEST__.v2GameDayLastArchiveDebug());assert.equal(y2.engine,'v2');assert.equal(y2.gameDayVersion,2);assert.equal(y2.coachingDecisionVersion,1);assert.ok(Array.isArray(y2.coachingDecisions),'Year 2 archive should retain the coaching-decision receipt collection even if this seed produces no player-facing window');assert.ok(y2.drives>0);assert.ok(y2.playerLines>0);assert.ok(y2.playByPlayLines>10);
     await goTab(page,'season');await openGamePlayByPlay(page,y2.id,'Year 2 opening Interactive Game Day');assert.deepEqual(errors,[],`lifecycle browser regression emitted errors: ${errors.join('\n')}`);console.log(`PASS v0.10.1 Interactive Game Day lifecycle ${year1}->${year2}; Year 1 archives survived offseason and Year 2 recorded ${y2.id}`)
   }finally{await browser.close()}

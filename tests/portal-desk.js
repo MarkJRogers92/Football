@@ -55,7 +55,9 @@ test('hours reset each round and actions close once he has decided',async()=>{
  desk.perform(list[0],t,'call');
  e.advancePortalRound();
  assert.equal(desk.roundInfo(t).spent,0,'a new round, a fresh budget');
- assert.equal(desk.perform(list[0],t,'call').ok,true,'and a new call');
+ // The world is seeded, so whoever was called may have committed during the round: call someone still open.
+ const open=[list[0],...list].find(x=>!x.decision&&desk.availability(x,t,'call').ok);assert.ok(open,'someone is still open');
+ assert.equal(desk.perform(open,t,'call').ok,true,'and a new call');
  const decided=e.portalCandidates().find(x=>x.decision);
  if(decided)assert.match(desk.availability(decided,t,'call').reason,/already decided/);
 });

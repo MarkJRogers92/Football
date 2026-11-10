@@ -1,4 +1,5 @@
 const {testPageURL}=require('./helpers/browser-url');
+const {startLiveGame}=require('./helpers/start-live-game');
 const assert=require('node:assert/strict');
 const {chromium}=require('playwright-core');
 const {chromiumPath}=require('./helpers/chromium-path');
@@ -17,7 +18,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
     for(const phrase of ['GAME DAY INTELLIGENCE','Where the game tilts','Opponent identity','Staff recommendation','Your key players','Players to know'])assert.match(pre.matchup.text,new RegExp(phrase,'i'));
     assert.match(pre.matchup.text,/% pass/i);assert.match(pre.matchup.text,/Active plan/i);
     const activePlan=(await page.locator('#v2MatchupIntelligence .v2-matchup-plan > div strong').first().innerText()).trim();assert.ok(activePlan,'the pregame plan label is present');console.log('MATCHUP FIXTURE',JSON.stringify({ready,activePlan}));
-    await page.waitForSelector('[data-v2-gameday-start]',{timeout:10000});await page.click('[data-v2-gameday-start]');await page.click('[data-v2-gameday-delegate]');
+    await page.waitForSelector('[data-v2-gameday-start]',{timeout:10000});await startLiveGame(page);await page.click('[data-v2-gameday-delegate]');
     /* the live game records itself at the final whistle */
     await page.waitForFunction(()=>/GAME PLAN REVIEW/i.test(window.__DL_TEST__.v2MatchupSummary()?.receipt||''),{timeout:30000});const post=await page.evaluate(()=>window.__DL_TEST__.v2MatchupSummary());
     assert.match(post.receipt,/GAME PLAN REVIEW/i);

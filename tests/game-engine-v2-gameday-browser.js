@@ -2,6 +2,7 @@ const assert=require('node:assert/strict');
 const path=require('path');
 const {chromium}=require('playwright-core');
 const {chromiumPath}=require('./helpers/chromium-path');
+const {startLiveGame,resolvePendingWeeklyDecisions}=require('./helpers/start-live-game');
 const TAB_GROUP={dashboard:'home',program:'program',history:'world',roster:'program',depth:'program',development:'program',recruiting:'recruiting',gamelab:'season',season:'season',stats:'season',newsletter:'home',staff:'program',offseason:'program',records:'world'};
 const goTab=async(page,id)=>page.evaluate(({id,group})=>{const g=document.querySelector(`.tab-groups button[data-group="${group}"]`);if(g&&!g.classList.contains("active"))g.click();document.querySelector(`.tabs button[data-tab="${id}"]`)?.click()},{id,group:TAB_GROUP[id]});
 const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
@@ -13,11 +14,19 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
   try{
     await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);await goTab(page,'gamelab');
     await page.waitForSelector('#v2InteractiveGameDay [data-v2-gameday-start]',{timeout:15000});
+    await resolvePendingWeeklyDecisions(page);
     const before=await page.evaluate(()=>window.__DL_TEST__.v2GameDayPreviewDigest());assert.ok(before,'preview integrity digest should be available');
-    await page.evaluate(()=>window.__DL_TEST__.v2GameDayHoldFinal(true));await page.click('[data-v2-gameday-start]');await page.waitForSelector('#v2InteractiveGameDay .v2-gameday-scoreboard',{timeout:10000});
+    await page.evaluate(()=>window.__DL_TEST__.v2GameDayHoldFinal(true));await startLiveGame(page);await page.waitForSelector('#v2InteractiveGameDay .v2-gameday-scoreboard',{timeout:10000});
     let state=await page.evaluate(()=>window.__DL_TEST__.v2GameDayPreviewState());assert.ok(state);assert.ok(['live','decision'].includes(state.status));assert.ok(state.state.events.length>=3,'interactive preview should start the football event stream');
     for(let i=0;i<3;i++)if(await page.locator('[data-v2-gameday-next]').count())await page.click('[data-v2-gameday-next]');
-    if(await page.locator('[data-v2-gameday-decision]').count())await page.click('[data-v2-gameday-decision]');
+    // Routine fourth downs no longer stop the game, so the first stop can be another kind of call: hand those to the
+    // staff until a real fourth-down decision is on the board.
+    for(let i=0;i<40;i++){
+      const pending=await page.evaluate(()=>window.__DL_TEST__.v2GameDayPreviewState().state.pendingCoachingDecision);if(pending?.type==='fourth_down')break;
+      if(await page.locator('[data-v2-gameday-choice="delegate"]').count())await page.click('[data-v2-gameday-choice="delegate"]');
+      else if(await page.locator('[data-v2-gameday-decision]').count())await page.click('[data-v2-gameday-decision]');
+      else break;
+    }
     await page.waitForSelector('#v2InteractiveGameDay .v2-gameday-decision',{timeout:15000});
     const decision=await page.evaluate(()=>window.__DL_TEST__.v2GameDayPreviewState().state.pendingCoachingDecision);assert.equal(decision.type,'fourth_down');assert.ok(decision.options.some(o=>o.id==='delegate'));
     await page.click('[data-v2-gameday-choice="delegate"]');

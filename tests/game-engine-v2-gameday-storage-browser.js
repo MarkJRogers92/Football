@@ -1,4 +1,5 @@
 const {testPageURL}=require('./helpers/browser-url');
+const {startLiveGame}=require('./helpers/start-live-game');
 const assert=require('node:assert/strict');
 const path=require('path');
 const {chromium}=require('playwright-core');
@@ -18,7 +19,7 @@ const waitStatus=(page,pattern)=>page.waitForFunction(src=>new RegExp(src).test(
     // Coach's Desk decisions block official records (added after this test); let staff settle them first.
     const ready=await page.evaluate(()=>window.__DL_TEST__.v2PrepareDetailedGame());assert.equal(ready.ready,true,`Game Day fixture should be ready to record: ${JSON.stringify(ready)}`);
     await goTab(page,'gamelab');
-    await page.click('[data-v2-gameday-start]');await page.waitForSelector('.v2-gameday-scoreboard',{timeout:10000});
+    await startLiveGame(page);await page.waitForSelector('.v2-gameday-scoreboard',{timeout:10000});
     await page.click('[data-v2-gameday-delegate]');/* the live game records itself at the final whistle */
     await page.waitForFunction(()=>window.__DL_TEST__.v2GameDayLastArchiveDebug()?.gameDayVersion===2,{timeout:30000});
     const archive=await page.evaluate(()=>window.__DL_TEST__.v2GameDayLastArchiveDebug());assert.ok(archive.id);assert.ok(archive.coachingDecisions.length>0);assert.equal(archive.playByPlayHasCoachDecision,true);

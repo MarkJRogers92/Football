@@ -9,6 +9,7 @@
 // with timings and no console errors, at desktop and phone width.
 const assert = require('node:assert/strict'), path = require('node:path'), fs = require('node:fs');
 const {chromium} = require('playwright-core'), {chromiumPath} = require('./helpers/chromium-path'), {startNewDynasty} = require('./helpers/start-new-dynasty'), {clickShellUtility} = require('./helpers/client-shell');
+const {startLiveGame}=require('./helpers/start-live-game');
 const SAVE = process.env.LONG_SAVE;
 if (!SAVE || !fs.existsSync(SAVE)) { console.log('SKIP long-save browser test: set LONG_SAVE to a packed save (see the header).'); process.exit(0); }
 const TAB_GROUP = {dashboard: 'home', program: 'program', history: 'world', roster: 'program', season: 'season', gamelab: 'season', stats: 'season', staff: 'program', recruiting: 'recruiting'};
@@ -40,7 +41,7 @@ const goTab = (page, id) => page.evaluate(({id, group}) => { const g = document.
       assert.match(await page.locator('#facilitiesBoosters').textContent(), /Level|Finished/);
       // --- Game Day: the forecast and the live strip.
       await goTab(page, 'gamelab'); await page.waitForSelector('#v2InteractiveGameDay [data-v2-gameday-start]', {timeout: 60000});
-      await page.click('[data-v2-gameday-start]'); await page.waitForSelector('#v2InteractiveGameDay .v2-gameday-conditions', {timeout: 60000});
+      await startLiveGame(page); await page.waitForSelector('#v2InteractiveGameDay .v2-gameday-conditions', {timeout: 60000});
       for (let i = 0; i < 12; i++) if (await page.locator('[data-v2-gameday-next]').count()) await page.click('[data-v2-gameday-next]');
       const feed = await page.locator('#v2InteractiveGameDay').textContent();
       assert.match(feed, /Game begins|kickoff/i, `[${label}] the live game plays`);

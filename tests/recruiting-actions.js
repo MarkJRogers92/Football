@@ -917,8 +917,11 @@ test('over a real season the This Week list reports what happened, and the revie
  }
  const d=A.deskSummary(t);
  assert.ok(d&&d.hours>0&&d.budget>=d.hours,'the staff worked the board and the year records it');
- assert.equal(d.won+d.lost,board.filter(r=>A.funnelState(r)?.decided).length,'every decision is counted exactly once');
- assert.equal(d.cut,board.filter(r=>A.funnelState(r)?.cut).length);
+ // With Staff handle recruiting on, the staff also add prospects to the board, so count the whole board.
+ const worked=u.recruits.filter(r=>r.targeted||board.includes(r));
+ assert.ok(worked.length>=board.length);
+ assert.equal(d.won+d.lost,worked.filter(r=>A.funnelState(r)?.decided).length,'every decision is counted exactly once');
+ assert.equal(d.cut,worked.filter(r=>A.funnelState(r)?.cut).length);
  assert.ok(seen.LOST+seen.CUT>0,`something was worth reporting (${JSON.stringify(seen)})`);
  e.simConferenceChampionships();e.simBowls();e.simPlayoff();
  const m=globalThis.DynastySeasonReview.model();

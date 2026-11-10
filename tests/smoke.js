@@ -38,6 +38,8 @@ const mean = a => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0);
   e.simConferenceChampionships();
   check('ten conference champions', u.confChamps.length === 10, `got ${u.confChamps.length}`);
   e.simPlayoff();
+  // Signing day ends the playoff. Capacity describes the class being signed; camps and the offseason move it on to next year's.
+  const capacityAtSigning = Object.fromEntries(u.teams.map(t => [t.name, e.scholarshipCapacity(t)]));
   check('champion crowned', !!u.champion);
   check('season archived', u.history.some(h => h.year === 2027));
 
@@ -112,7 +114,7 @@ const mean = a => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0);
   check('recruiting classes are in range',
     Math.min(...classSizes) >= 10 && Math.max(...classSizes) <= 25,
     `min ${Math.min(...classSizes)} max ${Math.max(...classSizes)}`);
-  const overLimit = u.teams.filter(t => (u.recruitCycle.signeesByTeam[t.name] || 0) > e.scholarshipCapacity(t));
+  const overLimit = u.teams.filter(t => (u.recruitCycle.signeesByTeam[t.name] || 0) > capacityAtSigning[t.name])
   check('no program signed past its scholarship limit',
     overLimit.length === 0, overLimit.map(t => t.name).slice(0, 3).join(', '));
 

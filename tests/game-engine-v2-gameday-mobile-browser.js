@@ -2,6 +2,7 @@ const assert=require('node:assert/strict');
 const path=require('path');
 const {chromium}=require('playwright-core');
 const {chromiumPath}=require('./helpers/chromium-path');
+const {startLiveGame}=require('./helpers/start-live-game');
 const TAB_GROUP={dashboard:'home',program:'program',history:'world',roster:'program',depth:'program',development:'program',recruiting:'recruiting',gamelab:'season',season:'season',stats:'season',newsletter:'home',staff:'program',offseason:'program',records:'world'};
 const goTab=async(page,id)=>page.evaluate(({id,group})=>{const g=document.querySelector(`.tab-groups button[data-group="${group}"]`);if(g&&!g.classList.contains("active"))g.click();document.querySelector(`.tabs button[data-tab="${id}"]`)?.click()},{id,group:TAB_GROUP[id]});
 const {startNewDynasty:sharedStartNewDynasty}=require('./helpers/start-new-dynasty');
@@ -16,7 +17,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
     const matchup=await page.evaluate(()=>{const e=document.querySelector('#v2MatchupIntelligence'),r=e.getBoundingClientRect();return{left:r.left,right:r.right,width:r.width,scroll:e.scrollWidth,client:e.clientWidth,viewport:innerWidth}});
     assert.ok(matchup.left>=-1&&matchup.right<=matchup.viewport+1,`matchup card must fit phone viewport: ${JSON.stringify(matchup)}`);
     assert.ok(matchup.scroll<=matchup.client+2,`matchup content must not horizontally overflow: ${JSON.stringify(matchup)}`);
-    await page.click('[data-v2-gameday-start]');await page.waitForSelector('.v2-gameday-scoreboard',{timeout:10000});
+    await startLiveGame(page);await page.waitForSelector('.v2-gameday-scoreboard',{timeout:10000});
     if(await page.locator('[data-v2-gameday-decision]').count())await page.click('[data-v2-gameday-decision]');
     await page.waitForSelector('.v2-gameday-decision',{timeout:15000});
     const layout=await page.evaluate(()=>{

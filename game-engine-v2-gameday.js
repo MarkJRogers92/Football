@@ -50,9 +50,22 @@ function createSession(options={}){
     state:made.state,inputs:{home:made.homeInput,away:made.awayInput},homeFieldRating,controlledSide,
     tempo:{home:'normal',away:'normal'},tempoDecisionMade:{home:false,away:false},
     halftimeApproach:{home:'balanced',away:'balanced'},halftimeDecisionMade:false,pendingConversion:null,pendingStrategyDecision:null,
-    names:{home:String(options.home?.name??made.homeInput.name??'Home'),away:String(options.away?.name??made.awayInput.name??'Away')}
+    names:{home:String(options.home?.name??made.homeInput.name??'Home'),away:String(options.away?.name??made.awayInput.name??'Away')},
+    skipRoutine:options.skipRoutine===true
   };
   validateSession(session);return session
+}
+// A fourth down no coach would agonise over: punting from your own side on 4th and 4 or more, or kicking a short
+// field goal, with the game not close and late. Sessions created with skipRoutine take the staff call on these
+// without stopping; short yardage, no-man's land, long kicks and tight or trailing fourth quarters still stop.
+function routineFourthDown(session,state){
+  if(!session.skipRoutine||state.down!==4||state.period>4)return false;
+  const side=state.possession,margin=(state.score?.[side]||0)-(state.score?.[other(side)]||0),lateClose=state.period===4&&(margin<0||(state.clock<=480&&Math.abs(margin)<=8));
+  if(lateClose||state.distance<4)return false;
+  const action=staffFourthDown(state),fg=Math.round(100-state.fieldPosition+17);
+  if(action==='punt')return state.fieldPosition<=50;
+  if(action==='field_goal')return fg<=40;
+  return false
 }
 function isControlled(session,side){return !session.controlledSide||session.controlledSide===side}
 function eventState(state){return{
@@ -125,7 +138,7 @@ function executeAction(session,action,state){
 function stepSession(session,state){
   if(session.pendingConversion){resolvePendingConversion(session,staffConversion(session));return}
   if(state.period>4){if(state.ot?.period>=3||(state.down===4&&state.fieldPosition>=55)){engine.step(state);return}playOutcome(session,state);return}
-  if(state.down===4){if(isControlled(session,state.possession))throw new Error('Game Day runner attempted to step through an unresolved fourth-down decision.');executeAction(session,staffFourthDown(state),state);return}
+  if(state.down===4){if(isControlled(session,state.possession)&&!routineFourthDown(session,state))throw new Error('Game Day runner attempted to step through an unresolved fourth-down decision.');executeAction(session,staffFourthDown(state),state);return}
   playOutcome(session,state)
 }
 function hooks(session){return{policyId:POLICY_ID,defaultAction:state=>staffFourthDown(state),executeAction:(action,state)=>executeAction(session,action,state),step:state=>stepSession(session,state)}}
@@ -164,7 +177,7 @@ function currentDecision(session){
   if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);const state=session.state;
   if(session.pendingConversion){const conversion=createConversionDecision(session);if(conversion)return conversion;resolvePendingConversion(session,staffConversion(session));if(state.status==='final')return null}
   const existing=decisions.pendingDecision(state);if(existing){if(isControlled(session,existing.team))return clone(existing);state.pendingCoachingDecision=null}
-  if(state.status==='live'&&state.period<=4&&state.down===4&&state.possession&&isControlled(session,state.possession))return decisions.ensureDecision(state,hooks(session));
+  if(state.status==='live'&&state.period<=4&&state.down===4&&state.possession&&isControlled(session,state.possession)&&!routineFourthDown(session,state))return decisions.ensureDecision(state,hooks(session));
   return createHalftimeDecision(session)||createTempoDecision(session)
 }
 function resolveStrategy(session,optionId){

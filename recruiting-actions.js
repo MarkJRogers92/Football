@@ -700,7 +700,7 @@ if(typeof module==='object'&&module.exports){
  simWeek=function(skipDecisions=false){
   if(recruitingActions.isActive()){
    const t=selected(),skipping=skipDecisions===true;
-   if(t&&(skipping||recruitingActions.isAuto(universe))&&guidanceActionEligibility(skipping?'simulate-season':'advance-week').allowed)recruitingActions.staffPlan(universe.recruits,t);
+   if(t&&(skipping||recruitingActions.isAuto(universe))&&guidanceActionEligibility(skipping?'simulate-season':'advance-week').allowed){if(typeof staffBuildBoard==='function')staffBuildBoard(t);recruitingActions.staffPlan(universe.recruits,t)}
   }
   return simWeekBeforeRecruitingActions(skipDecisions);
  };
@@ -708,7 +708,7 @@ if(typeof module==='object'&&module.exports){
  const beginSeasonBeforeRecruitingActions=beginSeason;
  beginSeason=function(...args){
   const t=selected();
-  if(t&&openingPreseason()&&recruitingActions.isActive()&&recruitingActions.isAuto(universe))recruitingActions.staffPlan(universe.recruits,t);
+  if(t&&openingPreseason()&&recruitingActions.isActive()&&recruitingActions.isAuto(universe)){if(typeof staffBuildBoard==='function')staffBuildBoard(t);recruitingActions.staffPlan(universe.recruits,t)}
   return beginSeasonBeforeRecruitingActions(...args);
  };
 

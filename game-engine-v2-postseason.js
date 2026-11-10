@@ -29,7 +29,7 @@ function v2PostseasonRecordMatch(home,away,options={}){
   try{
     const before=beginGame(home,away,neutral,{week,label}),homeProfile=gameProfiles(home,away.name),awayProfile=gameProfiles(away,home.name);
     const key=`${universe.year}:${week}:${label}:${home.name}:${away.name}`,preview=api.simulate({gameId:`v0102-post-${key}`,seed:`v0102-post-${key}`,home,away,homeProfile,awayProfile,homeFieldRating:neutral?0:homeFieldFor(home),year:universe.year,week,neutral});
-    const attribution=actors.attributeGame(preview.state,{home:v2AttributionContext(home),away:v2AttributionContext(away)});actors.attachEventSummary(attribution,preview.summary);preview.attribution=attribution;
+    const attribution=actors.attributeGame(preview.state,{home:v2AttributionContext(home),away:v2AttributionContext(away)});actors.attachEventSummary(attribution,preview.summary);preview.attribution=attribution;if(globalThis.DynastyGameEngineV2Lab?.withActors)preview.names=globalThis.DynastyGameEngineV2Lab.withActors(preview.names,attribution);
     const candidate=tx.buildCandidate({state:preview.state,attribution,homeTeam:home,awayTeam:away,starterIds:{home:v2StarterIds(home),away:v2StarterIds(away)},meta:{season:universe.year,week,phase:universe.phase,label,venue:neutral?'Neutral site':`${home.name} · ${home.city||''}`},conference,homeOpponentOverall:awayProfile.overall,awayOpponentOverall:homeProfile.overall});
     preview.transactionProof=tx.dryRunTransaction({candidate,homeTeam:home,awayTeam:away,homeGameplan:gameplanSnapshot(home,away.name),awayGameplan:gameplanSnapshot(away,home.name)});
     if(options.testFault==='afterDryRun')throw new Error('Injected postseason v2 rollback fault after dry run.');

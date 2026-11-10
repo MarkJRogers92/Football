@@ -102,3 +102,23 @@ test('meaningful late-game touchdown pauses before conversion and PAT/two-point 
   assert.ok(pat.state.events.some(e=>e.type==='extra_point'));assert.ok(two.state.events.some(e=>e.type==='two_point'));assert.ok(two.state.events.some(e=>e.type==='coaching_decision'&&e.decisionType==='two_point_decision'&&e.resolvedAction==='two_point'));
   assert.ok(pat.state.events.some(e=>e.type==='kickoff'));assert.ok(two.state.events.some(e=>e.type==='kickoff'));engine.validateState(pat.state);engine.validateState(two.state);
 });
+
+test('routine fourth downs are played with the staff call without stopping the game',()=>{
+  let stopsAll=0,stopsRoutine=0;
+  for(let i=0;i<20;i++){
+    const o={...options,gameId:`GD-ROUTINE-${i}`,seed:`gameday-routine-${i}`,controlledTeamId:1};
+    const baseline=adapter.simulateShadow(o),all=gameday.createSession(o),skip=gameday.createSession({...o,skipRoutine:true});
+    finishDelegated(all);finishDelegated(skip);
+    // Delegating every call gives the same game either way: the staff make the routine calls too.
+    assert.deepEqual(skip.state.score,baseline.state.score);assert.deepEqual(normalized(skip.state.events),normalized(baseline.state.events));
+    const fourth=s=>s.state.events.filter(e=>e.type==='coaching_decision'&&e.decisionType==='fourth_down');
+    stopsAll+=fourth(all).length;stopsRoutine+=fourth(skip).length;
+    for(const e of fourth(skip)){
+      const st=e.state,margin=st.score[e.team]-st.score[e.team==='home'?'away':'home'],late=st.period===4&&(margin<0||(st.clock<=480&&Math.abs(margin)<=8));
+      const routinePunt=e.resolvedAction==='punt'&&st.distance>=4&&st.fieldPosition<=50&&!late;
+      assert.ok(!routinePunt,`stopped for a routine punt: ${e.situation}`);
+    }
+  }
+  assert.ok(stopsRoutine<stopsAll*.6,`routine calls no longer stop the game (${stopsRoutine} of ${stopsAll})`);
+  assert.ok(stopsRoutine>0,'real dilemmas still stop it');
+});
