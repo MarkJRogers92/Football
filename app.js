@@ -685,6 +685,28 @@ function recruitPitchBreakdown(t,r){
  return items;
 }
 function sample(arr,n){if(arr.length<=n)return arr.slice();let seen=new Set(),out=[];while(out.length<n){let j=gi(0,arr.length-1);if(seen.has(j))continue;seen.add(j);out.push(arr[j])}return out}
+// A recruit's real list: the programs that pitch him best. Before this, every choice was made among a random 20 of the
+// 120 programs, so a blue-blood was in the running for a given prospect only a sixth of the time and elite talent
+// spread almost evenly across the league. Cached per recruit and refreshed at the season's turn and at midseason
+// (records move the pitch); the user's program is left to the user's own recruiting.
+const RECRUIT_LIST_SIZE=6,RECRUIT_RANDOM_LOOK=14;
+function recruitAiList(r){
+ const stamp=`${universe.year}:${universe.week<6?0:1}`;
+ if(r.aiList?.stamp===stamp)return r.aiList.ids.map(id=>teamById(id)).filter(Boolean);
+ const user=selected()?.name,ranked=universe.teams.filter(t=>t.name!==user).map(t=>({t,p:recruitPitch(t,r)})).sort((a,b)=>b.p-a.p).slice(0,RECRUIT_LIST_SIZE).map(x=>x.t);
+ r.aiList={stamp,ids:ranked.map(t=>t.id)};return ranked;
+}
+function recruitConsideration(r,n=RECRUIT_RANDOM_LOOK){const list=recruitAiList(r),seen=new Set(list.map(t=>t.id));return[...list,...sample(universe.teams,n).filter(t=>!seen.has(t.id))]}
+// Programs spend early scholarships on prospects at their level; anyone can sign late. The user's program decides
+// for itself.
+// Strong programs also keep room for the prospects they expect to land: below their target level they fill at most
+// 60% of the class before signing week.
+function aiWantsRecruit(t,r){
+ if(!t||t.name===selected()?.name||universe.week>=10)return true;
+ const stars=r.stars||1,floor=t.prestige>=85?3:t.prestige>=70?2:1,target=t.prestige>=85?4:t.prestige>=70?3:t.prestige>=55?2:1;
+ if(stars>=target)return true;if(stars<floor)return false;
+ return classCommitCount(t.name)<Math.floor(scholarshipCapacity(t)*.6)
+}
 function recruitTopSchools(r,n=5){return universe.teams.map(t=>({t,score:recruitPitch(t,r)+(t.name===selected()?.name&&r.targeted?10+r.relationship*.12:0)})).sort((a,b)=>b.score-a.score).slice(0,n)}
 function normalizeRecruitGeography(r,hsPool=universe.highSchools||[]){if(!r.highSchoolId){let h=weightedHighSchool(hsPool);Object.assign(r,{highSchoolId:h.id,highSchool:h.name,homeCity:h.city,homeState:h.state,lat:h.lat,lon:h.lon,homeRegion:h.region,distanceImportance:gi(5,100),distanceTolerance:pick([100,150,250,400,600,900,1500,2500])})}r.prevInterest??=r.interest;r.trend??=0;ensureRecruitRelationships(r)}
 function recruitHash(value){let h=2166136261>>>0;for(const ch of String(value??'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
@@ -819,8 +841,8 @@ function applyEarlyCommitments(){
  const candidates=universe.recruits.filter(r=>r.fromRisingClass&&!r.committed).sort((a,b)=>(a.nationalRank||1e9)-(b.nationalRank||1e9)).slice(0,EARLY_COMMIT_POOL);
  for(const r of candidates){
   const chance=EARLY_COMMIT_CHANCE[r.stars];if(!chance)continue;
-  const rivals=sample(universe.teams.filter(t=>t.name!==user?.name),20).map(t=>({t,pitch:recruitPitch(t,r)})).sort((a,b)=>b.pitch-a.pitch);
-  const dest=rivals.find(x=>canTakeCommit(x.t.name));
+  const rivals=recruitConsideration(r).filter(t=>t.name!==user?.name).map(t=>({t,pitch:recruitPitch(t,r)})).sort((a,b)=>b.pitch-a.pitch);
+  const dest=rivals.find(x=>canTakeCommit(x.t.name)&&aiWantsRecruit(x.t,r));
   const watched=!!r.watchedHeadStart;if(watched)log.watched++;
   if(!dest)continue;
   let p=chance;
@@ -2833,11 +2855,11 @@ function userMayCommit(r,t){return true}
 // still happens, so the seeded stream is unchanged), and a check-in strengthens a commitment against flips.
 function recruitHolds(r,u){return false}
 function recruitKeepBoost(r,u){return 0}
-function advanceRecruiting(){const u=selected();clearUnitCache();universe.recruits.forEach(r=>{ensureRecruitRelationships(r);if(r.committed){pressureCommit(r,u);return}r.prevInterest=r.interest;let pool=sample(universe.teams,20).map(t=>({t,pitch:recruitPitch(t,r)})).sort((a,b)=>b.pitch-a.pitch).map(x=>x.t),top=pool.find(t=>canTakeCommit(t.name))||pool[0];r.leader=top.name;let promiseBoost=recruitPromiseBoost(r,u),visitBoost=0;if(r.visitWeek===universe.week){let g=u.schedule.find(g=>g.week===universe.week&&g.home===u.name);visitBoost=g&&g.played?(g.winner===u.name?13:5):7;r.visit=false}let us=recruitPitch(u,r)+(r.targeted?10:0)+r.relationship*.12+visitBoost+promiseBoost,ais=recruitPitch(top,r);if(r.targeted){firstRecruitEvaluation(r,u);refreshScoutingIntel(r,u,2+(visitBoost?4:0),'RECRUITING',true);
+function advanceRecruiting(){const u=selected();clearUnitCache();universe.recruits.forEach(r=>{ensureRecruitRelationships(r);if(r.committed){pressureCommit(r,u);return}r.prevInterest=r.interest;let pool=recruitConsideration(r).map(t=>({t,pitch:recruitPitch(t,r)})).sort((a,b)=>b.pitch-a.pitch).map(x=>x.t),top=pool.find(t=>canTakeCommit(t.name)&&aiWantsRecruit(t,r))||pool.find(t=>canTakeCommit(t.name))||pool[0];r.leader=top.name;let promiseBoost=recruitPromiseBoost(r,u),visitBoost=0;if(r.visitWeek===universe.week){let g=u.schedule.find(g=>g.week===universe.week&&g.home===u.name);visitBoost=g&&g.played?(g.winner===u.name?13:5):7;r.visit=false}let us=recruitPitch(u,r)+(r.targeted?10:0)+r.relationship*.12+visitBoost+promiseBoost,ais=recruitPitch(top,r);if(r.targeted){firstRecruitEvaluation(r,u);refreshScoutingIntel(r,u,2+(visitBoost?4:0),'RECRUITING',true);
  // Draw order is part of the seeded contract: gain, bump, noise. recruitEffort() only scales what was drawn.
  let gain=gi(2,6),bump=gi(1,5),noise=gauss()*2,drift=(us-ais)*.065,cool=0;const eff=recruitEffort(r,u);
  if(eff){gain=Math.round(gain*eff.relScale);bump*=eff.bumpScale;noise*=eff.noiseScale;if(eff.freeze)drift=Math.min(0,drift);cool=eff.cool}
- r.relationship=clamp(r.relationship+gain-(eff?.relDecay||0),0,100);if(gain>0)growRecruiterRelationship(r,u,gain);r.interest=clamp(Math.round(r.interest+drift+bump+noise-cool),1,100)}else r.interest=clamp(Math.round(r.interest+(us-ais)*.018+gauss()*2),1,100);r.trend=r.interest-r.prevInterest;if(universe.week>=5&&gameplayRandom()<.028+universe.week*.009&&!recruitHolds(r,u)){if(r.targeted&&r.interest>=72&&us>=ais-4&&canTakeCommit(u.name)&&userMayCommit(r,u))commitRecruit(r,u.name);else{let dest=pool.find(t=>canTakeCommit(t.name));if(dest)commitRecruit(r,dest.name)}}})}
+ r.relationship=clamp(r.relationship+gain-(eff?.relDecay||0),0,100);if(gain>0)growRecruiterRelationship(r,u,gain);r.interest=clamp(Math.round(r.interest+drift+bump+noise-cool),1,100)}else r.interest=clamp(Math.round(r.interest+(us-ais)*.018+gauss()*2),1,100);r.trend=r.interest-r.prevInterest;if(universe.week>=5&&gameplayRandom()<.028+universe.week*.009&&!recruitHolds(r,u)){if(r.targeted&&r.interest>=72&&us>=ais-4&&canTakeCommit(u.name)&&userMayCommit(r,u))commitRecruit(r,u.name);else{let dest=pool.find(t=>canTakeCommit(t.name)&&aiWantsRecruit(t,r));if(dest)commitRecruit(r,dest.name)}}})}
 // v0.12.29: commitments fill first-come, so in a small-class year the room is gone before
 // the best prospects decide, and 4- and 5-stars were left unsigned (149 of them in one
 // measured cycle, as good as the ones who signed). Signing day places each unsigned elite
@@ -2854,9 +2876,19 @@ function placeUnsignedElites(){
  for(const e of elites){
   // A target the controlled program is winning is settled by the normal fill below.
   if(userRoom&&e.targeted&&e.interest>=68&&userMayCommit(e,selected()))continue;
-  const open=universe.teams.filter(t=>t.name!==controlled&&canTakeCommit(t.name)&&!recruitBlocked(t,e));
   let dest=null,removed=null;
-  if(open.length)dest=sample(open,24).sort((a,b)=>recruitPitch(b,e)-recruitPitch(a,e))[0];
+  // His own list first: a program he wants signs him if it has room, or by releasing a commit two stars lower.
+  for(const t of recruitAiList(e)){
+   if(t.name===controlled||recruitBlocked(t,e))continue;
+   if(canTakeCommit(t.name)){dest=t;break}
+   if((taken[t.name]||0)>=ELITE_DISPLACE_CAP)continue;
+   const weakest=universe.recruits.filter(r=>r.committed===t.name&&!protectedIds.has(r.id)&&r.stars<=e.stars-ELITE_DISPLACE_GAP).sort((a,b)=>(a.scoutUp+a.scout*.55)-(b.scoutUp+b.scout*.55))[0];
+   if(!weakest||!decommitRecruit(weakest,'DISPLACED_BY_ELITE'))continue;
+   removed=weakest;taken[t.name]=(taken[t.name]||0)+1;dest=t;break;
+  }
+  const open=dest?[]:universe.teams.filter(t=>t.name!==controlled&&canTakeCommit(t.name)&&!recruitBlocked(t,e));
+  if(dest){}
+  else if(open.length)dest=sample(open,24).sort((a,b)=>recruitPitch(b,e)-recruitPitch(a,e))[0];
   else{
    const cands=sample(universe.teams.filter(t=>t.name!==controlled&&!recruitBlocked(t,e)&&(taken[t.name]||0)<ELITE_DISPLACE_CAP),24).sort((a,b)=>recruitPitch(b,e)-recruitPitch(a,e));
    for(const t of cands){
