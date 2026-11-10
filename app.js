@@ -1624,7 +1624,10 @@ function draftProjection(p,t){let athletic=avg([p.speed,p.power,p.technique]),sc
 function draftPlayer(p,t,reason='Eligibility exhausted'){let d=draftProjection(p,t),r={year:universe.year,playerId:p.id,playerName:p.name,pos:p.pos,school:t.name,reason,...d};return r}
 function runDraft(pool){let rankedPool=pool.slice().sort((a,b)=>b.score-a.score);universe.draftHistory[universe.year]=[];rankedPool.forEach((x,i)=>{let round=i<224?Math.floor(i/32)+1:null,pick=round?(i%32)+1:null,status=round?'Drafted':x.score>=66?'UDFA':'College Career Complete',label=round?`Round ${round}, Pick ${pick}`:status==='UDFA'?'Undrafted Free Agent':'No professional deal',r={year:universe.year,playerId:x.p.id,playerName:x.p.name,pos:x.p.pos,school:x.t.name,reason:x.reason,score:Math.round(x.score),round,pick,status,label};x.p.draftResult=r;universe.draftHistory[universe.year].push(r);addToArchive(x.p,x.t,x.reason)});return universe.draftHistory[universe.year]}
 function earlyDeclaration(p,t){if(eligibilityBase(p)<2||eligibilityBase(p)>=3)return false;let d=draftProjection(p,t);return d.round&&d.round<=2&&gameplayRandom()<(d.round===1?.52:.24)}
-function rankingScore(t){const g=t.w+t.l,wp=g?t.w/g:0,sos=g?t.sos/g:60,margin=g?(t.pf-t.pa)/g:0,p=profiles(t).overall;return wp*60+p*.22+sos*.10+clamp(margin,-20,20)*.4}
+// Early in the season a single result should not throw a team across the poll: win rate and margin are blended
+// with what the team's strength says to expect, weighted like a few phantom games that fade out by week ten, so
+// late-season rankings, conference title races and the playoff field are exactly as before.
+function rankingScore(t){const g=t.w+t.l,p=profiles(t).overall,prior=clamp(.5+(p-73)/30,.05,.95),k=Math.max(0,9-g*.9),wp=g+k?(t.w+k*prior)/(g+k):0,sos=g?t.sos/g:60,margin=g+k?(t.pf-t.pa)/(g+k):0;return wp*60+p*.22+sos*.10+clamp(margin,-20,20)*.4}
 function ranked(){let r=universe.teams.map(t=>({t,s:rankingScore(t)})).sort((a,b)=>b.s-a.s).map(x=>x.t);r.forEach((t,i)=>t.rank=i+1);return r}
 function findUserGame(){if(universe.phase!=='regular'||universe.week>=12)return null;const n=$('#userTeam').value;return universe.schedule[universe.week].find(g=>!g.played&&(g.home===n||g.away===n))||null}
 
