@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.17.1 — Mac downloads for every Mac
+
+- **One Mac download for Apple silicon and Intel.** The desktop alpha is now a universal app, so it runs on every Mac that supports it; it was Apple silicon only.
+- **Update notices work.** The desktop app checks for a newer version on the title screen, but it asked GitHub only for full releases and every desktop build is a prerelease, so the notice never appeared. It now sees prereleases too. (Players on v0.17.0 or earlier need to download this version once by hand.)
+- **Install steps on every release page,** including the one-time step to open the unnotarised Mac app (Open Anyway in System Settings → Privacy & Security, or Control-click → Open on macOS 14 and earlier) and the Windows SmartScreen step.
+- **The web game links to the desktop app** from About Dynasty Lab.
+
+No gameplay changes; saves carry over.
+
 ## v0.17.0 — Real football results, a living league and recruiting that rewards effort
 
 ### Fixes
