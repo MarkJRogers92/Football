@@ -38,11 +38,10 @@ test('a declined offer marks the candidate and leaves the opening searchable',as
  const e=await setup(964),u=e.universe,t=u.teams[0];
  const o=e.createOpening(t,'RC','Retired after the season','RETIRED'),cand=u.candidateMarket[o.id][0];
  e.interviewCandidate(o.id,cand.candidateId);
- // A single, non-cascading extendOffer call: safe to force with a constant
- // Math.random override (guaranteed above any clamped acceptance chance).
- const real=Math.random;Math.random=()=>0.999;
+ // The acceptance roll uses the seeded gameplay RNG (overriding Math.random never reached it): pick a gameplay seed
+ // whose next draw is above any acceptance chance (capped at .95), so the offer is certainly declined.
+ let s=1;for(;s<5000;s++){e.setGameplayRng(s);if(e.gameplayRandom()>.96)break}e.setGameplayRng(s);
  const res=e.extendOffer(o.id,cand.candidateId,{salary:cand.askSalary*0.5,years:1,authority:'shared'});
- Math.random=real;
  assert.equal(res.ok,true);assert.equal(res.accepted,false);
  assert.equal(cand.status,'DECLINED');assert.ok(cand.declineReason);
  assert.equal(u.openings.find(x=>x.id===o.id).status,'OPEN');

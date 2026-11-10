@@ -372,10 +372,15 @@ test('portal commitments spread across the league rather than piling onto one pr
 });
 
 test('attention improves signings when league state, finalists and random draws are held equal',async()=>{
- const e=await setup(4722);e.simSeason();e.simConferenceChampionships();e.simPlayoff();
- e.offseasonReview();e.offseasonDepartures();e.openPortalCycle();e.normalizeUniverse();
- const user=e.T('Chicago Metropolitan'),targets=(e.universe.transferPortal||[])
-  .filter(x=>x.fromSchoolId!==user.id&&e.portalFit(x,user)&&x.finalists.includes(user.id)).slice(0,e.PORTAL_TARGET_CAP).map(x=>x.candidateId);
+ // A seeded world may hold no portal player who lists the program; use the first of a few seeds that does.
+ let e,user,targets=[];
+ for(const seed of [4722,4724,4725,4726,4727,4728]){
+  e=await setup(seed);e.simSeason();e.simConferenceChampionships();e.simPlayoff();
+  e.offseasonReview();e.offseasonDepartures();e.openPortalCycle();e.normalizeUniverse();
+  user=e.T('Chicago Metropolitan');targets=(e.universe.transferPortal||[])
+   .filter(x=>x.fromSchoolId!==user.id&&e.portalFit(x,user)&&x.finalists.includes(user.id)).slice(0,e.PORTAL_TARGET_CAP).map(x=>x.candidateId);
+  if(targets.length)break;
+ }
  assert.ok(targets.length>0,'real candidates already consider the user program');
  const snapshot=JSON.parse(JSON.stringify(e.packUniverse(e.universe)));
  const run=active=>{

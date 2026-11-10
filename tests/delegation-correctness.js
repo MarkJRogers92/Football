@@ -13,7 +13,9 @@ test('seed 1402 delegation applies the manual limited role once, persists across
  assert.equal(e.resolveWeeklyDecision(d.id,'limited'),true);const manual=JSON.parse(JSON.stringify(p));
  const role=e.ROLE_DEFS.find(r=>t.roleDepth[r.id]?.[0]===p.id);assert.ok(role);
  const manualStarter=e.roleStarter(t,role.id).id;assert.notEqual(manualStarter,p.id);
- e.simWeek(true);const manualWeek=JSON.stringify(e.universe.schedule[0]),manualStats=JSON.stringify(p.stats);
+ // Delegation also settles any other live decision the week generates; let the staff do the same here so the two runs
+ // differ only in who chose the limited role.
+ e.delegateWeeklyDecisions(t);e.simWeek(true);const manualWeek=JSON.stringify(e.universe.schedule[0]),manualStats=JSON.stringify(p.stats);
  e.universe=JSON.parse(before);e.normalizeUniverse();const dt=e.T(t.name),dp=dt.roster.find(x=>x.id===p.id);
  assert.equal(e.delegateWeeklyDecisions(dt),true);
  assert.deepEqual(dp.weeklyAvailability,manual.weeklyAvailability);assert.equal(e.roleStarter(dt,role.id).id,manualStarter);

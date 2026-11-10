@@ -133,9 +133,11 @@ test('league grades share ties and reflect new starts even in the same week and 
 test('only a recorded first college start earns a callback in quick and detailed finals',async()=>{
  for(const detailed of [false,true]){
   const e=loadEngine({seed:5204,fullRuntime:true});e.setUserTeam(USER);await e.loadSchools();e.initUniverse();
-  const u=e.universe,t=e.T(USER),qb=e.roleStarter(t,'QB1'),m={schoolId:t.id,season:u.year-1,stars:3,desk:{beat:'Rival State',hours:14}};
+  // The staff settle the week first (a starter challenge can change who plays), then the QB who will start is known.
+  const u=e.universe,t=e.T(USER);e.delegateWeeklyDecisions(t);
+  const qb=e.roleStarter(t,'QB1'),m={schoolId:t.id,season:u.year-1,stars:3,desk:{beat:'Rival State',hours:14}};
   qb.recruitingMemory=m;
-  const first=e.findUserGame();if(detailed){e.delegateWeeklyDecisions(t);e.simulateUserDetailed()}else e.simWeek(true);
+  const first=e.findUserGame();if(detailed)e.simulateUserDetailed();else e.simWeek(true);
   const game=u.gameArchive.find(g=>g.id===first.gameId),side=game.home.id===t.id?'home':'away';
   assert.equal(game.playerStats[side].find(p=>p.id===qb.id).stats.starts,1);
   assert.equal(game.firstStart.playerId,qb.id);assert.match(e.gameRecap(game).body,/first college start.*over Rival State/);
