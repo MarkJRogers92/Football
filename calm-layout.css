@@ -25,3 +25,9 @@
 /* v0.20: the one stop before an offseason stage that holds a decision. */
 .offseason-stop{margin:14px 0;padding:16px 18px;border:1px solid var(--warn,#f3ca78);border-left-width:4px;border-radius:12px;background:rgba(243,202,120,.06)}
 .offseason-stop h3{margin:4px 0 6px}.offseason-stop p{margin:0 0 12px;color:var(--muted,#9ca8b8);max-width:70ch}
+/* v0.24: signing day decisions announced inside the offseason stop. */
+.offseason-signing{list-style:none;margin:0 0 12px;padding:0;display:grid;gap:6px;max-width:70ch}
+.offseason-signing li{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.03);border-left:3px solid var(--line,#2b3440)}
+.offseason-signing li.signing-good{border-left-color:var(--good,#4ade80)}
+.offseason-signing li.signing-bad{border-left-color:var(--bad,#f08a8a)}
+@media(prefers-reduced-motion:no-preference){.offseason-signing li:last-child{animation:dl-value-in .35s ease both}}

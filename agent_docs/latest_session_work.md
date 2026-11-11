@@ -1,5 +1,9 @@
 # Latest Session Work
 
+## v0.24.0 signing day in the offseason — 2026-11-11
+
+Item 3 of the handoff, for signing day: `offseason-stops.js` (`mySigningDayLeft`, `signingDayMineFirst`, `signingRevealHTML`) announces the coach's contested signing day entries inside the signing stop, reusing `revealNextSigning` from `app.js`. Outcomes are still decided in `buildSigningDay`. `__DL_TEST__.signingDayFixture` builds a board where the coach is contested (every entry holds, so no commitment moves); `tests/signing-day-stop-browser.js` covers it. The transfer portal half of item 3 is not done: the portal stop still routes to the Offseason screen.
+
 ## v0.23.0 timeouts, art, release build — 2026-11-11
 
 Continuation of the "What is left" list in `agent_docs/HANDOFF_2026-11-11_v0.22.0.md`. Done: the desktop smoke test (`xvfb-run -a node tests/desktop-smoke.js` after `node node_modules/electron/install.js`; it passes), timeouts (`createTimeoutDecision` in `game-engine-v2-gameday.js`, behind `session.driveCall`), the fast and slow unit tiers, and test hooks only under `navigator.webdriver` or Node (`dynastyTestHooksEnabled` in `app.js`; covered by `tests/release-build-browser.js`). Added the art pack's 256px sprites as `assets/awards/*.webp` through `program-art.js` (`DynastyArt`).
