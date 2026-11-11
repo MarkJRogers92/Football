@@ -123,7 +123,15 @@
         <section class="title-about-card"><span>COMMISSIONER MODE</span><h3>Run the whole universe</h3><p>Switch programs and edit institutional details when you want broader sandbox control.</p></section>
         <section class="title-about-card title-about-card--wide"><span>YOUR SAVE DATA</span><h3>${storageSummary}</h3><p>${storageCopy}</p></section>
         ${desktopStorage?'':`<section class="title-about-card title-about-card--wide" data-about-desktop><span>DESKTOP APP</span><h3>Play offline on Mac or Windows</h3><p>The desktop alpha runs on Apple silicon and Intel Macs and on Windows, with saves on your computer. Each release page explains the one-time step to open it on a Mac.</p><a class="title-about-link" href="https://github.com/MarkJRogers92/Football/releases" target="_blank" rel="noopener">Download the desktop app</a></section>`}
+        <section class="title-about-card title-about-card--wide" data-about-report><span>REPORT A PROBLEM</span><h3>Tell us what went wrong</h3><p>Copy the details below into a new issue. They hold the version, your browser and the last errors the game recorded on this device. Nothing is sent automatically, and your dynasty is not included.</p><div class="title-about-actions"><button type="button" data-about-copy-report>Copy problem details</button><a class="title-about-link" href="https://github.com/MarkJRogers92/Football/issues/new" target="_blank" rel="noopener">Open a new issue</a></div><p class="title-about-note" data-about-report-status role="status"></p></section>
+        <section class="title-about-card title-about-card--wide" data-about-credits><span>CREDITS</span><h3>Made with</h3><p>Display type is Barlow Condensed, © The Barlow Project Authors, used under the SIL Open Font License 1.1. The championship trophy and the team helmets were generated as 3D models with Meshy and rendered for this game. Every school, nickname, player and coach is fictional; any resemblance to a real program or person is coincidental.</p></section>
       </div>`;
+    panel.addEventListener('click',async event=>{
+      if(!event.target.closest('[data-about-copy-report]'))return;
+      const status=panel.querySelector('[data-about-report-status]'),text=window.DynastyCrashGuard?.report?.()||`Dynasty Lab ${titleVersion()}\n${navigator.userAgent}`;
+      try{await navigator.clipboard.writeText(text);status.textContent='Details copied. Paste them into the issue.'}
+      catch{let area=panel.querySelector('[data-about-report-text]');if(!area){area=document.createElement('textarea');area.dataset.aboutReportText='';area.readOnly=true;area.setAttribute('aria-label','Problem details');area.className='title-about-report-text';status.insertAdjacentElement('afterend',area)}area.value=text;area.focus();area.select();status.textContent='Select and copy the details below.'}
+    });
     menuShell.appendChild(panel);
 
     aboutButton.addEventListener('click',()=>{

@@ -3,6 +3,41 @@
 Reviewed 2026-11-11 at source `f9e43f2` (v0.17.1). This is a plan, not a status
 report: nothing in the game changed in this pass.
 
+## Status at v0.22.0
+
+Six releases shipped from this plan on 2026-11-11. This section is the current state; the review below it is
+unchanged from v0.17.1 except where a correction is noted here.
+
+| Release | Shipped | Left out, and why |
+| --- | --- | --- |
+| v0.17.2 | Postgame panel clipping, field-goal range from the odds of the kick, one week label, scoring play in the scoring flow, one final per screen, singular stat lines, phone notices | Nothing |
+| v0.18.0 | Compressed, chunked export (299 MB to 35 MB at season 30), crash screen, save size in the save menu, quota warning | A second box-score tier (0.7 MB of 9 MB a season); the 30-season run in a browser and on a phone |
+| v0.19.0 | A call for each drive, defensive calls on key third downs, a field and consequence line on the live screen, live-game takeover, Coach It Live under the matchup | Timeouts; the animated 3D field on the live screen (it is a 2D strip); timing a game with a person |
+| v0.20.0 | Nicknames for all 120 programs, offseason stops before departures, signing and the portal, staff recruiting on by default, confidence at 60 for a new coach, a review sentence that adds up | Renaming programs (the name is the key in saves and tests); signing day and the portal one name at a time; decisions inside the stop card |
+| v0.21.0 | 44px controls and 12px text at phone width, named dropdowns and meters, an automated accessibility test on 16 screens at two widths | A real iPhone, Safari and Firefox; a screen-reader pass; watching new players |
+| v0.22.0 | Installable offline web build, a security policy, Report a problem, credits, fifty historical docs archived | See "Not done" below |
+
+**Decisions taken** (owner answers on 2026-11-11): no signing certificates, no licence or price yet, nicknames
+approved, alpha saves need not migrate, play calling and crash reporting left to this pass. Play calling stops at a
+call per drive. Crash reports stay on the device: nothing is sent anywhere, and "Copy problem details" is the report.
+
+**Not done, and still between here and a 1.0:**
+
+- **Signed installers.** Declined, so the Mac and Windows builds keep their install warnings and the desktop update
+  notice stays a link.
+- **A licence.** Declined for now. The repository still has no `LICENSE`; the About panel credits the font and art.
+- **Test hooks in the release build.** `window.__DL_TEST__` still ships. About 150 browser tests drive the same
+  `index.html` that is published, so removing it means a second build or a flag in every test.
+- **A linter.** The engine is one closure assembled from 130 files that share globals; an undefined-variable rule
+  reports thousands of false positives until that structure changes.
+- **Splitting `app.js`** and generating the build's module list from a manifest.
+- **A fast test tier.** The unit suite takes about 12 minutes; the browser suites much longer.
+- **Real devices and real players**, as listed against v0.18 and v0.21.
+
+**Corrections to the review below.** Two findings in D were wrong: the "25 unnamed controls" had names the first
+scan did not read, and only one `h1` is visible at a time. And the review said the unit suite "did not finish in ten
+minutes"; it finishes in about twelve.
+
 ## Verdict
 
 Dynasty Lab is a deep, stable simulation with a strong front-office presentation.

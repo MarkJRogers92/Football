@@ -1,5 +1,13 @@
 # Latest Session Work
 
+## v0.22.0 install, offline, report — 2026-11-11
+
+Sixth release of `docs/RELEASE_GAMEPLAN_2026-11-11.md`; its "Status at v0.22.0" section lists what shipped and what was left out across all six. `manifest.webmanifest`, `pwa.js` (registers the worker on http and https only), `tools/sw-template.js` and the generated `sw.js` (written by `tools/build.js` with the version and the asset list; CI now checks `index.html sw.js` are current), a Content-Security-Policy meta tag built in `tools/build.js`, and Report a problem and Credits in `title-menus.js`. `tools/publish.js` copies the manifest and worker beside the page.
+
+`sw.js` is generated: run `npm run build` after a version bump or after adding a file under `assets/`, and commit it.
+
+Fifty per-version checkpoint files moved from `docs/` to `docs/archive/`; nothing outside `docs/` referred to them.
+
 ## v0.21.0 phones and accessibility — 2026-11-11
 
 Fifth release of `docs/RELEASE_GAMEPLAN_2026-11-11.md`. `phone-a11y.css` (loaded last by `tools/build.js`) sets a 44px control floor and a 12px text floor under `max-width:720px`. Its text rules use `!important` on explicit selectors, so before adding one, check it does not match text that is already larger: build without the file and compare (the method is in the commit that added it). `axe-core` is a dev dependency; `tests/accessibility-browser.js` and `tests/phone-floor-browser.js` are in `test:browser-extended` and `npm run test:accessibility`.

@@ -1,5 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.21.0</title><style>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.22.0</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -2276,6 +2277,11 @@ td .small.muted,.lineitem .small.muted,.battle-card .small.muted,#classSummary .
 }
 
 .title-about-link{display:inline-flex;align-items:center;min-height:34px;margin-top:8px;padding:0 13px;border:1px solid #4b719c;border-radius:7px;background:#14263a;color:#e6eef7;font-size:11.5px;font-weight:750;text-decoration:none}.title-about-link:hover{background:#1b3350}.title-about-link:focus-visible{outline:2px solid #8fb4dd;outline-offset:2px}
+/* v0.22: report a problem and credits on the About panel. */
+.title-about-actions{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:10px}
+.title-about-actions button{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid #3a4c63;background:#142031;color:#eef3fc;font-weight:600;cursor:pointer}
+.title-about-note{margin:8px 0 0;font-size:12.5px;color:#9aabbf;min-height:1em}
+.title-about-report-text{width:100%;box-sizing:border-box;height:120px;margin-top:8px;background:#0a0f17;color:#c6d0de;border:1px solid #3a4c63;border-radius:8px;font:12px/1.4 ui-monospace,monospace}
 
 /* Take the Job — a focused front-office setup shell, separate from the game client. */
 .dynasty-setup{--program-primary:#234875;--program-secondary:#73a8ff;--program-accent:#d6b45e;position:fixed;inset:0;z-index:110;min-height:100dvh;overflow:auto;color:#eaf0f7;background:#070b10;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -3451,7 +3457,7 @@ select{min-width:44px}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.21.0</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.22.0</b></span></footer>
   </div>
 </section>
 
@@ -3478,7 +3484,7 @@ select{min-width:44px}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.21.0</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.22.0</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -7389,7 +7395,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.21.0';
+const APP_VERSION='0.22.0';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi','Aiden','Alex','Amari','Andrew','Anthony','Antonio','Armani','Ashton','Austin','Avery','Bennett','Blake','Brady','Brandon','Brayden','Brennan','Brock','Bryson','Cade','Caden','Calvin','Cameron','Carson','Cedric','Chase','Christian','Cody','Colby','Collin','Connor','Corey','Damian','Damon','Daniel','Davion','Dawson','Deandre','Demarcus','Derek','Desmond','Dillon','Drew','Dylan','Elijah','Ethan','Ezra','Garrett','Grady','Graham','Grant','Hayden','Hunter','Ian','Isaac','Jabari','Jace','Jackson','Jacob','Jaden','Jake','Jamar','Jameson','Jared','Jarrett','Javon','Jaxon','Jay','Jermaine','Jesse','Joel','Jonah','Josiah','Julian','Justin','Kaden','Kai','Kamari','Keegan','Keenan','Kendall','Kendrick','Kevin','Kobe','Kyle','Kyler','Lamar','Landon','Lane','Lawrence','Leon','Levi','Lincoln','Lucas','Marco','Mario','Mateo','Matthew','Maurice','Max','Myles','Nate','Nathan','Nolan','Omar','Owen','Parker','Patrick','Preston','Quentin','Quincy','Reggie','Riley','Ryan','Sam','Sean','Seth','Shane','Silas','Solomon','Spencer','Sterling','Terrell','Theo','Tobias','Travis','Tristan','Troy','Tucker','Tyrese','Victor','Wade','Walker','Wes','Wyatt','Zach','Zane','Andres','Diego','Rafael','Tevita','Sione','Manu','Keoni','Kenji','Darnell'];
@@ -21383,7 +21389,15 @@ queue();
         <section class="title-about-card"><span>COMMISSIONER MODE</span><h3>Run the whole universe</h3><p>Switch programs and edit institutional details when you want broader sandbox control.</p></section>
         <section class="title-about-card title-about-card--wide"><span>YOUR SAVE DATA</span><h3>${storageSummary}</h3><p>${storageCopy}</p></section>
         ${desktopStorage?'':`<section class="title-about-card title-about-card--wide" data-about-desktop><span>DESKTOP APP</span><h3>Play offline on Mac or Windows</h3><p>The desktop alpha runs on Apple silicon and Intel Macs and on Windows, with saves on your computer. Each release page explains the one-time step to open it on a Mac.</p><a class="title-about-link" href="https://github.com/MarkJRogers92/Football/releases" target="_blank" rel="noopener">Download the desktop app</a></section>`}
+        <section class="title-about-card title-about-card--wide" data-about-report><span>REPORT A PROBLEM</span><h3>Tell us what went wrong</h3><p>Copy the details below into a new issue. They hold the version, your browser and the last errors the game recorded on this device. Nothing is sent automatically, and your dynasty is not included.</p><div class="title-about-actions"><button type="button" data-about-copy-report>Copy problem details</button><a class="title-about-link" href="https://github.com/MarkJRogers92/Football/issues/new" target="_blank" rel="noopener">Open a new issue</a></div><p class="title-about-note" data-about-report-status role="status"></p></section>
+        <section class="title-about-card title-about-card--wide" data-about-credits><span>CREDITS</span><h3>Made with</h3><p>Display type is Barlow Condensed, © The Barlow Project Authors, used under the SIL Open Font License 1.1. The championship trophy and the team helmets were generated as 3D models with Meshy and rendered for this game. Every school, nickname, player and coach is fictional; any resemblance to a real program or person is coincidental.</p></section>
       </div>`;
+    panel.addEventListener('click',async event=>{
+      if(!event.target.closest('[data-about-copy-report]'))return;
+      const status=panel.querySelector('[data-about-report-status]'),text=window.DynastyCrashGuard?.report?.()||`Dynasty Lab ${titleVersion()}\n${navigator.userAgent}`;
+      try{await navigator.clipboard.writeText(text);status.textContent='Details copied. Paste them into the issue.'}
+      catch{let area=panel.querySelector('[data-about-report-text]');if(!area){area=document.createElement('textarea');area.dataset.aboutReportText='';area.readOnly=true;area.setAttribute('aria-label','Problem details');area.className='title-about-report-text';status.insertAdjacentElement('afterend',area)}area.value=text;area.focus();area.select();status.textContent='Select and copy the details below.'}
+    });
     menuShell.appendChild(panel);
 
     aboutButton.addEventListener('click',()=>{
@@ -22006,4 +22020,14 @@ function mount(){
 }
 return{KEY,emptyStore,followed,toggleFollow,reconcile,briefing,html,mount};
 });
+
+// v0.22 — installable, offline web build. On the web (http or https, never the desktop app or a file opened from
+// disk) this registers the service worker that keeps the game and its art available without a connection. The game
+// itself makes no network requests, so once it is cached it plays offline; saves were always on the device.
+(function(){
+  'use strict';
+  if(typeof navigator==='undefined'||!('serviceWorker' in navigator))return;
+  if(!/^https?:$/.test(location.protocol)||globalThis.DynastyDesktopShell?.isDesktop)return;
+  window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})});
+})();
 </script></body></html>

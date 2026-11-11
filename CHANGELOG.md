@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.22.0 — Install it, play it offline, report a problem
+
+- **The web game installs like an app.** In Chrome, Edge or Safari, use "Install" or "Add to Home Screen" and Dynasty Lab opens in its own window with its own icon.
+- **It plays without a connection.** After one visit the game and its art are kept on your device. Open it on a plane and your saved dynasty is there. A new release still appears as soon as you are back online.
+- **A stated security policy.** The game makes no network requests and loads nothing from another site, and the page now says so to the browser, which blocks anything that tries.
+- **Report a problem.** About Dynasty Lab has "Copy problem details" (version, browser and the last errors recorded on your device) and a link to open an issue. Nothing is sent automatically and your dynasty is not included.
+- **Credits.** About now credits the display typeface (Barlow Condensed, SIL Open Font License) and says how the trophy and helmets were made.
+
+Not in this release: signed Mac and Windows installers (the builds still show the one-time install warning) and a licence file. Saves carry over.
+
 ## v0.21.0 — Phones and accessibility
 
 - **Every control on a phone is a full-size touch target.** At phone width all buttons, dropdowns, tabs, disclosure rows and tappable names are at least 44 pixels tall. Before this, each screen had between 22 and 60 controls smaller than that. The four icon buttons in the top bar are 40 pixels so the program, record and week still fit beside them.
