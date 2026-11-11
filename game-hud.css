@@ -173,7 +173,8 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
 .program-peek-head p{margin:2px 0 0;font-size:12.5px}
 .program-peek form{margin-top:14px;display:flex;justify-content:flex-end}
 
-@media(max-width:700px){.hud-toasts{left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom,0px));max-width:none}}
+/* Phones: notices sit under the header, clear of the bottom navigation and the primary action above it. */
+@media(max-width:700px){.hud-toasts{left:12px;right:12px;top:calc(58px + env(safe-area-inset-top,0px));bottom:auto;max-width:none}}
 
 .gate-note{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0 0 14px;padding:10px 14px;border:1px solid rgba(242,193,78,.4);border-radius:10px;background:rgba(242,193,78,.08);color:#f2d68a;font-size:.88rem}
 .gate-note[hidden]{display:none}

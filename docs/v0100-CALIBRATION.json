@@ -1,65 +1,65 @@
 {
-  "generatedAt": "2026-11-08T13:10:22.042Z",
+  "generatedAt": "2026-11-11T01:58:03.560Z",
   "branch": "codex/v0100-game-engine-2",
-  "baselineVersion": "0.15.2",
+  "baselineVersion": "0.17.1",
   "mode": "development-only shadow comparison",
-  "matchups": 120,
-  "sample": "weeks 1-2, all 120 scheduled games",
+  "matchups": 480,
+  "sample": "weeks 1-8, all 480 scheduled games (120 was too few: the mean-points delta moved by 2 between runs of the same rules)",
   "old": {
-    "games": 120,
-    "meanPoints": 42.48,
-    "meanPlays": 120.53,
-    "meanYards": 588.89,
-    "meanTurnovers": 2.38,
-    "meanTouchdowns": 4.63,
-    "meanFgMade": 2.53,
-    "meanFgAtt": 3.16,
-    "meanPunts": 7.98,
-    "homeWinRate": 0.51,
-    "meanHomeMargin": 1.24,
-    "meanHomeFieldRating": 2.38
+    "games": 480,
+    "meanPoints": 42.56,
+    "meanPlays": 120.21,
+    "meanYards": 596.02,
+    "meanTurnovers": 2.41,
+    "meanTouchdowns": 4.65,
+    "meanFgMade": 2.45,
+    "meanFgAtt": 3,
+    "meanPunts": 7.86,
+    "homeWinRate": 0.57,
+    "meanHomeMargin": 2.64,
+    "meanHomeFieldRating": 2.36
   },
   "v2": {
-    "games": 120,
-    "meanPoints": 41.31,
-    "meanPlays": 114.72,
-    "meanYards": 591.52,
-    "meanTurnovers": 2.09,
-    "meanTouchdowns": 4.95,
-    "meanFgMade": 2.22,
-    "meanFgAtt": 3.27,
-    "meanPunts": 7.98,
-    "homeWinRate": 0.54,
-    "meanHomeMargin": 1.66,
-    "meanHomeFieldRating": 2.38
+    "games": 480,
+    "meanPoints": 39.28,
+    "meanPlays": 114.78,
+    "meanYards": 587.2,
+    "meanTurnovers": 2.13,
+    "meanTouchdowns": 4.83,
+    "meanFgMade": 1.82,
+    "meanFgAtt": 2.48,
+    "meanPunts": 8.94,
+    "homeWinRate": 0.51,
+    "meanHomeMargin": 1.09,
+    "meanHomeFieldRating": 2.36
   },
   "delta": {
-    "meanPoints": -1.17,
-    "meanPlays": -5.81,
-    "meanYards": 2.63,
-    "meanTurnovers": -0.29,
-    "meanTouchdowns": 0.32,
-    "meanFgMade": -0.31,
-    "meanFgAtt": 0.11,
-    "meanPunts": 0,
-    "homeWinRate": 0.03,
-    "meanHomeMargin": 0.42
+    "meanPoints": -3.28,
+    "meanPlays": -5.43,
+    "meanYards": -8.82,
+    "meanTurnovers": -0.28,
+    "meanTouchdowns": 0.18,
+    "meanFgMade": -0.63,
+    "meanFgAtt": -0.52,
+    "meanPunts": 1.08,
+    "homeWinRate": -0.06,
+    "meanHomeMargin": -1.55
   },
   "strengthSensitivity": {
     "favored": {
-      "games": 27,
-      "oldHomeWinRate": 0.85,
-      "v2HomeWinRate": 0.89
+      "games": 103,
+      "oldHomeWinRate": 0.81,
+      "v2HomeWinRate": 0.79
     },
     "even": {
-      "games": 72,
-      "oldHomeWinRate": 0.46,
-      "v2HomeWinRate": 0.54
+      "games": 273,
+      "oldHomeWinRate": 0.58,
+      "v2HomeWinRate": 0.49
     },
     "underdog": {
-      "games": 21,
-      "oldHomeWinRate": 0.24,
-      "v2HomeWinRate": 0.1
+      "games": 104,
+      "oldHomeWinRate": 0.31,
+      "v2HomeWinRate": 0.28
     }
   },
   "notes": [
@@ -70,7 +70,7 @@
     "These are calibration observations, not release thresholds."
   ],
   "calibrationContract": 1,
-  "sourceSha256": "3b2e7ebcf7d1ac6888896e7f7fccf35e91f34b457e475483b3f991c4cb4c1339",
+  "sourceSha256": "b2e0052574621aa851ec7e86c65f1418d63bf4eb46fbfacc68547be05dc2424f",
   "sourceFiles": [
     "game-engine-v2.js",
     "game-engine-v2-adapter.js",

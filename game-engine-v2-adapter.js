@@ -171,13 +171,7 @@ function annotateOutcomeEvent(state,startIndex,outcome){
   }
   return null;
 }
-function shadowDecision(state){
-  if(state.down!==4)return'play';
-  if(state.distance<=2&&state.fieldPosition>=45)return'play';
-  if(state.fieldPosition>=58&&state.distance>2)return'field_goal';
-  if(state.fieldPosition<60&&state.distance>1)return'punt';
-  return'play';
-}
+function shadowDecision(state){return GameEngineV2.defaultFourthDown(state,true)}
 // Situational playbooks by side ({home, away}); a side without one plays the default policy.
 function attachPlaybook(state,playbook){
   if(!playbook||typeof playbook!=='object')return state;

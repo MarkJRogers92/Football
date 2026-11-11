@@ -14,11 +14,18 @@ function v2ReleaseTeamLeaders(record,side){
   const lines=record.playerStats?.[side]||[],passer=v2ReleaseLeader(lines,'passYds'),rusher=v2ReleaseLeader(lines,'rushYds'),receiver=v2ReleaseLeader(lines,'recYds'),defender=v2ReleaseLeader(lines,'tackles',r=>v2ReleaseNum(r.stats?.tackles)+v2ReleaseNum(r.stats?.sacks)*4+v2ReleaseNum(r.stats?.intDef)*6+v2ReleaseNum(r.stats?.forcedFumbles)*3);
   return`${v2ReleaseLeaderLine('PASS',passer,s=>`${v2ReleaseNum(s.passComp)}/${v2ReleaseNum(s.passAtt)} · ${v2ReleaseNum(s.passYds)} YDS · ${v2ReleaseNum(s.passTD)} TD`)}${v2ReleaseLeaderLine('RUSH',rusher,s=>`${v2ReleaseNum(s.rushAtt)} CAR · ${v2ReleaseNum(s.rushYds)} YDS · ${v2ReleaseNum(s.rushTD)} TD`)}${v2ReleaseLeaderLine('REC',receiver,s=>`${v2ReleaseNum(s.receptions)} REC · ${v2ReleaseNum(s.recYds)} YDS · ${v2ReleaseNum(s.recTD)} TD`)}${v2ReleaseLeaderLine('DEF',defender,s=>`${v2ReleaseNum(s.tackles)} TKL · ${v2ReleaseNum(s.sacks)} SACK · ${v2ReleaseNum(s.intDef)} INT`)}`
 }
+// The scoring play itself: the snap before a touchdown call, or the kick. Read from the archived play-by-play, so no save shape changes.
+function v2ReleaseScoringDetail(d){
+  const lines=d.playByPlay||[],td=lines.findIndex(x=>/TOUCHDOWN/.test(x));
+  const line=td>0?lines[td-1]:td<0?[...lines].reverse().find(x=>/field goal|safety/i.test(x)):null;
+  if(!line||/TOUCHDOWN|chooses|extra point|two-point/i.test(line))return'';
+  return String(line).split(' · ').pop().replace(/\.$/,'')
+}
 function v2ReleaseDriveTimeline(record){
   const score={home:0,away:0},names={home:record.home?.name||'Home',away:record.away?.name||'Away'},scoring=[];
   for(const d of record.drives||[]){
     score[d.side]+=v2ReleaseNum(d.points);
-    if(v2ReleaseNum(d.points)>0)scoring.push(`<div class="v2-release-scoring-row"><span>${gameEscape(d.overtime?'OT':d.label)}</span><strong>${gameEscape(names[d.side])} · ${gameEscape(d.result||'SCORE')} · +${v2ReleaseNum(d.points)}</strong><b>${score.away}–${score.home}</b></div>`)
+    if(v2ReleaseNum(d.points)>0)scoring.push(`<div class="v2-release-scoring-row"><span>${gameEscape(d.overtime?'OT':d.label)}</span><strong>${gameEscape(names[d.side])} · ${gameEscape(d.result||'SCORE')} · +${v2ReleaseNum(d.points)}${(detail=>detail?`<small>${gameEscape(detail)}</small>`:'')(v2ReleaseScoringDetail(d))}</strong><b>${score.away}–${score.home}</b></div>`)
   }
   return scoring.length?scoring.join(''):'<div class="muted">No scoring drives were retained.</div>'
 }
@@ -38,7 +45,9 @@ function renderV2ReleaseGameLab(){
   document.querySelector('#v2ShadowLab')?.remove();document.querySelector('#v2RecordGate')?.remove();
   const host=ensureV2ReleaseRecap(),record=v2ReleaseRecord();if(host){host.hidden=!record;host.innerHTML=record?v2ReleaseRecapHTML(record):''}
   const box=document.querySelector('#detailedBox'),log=document.querySelector('#detailedLog');
-  if(box){const h=box.closest('.card')?.querySelector('h3');if(h)h.textContent='Quick Box'}
+  if(box){const card=box.closest('.card'),h=card?.querySelector('h3');if(h)h.textContent='Quick Box';
+    // One final per screen: the recap below already carries this game's score, yards and turnovers.
+    if(card)card.hidden=!!(record&&universe.lastDetailedGame?.gameId===record.id)}
   if(log){const h=log.closest('.card')?.querySelector('h3');if(h)h.textContent='Play-by-Play';if(record){const lines=(record.drives||[]).flatMap(d=>d.playByPlay||[]).slice(-160).reverse();log.classList.remove('muted');log.innerHTML=lines.map(x=>`<div class="playline">${gameEscape(x)}</div>`).join('')}}
 }
 renderV2GameLabPanel=function renderV2GameLabPanelRelease(){document.querySelector('#v2ShadowLab')?.remove()};

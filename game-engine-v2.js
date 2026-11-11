@@ -227,9 +227,9 @@ function marginFor(state,side){return(state.score[side]||0)-(state.score[other(s
 function playbookFourthDown(state){
   if(!state||state.down!==4||state.period>4)return null;
   const side=state.possession,p=playbookFor(state,side);if(!p||!p.fourthDown||p.fourthDown==='standard')return null;
-  const margin=marginFor(state,side),fgRange=state.fieldPosition>=58;
-  // Late and behind, a field goal only when it ties or takes the lead; otherwise keep the ball.
-  if(state.period===4&&state.clock<=LATE_SECONDS&&margin<0)return fgRange&&margin>=-3?'field_goal':'play';
+  const margin=marginFor(state,side),fgRange=fieldGoalInRange(state);
+  // Late and behind, a field goal only when it ties or takes the lead; otherwise keep the ball. A long shot is worth it then.
+  if(state.period===4&&state.clock<=LATE_SECONDS&&margin<0)return fieldGoalInRange(state,FG_DESPERATE_CHANCE)&&margin>=-3?'field_goal':'play';
   if(p.fourthDown==='aggressive'){
     if(state.distance<=2&&state.fieldPosition>=35)return'play';
     if(state.distance<=4&&state.fieldPosition>=55&&state.fieldPosition<70)return'play';
@@ -266,11 +266,27 @@ function sanitizePlaybook(value){
   return out;
 }
 // Wind, wet or frozen balls and thin air move a field goal's odds; without rules this is the original curve.
+// Past 52 yards the odds fall away quickly, as they do for college kickers: about 43% from 55, 38% from 56, 24% from 59.
 function fieldGoalChance(state,distance){
-  const base=.97-Math.max(0,distance-30)*.018;
-  if(!rulesOf(state))return clamp(base,.18,.97);
+  const base=.97-Math.max(0,distance-30)*.018-Math.max(0,distance-52)*.03;
+  if(!rulesOf(state))return clamp(base,.02,.97);
   const e=effectsOf(state);
-  return clamp(base-e.fgFlat-e.fgPerYard*Math.max(0,distance-25),.12,.98);
+  return clamp(base-e.fgFlat-e.fgPerYard*Math.max(0,distance-25),.02,.98);
+}
+// One rule for every caller (simulated games, staff advice, the options a coach is offered): a kick is in range when
+// it is made often enough in these conditions. Wind and rain shorten the range because they lower the odds.
+const FG_TRY_CHANCE=0.42,FG_DESPERATE_CHANCE=.12,FG_OFFER_CHANCE=.05;
+function fieldGoalDistance(state){return Math.round(100-state.fieldPosition+17)}
+function fieldGoalInRange(state,floor=FG_TRY_CHANCE){return fieldGoalChance(state,fieldGoalDistance(state))>=floor}
+// The default fourth-down call. goShort is the profile-driven sim's extra rule: keep the ball on 4th and 2 or less past the own 45.
+function defaultFourthDown(state,goShort=false){
+  if(state.down!==4)return 'play';
+  if(goShort&&state.distance<=2&&state.fieldPosition>=45)return 'play';
+  if(state.distance>2&&fieldGoalInRange(state))return 'field_goal';
+  // Too far to kick, too close to punt well: go on 4th and 5 or less, otherwise pin them deep.
+  if(state.distance>2&&state.fieldPosition>=58)return state.distance<=5?'play':'punt';
+  if(state.fieldPosition<60&&state.distance>1)return 'punt';
+  return 'play';
 }
 function attemptFieldGoal(state){
   requireStatus(state,'live');if(state.period>4)throw new Error('Use overtime resolution for overtime field goals.');
@@ -330,12 +346,7 @@ function generateOutcome(state){
   }
   finishRng(state,rng);return outcome;
 }
-function chooseFourthDown(state){
-  if(state.down!==4)return 'play';
-  if(state.fieldPosition>=58&&state.distance>2)return 'field_goal';
-  if(state.fieldPosition<60&&state.distance>1)return 'punt';
-  return 'play';
-}
+function chooseFourthDown(state){return defaultFourthDown(state)}
 function step(state){
   requireStatus(state,'live');
   if(state.period>4)return stepOvertime(state);
@@ -440,5 +451,5 @@ function validateGame(state){
   return true;
 }
 
-return{ENGINE_VERSION,RULES_VERSION,PENALTY_TYPES,fieldGoalChance,QUARTER_SECONDS,PLAYBOOK_OPTIONS,normalizeRules,effectsOf,kickoffTo,TWO_POINT_CHART,playbookFourthDown,playbookTwoPoint,playbookTempo,playbookClock,sanitizePlaybook,createGame,startGame,step,simulate,applyScrimmage,attemptFieldGoal,punt,snapshot,restore,scoringTotals,validateState,validateGame,generateOutcome};
+return{ENGINE_VERSION,RULES_VERSION,PENALTY_TYPES,fieldGoalChance,fieldGoalDistance,fieldGoalInRange,defaultFourthDown,FG_TRY_CHANCE,FG_DESPERATE_CHANCE,FG_OFFER_CHANCE,QUARTER_SECONDS,PLAYBOOK_OPTIONS,normalizeRules,effectsOf,kickoffTo,TWO_POINT_CHART,playbookFourthDown,playbookTwoPoint,playbookTempo,playbookClock,sanitizePlaybook,createGame,startGame,step,simulate,applyScrimmage,attemptFieldGoal,punt,snapshot,restore,scoringTotals,validateState,validateGame,generateOutcome};
 });

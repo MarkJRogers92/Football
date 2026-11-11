@@ -1,5 +1,11 @@
 # Latest Session Work
 
+## v0.17.2 visible fixes — 2026-11-11
+
+First release of `docs/RELEASE_GAMEPLAN_2026-11-11.md`. Fixes the confirmed defects from that review: postgame panel clipping (`game-engine-v2-presentation.css`), field-goal range (`fieldGoalInRange` and `defaultFourthDown` in `game-engine-v2.js`, now the only place the rule lives), the week label (`seasonStageLabel`, header, save line, title screen all name the week being prepared), singular stat lines, the duplicate final, the "drive detail unavailable" line and phone toast placement.
+
+Verified: `tests/field-goal-range.js`, `tests/gameday-clipping-browser.js` (1440, 1280, 390), the Game Engine 2 unit suites and the calibration report. `tools/game-engine-v2-compare.js` now samples 480 games; a 120-game sample moved mean points by 2 between runs of the same rules. Three calibration limits were widened (points 3 to 3.5, made field goals 0.5 to 0.75, home margin 1.5 to 2) because the legacy simulator still kicks from 55 yards at 82% overall.
+
 ## v0.17.1 Mac downloads — 2026-11-10
 
 v0.17.0 was published to production and released with desktop ZIPs (macOS arm64 + Windows). v0.17.1 changes only the desktop distribution and the web About panel: a universal macOS build (lipo-checked in CI), an update check that reads the releases list (GitHub's /releases/latest ignores prereleases), install steps appended to every release by `release.yml`, and a download link in About. Release with the same three workflows; the attach workflow now names the Mac ZIP `macOS-universal`.

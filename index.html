@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.17.1</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.17.2</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -1186,7 +1186,7 @@ tr[hidden]{display:none!important}
 .v2-lab-head{align-items:center}.v2-shadow-score{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:14px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);margin-bottom:10px}.v2-shadow-score>div:first-child{text-align:left}.v2-shadow-score>div:last-child{text-align:right}.v2-shadow-score span{display:block;color:var(--muted);font-size:12px}.v2-shadow-score strong{font-size:32px;line-height:1}.v2-shadow-final{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--muted);text-align:center}.v2-shadow-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px}.v2-shadow-metrics>div{padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}.v2-shadow-metrics span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em}.v2-shadow-metrics strong{font-size:18px}.v2-shadow-safety{padding:9px 10px;border-left:3px solid var(--accent2);background:rgba(143,177,255,.06);font-size:12px;margin:10px 0}.v2-transaction-proof{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:10px 12px;margin:10px 0;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}.v2-transaction-proof>div:first-child{min-width:0}.v2-proof-records{display:flex;gap:7px;align-items:center;white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:750}.v2-leader-card{padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}.v2-event-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:14px 0 6px}.v2-event-feed{max-height:480px;overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}.v2-event-line{display:grid;grid-template-columns:76px minmax(0,1fr) 52px;gap:10px;align-items:start;padding:8px 10px;border-bottom:1px solid var(--line)}.v2-event-line:last-child{border-bottom:0}.v2-event-clock{font-variant-numeric:tabular-nums;font-size:11px;color:var(--muted);white-space:nowrap}.v2-event-copy{min-width:0;font-size:12px}.v2-event-copy strong,.v2-event-copy small{display:block}.v2-event-copy small{color:var(--muted);margin-top:2px}.v2-event-score{text-align:right;font-variant-numeric:tabular-nums;font-weight:750;font-size:12px}
 @media(max-width:620px){.v2-shadow-score{grid-template-columns:1fr auto 1fr;gap:8px}.v2-shadow-score strong{font-size:26px}.v2-shadow-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.v2-transaction-proof{align-items:flex-start;flex-direction:column}.v2-event-line{grid-template-columns:68px minmax(0,1fr) 42px;gap:7px;padding:8px}.v2-event-head{align-items:flex-start;flex-direction:column}}
 
-.v2-release-host{overflow:hidden;padding:0}.v2-release-recap{display:grid;gap:0}.v2-release-kicker{display:flex;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line,#2b3440);font-size:.76rem;letter-spacing:.08em}.v2-release-kicker span{font-weight:800}.v2-release-kicker strong{font-weight:600;color:var(--muted,#9ca8b8);letter-spacing:0}.v2-release-score{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;padding:22px 18px}.v2-release-team{display:flex;align-items:center;gap:10px;font-size:1.05rem;font-weight:750}.v2-release-team.home{justify-content:flex-end;text-align:right}.v2-release-team b{font-size:2.3rem;line-height:1}.v2-release-final{font-size:.78rem;font-weight:850;letter-spacing:.12em;padding:7px 10px;border:1px solid var(--line,#2b3440);border-radius:999px}.v2-release-metrics{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line,#2b3440);border-bottom:1px solid var(--line,#2b3440)}.v2-release-metrics>div{display:grid;gap:3px;padding:12px 14px;text-align:center;border-right:1px solid var(--line,#2b3440)}.v2-release-metrics>div:last-child{border-right:0}.v2-release-metrics span,.v2-release-section-head span{font-size:.72rem;color:var(--muted,#9ca8b8);text-transform:uppercase;letter-spacing:.06em}.v2-release-metrics strong{font-size:1rem}.v2-release-section{padding:15px 16px;border-bottom:1px solid var(--line,#2b3440)}.v2-release-section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}.v2-release-drive-strip{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px}.v2-release-drive{min-width:76px;padding:7px 8px;border:1px solid var(--line,#2b3440);border-radius:8px;display:grid;gap:2px;font-size:.75rem}.v2-release-drive b{font-size:.66rem;color:var(--muted,#9ca8b8)}.v2-release-drive small{font-size:.63rem;color:var(--muted,#9ca8b8);white-space:nowrap}.v2-release-drive.score{border-color:color-mix(in srgb,currentColor 35%,transparent)}.v2-release-drive.turnover{box-shadow:inset 3px 0 0 currentColor}.v2-release-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}.v2-release-grid>section{padding:16px}.v2-release-grid>section+section{border-left:1px solid var(--line,#2b3440)}.v2-release-scoring-row{display:grid;grid-template-columns:42px 1fr auto;gap:9px;align-items:center;padding:7px 0;border-bottom:1px solid color-mix(in srgb,currentColor 10%,transparent);font-size:.78rem}.v2-release-scoring-row span{color:var(--muted,#9ca8b8);font-weight:750}.v2-release-scoring-row b{font-variant-numeric:tabular-nums}.v2-release-leader-team+h4{margin-top:12px}.v2-release-leader-team h4{margin:9px 0 5px}.v2-release-leader{display:grid;grid-template-columns:42px 1fr;gap:8px;padding:5px 0;font-size:.75rem}.v2-release-leader span{color:var(--muted,#9ca8b8);font-weight:800}.v2-release-leader strong{font-weight:650}@media(max-width:760px){.v2-release-score{grid-template-columns:1fr;gap:10px;text-align:center}.v2-release-team,.v2-release-team.home{justify-content:center}.v2-release-team.home{flex-direction:row-reverse}.v2-release-final{justify-self:center}.v2-release-metrics{grid-template-columns:repeat(2,1fr)}.v2-release-metrics>div:nth-child(2){border-right:0}.v2-release-metrics>div:nth-child(-n+2){border-bottom:1px solid var(--line,#2b3440)}.v2-release-grid{grid-template-columns:1fr}.v2-release-grid>section+section{border-left:0;border-top:1px solid var(--line,#2b3440)}.v2-release-kicker{display:grid}}
+.v2-release-host{overflow:hidden;padding:0}.v2-release-recap{display:grid;grid-template-columns:minmax(0,1fr);gap:0}.v2-release-recap>*{min-width:0}.v2-release-kicker{display:flex;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line,#2b3440);font-size:.76rem;letter-spacing:.08em}.v2-release-kicker span{font-weight:800}.v2-release-kicker strong{font-weight:600;color:var(--muted,#9ca8b8);letter-spacing:0}.v2-release-score{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;padding:22px 18px}.v2-release-team{display:flex;align-items:center;gap:10px;font-size:1.05rem;font-weight:750}.v2-release-team.home{justify-content:flex-end;text-align:right}.v2-release-team b{font-size:2.3rem;line-height:1}.v2-release-final{font-size:.78rem;font-weight:850;letter-spacing:.12em;padding:7px 10px;border:1px solid var(--line,#2b3440);border-radius:999px}.v2-release-metrics{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line,#2b3440);border-bottom:1px solid var(--line,#2b3440)}.v2-release-metrics>div{display:grid;gap:3px;padding:12px 14px;text-align:center;border-right:1px solid var(--line,#2b3440)}.v2-release-metrics>div:last-child{border-right:0}.v2-release-metrics span,.v2-release-section-head span{font-size:.72rem;color:var(--muted,#9ca8b8);text-transform:uppercase;letter-spacing:.06em}.v2-release-metrics strong{font-size:1rem}.v2-release-section{padding:15px 16px;border-bottom:1px solid var(--line,#2b3440)}.v2-release-section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}.v2-release-drive-strip{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px}.v2-release-drive{min-width:76px;padding:7px 8px;border:1px solid var(--line,#2b3440);border-radius:8px;display:grid;gap:2px;font-size:.75rem}.v2-release-drive b{font-size:.66rem;color:var(--muted,#9ca8b8)}.v2-release-drive small{font-size:.63rem;color:var(--muted,#9ca8b8);white-space:nowrap}.v2-release-drive.score{border-color:color-mix(in srgb,currentColor 35%,transparent)}.v2-release-drive.turnover{box-shadow:inset 3px 0 0 currentColor}.v2-release-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}.v2-release-grid>section{padding:16px}.v2-release-grid>section+section{border-left:1px solid var(--line,#2b3440)}.v2-release-scoring-row{display:grid;grid-template-columns:42px 1fr auto;gap:9px;align-items:center;padding:7px 0;border-bottom:1px solid color-mix(in srgb,currentColor 10%,transparent);font-size:.78rem}.v2-release-scoring-row span{color:var(--muted,#9ca8b8);font-weight:750}.v2-release-scoring-row b{font-variant-numeric:tabular-nums}.v2-release-leader-team+h4{margin-top:12px}.v2-release-leader-team h4{margin:9px 0 5px}.v2-release-leader{display:grid;grid-template-columns:42px 1fr;gap:8px;padding:5px 0;font-size:.75rem}.v2-release-leader span{color:var(--muted,#9ca8b8);font-weight:800}.v2-release-leader strong{font-weight:650;min-width:0;overflow-wrap:anywhere}.v2-release-scoring-row strong{min-width:0}.v2-release-scoring-row small{display:block;font-weight:500;color:var(--muted,#9ca8b8)}.v2-release-team{min-width:0}.v2-release-team span{min-width:0;overflow-wrap:anywhere}@media(max-width:760px){.v2-release-score{grid-template-columns:1fr;gap:10px;text-align:center}.v2-release-team,.v2-release-team.home{justify-content:center}.v2-release-team.home{flex-direction:row-reverse}.v2-release-final{justify-self:center}.v2-release-metrics{grid-template-columns:repeat(2,1fr)}.v2-release-metrics>div:nth-child(2){border-right:0}.v2-release-metrics>div:nth-child(-n+2){border-bottom:1px solid var(--line,#2b3440)}.v2-release-grid{grid-template-columns:1fr}.v2-release-grid>section+section{border-left:0;border-top:1px solid var(--line,#2b3440)}.v2-release-kicker{display:grid}}
 
 .v2-gameday-host{border-color:#42516a;background:linear-gradient(180deg,#151c27,#131922)}
 .v2-gameday-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:14px}
@@ -2477,7 +2477,8 @@ button:not(:disabled):active{transform:translateY(1px) scale(.985)}
 .program-peek-head p{margin:2px 0 0;font-size:12.5px}
 .program-peek form{margin-top:14px;display:flex;justify-content:flex-end}
 
-@media(max-width:700px){.hud-toasts{left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom,0px));max-width:none}}
+/* Phones: notices sit under the header, clear of the bottom navigation and the primary action above it. */
+@media(max-width:700px){.hud-toasts{left:12px;right:12px;top:calc(58px + env(safe-area-inset-top,0px));bottom:auto;max-width:none}}
 
 .gate-note{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0 0 14px;padding:10px 14px;border:1px solid rgba(242,193,78,.4);border-radius:10px;background:rgba(242,193,78,.08);color:#f2d68a;font-size:.88rem}
 .gate-note[hidden]{display:none}
@@ -3295,6 +3296,8 @@ button.lw-follow[aria-pressed="true"]{color:var(--text);border-color:var(--team-
 .gameday-event-hero:not(:has(.event-recent)){gap:0}
 /* Around your program only takes space when it has something to say. */
 #weeklyWorldBriefing:not(:has(.lw-brief)) .lw-heading{display:none}
+/* v0.17.2: on phones an achievement sits below the notices rather than on top of them. */
+@media(max-width:700px){.lg-toast{top:calc(128px + env(safe-area-inset-top,0px))}}
 </style></head><body>
 <section id="titleScreen" class="title-screen" aria-labelledby="titleGameName">
   <div class="title-screen-art" aria-hidden="true"></div>
@@ -3352,7 +3355,7 @@ button.lw-follow[aria-pressed="true"]{color:var(--text);border-color:var(--team-
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.17.1</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.17.2</b></span></footer>
   </div>
 </section>
 
@@ -3379,7 +3382,7 @@ button.lw-follow[aria-pressed="true"]{color:var(--text);border-color:var(--team-
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.17.1</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.17.2</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -5157,9 +5160,9 @@ function marginFor(state,side){return(state.score[side]||0)-(state.score[other(s
 function playbookFourthDown(state){
   if(!state||state.down!==4||state.period>4)return null;
   const side=state.possession,p=playbookFor(state,side);if(!p||!p.fourthDown||p.fourthDown==='standard')return null;
-  const margin=marginFor(state,side),fgRange=state.fieldPosition>=58;
-  // Late and behind, a field goal only when it ties or takes the lead; otherwise keep the ball.
-  if(state.period===4&&state.clock<=LATE_SECONDS&&margin<0)return fgRange&&margin>=-3?'field_goal':'play';
+  const margin=marginFor(state,side),fgRange=fieldGoalInRange(state);
+  // Late and behind, a field goal only when it ties or takes the lead; otherwise keep the ball. A long shot is worth it then.
+  if(state.period===4&&state.clock<=LATE_SECONDS&&margin<0)return fieldGoalInRange(state,FG_DESPERATE_CHANCE)&&margin>=-3?'field_goal':'play';
   if(p.fourthDown==='aggressive'){
     if(state.distance<=2&&state.fieldPosition>=35)return'play';
     if(state.distance<=4&&state.fieldPosition>=55&&state.fieldPosition<70)return'play';
@@ -5196,11 +5199,27 @@ function sanitizePlaybook(value){
   return out;
 }
 // Wind, wet or frozen balls and thin air move a field goal's odds; without rules this is the original curve.
+// Past 52 yards the odds fall away quickly, as they do for college kickers: about 43% from 55, 38% from 56, 24% from 59.
 function fieldGoalChance(state,distance){
-  const base=.97-Math.max(0,distance-30)*.018;
-  if(!rulesOf(state))return clamp(base,.18,.97);
+  const base=.97-Math.max(0,distance-30)*.018-Math.max(0,distance-52)*.03;
+  if(!rulesOf(state))return clamp(base,.02,.97);
   const e=effectsOf(state);
-  return clamp(base-e.fgFlat-e.fgPerYard*Math.max(0,distance-25),.12,.98);
+  return clamp(base-e.fgFlat-e.fgPerYard*Math.max(0,distance-25),.02,.98);
+}
+// One rule for every caller (simulated games, staff advice, the options a coach is offered): a kick is in range when
+// it is made often enough in these conditions. Wind and rain shorten the range because they lower the odds.
+const FG_TRY_CHANCE=0.42,FG_DESPERATE_CHANCE=.12,FG_OFFER_CHANCE=.05;
+function fieldGoalDistance(state){return Math.round(100-state.fieldPosition+17)}
+function fieldGoalInRange(state,floor=FG_TRY_CHANCE){return fieldGoalChance(state,fieldGoalDistance(state))>=floor}
+// The default fourth-down call. goShort is the profile-driven sim's extra rule: keep the ball on 4th and 2 or less past the own 45.
+function defaultFourthDown(state,goShort=false){
+  if(state.down!==4)return 'play';
+  if(goShort&&state.distance<=2&&state.fieldPosition>=45)return 'play';
+  if(state.distance>2&&fieldGoalInRange(state))return 'field_goal';
+  // Too far to kick, too close to punt well: go on 4th and 5 or less, otherwise pin them deep.
+  if(state.distance>2&&state.fieldPosition>=58)return state.distance<=5?'play':'punt';
+  if(state.fieldPosition<60&&state.distance>1)return 'punt';
+  return 'play';
 }
 function attemptFieldGoal(state){
   requireStatus(state,'live');if(state.period>4)throw new Error('Use overtime resolution for overtime field goals.');
@@ -5260,12 +5279,7 @@ function generateOutcome(state){
   }
   finishRng(state,rng);return outcome;
 }
-function chooseFourthDown(state){
-  if(state.down!==4)return 'play';
-  if(state.fieldPosition>=58&&state.distance>2)return 'field_goal';
-  if(state.fieldPosition<60&&state.distance>1)return 'punt';
-  return 'play';
-}
+function chooseFourthDown(state){return defaultFourthDown(state)}
 function step(state){
   requireStatus(state,'live');
   if(state.period>4)return stepOvertime(state);
@@ -5370,7 +5384,7 @@ function validateGame(state){
   return true;
 }
 
-return{ENGINE_VERSION,RULES_VERSION,PENALTY_TYPES,fieldGoalChance,QUARTER_SECONDS,PLAYBOOK_OPTIONS,normalizeRules,effectsOf,kickoffTo,TWO_POINT_CHART,playbookFourthDown,playbookTwoPoint,playbookTempo,playbookClock,sanitizePlaybook,createGame,startGame,step,simulate,applyScrimmage,attemptFieldGoal,punt,snapshot,restore,scoringTotals,validateState,validateGame,generateOutcome};
+return{ENGINE_VERSION,RULES_VERSION,PENALTY_TYPES,fieldGoalChance,fieldGoalDistance,fieldGoalInRange,defaultFourthDown,FG_TRY_CHANCE,FG_DESPERATE_CHANCE,FG_OFFER_CHANCE,QUARTER_SECONDS,PLAYBOOK_OPTIONS,normalizeRules,effectsOf,kickoffTo,TWO_POINT_CHART,playbookFourthDown,playbookTwoPoint,playbookTempo,playbookClock,sanitizePlaybook,createGame,startGame,step,simulate,applyScrimmage,attemptFieldGoal,punt,snapshot,restore,scoringTotals,validateState,validateGame,generateOutcome};
 });
 (function(root,factory){
   const engine=(typeof module==='object'&&module.exports)?require('./game-engine-v2.js'):root.DynastyGameEngineV2;
@@ -5397,9 +5411,7 @@ function fieldGoalDistance(state){return Math.round(100-state.fieldPosition+17)}
 function normalizeAction(value){const action=String(value||'').toLowerCase();return action==='play'?'go':action}
 function oldFourthDownPolicy(state){
   if(state.down!==4)return null;
-  if(state.fieldPosition>=58&&state.distance>2)return 'field_goal';
-  if(state.fieldPosition<60&&state.distance>1)return 'punt';
-  return 'go';
+  return normalizeAction(engine.defaultFourthDown(state));
 }
 function policyAction(state,hooks={}){
   const raw=typeof hooks.defaultAction==='function'?hooks.defaultAction(state):oldFourthDownPolicy(state);
@@ -5421,7 +5433,8 @@ function optionList(state){
     {id:'go',label:'Go for it'},
     {id:'punt',label:'Punt'}
   ];
-  if(fg<=67)options.push({id:'field_goal',label:`Try ${fg}-yard field goal`});
+  // Offer only a kick that can be made in these conditions; nobody lines up a 65-yarder in the rain.
+  if(engine.fieldGoalInRange(state,engine.FG_OFFER_CHANCE))options.push({id:'field_goal',label:`Try ${fg}-yard field goal`});
   options.push({id:'delegate',label:'Delegate to staff'});
   return options
 }
@@ -5674,13 +5687,7 @@ function annotateOutcomeEvent(state,startIndex,outcome){
   }
   return null;
 }
-function shadowDecision(state){
-  if(state.down!==4)return'play';
-  if(state.distance<=2&&state.fieldPosition>=45)return'play';
-  if(state.fieldPosition>=58&&state.distance>2)return'field_goal';
-  if(state.fieldPosition<60&&state.distance>1)return'punt';
-  return'play';
-}
+function shadowDecision(state){return GameEngineV2.defaultFourthDown(state,true)}
 // Situational playbooks by side ({home, away}); a side without one plays the default policy.
 function attachPlaybook(state,playbook){
   if(!playbook||typeof playbook!=='object')return state;
@@ -7004,7 +7011,7 @@ return{guidanceMode,classifyAgenda,buildCarryForward,buildBriefing,buildPrepPath
     if(p.pos==='QB')return`${s.passYds||0} pass yd · ${s.passTD||0} TD · ${s.int||0} INT`;
     if(p.pos==='RB')return`${s.rushYds||0} rush yd · ${s.rushTD||0} rush TD`;
     if(['WR','TE'].includes(p.pos))return`${s.receptions||0} rec · ${s.recYds||0} yd · ${s.recTD||0} TD`;
-    if(['EDGE','DT','LB','CB','S'].includes(p.pos))return`${s.tackles||0} tackles · ${s.sacks||0} sacks · ${s.intDef||0} INT`;
+    if(['EDGE','DT','LB','CB','S'].includes(p.pos))return`${s.tackles||0} tackle${s.tackles===1?'':'s'} · ${s.sacks||0} sack${s.sacks===1?'':'s'} · ${s.intDef||0} INT`;
     return`${s.starts||0} starts · ${s.games||0} games`
   }
   function buildPlayerStories(players=[],context={}){
@@ -7096,7 +7103,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.17.1';
+const APP_VERSION='0.17.2';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi','Aiden','Alex','Amari','Andrew','Anthony','Antonio','Armani','Ashton','Austin','Avery','Bennett','Blake','Brady','Brandon','Brayden','Brennan','Brock','Bryson','Cade','Caden','Calvin','Cameron','Carson','Cedric','Chase','Christian','Cody','Colby','Collin','Connor','Corey','Damian','Damon','Daniel','Davion','Dawson','Deandre','Demarcus','Derek','Desmond','Dillon','Drew','Dylan','Elijah','Ethan','Ezra','Garrett','Grady','Graham','Grant','Hayden','Hunter','Ian','Isaac','Jabari','Jace','Jackson','Jacob','Jaden','Jake','Jamar','Jameson','Jared','Jarrett','Javon','Jaxon','Jay','Jermaine','Jesse','Joel','Jonah','Josiah','Julian','Justin','Kaden','Kai','Kamari','Keegan','Keenan','Kendall','Kendrick','Kevin','Kobe','Kyle','Kyler','Lamar','Landon','Lane','Lawrence','Leon','Levi','Lincoln','Lucas','Marco','Mario','Mateo','Matthew','Maurice','Max','Myles','Nate','Nathan','Nolan','Omar','Owen','Parker','Patrick','Preston','Quentin','Quincy','Reggie','Riley','Ryan','Sam','Sean','Seth','Shane','Silas','Solomon','Spencer','Sterling','Terrell','Theo','Tobias','Travis','Tristan','Troy','Tucker','Tyrese','Victor','Wade','Walker','Wes','Wyatt','Zach','Zane','Andres','Diego','Rafael','Tevita','Sione','Manu','Keoni','Kenji','Darnell'];
@@ -8405,7 +8412,7 @@ function recapStarLine(g,f,pick){
  if(passer){const s=passer.stats,td=s.passTD||0,int=s.int||0;
   bits.push(`${gameEscape(passer.name)} threw for ${s.passYds} yards${s.passComp?` on ${s.passComp}-of-${s.passAtt||s.passComp}`:''}${td?` with ${td} touchdown${td===1?'':'s'}`:''}${int?` and ${int} interception${int===1?'':'s'}`:''}`)}
  if(rusher){const s=rusher.stats;
-  bits.push(`${gameEscape(rusher.name)} ran for ${s.rushYds} yards${s.rushAtt?` on ${s.rushAtt} carries`:''}${s.rushTD?` and ${s.rushTD===1?'a score':`${s.rushTD} scores`}`:''}`)}
+  bits.push(`${gameEscape(rusher.name)} ran for ${s.rushYds} yards${s.rushAtt?` on ${s.rushAtt} carr${s.rushAtt===1?'y':'ies'}`:''}${s.rushTD?` and ${s.rushTD===1?'a score':`${s.rushTD} scores`}`:''}`)}
  if(receiver&&bits.length<3){const s=receiver.stats;
   bits.push(`${gameEscape(receiver.name)} caught ${s.receptions||0} passes for ${s.recYds} yards${s.recTD?' and a score':''}`)}
  if(!bits.length){
@@ -8740,7 +8747,8 @@ function openingPreseason(target=universe){return !!target&&target.phase==='pres
 const SEASON_STAGE_LABELS={confReady:'Conference championships',bowlReady:'Bowl season',playoffReady:'Playoff',complete:'Season complete'};
 function seasonStageLabel(target=universe){
  if(openingPreseason(target))return 'Preseason';
- if(target.phase==='regular')return target.week===0?'Regular season · Opening week':`Regular season · Week ${target.week}`;
+ // universe.week counts completed weeks; every screen names the week being prepared, so the label does too.
+ if(target.phase==='regular')return `Regular season · Week ${target.week+1}`;
  return SEASON_STAGE_LABELS[target.phase]||`${target.phase} · Week ${target.week}`;
 }
 function beginSeason(){
@@ -10788,7 +10796,7 @@ function render(){
  $('#teamName').textContent=u.name;const mm=$('.masthead-mark');if(mm){mm.innerHTML=teamLogoHTML(u.id,48);mm.classList.add('has-logo')}
  $('#teamMeta').textContent=`${u.conference} · ${u.offScheme} / ${u.defScheme} · Prestige ${u.prestige} · Ceiling ${u.program_ceiling}`;
  $('#teamMetrics').innerHTML=[['Offense',grade(p.offense)],['Defense',grade(p.defense)],['Scheme Fit',grade((p.offFit+p.defFit)/2)],['Development',grade(u.development)]].map(x=>`<div class="metric"><div class="small muted">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');
- $('#recordBig').textContent=`${u.w}–${u.l}`;$('#rankLine').textContent=preseason?`Preseason · #${u.rank} nationally`:u.rank<=25?`#${u.rank} nationally`:`#${u.rank} nationally · outside the top 25`;$('#weekLine').textContent=preseason?`${universe.year} · Preseason`:universe.phase!=='regular'&&SEASON_STAGE_LABELS[universe.phase]?`${universe.year} · ${universe.phase==='complete'&&universe.offseason?.year===universe.year&&(universe.offseason.completed||[]).includes('review')?'Offseason':SEASON_STAGE_LABELS[universe.phase]}`:`${universe.year} · ${universe.week===0?'Opening week':`Week ${universe.week}`}`;
+ $('#recordBig').textContent=`${u.w}–${u.l}`;$('#rankLine').textContent=preseason?`Preseason · #${u.rank} nationally`:u.rank<=25?`#${u.rank} nationally`:`#${u.rank} nationally · outside the top 25`;$('#weekLine').textContent=preseason?`${universe.year} · Preseason`:universe.phase!=='regular'&&SEASON_STAGE_LABELS[universe.phase]?`${universe.year} · ${universe.phase==='complete'&&universe.offseason?.year===universe.year&&(universe.offseason.completed||[]).includes('review')?'Offseason':SEASON_STAGE_LABELS[universe.phase]}`:`${universe.year} · Week ${universe.week+1}`;
  $('#top15').innerHTML=order.slice(0,15).map((t,i)=>`<div class="rankrow${t.name===u.name?' target':''}"><div><span class="rank">${i+1}.</span> ${teamLogoHTML(t.id,20,'team-logo--inline')} ${t.name}</div><div>${t.w}-${t.l}</div></div>`).join('');
  const leaders=u.roster.slice().sort((a,b)=>b.perceived-a.perceived).slice(0,5);$('#snapshot').innerHTML=`<div class="lineitem"><span>Roster</span><strong>${u.roster.length}</strong></div><div class="lineitem"><span>Protected redshirts</span><strong>${u.roster.filter(p=>p.redshirtActive).length}</strong></div><div class="lineitem"><span>Commits</span><strong>${u.commits.length}</strong></div><div class="lineitem"><span>Head Coach</span><strong>${u.staff.HC.name}</strong></div><div class="lineitem"><span>PF / PA</span><strong>${u.pf} / ${u.pa}</strong></div>`+leaders.map(x=>`<div class="lineitem compact"><span>${x.pos} ${x.name}</span><span>${playerGrade(x)} · ${x.style}</span></div>`).join('');
  renderWeeklyDecisions();if(typeof renderGuidanceSystem==='function')renderGuidanceSystem();renderWeeklyHub();renderActiveTab();$('#simConf').disabled=universe.phase!=='confReady';$('#simBowls').disabled=universe.phase!=='bowlReady';$('#simPlayoff').disabled=universe.phase!=='playoffReady';
@@ -11273,7 +11281,7 @@ function bindPortalControls(){
 }
 
 function findPlayer(id){const pending=(universe.transferPortal||[]).find(x=>x.p.id===id);if(pending)return {p:pending.p,team:null,active:false,portal:true};if(!IDX.players)rebuildIndexes();let h=IDX.players.get(id);if(h&&universe.teams[h.i]===h.t&&h.t.roster.includes(h.p))return {p:h.p,team:h.t,active:true};if(IDX.pop!==rosterPopulation()||(h&&!IDX.archive.has(id))){rebuildIndexes();h=IDX.players.get(id);if(h)return {p:h.p,team:h.t,active:true}}indexArchive();let p=IDX.archive.get(id);if(p)return {p,team:p.lastTeam?{name:p.lastTeam}:null,active:false};if(IDX.miss!==id){IDX.miss=id;rebuildIndexes();h=IDX.players.get(id);if(h)return {p:h.p,team:h.t,active:true}}return null}
-function statLine(s){if(!s)return 'No recorded statistics.';let a=[];if(s.passAtt||s.passYds){let pct=s.passAtt?Math.round((s.passComp||0)/s.passAtt*1000)/10:0;a.push(`${s.passComp||0}/${s.passAtt||0} (${pct}%) · ${s.passYds||0} pass yds · ${s.passTD||0} TD · ${s.int||0} INT`)}if(s.rushAtt||s.rushYds)a.push(`${s.rushAtt||0} car · ${s.rushYds||0} rush yds · ${s.rushTD||0} TD`);if(s.targets||s.recYds)a.push(`${s.receptions||0}/${s.targets||0} rec · ${s.recYds||0} yds · ${s.recTD||0} TD`);if(s.tackles||s.sacks||s.intDef)a.push(`${s.tackles||0} tackles · ${s.tfl||0} TFL · ${s.sacks||0} sacks · ${s.pressures||0} pressures · ${s.intDef||0} INT`);if(s.snaps&&!(s.passYds||s.rushYds||s.recYds||s.tackles))a.push(`${s.snaps} snaps · ${s.sacksAllowed||0} sacks allowed · ${s.pressuresAllowed||0} pressures allowed`);return a.join(' · ')||`${s.games||0} games`}
+function statLine(s){if(!s)return 'No recorded statistics.';let a=[];if(s.passAtt||s.passYds){let pct=s.passAtt?Math.round((s.passComp||0)/s.passAtt*1000)/10:0;a.push(`${s.passComp||0}/${s.passAtt||0} (${pct}%) · ${s.passYds||0} pass yds · ${s.passTD||0} TD · ${s.int||0} INT`)}if(s.rushAtt||s.rushYds)a.push(`${s.rushAtt||0} car · ${s.rushYds||0} rush yds · ${s.rushTD||0} TD`);if(s.targets||s.recYds)a.push(`${s.receptions||0}/${s.targets||0} rec · ${s.recYds||0} yds · ${s.recTD||0} TD`);if(s.tackles||s.sacks||s.intDef)a.push(`${s.tackles||0} tackle${s.tackles===1?'':'s'} · ${s.tfl||0} TFL · ${s.sacks||0} sacks · ${s.pressures||0} pressures · ${s.intDef||0} INT`);if(s.snaps&&!(s.passYds||s.rushYds||s.recYds||s.tackles))a.push(`${s.snaps} snaps · ${s.sacksAllowed||0} sacks allowed · ${s.pressuresAllowed||0} pressures allowed`);return a.join(' · ')||`${s.games||0} games`}
 function showPlayerProfile(id){let f=findPlayer(id);if(!f&&archiveIsDeferred()){const current=universe;return ensureArchiveLoaded().then(()=>{if(universe===current)showPlayerProfile(id)}).catch(e=>{if(universe===current)setStatus(e.message)})}if(!f)return;const p=f.p,t=f.team;{const ph=$('#playerDialogPortrait');if(ph){ph.innerHTML=portraitTag(p,192,'profile');}}
  $('#playerDialogName').textContent=p.name;$('#playerDialogMeta').textContent=`${p.pos} · ${eligibilityLabel(p)} · ${heightStr(p.height)} / ${p.weight} · ${p.style}${t?` · ${t.name}`:''}`;$('#playerDialogKicker').textContent=f.portal?'TRANSFER PORTAL':f.active?'ACTIVE PLAYER':'PLAYER ARCHIVE';if(f.active&&t)ensurePlayerDevelopment(p,t);let attrs=[['Current',f.active&&t?scoutRangeText(p,t,false):grade(p.perceived)],['Upside',f.active&&t?scoutRangeText(p,t,true):grade(p.perceivedUpside)],['Scout Confidence',f.active?`${Math.round(p.scoutConfidence||50)}%`:'Final'],['Health',p.health??100]];let injury=(p.injuryWeeks||0)>0?`<div class="injury-note"><strong>${p.injury}</strong> · expected ${p.injuryWeeks} more week${p.injuryWeeks===1?'':'s'}.</div>`:'';let hist=careerChronologyHTML(p),aw=(p.awards||[]).slice().reverse().map(a=>`<div class="lineitem"><span>${a.year}</span><strong>${a.name}</strong></div>`).join('')||'<div class="muted">No major awards.</div>',draft=p.draftResult?`<div class="lineitem"><span>${p.draftResult.year} Draft</span><strong>${p.draftResult.label}</strong></div>`:'';$('#playerDialogBody').innerHTML=`${injury}${f.active&&t?scoutingPanelHTML(p,t):''}<div class="profile-grid">${attrs.map(x=>`<div class="profile-stat"><div class="small muted">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('')}</div><div class="profile-sections"><section class="profile-section"><h3>Season</h3><div class="profile-callout"><span class="eyebrow">Production</span><strong>${statLine(p.stats)}</strong></div><div class="lineitem"><span>Eligibility</span><strong>${eligibilityLabel(p)}</strong></div><div class="lineitem"><span>Redshirt</span><strong>${p.redshirtUsed?`Used${p.redshirtSeason?' in '+p.redshirtSeason:''}`:p.redshirtActive?'Protected this year':'Available'}</strong></div><div class="lineitem"><span>Origin</span><strong>${p.origin||'—'}</strong></div></section><section class="profile-section"><h3>Development</h3><div class="lineitem"><span>Training focus</span><strong>${p.trainingFocus||'Balanced'}</strong></div><div class="lineitem"><span>Position familiarity</span><strong>${familiarity(p,p.pos)}%</strong></div><div class="lineitem"><span>Wear</span><strong>${p.wear||0}/100</strong></div><div class="profile-note">${f.active&&t?devStaffNote(p,t):'Career complete'}</div></section><section class="profile-section"><h3>Health</h3><div class="lineitem"><span>Status</span><strong>${f.active?healthText(p):(f.portal?'Awaiting a destination':p.exitReason||'Career complete')}</strong></div><div class="lineitem"><span>Injuries recorded</span><strong>${p.injuryHistory?.length||0}</strong></div><div class="lineitem"><span>Promise</span><strong>${p.promise||'None'}</strong></div></section><section class="profile-section"><h3>Career</h3><div class="lineitem"><span>Career production</span><strong>${statLine(p.career)}</strong></div>${draft}<div class="profile-subhead">Honors</div>${aw}</section></div>${scoutingHistoryHTML(p)}${promiseHTML(p)}${transferHistoryHTML(p)}<section class="profile-section profile-section--wide"><h3>Career Chronology</h3><div class="timeline">${hist}</div></section>`;let d=$('#playerDialog');d.dataset.lwEntity=`player:${p.id}`;if(d.showModal)d.showModal();else d.setAttribute('open','');paintPortraits(d)}
 // v0.12.13 — history index models. Read-only over collections the dynasty already
@@ -11694,7 +11702,7 @@ function saveBrowser(){return storageOperation(async()=>{
   const occupied=activeSlotMeta()&&!activeSlotMeta().empty&&!currentArchiveState();
   if(occupied&&!confirm(`Replace ${activeSlotMeta().label}? Its current dynasty will be overwritten.`))return false;
   const target=universe,slot=activeSaveSlot;await writeBrowserSave('manual');
-  if(target===universe&&slot===activeSaveSlot)setStatus(`Saved ${universe.year}, Week ${universe.week} to ${activeSlotMeta()?.label||savedDynastyLabel()} ${storageLocation()}.`);
+  if(target===universe&&slot===activeSaveSlot)setStatus(`Saved ${universe.year}, ${seasonStageLabel()} to ${activeSlotMeta()?.label||savedDynastyLabel()} ${storageLocation()}.`);
 })}
 
 // Autosave fires only after a completed atomic action, never mid-transaction. The debounce
@@ -11808,7 +11816,7 @@ function applyTitlePreferences(){const p=titlePreferences();document.body.classL
 function saveTitlePreferences(){const p={motion:$('#titleMotion').checked,watchSpeed:$('#titleWatchSpeed').value};try{localStorage.setItem('dynastyLabPreferences',JSON.stringify(p))}catch{setTitleStatus('Options could not be saved. Check this device\'s storage settings.');return}applyTitlePreferences();setTitleStatus('Options saved on this device.');showTitlePanel()}
 function setTitleStatus(x){if($('#titleStatus'))$('#titleStatus').textContent=x}
 function slotBytes(n){if(!Number.isFinite(n)||n<=0)return'';const mb=n/1048576;return mb>=10?`${mb.toFixed(0)} MB`:`${mb.toFixed(1)} MB`}
-function titleCalendarStage(phase,week){if(phase==='preseason')return'Preseason';if(phase==='regular')return week?`Week ${week}`:'Week 1 ready';if(phase==='complete')return'Season complete';return'Postseason'}
+function titleCalendarStage(phase,week){if(phase==='preseason')return'Preseason';if(phase==='regular')return `Week ${(Number(week)||0)+1}`;if(phase==='complete')return'Season complete';return'Postseason'}
 function titleSummary(d){
  if(d?.program){const stage=titleCalendarStage(d.phase,d.week);return `${d.program} · ${d.year} · ${stage}${d.record?` · ${d.record}`:''}${d.approximateBytes?` · ${slotBytes(d.approximateBytes)}`:''}`}
  const u=d?.universe;if(!u||!Array.isArray(u.teams))return'';const name=d.userTeam||u.teams[0]?.name||'Unknown program',t=u.teams.find(x=>x.name===name),stage=titleCalendarStage(u.phase,u.week);return `${name} · ${u.year} · ${stage}${t?` · ${t.w}-${t.l}`:''}`;
@@ -15240,7 +15248,7 @@ else{
  function archiveTeamId(record,side){const x=record?.[side];return Number(x?.id)||T(archiveTeamName(record,side))?.id||null}
  function archiveScore(record,side){const score=record?.score;if(Number.isFinite(Number(score?.[side])))return Number(score[side]);if(Array.isArray(score))return Number(score[side==='home'?0:1])||0;return 0}
  function performerImpact(line){const s=line?.stats||{};return (s.passYds||0)*.035+(s.passTD||0)*5-(s.int||0)*3+(s.rushYds||0)*.08+(s.rushTD||0)*5+(s.recYds||0)*.08+(s.recTD||0)*5+(s.tackles||0)*.8+(s.tfl||0)*1.6+(s.sacks||0)*3.5+(s.intDef||0)*4.5+(s.forcedFumbles||0)*3}
- function performerSummary(line){const s=line?.stats||{},parts=[];if(s.passYds)parts.push(`${s.passYds} pass yds`);if(s.passTD)parts.push(`${s.passTD} pass TD`);if(s.rushYds)parts.push(`${s.rushYds} rush yds`);if(s.rushTD)parts.push(`${s.rushTD} rush TD`);if(s.recYds)parts.push(`${s.recYds} rec yds`);if(s.recTD)parts.push(`${s.recTD} rec TD`);if(s.tackles)parts.push(`${s.tackles} tackles`);if(s.sacks)parts.push(`${s.sacks} sacks`);if(s.intDef)parts.push(`${s.intDef} INT`);return parts.slice(0,2).join(' · ')||'Contributed in the win/loss'}
+ function performerSummary(line){const s=line?.stats||{},parts=[];if(s.passYds)parts.push(`${s.passYds} pass yds`);if(s.passTD)parts.push(`${s.passTD} pass TD`);if(s.rushYds)parts.push(`${s.rushYds} rush yds`);if(s.rushTD)parts.push(`${s.rushTD} rush TD`);if(s.recYds)parts.push(`${s.recYds} rec yds`);if(s.recTD)parts.push(`${s.recTD} rec TD`);if(s.tackles)parts.push(`${s.tackles} tackle${s.tackles===1?'':'s'}`);if(s.sacks)parts.push(`${s.sacks} sack${s.sacks===1?'':'s'}`);if(s.intDef)parts.push(`${s.intDef} INT`);return parts.slice(0,2).join(' · ')||'Contributed in the win/loss'}
  function latestShowcase(u){
   const records=(universe.gameArchive||[]).filter(r=>{const h=archiveTeamName(r,'home'),a=archiveTeamName(r,'away');return h===u.name||a===u.name}).slice().sort((a,b)=>(b.season||universe.year)-(a.season||universe.year)||(b.week||0)-(a.week||0));const r=records[0];if(!r)return null;
   const userSide=archiveTeamName(r,'home')===u.name?'home':'away',oppSide=userSide==='home'?'away':'home',oppName=archiveTeamName(r,oppSide),userScore=archiveScore(r,userSide),oppScore=archiveScore(r,oppSide),lines=(r.playerStats?.[userSide]||[]).slice().sort((a,b)=>performerImpact(b)-performerImpact(a)).slice(0,3);
@@ -15895,11 +15903,18 @@ function v2ReleaseTeamLeaders(record,side){
   const lines=record.playerStats?.[side]||[],passer=v2ReleaseLeader(lines,'passYds'),rusher=v2ReleaseLeader(lines,'rushYds'),receiver=v2ReleaseLeader(lines,'recYds'),defender=v2ReleaseLeader(lines,'tackles',r=>v2ReleaseNum(r.stats?.tackles)+v2ReleaseNum(r.stats?.sacks)*4+v2ReleaseNum(r.stats?.intDef)*6+v2ReleaseNum(r.stats?.forcedFumbles)*3);
   return`${v2ReleaseLeaderLine('PASS',passer,s=>`${v2ReleaseNum(s.passComp)}/${v2ReleaseNum(s.passAtt)} · ${v2ReleaseNum(s.passYds)} YDS · ${v2ReleaseNum(s.passTD)} TD`)}${v2ReleaseLeaderLine('RUSH',rusher,s=>`${v2ReleaseNum(s.rushAtt)} CAR · ${v2ReleaseNum(s.rushYds)} YDS · ${v2ReleaseNum(s.rushTD)} TD`)}${v2ReleaseLeaderLine('REC',receiver,s=>`${v2ReleaseNum(s.receptions)} REC · ${v2ReleaseNum(s.recYds)} YDS · ${v2ReleaseNum(s.recTD)} TD`)}${v2ReleaseLeaderLine('DEF',defender,s=>`${v2ReleaseNum(s.tackles)} TKL · ${v2ReleaseNum(s.sacks)} SACK · ${v2ReleaseNum(s.intDef)} INT`)}`
 }
+// The scoring play itself: the snap before a touchdown call, or the kick. Read from the archived play-by-play, so no save shape changes.
+function v2ReleaseScoringDetail(d){
+  const lines=d.playByPlay||[],td=lines.findIndex(x=>/TOUCHDOWN/.test(x));
+  const line=td>0?lines[td-1]:td<0?[...lines].reverse().find(x=>/field goal|safety/i.test(x)):null;
+  if(!line||/TOUCHDOWN|chooses|extra point|two-point/i.test(line))return'';
+  return String(line).split(' · ').pop().replace(/\.$/,'')
+}
 function v2ReleaseDriveTimeline(record){
   const score={home:0,away:0},names={home:record.home?.name||'Home',away:record.away?.name||'Away'},scoring=[];
   for(const d of record.drives||[]){
     score[d.side]+=v2ReleaseNum(d.points);
-    if(v2ReleaseNum(d.points)>0)scoring.push(`<div class="v2-release-scoring-row"><span>${gameEscape(d.overtime?'OT':d.label)}</span><strong>${gameEscape(names[d.side])} · ${gameEscape(d.result||'SCORE')} · +${v2ReleaseNum(d.points)}</strong><b>${score.away}–${score.home}</b></div>`)
+    if(v2ReleaseNum(d.points)>0)scoring.push(`<div class="v2-release-scoring-row"><span>${gameEscape(d.overtime?'OT':d.label)}</span><strong>${gameEscape(names[d.side])} · ${gameEscape(d.result||'SCORE')} · +${v2ReleaseNum(d.points)}${(detail=>detail?`<small>${gameEscape(detail)}</small>`:'')(v2ReleaseScoringDetail(d))}</strong><b>${score.away}–${score.home}</b></div>`)
   }
   return scoring.length?scoring.join(''):'<div class="muted">No scoring drives were retained.</div>'
 }
@@ -15919,7 +15934,9 @@ function renderV2ReleaseGameLab(){
   document.querySelector('#v2ShadowLab')?.remove();document.querySelector('#v2RecordGate')?.remove();
   const host=ensureV2ReleaseRecap(),record=v2ReleaseRecord();if(host){host.hidden=!record;host.innerHTML=record?v2ReleaseRecapHTML(record):''}
   const box=document.querySelector('#detailedBox'),log=document.querySelector('#detailedLog');
-  if(box){const h=box.closest('.card')?.querySelector('h3');if(h)h.textContent='Quick Box'}
+  if(box){const card=box.closest('.card'),h=card?.querySelector('h3');if(h)h.textContent='Quick Box';
+    // One final per screen: the recap below already carries this game's score, yards and turnovers.
+    if(card)card.hidden=!!(record&&universe.lastDetailedGame?.gameId===record.id)}
   if(log){const h=log.closest('.card')?.querySelector('h3');if(h)h.textContent='Play-by-Play';if(record){const lines=(record.drives||[]).flatMap(d=>d.playByPlay||[]).slice(-160).reverse();log.classList.remove('muted');log.innerHTML=lines.map(x=>`<div class="playline">${gameEscape(x)}</div>`).join('')}}
 }
 renderV2GameLabPanel=function renderV2GameLabPanelRelease(){document.querySelector('#v2ShadowLab')?.remove()};
@@ -18315,7 +18332,7 @@ globalThis.DynastySeasonMoments=Object.freeze({
    const top=plays.sort((a,b)=>(b.ours-a.ours)||(b.weight-a.weight)).slice(0,3);
    // Box-score performers exist for every game, simmed or played: the same impact weighting the season page uses.
    const impact=x=>{const t=x.stats||{};return(t.passYds||0)*.035+(t.passTD||0)*5-(t.int||0)*3+(t.rushYds||0)*.08+(t.rushTD||0)*5+(t.recYds||0)*.08+(t.recTD||0)*5+(t.tackles||0)*.8+(t.tfl||0)*1.6+(t.sacks||0)*3.5+(t.intDef||0)*4.5+(t.forcedFumbles||0)*3};
-   const line=x=>{const t=x.stats||{},o=[];if(t.passYds)o.push(`${t.passYds} pass yd`);if(t.passTD)o.push(`${t.passTD} pass TD`);if(t.rushYds)o.push(`${t.rushYds} rush yd`);if(t.rushTD)o.push(`${t.rushTD} rush TD`);if(t.recYds)o.push(`${t.recYds} rec yd`);if(t.recTD)o.push(`${t.recTD} rec TD`);if(t.sacks)o.push(`${t.sacks} sacks`);if(t.intDef)o.push(`${t.intDef} INT`);if(t.tackles&&o.length<2)o.push(`${t.tackles} tackles`);return o.slice(0,3).join(' · ')};
+   const line=x=>{const t=x.stats||{},o=[];if(t.passYds)o.push(`${t.passYds} pass yd`);if(t.passTD)o.push(`${t.passTD} pass TD`);if(t.rushYds)o.push(`${t.rushYds} rush yd`);if(t.rushTD)o.push(`${t.rushTD} rush TD`);if(t.recYds)o.push(`${t.recYds} rec yd`);if(t.recTD)o.push(`${t.recTD} rec TD`);if(t.sacks)o.push(`${t.sacks} sack${t.sacks===1?'':'s'}`);if(t.intDef)o.push(`${t.intDef} INT`);if(t.tackles&&o.length<2)o.push(`${t.tackles} tackles`);return o.slice(0,3).join(' · ')};
    const performers=(g.playerStats?.[side]||[]).slice().sort((a,b)=>impact(b)-impact(a)).filter(x=>impact(x)>0&&x.name&&line(x)).slice(0,3).map(x=>{const f=typeof findPlayer==='function'?findPlayer(x.id):null;return{id:x.id,name:x.name,pos:x.pos||'',line:line(x),face:!!f?.p}});
    return{gameId:g.id,season:g.season,week:g.week,label:g.label||'Final',opponent:names[opp],outcome,won:outcome==='W',us,them,hasBoxScore:!g.scheduleOnly,hasReplay:!!rows?.length,plays:top,performers,firstStart:g.firstStart?.schoolId===u.id?g.firstStart.text:null,consequence:momentsConsequence(g,side,u,outcome)};
   }catch(e){return null}
@@ -20007,7 +20024,7 @@ function helmet(el,id){id=+id;if(!el||!Number.isInteger(id)||id<1||id>120)return
 function teamCard(cls,t){return `<article class="event-team ${cls}" data-event-team="${esc(t.id)}"><div class="event-team-helmet" aria-hidden="true"><span class="event-team-shell"></span><span class="event-team-logo"></span></div><div class="event-team-copy"><span>${esc(t.rank)} · ${esc(t.record)}</span><strong>${esc(t.name)}</strong><small>OFF ${esc(t.offense)} · DEF ${esc(t.defense)}</small></div></article>`}
 function recentShowcase(last){
  if(!last)return'';const userSide=last.location==='vs'?'home':'away';
- const drives=last.drives.length?`<div class="event-drive-strip" aria-label="Last game scoring drives">${last.drives.map((d,i)=>`<i class="${d.side===userSide?'user':'opp'} ${d.points>0?'score':'empty'}" title="Drive ${i+1}: ${d.points} points"><b>${d.points||'·'}</b></i>`).join('')}</div>`:'<div class="event-drive-empty">Drive detail unavailable for this archived game.</div>';
+ const drives=last.drives.length?`<div class="event-drive-strip" aria-label="Last game scoring drives">${last.drives.map((d,i)=>`<i class="${d.side===userSide?'user':'opp'} ${d.points>0?'score':'empty'}" title="Drive ${i+1}: ${d.points} points"><b>${d.points||'·'}</b></i>`).join('')}</div>`:'';
  const performers=last.performers.length?`<div class="event-performers">${last.performers.map(p=>`<button type="button" data-event-player="${esc(p.id)}"><span>${esc(p.pos)}</span><strong>${esc(p.name)}</strong><small>${esc(p.summary)}</small></button>`).join('')}</div>`:'<div class="event-performers-empty">No individual stat leaders stored for this result.</div>';
  const actions=last.id?`<div class="event-result-actions">${last.hasReplay?`<button type="button" class="event-box-score-action event-watch-action" data-game="${esc(last.id)}" data-game-tab="Watch">▶ Watch Replay</button>`:''}<button type="button" class="event-box-score-action" data-game="${esc(last.id)}" data-game-tab="Box Score">View Box Score</button><button type="button" data-game="${esc(last.id)}" data-game-tab="Summary">Full Game Center</button></div>`:'';
  return `<section class="event-recent ${last.result==='W'?'win':'loss'}"><div class="event-recent-score"><div><span>LAST GAME · WEEK ${esc(last.week)}</span><strong>${esc(last.result)} ${esc(last.userScore)}–${esc(last.oppScore)}</strong><small>${esc(last.location)} ${esc(last.opponent)}</small></div><div class="event-final-mark">FINAL</div></div>${actions}${drives}<div class="event-recent-label">KEY PERFORMERS</div>${performers}</section>`;

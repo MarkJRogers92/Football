@@ -26,7 +26,8 @@ test('fourth down: aggressive goes for it where conservative kicks',()=>{
  assert.equal(E.playbookFourthDown(agg({distance:2,fieldPosition:40})),'play');
  assert.equal(E.playbookFourthDown(con({distance:2,fieldPosition:40})),'punt');
  assert.equal(E.playbookFourthDown(agg({distance:4,fieldPosition:62})),'play','4th and 4 between midfield and the 30');
- assert.equal(E.playbookFourthDown(con({distance:4,fieldPosition:62})),'field_goal');
+ assert.equal(E.playbookFourthDown(con({distance:4,fieldPosition:66})),'field_goal','a 51-yard kick is in range');
+ assert.equal(E.playbookFourthDown(con({distance:4,fieldPosition:60})),'punt','a 57-yard kick is not; conservative pins them deep');
  assert.equal(E.playbookFourthDown(con({distance:1,fieldPosition:62})),'play');
  assert.equal(E.playbookFourthDown(agg({distance:9,fieldPosition:30})),'punt');
  assert.equal(E.playbookFourthDown(live({down:3})),null);

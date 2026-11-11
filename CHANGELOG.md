@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.17.2 — Visible fixes on Game Day
+
+- **The postgame panel fits the screen.** On wide screens the final was cut off on the right, hiding the home team, its score and part of the player leaders. Everything is now on screen at every width.
+- **Staff no longer recommend kicks that cannot be made.** A 59-yard field goal on 4th and 9 in the rain was the staff's advice, because "in range" meant "past the opponent's 42". The range now follows the odds of making the kick, so wind and rain shorten it. Kicks past about 55 yards are not tried in simulated games or recommended in coached ones, and nobody is offered one past about 62. Too far to kick and too close to punt well, teams keep the ball on 4th and 5 or less.
+- **Long field goals are harder.** The odds fall away past 52 yards: about 43% from 55 and 24% from 59 on a calm day. Games coached or simulated on Game Day score about half a point less in total as a result.
+- **One week number everywhere.** The header said "Week 3" while the briefing and Game Day said "Week 4". Every screen, the save line and the title screen now name the week you are preparing.
+- **Scoring flow names the play.** Each score lists the play that produced it, such as "A. Rhodes runs for 12 yards".
+- **One final per screen.** After a coached game the Quick Box steps aside for the full recap instead of repeating the score.
+- **No apology on simulated games.** "Drive detail unavailable for this archived game" is gone from the last-game card.
+- **"1 sack", not "1 sacks".** Stat lines use the singular where it applies.
+- **Phone notices stay out of the way.** They appear under the header instead of over the bottom navigation and the main action.
+
+Saves carry over. Game Engine 2 calibration was re-measured on 480 games (was 120) and three limits were widened to fit the field-goal change; see `tests/game-engine-v2-calibration-report.js`.
+
 ## v0.17.1 — Mac downloads for every Mac
 
 - **One Mac download for Apple silicon and Intel.** The desktop alpha is now a universal app, so it runs on every Mac that supports it; it was Apple silicon only.
