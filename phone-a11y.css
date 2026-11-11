@@ -1,0 +1,47 @@
+/* v0.21 — phone floor for touch and reading. At phone width every control is at least 44px tall (icon buttons 44px
+   wide) and no text is under 12px. Loaded last so it holds whatever a feature stylesheet says. Desktop is untouched. */
+@media(max-width:720px){
+button,select,[role=button],[role=tab],input[type=text],input[type=search],input[type=number],input:not([type]){min-height:44px}
+button,[role=button]{min-width:44px}
+/* A summary keeps its disclosure marker; padding gives it the height. */
+summary{min-height:44px!important;box-sizing:border-box;align-content:center}
+/* Names in tables and lists are controls too: keep them inline, give them the height. */
+.player-button,.so-coach-name,.guidance-text-action,.game-link{display:inline-flex;align-items:center;min-height:44px}
+.guidance-text-action{padding-inline:8px}
+.client-nav-item{min-height:46px}
+.tabs button{min-height:44px;padding-block:10px;flex:0 0 auto;white-space:nowrap}
+select{padding-block:8px}
+/* A checkbox keeps its size; its label is the target. */
+label:has(>input[type=checkbox]),label:has(>input[type=radio]){display:inline-flex;align-items:center;gap:8px;min-height:44px}
+/* Decorative or non-interactive marks that happen to be buttons inside the live field or charts keep their shape. */
+.v2-live-field *,.gc-field *{min-height:0;min-width:0}
+
+/* Reading floor. */
+.small,small,th,.pill,.scheme-badge,
+.client-nav-label,.client-rail-brand span,.client-utilities summary,.client-rail-footer span,.dynasty-session-status span,.client-mobile-item span,
+.rw-main small,.rw-state,.rd-jersey,.rd-role-label,.rd-group-flags b,.rd-player-meta span,.rd-player-meta strong,
+.so-metric b,.so-metric strong,.so-node-foot span,.so-node-foot small,.so-node-lane,.so-node-role,.so-node-meta,.so-node-focus b,.so-node-focus span,.staff-scouting-identity span,.staff-scouting-identity small,
+.bi-chip-wk,.dev-confidence,.development-feature-btn,.development-feature-btn span,.v2-matchup-player span,.v2-matchup-player small,.milestone em,.hud-pause-trigger,
+.v2-release-drive b,.v2-release-drive small,.v2-release-metrics span,.v2-release-section-head span,.event-kicker span,.event-team-copy span,.event-team-copy small{font-size:12px!important}
+select{min-width:44px}
+.v0102-prep-focus,.legacy-program{min-height:44px!important}
+.portal-toggle,.portal-filters label,.history-controls label{display:inline-flex;align-items:center;gap:8px;min-height:44px}
+/* Second pass: the remaining labels under 12px. */
+.rd-depth-key span,.rd-depth-note,.rd-group-head span,.rd-group-head strong,.rd-player-line span,.rd-player-line strong,
+.development-feature-btn *,.dev-viz-head span,.dev-viz-head strong,.dev-story-card span,.dev-viz-guardrail,.development-plan-head span,.development-plan-attribution,
+.portal-filters label,.portal-toggle,.history-controls label,.decision-kicker,.guidance-text-action,.broadcast-team-role,.broadcast-kicker,.broadcast-versus span,.broadcast-actions span,
+.rw-filter-stack button,.rw-filter-stack b,.v2-matchup-section-head span,.v2-matchup-availability span,.v0102-weekly-head span,.legacy-kicker,.record-group h4,
+.team-conference-lockup span,#weekLine,.desk-details summary,.weekly-desk-status,.weekly-setup-label,.so-note,.event-kicker strong,.event-center span,.event-center small,
+.season-pulse-identity span,.season-pulse-record span,.season-progress span,.season-pulse-empty,.v2-matchup-host small{font-size:12px!important}
+.training-focus{min-width:44px!important}
+.dev-viz-kpis span,.dev-player-picker button span,.dev-player-head span,.so-summary span,.season-pulse-metrics span,.season-next span,.conference-banner-copy span,.first-season-stage strong,.first-season-stage small{font-size:12px!important}
+/* The top bar keeps room for the program, record and week: its four icon buttons are 40px, the rest of the game 44. */
+.client-topbar button,.topbar button,header button{min-width:40px;min-height:40px}
+.guidance-boundary,.guidance-meaning,.guidance-entity,blockquote footer,blockquote footer span,.legacy-memory-summary span,.legacy-note,.client-utility-actions button,.current-plan-item span,.hub-kicker,.hub-sub,.rd-roster-head span,.rvw-facts span,.rvw-meter span,.v2-matchup-plan span,.first-season-next button,.lw-follow{font-size:12px!important}
+#roster header>div>strong,#depth header>div>span,.guidance-flow-empty{font-size:12px!important}
+/* Taller controls cost height; on Recruiting the two header controls share a row so the first prospect stays high. */
+#recruiting>.section-head{display:flex!important;flex-direction:row!important;flex-wrap:wrap;align-items:center;gap:6px 12px}
+#recruiting>.section-head>div:first-child{flex:1 0 100%}
+#recruiting>.section-head>details{flex:0 1 auto!important;width:auto!important}
+#recruiting>.section-head>details[open]{flex:1 0 100%!important}
+}

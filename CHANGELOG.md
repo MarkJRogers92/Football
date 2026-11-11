@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.21.0 — Phones and accessibility
+
+- **Every control on a phone is a full-size touch target.** At phone width all buttons, dropdowns, tabs, disclosure rows and tappable names are at least 44 pixels tall. Before this, each screen had between 22 and 60 controls smaller than that. The four icon buttons in the top bar are 40 pixels so the program, record and week still fit beside them.
+- **No more tiny text on a phone.** Text is at least 12 pixels at phone width; a handful of labels sit at 11 and nothing is smaller. Some labels had been 8 pixels.
+- **Dropdowns say what they are.** The roster position filter, the depth-chart role pickers, each player's training focus, the position-change pickers and the statistics scope now have names for screen readers. Career milestone progress bars and facility levels are named too.
+- **The schedule strip can be reached with the keyboard**, and the prospect list announces which prospect is selected in a valid way.
+- **An automated accessibility check now runs with the browser tests.** It checks the title screen and all fifteen game screens at desktop and phone width and reports no serious or critical issues.
+- **Recruiting keeps its first prospect high on a phone.** The two header controls share a row so the taller buttons do not push the list down.
+
+Desktop layout is unchanged. Not done in this release: testing on a real iPhone, Safari and Firefox, a pass with a screen reader, and watching new players through their first hour.
+
 ## v0.20.0 — A world you care about
 
 - **Every program has a nickname.** All 120 programs now have one of their own: the Chicago Metropolitan Skyliners, the Alabama Commonwealth Vulcans, the Montana Commonwealth Copper Kings. Each was invented for this game from local history, industry or wildlife. Nicknames appear on This Week, when you choose a program, on Game Day, in the end zones of the live field and on the final. Older dynasties get them too.

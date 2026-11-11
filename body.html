@@ -183,7 +183,7 @@
     <section id="roster" class="panel tab stacked-table">
       <div class="section-head">
         <div><h2>Roster</h2><div class="muted">Grades are your staff&#39;s estimates. The bar shows how sure they are.</div></div>
-        <select id="positionFilter"><option value="ALL">All positions</option></select>
+        <select id="positionFilter" aria-label="Filter roster by position"><option value="ALL">All positions</option></select>
       </div>
       <div class="table-wrap"><table><thead><tr>
         <th>Player</th><th>Pos</th><th>Elig</th><th>Redshirt</th><th>Ht/Wt</th><th>Style</th><th>Current</th><th>Upside</th><th>Scheme Fit</th><th>Health</th><th>Morale</th><th>NIL</th><th>Academics</th>
@@ -263,7 +263,7 @@
 
 
     <section id="stats" class="panel tab">
-      <div class="section-head"><div><h2>Statistics Center</h2><div class="muted">National and team leaders this season.</div></div><select id="statsScope"><option value="national">National</option><option value="team">My Program</option></select></div>
+      <div class="section-head"><div><h2>Statistics Center</h2><div class="muted">National and team leaders this season.</div></div><select id="statsScope" aria-label="Statistics scope"><option value="national">National</option><option value="team">My Program</option></select></div>
       <div class="stats-grid">
         <div class="card"><h3>Passing Leaders</h3><div id="passingLeaders"></div></div>
         <div class="card"><h3>Rushing Leaders</h3><div id="rushingLeaders"></div></div>
@@ -332,8 +332,8 @@
       <div class="card">
         <div class="section-head"><div><h3>Position Change Planner</h3><div class="muted">A position change can unlock a better role, but unfamiliarity temporarily suppresses role fit.</div></div></div>
         <div class="position-change-grid">
-          <select id="positionChangePlayer"></select>
-          <select id="positionChangeTarget"></select>
+          <select id="positionChangePlayer" aria-label="Player to move"></select>
+          <select id="positionChangeTarget" aria-label="New position"></select>
           <button id="applyPositionChange">Change Position</button>
         </div>
         <div id="positionChangePreview" class="compact muted"></div>

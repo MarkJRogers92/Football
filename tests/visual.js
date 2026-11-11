@@ -51,7 +51,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
   check(`[${label}] visual weekly decision gate clears before sim`,visualSimReady);
   if(!visualSimReady)throw new Error(`[${label}] Sim Week remained disabled in visual regression after resolving visible weekly decisions`);
   if(!await page.locator('#simWeek').isVisible())await page.click('#programDetails > summary');
-  await page.click('#simWeek');await page.waitForFunction(()=>/Week 1/.test(document.querySelector('#weekLine')?.textContent),{timeout:60000});await page.waitForSelector('#broadcastFeature .broadcast-matchup');
+  await page.click('#simWeek');await page.waitForFunction(()=>/Week 2/.test(document.querySelector('#weekLine')?.textContent),undefined,{timeout:60000});await page.waitForSelector('#broadcastFeature .broadcast-matchup');
   await page.waitForFunction(()=>document.querySelectorAll('#broadcastFeature .sports-mark.coverage-real-logo').length>=2,undefined,{timeout:60000}).catch(async err=>{
    const state=await page.$eval('#broadcastFeature',el=>({logos:el.querySelectorAll('.sports-mark.coverage-real-logo').length,text:el.textContent.trim().slice(0,240)}));
    throw new Error(`[${label}] post-week matchup logos did not settle: ${JSON.stringify(state)} errors=${JSON.stringify(errors.slice(-3))} (${err.message})`);

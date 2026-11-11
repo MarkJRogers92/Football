@@ -47,7 +47,7 @@ test('a real season records a review, an event and a tenure history',async()=>{
  assert.equal(u.tenure.school,'Chicago Metropolitan');
  const ev=u.events.filter(x=>x.type==='ADMIN_REVIEW');
  assert.equal(ev.length,1,'and one ledger entry');
- assert.ok(ev[0].summary.includes('expected'));
+ assert.match(ev[0].summary,/-win target/,'the review names the target');assert.match(ev[0].summary,/Confidence \d+ to \d+ \(/,'and says where confidence went');
  assert.ok(['Secure','Backed','Watched','Hot seat','Final warning'].includes(r.label));
 });
 

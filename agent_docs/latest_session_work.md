@@ -1,5 +1,13 @@
 # Latest Session Work
 
+## v0.21.0 phones and accessibility — 2026-11-11
+
+Fifth release of `docs/RELEASE_GAMEPLAN_2026-11-11.md`. `phone-a11y.css` (loaded last by `tools/build.js`) sets a 44px control floor and a 12px text floor under `max-width:720px`. Its text rules use `!important` on explicit selectors, so before adding one, check it does not match text that is already larger: build without the file and compare (the method is in the commit that added it). `axe-core` is a dev dependency; `tests/accessibility-browser.js` and `tests/phone-floor-browser.js` are in `test:browser-extended` and `npm run test:accessibility`.
+
+Corrections to the review in the game plan: the "25 unnamed controls on This Week" and "three h1 per screen" findings were wrong. The controls had names my first scan did not read, and only one h1 is visible at a time.
+
+Also fixed here: `tests/visual.js` and `tests/adminconfidence.js` still expected wording changed in v0.17.2 and v0.20.0. The unit suite was run in full after each release; the full browser suites had not been, which is how these were missed.
+
 ## v0.20.0 a world you care about — 2026-11-11
 
 Fourth release of `docs/RELEASE_GAMEPLAN_2026-11-11.md`. `mascots.js` (`DynastyMascots`, keyed by school id, loaded before the engine), `offseason-stops.js` (stops before departures, signing and the portal; reached from the Next button's controller in `next-action.js` through `globalThis.DynastyOffseasonStop`), the new-dynasty defaults in `acceptNewDynastySetup` (staff recruiting on, confidence at least 60), and `adminReviewSummary` in `app.js`.
