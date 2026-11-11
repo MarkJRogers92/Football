@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.23.0 — Timeouts, award art and a cleaner release build
+
+- **Timeouts.** In a fully coached game, the last two minutes of each half now offer a timeout after a play that runs the clock, when your side has one left and a reason to stop it. A timeout keeps the time between plays, so only the play itself runs off. Your staff recommend when to use one and when to save it. Coach big moments, simulated games and live games saved before this release are unchanged.
+- **Award and facility art.** Sixteen pieces from the November 11 art pack are now in the game: the four rivalry trophies (bell, boot, lantern and shield, matched to each rivalry's trophy name) on Rival Watch and the rivalry ceremony; the conference crown, bowl laurel and signing day cap on their ceremonies; the stadium, strength room and practice building on the three facility upgrades; trophies and game balls on career milestones (greyed until reached); and small header art on Staff, Recruiting, Awards and Legacy. All 16 add about 280 KB and are kept for offline play. The 3D models stay in the release as source files.
+- **No test tools in the game you play.** The hooks the automated tests use are now only present under test automation. A player's browser and the desktop app no longer have them.
+- **The offline cache skips art the game no longer uses**, saving a 520 KB download.
+- **A fast test set.** `npm run test:fast` runs 550 unit tests in about 80 seconds; `npm run test:slow` runs the 32 slow simulation files. `npm test` still runs everything.
+
+Saves carry over.
+
 ## v0.22.0 — Install it, play it offline, report a problem
 
 - **The web game installs like an app.** In Chrome, Edge or Safari, use "Install" or "Add to Home Screen" and Dynasty Lab opens in its own window with its own icon.

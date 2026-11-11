@@ -50,7 +50,7 @@ function cardHTML(snap){
  const meet=r.lastMeeting?`${r.lastMeeting.won?'W':'L'} ${r.lastMeeting.us}-${r.lastMeeting.them}`:r.meeting?`Week ${r.meeting.week} · ${r.meeting.home?'home':'away'}`:'Not scheduled';
  const others=(snap.recruiters||[]).filter(x=>x.team.id!==r.team.id).slice(0,2);
  return`<section id="rivalWatch" class="card rival-watch" aria-label="Rival watch">`+
-  `<div class="rvw-head"><span class="eyebrow">RIVAL WATCH</span>${r.trophy?`<span class="rvw-trophy">${esc(r.trophy)}</span>`:''}</div>`+
+  `<div class="rvw-head"><span class="eyebrow">RIVAL WATCH</span>${r.trophy?`<span class="rvw-trophy">${globalThis.DynastyArt?.img(globalThis.DynastyArt.rivalryKey(r.trophy),'dl-art dl-art-inline')||''}${esc(r.trophy)}</span>`:''}</div>`+
   `<div class="rvw-main">${helmet(r.team.id,'rvw-helmet is-away')}<div class="rvw-id"><strong>${esc(r.coach.name)}</strong><span>Head coach · ${esc(r.team.rank?`#${r.team.rank} `:'')}${esc(r.team.name)} (${r.team.w}-${r.team.l})</span><div class="rvw-tags"><b class="rvw-arch">${esc(a.name)}</b>${tr.map(t=>`<i>${esc(t)}</i>`).join('')}</div><p>${esc(a.blurb)}</p></div>`+
   `<div class="rvw-meters">${meter('Recruiting',r.coach.recruiting)}${meter('Play calling',r.coach.playCall)}${meter('Development',r.coach.development)}${meter('Evaluation',r.coach.evaluation)}</div></div>`+
   `<div class="rvw-facts"><div><span>Series</span><b>${esc(series)}</b></div><div><span>${r.lastMeeting?'This year':'Next meeting'}</span><b>${esc(meet)}</b></div><div><span>Your targets they lead</span><b>${r.racesLed?.length||0}</b></div></div>`+

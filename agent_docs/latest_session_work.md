@@ -1,5 +1,11 @@
 # Latest Session Work
 
+## v0.23.0 timeouts, art, release build — 2026-11-11
+
+Continuation of the "What is left" list in `agent_docs/HANDOFF_2026-11-11_v0.22.0.md`. Done: the desktop smoke test (`xvfb-run -a node tests/desktop-smoke.js` after `node node_modules/electron/install.js`; it passes), timeouts (`createTimeoutDecision` in `game-engine-v2-gameday.js`, behind `session.driveCall`), the fast and slow unit tiers, and test hooks only under `navigator.webdriver` or Node (`dynastyTestHooksEnabled` in `app.js`; covered by `tests/release-build-browser.js`). Added the art pack's 256px sprites as `assets/awards/*.webp` through `program-art.js` (`DynastyArt`).
+
+Not done: signing day and the portal resolved one name at a time.
+
 **Start here:** `agent_docs/HANDOFF_2026-11-11_v0.22.0.md` (state, decisions, what is left, traps) and `docs/RELEASE_GAMEPLAN_2026-11-11.md` (review and plan).
 
 ## v0.22.0 install, offline, report — 2026-11-11

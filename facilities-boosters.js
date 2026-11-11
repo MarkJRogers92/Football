@@ -331,7 +331,7 @@ if(typeof module==='object'&&module.exports){
    const l=row.level+1,fits=facilities.activeProjects(t).length<facilities.MAX_PROJECTS;
    action=`<div class="small muted">Level ${l} costs ${row.nextCost} units and takes ${row.buildSeasons} season${row.buildSeasons===1?'':'s'} to build.</div><div class="fb-actions">${CTL(`Start level ${l}`,`data-fb-start="${row.id}"`,{disabled:!fits,title:fits?'':`Only ${facilities.MAX_PROJECTS} projects at a time`})}</div>`;
   }else action='<div class="small muted">Finished. This is as good as it gets.</div>';
-  return`<div class="fb-track" data-fb-track="${row.id}"><div class="fb-track-head"><strong>${fbEsc(row.label)}</strong><span class="fb-pips" role="img" aria-label="Level ${row.level} of ${row.max}">${pips}</span></div><div class="small muted">${fbEsc(row.blurb)} Each level: ${fbEsc(row.perLevel)}.</div>${action}</div>`;
+  return`<div class="fb-track" data-fb-track="${row.id}"><div class="fb-track-head">${globalThis.DynastyArt?.img(globalThis.DynastyArt.facilityKey(row.id),'dl-art dl-art-track')||''}<strong>${fbEsc(row.label)}</strong><span class="fb-pips" role="img" aria-label="Level ${row.level} of ${row.max}">${pips}</span></div><div class="small muted">${fbEsc(row.blurb)} Each level: ${fbEsc(row.perLevel)}.</div>${action}</div>`;
  }
  function cardHTML(t){
   const s=facilities.summary(t),rows=facilities.trackRows(t),nilLeft=nilRemaining(t),nilTotal=nilBudgetFor(t),left=s.campaignsLeft;

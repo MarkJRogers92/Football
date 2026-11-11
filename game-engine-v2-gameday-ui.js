@@ -104,7 +104,7 @@ const V2_GAMEDAY_CALL_HINTS={
   balanced:'No tilt either way.',ground:'Safer and slower. Fewer big plays.',quick:'High percentage, short gains, fewer sacks.',shots:'Bigger gains. More sacks and interceptions.',
   base:'No tilt either way.',pressure:'More sacks. A completion goes further.',coverage:'Takes away the deep ball. Gives up the run.',run_stop:'Stops the run. Thin behind it.'
 };
-const V2_GAMEDAY_DECISION_TITLES={drive_call:'YOUR DRIVE',defense_call:'DEFENSIVE CALL',fourth_down:'FOURTH DOWN',two_point_decision:'AFTER THE TOUCHDOWN',halftime_adjustment:'HALFTIME',late_game_tempo:'CLOCK MANAGEMENT'};
+const V2_GAMEDAY_DECISION_TITLES={timeout_call:'CLOCK RUNNING',drive_call:'YOUR DRIVE',defense_call:'DEFENSIVE CALL',fourth_down:'FOURTH DOWN',two_point_decision:'AFTER THE TOUCHDOWN',halftime_adjustment:'HALFTIME',late_game_tempo:'CLOCK MANAGEMENT'};
 function v2GameDayUIOptionLabel(d,id){return d.options.find(o=>o.id===id)?.label||String(id||'').replaceAll('_',' ')}
 function v2GameDayUIDecision(session){
   const d=globalThis.DynastyGameEngineV2GameDay?.pendingDecision(session);if(!d)return'';

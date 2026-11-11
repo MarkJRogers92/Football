@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.22.0</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.23.0</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -3223,6 +3223,19 @@ html.bi-brand #history .historyrow span{min-width:0;overflow-wrap:anywhere}
  html.bi-brand #history .history-row{align-items:flex-start;gap:10px}
  html.bi-brand #history .history-record{white-space:normal;min-width:72px}
 }
+/* v0.23: award and facility art from the November 11 pack. Decorative; sized by the slot it sits in. */
+.dl-art{display:block;object-fit:contain;filter:drop-shadow(0 6px 14px rgba(0,0,0,.45));pointer-events:none;user-select:none}
+.section-head.has-art{display:flex;align-items:center;gap:14px}
+.section-head.has-art>.dl-art-head{width:64px;height:64px;flex:none}
+.dl-art-ceremony{width:132px;height:132px;margin:0 auto 6px}
+.dl-art-inline{display:inline-block;width:28px;height:28px;vertical-align:middle;margin-right:6px;filter:none}
+.fb-track-head{display:flex;align-items:center;gap:10px}
+.fb-track-head>.dl-art-track{width:52px;height:52px;flex:none}
+.fb-track-head>.fb-pips{margin-left:auto}
+.milestone:has(>.dl-art-milestone){position:relative;padding-right:64px}
+.milestone>.dl-art-milestone{position:absolute;top:10px;right:10px;width:44px;height:44px;margin:0;opacity:.55;filter:grayscale(.85)}
+.milestone.is-done>.dl-art-milestone{opacity:1;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4))}
+@media(max-width:720px){.section-head.has-art>.dl-art-head{width:44px;height:44px}.dl-art-ceremony{width:96px;height:96px}}
 
 /* A quiet sports briefing. The existing advance control remains the only primary action. */
 .lw-world{margin:14px 0;border-top:1px solid var(--line);padding-top:12px;min-width:0}
@@ -3457,7 +3470,7 @@ select{min-width:44px}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.22.0</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.23.0</b></span></footer>
   </div>
 </section>
 
@@ -3484,7 +3497,7 @@ select{min-width:44px}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.22.0</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.23.0</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -3607,7 +3620,7 @@ select{min-width:44px}
     </section>
 
     <section id="staff" class="panel tab">
-      <div class="section-head"><div><h2>Staff & Schemes</h2><div class="muted">Your coaches shape scouting, recruiting, development and game calling.</div></div></div>
+      <div class="section-head has-art"><img class="dl-art dl-art-head" src="assets/awards/coach-headset.webp" alt="" aria-hidden="true" width="256" height="256"><div><h2>Staff & Schemes</h2><div class="muted">Your coaches shape scouting, recruiting, development and game calling.</div></div></div>
       <div class="two-col">
         <div class="card"><h3>Coaching Staff</h3><div id="staffList"></div></div>
         <div class="card"><h3>Scheme Identity</h3><div id="schemeCard"></div></div>
@@ -3677,8 +3690,8 @@ select{min-width:44px}
     </section>
 
     <section id="recruiting" class="panel tab stacked-table">
-      <div class="section-head">
-        <div><h2>Recruiting Board</h2><div class="muted">Find, scout and win the players who fit your program.</div></div>
+      <div class="section-head has-art">
+        <img class="dl-art dl-art-head" src="assets/awards/scouting-folio.webp" alt="" aria-hidden="true" width="256" height="256"><div><h2>Recruiting Board</h2><div class="muted">Find, scout and win the players who fit your program.</div></div>
         <button id="autoTarget">Auto-Target 20</button>
       </div>
       <div id="signingDay"></div>
@@ -3796,7 +3809,7 @@ select{min-width:44px}
 
 
     <section id="records" class="panel tab">
-      <div class="section-head"><div><h2>Awards, Records & Draft</h2><div class="muted">Honors, record books and draft results.</div></div></div>
+      <div class="section-head has-art"><img class="dl-art dl-art-head" src="assets/awards/player-of-year.webp" alt="" aria-hidden="true" width="256" height="256"><div><h2>Awards, Records & Draft</h2><div class="muted">Honors, record books and draft results.</div></div></div>
       <div class="two-col">
         <div class="card"><h3 id="awardsHeading">Awards Watch</h3><div id="awardsBoard"></div></div>
         <div class="card"><h3>Recent Draft Results</h3><div id="draftBoard"></div></div>
@@ -3808,7 +3821,7 @@ select{min-width:44px}
     </section>
 
     <section id="legacy" class="panel tab">
-      <div class="section-head"><div><h2>Legacy</h2><div class="muted">Achievements, records and a hall of fame that carry across every dynasty on this device.</div></div></div>
+      <div class="section-head has-art"><img class="dl-art dl-art-head" src="assets/awards/coach-legacy.webp" alt="" aria-hidden="true" width="256" height="256"><div><h2>Legacy</h2><div class="muted">Achievements, records and a hall of fame that carry across every dynasty on this device.</div></div></div>
       <div id="legacyBoard"></div>
     </section>
     <section id="history" class="panel tab">
@@ -6088,9 +6101,12 @@ function playOutcome(session,state){
   let outcome=adapter.profileOutcome(state,session.inputs.home,session.inputs.away,session.homeFieldRating,call);
   if(call&&call.clock!==1&&!outcome.penalty)outcome.clock=clamp(Math.round((Number(outcome.clock)||1)*call.clock),1,45);
   session.defenseCall=null;
+  // A timeout called before this snap stops the clock between plays: only the play itself runs off.
+  const timedOut=session.timeoutAt===start;if(timedOut)session.timeoutAt=null;
   halftimeAdjustedOutcome(session,state,outcome);
   if(!session.tempoDecisionMade[side]||session.tempo[side]==='staff')outcome=engine.playbookClock(state,outcome);
   else outcome.clock=tempoAdjustedClock(session,state,outcome.clock);
+  if(timedOut&&!outcome.penalty)outcome.clock=clamp(Math.min(Number(outcome.clock)||1,TIMEOUT_PLAY_SECONDS),1,45);
   const yards=clamp(Math.round(outcome.yards??0),-99,99),touchdown=state.period<=4&&!outcome.turnover&&!outcome.penalty&&beforeField+yards>=100;
   if(touchdown)deferredTouchdown(session,state,outcome);else engine.applyScrimmage(state,outcome);
   adapter.annotateOutcomeEvent(state,start,outcome);return outcome
@@ -6179,6 +6195,36 @@ function staffDefenseCall(session,state,side){
   if(edge>=4)return{call:'pressure',why:'our front can get home'};
   return{call:'base',why:'no clear tell from the offense'}
 }
+// v0.20+: timeouts in the last two minutes of a half. The clock runs between plays after a run or a completed pass;
+// a timeout keeps that time. Asked only after such a play, only when the coached side has one left and has a reason
+// to want the clock stopped, and only in a session with calls (a fully coached game).
+const TIMEOUT_PLAY_SECONDS=7;
+function clockRanOnLastPlay(state){
+  const last=[...(state.events||[])].reverse().find(e=>['scrimmage','interception','fumble','punt','field_goal','kickoff','touchdown','penalty','timeout','period_start','halftime'].includes(e.type));
+  return!!last&&last.type==='scrimmage'&&(last.kind==='rush'||last.completed===true)
+}
+function timeoutWindow(session){
+  const state=session.state,side=session.controlledSide,offense=state.possession;
+  if(!side||!session.driveCall||state.status!=='live'||state.period>4||!offense||session.pendingConversion)return false;
+  if((state.period!==2&&state.period!==4)||state.clock>120||state.clock<=0||!(state.timeouts?.[side]>0))return false;
+  if(session.timeoutAsked===state.events.length||session.timeoutAt===state.events.length||!clockRanOnLastPlay(state))return false;
+  const margin=marginFor(state,side);
+  if(offense===side)return state.period===2?state.fieldPosition>=40:margin<=0||margin>=-16&&margin<=3;
+  return state.period===4&&margin<0&&margin>=-16
+}
+function staffTimeoutCall(session,state,side){
+  const margin=marginFor(state,side),offense=state.possession===side;
+  if(offense&&state.period===4&&margin<=0)return{call:'timeout',why:'every second counts on this drive'};
+  if(offense&&state.period===2&&state.fieldPosition>=55&&state.clock<=60)return{call:'timeout',why:'a score before the half is in reach'};
+  if(!offense&&margin<0&&margin>=-8)return{call:'timeout',why:'we need the ball back with time left'};
+  return{call:'run',why:state.timeouts[side]>1?'save it for when it matters more':'it is the last one'}
+}
+function createTimeoutDecision(session){
+  if(!timeoutWindow(session))return null;if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);
+  const state=session.state,side=session.controlledSide,offense=state.possession,team=state[offense]?.name||session.names[offense],staff=staffTimeoutCall(session,state,side),left=state.timeouts[side];
+  const decision={id:nextDecisionId(state),type:'timeout_call',policyId:'timeout-v1',team:side,teamId:state[side]?.id??null,contextKey:`timeout:${state.events.length}:${side}`,situation:`${clockText(state)} · ${team} ball at ${spotText(state)} · ${scoreText(marginFor(state,side))} · ${left} timeout${left===1?'':'s'} left`,prompt:'Clock is running',reason:staff.why,context:{period:state.period,clock:state.clock,possession:offense,fieldPosition:state.fieldPosition,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},options:[{id:'timeout',label:'Call timeout'},{id:'run',label:'Let it run'},{id:'delegate',label:'Delegate to staff'}],staffRecommendation:staff.call,defaultOption:staff.call,createdAfterEventSeq:state.events?.length||0};
+  session.pendingStrategyDecision=decision;return clone(decision)
+}
 function createDefenseDecision(session){
   if(!defenseWindow(session))return null;if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);
   const state=session.state,side=session.controlledSide,offense=state.possession,team=state[offense]?.name||session.names[offense],staff=staffDefenseCall(session,state,side);
@@ -6191,7 +6237,7 @@ function currentDecision(session){
   if(session.pendingConversion){const conversion=createConversionDecision(session);if(conversion)return conversion;resolvePendingConversion(session,staffConversion(session));if(state.status==='final')return null}
   const existing=decisions.pendingDecision(state);if(existing){if(isControlled(session,existing.team))return clone(existing);state.pendingCoachingDecision=null}
   if(state.status==='live'&&state.period<=4&&state.down===4&&state.possession&&isControlled(session,state.possession)&&!routineFourthDown(session,state))return decisions.ensureDecision(state,hooks(session));
-  return createHalftimeDecision(session)||createTempoDecision(session)||createDriveDecision(session)||createDefenseDecision(session)
+  return createHalftimeDecision(session)||createTempoDecision(session)||createTimeoutDecision(session)||createDriveDecision(session)||createDefenseDecision(session)
 }
 function resolveStrategy(session,optionId){
   const decision=session.pendingStrategyDecision;if(!decision)throw new Error('No strategy decision is pending.');const selected=String(optionId||'delegate');if(!decision.options.some(o=>o.id===selected))throw new Error(`Illegal ${decision.type} option: ${selected}`);const action=selected==='delegate'?decision.defaultOption:selected;session.pendingStrategyDecision=null;
@@ -6203,6 +6249,10 @@ function resolveStrategy(session,optionId){
     if(!['balanced','aggressive','ball_control'].includes(action))throw new Error(`Unknown halftime action: ${action}`);session.halftimeApproach[decision.team]=action;session.halftimeDecisionMade=true;appendStrategyReceipt(session,decision,selected,action)
   }else if(decision.type==='drive_call'){
     if(!(action in DRIVE_CALLS))throw new Error(`Unknown drive call: ${action}`);session.driveCall[decision.team]=action;session.driveAsked=decision.context.drive;appendStrategyReceipt(session,decision,selected,action)
+  }else if(decision.type==='timeout_call'){
+    if(!['timeout','run'].includes(action))throw new Error(`Unknown timeout action: ${action}`);appendStrategyReceipt(session,decision,selected,action);
+    const state=session.state;session.timeoutAsked=state.events.length;
+    if(action==='timeout'&&state.timeouts[decision.team]>0){state.timeouts[decision.team]--;pushGameEvent(state,'timeout',{team:decision.team,left:state.timeouts[decision.team]});session.timeoutAt=state.events.length;session.timeoutAsked=state.events.length}
   }else if(decision.type==='defense_call'){
     if(!(action in DEFENSE_CALLS))throw new Error(`Unknown defensive call: ${action}`);appendStrategyReceipt(session,decision,selected,action);const at=session.state.events.length;session.defenseCall={side:decision.team,call:action,at};session.defenseAsked=at
   }else throw new Error(`Unknown strategy decision type: ${decision.type}`);
@@ -6914,7 +6964,7 @@ function returnText(event){
   if(event.fairCatch)return', fair catch';
   return n>0?`, returned ${n} yard${n===1?'':'s'}`:'';
 }
-const DECISION_ACTION_LABELS={ground:'to run the ball',quick:'quick passes',shots:'to take shots',balanced:'a balanced drive',base:'to play it straight',pressure:'to bring pressure',coverage:'to drop into coverage',run_stop:'to load the box'};
+const DECISION_ACTION_LABELS={timeout:'a timeout',run:'to let the clock run',ground:'to run the ball',quick:'quick passes',shots:'to take shots',balanced:'a balanced drive',base:'to play it straight',pressure:'to bring pressure',coverage:'to drop into coverage',run_stop:'to load the box'};
 function decisionActionLabel(value){return DECISION_ACTION_LABELS[value]||String(value||'decision').replaceAll('_',' ')}
 // Broadcast-style short name: "Gavin Kemp" -> "G. Kemp".
 function shortName(name){const parts=String(name||'').trim().split(/\s+/);return parts.length>1?`${parts[0][0]}. ${parts.slice(1).join(' ')}`:parts[0]||''}
@@ -6964,6 +7014,7 @@ function eventText(event={},names={}){
   if(event.type==='field_goal'){const kk=who('kk');return`${kk?`${kk} (${team})`:team} ${event.distance||''}-yard field goal ${event.made?'good':'missed'}.`.replace('  -',' ')}
   if(event.type==='punt'){const pt=who('pt'),rt=who('rt');return`${pt?`${pt} (${team})`:team} punts${event.touchback?' for a touchback':''}${event.touchback?'':returnText(event)}${rt&&!event.touchback&&(Number(event.ret)>0||event.td)?` by ${rt}`:''}.`}
   if(event.type==='safety')return`SAFETY for ${team}.`;
+  if(event.type==='timeout')return`Timeout, ${team} (${event.left??0} left).`;
   if(event.type==='coaching_decision'){
     const choice=event.selectedOption==='delegate'?`delegates — staff chooses ${decisionActionLabel(event.resolvedAction)}`:`chooses ${decisionActionLabel(event.selectedOption)}`;
     return`${team} coach ${choice}.`;
@@ -7395,7 +7446,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.22.0';
+const APP_VERSION='0.23.0';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi','Aiden','Alex','Amari','Andrew','Anthony','Antonio','Armani','Ashton','Austin','Avery','Bennett','Blake','Brady','Brandon','Brayden','Brennan','Brock','Bryson','Cade','Caden','Calvin','Cameron','Carson','Cedric','Chase','Christian','Cody','Colby','Collin','Connor','Corey','Damian','Damon','Daniel','Davion','Dawson','Deandre','Demarcus','Derek','Desmond','Dillon','Drew','Dylan','Elijah','Ethan','Ezra','Garrett','Grady','Graham','Grant','Hayden','Hunter','Ian','Isaac','Jabari','Jace','Jackson','Jacob','Jaden','Jake','Jamar','Jameson','Jared','Jarrett','Javon','Jaxon','Jay','Jermaine','Jesse','Joel','Jonah','Josiah','Julian','Justin','Kaden','Kai','Kamari','Keegan','Keenan','Kendall','Kendrick','Kevin','Kobe','Kyle','Kyler','Lamar','Landon','Lane','Lawrence','Leon','Levi','Lincoln','Lucas','Marco','Mario','Mateo','Matthew','Maurice','Max','Myles','Nate','Nathan','Nolan','Omar','Owen','Parker','Patrick','Preston','Quentin','Quincy','Reggie','Riley','Ryan','Sam','Sean','Seth','Shane','Silas','Solomon','Spencer','Sterling','Terrell','Theo','Tobias','Travis','Tristan','Troy','Tucker','Tyrese','Victor','Wade','Walker','Wes','Wyatt','Zach','Zane','Andres','Diego','Rafael','Tevita','Sione','Manu','Keoni','Kenji','Darnell'];
@@ -12199,9 +12250,12 @@ $$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.cla
  $('#titleContinue').onclick=continueTitleDynasty;$('#titleNew').onclick=openNewDynastySetup;$('#titleLoad').onclick=()=>showTitlePanel('titleLoadPanel');$('#titleOptions').onclick=()=>showTitlePanel('titleOptionsPanel');$('#titleHowTo').onclick=()=>showTitlePanel('titleHowPanel');
  $('#titleStart').onclick=startTitleDynasty;$('#titleLoadBrowser').onclick=loadTitleDynasty;$('#titleSaveSlot').onchange=e=>chooseSaveSlot(e.target.value);$('#titleRenameSlot').onclick=renameSaveSlot;$('#titleImport').onclick=()=>$('#importFile').click();$('#titleSaveOptions').onclick=saveTitlePreferences;$$('[data-title-back]').forEach(b=>b.onclick=()=>showTitlePanel());
 }
-if(typeof window!=='undefined')window.__DL_TEST__={selected,createOpening,renderStaff,setTeamScheme,schemeTransition,positionChangeWillingness,commissionerMode,renderControlMode,applyCampRecommendations,careerChronologyHTML,preseasonDebug(){return{phase:universe?.phase,week:universe?.week,played:(universe?.schedule||[]).flat().filter(g=>g.played).length,targeted:(universe?.recruits||[]).filter(r=>r.targeted).length,rng:JSON.stringify(gameplayRng?.snapshot()||universe?.rng||null)}},setGameplayRng(seed){activateGameplayRng(seed,universe);syncGameplayRng()},prepareDevelopmentResults(){universe.phase='complete';universe.offseason=makeOffseasonState(universe.year,'spring',['review','departures','signing','portal']);runSpringCamp()}};
-if(typeof window!=='undefined')Object.assign(window.__DL_TEST__,{prepareFeaturedDevelopmentPlans(){const t=selected(),specs=[['QB','Technique'],['RB','Rehab'],['WR','Position Transition']];return specs.map(([pos,focus])=>{const p=t?.roster?.find(x=>x.pos===pos);if(!p)return false;p.trainingFocus=focus;p.developmentPlan={season:universe.year+1,featured:true,focus,createdYear:universe.year,receipts:[]};if(focus==='Rehab'){p.health=65;p.wear=40}if(focus==='Position Transition'){p.positionFamiliarity??={};p.positionFamiliarity[p.pos]=45}return true}).every(Boolean)}});
-if(typeof window!=='undefined')Object.assign(window.__DL_TEST__,{prepareGuidanceReturn(savedAt){guidancePrepareReturn(savedAt);renderGuidanceSystem()}});
+// v0.23: test hooks exist only under browser automation (Playwright sets navigator.webdriver) or the Node harness.
+// A player's browser and the desktop app never get them, including the ones that change the dynasty.
+function dynastyTestHooksEnabled(){try{return globalThis.navigator?.webdriver===true||(typeof process==='object'&&!!process.versions?.node)}catch{return false}}
+if(typeof window!=='undefined'&&dynastyTestHooksEnabled())window.__DL_TEST__={selected,createOpening,renderStaff,setTeamScheme,schemeTransition,positionChangeWillingness,commissionerMode,renderControlMode,applyCampRecommendations,careerChronologyHTML,preseasonDebug(){return{phase:universe?.phase,week:universe?.week,played:(universe?.schedule||[]).flat().filter(g=>g.played).length,targeted:(universe?.recruits||[]).filter(r=>r.targeted).length,rng:JSON.stringify(gameplayRng?.snapshot()||universe?.rng||null)}},setGameplayRng(seed){activateGameplayRng(seed,universe);syncGameplayRng()},prepareDevelopmentResults(){universe.phase='complete';universe.offseason=makeOffseasonState(universe.year,'spring',['review','departures','signing','portal']);runSpringCamp()}};
+if(typeof window!=='undefined'&&window.__DL_TEST__)Object.assign(window.__DL_TEST__,{prepareFeaturedDevelopmentPlans(){const t=selected(),specs=[['QB','Technique'],['RB','Rehab'],['WR','Position Transition']];return specs.map(([pos,focus])=>{const p=t?.roster?.find(x=>x.pos===pos);if(!p)return false;p.trainingFocus=focus;p.developmentPlan={season:universe.year+1,featured:true,focus,createdYear:universe.year,receipts:[]};if(focus==='Rehab'){p.health=65;p.wear=40}if(focus==='Position Transition'){p.positionFamiliarity??={};p.positionFamiliarity[p.pos]=45}return true}).every(Boolean)}});
+if(typeof window!=='undefined'&&window.__DL_TEST__)Object.assign(window.__DL_TEST__,{prepareGuidanceReturn(savedAt){guidancePrepareReturn(savedAt);renderGuidanceSystem()}});
 function makeStaffScoutingIdentitySystem(){
  'use strict';
  const GROUPS=[
@@ -15105,7 +15159,7 @@ if(typeof module==='object'&&module.exports){
    const l=row.level+1,fits=facilities.activeProjects(t).length<facilities.MAX_PROJECTS;
    action=`<div class="small muted">Level ${l} costs ${row.nextCost} units and takes ${row.buildSeasons} season${row.buildSeasons===1?'':'s'} to build.</div><div class="fb-actions">${CTL(`Start level ${l}`,`data-fb-start="${row.id}"`,{disabled:!fits,title:fits?'':`Only ${facilities.MAX_PROJECTS} projects at a time`})}</div>`;
   }else action='<div class="small muted">Finished. This is as good as it gets.</div>';
-  return`<div class="fb-track" data-fb-track="${row.id}"><div class="fb-track-head"><strong>${fbEsc(row.label)}</strong><span class="fb-pips" role="img" aria-label="Level ${row.level} of ${row.max}">${pips}</span></div><div class="small muted">${fbEsc(row.blurb)} Each level: ${fbEsc(row.perLevel)}.</div>${action}</div>`;
+  return`<div class="fb-track" data-fb-track="${row.id}"><div class="fb-track-head">${globalThis.DynastyArt?.img(globalThis.DynastyArt.facilityKey(row.id),'dl-art dl-art-track')||''}<strong>${fbEsc(row.label)}</strong><span class="fb-pips" role="img" aria-label="Level ${row.level} of ${row.max}">${pips}</span></div><div class="small muted">${fbEsc(row.blurb)} Each level: ${fbEsc(row.perLevel)}.</div>${action}</div>`;
  }
  function cardHTML(t){
   const s=facilities.summary(t),rows=facilities.trackRows(t),nilLeft=nilRemaining(t),nilTotal=nilBudgetFor(t),left=s.campaignsLeft;
@@ -15887,7 +15941,7 @@ function v2RecordDriveArchive(preview){
     if(e.type==='possession_change'&&valid(e.to)){if(drive&&drive.side!==e.to){if(e.reason==='turnover_on_downs'&&!drive.result)drive.result='DOWNS';finish()}if(!drive)start(e.to);continue}
     const side=valid(e.team)?e.team:null;if(side&&(!drive||drive.side!==side)){finish();start(side,(e.state?.period||0)>4)}if(!drive)continue;
     if(['scrimmage','interception','fumble'].includes(e.type)){drive.plays++;drive.playByPlay.push(v2RecordArchiveText(e,names));if(e.type==='interception')drive.result='INT';if(e.type==='fumble')drive.result='FUMBLE'}
-    else if(e.type==='coaching_decision'||e.type==='penalty'){drive.playByPlay.push(v2RecordArchiveText(e,names))}
+    else if(e.type==='coaching_decision'||e.type==='penalty'||e.type==='timeout'){drive.playByPlay.push(v2RecordArchiveText(e,names))}
     else if(e.type==='touchdown'){drive.points+=6;drive.result='TD';drive.playByPlay.push(v2RecordArchiveText(e,names))}
     else if(e.type==='extra_point'){if(e.made!==false)drive.points++;drive.playByPlay.push(v2RecordArchiveText(e,names))}
     else if(e.type==='two_point'){if(e.made)drive.points+=2;drive.playByPlay.push(v2RecordArchiveText(e,names))}
@@ -16457,7 +16511,7 @@ const V2_GAMEDAY_CALL_HINTS={
   balanced:'No tilt either way.',ground:'Safer and slower. Fewer big plays.',quick:'High percentage, short gains, fewer sacks.',shots:'Bigger gains. More sacks and interceptions.',
   base:'No tilt either way.',pressure:'More sacks. A completion goes further.',coverage:'Takes away the deep ball. Gives up the run.',run_stop:'Stops the run. Thin behind it.'
 };
-const V2_GAMEDAY_DECISION_TITLES={drive_call:'YOUR DRIVE',defense_call:'DEFENSIVE CALL',fourth_down:'FOURTH DOWN',two_point_decision:'AFTER THE TOUCHDOWN',halftime_adjustment:'HALFTIME',late_game_tempo:'CLOCK MANAGEMENT'};
+const V2_GAMEDAY_DECISION_TITLES={timeout_call:'CLOCK RUNNING',drive_call:'YOUR DRIVE',defense_call:'DEFENSIVE CALL',fourth_down:'FOURTH DOWN',two_point_decision:'AFTER THE TOUCHDOWN',halftime_adjustment:'HALFTIME',late_game_tempo:'CLOCK MANAGEMENT'};
 function v2GameDayUIOptionLabel(d,id){return d.options.find(o=>o.id===id)?.label||String(id||'').replaceAll('_',' ')}
 function v2GameDayUIDecision(session){
   const d=globalThis.DynastyGameEngineV2GameDay?.pendingDecision(session);if(!d)return'';
@@ -17515,7 +17569,7 @@ function milestoneHubItems(){
 function renderCareerMilestones(){
  const host=$('#careerMilestones');if(!host||!universe)return;
  const rows=careerMilestoneStatus(),reached=rows.filter(r=>r.done).length;
- host.innerHTML=`<div class="section-head"><div><div class="eyebrow">CAREER</div><h3>Milestones</h3><div class="muted">Reached across every post you hold. ${reached} of ${rows.length} so far.</div></div></div><div class="milestone-grid">${rows.map(r=>`<div class="milestone${r.done?' is-done':''}"><strong>${esc(r.label)}</strong><span>${esc(r.detail)}</span>${r.done?`<em>${r.year?`Reached ${r.year}`:'Reached'}</em>`:`<div class="milestone-bar" role="meter" aria-label="${esc(r.label)} progress" aria-valuemin="0" aria-valuemax="${r.target}" aria-valuenow="${r.value}"><i style="width:${Math.round(r.value/r.target*100)}%"></i></div><em>${r.value} / ${r.target}</em>`}</div>`).join('')}</div>`;
+ host.innerHTML=`<div class="section-head"><div><div class="eyebrow">CAREER</div><h3>Milestones</h3><div class="muted">Reached across every post you hold. ${reached} of ${rows.length} so far.</div></div></div><div class="milestone-grid">${rows.map(r=>`<div class="milestone${r.done?' is-done':''}">${globalThis.DynastyArt?.img(globalThis.DynastyArt.milestoneKey(r.id),'dl-art dl-art-milestone')||''}<strong>${esc(r.label)}</strong><span>${esc(r.detail)}</span>${r.done?`<em>${r.year?`Reached ${r.year}`:'Reached'}</em>`:`<div class="milestone-bar" role="meter" aria-label="${esc(r.label)} progress" aria-valuemin="0" aria-valuemax="${r.target}" aria-valuenow="${r.value}"><i style="width:${Math.round(r.value/r.target*100)}%"></i></div><em>${r.value} / ${r.target}</em>`}</div>`).join('')}</div>`;
 }
 const renderProgramWithSettings=TAB_RENDERERS.program;
 TAB_RENDERERS.program=()=>{renderProgramWithSettings();renderCareerMilestones()};
@@ -18867,6 +18921,24 @@ globalThis.DynastyOffseasonStop=offseasonStopBeforeAdvance;
 loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});[...new Set(schools.map(t=>t.conference))].forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();bindNewDynastySetup();applyTitlePreferences();showTitleScreen();refreshTitleSave().then(restoreNewDynastySetupDraft);}).catch(e=>{$('#titleStatus').textContent='Could not initialize Dynasty Lab. '+e.message});
 })();
 
+// v0.23 — the award and facility sprites from the November 11 art pack (release dynasty-assets-2026-11-11). Each is
+// a 256px transparent WebP rendered from a Meshy model; the models themselves stay in the release as source files.
+// Everything here is decorative (empty alt): the text next to each image already says what it is.
+(function(root){
+  'use strict';
+  const FILES=['bowl-laurel','coach-headset','coach-legacy','conference-crown','game-ball','locker-room','player-of-year','practice-facility','rivalry-bell','rivalry-boot','rivalry-lantern','rivalry-shield','scouting-folio','signing-cap','stadium-miniature','weight-room'];
+  const src=key=>FILES.includes(key)?`assets/awards/${key}.webp`:'';
+  const attr=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function img(key,cls='dl-art'){const s=src(key);return s?`<img class="${attr(cls)}" src="${s}" alt="" aria-hidden="true" loading="lazy" decoding="async" width="256" height="256">`:''}
+  // Rivalry trophies are named "The <place> <noun>"; four nouns have their own art and the rest share the shield.
+  function rivalryKey(trophy){const t=String(trophy||'').toLowerCase();return/\bbell\b/.test(t)?'rivalry-bell':/\bboot\b/.test(t)?'rivalry-boot':/\blantern\b/.test(t)?'rivalry-lantern':'rivalry-shield'}
+  const FACILITY={stadium:'stadium-miniature',training:'weight-room',football_ops:'practice-facility'};
+  const MILESTONE={'conf-title':'conference-crown',rival:'rivalry-shield','national-title':'player-of-year',repeat:'player-of-year'};
+  const facilityKey=id=>FACILITY[id]||'';
+  const milestoneKey=id=>MILESTONE[id]||(/win|season|perfect/.test(String(id))?'game-ball':'coach-legacy');
+  root.DynastyArt={FILES,src,img,rivalryKey,facilityKey,milestoneKey};
+})(typeof globalThis!=='undefined'?globalThis:this);
+
 (() => {
 'use strict';
 
@@ -19830,7 +19902,7 @@ function cardHTML(snap){
  const meet=r.lastMeeting?`${r.lastMeeting.won?'W':'L'} ${r.lastMeeting.us}-${r.lastMeeting.them}`:r.meeting?`Week ${r.meeting.week} · ${r.meeting.home?'home':'away'}`:'Not scheduled';
  const others=(snap.recruiters||[]).filter(x=>x.team.id!==r.team.id).slice(0,2);
  return`<section id="rivalWatch" class="card rival-watch" aria-label="Rival watch">`+
-  `<div class="rvw-head"><span class="eyebrow">RIVAL WATCH</span>${r.trophy?`<span class="rvw-trophy">${esc(r.trophy)}</span>`:''}</div>`+
+  `<div class="rvw-head"><span class="eyebrow">RIVAL WATCH</span>${r.trophy?`<span class="rvw-trophy">${globalThis.DynastyArt?.img(globalThis.DynastyArt.rivalryKey(r.trophy),'dl-art dl-art-inline')||''}${esc(r.trophy)}</span>`:''}</div>`+
   `<div class="rvw-main">${helmet(r.team.id,'rvw-helmet is-away')}<div class="rvw-id"><strong>${esc(r.coach.name)}</strong><span>Head coach · ${esc(r.team.rank?`#${r.team.rank} `:'')}${esc(r.team.name)} (${r.team.w}-${r.team.l})</span><div class="rvw-tags"><b class="rvw-arch">${esc(a.name)}</b>${tr.map(t=>`<i>${esc(t)}</i>`).join('')}</div><p>${esc(a.blurb)}</p></div>`+
   `<div class="rvw-meters">${meter('Recruiting',r.coach.recruiting)}${meter('Play calling',r.coach.playCall)}${meter('Development',r.coach.development)}${meter('Evaluation',r.coach.evaluation)}</div></div>`+
   `<div class="rvw-facts"><div><span>Series</span><b>${esc(series)}</b></div><div><span>${r.lastMeeting?'This year':'Next meeting'}</span><b>${esc(meet)}</b></div><div><span>Your targets they lead</span><b>${r.racesLed?.length||0}</b></div></div>`+
@@ -20182,13 +20254,14 @@ function confettiHTML(n=56){
 }
 const stars=n=>'★'.repeat(Math.max(0,Math.min(5,Number(n)||0)));
 function helmet(id,cls){return globalThis.DynastyBrandVisuals?.helmetHTML?.(id,cls)||''}
+function art(key){return globalThis.DynastyArt?.img(key,'dl-art dl-art-ceremony')||''}
 function bodyHTML(m){
  const t=m.team,record=`${t.w}-${t.l}`;
  if(m.kind==='national')return{tone:'gold',confetti:true,html:`<div class="cer-trophy" aria-hidden="true"></div><span class="cer-kicker">${m.year} College Football</span><h2>National Champions</h2><p class="cer-team">${esc(t.name)}</p><p class="cer-sub">${record} · the last team standing</p>`};
- if(m.kind==='conference')return{tone:'gold',confetti:true,html:`${helmet(t.id,'cer-helmet')}<span class="cer-kicker">${m.year} · ${esc(t.conference)}</span><h2>Conference Champions</h2><p class="cer-team">${esc(t.name)}</p><p class="cer-sub">${record} · a banner for the stadium</p>`};
- if(m.kind==='bowl')return{tone:'gold',confetti:true,html:`<div class="cer-faceoff">${helmet(t.id,'cer-helmet')}<b>${esc(m.score?.[0]??'')}–${esc(m.score?.[1]??'')}</b>${helmet(m.opponent?.id,'cer-helmet is-away')}</div><span class="cer-kicker">${m.year} · Bowl season</span><h2>${esc(m.label)} Champions</h2><p class="cer-team">${esc(t.name)}</p><p class="cer-sub">over ${esc(m.opponent?.name||'')}</p>`};
- if(m.kind==='rivalry')return{tone:'gold',confetti:true,html:`<div class="cer-faceoff">${helmet(t.id,'cer-helmet')}<b>${esc(m.score?.[0]??'')}–${esc(m.score?.[1]??'')}</b>${helmet(m.opponent?.id,'cer-helmet is-away')}</div><span class="cer-kicker">${m.year} · Rivalry game</span><h2>${m.trophy?esc(m.trophy):'Rivalry won'}</h2><p class="cer-team">${m.trophy?(m.streak>1?`stays with ${esc(t.name)}`:`comes home to ${esc(t.name)}`):`${esc(t.name)} beats ${esc(m.opponent?.name||'')}`}</p><p class="cer-sub">${m.streak>1?`${m.streak} straight over ${esc(m.opponent?.name||'')}`:`over ${esc(m.opponent?.name||'')}`}</p>`};
- if(m.kind==='signing'){const [s5,s4,s3]=m.stars||[0,0,0];return{tone:'team',confetti:false,html:`<span class="cer-kicker">${m.year} · Signing Day</span><h2>The Class Is In</h2><p class="cer-team">${esc(t.name)} signs ${m.count}</p><div class="cer-stars"><span><b>${s5}</b>5★</span><span><b>${s4}</b>4★</span><span><b>${s3}</b>3★</span></div><ol class="cer-list">${(m.top||[]).map((r,i)=>`<li style="--i:${i}"><canvas class="portrait portrait-list" width="44" height="44" data-portrait="${esc(r.id)}" data-portrait-size="44" data-portrait-frame="list" data-portrait-kind="recruit" aria-hidden="true"></canvas><span><b>${esc(r.name)}</b><small>${esc(r.pos)} · ${stars(r.stars)}</small></span></li>`).join('')}</ol>`}}
+ if(m.kind==='conference')return{tone:'gold',confetti:true,html:`${art('conference-crown')||helmet(t.id,'cer-helmet')}<span class="cer-kicker">${m.year} · ${esc(t.conference)}</span><h2>Conference Champions</h2><p class="cer-team">${esc(t.name)}</p><p class="cer-sub">${record} · a banner for the stadium</p>`};
+ if(m.kind==='bowl')return{tone:'gold',confetti:true,html:`<div class="cer-faceoff">${helmet(t.id,'cer-helmet')}<b>${esc(m.score?.[0]??'')}–${esc(m.score?.[1]??'')}</b>${helmet(m.opponent?.id,'cer-helmet is-away')}</div>${art('bowl-laurel')}<span class="cer-kicker">${m.year} · Bowl season</span><h2>${esc(m.label)} Champions</h2><p class="cer-team">${esc(t.name)}</p><p class="cer-sub">over ${esc(m.opponent?.name||'')}</p>`};
+ if(m.kind==='rivalry')return{tone:'gold',confetti:true,html:`<div class="cer-faceoff">${helmet(t.id,'cer-helmet')}<b>${esc(m.score?.[0]??'')}–${esc(m.score?.[1]??'')}</b>${helmet(m.opponent?.id,'cer-helmet is-away')}</div>${art(globalThis.DynastyArt?.rivalryKey(m.trophy))}<span class="cer-kicker">${m.year} · Rivalry game</span><h2>${m.trophy?esc(m.trophy):'Rivalry won'}</h2><p class="cer-team">${m.trophy?(m.streak>1?`stays with ${esc(t.name)}`:`comes home to ${esc(t.name)}`):`${esc(t.name)} beats ${esc(m.opponent?.name||'')}`}</p><p class="cer-sub">${m.streak>1?`${m.streak} straight over ${esc(m.opponent?.name||'')}`:`over ${esc(m.opponent?.name||'')}`}</p>`};
+ if(m.kind==='signing'){const [s5,s4,s3]=m.stars||[0,0,0];return{tone:'team',confetti:false,html:`${art('signing-cap')}<span class="cer-kicker">${m.year} · Signing Day</span><h2>The Class Is In</h2><p class="cer-team">${esc(t.name)} signs ${m.count}</p><div class="cer-stars"><span><b>${s5}</b>5★</span><span><b>${s4}</b>4★</span><span><b>${s3}</b>3★</span></div><ol class="cer-list">${(m.top||[]).map((r,i)=>`<li style="--i:${i}"><canvas class="portrait portrait-list" width="44" height="44" data-portrait="${esc(r.id)}" data-portrait-size="44" data-portrait-frame="list" data-portrait-kind="recruit" aria-hidden="true"></canvas><span><b>${esc(r.name)}</b><small>${esc(r.pos)} · ${stars(r.stars)}</small></span></li>`).join('')}</ol>`}}
  if(m.kind==='draft')return{tone:'team',confetti:false,html:`<span class="cer-kicker">${m.year} · Draft Night</span><h2>Your Players Go Pro</h2><p class="cer-team">${esc(t.name)} · ${m.picks.length} drafted</p><ol class="cer-list">${m.picks.map((p,i)=>`<li style="--i:${i}"><span class="cer-pick">R${esc(p.round)}<small>#${esc(p.pick)}</small></span><span><b>${esc(p.name)}</b><small>${esc(p.pos)} · ${esc(p.label)}</small></span></li>`).join('')}</ol>`};
  return null;
 }

@@ -190,3 +190,32 @@ test('a live game saved before v0.19 resumes and plays without the new calls',()
   gameday.simulate(resumed,decision=>{types.add(decision.type);return'delegate'});
   assert.ok(!types.has('drive_call')&&!types.has('defense_call'));engine.validateGame(resumed.state);
 });
+
+// Timeouts: the last two minutes of a half, only after a play that ran the clock, only in a fully coached game.
+test('a coached game offers a timeout late in a half and it saves the clock',()=>{
+  const base=gameday.createSession({...options,gameId:'GD-TO',seed:'gameday-to',controlledTeamId:home.id,calls:true});engine.startGame(base.state);
+  base.driveAsked=-1;
+  Object.assign(base.state,{period:4,clock:100,possession:'home',fieldPosition:45,down:2,distance:6,score:{home:14,away:17}});
+  base.state.events.push({seq:base.state.events.length+1,type:'scrimmage',team:'home',kind:'rush',yards:4,state:{...base.state,events:undefined}});
+  const asked=gameday.advanceOne(base);
+  assert.equal(asked.status,'decision');assert.equal(asked.decision.type,'timeout_call');assert.equal(asked.decision.staffRecommendation,'timeout');
+  assert.deepEqual(asked.decision.options.map(o=>o.id),['timeout','run','delegate']);
+  const saved=JSON.parse(JSON.stringify(gameday.snapshot(base))),stop=gameday.restore(saved),run=gameday.restore(saved);
+  gameday.resolve(stop,'timeout');gameday.resolve(run,'run');
+  assert.equal(stop.state.timeouts.home,2);assert.equal(run.state.timeouts.home,3);
+  assert.ok(stop.state.events.some(e=>e.type==='timeout'&&e.team==='home'&&e.left===2));
+  // Exactly one snap each: after it, a new timeout prompt may be waiting, and answering it would play another.
+  for(const s of [stop,run])gameday.advanceOne(s);
+  assert.ok(stop.state.clock>run.state.clock,`the timeout kept time on the clock (${stop.state.clock} vs ${run.state.clock})`);
+  assert.ok(100-stop.state.clock<=7,'only the play itself ran off');
+  // Never asked twice for the same snap, and never without a timeout left.
+  const none=gameday.restore(saved);none.state.timeouts.home=0;none.pendingStrategyDecision=null;
+  assert.notEqual(gameday.advanceOne(none).decision?.type,'timeout_call');
+  engine.validateState(stop.state);
+});
+
+test('timeouts are never offered in a session without calls',()=>{
+  const types=new Set();
+  for(let i=0;i<6;i++){const s=gameday.createSession({...options,gameId:`GD-NOTO-${i}`,seed:`gameday-noto-${i}`,controlledTeamId:home.id});gameday.simulate(s,d=>{types.add(d.type);return'delegate'})}
+  assert.ok(!types.has('timeout_call'));
+});
