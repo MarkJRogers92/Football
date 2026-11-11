@@ -31,7 +31,8 @@ concurrency:
 jobs:
   validate-and-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    # Full validation runs every unit and browser suite in series; by v0.23.0 that takes 35 to 40 minutes.
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
         with:
