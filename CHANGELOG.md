@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.19.0 — Game Day worth coaching
+
+- **Call every drive.** When you coach a game live, each of your possessions starts with a call: stay balanced, run the ball, quick passes or take shots. Each one trades something. Running protects the ball and the clock and gives up big plays; taking shots gains more per completion and costs sacks and interceptions. Your staff say which they would choose and why (the score, the clock, the weather or the matchup), and the card marks what you called last drive.
+- **Call the big defensive downs.** On third downs inside your 30, in a one-score fourth quarter, or in the two-minute drill before the half, you choose to play it straight, bring pressure, drop into coverage or load the box. The call covers that one snap.
+- **See what your call led to.** After each call the screen shows the next play and how the win chance moved because of it.
+- **A field on the live screen.** The ball, the direction of the drive and the first-down line are drawn on a field under the scoreboard.
+- **A live game takes the screen.** Scouting, preparation and last week's result step aside until the final, so the scoreboard, the field and the decision fit one screen on a desktop and on a phone. "Show scouting and prep" brings them back.
+- **Coach It Live sits under the matchup**, not under a page of preparation.
+- **A coached game is now about 15 to 22 decisions** (it was about 7). "Coach big moments" is unchanged and still stops only for fourth downs, late conversions, halftime and the final minutes.
+- **Plain words in the play-by-play.** The feed says "Drive call · Run the ball" and the archived log says the coach "chooses to run the ball".
+
+Measured over 480 simulated games with one call used every drive: win rate 49% to 53% for all four calls, so none is simply the best. Points scored ranged from 19.2 a game (run the ball) to 22.2 (take shots), with points allowed moving the same way. Simulated games and Coach big moments do not use the new calls and play exactly as before. A live game saved in v0.18 resumes without them.
+
 ## v0.18.0 — A dynasty that lasts
 
 - **Backups are a ninth of the size.** Export now writes a compressed backup (`.json.gz`). A 30-season dynasty that exported at about 299 MB is about 35 MB; a first-season backup is under 4 MB. Import takes the compressed file as it is, and still takes older plain `.json` backups.

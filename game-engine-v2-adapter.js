@@ -106,28 +106,31 @@ function penaltyAccepted(state,type,spotYards,outcome){
   const gain=spotYards+(type.auto||spotYards>=distance?5:0),playValue=Math.max(0,yards)+(conversion?5:0);
   return !!outcome.turnover||gain>playValue;
 }
-function profileOutcomeRules(state,homeInput,awayInput,homeFieldRating=0){
+// `call` is a coach's play call for this snap (v0.19): small shifts to how often a team throws and how the play
+// tends to go. Every field is optional and a missing call changes nothing, including the order of random draws.
+function profileOutcomeRules(state,homeInput,awayInput,homeFieldRating=0,call=null){
+  const c=call||{},cPass=finite(c.passRate,0),cPassYards=finite(c.passYards,1),cRushYards=finite(c.rushYards,0),cInt=finite(c.intMult,1),cSack=finite(c.sackMult,1),cComp=finite(c.comp,0),cHurry=finite(c.hurry,0);
   const rng=DynastyRng.create(state.rng),isHome=state.possession==='home',offense=isHome?homeInput:awayInput,defense=isHome?awayInput:homeInput;
   const rules=state.rules,e=GameEngineV2.effectsOf(state),pressureOn=rules.pressure!==false;
   const venueEdge=isHome?homeFieldRating:-homeFieldRating,matchup=offense.offense-defense.defense+venueEdge,edge=matchup/18;
-  const roll=rng.next(),pass=rng.next()<clamp(.53+e.passRate,.35,.62);
+  const roll=rng.next(),pass=rng.next()<clamp(.53+e.passRate+cPass,call?.2:.35,call?.8:.62);
   let outcome;
   if(pass){
-    const intRate=clamp(.0145-matchup*.00014,.006,.032)*e.interception,fumbleRate=clamp(.005-matchup*.00003,.0025,.010)*e.fumble,sackRate=clamp(.052-matchup*.00045,.030,.088);
+    const intRate=clamp(.0145-matchup*.00014,.006,.032)*e.interception*cInt,fumbleRate=clamp(.005-matchup*.00003,.0025,.010)*e.fumble,sackRate=clamp(.052-matchup*.00045,.030,.088)*cSack;
     const redZoneFinish=state.fieldPosition>=80?2.6:state.fieldPosition>=65?.9:0;
     if(roll<intRate)outcome={turnover:'interception',kind:'pass',completed:false,yards:clamp(Math.round(8+rng.gauss()*9),-5,35),clock:rng.int(8,18)};
     else if(roll<intRate+fumbleRate)outcome={turnover:'fumble',kind:'pass',completed:false,sack:true,pressure:true,yards:-clamp(Math.round(6+rng.gauss()*2),2,12),clock:rng.int(22,38)};
     else if(roll<intRate+fumbleRate+sackRate)outcome={kind:'pass',completed:false,sack:true,pressure:true,yards:-clamp(Math.round(6+rng.gauss()*2),2,12),clock:rng.int(22,38)};
     else{
       // Pressure that stops short of a sack: the quarterback is hurried, scrambles, or throws it away.
-      const hurryRate=pressureOn?clamp(.205-matchup*.0022,.10,.34):0,hurried=rng.next()<hurryRate,shape=rng.next();
+      const hurryRate=pressureOn?clamp(.205-matchup*.0022+cHurry,.05,.45):0,hurried=rng.next()<hurryRate,shape=rng.next();
       if(hurried&&shape<.17)outcome={kind:'rush',scramble:true,pressure:true,yards:clamp(Math.round(6.2+rng.gauss()*5.2),-4,32),clock:rng.int(26,40)};
       else if(hurried&&shape<.42)outcome={kind:'pass',completed:false,pressure:true,yards:0,clock:rng.int(6,12)};
       else{
-        const comp=clamp((hurried?.595:.724)+matchup*.0032+e.passComp,.36,.86),completed=rng.next()<comp;
+        const comp=clamp((hurried?.595:.724)+matchup*.0032+e.passComp+cComp,.36,.86),completed=rng.next()<comp;
         if(!completed)outcome={kind:'pass',completed:false,yards:0,clock:rng.int(6,12)};
         else{
-          const raw=(9.6+edge*1.15+redZoneFinish+rng.gauss()*7.2)*(hurried?.92:1.045)*e.passYards;
+          const raw=(9.6+edge*1.15+redZoneFinish+rng.gauss()*7.2)*(hurried?.92:1.045)*e.passYards*cPassYards;
           outcome={kind:'pass',completed:true,yards:clamp(Math.round(raw),-3,55),clock:rng.int(26,42)};
         }
         if(hurried)outcome.pressure=true;
@@ -138,7 +141,7 @@ function profileOutcomeRules(state,homeInput,awayInput,homeFieldRating=0){
     if(roll<fumbleRate)outcome={turnover:'fumble',kind:'rush',yards:clamp(Math.round(3+rng.gauss()*6),-8,18),clock:rng.int(18,34)};
     else{
       const redZoneFinish=state.fieldPosition>=80?2.6:state.fieldPosition>=65?1.0:0;
-      outcome={kind:'rush',yards:clamp(Math.round((4.3+edge*.7+redZoneFinish+rng.gauss()*4.8)*e.rushYards),-14,55),clock:rng.int(27,42)};
+      outcome={kind:'rush',yards:clamp(Math.round((4.3+edge*.7+redZoneFinish+cRushYards+rng.gauss()*4.8)*e.rushYards),-14,55),clock:rng.int(27,42)};
     }
   }
   // Flags: one draw decides whether there is a foul at all, one picks it, one sizes a pass interference spot.
@@ -154,8 +157,8 @@ function profileOutcomeRules(state,homeInput,awayInput,homeFieldRating=0){
   state.rng=rng.snapshot();return outcome;
 }
 // Games that carry rules use the v0.16 model; a game saved before it (no rules on the state) plays as it did.
-function profileOutcome(state,homeInput,awayInput,homeFieldRating=0){
-  return state&&state.rules?profileOutcomeRules(state,homeInput,awayInput,homeFieldRating):legacyProfileOutcome(state,homeInput,awayInput,homeFieldRating);
+function profileOutcome(state,homeInput,awayInput,homeFieldRating=0,call=null){
+  return state&&state.rules?profileOutcomeRules(state,homeInput,awayInput,homeFieldRating,call):legacyProfileOutcome(state,homeInput,awayInput,homeFieldRating);
 }
 function annotateOutcomeEvent(state,startIndex,outcome){
   const events=state.events||[];

@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.18.0</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.19.0</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -1210,6 +1210,48 @@ tr[hidden]{display:none!important}
 .v2-forecast{font-weight:600}
 .v2-forecast[data-severity="rough"],.v2-forecast[data-severity="harsh"]{color:#d9a441}
 .game-conditions{margin:0 0 .6rem}
+
+/* v0.19: a live game takes the screen. Preparation, scouting and the last game step aside until the final. */
+#gamelab.v2-live>:not(#v2InteractiveGameDay){display:none!important}
+.v2-gameday-prep-toggle{margin-left:auto;background:transparent;border-color:transparent;color:var(--muted);text-decoration:underline;font-weight:500}
+/* The field strip. */
+.v2-live-field{position:relative;height:84px;margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#132235}
+.v2-live-turf{position:absolute;top:0;bottom:0;left:8%;right:8%;background:repeating-linear-gradient(90deg,#17402a 0 10%,#1b4a31 10% 20%)}
+.v2-live-endzone{position:absolute;top:0;bottom:0;width:8%;display:grid;place-items:center;overflow:hidden;font:800 10px/1 var(--bi-display,inherit);letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.75)}
+.v2-live-endzone span{writing-mode:vertical-rl;white-space:nowrap;max-height:76px;overflow:hidden;text-overflow:ellipsis}
+.v2-live-endzone.away{left:0;background:#1a2f4a}.v2-live-endzone.home{right:0;background:#3a2a12}
+.v2-live-field i{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.22)}
+.v2-live-field i b{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font:700 10px/1 system-ui,sans-serif;color:rgba(255,255,255,.55);font-style:normal}
+.v2-live-field u{position:absolute;top:0;bottom:0;width:3px;margin-left:-1px;background:#f3ca78;text-decoration:none}
+.v2-live-field s{position:absolute;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#10161f;font-size:12px;text-decoration:none;box-shadow:0 0 0 3px rgba(0,0,0,.35);transition:left .35s ease}
+@media(prefers-reduced-motion:reduce){.v2-live-field s{transition:none}}
+/* Drive and defensive calls: a label, what it trades, and which one was used last. */
+.v2-gameday-calls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.v2-gameday-calls button{display:grid;gap:4px;align-content:start;text-align:left;min-height:64px;padding:10px 12px;white-space:normal}
+.v2-gameday-calls button small{font-weight:400;font-size:12px;line-height:1.35;color:var(--muted)}
+.v2-gameday-calls button em{font-style:normal;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--warn)}
+.v2-gameday-consequence{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin-top:10px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-size:13px;background:var(--panel2)}
+.v2-gameday-consequence b{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--muted)}
+.v2-gameday-consequence b.up{color:var(--good)}.v2-gameday-consequence b.down{color:var(--bad,#f08a8a)}
+@media(max-width:720px){.v2-live-field{height:64px}.v2-live-endzone span{display:none}.v2-gameday-calls{grid-template-columns:1fr 1fr}.v2-gameday-prep-toggle{margin-left:0}}
+/* Phones: the scoreboard is one compact block so the field and the whole decision fit above the navigation. */
+@media(max-width:720px){
+#gamelab.v2-live .v2-gameday-head{display:none}
+#gamelab.v2-live .v2-gameday-host{padding:10px}
+.v2-gameday-scoreboard{grid-template-columns:1fr 1fr;gap:6px 10px;padding:10px}
+.v2-gameday-scoreboard .v2-gameday-center{grid-column:1/-1}
+.v2-gameday-team,.v2-gameday-team.home{grid-template-columns:minmax(0,1fr) auto;gap:6px}
+.v2-gameday-team .team-logo,.v2-gameday-team [class*=team-logo]{display:none}
+.v2-gameday-team.home{direction:rtl}.v2-gameday-team.home>*{direction:ltr}
+.v2-gameday-team span{font-size:13px}.v2-gameday-team b{font-size:24px}
+.v2-live-field{height:52px;margin-top:8px}
+.v2-gameday-decision{padding:10px;margin-top:8px}
+.v2-gameday-decision h3{font-size:16px;line-height:1.25}
+.v2-gameday-decision .button-row{margin-top:8px}
+.v2-gameday-calls{gap:6px}
+.v2-gameday-calls button{min-height:56px;padding:8px 10px}
+.v2-gameday-calls button small{font-size:11.5px;line-height:1.3}
+}
 
 .v2-matchup-host{border-color:#3b4e69;background:linear-gradient(180deg,#171e29,#141a22)}
 .v2-matchup-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:16px}.v2-matchup-head h2{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.v2-matchup-ratings{display:grid;gap:6px;text-align:right;min-width:190px}.v2-matchup-ratings span{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}.v2-matchup-ratings b{color:var(--text);font-size:12px;letter-spacing:0}
@@ -3355,7 +3397,7 @@ button.lw-follow[aria-pressed="true"]{color:var(--text);border-color:var(--team-
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.18.0</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.19.0</b></span></footer>
   </div>
 </section>
 
@@ -3382,7 +3424,7 @@ button.lw-follow[aria-pressed="true"]{color:var(--text);border-color:var(--team-
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.18.0</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.19.0</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -5691,28 +5733,31 @@ function penaltyAccepted(state,type,spotYards,outcome){
   const gain=spotYards+(type.auto||spotYards>=distance?5:0),playValue=Math.max(0,yards)+(conversion?5:0);
   return !!outcome.turnover||gain>playValue;
 }
-function profileOutcomeRules(state,homeInput,awayInput,homeFieldRating=0){
+// `call` is a coach's play call for this snap (v0.19): small shifts to how often a team throws and how the play
+// tends to go. Every field is optional and a missing call changes nothing, including the order of random draws.
+function profileOutcomeRules(state,homeInput,awayInput,homeFieldRating=0,call=null){
+  const c=call||{},cPass=finite(c.passRate,0),cPassYards=finite(c.passYards,1),cRushYards=finite(c.rushYards,0),cInt=finite(c.intMult,1),cSack=finite(c.sackMult,1),cComp=finite(c.comp,0),cHurry=finite(c.hurry,0);
   const rng=DynastyRng.create(state.rng),isHome=state.possession==='home',offense=isHome?homeInput:awayInput,defense=isHome?awayInput:homeInput;
   const rules=state.rules,e=GameEngineV2.effectsOf(state),pressureOn=rules.pressure!==false;
   const venueEdge=isHome?homeFieldRating:-homeFieldRating,matchup=offense.offense-defense.defense+venueEdge,edge=matchup/18;
-  const roll=rng.next(),pass=rng.next()<clamp(.53+e.passRate,.35,.62);
+  const roll=rng.next(),pass=rng.next()<clamp(.53+e.passRate+cPass,call?.2:.35,call?.8:.62);
   let outcome;
   if(pass){
-    const intRate=clamp(.0145-matchup*.00014,.006,.032)*e.interception,fumbleRate=clamp(.005-matchup*.00003,.0025,.010)*e.fumble,sackRate=clamp(.052-matchup*.00045,.030,.088);
+    const intRate=clamp(.0145-matchup*.00014,.006,.032)*e.interception*cInt,fumbleRate=clamp(.005-matchup*.00003,.0025,.010)*e.fumble,sackRate=clamp(.052-matchup*.00045,.030,.088)*cSack;
     const redZoneFinish=state.fieldPosition>=80?2.6:state.fieldPosition>=65?.9:0;
     if(roll<intRate)outcome={turnover:'interception',kind:'pass',completed:false,yards:clamp(Math.round(8+rng.gauss()*9),-5,35),clock:rng.int(8,18)};
     else if(roll<intRate+fumbleRate)outcome={turnover:'fumble',kind:'pass',completed:false,sack:true,pressure:true,yards:-clamp(Math.round(6+rng.gauss()*2),2,12),clock:rng.int(22,38)};
     else if(roll<intRate+fumbleRate+sackRate)outcome={kind:'pass',completed:false,sack:true,pressure:true,yards:-clamp(Math.round(6+rng.gauss()*2),2,12),clock:rng.int(22,38)};
     else{
       // Pressure that stops short of a sack: the quarterback is hurried, scrambles, or throws it away.
-      const hurryRate=pressureOn?clamp(.205-matchup*.0022,.10,.34):0,hurried=rng.next()<hurryRate,shape=rng.next();
+      const hurryRate=pressureOn?clamp(.205-matchup*.0022+cHurry,.05,.45):0,hurried=rng.next()<hurryRate,shape=rng.next();
       if(hurried&&shape<.17)outcome={kind:'rush',scramble:true,pressure:true,yards:clamp(Math.round(6.2+rng.gauss()*5.2),-4,32),clock:rng.int(26,40)};
       else if(hurried&&shape<.42)outcome={kind:'pass',completed:false,pressure:true,yards:0,clock:rng.int(6,12)};
       else{
-        const comp=clamp((hurried?.595:.724)+matchup*.0032+e.passComp,.36,.86),completed=rng.next()<comp;
+        const comp=clamp((hurried?.595:.724)+matchup*.0032+e.passComp+cComp,.36,.86),completed=rng.next()<comp;
         if(!completed)outcome={kind:'pass',completed:false,yards:0,clock:rng.int(6,12)};
         else{
-          const raw=(9.6+edge*1.15+redZoneFinish+rng.gauss()*7.2)*(hurried?.92:1.045)*e.passYards;
+          const raw=(9.6+edge*1.15+redZoneFinish+rng.gauss()*7.2)*(hurried?.92:1.045)*e.passYards*cPassYards;
           outcome={kind:'pass',completed:true,yards:clamp(Math.round(raw),-3,55),clock:rng.int(26,42)};
         }
         if(hurried)outcome.pressure=true;
@@ -5723,7 +5768,7 @@ function profileOutcomeRules(state,homeInput,awayInput,homeFieldRating=0){
     if(roll<fumbleRate)outcome={turnover:'fumble',kind:'rush',yards:clamp(Math.round(3+rng.gauss()*6),-8,18),clock:rng.int(18,34)};
     else{
       const redZoneFinish=state.fieldPosition>=80?2.6:state.fieldPosition>=65?1.0:0;
-      outcome={kind:'rush',yards:clamp(Math.round((4.3+edge*.7+redZoneFinish+rng.gauss()*4.8)*e.rushYards),-14,55),clock:rng.int(27,42)};
+      outcome={kind:'rush',yards:clamp(Math.round((4.3+edge*.7+redZoneFinish+cRushYards+rng.gauss()*4.8)*e.rushYards),-14,55),clock:rng.int(27,42)};
     }
   }
   // Flags: one draw decides whether there is a foul at all, one picks it, one sizes a pass interference spot.
@@ -5739,8 +5784,8 @@ function profileOutcomeRules(state,homeInput,awayInput,homeFieldRating=0){
   state.rng=rng.snapshot();return outcome;
 }
 // Games that carry rules use the v0.16 model; a game saved before it (no rules on the state) plays as it did.
-function profileOutcome(state,homeInput,awayInput,homeFieldRating=0){
-  return state&&state.rules?profileOutcomeRules(state,homeInput,awayInput,homeFieldRating):legacyProfileOutcome(state,homeInput,awayInput,homeFieldRating);
+function profileOutcome(state,homeInput,awayInput,homeFieldRating=0,call=null){
+  return state&&state.rules?profileOutcomeRules(state,homeInput,awayInput,homeFieldRating,call):legacyProfileOutcome(state,homeInput,awayInput,homeFieldRating);
 }
 function annotateOutcomeEvent(state,startIndex,outcome){
   const events=state.events||[];
@@ -5810,6 +5855,27 @@ const POLICY_ID='adapter-v1';
 const TEMPO_POLICY_ID='tempo-v1';
 const HALFTIME_POLICY_ID='halftime-v1';
 const CONVERSION_POLICY_ID='conversion-v1';
+const DRIVE_POLICY_ID='drive-v1';
+const DEFENSE_POLICY_ID='defense-v1';
+// v0.19: what a head coach asks for, not the play itself. Each call trades something: running it protects the ball
+// and the clock but gives up explosive plays; taking shots gains yards per completion and gives up sacks and
+// interceptions. None is better on average, so the right one depends on the score, the clock and the weather.
+const DRIVE_CALLS={
+  balanced:null,
+  ground:{passRate:-.15,rushYards:.2,clock:1.08},
+  quick:{passRate:.07,comp:.05,passYards:.85,sackMult:.65,intMult:.88},
+  shots:{passRate:.09,comp:-.05,passYards:1.17,sackMult:1.2,intMult:1.3,clock:.94}
+};
+const DRIVE_LABELS={balanced:'Stay balanced',ground:'Run the ball',quick:'Quick passes',shots:'Take shots'};
+// The defensive call covers one snap. Pressure gets home more often and gives up more when it does not; coverage
+// takes away the deep ball and concedes the run; loading the box stops the run and leaves the secondary alone.
+const DEFENSE_CALLS={
+  base:null,
+  pressure:{sackMult:1.6,hurry:.09,comp:-.02,passYards:1.15,rushYards:.5},
+  coverage:{sackMult:.6,hurry:-.06,comp:.02,passYards:.8,intMult:1.25,rushYards:.8},
+  run_stop:{passRate:-.04,rushYards:-1.5,passYards:1.12,comp:.02}
+};
+const DEFENSE_LABELS={base:'Play it straight',pressure:'Bring pressure',coverage:'Drop into coverage',run_stop:'Load the box'};
 const clone=value=>JSON.parse(JSON.stringify(value));
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
 const finite=(value,fallback=0)=>Number.isFinite(Number(value))?Number(value):fallback;
@@ -5844,6 +5910,8 @@ function createSession(options={}){
     version:VERSION,status:'pregame',gameId:String(options.gameId??made.state.gameId),seed:String(options.seed??made.state.seed),
     state:made.state,inputs:{home:made.homeInput,away:made.awayInput},homeFieldRating,controlledSide,
     tempo:{home:'normal',away:'normal'},tempoDecisionMade:{home:false,away:false},
+    // Drive and defensive calls are on only for a fully coached game (options.calls); null means the session never asks.
+    driveCall:options.calls===true&&controlledSide?{home:'balanced',away:'balanced'}:null,driveAsked:null,defenseCall:null,defenseAsked:null,
     halftimeApproach:{home:'balanced',away:'balanced'},halftimeDecisionMade:false,pendingConversion:null,pendingStrategyDecision:null,
     names:{home:String(options.home?.name??made.homeInput.name??'Home'),away:String(options.away?.name??made.awayInput.name??'Away')},
     skipRoutine:options.skipRoutine===true
@@ -5917,9 +5985,21 @@ function deferredTouchdown(session,state,outcome){
   pushGameEvent(state,'scrimmage',{team:offense,yards:100-beforeField,from:{fieldPosition:beforeField,down:beforeDown,distance:beforeDistance}});addGamePoints(state,offense,6,'touchdown',{});
   session.pendingConversion={side:offense,createdAfterEventSeq:state.events.length,period:state.period,clock:state.clock};engine.validateState(state);return state
 }
+// The calls in force for this snap: the offense's call for the drive and, if one was made for this exact snap, the
+// defense's. Sessions saved before v0.19 carry neither and play as they did.
+function snapCall(session,state){
+  const side=state.possession,offense=DRIVE_CALLS[session.driveCall?.[side]]||null,d=session.defenseCall;
+  const defense=d&&d.side===other(side)&&d.at===state.events.length?DEFENSE_CALLS[d.call]||null:null;
+  if(!offense&&!defense)return null;
+  const out={passRate:0,passYards:1,rushYards:0,intMult:1,sackMult:1,comp:0,hurry:0,clock:1};
+  for(const c of [offense,defense])if(c){out.passRate+=c.passRate||0;out.rushYards+=c.rushYards||0;out.comp+=c.comp||0;out.hurry+=c.hurry||0;out.passYards*=c.passYards??1;out.intMult*=c.intMult??1;out.sackMult*=c.sackMult??1;out.clock*=c.clock??1}
+  return out
+}
 function playOutcome(session,state){
-  const start=state.events.length,beforeField=state.fieldPosition,side=state.possession;
-  let outcome=adapter.profileOutcome(state,session.inputs.home,session.inputs.away,session.homeFieldRating);
+  const start=state.events.length,beforeField=state.fieldPosition,side=state.possession,call=snapCall(session,state);
+  let outcome=adapter.profileOutcome(state,session.inputs.home,session.inputs.away,session.homeFieldRating,call);
+  if(call&&call.clock!==1&&!outcome.penalty)outcome.clock=clamp(Math.round((Number(outcome.clock)||1)*call.clock),1,45);
+  session.defenseCall=null;
   halftimeAdjustedOutcome(session,state,outcome);
   if(!session.tempoDecisionMade[side]||session.tempo[side]==='staff')outcome=engine.playbookClock(state,outcome);
   else outcome.clock=tempoAdjustedClock(session,state,outcome.clock);
@@ -5967,13 +6047,63 @@ function createTempoDecision(session){
   const decision={id:nextDecisionId(state),type:'late_game_tempo',policyId:TEMPO_POLICY_ID,team:side,teamId:state[side]?.id??null,contextKey:`tempo:${state.period}:${state.clock}:${side}:${state.fieldPosition}:${state.score.home}:${state.score.away}`,situation:`Q4 ${min}:${sec} · ${team} ball · ${margin===0?'tie game':margin>0?`leading by ${margin}`:`trailing by ${Math.abs(margin)}`}`,context:{period:state.period,clock:state.clock,possession:side,fieldPosition:state.fieldPosition,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},options:[{id:'hurry',label:'Hurry-up'},{id:'normal',label:'Normal tempo'},{id:'drain',label:'Drain clock'},{id:'delegate',label:'Delegate to staff'}],staffRecommendation:staffTempo,defaultOption:staffTempo,createdAfterEventSeq:state.events?.length||0};
   session.pendingStrategyDecision=decision;return clone(decision)
 }
+// A drive is a kickoff received or a change of possession; counting them names the drive being played.
+function driveNumber(state){let n=0;for(const e of state.events||[])if(e.type==='kickoff'||e.type==='possession_change')n++;return n}
+function marginFor(state,side){return(state.score?.[side]||0)-(state.score?.[other(side)]||0)}
+function clockText(state){return`Q${state.period} ${Math.floor(state.clock/60)}:${String(state.clock%60).padStart(2,'0')}`}
+function spotText(state){return state.fieldPosition>=50?`opp ${100-state.fieldPosition}`:`own ${state.fieldPosition}`}
+function scoreText(margin){return margin===0?'tie game':margin>0?`leading by ${margin}`:`trailing by ${Math.abs(margin)}`}
+// Sessions created without calls (Coach big moments, the lab, simulated games) never stop for these.
+function driveWindow(session){
+  const state=session.state,side=state.possession;
+  if(!session.controlledSide||!session.driveCall||state.status!=='live'||state.period>4||side!==session.controlledSide||state.down!==1||session.pendingConversion)return false;
+  const drive=driveNumber(state);if(session.driveAsked===drive)return false;
+  // Under 40 seconds in a half there is no drive to plan.
+  if((state.period===2||state.period===4)&&state.clock<40){session.driveAsked=drive;return false}
+  return true
+}
+function staffDriveCall(session,state,side){
+  const margin=marginFor(state,side),effects=engine.effectsOf(state),edge=(session.inputs[side]?.offense||70)-(session.inputs[other(side)]?.defense||70);
+  if(state.period===4&&margin>0&&state.clock<=480)return{call:'ground',why:'protect the lead and the clock'};
+  if((state.period===4&&margin<0&&state.clock<=300)||(state.period>=3&&margin<=-14))return{call:'shots',why:'points are needed quickly'};
+  if(effects.wind>=18||effects.precip>=2)return{call:'ground',why:'the weather makes throwing a risk'};
+  if(edge<=-6)return{call:'quick',why:'their front is the better unit, so get the ball out'};
+  return{call:'balanced',why:'no reason to tip the hand'}
+}
+function createDriveDecision(session){
+  if(!driveWindow(session))return null;if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);
+  const state=session.state,side=state.possession,team=state[side]?.name||session.names[side],staff=staffDriveCall(session,state,side),current=session.driveCall[side]||'balanced';
+  const decision={id:nextDecisionId(state),type:'drive_call',policyId:DRIVE_POLICY_ID,team:side,teamId:state[side]?.id??null,contextKey:`drive:${driveNumber(state)}:${side}`,situation:`${clockText(state)} · ${team} ball at ${spotText(state)} · ${scoreText(marginFor(state,side))}`,prompt:'Call for this drive',reason:staff.why,lastCall:current,context:{period:state.period,clock:state.clock,possession:side,fieldPosition:state.fieldPosition,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts},drive:driveNumber(state)},options:[...Object.keys(DRIVE_CALLS).map(id=>({id,label:DRIVE_LABELS[id]})),{id:'delegate',label:'Delegate to staff'}],staffRecommendation:staff.call,defaultOption:staff.call,createdAfterEventSeq:state.events?.length||0};
+  session.pendingStrategyDecision=decision;return clone(decision)
+}
+// Third downs that decide something: inside the 30, a one-score fourth quarter, or the two-minute drill before the half.
+function defenseWindow(session){
+  const state=session.state,offense=state.possession,side=session.controlledSide;
+  if(!side||!session.driveCall||state.status!=='live'||state.period>4||!offense||offense===side||state.down!==3||session.pendingConversion)return false;
+  if(session.defenseAsked===state.events.length)return false;
+  const close=Math.abs(marginFor(state,side))<=8;
+  return state.fieldPosition>=70||(state.period===4&&close)||(state.period===2&&state.clock<=120&&state.fieldPosition>=50)
+}
+function staffDefenseCall(session,state,side){
+  const edge=(session.inputs[side]?.defense||70)-(session.inputs[other(side)]?.offense||70);
+  if(state.distance<=2)return{call:'run_stop',why:'short yardage, expect the run'};
+  if(state.distance>=8)return{call:'coverage',why:'they have to throw past the sticks'};
+  if(edge>=4)return{call:'pressure',why:'our front can get home'};
+  return{call:'base',why:'no clear tell from the offense'}
+}
+function createDefenseDecision(session){
+  if(!defenseWindow(session))return null;if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);
+  const state=session.state,side=session.controlledSide,offense=state.possession,team=state[offense]?.name||session.names[offense],staff=staffDefenseCall(session,state,side);
+  const decision={id:nextDecisionId(state),type:'defense_call',policyId:DEFENSE_POLICY_ID,team:side,teamId:state[side]?.id??null,contextKey:`defense:${state.events.length}:${side}`,situation:`${clockText(state)} · ${team} · 3rd & ${state.distance} at ${spotText(state)} · ${scoreText(marginFor(state,side))}`,prompt:'Defensive call',reason:staff.why,context:{period:state.period,clock:state.clock,possession:offense,fieldPosition:state.fieldPosition,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},options:[...Object.keys(DEFENSE_CALLS).map(id=>({id,label:DEFENSE_LABELS[id]})),{id:'delegate',label:'Delegate to staff'}],staffRecommendation:staff.call,defaultOption:staff.call,createdAfterEventSeq:state.events?.length||0};
+  session.pendingStrategyDecision=decision;return clone(decision)
+}
 function appendStrategyReceipt(session,decision,selectedOption,resolvedAction){const state=session.state,event={seq:(state.events?.length||0)+1,type:'coaching_decision',decisionId:decision.id,decisionType:decision.type,policyId:decision.policyId,team:decision.team,selectedOption,resolvedAction,staffRecommendation:decision.staffRecommendation,situation:decision.situation,state:eventState(state)};state.events.push(event);return event}
 function currentDecision(session){
   if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);const state=session.state;
   if(session.pendingConversion){const conversion=createConversionDecision(session);if(conversion)return conversion;resolvePendingConversion(session,staffConversion(session));if(state.status==='final')return null}
   const existing=decisions.pendingDecision(state);if(existing){if(isControlled(session,existing.team))return clone(existing);state.pendingCoachingDecision=null}
   if(state.status==='live'&&state.period<=4&&state.down===4&&state.possession&&isControlled(session,state.possession)&&!routineFourthDown(session,state))return decisions.ensureDecision(state,hooks(session));
-  return createHalftimeDecision(session)||createTempoDecision(session)
+  return createHalftimeDecision(session)||createTempoDecision(session)||createDriveDecision(session)||createDefenseDecision(session)
 }
 function resolveStrategy(session,optionId){
   const decision=session.pendingStrategyDecision;if(!decision)throw new Error('No strategy decision is pending.');const selected=String(optionId||'delegate');if(!decision.options.some(o=>o.id===selected))throw new Error(`Illegal ${decision.type} option: ${selected}`);const action=selected==='delegate'?decision.defaultOption:selected;session.pendingStrategyDecision=null;
@@ -5983,6 +6113,10 @@ function resolveStrategy(session,optionId){
     if(!['normal','hurry','drain'].includes(action))throw new Error(`Unknown tempo action: ${action}`);session.tempo[decision.team]=selected==='delegate'?'staff':action;session.tempoDecisionMade[decision.team]=true;appendStrategyReceipt(session,decision,selected,action)
   }else if(decision.type==='halftime_adjustment'){
     if(!['balanced','aggressive','ball_control'].includes(action))throw new Error(`Unknown halftime action: ${action}`);session.halftimeApproach[decision.team]=action;session.halftimeDecisionMade=true;appendStrategyReceipt(session,decision,selected,action)
+  }else if(decision.type==='drive_call'){
+    if(!(action in DRIVE_CALLS))throw new Error(`Unknown drive call: ${action}`);session.driveCall[decision.team]=action;session.driveAsked=decision.context.drive;appendStrategyReceipt(session,decision,selected,action)
+  }else if(decision.type==='defense_call'){
+    if(!(action in DEFENSE_CALLS))throw new Error(`Unknown defensive call: ${action}`);appendStrategyReceipt(session,decision,selected,action);const at=session.state.events.length;session.defenseCall={side:decision.team,call:action,at};session.defenseAsked=at
   }else throw new Error(`Unknown strategy decision type: ${decision.type}`);
   engine.validateState(session.state);return{decision:clone(decision),selectedOption:selected,resolvedAction:action,state:session.state,session}
 }
@@ -6006,7 +6140,7 @@ function snapshot(session){validateSession(session);return clone(session)}
 function restore(value){const session=clone(value);validateSession(session);const pending=session.pendingStrategyDecision||decisions.pendingDecision(session.state);session.status=session.state.status==='final'?'final':(pending?'decision':session.state.status);return session}
 function pendingDecision(session){validateSession(session);return session.pendingStrategyDecision?clone(session.pendingStrategyDecision):decisions.pendingDecision(session.state)}
 
-return{VERSION,POLICY_ID,TEMPO_POLICY_ID,HALFTIME_POLICY_ID,CONVERSION_POLICY_ID,createSession,advanceOne,advance,resolve,simulate,snapshot,restore,pendingDecision,validateSession};
+return{VERSION,POLICY_ID,TEMPO_POLICY_ID,HALFTIME_POLICY_ID,CONVERSION_POLICY_ID,DRIVE_POLICY_ID,DEFENSE_POLICY_ID,DRIVE_CALLS,DEFENSE_CALLS,DRIVE_LABELS,DEFENSE_LABELS,createSession,advanceOne,advance,resolve,simulate,snapshot,restore,pendingDecision,validateSession};
 });
 
 (function(root,factory){
@@ -6692,7 +6826,8 @@ function returnText(event){
   if(event.fairCatch)return', fair catch';
   return n>0?`, returned ${n} yard${n===1?'':'s'}`:'';
 }
-function decisionActionLabel(value){return String(value||'decision').replaceAll('_',' ')}
+const DECISION_ACTION_LABELS={ground:'to run the ball',quick:'quick passes',shots:'to take shots',balanced:'a balanced drive',base:'to play it straight',pressure:'to bring pressure',coverage:'to drop into coverage',run_stop:'to load the box'};
+function decisionActionLabel(value){return DECISION_ACTION_LABELS[value]||String(value||'decision').replaceAll('_',' ')}
 // Broadcast-style short name: "Gavin Kemp" -> "G. Kemp".
 function shortName(name){const parts=String(name||'').trim().split(/\s+/);return parts.length>1?`${parts[0][0]}. ${parts.slice(1).join(' ')}`:parts[0]||''}
 // The player recorded in a play role (qb, ca carrier, tg target, tk tackler, sb sacker, ib interceptor, ff forced
@@ -7172,7 +7307,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.18.0';
+const APP_VERSION='0.19.0';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi','Aiden','Alex','Amari','Andrew','Anthony','Antonio','Armani','Ashton','Austin','Avery','Bennett','Blake','Brady','Brandon','Brayden','Brennan','Brock','Bryson','Cade','Caden','Calvin','Cameron','Carson','Cedric','Chase','Christian','Cody','Colby','Collin','Connor','Corey','Damian','Damon','Daniel','Davion','Dawson','Deandre','Demarcus','Derek','Desmond','Dillon','Drew','Dylan','Elijah','Ethan','Ezra','Garrett','Grady','Graham','Grant','Hayden','Hunter','Ian','Isaac','Jabari','Jace','Jackson','Jacob','Jaden','Jake','Jamar','Jameson','Jared','Jarrett','Javon','Jaxon','Jay','Jermaine','Jesse','Joel','Jonah','Josiah','Julian','Justin','Kaden','Kai','Kamari','Keegan','Keenan','Kendall','Kendrick','Kevin','Kobe','Kyle','Kyler','Lamar','Landon','Lane','Lawrence','Leon','Levi','Lincoln','Lucas','Marco','Mario','Mateo','Matthew','Maurice','Max','Myles','Nate','Nathan','Nolan','Omar','Owen','Parker','Patrick','Preston','Quentin','Quincy','Reggie','Riley','Ryan','Sam','Sean','Seth','Shane','Silas','Solomon','Spencer','Sterling','Terrell','Theo','Tobias','Travis','Tristan','Troy','Tucker','Tyrese','Victor','Wade','Walker','Wes','Wyatt','Zach','Zane','Andres','Diego','Rafael','Tevita','Sione','Manu','Keoni','Kenji','Darnell'];
@@ -16143,7 +16278,7 @@ function v2GameDayUIPersist(){
   if(!universe)return;
   if(!v2InteractiveGameDay){if(universe.liveGameDay){delete universe.liveGameDay;autosaveAfter('game')}return}
   const {key,session,actions}=v2InteractiveGameDay;
-  universe.liveGameDay={version:1,key,playbook:session.state.playbook??null,rules:session.state.rules??null,actions:actions.slice(),mode:v2InteractiveGameDay.mode||'plays',skipRoutine:session.skipRoutine===true};
+  universe.liveGameDay={version:1,key,playbook:session.state.playbook??null,rules:session.state.rules??null,actions:actions.slice(),mode:v2InteractiveGameDay.mode||'plays',skipRoutine:session.skipRoutine===true,calls:!!session.driveCall};
   autosaveAfter('game')
 }
 function v2GameDayUIApply(api,session,action){if(action==='next')return api.advanceOne(session);if(action==='decision')return api.advance(session);if(action==='delegate')return api.simulate(session,()=> 'delegate');if(typeof action==='string'&&action.startsWith('choice:'))return api.resolve(session,action.slice(7));throw new Error(`Unknown Game Day action ${action}`)}
@@ -16151,7 +16286,7 @@ function v2GameDayUIRestore(){
   if(v2InteractiveGameDay||!universe?.liveGameDay)return false;const saved=universe.liveGameDay,ctx=v2GameDayUILiveContext();
   if(!ctx||saved.key!==ctx.key||!Array.isArray(saved.actions)){delete universe.liveGameDay;return false}
   try{// A game saved before routine fourth downs were skipped replays under the rules it was played with.
-  const session=v2GameDayUIPrepare(saved.playbook,saved.rules&&typeof saved.rules==='object'?saved.rules:false,saved.mode==='moments'?'moments':'plays',saved.skipRoutine===true),api=globalThis.DynastyGameEngineV2GameDay;for(const a of saved.actions){v2GameDayUIApply(api,session,a);v2InteractiveGameDay.actions.push(a)}v2InteractiveGameDay.integrity=v2GameDayUIDigest(ctx);universe.liveGameDay.actions=v2InteractiveGameDay.actions.slice();return true}
+  const session=v2GameDayUIPrepare(saved.playbook,saved.rules&&typeof saved.rules==='object'?saved.rules:false,saved.mode==='moments'?'moments':'plays',saved.skipRoutine===true,saved.calls===true),api=globalThis.DynastyGameEngineV2GameDay;for(const a of saved.actions){v2GameDayUIApply(api,session,a);v2InteractiveGameDay.actions.push(a)}v2InteractiveGameDay.integrity=v2GameDayUIDigest(ctx);universe.liveGameDay.actions=v2InteractiveGameDay.actions.slice();return true}
   catch(err){console.error(err);v2InteractiveGameDay=null;delete universe.liveGameDay;setStatus('The saved live game could not be rebuilt, so it was set aside.');return false}
 }
 // Finish a live game with the staff and record it. Used before anything else would play this week.
@@ -16172,7 +16307,9 @@ function v2GameDayUIStartBigMoments(){
 }
 function v2GameDayUIRun(action){
   const ctx=v2GameDayUILiveContext(),api=globalThis.DynastyGameEngineV2GameDay;if(!ctx||!api||!v2InteractiveGameDay)throw new Error('Game Day session is unavailable.');
-  const before=v2GameDayUIDigest(ctx),session=v2InteractiveGameDay.session;v2GameDayUIApply(api,session,action);v2InteractiveGameDay.actions.push(action);
+  const before=v2GameDayUIDigest(ctx),session=v2InteractiveGameDay.session;
+  if(action.startsWith('choice:')){const d=api.pendingDecision(session),id=action.slice(7);if(d)v2InteractiveGameDay.lastCall={label:id==='delegate'?`Staff: ${v2GameDayUIOptionLabel(d,d.defaultOption)}`:v2GameDayUIOptionLabel(d,id),win:v2GameDayUIWinChance(session),at:(session.state.events||[]).length+1}}
+  v2GameDayUIApply(api,session,action);v2InteractiveGameDay.actions.push(action);
   if(v2InteractiveGameDay.mode==='moments'&&action.startsWith('choice:')&&session.state.status!=='final'){
    v2GameDayUIApply(api,session,'decision');v2InteractiveGameDay.actions.push('decision');
   }
@@ -16198,8 +16335,9 @@ function v2GameDayUINames(session){
 }
 function v2GameDayUIEventText(event,names){
   if(event?.type==='coaching_decision'){
-    const chosen=event.selectedOption==='delegate'?`delegated (${event.resolvedAction.replaceAll('_',' ')})`:event.selectedOption.replaceAll('_',' ');
-    return`COACH DECISION · ${chosen}`
+    const api=globalThis.DynastyGameEngineV2GameDay,label=id=>api?.DRIVE_LABELS?.[id]||api?.DEFENSE_LABELS?.[id]||String(id||'').replaceAll('_',' ');
+    const chosen=event.selectedOption==='delegate'?`staff: ${label(event.resolvedAction)}`:label(event.selectedOption);
+    return`${event.decisionType==='drive_call'?'DRIVE CALL':event.decisionType==='defense_call'?'DEFENSIVE CALL':'COACH DECISION'} · ${chosen}`
   }
   return globalThis.DynastyGameEngineV2Lab?.eventText(event,names)||String(event?.type||'event').replaceAll('_',' ')
 }
@@ -16217,9 +16355,38 @@ function v2GameDayUIUserSide(session){return selected()?.name===session.names.ho
 function v2GameDayUIWinOptions(session){const m=globalThis.DynastyGameDayMomentum;return{homeEdge:Number(session.homeFieldRating)||0,strengthEdge:m?.strengthEdge?m.strengthEdge(session.inputs):0}}
 function v2GameDayUIWinChance(session){const m=globalThis.DynastyGameDayMomentum;return m?Math.round(m.winChance(session.state,v2GameDayUIUserSide(session),v2GameDayUIWinOptions(session))*100):null}
 function v2GameDayUIMomentum(session){return globalThis.DynastyGameDayMomentum?.panelHTML(session,v2GameDayUIUserSide(session),v2GameDayUIWinOptions(session))||''}
+// What each call trades, in a line a coach can read at a glance.
+const V2_GAMEDAY_CALL_HINTS={
+  balanced:'No tilt either way.',ground:'Safer and slower. Fewer big plays.',quick:'High percentage, short gains, fewer sacks.',shots:'Bigger gains. More sacks and interceptions.',
+  base:'No tilt either way.',pressure:'More sacks. A completion goes further.',coverage:'Takes away the deep ball. Gives up the run.',run_stop:'Stops the run. Thin behind it.'
+};
+const V2_GAMEDAY_DECISION_TITLES={drive_call:'YOUR DRIVE',defense_call:'DEFENSIVE CALL',fourth_down:'FOURTH DOWN',two_point_decision:'AFTER THE TOUCHDOWN',halftime_adjustment:'HALFTIME',late_game_tempo:'CLOCK MANAGEMENT'};
+function v2GameDayUIOptionLabel(d,id){return d.options.find(o=>o.id===id)?.label||String(id||'').replaceAll('_',' ')}
 function v2GameDayUIDecision(session){
   const d=globalThis.DynastyGameEngineV2GameDay?.pendingDecision(session);if(!d)return'';
-  return`<div class="v2-gameday-decision"><div class="eyebrow">HEAD COACH DECISION</div><h3>${gameEscape(d.situation)}</h3><div class="muted">Staff recommendation: <strong>${gameEscape(d.staffRecommendation.replaceAll('_',' '))}</strong>${v2GameDayUIWinChance(session)!=null?` · Win chance now <strong>${v2GameDayUIWinChance(session)}%</strong>`:''}</div><div class="button-row">${d.options.map(o=>`<button type="button" data-v2-gameday-choice="${gameEscape(o.id)}" ${o.id===d.staffRecommendation?'class="recommended"':''}>${gameEscape(o.label)}</button>`).join('')}</div></div>`
+  const calls=d.type==='drive_call'||d.type==='defense_call',win=v2GameDayUIWinChance(session),staff=v2GameDayUIOptionLabel(d,d.staffRecommendation);
+  const option=o=>{
+    const hint=calls?V2_GAMEDAY_CALL_HINTS[o.id]:'',current=d.type==='drive_call'&&o.id===d.lastCall,cls=[o.id===d.staffRecommendation?'recommended':'',calls&&o.id!=='delegate'?'v2-gameday-call':''].filter(Boolean).join(' ');
+    return`<button type="button" data-v2-gameday-choice="${gameEscape(o.id)}"${cls?` class="${cls}"`:''}><span>${gameEscape(o.label)}</span>${hint?`<small>${gameEscape(hint)}</small>`:''}${current?'<em>Last drive</em>':''}</button>`
+  };
+  return`<div class="v2-gameday-decision" data-decision-type="${gameEscape(d.type)}"><div class="eyebrow">${gameEscape(V2_GAMEDAY_DECISION_TITLES[d.type]||'HEAD COACH DECISION')}</div><h3>${gameEscape(d.situation)}</h3><div class="muted">Staff recommendation: <strong>${gameEscape(staff)}</strong>${d.reason?` (${gameEscape(d.reason)})`:''}${win!=null?` · Win chance now <strong>${win}%</strong>`:''}</div><div class="button-row${calls?' v2-gameday-calls':''}">${d.options.map(option).join('')}</div></div>`
+}
+// The field: where the ball is, which way the offense is going and where the first down is. Home defends the right
+// end zone, so the home offense drives left to right.
+function v2GameDayUIField(session){
+  const s=session.state;if(s.status==='final'||!s.possession||s.fieldPosition==null)return'';
+  const home=s.possession==='home',toGoal=100-s.fieldPosition,x=home?s.fieldPosition:100-s.fieldPosition,line=Math.min(100,s.fieldPosition+(s.distance||0)),lx=home?line:100-line,pct=v=>(8+v*.84).toFixed(2);
+  const lab=globalThis.DynastyGameEngineV2Lab,text=`${session.names[s.possession]} ball, ${lab?.downLabel(s)||''}, ${toGoal} yards from the end zone`;
+  const marks=[10,20,30,40,50,60,70,80,90].map(v=>`<i style="left:${pct(v)}%"><b>${v<=50?v:100-v}</b></i>`).join('');
+  return`<div class="v2-live-field" role="img" aria-label="${gameEscape(text)}" data-direction="${home?'right':'left'}"><div class="v2-live-turf"></div><div class="v2-live-endzone away"><span>${gameEscape(session.names.away)}</span></div><div class="v2-live-endzone home"><span>${gameEscape(session.names.home)}</span></div>${marks}${s.period<=4&&line<100?`<u style="left:${pct(lx)}%" title="First down"></u>`:''}<s style="left:${pct(x)}%"><span>${home?'▶':'◀'}</span></s></div>`
+}
+// What the last call led to: the play that followed it and how the win chance moved.
+function v2GameDayUIConsequence(session){
+  const last=v2InteractiveGameDay?.lastCall,events=session.state.events||[];if(!last||events.length<=last.at)return'';
+  const play=events.slice(last.at).find(e=>['scrimmage','interception','fumble','field_goal','punt','extra_point','two_point','penalty'].includes(e.type));if(!play)return'';
+  // Measured straight after that play, so a score three drives later is not blamed on this call.
+  const m=globalThis.DynastyGameDayMomentum,now=m&&play.state?Math.round(m.winChance(play.state,v2GameDayUIUserSide(session),v2GameDayUIWinOptions(session))*100):null,delta=now!=null&&last.win!=null?now-last.win:null,text=v2GameDayUIEventText(play,v2GameDayUINames(session));
+  return`<div class="v2-gameday-consequence" role="status"><span>Your call: <strong>${gameEscape(last.label)}</strong></span><span>Next play: ${gameEscape(text)}</span>${delta!=null?`<b class="${delta>0?'up':delta<0?'down':''}">${delta>0?'▲':delta<0?'▼':'■'} ${Math.abs(delta)} · win chance ${now}% after it</b>`:''}</div>`
 }
 function v2GameDayUIFeed(session){
   const rows=(session.state.events||[]).slice(-18).reverse();if(!rows.length)return'<div class="muted">Kickoff is next.</div>';
@@ -16230,19 +16397,30 @@ function ensureV2InteractiveGameDayHost(){
   let host=document.querySelector('#v2InteractiveGameDay');if(host)return host;const next=document.querySelector('#nextGameCard');if(!next)return null;
   host=document.createElement('div');host.id='v2InteractiveGameDay';host.className='card v2-gameday-host';next.insertAdjacentElement('afterend',host);return host
 }
+// v0.19: the way into the game sits directly under the matchup, not under a page of preparation, and a live game
+// takes the screen: everything that is not the game steps aside until the final (or until the coach asks for it).
+let v2GameDayShowPrep=false;
+function v2GameDayUILayout(host,live){
+  const hero=document.querySelector('#gamedayEventHero'),tab=document.querySelector('#gamelab'),prev=host.previousElementSibling;
+  if(hero&&typeof hero.insertAdjacentElement==='function'&&prev!==hero&&!(prev?.previousElementSibling===hero&&prev.querySelector?.('#detailedBox')))hero.insertAdjacentElement('afterend',host);
+  if(!live)v2GameDayShowPrep=false;
+  const on=!!live&&!v2GameDayShowPrep;if(tab?.classList)tab.classList[on?'add':'remove']('v2-live');
+}
 function renderV2InteractiveGameDay(){
   const host=ensureV2InteractiveGameDayHost();if(!host)return;const ctx=v2GameDayUILiveContext(),api=globalThis.DynastyGameEngineV2GameDay;
   if(v2InteractiveGameDay&&v2InteractiveGameDay.key!==ctx?.key){v2InteractiveGameDay=null;v2GameDayUIPersist()}
   if(!v2InteractiveGameDay&&ctx)v2GameDayUIRestore();
+  v2GameDayUILayout(host,!!v2InteractiveGameDay&&v2InteractiveGameDay.session.state.status!=='final');
   if(!ctx||!api){host.innerHTML=`<div class="muted">${typeof openingPreseason==='function'&&openingPreseason()?'Choose Begin Season in This Week to open your first matchup.':'Your next scheduled game will appear here.'}</div>`;return}
   if(!v2InteractiveGameDay){
     const lockAttr=(hasPendingCareerChoice()||hasPendingWeeklyDecisions())?' disabled title="Resolve the Coach’s Desk decisions before playing this week."':'';
-    host.innerHTML=`<div class="section-head"><div><div class="eyebrow">LIVE GAME DAY</div><h3>Coach the next game live</h3><div class="muted">Make the big calls yourself. The result counts as soon as the game ends.</div></div><div class="button-row"><button type="button" data-v2-gameday-start class="bi-primary"${lockAttr}>Coach It Live</button><button type="button" data-v2-gameday-moments${lockAttr}>Coach big moments</button></div></div>`;
+    host.innerHTML=`<div class="section-head"><div><div class="eyebrow">LIVE GAME DAY</div><h3>Coach the next game live</h3><div class="muted">${lockAttr?'Resolve this week’s Coach’s Desk decisions in This Week first.':'Call every drive and the big defensive downs, or stop only for the big moments. The result counts as soon as the game ends.'}</div></div><div class="button-row"><button type="button" data-v2-gameday-start class="bi-primary"${lockAttr}>Coach It Live</button><button type="button" data-v2-gameday-moments${lockAttr}>Coach big moments</button></div></div>`;
     host.querySelector('[data-v2-gameday-moments]').onclick=()=>{try{v2GameDayUIStartBigMoments()}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}};
     host.querySelector('[data-v2-gameday-start]').onclick=()=>{try{v2GameDayUIAssertStartable();v2GameDayUIPrepare()}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}};return
   }
   const session=v2InteractiveGameDay.session,d=api.pendingDecision(session),final=session.state.status==='final';
-  host.innerHTML=`<div class="v2-gameday-head"><div><div class="eyebrow">LIVE GAME DAY${v2InteractiveGameDay.mode==='moments'?' · BIG MOMENTS':''}${final?' · FINAL':''}</div><h3>${gameEscape(session.names.away)} at ${gameEscape(session.names.home)}</h3></div></div>${v2GameDayUIScoreboard(session)}${v2GameDayUIConditions(session)}${v2GameDayUIMomentum(session)}${v2GameDayUIDecision(session)}<div class="v2-gameday-controls button-row">${!final&&!d?'<button type="button" data-v2-gameday-next>Next Play</button><button type="button" data-v2-gameday-decision>Advance to Next Decision</button>':''}${!final?'<button type="button" data-v2-gameday-delegate>Delegate Rest</button>':''}${final?'<button type="button" data-v2-gameday-record class="recommended">Record Final</button>':''}</div><div class="v2-gameday-feed"><div class="v2-gameday-feed-head"><strong>Game feed</strong><span class="muted">Newest first</span></div>${v2GameDayUIFeed(session)}</div><div class="v2-shadow-safety"><strong>${final?'Final whistle.':'Live game.'}</strong> ${final?'Record the final to keep this result.':'Saved as you play. Your staff can finish this game when you advance the week.'}</div>`;
+  host.innerHTML=`<div class="v2-gameday-head"><div><div class="eyebrow">LIVE GAME DAY${v2InteractiveGameDay.mode==='moments'?' · BIG MOMENTS':''}${final?' · FINAL':''}</div><h3>${gameEscape(session.names.away)} at ${gameEscape(session.names.home)}</h3></div></div>${v2GameDayUIScoreboard(session)}${v2GameDayUIField(session)}${v2GameDayUIDecision(session)}${v2GameDayUIConsequence(session)}<div class="v2-gameday-controls button-row">${!final&&!d?'<button type="button" data-v2-gameday-next>Next Play</button><button type="button" data-v2-gameday-decision>Advance to Next Decision</button>':''}${!final?'<button type="button" data-v2-gameday-delegate>Delegate Rest</button>':''}${final?'<button type="button" data-v2-gameday-record class="recommended">Record Final</button>':''}${!final?`<button type="button" class="v2-gameday-prep-toggle" data-v2-gameday-prep aria-pressed="${v2GameDayShowPrep}">${v2GameDayShowPrep?'Hide scouting and prep':'Show scouting and prep'}</button>`:''}</div>${v2GameDayUIConditions(session)}${v2GameDayUIMomentum(session)}<div class="v2-gameday-feed"><div class="v2-gameday-feed-head"><strong>Game feed</strong><span class="muted">Newest first</span></div>${v2GameDayUIFeed(session)}</div><div class="v2-shadow-safety"><strong>${final?'Final whistle.':'Live game.'}</strong> ${final?'Record the final to keep this result.':'Saved as you play. Your staff can finish this game when you advance the week.'}</div>`;
+  host.querySelector('[data-v2-gameday-prep]')?.addEventListener('click',()=>{v2GameDayShowPrep=!v2GameDayShowPrep;renderV2InteractiveGameDay()});
   host.querySelector('[data-v2-gameday-next]')?.addEventListener('click',()=>{try{v2GameDayUIRun('next')}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}});
   host.querySelector('[data-v2-gameday-decision]')?.addEventListener('click',()=>{try{v2GameDayUIRun('decision')}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}});
   host.querySelector('[data-v2-gameday-delegate]')?.addEventListener('click',()=>{try{v2GameDayUIRun('delegate')}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}});
@@ -16277,11 +16455,13 @@ if(globalThis.__DL_TEST__){
 // v0.10.1 Interactive Game Day pregame bridge.
 // Replaces only the staged preparation step so preview kickoff profiles mirror the
 // permanent record path: recoverWeek() on cloned rosters, then beginGame() preparation wear.
-v2GameDayUIPrepare=function v2GameDayUIPrepareWithRecovery(playbook,rules,mode='plays',skipRoutine=true){
+// `calls` turns on the v0.19 drive and defensive calls. A fully coached game has them; Coach big moments and a live
+// game saved before v0.19 (which must replay exactly as it was played) do not.
+v2GameDayUIPrepare=function v2GameDayUIPrepareWithRecovery(playbook,rules,mode='plays',skipRoutine=true,calls=mode!=='moments'){
   const ctx=v2GameDayUILiveContext(),api=globalThis.DynastyGameEngineV2GameDay;if(!ctx||!api)throw new Error('No upcoming game is available for Interactive Game Day.');
   const before=v2GameDayUIDigest(ctx),prepared=v2GameDayPreparedTeams(ctx.home,ctx.away),hc=prepared.home,ac=prepared.away;
   const homeProfile=gameProfiles(hc,ac.name),awayProfile=gameProfiles(ac,hc.name),me=selected();
-  const session=api.createSession({gameId:`v0101-gameday-${ctx.key}`,seed:`v0101-gameday-${ctx.key}`,home:ctx.home,away:ctx.away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(ctx.home),controlledTeamId:me?.id??null,skipRoutine,playbook,year:universe.year,week:ctx.g.week??universe.week+1,rules});
+  const session=api.createSession({gameId:`v0101-gameday-${ctx.key}`,seed:`v0101-gameday-${ctx.key}`,home:ctx.home,away:ctx.away,homeProfile,awayProfile,homeFieldRating:homeFieldFor(ctx.home),controlledTeamId:me?.id??null,skipRoutine,calls:calls===true,playbook,year:universe.year,week:ctx.g.week??universe.week+1,rules});
   api.advanceOne(session);v2GameDayUIAssertUnchanged(before,ctx);
   v2InteractiveGameDay={key:ctx.key,session,integrity:before,actions:[],mode:mode==='moments'?'moments':'plays'};v2GameDayUIPersist();renderV2InteractiveGameDay();return session
 };

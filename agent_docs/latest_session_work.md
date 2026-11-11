@@ -1,5 +1,13 @@
 # Latest Session Work
 
+## v0.19.0 Game Day worth coaching — 2026-11-11
+
+Third release of `docs/RELEASE_GAMEPLAN_2026-11-11.md`. Drive calls and key third-down defensive calls live in `game-engine-v2-gameday.js` (`DRIVE_CALLS`, `DEFENSE_CALLS`, `snapCall`, `createDriveDecision`, `createDefenseDecision`) and reach the play model through an optional `call` argument on `profileOutcome` in `game-engine-v2-adapter.js`. A missing call changes nothing, including the order of random draws. Sessions ask for calls only when created with `calls:true`; `v2GameDayUIPrepare` passes that for Coach It Live and not for Coach big moments, and `universe.liveGameDay.calls` records it so a saved game replays the way it was played.
+
+The live screen (`game-engine-v2-gameday-ui.js`, `game-engine-v2-gameday.css`): typed decision card with trade-offs, `v2GameDayUIField`, `v2GameDayUIConsequence`, and `#gamelab.v2-live`, which hides everything but the game.
+
+Not done from the plan: timeouts, and the animated 3D field (`game-cast-field.js`) on the live screen; the live field is a 2D strip. The plan's "6 to 10 minutes at default pace" was not timed with a person.
+
 ## v0.18.0 a dynasty that lasts — 2026-11-11
 
 Second release of `docs/RELEASE_GAMEPLAN_2026-11-11.md`. Compressed, chunked export (`saveJsonParts`, `gzipBlob`, `saveFileText` in `app.js`), the crash screen (`crash-guard.js`, loaded first by `tools/build.js`), save size in Dynasty & Saves and a quota warning (`app-health.js`), and `tools/long-save-measure.js`.

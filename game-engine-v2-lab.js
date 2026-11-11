@@ -31,7 +31,8 @@ function returnText(event){
   if(event.fairCatch)return', fair catch';
   return n>0?`, returned ${n} yard${n===1?'':'s'}`:'';
 }
-function decisionActionLabel(value){return String(value||'decision').replaceAll('_',' ')}
+const DECISION_ACTION_LABELS={ground:'to run the ball',quick:'quick passes',shots:'to take shots',balanced:'a balanced drive',base:'to play it straight',pressure:'to bring pressure',coverage:'to drop into coverage',run_stop:'to load the box'};
+function decisionActionLabel(value){return DECISION_ACTION_LABELS[value]||String(value||'decision').replaceAll('_',' ')}
 // Broadcast-style short name: "Gavin Kemp" -> "G. Kemp".
 function shortName(name){const parts=String(name||'').trim().split(/\s+/);return parts.length>1?`${parts[0][0]}. ${parts.slice(1).join(' ')}`:parts[0]||''}
 // The player recorded in a play role (qb, ca carrier, tg target, tk tackler, sb sacker, ib interceptor, ff forced

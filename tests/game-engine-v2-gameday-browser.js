@@ -20,7 +20,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
     // This test covers the fourth-down decision UI, so start a classic session where every fourth down stops: with
     // routine fourth downs skipped (the default since v0.17.0) a random dynasty's game can reach the final without one.
     // Other browser tests start games through the Coach It Live button.
-    await page.waitForSelector('[data-v2-gameday-start]:not([disabled])',{timeout:15000});await page.evaluate(()=>window.DynastyGameEngineV2LabBridge.interactive.start(undefined,undefined,'plays',false));await page.waitForSelector('#v2InteractiveGameDay .v2-gameday-scoreboard',{timeout:10000});
+    await page.waitForSelector('[data-v2-gameday-start]:not([disabled])',{timeout:15000});await page.evaluate(()=>window.DynastyGameEngineV2LabBridge.interactive.start(undefined,undefined,'plays',false,false));await page.waitForSelector('#v2InteractiveGameDay .v2-gameday-scoreboard',{timeout:10000});
     let state=await page.evaluate(()=>window.__DL_TEST__.v2GameDayPreviewState());assert.ok(state);assert.ok(['live','decision'].includes(state.status));assert.ok(state.state.events.length>=3,'interactive preview should start the football event stream');
     for(let i=0;i<3;i++)if(await page.locator('[data-v2-gameday-next]').count())await page.click('[data-v2-gameday-next]');
     // Routine fourth downs no longer stop the game, so the first stop can be another kind of call: hand those to the
