@@ -1,5 +1,15 @@
 # Latest Session Work
 
+## v0.20.0 a world you care about — 2026-11-11
+
+Fourth release of `docs/RELEASE_GAMEPLAN_2026-11-11.md`. `mascots.js` (`DynastyMascots`, keyed by school id, loaded before the engine), `offseason-stops.js` (stops before departures, signing and the portal; reached from the Next button's controller in `next-action.js` through `globalThis.DynastyOffseasonStop`), the new-dynasty defaults in `acceptNewDynastySetup` (staff recruiting on, confidence at least 60), and `adminReviewSummary` in `app.js`.
+
+Two things to know. The Next button's clicks are handled by `next-action.js`, which stops propagation; a handler set on `#hubAdvance` in `app.js` never runs once guidance is installed. And engine extensions are block scoped: a function declared in one is not visible from `app.js`, so cross-module calls go through a global.
+
+`tests/helpers/start-new-dynasty.js` turns staff recruiting off unless a test passes `{staffRecruiting:true}`, so the existing suites still exercise a hand-run board. Only `tests/world-identity-browser.js` covers the new default.
+
+Not done from the plan: program names were not changed (the name is the key in saves, schedules and about a thousand test references), signing day and the portal are not yet resolved one name at a time, and the stops do not ask for a decision inside the card; they route to the screen that holds it.
+
 ## v0.19.0 Game Day worth coaching — 2026-11-11
 
 Third release of `docs/RELEASE_GAMEPLAN_2026-11-11.md`. Drive calls and key third-down defensive calls live in `game-engine-v2-gameday.js` (`DRIVE_CALLS`, `DEFENSE_CALLS`, `snapCall`, `createDriveDecision`, `createDefenseDecision`) and reach the play model through an optional `call` argument on `profileOutcome` in `game-engine-v2-adapter.js`. A missing call changes nothing, including the order of random draws. Sessions ask for calls only when created with `calls:true`; `v2GameDayUIPrepare` passes that for Coach It Live and not for Coach big moments, and `universe.liveGameDay.calls` records it so a saved game replays the way it was played.

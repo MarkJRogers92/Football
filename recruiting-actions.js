@@ -897,3 +897,4 @@ if(typeof module==='object'&&module.exports){
   if(r&&body&&!body.querySelector?.('.recruiting-desk')){const html=deskHTML(id);if(html){body.insertAdjacentHTML?.('afterbegin',html);bindDesk(body)}}
  };
 }
+if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.setStaffRecruiting=on=>{universe.recruitingActions={version:1,year:universe.year,week:universe.week,...(universe.recruitingActions||{}),auto:!!on};render();return universe.recruitingActions.auto};

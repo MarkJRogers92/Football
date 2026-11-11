@@ -56,7 +56,7 @@ function newDynastySetupProgramRows(){
  return rows;
 }
 function newDynastySetupProgramListHTML(rows,selected){
- return rows.map(s=>`<button type="button" role="option" aria-selected="${s.name===selected.name}" class="setup-program-row${s.name===selected.name?' selected':''}" data-setup-program="${esc(s.name)}"><span>${teamLogoHTML(s.id,34,'team-logo--inline')}<b>${esc(s.name)}</b><small>${esc(s.conference)} · ${esc(s.city)}, ${esc(s.state)}</small></span><span><b>${esc(newDynastyChallengeLabel(s))}</b><small>Prestige ${s.prestige} · Ceiling ${s.program_ceiling}</small></span></button>`).join('')||'<p class="setup-empty">No programs match those filters.</p>';
+ return rows.map(s=>`<button type="button" role="option" aria-selected="${s.name===selected.name}" class="setup-program-row${s.name===selected.name?' selected':''}" data-setup-program="${esc(s.name)}"><span>${teamLogoHTML(s.id,34,'team-logo--inline')}<b>${esc(s.name)}</b><small>${globalThis.DynastyMascots?.nickname(s)?`${esc(globalThis.DynastyMascots.nickname(s))} · `:''}${esc(s.conference)} · ${esc(s.city)}, ${esc(s.state)}</small></span><span><b>${esc(newDynastyChallengeLabel(s))}</b><small>Prestige ${s.prestige} · Ceiling ${s.program_ceiling}</small></span></button>`).join('')||'<p class="setup-empty">No programs match those filters.</p>';
 }
 function filterNewDynastySetupPrograms(){
  const rows=newDynastySetupProgramRows(),selected=newDynastySetupSchool(),count=$('#setupContent .setup-program-count'),list=$('#setupContent .setup-program-list');
@@ -175,6 +175,9 @@ async function acceptNewDynastySetup(){
  try{
   if(target.slot!==activeSaveSlot)setActiveSaveSlot(target.slot);
   universe=newDynastySetupCandidate;refreshTeamOptions(newDynastySetupDraft.program);
+  // v0.20: a new coach starts with the staff running recruiting (an untouched board costs a class) and with the
+  // administration behind the hire they just made, whatever their usual patience.
+  if(newDynastySetupDraft.mode!=='commissioner'){try{universe.recruitingActions={version:1,year:universe.year,week:universe.week,...(universe.recruitingActions||{}),auto:true};const mine=selected();if(mine)mine.adminConfidence=Math.max(Number(mine.adminConfidence)||0,60)}catch(err){console.error(err)}}
   universe.setup.completed=true;universe.setupCompleted=true;universe.setup.completedAt=new Date().toISOString();universe.setup.saveSlot=activeSaveSlot;
   await yieldToUserAction();await writeBrowserSave('setup');newDynastySetupSaveCount++;
   const program=newDynastySetupDraft.program,mode=newDynastySetupDraft.mode;clearNewDynastySetupDraft();newDynastySetupCandidate=null;newDynastySetupPreviousUniverse=null;newDynastySetupSubmitting=false;enterDynasty();setStatus(`${program} accepted. Your ${mode==='commissioner'?'commissioner universe':'dynasty'} is saved and ready for the 2027 preseason.`);return true;

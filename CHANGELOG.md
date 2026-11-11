@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.20.0 — A world you care about
+
+- **Every program has a nickname.** All 120 programs now have one of their own: the Chicago Metropolitan Skyliners, the Alabama Commonwealth Vulcans, the Montana Commonwealth Copper Kings. Each was invented for this game from local history, industry or wildlife. Nicknames appear on This Week, when you choose a program, on Game Day, in the end zones of the live field and on the final. Older dynasties get them too.
+- **The offseason stops where there is a decision.** Pressing Next used to run the whole offseason. It now stops once before each of three stages and tells you what is at stake: players close to leaving before departures are processed, open scholarships before the class enrolls, and the transfer portal before it is resolved. Each stop offers the way to act and the way to move on. A stage with nothing to decide does not stop.
+- **Your staff recruit until you take over.** A new dynasty starts with "Staff handle recruiting" on, so a coach who has not found the recruiting board yet still builds a class. This Week says so. Turn it off on the Recruiting Board whenever you like.
+- **A new coach starts with the administration behind him.** Confidence begins at 60 (Backed) or the program's usual level if that is higher. Quick Start used to begin one bad season from the hot seat.
+- **The season review adds up.** It read "8-5 against 8 expected — confidence 38 (Hot seat)", which looked like a pass. It now says what moved confidence: "8-5 met the 8-win target; season goals cost 4 (2 missed). Confidence 45 to 41 (Watched)."
+
+Saves carry over. Program names are unchanged; only nicknames were added.
+
 ## v0.19.0 — Game Day worth coaching
 
 - **Call every drive.** When you coach a game live, each of your possessions starts with a call: stay balanced, run the ball, quick passes or take shots. Each one trades something. Running protects the ball and the clock and gives up big plays; taking shots gains more per completion and costs sacks and interceptions. Your staff say which they would choose and why (the score, the clock, the weather or the matchup), and the card marks what you called last drive.

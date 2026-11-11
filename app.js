@@ -2,7 +2,7 @@
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.19.0';
+const APP_VERSION='0.20.0';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi','Aiden','Alex','Amari','Andrew','Anthony','Antonio','Armani','Ashton','Austin','Avery','Bennett','Blake','Brady','Brandon','Brayden','Brennan','Brock','Bryson','Cade','Caden','Calvin','Cameron','Carson','Cedric','Chase','Christian','Cody','Colby','Collin','Connor','Corey','Damian','Damon','Daniel','Davion','Dawson','Deandre','Demarcus','Derek','Desmond','Dillon','Drew','Dylan','Elijah','Ethan','Ezra','Garrett','Grady','Graham','Grant','Hayden','Hunter','Ian','Isaac','Jabari','Jace','Jackson','Jacob','Jaden','Jake','Jamar','Jameson','Jared','Jarrett','Javon','Jaxon','Jay','Jermaine','Jesse','Joel','Jonah','Josiah','Julian','Justin','Kaden','Kai','Kamari','Keegan','Keenan','Kendall','Kendrick','Kevin','Kobe','Kyle','Kyler','Lamar','Landon','Lane','Lawrence','Leon','Levi','Lincoln','Lucas','Marco','Mario','Mateo','Matthew','Maurice','Max','Myles','Nate','Nathan','Nolan','Omar','Owen','Parker','Patrick','Preston','Quentin','Quincy','Reggie','Riley','Ryan','Sam','Sean','Seth','Shane','Silas','Solomon','Spencer','Sterling','Terrell','Theo','Tobias','Travis','Tristan','Troy','Tucker','Tyrese','Victor','Wade','Walker','Wes','Wyatt','Zach','Zane','Andres','Diego','Rafael','Tevita','Sione','Manu','Keoni','Kenji','Darnell'];
@@ -1849,6 +1849,13 @@ function adminSeasonReview(t){
   text:`The administration expects ${exp} wins in ${universe.year+1}.`}:null;
  return review;
 }
+// The review in one sentence that adds up: the record against the target, what the season goals added or cost, and
+// where confidence went. "8-5 against 8 expected" alone read as a pass while confidence fell on missed goals.
+function adminReviewSummary(t,review){
+ const winPart=review.w===review.expected?`met the ${review.expected}-win target`:review.w>review.expected?`beat the ${review.expected}-win target by ${review.w-review.expected}`:`fell ${review.expected-review.w} short of the ${review.expected}-win target`;
+ const missed=(review.goals||[]).filter(g=>g&&g.weight!=='Critical'&&g.state!=='complete').length,goalPart=review.goalAdjustment?`; season goals ${review.goalAdjustment>0?'added':'cost'} ${Math.abs(review.goalAdjustment)}${review.goalAdjustment<0&&missed?` (${missed} missed)`:''}`:'';
+ return `${t.name} review: ${review.w}-${review.l} ${winPart}${goalPart}. Confidence ${review.before} to ${review.after} (${review.label}).`;
+}
 // Applied to the controlled program only, and recorded so the tenure has a history.
 function reviewControlledProgram(t){
  if(!t)return null;
@@ -1865,7 +1872,7 @@ function reviewControlledProgram(t){
  universe.events.push({id:`EVT_${order}`,season:universe.year,week:universe.week,timestampOrder:order,
   type:'ADMIN_REVIEW',importance:review.after<40?78:52,schoolIds:[t.id],playerIds:[],coachIds:[],
   recruitIds:[],gameIds:[],
-  summary:`${t.name} review: ${review.w}-${review.l} against ${review.expected} expected — confidence ${review.after} (${review.label}).`,
+  summary:adminReviewSummary(t,review),
   metadata:{...review}});
  if(t.adminConfidence<=0&&!universe.tenure.ended){
   universe.tenure.ended={year:universe.year,record:`${review.w}-${review.l}`,
@@ -2669,7 +2676,7 @@ function guidanceModel(t=selected()){
  if(sch.over)add({id:guidanceItemId(t,'scholarships','over-limit'),occurrence:'over-limit',meaning:'decision_due',category:'roster_management',priority:260,title:`Reduce the signing class by ${sch.over}`,cause:`${sch.committed} commitments currently exceed the ${sch.capacity}-player class capacity.`,affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'recruiting',focus:'scholarship-summary'},boundary:'Playoff completion',consequence:'This does not block time. When the playoff finalizes recruiting, the game pulls the weakest commitments until the class fits.',boundaryKey:'playoff'});
  for(const o of (universe.openings||[]).filter(o=>o.schoolId===t.id&&o.status==='OPEN'))add({id:guidanceItemId(t,'staff-opening',o.id||o.slot),occurrence:o.id||o.slot,meaning:'staff_recommendation',category:'staffing',priority:190,title:`Hire a ${o.role}`,cause:`The ${o.role} position is open${o.reason?`: ${o.reason}`:''}.`,affectedEntity:{type:'staff_role',id:o.slot,label:o.role},destination:{tab:'staff',focus:'coach-opening',coachId:o.coachId||null},boundary:null,consequence:'The interim arrangement remains in place if you advance; this recommendation never blocks time.'});
  const targets=(universe.recruits||[]).filter(r=>r.targeted&&!r.committed).length;
- if(!targets&&sch.room>0&&(universe.phase==='regular'||openingPreseason()))add({id:guidanceItemId(t,'recruiting-board','empty'),occurrence:'empty',meaning:'staff_recommendation',category:'recruiting',priority:170,title:'Build a recruiting board',cause:`You have ${sch.room} scholarship${sch.room===1?'':'s'} available and no active targets.`,affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'recruiting',focus:'recruiting-board'},boundary:null,consequence:'Prospects only commit to programs that recruit them. Left empty, the class fills on signing day with late additions nobody else wanted, unless you turn on Staff handle recruiting.'});
+ if(!targets&&sch.room>0&&(universe.phase==='regular'||openingPreseason()))add({id:guidanceItemId(t,'recruiting-board','empty'),occurrence:'empty',meaning:'staff_recommendation',category:'recruiting',priority:170,title:'Build a recruiting board',cause:universe.recruitingActions?.auto?`Your staff are running recruiting until you take over. ${sch.room} scholarship${sch.room===1?' is':'s are'} open.`:`You have ${sch.room} scholarship${sch.room===1?'':'s'} available and no active targets.`,affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'recruiting',focus:'recruiting-board'},boundary:null,consequence:'Prospects only commit to programs that recruit them. Left empty, the class fills on signing day with late additions nobody else wanted, unless you turn on Staff handle recruiting.'});
  // Setup reminders. All are optional staff recommendations: they never block an advance, but they
  // keep recruiting and development from sitting untouched while the season moves on.
  const inSeason=universe.phase==='regular'||openingPreseason(),optional='Optional. The week still advances if you leave it.';
@@ -3692,7 +3699,7 @@ function renderProgressionControls(){
 }
 function render(){
  const order=ranked(),u=selected();if(!u)return;ensureSeasonGoals(u);$('#seasonGoalsDashboard')&&($('#seasonGoalsDashboard').innerHTML=seasonGoalsHTML(u));const p=profiles(u),preseason=openingPreseason();
- $('#teamName').textContent=u.name;const mm=$('.masthead-mark');if(mm){mm.innerHTML=teamLogoHTML(u.id,48);mm.classList.add('has-logo')}
+ $('#teamName').textContent=u.name;{const nick=globalThis.DynastyMascots?.nickname(u),eyebrow=$('#dashboard .program-masthead .eyebrow');if(eyebrow&&nick){eyebrow.textContent=`THE ${nick.toUpperCase()}`;eyebrow.dataset.nickname=nick}}const mm=$('.masthead-mark');if(mm){mm.innerHTML=teamLogoHTML(u.id,48);mm.classList.add('has-logo')}
  $('#teamMeta').textContent=`${u.conference} · ${u.offScheme} / ${u.defScheme} · Prestige ${u.prestige} · Ceiling ${u.program_ceiling}`;
  $('#teamMetrics').innerHTML=[['Offense',grade(p.offense)],['Defense',grade(p.defense)],['Scheme Fit',grade((p.offFit+p.defFit)/2)],['Development',grade(u.development)]].map(x=>`<div class="metric"><div class="small muted">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');
  $('#recordBig').textContent=`${u.w}–${u.l}`;$('#rankLine').textContent=preseason?`Preseason · #${u.rank} nationally`:u.rank<=25?`#${u.rank} nationally`:`#${u.rank} nationally · outside the top 25`;$('#weekLine').textContent=preseason?`${universe.year} · Preseason`:universe.phase!=='regular'&&SEASON_STAGE_LABELS[universe.phase]?`${universe.year} · ${universe.phase==='complete'&&universe.offseason?.year===universe.year&&(universe.offseason.completed||[]).includes('review')?'Offseason':SEASON_STAGE_LABELS[universe.phase]}`:`${universe.year} · Week ${universe.week+1}`;

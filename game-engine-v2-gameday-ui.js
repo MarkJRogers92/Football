@@ -122,7 +122,7 @@ function v2GameDayUIField(session){
   const home=s.possession==='home',toGoal=100-s.fieldPosition,x=home?s.fieldPosition:100-s.fieldPosition,line=Math.min(100,s.fieldPosition+(s.distance||0)),lx=home?line:100-line,pct=v=>(8+v*.84).toFixed(2);
   const lab=globalThis.DynastyGameEngineV2Lab,text=`${session.names[s.possession]} ball, ${lab?.downLabel(s)||''}, ${toGoal} yards from the end zone`;
   const marks=[10,20,30,40,50,60,70,80,90].map(v=>`<i style="left:${pct(v)}%"><b>${v<=50?v:100-v}</b></i>`).join('');
-  return`<div class="v2-live-field" role="img" aria-label="${gameEscape(text)}" data-direction="${home?'right':'left'}"><div class="v2-live-turf"></div><div class="v2-live-endzone away"><span>${gameEscape(session.names.away)}</span></div><div class="v2-live-endzone home"><span>${gameEscape(session.names.home)}</span></div>${marks}${s.period<=4&&line<100?`<u style="left:${pct(lx)}%" title="First down"></u>`:''}<s style="left:${pct(x)}%"><span>${home?'▶':'◀'}</span></s></div>`
+  return`<div class="v2-live-field" role="img" aria-label="${gameEscape(text)}" data-direction="${home?'right':'left'}"><div class="v2-live-turf"></div><div class="v2-live-endzone away"><span>${gameEscape(globalThis.DynastyMascots?.nickname(s.away?.id)||session.names.away)}</span></div><div class="v2-live-endzone home"><span>${gameEscape(globalThis.DynastyMascots?.nickname(s.home?.id)||session.names.home)}</span></div>${marks}${s.period<=4&&line<100?`<u style="left:${pct(lx)}%" title="First down"></u>`:''}<s style="left:${pct(x)}%"><span>${home?'▶':'◀'}</span></s></div>`
 }
 // What the last call led to: the play that followed it and how the win chance moved.
 function v2GameDayUIConsequence(session){
