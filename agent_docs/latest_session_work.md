@@ -1,5 +1,15 @@
 # Latest Session Work
 
+## v0.18.0 a dynasty that lasts — 2026-11-11
+
+Second release of `docs/RELEASE_GAMEPLAN_2026-11-11.md`. Compressed, chunked export (`saveJsonParts`, `gzipBlob`, `saveFileText` in `app.js`), the crash screen (`crash-guard.js`, loaded first by `tools/build.js`), save size in Dynasty & Saves and a quota warning (`app-health.js`), and `tools/long-save-measure.js`.
+
+Decided against more pruning: at seven seasons the save is rosters 33 MB (fixed), box scores 28 MB and retired careers 27 MB, and the per-season growth that is left is history a player can open. A second box-score tier would have saved about 0.7 MB a season of 9. Compression takes 299 MB to 34.9 MB at season 30.
+
+Also re-took two engine golden hashes and the no-rules kick curve in `tests/play-model.js` and `tests/game-cast-field.js`; they pinned the pre-v0.17.2 fourth-down rule and should have moved with it.
+
+Not verified: export on a phone, in-memory size at season 30 in a browser, weekly save time at season 30 in a browser.
+
 ## v0.17.2 visible fixes — 2026-11-11
 
 First release of `docs/RELEASE_GAMEPLAN_2026-11-11.md`. Fixes the confirmed defects from that review: postgame panel clipping (`game-engine-v2-presentation.css`), field-goal range (`fieldGoalInRange` and `defaultFourthDown` in `game-engine-v2.js`, now the only place the rule lives), the week label (`seasonStageLabel`, header, save line, title screen all name the week being prepared), singular stat lines, the duplicate final, the "drive detail unavailable" line and phone toast placement.

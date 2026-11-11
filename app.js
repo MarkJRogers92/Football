@@ -2,7 +2,7 @@
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.17.2';
+const APP_VERSION='0.18.0';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi','Aiden','Alex','Amari','Andrew','Anthony','Antonio','Armani','Ashton','Austin','Avery','Bennett','Blake','Brady','Brandon','Brayden','Brennan','Brock','Bryson','Cade','Caden','Calvin','Cameron','Carson','Cedric','Chase','Christian','Cody','Colby','Collin','Connor','Corey','Damian','Damon','Daniel','Davion','Dawson','Deandre','Demarcus','Derek','Desmond','Dillon','Drew','Dylan','Elijah','Ethan','Ezra','Garrett','Grady','Graham','Grant','Hayden','Hunter','Ian','Isaac','Jabari','Jace','Jackson','Jacob','Jaden','Jake','Jamar','Jameson','Jared','Jarrett','Javon','Jaxon','Jay','Jermaine','Jesse','Joel','Jonah','Josiah','Julian','Justin','Kaden','Kai','Kamari','Keegan','Keenan','Kendall','Kendrick','Kevin','Kobe','Kyle','Kyler','Lamar','Landon','Lane','Lawrence','Leon','Levi','Lincoln','Lucas','Marco','Mario','Mateo','Matthew','Maurice','Max','Myles','Nate','Nathan','Nolan','Omar','Owen','Parker','Patrick','Preston','Quentin','Quincy','Reggie','Riley','Ryan','Sam','Sean','Seth','Shane','Silas','Solomon','Spencer','Sterling','Terrell','Theo','Tobias','Travis','Tristan','Troy','Tucker','Tyrese','Victor','Wade','Walker','Wes','Wyatt','Zach','Zane','Andres','Diego','Rafael','Tevita','Sione','Manu','Keoni','Kenji','Darnell'];
@@ -4690,15 +4690,36 @@ function loadBrowser(){return storageOperation(async()=>{
   setStatus(`Loaded ${activeSlotMeta()?.label||savedDynastyLabel()} from ${d.savedAt||'an earlier session'} ${storageLocation()}.`);
   return true;
 })}
+// A long dynasty's portable save is hundreds of megabytes as one JSON string. It is written in pieces (no single giant
+// string) and gzipped where the platform can, which is about a ninth of the size. The content is the same portable JSON.
+function saveJsonParts(payload){
+ const parts=[],key=k=>JSON.stringify(k)+':',big=v=>Array.isArray(v)&&v.length>20;
+ // Items are gathered into pieces of about a quarter of a megabyte, whatever their own size (a team is 200 KB, a game 2 KB).
+ const writeArray=list=>{parts.push('[');let piece='';for(let i=0;i<list.length;i++){piece+=(i?',':'')+(JSON.stringify(list[i]===undefined?null:list[i])??'null');if(piece.length>262144){parts.push(piece);piece=''}}if(piece)parts.push(piece);parts.push(']')};
+ const writeObject=(obj,deep)=>{parts.push('{');let first=true;for(const [k,v] of Object.entries(obj)){if(v===undefined||typeof v==='function')continue;parts.push((first?'':',')+key(k));first=false;if(big(v))writeArray(v);else if(deep&&v&&typeof v==='object'&&!Array.isArray(v)&&k==='universe')writeObject(v,false);else parts.push(JSON.stringify(v))}parts.push('}')};
+ writeObject(payload,true);return parts;
+}
+async function gzipBlob(blob){
+ if(typeof CompressionStream!=='function'||typeof Response!=='function'||typeof blob?.stream!=='function')return null;
+ try{return await new Response(blob.stream().pipeThrough(new CompressionStream('gzip'))).blob()}catch{return null}
+}
+async function saveFileText(file){
+ let head=null;try{if(typeof file?.slice==='function'&&typeof file.slice(0,2).arrayBuffer==='function')head=new Uint8Array(await file.slice(0,2).arrayBuffer())}catch{}
+ if(head&&head[0]===0x1f&&head[1]===0x8b){
+  if(typeof DecompressionStream!=='function')throw new Error('This browser cannot open a compressed save. Unzip the .gz file and import the .json inside.');
+  try{return await new Response(file.stream().pipeThrough(new DecompressionStream('gzip'))).text()}catch{throw new Error('The compressed save file is damaged or incomplete.')}
+ }
+ return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(new Error('Could not read the save file.'));r.onabort=()=>reject(new Error('Import cancelled.'));r.readAsText(file)});
+}
 function exportSave(){return storageOperation(async()=>{
   await ensureArchiveLoaded();await ensureGamesLoaded();
-  const blob=new Blob([JSON.stringify({version:APP_VERSION,userTeam:$('#userTeam').value,universe:packUniverse(universe)})],{type:'application/json'}),a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);a.download=`dynasty-lab-${universe.year}-week-${universe.week}.json`;a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),1000);setStatus('Save exported as JSON.');
+  const plain=new Blob(saveJsonParts({version:APP_VERSION,userTeam:$('#userTeam').value,universe:packUniverse(universe)}),{type:'application/json'}),zipped=await gzipBlob(plain),blob=zipped?new Blob([zipped],{type:'application/gzip'}):plain,a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=`dynasty-lab-${universe.year}-week-${universe.week+1}.json${zipped?'.gz':''}`;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);const size=Number.isFinite(blob.size)?` (${slotBytes(blob.size)})`:'';setStatus(zipped?`Save exported as a compressed backup${size}. Import it here as it is.`:`Save exported as JSON${size}.`);
 })}
 function importSave(file){return storageOperation(async()=>{
-  const text=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(new Error('Could not read the save file.'));r.onabort=()=>reject(new Error('Import cancelled.'));r.readAsText(file)});
-  const d=JSON.parse(text);
+  const text=await saveFileText(file);
+  let d;try{d=JSON.parse(text)}catch{throw new Error('That file is not a Dynasty Lab save.')}
   if(d.storageVersion||d.archiveRef)throw new Error('Import a complete exported JSON save, not an app storage record.');
   validateImportedSaveText(d?.universe||d);
   installSave(d);setStatus('Imported save file successfully.');

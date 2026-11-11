@@ -36,7 +36,7 @@
         <label class="title-field">Save slot<select id="titleSaveSlot" aria-label="Save slot"></select></label>
         <button id="titleLoadBrowser" class="title-panel-choice" type="button" disabled><strong>Load saved dynasty</strong><small id="titleLoadMeta">Checking this device…</small></button>
         <div class="title-slot-name"><input id="titleSlotName" type="text" maxlength="40" aria-label="Save slot name"><button id="titleRenameSlot" type="button">Rename</button></div>
-        <button id="titleImport" class="title-panel-choice" type="button"><strong>Import exported save</strong><small>Choose a complete Dynasty Lab JSON backup</small></button>
+        <button id="titleImport" class="title-panel-choice" type="button"><strong>Import exported save</strong><small>Choose a Dynasty Lab backup (.json or .json.gz)</small></button>
       </section>
 
       <section id="titleOptionsPanel" class="title-subpanel" aria-labelledby="titleOptionsHeading" hidden>
@@ -90,7 +90,7 @@
       <button id="loadBrowser">Load</button>
       <button id="exportSave">Export</button>
       <button id="importSave">Import</button>
-      <input id="importFile" type="file" accept="application/json,.json" hidden>
+      <input id="importFile" type="file" accept="application/json,application/gzip,.json,.gz" hidden>
       <button id="newUniverse">Title Screen</button>
     </div>
   </header>

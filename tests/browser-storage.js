@@ -71,7 +71,11 @@ const {clickShellUtility}=require('./helpers/client-shell');
   await tab('dashboard');await clickShellUtility(page,'#loadBrowser');await status('^Loaded');
   const downloadEvent=page.waitForEvent('download');await clickShellUtility(page,'#exportSave');const download=await downloadEvent;
   await status('^Save exported');
-  const exported=JSON.parse(await readFile(await download.path(),'utf8'));
+  // v0.18: the backup is gzipped portable JSON; the content contract is unchanged.
+  assert.match(download.suggestedFilename(),/\.json\.gz$/,'the backup downloads compressed');
+  const exportedBytes=await readFile(await download.path());
+  assert.ok(exportedBytes[0]===0x1f&&exportedBytes[1]===0x8b,'the backup is gzip');
+  const exported=JSON.parse(require('node:zlib').gunzipSync(exportedBytes).toString('utf8'));
   assert.equal(exported.universe.playerArchive.length,record.ref.count);
   assert.deepEqual(exported.universe.playerArchive[0],record.first);
   assert.deepEqual(exported.universe.gameArchive,record.games);assert.equal(exported.universe.year,2028);assert.equal(exported.storageVersion,undefined);

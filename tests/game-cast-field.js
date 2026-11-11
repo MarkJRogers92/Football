@@ -46,7 +46,7 @@ test('recording per-play actors leaves every stat line byte-identical', () => {
     const snaps = s.state.events.filter(e => ['scrimmage', 'interception', 'fumble'].includes(e.type));
     for (const e of snaps) assert.ok(a.playActors[e.seq], `snap ${e.seq} has recorded actors`);
   }
-  assert.equal(h.digest('hex'), 'd307c05645d1e2876c21801e126a5bb500acbf2dce48446b3ffb701146369f62');
+  assert.equal(h.digest('hex'), '5f5f4bbe333bdfd33b9688d277d3192995765f726f15bbd3c7a1054a12826a06' /* re-taken at v0.17.2: field goals past 55 yards are no longer attempted, which changes which plays are run */);
 });
 
 test('a user game saves a compact play log that replays to the final score and drive results', async () => {

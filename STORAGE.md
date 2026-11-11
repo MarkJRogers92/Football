@@ -343,3 +343,37 @@ No new stored fields. The gameplan wear-cost fix writes to the existing
 on `gh-pages`) — a binary asset outside the single-file build, referenced by
 CSS `url()` in the title screen. This is the first source-tree dependency
 that is not concatenated into `index.html` by `tools/build.js`.
+
+## v0.18 additions: compressed backups and the crash screen
+
+**Export.** `exportSave` writes the same portable JSON as before (`{version, userTeam, universe}` with an inlined
+`playerArchive`), but as many pieces of about 256 KB (`saveJsonParts`) rather than one string, and gzips it with
+`CompressionStream` where the platform has one. The download is `dynasty-lab-<year>-week-<n>.json.gz`; without
+`CompressionStream` it is the plain `.json` as before. Nothing about the content changed, so a `.json.gz` unzipped by
+hand is a valid save for any build that reads portable JSON.
+
+**Import.** `saveFileText` reads the first two bytes. A gzip file (`1f 8b`) is inflated with `DecompressionStream`;
+anything else is read as text exactly as before. A truncated or damaged gzip is refused with a message and never
+half-loaded. Old plain `.json` exports import unchanged.
+
+**Measured** with `npm run measure:long-save` (Node, seed 7, 30 seasons):
+
+| Season | Plain JSON | Compressed backup | Write time (stringify + gzip) |
+| --- | --- | --- | --- |
+| 1 | 29.4 MB | 3.7 MB | 0.7 s |
+| 10 | 117.4 MB | 13.8 MB | 3.1 s |
+| 20 | 207.9 MB | 24.4 MB | 6.5 s |
+| 30 | 298.7 MB | 34.9 MB | 11.4 s |
+
+Growth is still about 9 MB of plain JSON a season. Roughly 3.8 MB of that is retired careers, 2.5 MB is box scores
+already compacted to leaders, and the rest is rosters, the draft ledger and events. Removing more would mean deleting
+history a player can open, so this release compresses instead of pruning. The measurement was taken in Node; export
+on a phone and the size of the in-memory dynasty at season 30 are still unmeasured and remain a release gate.
+
+**Crash screen.** `crash-guard.js` loads first. It records uncaught errors and unhandled rejections in
+`localStorage` under `dynastyLabErrorLog` (last 20, on this device only; nothing is sent anywhere) and shows one
+panel offering a reload from the last checkpoint. It deliberately does not offer an export: the in-memory dynasty
+may be half-updated when an error fires, and a backup of that state could be worse than none.
+
+**Storage warning.** Dynasty & Saves shows how much storage the saves use, and a save that leaves the browser at
+80% or more of its quota says so once per session.

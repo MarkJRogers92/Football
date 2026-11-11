@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.18.0 — A dynasty that lasts
+
+- **Backups are a ninth of the size.** Export now writes a compressed backup (`.json.gz`). A 30-season dynasty that exported at about 299 MB is about 35 MB; a first-season backup is under 4 MB. Import takes the compressed file as it is, and still takes older plain `.json` backups.
+- **Exporting a long dynasty no longer builds one enormous block of text in memory.** The backup is written in small pieces, which is what made very long dynasties fail to export on devices with little memory.
+- **A crash screen instead of a frozen one.** If the game hits an error it says so, tells you your last saved checkpoint is not affected, and offers a reload. "Copy details" gives you a short report to paste into a bug report. Nothing is sent anywhere; the record stays on your device.
+- **Save size where you save.** Dynasty & Saves shows how much storage your saves use, and the game warns you once when the browser is nearly out of room, while there is still space to export.
+- **A damaged backup is refused, not half-loaded.** A compressed file that is cut short gives a clear message.
+
+Saves carry over. Measured in Node over 30 seasons (`npm run measure:long-save`); export on a phone is not yet measured. See `STORAGE.md`.
+
 ## v0.17.2 — Visible fixes on Game Day
 
 - **The postgame panel fits the screen.** On wide screens the final was cut off on the right, hiding the home team, its score and part of the player leaders. Everything is now on screen at every width.

@@ -35,7 +35,8 @@ function context(prefix) {
 }
 
 test('a game without rules plays exactly as it did before the v0.16 model', () => {
-  // The digest was taken from the engine as it stood at v0.15.2.
+  // The digest was taken from the engine as it stood at v0.15.2 and re-taken at v0.17.2, when the fourth-down kick rule
+  // and the long-kick odds changed for every game, with or without rules.
   const h = crypto.createHash('sha256');
   for (let i = 0; i < 150; i++) {
     const state = engine.createGame({home: team(1, 'H', 55 + (i % 40)), away: team(2, 'A', 90 - (i % 35)), seed: 'legacy-' + i});
@@ -44,7 +45,7 @@ test('a game without rules plays exactly as it did before the v0.16 model', () =
     assert.ok(!state.events.some(e => e.type === 'penalty'), 'no flags');
     h.update(JSON.stringify([state.score, state.events.length, state.rng, state.events.filter(x => x.type === 'punt' || x.type === 'kickoff').length]));
   }
-  assert.equal(h.digest('hex'), '225537ff01cd7190d6e76a21402e617eaaebd04ed4e4a9f0156bc617169535b0');
+  assert.equal(h.digest('hex'), '0ec31f09177dea82d55506de725c7415e256d387c38715c1182b514394b11a0b');
   const off = shadow('opt-out', {rules: false});
   assert.equal(off.state.rules, undefined);
   assert.ok(off.state.events.every(e => e.type !== 'penalty' && !e.scramble && !e.pressure && !e.ret));
@@ -227,7 +228,7 @@ test('a punt return touchdown and a kickoff return touchdown score like any othe
 test('wind, rain, cold and thin air move kicking and the passing game the way a coach expects', () => {
   const chance = (cond, distance) => engine.fieldGoalChance(live({}, {conditions: cond}), distance);
   const noRules = engine.createGame({home: team(1, 'H'), away: team(2, 'A'), seed: 'x'});
-  for (const d of [20, 35, 45, 55]) assert.equal(engine.fieldGoalChance(noRules, d), Math.max(.18, Math.min(.97, .97 - Math.max(0, d - 30) * .018)), 'the original curve without rules');
+  for (const d of [20, 35, 45, 55]) assert.equal(engine.fieldGoalChance(noRules, d), Math.max(.02, Math.min(.97, .97 - Math.max(0, d - 30) * .018 - Math.max(0, d - 52) * .03)), 'the curve without rules');
   const windy = {...calm, wind: 25}, snow = {...calm, temp: 15, precip: 3, sky: 'snow', wind: 14}, dome = {roof: 'dome', sky: 'dome', temp: 72, wind: 0, precip: 0, altitude: 'low'}, high = {...calm, altitude: 'high'};
   for (const d of [30, 42, 52]) {
     assert.ok(chance(windy, d) < chance(calm, d), `wind hurts a ${d}-yard attempt`);
@@ -236,7 +237,7 @@ test('wind, rain, cold and thin air move kicking and the passing game the way a 
     assert.ok(chance(high, d) >= chance(calm, d));
   }
   assert.ok(chance(windy, 52) - chance(windy, 30) < chance(calm, 52) - chance(calm, 30), 'wind costs long kicks the most');
-  assert.ok(chance(calm, 70) >= .12, 'never certain failure');
+  assert.ok(chance(calm, 70) >= .02, 'never certain failure');
 
   const average = (cond, key) => {
     let sum = 0, n = 0;
