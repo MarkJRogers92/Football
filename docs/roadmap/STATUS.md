@@ -34,6 +34,8 @@ should be sliced under a new version number.
 
 ## Next action
 
+**Current (2026-11-11):** follow "What is left" in `agent_docs/HANDOFF_2026-11-11_v0.22.0.md`. The list below predates v0.17.2 and is kept for history.
+
 One bounded packet at a time, in this order:
 
 1. **History surfaces** (`09-v012-encyclopedia.md` remainder): coach index,

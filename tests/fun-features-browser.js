@@ -49,7 +49,9 @@ const {chromium}=require('playwright-core'),{chromiumPath}=require('./helpers/ch
    const before=await page.evaluate(()=>window.__DL_TEST__.preseasonDebug());
    await page.locator('#broadcastFeature [data-coach-live]').click();
    await page.waitForSelector('#v2InteractiveGameDay .gm-panel .gm-graph',{timeout:20000});
-   await page.click('[data-v2-gameday-decision]');
+   // v0.19: a fully coached game can open on a drive call; hand it to the staff, then advance.
+   if(await page.locator('[data-v2-gameday-choice="delegate"]').count())await page.click('[data-v2-gameday-choice="delegate"]');
+   if(await page.locator('[data-v2-gameday-decision]').count())await page.click('[data-v2-gameday-decision]');
    await page.waitForSelector('#v2InteractiveGameDay .gm-panel');
    const pct=await page.locator('.gm-head strong').innerText();assert.match(pct,/^\d{1,2}%$|^100%$/,`[${label}] win chance shows a percentage`);
    if(await page.locator('.v2-gameday-decision').count())assert.match(await page.locator('.v2-gameday-decision').innerText(),/Win chance now \d+%/,`[${label}] decisions show the current win chance`);

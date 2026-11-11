@@ -1,5 +1,7 @@
 # Latest Session Work
 
+**Start here:** `agent_docs/HANDOFF_2026-11-11_v0.22.0.md` (state, decisions, what is left, traps) and `docs/RELEASE_GAMEPLAN_2026-11-11.md` (review and plan).
+
 ## v0.22.0 install, offline, report — 2026-11-11
 
 Sixth release of `docs/RELEASE_GAMEPLAN_2026-11-11.md`; its "Status at v0.22.0" section lists what shipped and what was left out across all six. `manifest.webmanifest`, `pwa.js` (registers the worker on http and https only), `tools/sw-template.js` and the generated `sw.js` (written by `tools/build.js` with the version and the asset list; CI now checks `index.html sw.js` are current), a Content-Security-Policy meta tag built in `tools/build.js`, and Report a problem and Credits in `title-menus.js`. `tools/publish.js` copies the manifest and worker beside the page.

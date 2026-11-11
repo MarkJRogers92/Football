@@ -15,7 +15,8 @@ async function startLive(page){
   const ready=await page.evaluate(()=>window.__DL_TEST__.v2PrepareDetailedGame());assert.equal(ready.ready,true,JSON.stringify(ready));
   await goTab(page,'gamelab','season');await page.waitForSelector('[data-v2-gameday-start]',{timeout:15000});
   await startLiveGame(page);await page.waitForSelector('.v2-gameday-scoreboard',{timeout:10000});
-  for(let i=0;i<6;i++)if(await page.locator('[data-v2-gameday-next]').count())await page.click('[data-v2-gameday-next]');
+  // v0.19: a drive or defensive call can be waiting; delegating it is a recorded action too.
+  for(let i=0;i<6;i++){if(await page.locator('[data-v2-gameday-next]').count())await page.click('[data-v2-gameday-next]');else if(await page.locator('[data-v2-gameday-choice="delegate"]').count())await page.click('[data-v2-gameday-choice="delegate"]')}
 }
 (async()=>{
   const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});
