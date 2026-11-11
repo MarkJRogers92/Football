@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.24.0 — Signing day where you decide
+
+- **Signing day is announced in the offseason.** When recruits committed to you are being pushed by a rival, or you are pushing someone else's commit, the Next button stops before the class enrolls and announces those decisions one at a time, yours first. "Announce the rest" shows them all. The card then says how many you kept or won and what is left of your class before you enroll it. Every decision was already made when the season ended; announcing them changes nothing about who signs where.
+- The full signing day board, including programs other than yours, is still on the Recruiting screen.
+
+Saves carry over.
+
 ## v0.23.0 — Timeouts, award art and a cleaner release build
 
 - **Timeouts.** In a fully coached game, the last two minutes of each half now offer a timeout after a play that runs the clock, when your side has one left and a reason to stop it. A timeout keeps the time between plays, so only the play itself runs off. Your staff recommend when to use one and when to save it. Coach big moments, simulated games and live games saved before this release are unchanged.

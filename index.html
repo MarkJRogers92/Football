@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.23.0</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.24.0</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -3365,6 +3365,12 @@ button.lw-follow[aria-pressed="true"]{color:var(--text);border-color:var(--team-
 /* v0.20: the one stop before an offseason stage that holds a decision. */
 .offseason-stop{margin:14px 0;padding:16px 18px;border:1px solid var(--warn,#f3ca78);border-left-width:4px;border-radius:12px;background:rgba(243,202,120,.06)}
 .offseason-stop h3{margin:4px 0 6px}.offseason-stop p{margin:0 0 12px;color:var(--muted,#9ca8b8);max-width:70ch}
+/* v0.24: signing day decisions announced inside the offseason stop. */
+.offseason-signing{list-style:none;margin:0 0 12px;padding:0;display:grid;gap:6px;max-width:70ch}
+.offseason-signing li{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.03);border-left:3px solid var(--line,#2b3440)}
+.offseason-signing li.signing-good{border-left-color:var(--good,#4ade80)}
+.offseason-signing li.signing-bad{border-left-color:var(--bad,#f08a8a)}
+@media(prefers-reduced-motion:no-preference){.offseason-signing li:last-child{animation:dl-value-in .35s ease both}}
 
 /* v0.21 — phone floor for touch and reading. At phone width every control is at least 44px tall (icon buttons 44px
    wide) and no text is under 12px. Loaded last so it holds whatever a feature stylesheet says. Desktop is untouched. */
@@ -3470,7 +3476,7 @@ select{min-width:44px}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.23.0</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.24.0</b></span></footer>
   </div>
 </section>
 
@@ -3497,7 +3503,7 @@ select{min-width:44px}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.23.0</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.24.0</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -7446,7 +7452,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.23.0';
+const APP_VERSION='0.24.0';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi','Aiden','Alex','Amari','Andrew','Anthony','Antonio','Armani','Ashton','Austin','Avery','Bennett','Blake','Brady','Brandon','Brayden','Brennan','Brock','Bryson','Cade','Caden','Calvin','Cameron','Carson','Cedric','Chase','Christian','Cody','Colby','Collin','Connor','Corey','Damian','Damon','Daniel','Davion','Dawson','Deandre','Demarcus','Derek','Desmond','Dillon','Drew','Dylan','Elijah','Ethan','Ezra','Garrett','Grady','Graham','Grant','Hayden','Hunter','Ian','Isaac','Jabari','Jace','Jackson','Jacob','Jaden','Jake','Jamar','Jameson','Jared','Jarrett','Javon','Jaxon','Jay','Jermaine','Jesse','Joel','Jonah','Josiah','Julian','Justin','Kaden','Kai','Kamari','Keegan','Keenan','Kendall','Kendrick','Kevin','Kobe','Kyle','Kyler','Lamar','Landon','Lane','Lawrence','Leon','Levi','Lincoln','Lucas','Marco','Mario','Mateo','Matthew','Maurice','Max','Myles','Nate','Nathan','Nolan','Omar','Owen','Parker','Patrick','Preston','Quentin','Quincy','Reggie','Riley','Ryan','Sam','Sean','Seth','Shane','Silas','Solomon','Spencer','Sterling','Terrell','Theo','Tobias','Travis','Tristan','Troy','Tucker','Tyrese','Victor','Wade','Walker','Wes','Wyatt','Zach','Zane','Andres','Diego','Rafael','Tevita','Sione','Manu','Keoni','Kenji','Darnell'];
@@ -18858,6 +18864,23 @@ globalThis.DynastyLivingWorldSnapshot=Object.freeze({
 // Next button on This Week now stops once before each of them to say what is at stake and offer the way to act on it.
 // Only that button stops: the Offseason screen's own controls, Sim Season and the engine advance as before.
 const OFFSEASON_STOP_PHASES=['departures','signing','portal'];
+// Signing day entries still to be announced that involve the coach's program, either as the school he committed to
+// or as the one trying to flip him. The outcome of each was decided and stored when the board was built.
+function mySigningDayLeft(t){
+ const s=universe?.signingDay;if(!t||!s||s.year!==universe.year)return[];
+ return s.board.slice(s.revealed).filter(x=>x.from===t.name||x.challenger===t.name);
+}
+// Move the coach's own unannounced entries to the front of the queue. Order is presentation only.
+function signingDayMineFirst(t){
+ const s=universe?.signingDay;if(!t||!s||s.year!==universe.year)return;
+ const done=s.board.slice(0,s.revealed),rest=s.board.slice(s.revealed),mine=x=>x.from===t.name||x.challenger===t.name;
+ s.board=[...done,...rest.filter(mine),...rest.filter(x=>!mine(x))];
+}
+function signingRevealHTML(t){
+ const s=universe.signingDay,shown=s.board.slice(0,s.revealed).filter(x=>x.from===t.name||x.challenger===t.name),left=mySigningDayLeft(t).length;
+ const row=x=>{const good=(x.flipped&&x.challenger===t.name)||(!x.flipped&&x.from===t.name);return`<li class="signing-${good?'good':'bad'}"><span>${'★'.repeat(x.stars)} ${gameEscape(x.pos)} ${gameEscape(x.name)}</span><strong>${x.flipped?`flips to ${gameEscape(x.challenger)}`:`stays with ${gameEscape(x.from)}`}</strong></li>`};
+ return`<ol class="offseason-signing" aria-live="polite">${shown.map(row).join('')}</ol>${left?`<div class="button-row"><button type="button" class="bi-primary" data-offseason-sign="next">Announce the next name</button><button type="button" data-offseason-sign="all">Announce the rest</button></div>`:''}`;
+}
 function offseasonStopState(){
  if(!universe)return null;
  if(!universe.offseasonStops||universe.offseasonStops.year!==universe.year)universe.offseasonStops={year:universe.year,seen:{},open:null};
@@ -18874,7 +18897,15 @@ function offseasonStopFacts(phase,t){
    act:{label:'See who is at risk',tab:'offseason'},go:'Process departures'};
  }
  if(phase==='signing'){
-  const sch=scholarshipSummary(t),commits=(universe.recruits||[]).filter(r=>r.committed===t.name).length;
+  const sch=scholarshipSummary(t),commits=(universe.recruits||[]).filter(r=>r.committed===t.name).length,mine=mySigningDayLeft(t);
+  // v0.24: signing day's contested commitments are announced here, the coach's own first, before the class enrolls.
+  if(mine.length)return{title:`${mine.length} of your recruit${mine.length===1?' is':'s are'} still deciding`,
+   text:`${mine.length===1?'He has':'They have'} committed to one program and a rival is still pushing. Each decision was made when the season ended; announce them one at a time, then enroll the class.`,
+   act:{label:'Review the class',tab:'recruiting'},go:'Enroll the class',signing:true};
+  const sd=universe.signingDay,told=sd?.year===universe.year?sd.board.slice(0,sd.revealed).filter(x=>x.from===t.name||x.challenger===t.name):[];
+  if(told.length&&universe.offseasonStops?.open==='signing'){const won=told.filter(x=>(x.flipped&&x.challenger===t.name)||(!x.flipped&&x.from===t.name)).length;
+   return{title:`Signing day: you kept or won ${won} of ${told.length}`,text:`Every contested decision involving your program is in. ${sch.over?`Your class is ${sch.over} over the limit; the last to commit will be turned away.`:sch.room?`${sch.room} scholarship${sch.room===1?' is':'s are'} still open and will be filled with whoever is left.`:'The class is full.'}`,
+    act:{label:'Review the class',tab:'recruiting'},go:'Enroll the class',signing:true}}
   if(!sch.room&&!sch.over)return null;
   return{title:sch.over?`Your class is ${sch.over} over the limit`:`${sch.room} scholarship${sch.room===1?' is':'s are'} still open`,
    text:sch.over?`${commits} recruits have committed and only ${sch.capacity} can enroll. Decide who signs, or the last to commit are turned away.`:`${commits} recruit${commits===1?' has':'s have'} committed. Enrolling the class closes this recruiting cycle; open places are filled with whoever is left.`,
@@ -18897,6 +18928,7 @@ function offseasonStopBeforeAdvance(){
   if(!OFFSEASON_STOP_PHASES.includes(phase)||state.seen[phase])return false;
   const facts=offseasonStopFacts(phase,selected());state.seen[phase]=true;
   if(!facts){state.open=null;return false}
+  if(facts.signing)signingDayMineFirst(selected());
   state.open=phase;renderOffseasonStop();setStatus(`${facts.title}. Decide before you move on.`);return true;
  }catch(err){console.error(err);return false}
 }
@@ -18907,8 +18939,14 @@ function renderOffseasonStop(){
  const facts=open?offseasonStopFacts(open,selected()):null;
  if(!facts){if(state&&state.open&&state.open!==phase)state.open=null;card?.remove();return}
  if(!card){card=document.createElement('section');card.id='offseasonStop';card.className='offseason-stop';card.setAttribute('role','region');card.setAttribute('aria-label','Offseason decision');host.insertAdjacentElement('beforebegin',card)}
- card.innerHTML=`<div class="eyebrow">BEFORE YOU MOVE ON</div><h3>${gameEscape(facts.title)}</h3><p>${gameEscape(facts.text)}</p><div class="button-row"><button type="button" class="bi-primary" data-offseason-stop-act>${gameEscape(facts.act.label)}</button><button type="button" data-offseason-stop-go>${gameEscape(facts.go)}</button></div>`;
+ const t=selected(),signing=facts.signing||(open==='signing'&&universe.signingDay?.year===universe.year&&universe.signingDay.board.slice(0,universe.signingDay.revealed).some(x=>x.from===t?.name||x.challenger===t?.name));
+ card.innerHTML=`<div class="eyebrow">${signing?'SIGNING DAY':'BEFORE YOU MOVE ON'}</div><h3>${gameEscape(facts.title)}</h3><p>${gameEscape(facts.text)}</p>${signing?signingRevealHTML(t):''}<div class="button-row"><button type="button" class="bi-primary" data-offseason-stop-act>${gameEscape(facts.act.label)}</button><button type="button" data-offseason-stop-go>${gameEscape(facts.go)}</button></div>`;
  card.querySelector('[data-offseason-stop-act]').onclick=()=>goToTab(facts.act.tab);
+ card.querySelectorAll('[data-offseason-sign]').forEach(b=>b.onclick=()=>{
+  if(b.dataset.offseasonSign==='all'){for(let i=0;i<40&&mySigningDayLeft(t).length;i++)revealNextSigning()}else revealNextSigning();
+  autosaveAfter('management');renderOffseasonStop();if(typeof renderSigningDay==='function')renderSigningDay();
+  card.querySelector('[data-offseason-sign="next"]')?.focus();
+ });
  // The stop is spent, so pressing Next again (here or on the main button) processes the stage.
  card.querySelector('[data-offseason-stop-go]').onclick=()=>{state.open=null;card.remove();$('#hubAdvance')?.click()};
 }
@@ -18917,6 +18955,16 @@ if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.offseasonS
 if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.offseasonStopFacts=phase=>{const t=selected();return{facts:offseasonStopFacts(phase,t),risks:t.roster.map(p=>transferRisk(p)).sort((a,b)=>b-a).slice(0,5),sch:scholarshipSummary(t),field:portalCandidates().length,targets:(ensurePortalCycle().targets||[]).length,status:ensurePortalCycle().status}};
 // The Next button's controller (next-action.js) reaches this module through one global.
 globalThis.DynastyOffseasonStop=offseasonStopBeforeAdvance;
+// Test fixture: a signing day board on which the coach's program is contested. Every entry holds (no flip), so the
+// fixture announces decisions without moving any commitment.
+if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.signingDayFixture=(n=3)=>{
+ const t=selected(),rival=universe.teams.find(x=>x.id===t?.rivalry?.rivalId)||universe.teams.find(x=>x.name!==t?.name);
+ const mine=(universe.recruits||[]).filter(r=>r.committed===t.name).slice(0,n),theirs=(universe.recruits||[]).filter(r=>r.committed===rival.name).slice(0,1);
+ const entry=(r,from,to)=>({recruitId:r.id,name:r.name,pos:r.pos,stars:r.stars,from,challenger:to,pressure:4,odds:20,flipped:false});
+ const others=(universe.recruits||[]).filter(r=>r.committed&&r.committed!==t.name&&r.committed!==rival.name).slice(0,3).map(r=>entry(r,r.committed,rival.name));
+ universe.signingDay={year:universe.year,board:[...others,...mine.map(r=>entry(r,t.name,rival.name)),...theirs.map(r=>entry(r,rival.name,t.name))],revealed:0};
+ return universe.signingDay.board.length;
+};
 
 loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});[...new Set(schools.map(t=>t.conference))].forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();bindNewDynastySetup();applyTitlePreferences();showTitleScreen();refreshTitleSave().then(restoreNewDynastySetupDraft);}).catch(e=>{$('#titleStatus').textContent='Could not initialize Dynasty Lab. '+e.message});
 })();
