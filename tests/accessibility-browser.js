@@ -21,12 +21,14 @@ const check=page=>page.evaluate(async()=>{
  const browser=await chromium.launch({executablePath:chromiumPath(),args:['--no-sandbox']});
  try{
   for(const width of [1280,390]){
-   const page=await browser.newPage({viewport:{width,height:900}});
+   // Reduced motion: values fade in when they change, and a contrast reading taken mid-fade is not the real colour.
+   const page=await browser.newPage({viewport:{width,height:900},reducedMotion:'reduce'});
    await page.goto(testPageURL());await page.waitForSelector('#titleNew');await page.evaluate(axeSource);
    assert.deepEqual(await check(page),[],`title screen at ${width}px`);
    await startNewDynasty(page);await page.evaluate(axeSource);
    for(const screen of SCREENS){
     await page.evaluate(id=>window.__DL_TEST__.goToTab(id),screen);await page.waitForTimeout(150);
+    await page.evaluate(()=>Promise.all(document.getAnimations().map(a=>a.finished.catch(()=>{}))));
     assert.deepEqual(await check(page),[],`${screen} at ${width}px`);
    }
    await page.close();
