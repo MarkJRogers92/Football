@@ -81,7 +81,7 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
     const t0 = Date.now();
     if(!await page.locator('#simWeek').isVisible())await page.click('#programDetails > summary');
     await page.click('#simWeek');
-    await page.waitForFunction(() => /Week 1/.test(document.querySelector('#weekLine').textContent), { timeout: 60000 });
+    await page.waitForFunction(() => /Week 2/.test(document.querySelector('#weekLine').textContent), { timeout: 60000 });
     const simMs = Date.now() - t0;
     check(`[${label}] sim week advances the UI (${simMs}ms)`, true);
     check(`[${label}] sim week is responsive`, simMs < 4000, `${simMs}ms`);

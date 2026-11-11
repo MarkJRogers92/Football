@@ -7,7 +7,7 @@
   const shell=globalThis.DynastyDesktopShell;
 
   // ---- Save storage usage, shown in Options ----
-  async function paintStorage(){
+  function paintStorage(){
     const panel=document.querySelector('#titleOptionsPanel');
     if(!panel)return;
     let line=panel.querySelector('#storageUsage');
@@ -17,6 +17,17 @@
       const anchor=panel.querySelector('#titleSaveOptions');
       if(anchor)anchor.insertAdjacentElement('beforebegin',line);else panel.append(line);
     }
+    return fillUsage(line);
+  }
+  // v0.18: the same line where saves are made, so the size of a dynasty is seen before it is a problem.
+  function paintSaveMenu(){
+    const host=document.querySelector('.client-utility-host');
+    if(!host)return;
+    let line=host.querySelector('#saveMenuUsage');
+    if(!line){line=document.createElement('p');line.id='saveMenuUsage';line.className='storage-usage';line.setAttribute('role','status');host.append(line)}
+    return fillUsage(line);
+  }
+  async function fillUsage(line){
     line.textContent='Checking save storage…';
     if(shell?.isDesktop){
       const usage=await shell.saveUsage?.().catch(()=>null);
@@ -44,6 +55,22 @@
   document.addEventListener('click',event=>{
     if(event.target.closest?.('#titleOptions'))setTimeout(paintStorage,60);
   });
+  document.addEventListener('toggle',event=>{
+    if(event.target?.matches?.('.client-utilities')&&event.target.open)paintSaveMenu();
+  },true);
+  // Warn once per session, while there is still room to export, rather than after a save has failed.
+  let warned=false;
+  async function warnIfNearlyFull(){
+    if(warned||shell?.isDesktop)return;
+    try{
+      const est=await navigator.storage?.estimate?.();
+      if(!est?.quota||!Number.isFinite(est.usage)||est.usage/est.quota<.8)return;
+      warned=true;
+      const status=document.querySelector('#saveStatus');
+      if(status)status.textContent=`This device is nearly out of save storage (${fmt(est.usage)} of ${fmt(est.quota)}). Export a backup from Dynasty & Saves now.`;
+    }catch{}
+  }
+  window.addEventListener('dynasty:save-status',event=>{if(event.detail?.state==='saved')setTimeout(warnIfNearlyFull,400)});
 
   // ---- Desktop update notice (Electron shell only) ----
   if(!shell?.isDesktop)return;

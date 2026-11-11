@@ -1,5 +1,63 @@
 # Latest Session Work
 
+## v0.23.0 timeouts, art, release build — 2026-11-11
+
+Continuation of the "What is left" list in `agent_docs/HANDOFF_2026-11-11_v0.22.0.md`. Done: the desktop smoke test (`xvfb-run -a node tests/desktop-smoke.js` after `node node_modules/electron/install.js`; it passes), timeouts (`createTimeoutDecision` in `game-engine-v2-gameday.js`, behind `session.driveCall`), the fast and slow unit tiers, and test hooks only under `navigator.webdriver` or Node (`dynastyTestHooksEnabled` in `app.js`; covered by `tests/release-build-browser.js`). Added the art pack's 256px sprites as `assets/awards/*.webp` through `program-art.js` (`DynastyArt`).
+
+Not done: signing day and the portal resolved one name at a time.
+
+**Start here:** `agent_docs/HANDOFF_2026-11-11_v0.22.0.md` (state, decisions, what is left, traps) and `docs/RELEASE_GAMEPLAN_2026-11-11.md` (review and plan).
+
+## v0.22.0 install, offline, report — 2026-11-11
+
+Sixth release of `docs/RELEASE_GAMEPLAN_2026-11-11.md`; its "Status at v0.22.0" section lists what shipped and what was left out across all six. `manifest.webmanifest`, `pwa.js` (registers the worker on http and https only), `tools/sw-template.js` and the generated `sw.js` (written by `tools/build.js` with the version and the asset list; CI now checks `index.html sw.js` are current), a Content-Security-Policy meta tag built in `tools/build.js`, and Report a problem and Credits in `title-menus.js`. `tools/publish.js` copies the manifest and worker beside the page.
+
+`sw.js` is generated: run `npm run build` after a version bump or after adding a file under `assets/`, and commit it.
+
+Fifty per-version checkpoint files moved from `docs/` to `docs/archive/`; nothing outside `docs/` referred to them.
+
+## v0.21.0 phones and accessibility — 2026-11-11
+
+Fifth release of `docs/RELEASE_GAMEPLAN_2026-11-11.md`. `phone-a11y.css` (loaded last by `tools/build.js`) sets a 44px control floor and a 12px text floor under `max-width:720px`. Its text rules use `!important` on explicit selectors, so before adding one, check it does not match text that is already larger: build without the file and compare (the method is in the commit that added it). `axe-core` is a dev dependency; `tests/accessibility-browser.js` and `tests/phone-floor-browser.js` are in `test:browser-extended` and `npm run test:accessibility`.
+
+Corrections to the review in the game plan: the "25 unnamed controls on This Week" and "three h1 per screen" findings were wrong. The controls had names my first scan did not read, and only one h1 is visible at a time.
+
+Also fixed here: `tests/visual.js` and `tests/adminconfidence.js` still expected wording changed in v0.17.2 and v0.20.0. The unit suite was run in full after each release; the full browser suites had not been, which is how these were missed.
+
+## v0.20.0 a world you care about — 2026-11-11
+
+Fourth release of `docs/RELEASE_GAMEPLAN_2026-11-11.md`. `mascots.js` (`DynastyMascots`, keyed by school id, loaded before the engine), `offseason-stops.js` (stops before departures, signing and the portal; reached from the Next button's controller in `next-action.js` through `globalThis.DynastyOffseasonStop`), the new-dynasty defaults in `acceptNewDynastySetup` (staff recruiting on, confidence at least 60), and `adminReviewSummary` in `app.js`.
+
+Two things to know. The Next button's clicks are handled by `next-action.js`, which stops propagation; a handler set on `#hubAdvance` in `app.js` never runs once guidance is installed. And engine extensions are block scoped: a function declared in one is not visible from `app.js`, so cross-module calls go through a global.
+
+`tests/helpers/start-new-dynasty.js` turns staff recruiting off unless a test passes `{staffRecruiting:true}`, so the existing suites still exercise a hand-run board. Only `tests/world-identity-browser.js` covers the new default.
+
+Not done from the plan: program names were not changed (the name is the key in saves, schedules and about a thousand test references), signing day and the portal are not yet resolved one name at a time, and the stops do not ask for a decision inside the card; they route to the screen that holds it.
+
+## v0.19.0 Game Day worth coaching — 2026-11-11
+
+Third release of `docs/RELEASE_GAMEPLAN_2026-11-11.md`. Drive calls and key third-down defensive calls live in `game-engine-v2-gameday.js` (`DRIVE_CALLS`, `DEFENSE_CALLS`, `snapCall`, `createDriveDecision`, `createDefenseDecision`) and reach the play model through an optional `call` argument on `profileOutcome` in `game-engine-v2-adapter.js`. A missing call changes nothing, including the order of random draws. Sessions ask for calls only when created with `calls:true`; `v2GameDayUIPrepare` passes that for Coach It Live and not for Coach big moments, and `universe.liveGameDay.calls` records it so a saved game replays the way it was played.
+
+The live screen (`game-engine-v2-gameday-ui.js`, `game-engine-v2-gameday.css`): typed decision card with trade-offs, `v2GameDayUIField`, `v2GameDayUIConsequence`, and `#gamelab.v2-live`, which hides everything but the game.
+
+Not done from the plan: timeouts, and the animated 3D field (`game-cast-field.js`) on the live screen; the live field is a 2D strip. The plan's "6 to 10 minutes at default pace" was not timed with a person.
+
+## v0.18.0 a dynasty that lasts — 2026-11-11
+
+Second release of `docs/RELEASE_GAMEPLAN_2026-11-11.md`. Compressed, chunked export (`saveJsonParts`, `gzipBlob`, `saveFileText` in `app.js`), the crash screen (`crash-guard.js`, loaded first by `tools/build.js`), save size in Dynasty & Saves and a quota warning (`app-health.js`), and `tools/long-save-measure.js`.
+
+Decided against more pruning: at seven seasons the save is rosters 33 MB (fixed), box scores 28 MB and retired careers 27 MB, and the per-season growth that is left is history a player can open. A second box-score tier would have saved about 0.7 MB a season of 9. Compression takes 299 MB to 34.9 MB at season 30.
+
+Also re-took two engine golden hashes and the no-rules kick curve in `tests/play-model.js` and `tests/game-cast-field.js`; they pinned the pre-v0.17.2 fourth-down rule and should have moved with it.
+
+Not verified: export on a phone, in-memory size at season 30 in a browser, weekly save time at season 30 in a browser.
+
+## v0.17.2 visible fixes — 2026-11-11
+
+First release of `docs/RELEASE_GAMEPLAN_2026-11-11.md`. Fixes the confirmed defects from that review: postgame panel clipping (`game-engine-v2-presentation.css`), field-goal range (`fieldGoalInRange` and `defaultFourthDown` in `game-engine-v2.js`, now the only place the rule lives), the week label (`seasonStageLabel`, header, save line, title screen all name the week being prepared), singular stat lines, the duplicate final, the "drive detail unavailable" line and phone toast placement.
+
+Verified: `tests/field-goal-range.js`, `tests/gameday-clipping-browser.js` (1440, 1280, 390), the Game Engine 2 unit suites and the calibration report. `tools/game-engine-v2-compare.js` now samples 480 games; a 120-game sample moved mean points by 2 between runs of the same rules. Three calibration limits were widened (points 3 to 3.5, made field goals 0.5 to 0.75, home margin 1.5 to 2) because the legacy simulator still kicks from 55 yards at 82% overall.
+
 ## v0.17.1 Mac downloads — 2026-11-10
 
 v0.17.0 was published to production and released with desktop ZIPs (macOS arm64 + Windows). v0.17.1 changes only the desktop distribution and the web About panel: a universal macOS build (lipo-checked in CI), an update check that reads the releases list (GitHub's /releases/latest ignores prereleases), install steps appended to every release by `release.yml`, and a download link in About. Release with the same three workflows; the attach workflow now names the Mac ZIP `macOS-universal`.

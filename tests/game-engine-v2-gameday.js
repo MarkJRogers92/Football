@@ -122,3 +122,100 @@ test('routine fourth downs are played with the staff call without stopping the g
   assert.ok(stopsRoutine<stopsAll*.6,`routine calls no longer stop the game (${stopsRoutine} of ${stopsAll})`);
   assert.ok(stopsRoutine>0,'real dilemmas still stop it');
 });
+
+// v0.19: a call for each drive and a defensive call on the third downs that decide something.
+test('a coached game asks for a call at the start of each of the coach\'s drives, and only his',()=>{
+  const session=gameday.createSession({...options,gameId:'GD-DRIVE',seed:'gameday-drive',controlledTeamId:home.id,calls:true});
+  const seen=[];
+  gameday.simulate(session,decision=>{seen.push(decision);return decision.type==='drive_call'?'ground':'delegate'});
+  const drives=seen.filter(d=>d.type==='drive_call');
+  assert.ok(drives.length>=6,`a full game has several drives to call, saw ${drives.length}`);
+  assert.ok(seen.every(d=>d.team==='home'),'every decision belongs to the coached side');
+  assert.deepEqual(drives[0].options.map(o=>o.id),['balanced','ground','quick','shots','delegate']);
+  assert.ok(drives.every(d=>d.context.down===1&&d.context.possession==='home'),'a drive call comes on first down with the ball');
+  assert.equal(new Set(drives.map(d=>d.context.drive)).size,drives.length,'one call per drive');
+  assert.ok(seen.length<=30,`a coached game stays a manageable number of decisions, saw ${seen.length}`);
+  engine.validateGame(session.state);
+});
+
+test('a session without calls (Coach big moments, the lab, simulated games) never stops for them',()=>{
+  const session=gameday.createSession({...options,gameId:'GD-BIG',seed:'gameday-drive',controlledTeamId:home.id,calls:false});
+  const types=new Set();gameday.simulate(session,decision=>{types.add(decision.type);return'delegate'});
+  assert.ok(!types.has('drive_call')&&!types.has('defense_call'));
+});
+
+test('a drive call changes how the offense plays without drawing extra random numbers',()=>{
+  const base=gameday.createSession({...options,gameId:'GD-CALL',seed:'gameday-call',controlledTeamId:home.id,calls:true});
+  let first=gameday.advance(base);while(first.decision.type!=='drive_call'){gameday.resolve(base,'delegate');first=gameday.advance(base)}
+  const saved=JSON.parse(JSON.stringify(gameday.snapshot(base)));
+  const tally=call=>{const s=gameday.restore(saved);gameday.resolve(s,call);const from=s.state.events.length;let rng=null;
+    for(let i=0;i<4;i++){const out=gameday.advanceOne(s);if(i===0)rng=JSON.stringify(s.state.rng);if(out.status!=='live')break}
+    return{rng,passes:s.state.events.slice(from).filter(e=>e.kind==='pass').length,call:s.driveCall.home}};
+  const ground=tally('ground'),shots=tally('shots');
+  assert.equal(ground.call,'ground');assert.equal(shots.call,'shots');
+  assert.equal(ground.rng,shots.rng,'the call moves thresholds, not the number of draws');
+  let groundPasses=0,shotPasses=0;
+  for(let i=0;i<60;i++){
+    for(const [call,add] of [['ground',n=>groundPasses+=n],['shots',n=>shotPasses+=n]]){
+      const s=gameday.createSession({...options,gameId:`GD-MIX-${i}`,seed:`gameday-mix-${i}`,controlledTeamId:home.id,calls:true});
+      gameday.simulate(s,d=>d.type==='drive_call'?call:d.type==='defense_call'?'base':'delegate');
+      add(s.state.events.filter(e=>e.team==='home'&&e.kind==='pass').length);
+    }
+  }
+  assert.ok(shotPasses>groundPasses*1.25,`taking shots throws far more than running it (${shotPasses} vs ${groundPasses})`);
+});
+
+test('a defensive call covers one snap and only key third downs',()=>{
+  const session=gameday.createSession({...options,gameId:'GD-DEF',seed:'gameday-def',controlledTeamId:home.id,calls:true});engine.startGame(session.state);
+  session.driveAsked=-1;
+  Object.assign(session.state,{period:2,clock:500,possession:'away',fieldPosition:40,down:3,distance:6});
+  assert.notEqual(gameday.advanceOne(session).decision?.type,'defense_call','an ordinary third down at midfield is played, not asked');
+  for(const pending of [gameday.pendingDecision(session)])if(pending)gameday.resolve(session,'delegate');
+  Object.assign(session.state,{period:2,clock:400,possession:'away',fieldPosition:78,down:3,distance:9});
+  const asked=gameday.advanceOne(session);
+  assert.equal(asked.status,'decision');assert.equal(asked.decision.type,'defense_call');assert.equal(asked.decision.team,'home');
+  assert.equal(asked.decision.staffRecommendation,'coverage','third and long: the staff drop into coverage');
+  assert.deepEqual(asked.decision.options.map(o=>o.id),['base','pressure','coverage','run_stop','delegate']);
+  gameday.resolve(session,'pressure');
+  assert.equal(session.defenseCall.call,'pressure');
+  gameday.advanceOne(session);
+  assert.equal(session.defenseCall,null,'the call is spent on the snap it was made for');
+});
+
+test('a live game saved before v0.19 resumes and plays without the new calls',()=>{
+  const session=gameday.createSession({...options,gameId:'GD-OLD',seed:'gameday-old',controlledTeamId:home.id,calls:true});
+  const old=JSON.parse(JSON.stringify(gameday.snapshot(session)));
+  for(const key of ['driveCall','driveAsked','defenseCall','defenseAsked'])delete old[key];
+  const resumed=gameday.restore(old),types=new Set();
+  gameday.simulate(resumed,decision=>{types.add(decision.type);return'delegate'});
+  assert.ok(!types.has('drive_call')&&!types.has('defense_call'));engine.validateGame(resumed.state);
+});
+
+// Timeouts: the last two minutes of a half, only after a play that ran the clock, only in a fully coached game.
+test('a coached game offers a timeout late in a half and it saves the clock',()=>{
+  const base=gameday.createSession({...options,gameId:'GD-TO',seed:'gameday-to',controlledTeamId:home.id,calls:true});engine.startGame(base.state);
+  base.driveAsked=-1;
+  Object.assign(base.state,{period:4,clock:100,possession:'home',fieldPosition:45,down:2,distance:6,score:{home:14,away:17}});
+  base.state.events.push({seq:base.state.events.length+1,type:'scrimmage',team:'home',kind:'rush',yards:4,state:{...base.state,events:undefined}});
+  const asked=gameday.advanceOne(base);
+  assert.equal(asked.status,'decision');assert.equal(asked.decision.type,'timeout_call');assert.equal(asked.decision.staffRecommendation,'timeout');
+  assert.deepEqual(asked.decision.options.map(o=>o.id),['timeout','run','delegate']);
+  const saved=JSON.parse(JSON.stringify(gameday.snapshot(base))),stop=gameday.restore(saved),run=gameday.restore(saved);
+  gameday.resolve(stop,'timeout');gameday.resolve(run,'run');
+  assert.equal(stop.state.timeouts.home,2);assert.equal(run.state.timeouts.home,3);
+  assert.ok(stop.state.events.some(e=>e.type==='timeout'&&e.team==='home'&&e.left===2));
+  // Exactly one snap each: after it, a new timeout prompt may be waiting, and answering it would play another.
+  for(const s of [stop,run])gameday.advanceOne(s);
+  assert.ok(stop.state.clock>run.state.clock,`the timeout kept time on the clock (${stop.state.clock} vs ${run.state.clock})`);
+  assert.ok(100-stop.state.clock<=7,'only the play itself ran off');
+  // Never asked twice for the same snap, and never without a timeout left.
+  const none=gameday.restore(saved);none.state.timeouts.home=0;none.pendingStrategyDecision=null;
+  assert.notEqual(gameday.advanceOne(none).decision?.type,'timeout_call');
+  engine.validateState(stop.state);
+});
+
+test('timeouts are never offered in a session without calls',()=>{
+  const types=new Set();
+  for(let i=0;i<6;i++){const s=gameday.createSession({...options,gameId:`GD-NOTO-${i}`,seed:`gameday-noto-${i}`,controlledTeamId:home.id});gameday.simulate(s,d=>{types.add(d.type);return'delegate'})}
+  assert.ok(!types.has('timeout_call'));
+});

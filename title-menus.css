@@ -75,3 +75,8 @@
 }
 
 .title-about-link{display:inline-flex;align-items:center;min-height:34px;margin-top:8px;padding:0 13px;border:1px solid #4b719c;border-radius:7px;background:#14263a;color:#e6eef7;font-size:11.5px;font-weight:750;text-decoration:none}.title-about-link:hover{background:#1b3350}.title-about-link:focus-visible{outline:2px solid #8fb4dd;outline-offset:2px}
+/* v0.22: report a problem and credits on the About panel. */
+.title-about-actions{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:10px}
+.title-about-actions button{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid #3a4c63;background:#142031;color:#eef3fc;font-weight:600;cursor:pointer}
+.title-about-note{margin:8px 0 0;font-size:12.5px;color:#9aabbf;min-height:1em}
+.title-about-report-text{width:100%;box-sizing:border-box;height:120px;margin-top:8px;background:#0a0f17;color:#c6d0de;border:1px solid #3a4c63;border-radius:8px;font:12px/1.4 ui-monospace,monospace}

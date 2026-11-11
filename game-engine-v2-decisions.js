@@ -23,9 +23,7 @@ function fieldGoalDistance(state){return Math.round(100-state.fieldPosition+17)}
 function normalizeAction(value){const action=String(value||'').toLowerCase();return action==='play'?'go':action}
 function oldFourthDownPolicy(state){
   if(state.down!==4)return null;
-  if(state.fieldPosition>=58&&state.distance>2)return 'field_goal';
-  if(state.fieldPosition<60&&state.distance>1)return 'punt';
-  return 'go';
+  return normalizeAction(engine.defaultFourthDown(state));
 }
 function policyAction(state,hooks={}){
   const raw=typeof hooks.defaultAction==='function'?hooks.defaultAction(state):oldFourthDownPolicy(state);
@@ -47,7 +45,8 @@ function optionList(state){
     {id:'go',label:'Go for it'},
     {id:'punt',label:'Punt'}
   ];
-  if(fg<=67)options.push({id:'field_goal',label:`Try ${fg}-yard field goal`});
+  // Offer only a kick that can be made in these conditions; nobody lines up a 65-yarder in the rain.
+  if(engine.fieldGoalInRange(state,engine.FG_OFFER_CHANCE))options.push({id:'field_goal',label:`Try ${fg}-yard field goal`});
   options.push({id:'delegate',label:'Delegate to staff'});
   return options
 }

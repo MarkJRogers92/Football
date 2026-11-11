@@ -84,7 +84,7 @@ function stripHTML(team){
   const when=g.post?esc(g.postLabel||g.post):`Week ${g.week}`;
   return`<li class="bi-chip ${state}${g.conf?' is-conf':''}${g.post?' is-post':''}${g.post==='TITLE'&&g.result==='W'?' is-title':''}" title="${when}: ${esc(opp)} · ${esc(res)}"><span class="bi-chip-wk">${g.post?esc(g.post):`W${g.week}`}</span>${helmetHTML(g.opponent.id,'bi-helmet--chip'+(g.home?'':' is-away'))}<b>${esc(g.label)}</b><span class="bi-sr">${when}, ${esc(opp)}, ${esc(res)}</span></li>`;
  }).join('');
- return`<ol class="bi-strip" aria-label="${esc(team.name)} season schedule">${chips}</ol>`;
+ return`<ol class="bi-strip" tabindex="0" aria-label="${esc(team.name)} season schedule">${chips}</ol>`;
 }
 
 // ---------- DOM mounting ----------

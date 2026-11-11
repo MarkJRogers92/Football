@@ -138,7 +138,7 @@ jobs:
       - name: Build standalone artifact
         run: npm run build
       - name: Verify committed build is current
-        run: git diff --exit-code -- index.html
+        run: git diff --exit-code -- index.html sw.js
       - name: Verify releasable source tree
         run: npm run verify:release
       - name: Fast smoke and version checks
@@ -162,7 +162,7 @@ jobs:
       - name: Build standalone artifact
         run: npm run build
       - name: Verify committed build is current
-        run: git diff --exit-code -- index.html
+        run: git diff --exit-code -- index.html sw.js
       - name: Locate Chromium
         id: chromium
         shell: bash
@@ -199,7 +199,7 @@ jobs:
       - name: Build standalone artifact
         run: npm run build
       - name: Verify committed build is current
-        run: git diff --exit-code -- index.html
+        run: git diff --exit-code -- index.html sw.js
       - name: Locate Chromium
         id: chromium
         shell: bash

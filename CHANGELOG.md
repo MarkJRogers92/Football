@@ -1,5 +1,83 @@
 # Changelog
 
+## v0.23.0 — Timeouts, award art and a cleaner release build
+
+- **Timeouts.** In a fully coached game, the last two minutes of each half now offer a timeout after a play that runs the clock, when your side has one left and a reason to stop it. A timeout keeps the time between plays, so only the play itself runs off. Your staff recommend when to use one and when to save it. Coach big moments, simulated games and live games saved before this release are unchanged.
+- **Award and facility art.** Sixteen pieces from the November 11 art pack are now in the game: the four rivalry trophies (bell, boot, lantern and shield, matched to each rivalry's trophy name) on Rival Watch and the rivalry ceremony; the conference crown, bowl laurel and signing day cap on their ceremonies; the stadium, strength room and practice building on the three facility upgrades; trophies and game balls on career milestones (greyed until reached); and small header art on Staff, Recruiting, Awards and Legacy. All 16 add about 280 KB and are kept for offline play. The 3D models stay in the release as source files.
+- **No test tools in the game you play.** The hooks the automated tests use are now only present under test automation. A player's browser and the desktop app no longer have them.
+- **The offline cache skips art the game no longer uses**, saving a 520 KB download.
+- **A fast test set.** `npm run test:fast` runs 550 unit tests in about 80 seconds; `npm run test:slow` runs the 32 slow simulation files. `npm test` still runs everything.
+
+Saves carry over.
+
+## v0.22.0 — Install it, play it offline, report a problem
+
+- **The web game installs like an app.** In Chrome, Edge or Safari, use "Install" or "Add to Home Screen" and Dynasty Lab opens in its own window with its own icon.
+- **It plays without a connection.** After one visit the game and its art are kept on your device. Open it on a plane and your saved dynasty is there. A new release still appears as soon as you are back online.
+- **A stated security policy.** The game makes no network requests and loads nothing from another site, and the page now says so to the browser, which blocks anything that tries.
+- **Report a problem.** About Dynasty Lab has "Copy problem details" (version, browser and the last errors recorded on your device) and a link to open an issue. Nothing is sent automatically and your dynasty is not included.
+- **Credits.** About now credits the display typeface (Barlow Condensed, SIL Open Font License) and says how the trophy and helmets were made.
+
+Not in this release: signed Mac and Windows installers (the builds still show the one-time install warning) and a licence file. Saves carry over.
+
+## v0.21.0 — Phones and accessibility
+
+- **Every control on a phone is a full-size touch target.** At phone width all buttons, dropdowns, tabs, disclosure rows and tappable names are at least 44 pixels tall. Before this, each screen had between 22 and 60 controls smaller than that. The four icon buttons in the top bar are 40 pixels so the program, record and week still fit beside them.
+- **No more tiny text on a phone.** Text is at least 12 pixels at phone width; a handful of labels sit at 11 and nothing is smaller. Some labels had been 8 pixels.
+- **Dropdowns say what they are.** The roster position filter, the depth-chart role pickers, each player's training focus, the position-change pickers and the statistics scope now have names for screen readers. Career milestone progress bars and facility levels are named too.
+- **The schedule strip can be reached with the keyboard**, and the prospect list announces which prospect is selected in a valid way.
+- **An automated accessibility check now runs with the browser tests.** It checks the title screen and all fifteen game screens at desktop and phone width and reports no serious or critical issues.
+- **Recruiting keeps its first prospect high on a phone.** The two header controls share a row so the taller buttons do not push the list down.
+
+Desktop layout is unchanged. Not done in this release: testing on a real iPhone, Safari and Firefox, a pass with a screen reader, and watching new players through their first hour.
+
+## v0.20.0 — A world you care about
+
+- **Every program has a nickname.** All 120 programs now have one of their own: the Chicago Metropolitan Skyliners, the Alabama Commonwealth Vulcans, the Montana Commonwealth Copper Kings. Each was invented for this game from local history, industry or wildlife. Nicknames appear on This Week, when you choose a program, on Game Day, in the end zones of the live field and on the final. Older dynasties get them too.
+- **The offseason stops where there is a decision.** Pressing Next used to run the whole offseason. It now stops once before each of three stages and tells you what is at stake: players close to leaving before departures are processed, open scholarships before the class enrolls, and the transfer portal before it is resolved. Each stop offers the way to act and the way to move on. A stage with nothing to decide does not stop.
+- **Your staff recruit until you take over.** A new dynasty starts with "Staff handle recruiting" on, so a coach who has not found the recruiting board yet still builds a class. This Week says so. Turn it off on the Recruiting Board whenever you like.
+- **A new coach starts with the administration behind him.** Confidence begins at 60 (Backed) or the program's usual level if that is higher. Quick Start used to begin one bad season from the hot seat.
+- **The season review adds up.** It read "8-5 against 8 expected — confidence 38 (Hot seat)", which looked like a pass. It now says what moved confidence: "8-5 met the 8-win target; season goals cost 4 (2 missed). Confidence 45 to 41 (Watched)."
+
+Saves carry over. Program names are unchanged; only nicknames were added.
+
+## v0.19.0 — Game Day worth coaching
+
+- **Call every drive.** When you coach a game live, each of your possessions starts with a call: stay balanced, run the ball, quick passes or take shots. Each one trades something. Running protects the ball and the clock and gives up big plays; taking shots gains more per completion and costs sacks and interceptions. Your staff say which they would choose and why (the score, the clock, the weather or the matchup), and the card marks what you called last drive.
+- **Call the big defensive downs.** On third downs inside your 30, in a one-score fourth quarter, or in the two-minute drill before the half, you choose to play it straight, bring pressure, drop into coverage or load the box. The call covers that one snap.
+- **See what your call led to.** After each call the screen shows the next play and how the win chance moved because of it.
+- **A field on the live screen.** The ball, the direction of the drive and the first-down line are drawn on a field under the scoreboard.
+- **A live game takes the screen.** Scouting, preparation and last week's result step aside until the final, so the scoreboard, the field and the decision fit one screen on a desktop and on a phone. "Show scouting and prep" brings them back.
+- **Coach It Live sits under the matchup**, not under a page of preparation.
+- **A coached game is now about 15 to 22 decisions** (it was about 7). "Coach big moments" is unchanged and still stops only for fourth downs, late conversions, halftime and the final minutes.
+- **Plain words in the play-by-play.** The feed says "Drive call · Run the ball" and the archived log says the coach "chooses to run the ball".
+
+Measured over 480 simulated games with one call used every drive: win rate 49% to 53% for all four calls, so none is simply the best. Points scored ranged from 19.2 a game (run the ball) to 22.2 (take shots), with points allowed moving the same way. Simulated games and Coach big moments do not use the new calls and play exactly as before. A live game saved in v0.18 resumes without them.
+
+## v0.18.0 — A dynasty that lasts
+
+- **Backups are a ninth of the size.** Export now writes a compressed backup (`.json.gz`). A 30-season dynasty that exported at about 299 MB is about 35 MB; a first-season backup is under 4 MB. Import takes the compressed file as it is, and still takes older plain `.json` backups.
+- **Exporting a long dynasty no longer builds one enormous block of text in memory.** The backup is written in small pieces, which is what made very long dynasties fail to export on devices with little memory.
+- **A crash screen instead of a frozen one.** If the game hits an error it says so, tells you your last saved checkpoint is not affected, and offers a reload. "Copy details" gives you a short report to paste into a bug report. Nothing is sent anywhere; the record stays on your device.
+- **Save size where you save.** Dynasty & Saves shows how much storage your saves use, and the game warns you once when the browser is nearly out of room, while there is still space to export.
+- **A damaged backup is refused, not half-loaded.** A compressed file that is cut short gives a clear message.
+
+Saves carry over. Measured in Node over 30 seasons (`npm run measure:long-save`); export on a phone is not yet measured. See `STORAGE.md`.
+
+## v0.17.2 — Visible fixes on Game Day
+
+- **The postgame panel fits the screen.** On wide screens the final was cut off on the right, hiding the home team, its score and part of the player leaders. Everything is now on screen at every width.
+- **Staff no longer recommend kicks that cannot be made.** A 59-yard field goal on 4th and 9 in the rain was the staff's advice, because "in range" meant "past the opponent's 42". The range now follows the odds of making the kick, so wind and rain shorten it. Kicks past about 55 yards are not tried in simulated games or recommended in coached ones, and nobody is offered one past about 62. Too far to kick and too close to punt well, teams keep the ball on 4th and 5 or less.
+- **Long field goals are harder.** The odds fall away past 52 yards: about 43% from 55 and 24% from 59 on a calm day. Games coached or simulated on Game Day score about half a point less in total as a result.
+- **One week number everywhere.** The header said "Week 3" while the briefing and Game Day said "Week 4". Every screen, the save line and the title screen now name the week you are preparing.
+- **Scoring flow names the play.** Each score lists the play that produced it, such as "A. Rhodes runs for 12 yards".
+- **One final per screen.** After a coached game the Quick Box steps aside for the full recap instead of repeating the score.
+- **No apology on simulated games.** "Drive detail unavailable for this archived game" is gone from the last-game card.
+- **"1 sack", not "1 sacks".** Stat lines use the singular where it applies.
+- **Phone notices stay out of the way.** They appear under the header instead of over the bottom navigation and the main action.
+
+Saves carry over. Game Engine 2 calibration was re-measured on 480 games (was 120) and three limits were widened to fit the field-goal change; see `tests/game-engine-v2-calibration-report.js`.
+
 ## v0.17.1 — Mac downloads for every Mac
 
 - **One Mac download for Apple silicon and Intel.** The desktop alpha is now a universal app, so it runs on every Mac that supports it; it was Apple silicon only.

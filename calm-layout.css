@@ -20,3 +20,8 @@
 .gameday-event-hero:not(:has(.event-recent)){gap:0}
 /* Around your program only takes space when it has something to say. */
 #weeklyWorldBriefing:not(:has(.lw-brief)) .lw-heading{display:none}
+/* v0.17.2: on phones an achievement sits below the notices rather than on top of them. */
+@media(max-width:700px){.lg-toast{top:calc(128px + env(safe-area-inset-top,0px))}}
+/* v0.20: the one stop before an offseason stage that holds a decision. */
+.offseason-stop{margin:14px 0;padding:16px 18px;border:1px solid var(--warn,#f3ca78);border-left-width:4px;border-radius:12px;background:rgba(243,202,120,.06)}
+.offseason-stop h3{margin:4px 0 6px}.offseason-stop p{margin:0 0 12px;color:var(--muted,#9ca8b8);max-width:70ch}

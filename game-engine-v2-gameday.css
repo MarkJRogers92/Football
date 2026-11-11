@@ -20,3 +20,45 @@
 .v2-forecast{font-weight:600}
 .v2-forecast[data-severity="rough"],.v2-forecast[data-severity="harsh"]{color:#d9a441}
 .game-conditions{margin:0 0 .6rem}
+
+/* v0.19: a live game takes the screen. Preparation, scouting and the last game step aside until the final. */
+#gamelab.v2-live>:not(#v2InteractiveGameDay){display:none!important}
+.v2-gameday-prep-toggle{margin-left:auto;background:transparent;border-color:transparent;color:var(--muted);text-decoration:underline;font-weight:500}
+/* The field strip. */
+.v2-live-field{position:relative;height:84px;margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#132235}
+.v2-live-turf{position:absolute;top:0;bottom:0;left:8%;right:8%;background:repeating-linear-gradient(90deg,#17402a 0 10%,#1b4a31 10% 20%)}
+.v2-live-endzone{position:absolute;top:0;bottom:0;width:8%;display:grid;place-items:center;overflow:hidden;font:800 10px/1 var(--bi-display,inherit);letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.75)}
+.v2-live-endzone span{writing-mode:vertical-rl;white-space:nowrap;max-height:76px;overflow:hidden;text-overflow:ellipsis}
+.v2-live-endzone.away{left:0;background:#1a2f4a}.v2-live-endzone.home{right:0;background:#3a2a12}
+.v2-live-field i{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.22)}
+.v2-live-field i b{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font:700 10px/1 system-ui,sans-serif;color:rgba(255,255,255,.55);font-style:normal}
+.v2-live-field u{position:absolute;top:0;bottom:0;width:3px;margin-left:-1px;background:#f3ca78;text-decoration:none}
+.v2-live-field s{position:absolute;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#10161f;font-size:12px;text-decoration:none;box-shadow:0 0 0 3px rgba(0,0,0,.35);transition:left .35s ease}
+@media(prefers-reduced-motion:reduce){.v2-live-field s{transition:none}}
+/* Drive and defensive calls: a label, what it trades, and which one was used last. */
+.v2-gameday-calls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.v2-gameday-calls button{display:grid;gap:4px;align-content:start;text-align:left;min-height:64px;padding:10px 12px;white-space:normal}
+.v2-gameday-calls button small{font-weight:400;font-size:12px;line-height:1.35;color:var(--muted)}
+.v2-gameday-calls button em{font-style:normal;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--warn)}
+.v2-gameday-consequence{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin-top:10px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-size:13px;background:var(--panel2)}
+.v2-gameday-consequence b{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--muted)}
+.v2-gameday-consequence b.up{color:var(--good)}.v2-gameday-consequence b.down{color:var(--bad,#f08a8a)}
+@media(max-width:720px){.v2-live-field{height:64px}.v2-live-endzone span{display:none}.v2-gameday-calls{grid-template-columns:1fr 1fr}.v2-gameday-prep-toggle{margin-left:0}}
+/* Phones: the scoreboard is one compact block so the field and the whole decision fit above the navigation. */
+@media(max-width:720px){
+#gamelab.v2-live .v2-gameday-head{display:none}
+#gamelab.v2-live .v2-gameday-host{padding:10px}
+.v2-gameday-scoreboard{grid-template-columns:1fr 1fr;gap:6px 10px;padding:10px}
+.v2-gameday-scoreboard .v2-gameday-center{grid-column:1/-1}
+.v2-gameday-team,.v2-gameday-team.home{grid-template-columns:minmax(0,1fr) auto;gap:6px}
+.v2-gameday-team .team-logo,.v2-gameday-team [class*=team-logo]{display:none}
+.v2-gameday-team.home{direction:rtl}.v2-gameday-team.home>*{direction:ltr}
+.v2-gameday-team span{font-size:13px}.v2-gameday-team b{font-size:24px}
+.v2-live-field{height:52px;margin-top:8px}
+.v2-gameday-decision{padding:10px;margin-top:8px}
+.v2-gameday-decision h3{font-size:16px;line-height:1.25}
+.v2-gameday-decision .button-row{margin-top:8px}
+.v2-gameday-calls{gap:6px}
+.v2-gameday-calls button{min-height:56px;padding:8px 10px}
+.v2-gameday-calls button small{font-size:11.5px;line-height:1.3}
+}

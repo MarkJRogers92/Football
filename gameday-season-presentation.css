@@ -11,3 +11,5 @@
 
 .season-next-gold{border-color:rgba(230,184,106,.55);background:radial-gradient(120% 140% at 0% 0%,rgba(230,184,106,.22),transparent 60%),linear-gradient(115deg,#2a2112,#111923 74%);box-shadow:inset 0 1px rgba(255,236,190,.08),0 0 0 1px rgba(230,184,106,.08)}.season-next-gold span{color:#e6c27a}.season-next-gold strong{color:#ffe7b0}.season-next-done span{color:#a8b7c7}.season-result.win.postseason,.season-result.loss.postseason{background:linear-gradient(115deg,rgba(230,184,106,.08),#111923 70%)}
 .gameday-event-hero .event-center .event-forecast{display:block;margin-top:2px;opacity:.85}
+/* v0.20: the program's nickname under its name. */
+.event-team-nick{display:block;font-style:normal;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--event-accent,#e9b949);opacity:.9}

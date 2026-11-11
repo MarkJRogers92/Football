@@ -16,7 +16,7 @@
     if(p.pos==='QB')return`${s.passYds||0} pass yd · ${s.passTD||0} TD · ${s.int||0} INT`;
     if(p.pos==='RB')return`${s.rushYds||0} rush yd · ${s.rushTD||0} rush TD`;
     if(['WR','TE'].includes(p.pos))return`${s.receptions||0} rec · ${s.recYds||0} yd · ${s.recTD||0} TD`;
-    if(['EDGE','DT','LB','CB','S'].includes(p.pos))return`${s.tackles||0} tackles · ${s.sacks||0} sacks · ${s.intDef||0} INT`;
+    if(['EDGE','DT','LB','CB','S'].includes(p.pos))return`${s.tackles||0} tackle${s.tackles===1?'':'s'} · ${s.sacks||0} sack${s.sacks===1?'':'s'} · ${s.intDef||0} INT`;
     return`${s.starts||0} starts · ${s.games||0} games`
   }
   function buildPlayerStories(players=[],context={}){

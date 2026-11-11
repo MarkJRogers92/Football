@@ -676,3 +676,16 @@ html.bi-brand #history .historyrow span{min-width:0;overflow-wrap:anywhere}
  html.bi-brand #history .history-row{align-items:flex-start;gap:10px}
  html.bi-brand #history .history-record{white-space:normal;min-width:72px}
 }
+/* v0.23: award and facility art from the November 11 pack. Decorative; sized by the slot it sits in. */
+.dl-art{display:block;object-fit:contain;filter:drop-shadow(0 6px 14px rgba(0,0,0,.45));pointer-events:none;user-select:none}
+.section-head.has-art{display:flex;align-items:center;gap:14px}
+.section-head.has-art>.dl-art-head{width:64px;height:64px;flex:none}
+.dl-art-ceremony{width:132px;height:132px;margin:0 auto 6px}
+.dl-art-inline{display:inline-block;width:28px;height:28px;vertical-align:middle;margin-right:6px;filter:none}
+.fb-track-head{display:flex;align-items:center;gap:10px}
+.fb-track-head>.dl-art-track{width:52px;height:52px;flex:none}
+.fb-track-head>.fb-pips{margin-left:auto}
+.milestone:has(>.dl-art-milestone){position:relative;padding-right:64px}
+.milestone>.dl-art-milestone{position:absolute;top:10px;right:10px;width:44px;height:44px;margin:0;opacity:.55;filter:grayscale(.85)}
+.milestone.is-done>.dl-art-milestone{opacity:1;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4))}
+@media(max-width:720px){.section-head.has-art>.dl-art-head{width:44px;height:44px}.dl-art-ceremony{width:96px;height:96px}}

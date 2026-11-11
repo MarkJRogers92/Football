@@ -36,7 +36,7 @@
         <label class="title-field">Save slot<select id="titleSaveSlot" aria-label="Save slot"></select></label>
         <button id="titleLoadBrowser" class="title-panel-choice" type="button" disabled><strong>Load saved dynasty</strong><small id="titleLoadMeta">Checking this device…</small></button>
         <div class="title-slot-name"><input id="titleSlotName" type="text" maxlength="40" aria-label="Save slot name"><button id="titleRenameSlot" type="button">Rename</button></div>
-        <button id="titleImport" class="title-panel-choice" type="button"><strong>Import exported save</strong><small>Choose a complete Dynasty Lab JSON backup</small></button>
+        <button id="titleImport" class="title-panel-choice" type="button"><strong>Import exported save</strong><small>Choose a Dynasty Lab backup (.json or .json.gz)</small></button>
       </section>
 
       <section id="titleOptionsPanel" class="title-subpanel" aria-labelledby="titleOptionsHeading" hidden>
@@ -90,7 +90,7 @@
       <button id="loadBrowser">Load</button>
       <button id="exportSave">Export</button>
       <button id="importSave">Import</button>
-      <input id="importFile" type="file" accept="application/json,.json" hidden>
+      <input id="importFile" type="file" accept="application/json,application/gzip,.json,.gz" hidden>
       <button id="newUniverse">Title Screen</button>
     </div>
   </header>
@@ -183,7 +183,7 @@
     <section id="roster" class="panel tab stacked-table">
       <div class="section-head">
         <div><h2>Roster</h2><div class="muted">Grades are your staff&#39;s estimates. The bar shows how sure they are.</div></div>
-        <select id="positionFilter"><option value="ALL">All positions</option></select>
+        <select id="positionFilter" aria-label="Filter roster by position"><option value="ALL">All positions</option></select>
       </div>
       <div class="table-wrap"><table><thead><tr>
         <th>Player</th><th>Pos</th><th>Elig</th><th>Redshirt</th><th>Ht/Wt</th><th>Style</th><th>Current</th><th>Upside</th><th>Scheme Fit</th><th>Health</th><th>Morale</th><th>NIL</th><th>Academics</th>
@@ -204,7 +204,7 @@
     </section>
 
     <section id="staff" class="panel tab">
-      <div class="section-head"><div><h2>Staff & Schemes</h2><div class="muted">Your coaches shape scouting, recruiting, development and game calling.</div></div></div>
+      <div class="section-head has-art"><img class="dl-art dl-art-head" src="assets/awards/coach-headset.webp" alt="" aria-hidden="true" width="256" height="256"><div><h2>Staff & Schemes</h2><div class="muted">Your coaches shape scouting, recruiting, development and game calling.</div></div></div>
       <div class="two-col">
         <div class="card"><h3>Coaching Staff</h3><div id="staffList"></div></div>
         <div class="card"><h3>Scheme Identity</h3><div id="schemeCard"></div></div>
@@ -263,7 +263,7 @@
 
 
     <section id="stats" class="panel tab">
-      <div class="section-head"><div><h2>Statistics Center</h2><div class="muted">National and team leaders this season.</div></div><select id="statsScope"><option value="national">National</option><option value="team">My Program</option></select></div>
+      <div class="section-head"><div><h2>Statistics Center</h2><div class="muted">National and team leaders this season.</div></div><select id="statsScope" aria-label="Statistics scope"><option value="national">National</option><option value="team">My Program</option></select></div>
       <div class="stats-grid">
         <div class="card"><h3>Passing Leaders</h3><div id="passingLeaders"></div></div>
         <div class="card"><h3>Rushing Leaders</h3><div id="rushingLeaders"></div></div>
@@ -274,8 +274,8 @@
     </section>
 
     <section id="recruiting" class="panel tab stacked-table">
-      <div class="section-head">
-        <div><h2>Recruiting Board</h2><div class="muted">Find, scout and win the players who fit your program.</div></div>
+      <div class="section-head has-art">
+        <img class="dl-art dl-art-head" src="assets/awards/scouting-folio.webp" alt="" aria-hidden="true" width="256" height="256"><div><h2>Recruiting Board</h2><div class="muted">Find, scout and win the players who fit your program.</div></div>
         <button id="autoTarget">Auto-Target 20</button>
       </div>
       <div id="signingDay"></div>
@@ -332,8 +332,8 @@
       <div class="card">
         <div class="section-head"><div><h3>Position Change Planner</h3><div class="muted">A position change can unlock a better role, but unfamiliarity temporarily suppresses role fit.</div></div></div>
         <div class="position-change-grid">
-          <select id="positionChangePlayer"></select>
-          <select id="positionChangeTarget"></select>
+          <select id="positionChangePlayer" aria-label="Player to move"></select>
+          <select id="positionChangeTarget" aria-label="New position"></select>
           <button id="applyPositionChange">Change Position</button>
         </div>
         <div id="positionChangePreview" class="compact muted"></div>
@@ -393,7 +393,7 @@
 
 
     <section id="records" class="panel tab">
-      <div class="section-head"><div><h2>Awards, Records & Draft</h2><div class="muted">Honors, record books and draft results.</div></div></div>
+      <div class="section-head has-art"><img class="dl-art dl-art-head" src="assets/awards/player-of-year.webp" alt="" aria-hidden="true" width="256" height="256"><div><h2>Awards, Records & Draft</h2><div class="muted">Honors, record books and draft results.</div></div></div>
       <div class="two-col">
         <div class="card"><h3 id="awardsHeading">Awards Watch</h3><div id="awardsBoard"></div></div>
         <div class="card"><h3>Recent Draft Results</h3><div id="draftBoard"></div></div>
@@ -405,7 +405,7 @@
     </section>
 
     <section id="legacy" class="panel tab">
-      <div class="section-head"><div><h2>Legacy</h2><div class="muted">Achievements, records and a hall of fame that carry across every dynasty on this device.</div></div></div>
+      <div class="section-head has-art"><img class="dl-art dl-art-head" src="assets/awards/coach-legacy.webp" alt="" aria-hidden="true" width="256" height="256"><div><h2>Legacy</h2><div class="muted">Achievements, records and a hall of fame that carry across every dynasty on this device.</div></div></div>
       <div id="legacyBoard"></div>
     </section>
     <section id="history" class="panel tab">

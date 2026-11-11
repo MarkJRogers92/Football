@@ -12,3 +12,7 @@ These are historical handoffs, worklogs, roadmaps and reviews moved out of the r
 - `HANDOFF_TO_GPT.md` -- v0.9.51 integrated-branch handoff to GPT.
 - `WORKLOG.md` -- long running per-version work log (v0.8 through v0.11.x).
 - `CONTINUATION.md` -- v0.12.0 desktop alpha continuation checkpoint.
+
+Added at v0.22.0: fifty per-version checkpoint, status, release-note and validation files from v0.9.52 to v0.12.1
+(`v0*-*.md`, `v0111-NOTE.txt`), moved here from `docs/` because nothing in the code, tests, tools or workflows
+refers to them. Links between them were written for `docs/` and may no longer resolve.

@@ -15,6 +15,27 @@ const POLICY_ID='adapter-v1';
 const TEMPO_POLICY_ID='tempo-v1';
 const HALFTIME_POLICY_ID='halftime-v1';
 const CONVERSION_POLICY_ID='conversion-v1';
+const DRIVE_POLICY_ID='drive-v1';
+const DEFENSE_POLICY_ID='defense-v1';
+// v0.19: what a head coach asks for, not the play itself. Each call trades something: running it protects the ball
+// and the clock but gives up explosive plays; taking shots gains yards per completion and gives up sacks and
+// interceptions. None is better on average, so the right one depends on the score, the clock and the weather.
+const DRIVE_CALLS={
+  balanced:null,
+  ground:{passRate:-.15,rushYards:.2,clock:1.08},
+  quick:{passRate:.07,comp:.05,passYards:.85,sackMult:.65,intMult:.88},
+  shots:{passRate:.09,comp:-.05,passYards:1.17,sackMult:1.2,intMult:1.3,clock:.94}
+};
+const DRIVE_LABELS={balanced:'Stay balanced',ground:'Run the ball',quick:'Quick passes',shots:'Take shots'};
+// The defensive call covers one snap. Pressure gets home more often and gives up more when it does not; coverage
+// takes away the deep ball and concedes the run; loading the box stops the run and leaves the secondary alone.
+const DEFENSE_CALLS={
+  base:null,
+  pressure:{sackMult:1.6,hurry:.09,comp:-.02,passYards:1.15,rushYards:.5},
+  coverage:{sackMult:.6,hurry:-.06,comp:.02,passYards:.8,intMult:1.25,rushYards:.8},
+  run_stop:{passRate:-.04,rushYards:-1.5,passYards:1.12,comp:.02}
+};
+const DEFENSE_LABELS={base:'Play it straight',pressure:'Bring pressure',coverage:'Drop into coverage',run_stop:'Load the box'};
 const clone=value=>JSON.parse(JSON.stringify(value));
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
 const finite=(value,fallback=0)=>Number.isFinite(Number(value))?Number(value):fallback;
@@ -49,6 +70,8 @@ function createSession(options={}){
     version:VERSION,status:'pregame',gameId:String(options.gameId??made.state.gameId),seed:String(options.seed??made.state.seed),
     state:made.state,inputs:{home:made.homeInput,away:made.awayInput},homeFieldRating,controlledSide,
     tempo:{home:'normal',away:'normal'},tempoDecisionMade:{home:false,away:false},
+    // Drive and defensive calls are on only for a fully coached game (options.calls); null means the session never asks.
+    driveCall:options.calls===true&&controlledSide?{home:'balanced',away:'balanced'}:null,driveAsked:null,defenseCall:null,defenseAsked:null,
     halftimeApproach:{home:'balanced',away:'balanced'},halftimeDecisionMade:false,pendingConversion:null,pendingStrategyDecision:null,
     names:{home:String(options.home?.name??made.homeInput.name??'Home'),away:String(options.away?.name??made.awayInput.name??'Away')},
     skipRoutine:options.skipRoutine===true
@@ -122,12 +145,27 @@ function deferredTouchdown(session,state,outcome){
   pushGameEvent(state,'scrimmage',{team:offense,yards:100-beforeField,from:{fieldPosition:beforeField,down:beforeDown,distance:beforeDistance}});addGamePoints(state,offense,6,'touchdown',{});
   session.pendingConversion={side:offense,createdAfterEventSeq:state.events.length,period:state.period,clock:state.clock};engine.validateState(state);return state
 }
+// The calls in force for this snap: the offense's call for the drive and, if one was made for this exact snap, the
+// defense's. Sessions saved before v0.19 carry neither and play as they did.
+function snapCall(session,state){
+  const side=state.possession,offense=DRIVE_CALLS[session.driveCall?.[side]]||null,d=session.defenseCall;
+  const defense=d&&d.side===other(side)&&d.at===state.events.length?DEFENSE_CALLS[d.call]||null:null;
+  if(!offense&&!defense)return null;
+  const out={passRate:0,passYards:1,rushYards:0,intMult:1,sackMult:1,comp:0,hurry:0,clock:1};
+  for(const c of [offense,defense])if(c){out.passRate+=c.passRate||0;out.rushYards+=c.rushYards||0;out.comp+=c.comp||0;out.hurry+=c.hurry||0;out.passYards*=c.passYards??1;out.intMult*=c.intMult??1;out.sackMult*=c.sackMult??1;out.clock*=c.clock??1}
+  return out
+}
 function playOutcome(session,state){
-  const start=state.events.length,beforeField=state.fieldPosition,side=state.possession;
-  let outcome=adapter.profileOutcome(state,session.inputs.home,session.inputs.away,session.homeFieldRating);
+  const start=state.events.length,beforeField=state.fieldPosition,side=state.possession,call=snapCall(session,state);
+  let outcome=adapter.profileOutcome(state,session.inputs.home,session.inputs.away,session.homeFieldRating,call);
+  if(call&&call.clock!==1&&!outcome.penalty)outcome.clock=clamp(Math.round((Number(outcome.clock)||1)*call.clock),1,45);
+  session.defenseCall=null;
+  // A timeout called before this snap stops the clock between plays: only the play itself runs off.
+  const timedOut=session.timeoutAt===start;if(timedOut)session.timeoutAt=null;
   halftimeAdjustedOutcome(session,state,outcome);
   if(!session.tempoDecisionMade[side]||session.tempo[side]==='staff')outcome=engine.playbookClock(state,outcome);
   else outcome.clock=tempoAdjustedClock(session,state,outcome.clock);
+  if(timedOut&&!outcome.penalty)outcome.clock=clamp(Math.min(Number(outcome.clock)||1,TIMEOUT_PLAY_SECONDS),1,45);
   const yards=clamp(Math.round(outcome.yards??0),-99,99),touchdown=state.period<=4&&!outcome.turnover&&!outcome.penalty&&beforeField+yards>=100;
   if(touchdown)deferredTouchdown(session,state,outcome);else engine.applyScrimmage(state,outcome);
   adapter.annotateOutcomeEvent(state,start,outcome);return outcome
@@ -172,13 +210,93 @@ function createTempoDecision(session){
   const decision={id:nextDecisionId(state),type:'late_game_tempo',policyId:TEMPO_POLICY_ID,team:side,teamId:state[side]?.id??null,contextKey:`tempo:${state.period}:${state.clock}:${side}:${state.fieldPosition}:${state.score.home}:${state.score.away}`,situation:`Q4 ${min}:${sec} · ${team} ball · ${margin===0?'tie game':margin>0?`leading by ${margin}`:`trailing by ${Math.abs(margin)}`}`,context:{period:state.period,clock:state.clock,possession:side,fieldPosition:state.fieldPosition,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},options:[{id:'hurry',label:'Hurry-up'},{id:'normal',label:'Normal tempo'},{id:'drain',label:'Drain clock'},{id:'delegate',label:'Delegate to staff'}],staffRecommendation:staffTempo,defaultOption:staffTempo,createdAfterEventSeq:state.events?.length||0};
   session.pendingStrategyDecision=decision;return clone(decision)
 }
+// A drive is a kickoff received or a change of possession; counting them names the drive being played.
+function driveNumber(state){let n=0;for(const e of state.events||[])if(e.type==='kickoff'||e.type==='possession_change')n++;return n}
+function marginFor(state,side){return(state.score?.[side]||0)-(state.score?.[other(side)]||0)}
+function clockText(state){return`Q${state.period} ${Math.floor(state.clock/60)}:${String(state.clock%60).padStart(2,'0')}`}
+function spotText(state){return state.fieldPosition>=50?`opp ${100-state.fieldPosition}`:`own ${state.fieldPosition}`}
+function scoreText(margin){return margin===0?'tie game':margin>0?`leading by ${margin}`:`trailing by ${Math.abs(margin)}`}
+// Sessions created without calls (Coach big moments, the lab, simulated games) never stop for these.
+function driveWindow(session){
+  const state=session.state,side=state.possession;
+  if(!session.controlledSide||!session.driveCall||state.status!=='live'||state.period>4||side!==session.controlledSide||state.down!==1||session.pendingConversion)return false;
+  const drive=driveNumber(state);if(session.driveAsked===drive)return false;
+  // Under 40 seconds in a half there is no drive to plan.
+  if((state.period===2||state.period===4)&&state.clock<40){session.driveAsked=drive;return false}
+  return true
+}
+function staffDriveCall(session,state,side){
+  const margin=marginFor(state,side),effects=engine.effectsOf(state),edge=(session.inputs[side]?.offense||70)-(session.inputs[other(side)]?.defense||70);
+  if(state.period===4&&margin>0&&state.clock<=480)return{call:'ground',why:'protect the lead and the clock'};
+  if((state.period===4&&margin<0&&state.clock<=300)||(state.period>=3&&margin<=-14))return{call:'shots',why:'points are needed quickly'};
+  if(effects.wind>=18||effects.precip>=2)return{call:'ground',why:'the weather makes throwing a risk'};
+  if(edge<=-6)return{call:'quick',why:'their front is the better unit, so get the ball out'};
+  return{call:'balanced',why:'no reason to tip the hand'}
+}
+function createDriveDecision(session){
+  if(!driveWindow(session))return null;if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);
+  const state=session.state,side=state.possession,team=state[side]?.name||session.names[side],staff=staffDriveCall(session,state,side),current=session.driveCall[side]||'balanced';
+  const decision={id:nextDecisionId(state),type:'drive_call',policyId:DRIVE_POLICY_ID,team:side,teamId:state[side]?.id??null,contextKey:`drive:${driveNumber(state)}:${side}`,situation:`${clockText(state)} · ${team} ball at ${spotText(state)} · ${scoreText(marginFor(state,side))}`,prompt:'Call for this drive',reason:staff.why,lastCall:current,context:{period:state.period,clock:state.clock,possession:side,fieldPosition:state.fieldPosition,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts},drive:driveNumber(state)},options:[...Object.keys(DRIVE_CALLS).map(id=>({id,label:DRIVE_LABELS[id]})),{id:'delegate',label:'Delegate to staff'}],staffRecommendation:staff.call,defaultOption:staff.call,createdAfterEventSeq:state.events?.length||0};
+  session.pendingStrategyDecision=decision;return clone(decision)
+}
+// Third downs that decide something: inside the 30, a one-score fourth quarter, or the two-minute drill before the half.
+function defenseWindow(session){
+  const state=session.state,offense=state.possession,side=session.controlledSide;
+  if(!side||!session.driveCall||state.status!=='live'||state.period>4||!offense||offense===side||state.down!==3||session.pendingConversion)return false;
+  if(session.defenseAsked===state.events.length)return false;
+  const close=Math.abs(marginFor(state,side))<=8;
+  return state.fieldPosition>=70||(state.period===4&&close)||(state.period===2&&state.clock<=120&&state.fieldPosition>=50)
+}
+function staffDefenseCall(session,state,side){
+  const edge=(session.inputs[side]?.defense||70)-(session.inputs[other(side)]?.offense||70);
+  if(state.distance<=2)return{call:'run_stop',why:'short yardage, expect the run'};
+  if(state.distance>=8)return{call:'coverage',why:'they have to throw past the sticks'};
+  if(edge>=4)return{call:'pressure',why:'our front can get home'};
+  return{call:'base',why:'no clear tell from the offense'}
+}
+// v0.20+: timeouts in the last two minutes of a half. The clock runs between plays after a run or a completed pass;
+// a timeout keeps that time. Asked only after such a play, only when the coached side has one left and has a reason
+// to want the clock stopped, and only in a session with calls (a fully coached game).
+const TIMEOUT_PLAY_SECONDS=7;
+function clockRanOnLastPlay(state){
+  const last=[...(state.events||[])].reverse().find(e=>['scrimmage','interception','fumble','punt','field_goal','kickoff','touchdown','penalty','timeout','period_start','halftime'].includes(e.type));
+  return!!last&&last.type==='scrimmage'&&(last.kind==='rush'||last.completed===true)
+}
+function timeoutWindow(session){
+  const state=session.state,side=session.controlledSide,offense=state.possession;
+  if(!side||!session.driveCall||state.status!=='live'||state.period>4||!offense||session.pendingConversion)return false;
+  if((state.period!==2&&state.period!==4)||state.clock>120||state.clock<=0||!(state.timeouts?.[side]>0))return false;
+  if(session.timeoutAsked===state.events.length||session.timeoutAt===state.events.length||!clockRanOnLastPlay(state))return false;
+  const margin=marginFor(state,side);
+  if(offense===side)return state.period===2?state.fieldPosition>=40:margin<=0||margin>=-16&&margin<=3;
+  return state.period===4&&margin<0&&margin>=-16
+}
+function staffTimeoutCall(session,state,side){
+  const margin=marginFor(state,side),offense=state.possession===side;
+  if(offense&&state.period===4&&margin<=0)return{call:'timeout',why:'every second counts on this drive'};
+  if(offense&&state.period===2&&state.fieldPosition>=55&&state.clock<=60)return{call:'timeout',why:'a score before the half is in reach'};
+  if(!offense&&margin<0&&margin>=-8)return{call:'timeout',why:'we need the ball back with time left'};
+  return{call:'run',why:state.timeouts[side]>1?'save it for when it matters more':'it is the last one'}
+}
+function createTimeoutDecision(session){
+  if(!timeoutWindow(session))return null;if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);
+  const state=session.state,side=session.controlledSide,offense=state.possession,team=state[offense]?.name||session.names[offense],staff=staffTimeoutCall(session,state,side),left=state.timeouts[side];
+  const decision={id:nextDecisionId(state),type:'timeout_call',policyId:'timeout-v1',team:side,teamId:state[side]?.id??null,contextKey:`timeout:${state.events.length}:${side}`,situation:`${clockText(state)} · ${team} ball at ${spotText(state)} · ${scoreText(marginFor(state,side))} · ${left} timeout${left===1?'':'s'} left`,prompt:'Clock is running',reason:staff.why,context:{period:state.period,clock:state.clock,possession:offense,fieldPosition:state.fieldPosition,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},options:[{id:'timeout',label:'Call timeout'},{id:'run',label:'Let it run'},{id:'delegate',label:'Delegate to staff'}],staffRecommendation:staff.call,defaultOption:staff.call,createdAfterEventSeq:state.events?.length||0};
+  session.pendingStrategyDecision=decision;return clone(decision)
+}
+function createDefenseDecision(session){
+  if(!defenseWindow(session))return null;if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);
+  const state=session.state,side=session.controlledSide,offense=state.possession,team=state[offense]?.name||session.names[offense],staff=staffDefenseCall(session,state,side);
+  const decision={id:nextDecisionId(state),type:'defense_call',policyId:DEFENSE_POLICY_ID,team:side,teamId:state[side]?.id??null,contextKey:`defense:${state.events.length}:${side}`,situation:`${clockText(state)} · ${team} · 3rd & ${state.distance} at ${spotText(state)} · ${scoreText(marginFor(state,side))}`,prompt:'Defensive call',reason:staff.why,context:{period:state.period,clock:state.clock,possession:offense,fieldPosition:state.fieldPosition,down:state.down,distance:state.distance,score:{...state.score},timeouts:{...state.timeouts}},options:[...Object.keys(DEFENSE_CALLS).map(id=>({id,label:DEFENSE_LABELS[id]})),{id:'delegate',label:'Delegate to staff'}],staffRecommendation:staff.call,defaultOption:staff.call,createdAfterEventSeq:state.events?.length||0};
+  session.pendingStrategyDecision=decision;return clone(decision)
+}
 function appendStrategyReceipt(session,decision,selectedOption,resolvedAction){const state=session.state,event={seq:(state.events?.length||0)+1,type:'coaching_decision',decisionId:decision.id,decisionType:decision.type,policyId:decision.policyId,team:decision.team,selectedOption,resolvedAction,staffRecommendation:decision.staffRecommendation,situation:decision.situation,state:eventState(state)};state.events.push(event);return event}
 function currentDecision(session){
   if(session.pendingStrategyDecision)return clone(session.pendingStrategyDecision);const state=session.state;
   if(session.pendingConversion){const conversion=createConversionDecision(session);if(conversion)return conversion;resolvePendingConversion(session,staffConversion(session));if(state.status==='final')return null}
   const existing=decisions.pendingDecision(state);if(existing){if(isControlled(session,existing.team))return clone(existing);state.pendingCoachingDecision=null}
   if(state.status==='live'&&state.period<=4&&state.down===4&&state.possession&&isControlled(session,state.possession)&&!routineFourthDown(session,state))return decisions.ensureDecision(state,hooks(session));
-  return createHalftimeDecision(session)||createTempoDecision(session)
+  return createHalftimeDecision(session)||createTempoDecision(session)||createTimeoutDecision(session)||createDriveDecision(session)||createDefenseDecision(session)
 }
 function resolveStrategy(session,optionId){
   const decision=session.pendingStrategyDecision;if(!decision)throw new Error('No strategy decision is pending.');const selected=String(optionId||'delegate');if(!decision.options.some(o=>o.id===selected))throw new Error(`Illegal ${decision.type} option: ${selected}`);const action=selected==='delegate'?decision.defaultOption:selected;session.pendingStrategyDecision=null;
@@ -188,6 +306,14 @@ function resolveStrategy(session,optionId){
     if(!['normal','hurry','drain'].includes(action))throw new Error(`Unknown tempo action: ${action}`);session.tempo[decision.team]=selected==='delegate'?'staff':action;session.tempoDecisionMade[decision.team]=true;appendStrategyReceipt(session,decision,selected,action)
   }else if(decision.type==='halftime_adjustment'){
     if(!['balanced','aggressive','ball_control'].includes(action))throw new Error(`Unknown halftime action: ${action}`);session.halftimeApproach[decision.team]=action;session.halftimeDecisionMade=true;appendStrategyReceipt(session,decision,selected,action)
+  }else if(decision.type==='drive_call'){
+    if(!(action in DRIVE_CALLS))throw new Error(`Unknown drive call: ${action}`);session.driveCall[decision.team]=action;session.driveAsked=decision.context.drive;appendStrategyReceipt(session,decision,selected,action)
+  }else if(decision.type==='timeout_call'){
+    if(!['timeout','run'].includes(action))throw new Error(`Unknown timeout action: ${action}`);appendStrategyReceipt(session,decision,selected,action);
+    const state=session.state;session.timeoutAsked=state.events.length;
+    if(action==='timeout'&&state.timeouts[decision.team]>0){state.timeouts[decision.team]--;pushGameEvent(state,'timeout',{team:decision.team,left:state.timeouts[decision.team]});session.timeoutAt=state.events.length;session.timeoutAsked=state.events.length}
+  }else if(decision.type==='defense_call'){
+    if(!(action in DEFENSE_CALLS))throw new Error(`Unknown defensive call: ${action}`);appendStrategyReceipt(session,decision,selected,action);const at=session.state.events.length;session.defenseCall={side:decision.team,call:action,at};session.defenseAsked=at
   }else throw new Error(`Unknown strategy decision type: ${decision.type}`);
   engine.validateState(session.state);return{decision:clone(decision),selectedOption:selected,resolvedAction:action,state:session.state,session}
 }
@@ -211,5 +337,5 @@ function snapshot(session){validateSession(session);return clone(session)}
 function restore(value){const session=clone(value);validateSession(session);const pending=session.pendingStrategyDecision||decisions.pendingDecision(session.state);session.status=session.state.status==='final'?'final':(pending?'decision':session.state.status);return session}
 function pendingDecision(session){validateSession(session);return session.pendingStrategyDecision?clone(session.pendingStrategyDecision):decisions.pendingDecision(session.state)}
 
-return{VERSION,POLICY_ID,TEMPO_POLICY_ID,HALFTIME_POLICY_ID,CONVERSION_POLICY_ID,createSession,advanceOne,advance,resolve,simulate,snapshot,restore,pendingDecision,validateSession};
+return{VERSION,POLICY_ID,TEMPO_POLICY_ID,HALFTIME_POLICY_ID,CONVERSION_POLICY_ID,DRIVE_POLICY_ID,DEFENSE_POLICY_ID,DRIVE_CALLS,DEFENSE_CALLS,DRIVE_LABELS,DEFENSE_LABELS,createSession,advanceOne,advance,resolve,simulate,snapshot,restore,pendingDecision,validateSession};
 });

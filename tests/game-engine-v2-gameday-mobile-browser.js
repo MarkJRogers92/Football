@@ -28,7 +28,8 @@ const startNewDynasty=page=>sharedStartNewDynasty(page);
     });
     for(const box of [layout.host,layout.score,layout.decision])assert.ok(box.left>=-1&&box.right<=layout.viewport+1,`Game Day surface must fit phone viewport: ${JSON.stringify(layout)}`);
     assert.ok(layout.host.scroll<=layout.host.client+2,'Game Day host must not horizontally overflow');assert.ok(layout.decision.scroll<=layout.decision.client+2,'decision window must not horizontally overflow');
-    assert.ok(!layout.score.columns.includes(' '),`mobile scoreboard should collapse to one column; got ${layout.score.columns}`);
+    // v0.19: the two teams sit side by side under the clock so the field and the decision fit above the navigation.
+    assert.ok(layout.score.columns.split(' ').length<=2,`mobile scoreboard should be at most two columns; got ${layout.score.columns}`);
     assert.ok(layout.buttons.length>=3,'mobile decision window should expose coaching choices');for(const b of layout.buttons){assert.ok(b.left>=-1&&b.right<=layout.viewport+1,`decision button outside phone viewport: ${JSON.stringify(b)}`);assert.ok(b.height>=30,'decision buttons must remain tappable')}
     assert.deepEqual(errors,[],`mobile Game Day emitted browser errors: ${errors.join('\n')}`);
     console.log('PASS v0.10.1 mobile Game Day: matchup, scoreboard, decision controls and feed remain usable at 390px');

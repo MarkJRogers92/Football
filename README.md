@@ -5,7 +5,7 @@ ability, role-based depth charts, recruiting with real geography, scouting and
 development, coaching careers, weekly game-day play and permanent program
 history. It ships as a standalone web build and as an Electron desktop alpha.
 
-Current version: **0.17.1** (see `VERSION.txt`). `CHANGELOG.md` has the
+Current version: **0.23.0** (see `VERSION.txt`). `CHANGELOG.md` has the
 version-by-version record.
 
 The game includes the **One More Saturday** experience pass: a compact weekly desk, factual postgame stopping points, quieter football presentation, personal history, and safe saved-state/re-entry feedback. See `agent_docs/ONE_MORE_SATURDAY_PLAN.md` for scope and `agent_docs/latest_session_work.md` for verified delivery status.
@@ -14,13 +14,18 @@ v0.17.0 makes coached and simulated games play the same way, keeps elite program
 
 ## Source layout
 
-`index.html` is **generated** by `npm run build` -- never hand-edit it.
+`index.html` and `sw.js` are **generated** by `npm run build` -- never hand-edit them, and commit both after a
+version bump or a change under `assets/`.
 
 | Path | Role |
 | --- | --- |
 | `app.js` | Engine and UI core. Source of truth. |
 | `*.js` / `*.css` feature modules | Feature extensions (recruiting, scouting, game-engine-v2, weekly coaching, presentation, guidance, etc.). `tools/build.js` injects them into `app.js` (engine extensions) or appends them after it (presentation modules) in a fixed, dependency-ordered list. A new module must be added to that list. |
 | `schools-data.js` | The 120 fictional programs every new universe starts from (`DynastySchools`). |
+| `mascots.js` | A nickname for each program, keyed by school id (`DynastyMascots`). |
+| `crash-guard.js` | Loaded first: records uncaught errors on the device and shows the crash screen. |
+| `phone-a11y.css` | Loaded last: the 44px control and 12px text floors at phone width. |
+| `manifest.webmanifest`, `pwa.js`, `sw.js` | The installable, offline web build. `sw.js` is **generated** by `npm run build` from `tools/sw-template.js`. |
 | `storage.js` | Browser IndexedDB archive persistence (`DynastyStorage`). |
 | `body.html`, `styles.css` | Page markup and base stylesheet. |
 | `portraits/` | Frozen deterministic Portrait V1 renderer. |
@@ -41,6 +46,8 @@ npm run test:browser          # Chromium UI/visual suites
 npm run test:browser-storage  # browser save/load and storage
 npm run audit                 # engine balance/consistency audit
 npm run longrun               # multi-season (12) stability run
+npm run test:accessibility    # axe-core on every screen, plus the phone touch and text floors
+npm run measure:long-save     # 30 seasons: plain and compressed backup size and write time
 npm run verify:release        # release-source and build-currentness checks
 npm run validate:full         # build + verify + all of the above
 ```
@@ -98,6 +105,7 @@ share browser save storage -- export a JSON backup before switching builds.
 - `STORAGE.md` -- save format and persistence contract; read before changing save behavior.
 - `VISUAL_IDENTITY.md` -- visual identity rules.
 - `IDEAS.md` -- idea backlog.
+- `docs/RELEASE_GAMEPLAN_2026-11-11.md` -- the review and plan toward 1.0, with what has shipped and what is left.
 - `docs/` -- milestone checkpoints, validation policy, release notes, `docs/roadmap/`.
 - `docs/archive/` -- historical root-level handoffs, worklog and roadmaps (may be out of date).
 - `agent_docs/` -- working context for coding agents.

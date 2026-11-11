@@ -8,7 +8,7 @@ const round=n=>Math.round(n*100)/100;
 
 async function main(){
  const e=loadEngine({seed:41010});e.setUserTeam('Chicago Metropolitan');await e.loadSchools();e.initUniverse();
- const u=e.universe,matchups=(u.schedule||[]).slice(0,2).flatMap((games,weekIndex)=>games.map(g=>({g,week:weekIndex+1}))).slice(0,120);
+ const u=e.universe,matchups=(u.schedule||[]).slice(0,8).flatMap((games,weekIndex)=>games.map(g=>({g,week:weekIndex+1}))).slice(0,480);
  if(matchups.length<100)throw new Error(`Calibration expected at least 100 early-season matchups; found ${matchups.length}.`);
  const oldRows=[],v2Rows=[];
  for(let i=0;i<matchups.length;i++){
@@ -45,7 +45,7 @@ async function main(){
  const strengthBuckets={favored:{old:[],v2:[]},even:{old:[],v2:[]},underdog:{old:[],v2:[]}};
  for(let i=0;i<oldRows.length;i++){const gap=oldRows[i].profileGap,b=gap>=7?'favored':gap<=-7?'underdog':'even';strengthBuckets[b].old.push(oldRows[i].homeWin);strengthBuckets[b].v2.push(v2Rows[i].homeWin)}
  const sensitivity={};for(const [k,b] of Object.entries(strengthBuckets))sensitivity[k]={games:b.old.length,oldHomeWinRate:round(mean(b.old.map(homeWin=>({homeWin})),'homeWin')),v2HomeWinRate:round(mean(b.v2.map(homeWin=>({homeWin})),'homeWin'))};
- const report={generatedAt:new Date().toISOString(),branch:'codex/v0100-game-engine-2',baselineVersion:e.APP_VERSION,mode:'development-only shadow comparison',matchups:matchups.length,sample:'weeks 1-2, all 120 scheduled games',old,v2,delta,strengthSensitivity:sensitivity,notes:['The v0.9 simulator runs only on cloned team objects. Its temporary archive/event writes are removed after each sample.','The v2 result is never installed into the dynasty.','Home-field input uses the current homeFieldFor() value directly as a bounded matchup-rating edge.','Red-zone finishing is a v2 calibration layer; it changes only shadow play outcomes, not live dynasty results.','These are calibration observations, not release thresholds.']};
+ const report={generatedAt:new Date().toISOString(),branch:'codex/v0100-game-engine-2',baselineVersion:e.APP_VERSION,mode:'development-only shadow comparison',matchups:matchups.length,sample:'weeks 1-8, all 480 scheduled games (120 was too few: the mean-points delta moved by 2 between runs of the same rules)',old,v2,delta,strengthSensitivity:sensitivity,notes:['The v0.9 simulator runs only on cloned team objects. Its temporary archive/event writes are removed after each sample.','The v2 result is never installed into the dynasty.','Home-field input uses the current homeFieldFor() value directly as a bounded matchup-rating edge.','Red-zone finishing is a v2 calibration layer; it changes only shadow play outcomes, not live dynasty results.','These are calibration observations, not release thresholds.']};
  if(!Number.isFinite(v2.meanPoints)||v2.games!==matchups.length)throw new Error('Invalid v2 calibration report.');
  const text=JSON.stringify(report,null,2)+'\n',out=process.argv[2];if(out)fs.writeFileSync(out,text);else process.stdout.write(text);
  console.log(`Compared ${matchups.length} real early-season matchup profiles: old ${old.meanPoints} pts/${old.meanPlays} plays vs v2 ${v2.meanPoints} pts/${v2.meanPlays} plays.`);

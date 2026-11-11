@@ -31,7 +31,8 @@ function returnText(event){
   if(event.fairCatch)return', fair catch';
   return n>0?`, returned ${n} yard${n===1?'':'s'}`:'';
 }
-function decisionActionLabel(value){return String(value||'decision').replaceAll('_',' ')}
+const DECISION_ACTION_LABELS={timeout:'a timeout',run:'to let the clock run',ground:'to run the ball',quick:'quick passes',shots:'to take shots',balanced:'a balanced drive',base:'to play it straight',pressure:'to bring pressure',coverage:'to drop into coverage',run_stop:'to load the box'};
+function decisionActionLabel(value){return DECISION_ACTION_LABELS[value]||String(value||'decision').replaceAll('_',' ')}
 // Broadcast-style short name: "Gavin Kemp" -> "G. Kemp".
 function shortName(name){const parts=String(name||'').trim().split(/\s+/);return parts.length>1?`${parts[0][0]}. ${parts.slice(1).join(' ')}`:parts[0]||''}
 // The player recorded in a play role (qb, ca carrier, tg target, tk tackler, sb sacker, ib interceptor, ff forced
@@ -80,6 +81,7 @@ function eventText(event={},names={}){
   if(event.type==='field_goal'){const kk=who('kk');return`${kk?`${kk} (${team})`:team} ${event.distance||''}-yard field goal ${event.made?'good':'missed'}.`.replace('  -',' ')}
   if(event.type==='punt'){const pt=who('pt'),rt=who('rt');return`${pt?`${pt} (${team})`:team} punts${event.touchback?' for a touchback':''}${event.touchback?'':returnText(event)}${rt&&!event.touchback&&(Number(event.ret)>0||event.td)?` by ${rt}`:''}.`}
   if(event.type==='safety')return`SAFETY for ${team}.`;
+  if(event.type==='timeout')return`Timeout, ${team} (${event.left??0} left).`;
   if(event.type==='coaching_decision'){
     const choice=event.selectedOption==='delegate'?`delegates — staff chooses ${decisionActionLabel(event.resolvedAction)}`:`chooses ${decisionActionLabel(event.selectedOption)}`;
     return`${team} coach ${choice}.`;

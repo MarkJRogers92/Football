@@ -8,8 +8,8 @@ test('season stage reads as copy, never as engine phase keys',async()=>{
  const e=loadEngine({seed:9801});e.setUserTeam('Chicago Metropolitan');await e.loadSchools();e.initUniverse();
  const label=(phase,week)=>e.seasonStageLabel({phase,week});
  assert.equal(label('preseason',0),'Preseason');
- assert.equal(label('regular',0),'Regular season · Opening week');
- assert.equal(label('regular',7),'Regular season · Week 7');
+ assert.equal(label('regular',0),'Regular season · Week 1');
+ assert.equal(label('regular',7),'Regular season · Week 8','the label names the week being prepared, as the briefing and Game Day do');
  assert.equal(label('confReady',12),'Conference championships');
  assert.equal(label('bowlReady',12),'Bowl season');
  assert.equal(label('playoffReady',12),'Playoff');
