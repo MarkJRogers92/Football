@@ -21,10 +21,11 @@ async function startNewDynasty(page,{beginSeason=true,staffRecruiting=false}={})
     const failure=await page.evaluate(()=>({status:document.querySelector('#setupStatus')?.textContent||'',debug:window.__DL_TEST__?.setupDebug?.()}));
     throw new Error(`Setup acceptance failed: ${failure.status} · ${JSON.stringify(failure.debug)}`);
   }
-  if(!staffRecruiting)await page.evaluate(()=>window.__DL_TEST__.setStaffRecruiting?.(false));
+  // The packaged desktop app (and any build without automation) has no test hooks; it plays the default.
+  if(!staffRecruiting)await page.evaluate(()=>window.__DL_TEST__?.setStaffRecruiting?.(false));
   if(beginSeason){
     await page.click('#hubAdvance');
-    await page.waitForFunction(()=>window.__DL_TEST__.preseasonDebug().phase==='regular',{timeout:30000});
+    await page.waitForFunction(()=>window.__DL_TEST__?window.__DL_TEST__.preseasonDebug().phase==='regular':/Week 1$/.test(document.querySelector('#weekLine')?.textContent||''),{timeout:30000});
   }
 }
 
