@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.25.0</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.26.0</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -3249,6 +3249,23 @@ h3:has(>.dl-art-h3){display:flex;align-items:center;gap:8px}
 @media(max-width:760px){.offseason-stop:has(>.dl-art-stop){padding-right:76px}.offseason-stop>.dl-art-stop{width:56px;height:56px}}
 @media(max-width:760px){.section-head.has-art{flex-direction:row!important;flex-wrap:wrap!important;align-items:center!important}.section-head.has-art>.dl-art-head+div{flex:1 1 calc(100% - 64px)}.section-head.has-art>.dl-art-head{width:44px;height:44px}.dl-art-ceremony{width:96px;height:96px}}
 
+/* v0.26 — quarter-by-quarter line score (only for games that recorded each score's quarter). */
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.line-score{border-collapse:collapse;margin:8px 0 14px;font-variant-numeric:tabular-nums;min-width:260px}
+.line-score th,.line-score td{padding:6px 10px;text-align:center;border-bottom:1px solid var(--line,#2b3440)}
+.line-score thead th{font-size:.72rem;letter-spacing:.06em;color:var(--muted,#9ca8b8);font-weight:700}
+.line-score tbody th{text-align:left;font-weight:650;max-width:14em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.line-score .line-score-total{font-weight:850}
+.v2-release-linescore{margin:0 auto 14px;width:calc(100% - 32px);max-width:560px}
+@media(max-width:760px){.line-score th,.line-score td{padding:5px 6px}.line-score tbody th{max-width:9em}}
+.v2-gameday-decision:has(>.dl-art-decision){position:relative;padding-right:84px}
+.v2-gameday-decision>.dl-art-decision{position:absolute;top:8px;right:8px;width:64px;height:64px}
+@media(max-width:760px){.v2-gameday-decision:has(>.dl-art-decision){padding-right:56px}.v2-gameday-decision>.dl-art-decision{width:44px;height:44px}}
+/* v0.26 — the championship ring turns under the national title. 36 frames of 192px in one row, stepped by pixels. */
+.cer-ring{width:120px;height:120px;margin:6px auto 0;background:url("assets/ring-turn-v1.webp") 0 0/4320px 120px no-repeat;filter:drop-shadow(0 10px 18px rgba(0,0,0,.55)) drop-shadow(0 0 18px rgba(var(--bi-gold-rgb),.35));animation:cer-ring-turn 6s steps(36) infinite,cer-rise .9s var(--bi-ease) .25s both}
+@keyframes cer-ring-turn{to{background-position:-4320px 0}}
+@media(prefers-reduced-motion:reduce){.cer-ring{animation:none}}
+
 /* A quiet sports briefing. The existing advance control remains the only primary action. */
 .lw-world{margin:14px 0;border-top:1px solid var(--line);padding-top:12px;min-width:0}
 .lw-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -3488,7 +3505,7 @@ select{min-width:44px}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.25.0</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.26.0</b></span></footer>
   </div>
 </section>
 
@@ -3515,7 +3532,7 @@ select{min-width:44px}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.25.0</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.26.0</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -3792,7 +3809,7 @@ select{min-width:44px}
         <button id="runOffseason" disabled>Advance Offseason Phase</button>
       </div>
       <div class="two-col">
-        <div class="card"><h3>Transfer Watch</h3><div id="transferWatch"></div></div>
+        <div class="card"><h3><img class="dl-art dl-art-h3" src="assets/awards/locker-room.webp" alt="" aria-hidden="true" width="256" height="256">Transfer Watch</h3><div id="transferWatch"></div></div>
         <div class="card"><h3>Development Candidates</h3><div id="developmentWatch"></div></div>
       </div>
       <div class="card"><h3><img class="dl-art dl-art-h3" src="assets/awards/stadium-lights.webp" alt="" aria-hidden="true" width="256" height="256">Offseason Report</h3><div id="offseasonReport" class="muted">Complete the season first.</div></div>
@@ -7464,7 +7481,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.25.0';
+const APP_VERSION='0.26.0';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi','Aiden','Alex','Amari','Andrew','Anthony','Antonio','Armani','Ashton','Austin','Avery','Bennett','Blake','Brady','Brandon','Brayden','Brennan','Brock','Bryson','Cade','Caden','Calvin','Cameron','Carson','Cedric','Chase','Christian','Cody','Colby','Collin','Connor','Corey','Damian','Damon','Daniel','Davion','Dawson','Deandre','Demarcus','Derek','Desmond','Dillon','Drew','Dylan','Elijah','Ethan','Ezra','Garrett','Grady','Graham','Grant','Hayden','Hunter','Ian','Isaac','Jabari','Jace','Jackson','Jacob','Jaden','Jake','Jamar','Jameson','Jared','Jarrett','Javon','Jaxon','Jay','Jermaine','Jesse','Joel','Jonah','Josiah','Julian','Justin','Kaden','Kai','Kamari','Keegan','Keenan','Kendall','Kendrick','Kevin','Kobe','Kyle','Kyler','Lamar','Landon','Lane','Lawrence','Leon','Levi','Lincoln','Lucas','Marco','Mario','Mateo','Matthew','Maurice','Max','Myles','Nate','Nathan','Nolan','Omar','Owen','Parker','Patrick','Preston','Quentin','Quincy','Reggie','Riley','Ryan','Sam','Sean','Seth','Shane','Silas','Solomon','Spencer','Sterling','Terrell','Theo','Tobias','Travis','Tristan','Troy','Tucker','Tyrese','Victor','Wade','Walker','Wes','Wyatt','Zach','Zane','Andres','Diego','Rafael','Tevita','Sione','Manu','Keoni','Kenji','Darnell'];
@@ -8996,11 +9013,27 @@ function compactGameArchive({horizon=GAME_DETAIL_HORIZON}={}){
  return {games,dropped};
 }
 
+// v0.26: real quarter-by-quarter scores. Only games whose scoring drives recorded their period (Game Engine 2 games
+// archived from v0.26) have them, and only when the drives add up to the final score; otherwise nothing is shown.
+function gameLineScore(g){
+ const drives=(g?.drives||[]).filter(d=>Number(d.points)>0);if(!drives.length||drives.some(d=>!(Number(d.q)>0)))return null;
+ const last=Math.max(4,...drives.map(d=>Number(d.q))),row=()=>Array(last).fill(0),out={periods:last,home:row(),away:row()};
+ for(const d of drives){if(!out[d.side])return null;out[d.side][Number(d.q)-1]+=Number(d.points)}
+ const sum=r=>r.reduce((n,v)=>n+v,0);if(sum(out.home)!==Number(g.score?.home)||sum(out.away)!==Number(g.score?.away))return null;
+ return out;
+}
+function gamePeriodLabel(q){q=Number(q);return q>4?(q===5?'OT':`${q-4}OT`):`Q${q}`}
+function gameLineScoreHTML(g,cls='line-score'){
+ const ls=gameLineScore(g);if(!ls)return'';
+ const head=Array.from({length:ls.periods},(_,i)=>`<th scope="col">${i<4?i+1:gamePeriodLabel(i+1)}</th>`).join('');
+ const row=side=>`<tr><th scope="row">${gameEscape(g[side]?.name||side)}</th>${ls[side].map(v=>`<td>${v}</td>`).join('')}<td class="line-score-total">${Number(g.score?.[side])||0}</td></tr>`;
+ return`<table class="${cls}" aria-label="Score by quarter"><thead><tr><th scope="col"><span class="sr-only">Team</span></th>${head}<th scope="col">T</th></tr></thead><tbody>${row('away')}${row('home')}</tbody></table>`;
+}
 function gameSummaryHTML(g){
  const winner=g.score.home>g.score.away?g.home:g.away;
- let html=`<p class="recap">${gameRecap(g).body}</p><p><strong>${gameEscape(winner.name)} wins by ${Math.abs(g.score.home-g.score.away)}.</strong> Total offense: ${gameEscape(g.away.name)} ${g.teamStats.away.passYds+g.teamStats.away.rushYds} yards; ${gameEscape(g.home.name)} ${g.teamStats.home.passYds+g.teamStats.home.rushYds} yards.</p><p class="muted">The recap above is written from this box score. Quarter-by-quarter scores, attendance and the game clock are not recorded for this game.</p>${coachingReportHTML(g)}<h3>Game leaders</h3>`;
+ let html=`<p class="recap">${gameRecap(g).body}</p><p><strong>${gameEscape(winner.name)} wins by ${Math.abs(g.score.home-g.score.away)}.</strong> Total offense: ${gameEscape(g.away.name)} ${g.teamStats.away.passYds+g.teamStats.away.rushYds} yards; ${gameEscape(g.home.name)} ${g.teamStats.home.passYds+g.teamStats.home.rushYds} yards.</p>${gameLineScoreHTML(g)||'<p class="muted">The recap above is written from this box score. Quarter-by-quarter scores, attendance and the game clock are not recorded for this game.</p>'}${coachingReportHTML(g)}<h3>Game leaders</h3>`;
  for(const side of ['away','home']){html+=`<h4>${gameEscape(g[side].name)}</h4>`;for(const [label,key] of [['Passing','passYds'],['Rushing','rushYds'],['Receiving','recYds'],['Tackles','tackles']]){const p=g.playerStats[side].slice().sort((a,b)=>(b.stats[key]||0)-(a.stats[key]||0))[0];if(p?.stats[key])html+=`<div class="lineitem"><span>${label} · ${gameEscape(p.name)}</span><strong>${p.stats[key]}${key==='tackles'?'':' yds'}</strong></div>`}}
- html+='<h3>Scoring summary</h3>';const scoring=(g.drives||[]).filter(d=>d.points);html+=scoring.length?scoring.map(d=>`<div class="lineitem"><span>${gameEscape(d.label)} · ${gameEscape(g[d.side].name)}</span><strong>${gameEscape(d.result)} +${d.points}</strong></div>`).join(''):'<p class="muted">Individual scoring plays were not retained for this simulation.</p>';
+ html+='<h3>Scoring summary</h3>';const scoring=(g.drives||[]).filter(d=>d.points);html+=scoring.length?scoring.map(d=>`<div class="lineitem"><span>${d.q?`${gamePeriodLabel(d.q)} · `:''}${gameEscape(d.label)} · ${gameEscape(g[d.side].name)}</span><strong>${gameEscape(d.result)} +${d.points}</strong></div>`).join(''):'<p class="muted">Individual scoring plays were not retained for this simulation.</p>';
  for(const s of ['away','home'])if(g.scoreAdjustment?.[s])html+=`<p class="muted">${gameEscape(g[s].name)}: ${g.scoreAdjustment[s]} additional simulation points (home-field/tiebreak adjustment; no scoring play recorded).</p>`;
  if(g.formerPlayers?.length)html+='<h3>Familiar faces</h3>'+g.formerPlayers.map(p=>`<p>${gameEscape(p.name)} appeared for ${gameEscape(p.school)} against former school ${gameEscape(p.formerSchool)}.</p>`).join('');
  html+='<h3>Injuries recorded in this game</h3>'+(g.injuries?.length?g.injuries.map(i=>`<p>${gameEscape(i.name)} · ${gameEscape(i.school)} · ${gameEscape(i.type)}, ${i.weeks} week(s)</p>`).join(''):'<p class="muted">None recorded.</p>');return html;
@@ -10558,9 +10591,19 @@ function resolveUnplacedPortal(entry){
  addToArchive(p,from,'No landing spot');
  return {outcome:'exited',team:from};
 }
+// One portal outcome for the coach's program: a player of his leaving (out), one returning or leaving football after
+// finding no landing spot, or a player arriving (in). Presentation only; the move itself is already made.
+function portalDayNote(x,destName,unplaced){
+ const pd=universe.portalDay,me=$('#userTeam')?.value;if(!pd?.collecting||!x?.p||!me)return;
+ const kind=unplaced?(unplaced==='returned'?'returned':'left'):destName===me?'in':x.from===me?'out':null;if(!kind||(kind!=='in'&&x.from!==me))return;
+ if(pd.board.some(b=>b.playerId===x.p.id))return;
+ pd.board.push({playerId:x.p.id,name:x.p.name,pos:x.p.pos,from:x.from,to:destName||null,kind,reason:transferReasonLabel(x.reason)});
+}
 function offseasonPortal(){
  const os=normalizeOffseasonState();
  if(offseasonPhaseDone('portal')){if(os.phase==='portal')os.phase='spring';return true}
+ // v0.26: every portal outcome that touches the coach's program is kept so the offseason stop can announce them in turn.
+ universe.portalDay={year:universe.year,board:[],revealed:0,collecting:true};
  // Place announced decisions before the draft or any fallback draws, exactly as the Finalize button does.
  if((universe.transferPortal||[]).some(x=>x.decision)){
   const {blocked}=resolvePortalCommitments();
@@ -10571,9 +10614,10 @@ function offseasonPortal(){
  const portal=[...(universe.transferPortal||[])];universe.transferPortal=[];
  let placedCount=universe.portalCycle?.year===universe.year?(universe.portalCycle.finalizedCount||0):0,returnedCount=0,exitedCount=0;
  portal.forEach(x=>{x.p.stats=newStats();x.p.year=CLASS_NAMES[Math.min(3,eligibilityBase(x.p))]||'SR';const dest=placeTransfer(x);
-  if(dest){placedCount++;if(x.from===controlled||dest.name===controlled)movement.push(`${x.p.pos} ${x.p.name}: ${x.from} → ${dest.name} (${transferReasonLabel(x.reason)})`);return}
+  if(dest){placedCount++;portalDayNote(x,dest.name);if(x.from===controlled||dest.name===controlled)movement.push(`${x.p.pos} ${x.p.name}: ${x.from} → ${dest.name} (${transferReasonLabel(x.reason)})`);return}
   const outcome=resolveUnplacedPortal(x);
   if(!outcome){universe.transferPortal.push(x);return}
+  portalDayNote(x,null,outcome.outcome);
   if(outcome.outcome==='returned'){returnedCount++;if(x.from===controlled)movement.push(`${x.p.pos} ${x.p.name}: no landing spot, returned to ${x.from}`)}
   else{exitedCount++;if(x.from===controlled)movement.push(`${x.p.pos} ${x.p.name}: no landing spot, left the program`)}
  });
@@ -10581,6 +10625,7 @@ function offseasonPortal(){
   universe.portalCycle.status='resolved';
   portalLog('Offseason advanced. Remaining transfers resolved.');
  }
+ if(universe.portalDay){const pd=universe.portalDay,order={out:0,returned:1,left:2,in:3};pd.board.sort((x,y)=>order[x.kind]-order[y.kind]);delete pd.collecting}
  updateCareerRecords();
  movement.push(...(os.reports.review?.carouselLog||[]).filter(x=>x.includes(controlled)));
  universe.movementLog=movement.slice(0,100);
@@ -10924,6 +10969,7 @@ function resolvePortalCommitments(){
   if(os?.reports&&(entry.from===controlled||landed.name===controlled)){
    (os.reports.movement??=[]).push(`${entry.p.pos} ${entry.p.name}: ${entry.from} → ${landed.name} (${transferReasonLabel(entry.reason)})`);
   }
+  portalDayNote(entry,landed.name);
   placed.push({candidateId:entry.candidateId,playerId:entry.p.id,schoolId:landed.id});
  }
  universe.transferPortal=(universe.transferPortal||[]).filter(x=>!x.placed);
@@ -15185,7 +15231,7 @@ if(typeof module==='object'&&module.exports){
   const odds=facilities.askChance(t),risky=odds<40;
   const camp=(kind,dest)=>CTL(`${facilities.CAMPAIGNS[kind].label} → ${dest==='nil'?'NIL':'Facilities'}${kind==='ask'?` · ${odds}%`:''}`,`data-fb-campaign="${kind}" data-fb-dest="${dest}"`,{disabled:left<=0,cls:kind==='ask'&&risky?'fb-risky':'',title:kind==='ask'?`${odds}% chance. ${risky?'A refusal costs 4 goodwill, and goodwill is low. Winning brings it back.':'A refusal costs 4 goodwill.'}`:facilities.CAMPAIGNS[kind].blurb});
   const log=s.log.length?`<details class="fb-log"><summary>Recent activity</summary><ul>${s.log.slice().reverse().map(x=>`<li><span class="muted">${x.year}</span> ${fbEsc(x.text)}</li>`).join('')}</ul></details>`:'';
-  return`<div class="section-head"><div><div class="eyebrow">FACILITIES &amp; BOOSTERS</div><h3>Build the program</h3><div class="muted">Boosters give money. You decide whether it becomes buildings or NIL.</div></div></div>
+  return`<div class="section-head has-art">${globalThis.DynastyArt?.img('money-bag','dl-art dl-art-head')||''}<div><div class="eyebrow">FACILITIES &amp; BOOSTERS</div><h3>Build the program</h3><div class="muted">Boosters give money. You decide whether it becomes buildings or NIL.</div></div></div>
   <div class="fb-summary"><div><span class="small muted">Facilities rating</span><strong>${s.facilities??'—'}</strong></div><div><span class="small muted">Booster fund</span><strong>${s.fund}<small> units</small></strong></div><div><span class="small muted">Goodwill</span><strong>${s.goodwill}<small> ${fbEsc(s.goodwillLabel)}</small></strong></div><div><span class="small muted">Gifts next offseason</span><strong>+${s.income}<small>${s.upkeep?` (${s.gross} − ${Math.min(s.gross,s.upkeep)} upkeep)`:''}</small></strong></div><div><span class="small muted">NIL this season</span><strong>${nilLeft}<small> of ${nilTotal}</small></strong></div></div>
   ${effects.length?`<div class="small fb-effects">${effects.map(fbEsc).join(' · ')}</div>`:''}
   <div class="fb-tracks">${rows.map(r=>trackHTML(t,r)).join('')}</div>
@@ -15951,6 +15997,8 @@ function v2RecordArchiveText(event,names){
 function v2RecordDriveArchive(preview){
   const events=preview?.state?.events||[],names=preview?.names||{},counts={home:0,away:0},drives=[];let drive=null;
   const valid=s=>s==='home'||s==='away';
+  // v0.26: the period of the drive's score (5+ is overtime), so the archive can show real quarter-by-quarter scores.
+  const scoredIn=e=>{const q=Number(e.state?.period);if(drive&&Number.isFinite(q)&&q>0)drive.q=q};
   const finish=()=>{if(drive&&(drive.plays||drive.playByPlay.length)){if(!drive.result)drive.result='END';drives.push(drive)}drive=null};
   const start=(side,overtime=false)=>{if(valid(side))drive={side,label:`${side==='home'?'H':'A'}${++counts[side]}`,points:0,result:'',plays:0,overtime:!!overtime,playByPlay:[]}};
   for(const e of events){
@@ -15960,12 +16008,12 @@ function v2RecordDriveArchive(preview){
     const side=valid(e.team)?e.team:null;if(side&&(!drive||drive.side!==side)){finish();start(side,(e.state?.period||0)>4)}if(!drive)continue;
     if(['scrimmage','interception','fumble'].includes(e.type)){drive.plays++;drive.playByPlay.push(v2RecordArchiveText(e,names));if(e.type==='interception')drive.result='INT';if(e.type==='fumble')drive.result='FUMBLE'}
     else if(e.type==='coaching_decision'||e.type==='penalty'||e.type==='timeout'){drive.playByPlay.push(v2RecordArchiveText(e,names))}
-    else if(e.type==='touchdown'){drive.points+=6;drive.result='TD';drive.playByPlay.push(v2RecordArchiveText(e,names))}
-    else if(e.type==='extra_point'){if(e.made!==false)drive.points++;drive.playByPlay.push(v2RecordArchiveText(e,names))}
-    else if(e.type==='two_point'){if(e.made)drive.points+=2;drive.playByPlay.push(v2RecordArchiveText(e,names))}
-    else if(e.type==='field_goal'){if(e.made){drive.points+=3;drive.result='FG'}else drive.result='MISS';drive.playByPlay.push(v2RecordArchiveText(e,names))}
+    else if(e.type==='touchdown'){drive.points+=6;scoredIn(e);drive.result='TD';drive.playByPlay.push(v2RecordArchiveText(e,names))}
+    else if(e.type==='extra_point'){if(e.made!==false){drive.points++;scoredIn(e)}drive.playByPlay.push(v2RecordArchiveText(e,names))}
+    else if(e.type==='two_point'){if(e.made){drive.points+=2;scoredIn(e)}drive.playByPlay.push(v2RecordArchiveText(e,names))}
+    else if(e.type==='field_goal'){if(e.made){drive.points+=3;scoredIn(e);drive.result='FG'}else drive.result='MISS';drive.playByPlay.push(v2RecordArchiveText(e,names))}
     else if(e.type==='punt'){drive.result='PUNT';drive.playByPlay.push(v2RecordArchiveText(e,names))}
-    else if(e.type==='safety'){drive.points+=2;drive.result='SAFETY';drive.playByPlay.push(v2RecordArchiveText(e,names))}
+    else if(e.type==='safety'){drive.points+=2;scoredIn(e);drive.result='SAFETY';drive.playByPlay.push(v2RecordArchiveText(e,names))}
   }
   finish();return drives.slice(-40)
 }
@@ -16308,7 +16356,7 @@ function v2ReleaseDriveTimeline(record){
   const score={home:0,away:0},names={home:record.home?.name||'Home',away:record.away?.name||'Away'},scoring=[];
   for(const d of record.drives||[]){
     score[d.side]+=v2ReleaseNum(d.points);
-    if(v2ReleaseNum(d.points)>0)scoring.push(`<div class="v2-release-scoring-row"><span>${gameEscape(d.overtime?'OT':d.label)}</span><strong>${gameEscape(names[d.side])} · ${gameEscape(d.result||'SCORE')} · +${v2ReleaseNum(d.points)}${(detail=>detail?`<small>${gameEscape(detail)}</small>`:'')(v2ReleaseScoringDetail(d))}</strong><b>${score.away}–${score.home}</b></div>`)
+    if(v2ReleaseNum(d.points)>0)scoring.push(`<div class="v2-release-scoring-row"><span>${gameEscape(d.q&&typeof gamePeriodLabel==='function'?gamePeriodLabel(d.q):d.overtime?'OT':d.label)}</span><strong>${gameEscape(names[d.side])} · ${gameEscape(d.result||'SCORE')} · +${v2ReleaseNum(d.points)}${(detail=>detail?`<small>${gameEscape(detail)}</small>`:'')(v2ReleaseScoringDetail(d))}</strong><b>${score.away}–${score.home}</b></div>`)
   }
   return scoring.length?scoring.join(''):'<div class="muted">No scoring drives were retained.</div>'
 }
@@ -16318,7 +16366,7 @@ function v2ReleaseDriveStrip(record){
 function v2ReleaseRecapHTML(record){
   const hs=record.teamStats?.home||{},as=record.teamStats?.away||{},ot=(record.drives||[]).some(d=>d.overtime),meta=[record.season,record.label||`Week ${record.week??'—'}`,record.venue].filter(Boolean).map(gameEscape).join(' · ');
   const awayY=v2ReleaseNum(as.passYds)+v2ReleaseNum(as.rushYds),homeY=v2ReleaseNum(hs.passYds)+v2ReleaseNum(hs.rushYds);
-  return`<div class="v2-release-recap"><div class="v2-release-kicker"><span>GAME DAY</span><strong>${meta}</strong></div><div class="v2-release-score"><div class="v2-release-team">${teamLogoHTML(record.away?.id,46,'team-logo--inline')}<span>${gameEscape(record.away?.name||'Away')}${v2ReleaseNick(record.away)}</span><b>${v2ReleaseNum(record.score?.away)}</b></div><div class="v2-release-final">FINAL${ot?' · OT':''}</div><div class="v2-release-team home"><b>${v2ReleaseNum(record.score?.home)}</b><span>${gameEscape(record.home?.name||'Home')}${v2ReleaseNick(record.home)}</span>${teamLogoHTML(record.home?.id,46,'team-logo--inline')}</div></div><div class="v2-release-metrics"><div><span>Total yards</span><strong>${awayY} – ${homeY}</strong></div><div><span>Plays</span><strong>${v2ReleaseNum(as.plays)} – ${v2ReleaseNum(hs.plays)}</strong></div><div><span>First downs</span><strong>${v2ReleaseNum(as.firstDowns)} – ${v2ReleaseNum(hs.firstDowns)}</strong></div><div><span>Turnovers</span><strong>${v2ReleaseNum(as.turnovers)} – ${v2ReleaseNum(hs.turnovers)}</strong></div></div><div class="v2-release-section"><div class="v2-release-section-head"><strong>Drive chart</strong><span>${(record.drives||[]).length} possessions · clock-aware archive</span></div><div class="v2-release-drive-strip">${v2ReleaseDriveStrip(record)}</div></div><div class="v2-release-grid"><section><div class="v2-release-section-head"><strong>Scoring flow</strong><span>away – home</span></div>${v2ReleaseDriveTimeline(record)}</section><section><div class="v2-release-section-head"><strong>Player leaders</strong><span>real roster production</span></div><div class="v2-release-leader-team"><h4>${gameEscape(record.away?.name||'Away')}</h4>${v2ReleaseTeamLeaders(record,'away')}</div><div class="v2-release-leader-team"><h4>${gameEscape(record.home?.name||'Home')}</h4>${v2ReleaseTeamLeaders(record,'home')}</div></section></div></div>`
+  return`<div class="v2-release-recap"><div class="v2-release-kicker"><span>GAME DAY</span><strong>${meta}</strong></div><div class="v2-release-score"><div class="v2-release-team">${teamLogoHTML(record.away?.id,46,'team-logo--inline')}<span>${gameEscape(record.away?.name||'Away')}${v2ReleaseNick(record.away)}</span><b>${v2ReleaseNum(record.score?.away)}</b></div><div class="v2-release-final">FINAL${ot?' · OT':''}</div><div class="v2-release-team home"><b>${v2ReleaseNum(record.score?.home)}</b><span>${gameEscape(record.home?.name||'Home')}${v2ReleaseNick(record.home)}</span>${teamLogoHTML(record.home?.id,46,'team-logo--inline')}</div></div>${typeof gameLineScoreHTML==='function'?gameLineScoreHTML(record,'line-score v2-release-linescore'):''}<div class="v2-release-metrics"><div><span>Total yards</span><strong>${awayY} – ${homeY}</strong></div><div><span>Plays</span><strong>${v2ReleaseNum(as.plays)} – ${v2ReleaseNum(hs.plays)}</strong></div><div><span>First downs</span><strong>${v2ReleaseNum(as.firstDowns)} – ${v2ReleaseNum(hs.firstDowns)}</strong></div><div><span>Turnovers</span><strong>${v2ReleaseNum(as.turnovers)} – ${v2ReleaseNum(hs.turnovers)}</strong></div></div><div class="v2-release-section"><div class="v2-release-section-head"><strong>Drive chart</strong><span>${(record.drives||[]).length} possessions · clock-aware archive</span></div><div class="v2-release-drive-strip">${v2ReleaseDriveStrip(record)}</div></div><div class="v2-release-grid"><section><div class="v2-release-section-head"><strong>Scoring flow</strong><span>away – home</span></div>${v2ReleaseDriveTimeline(record)}</section><section><div class="v2-release-section-head"><strong>Player leaders</strong><span>real roster production</span></div><div class="v2-release-leader-team"><h4>${gameEscape(record.away?.name||'Away')}</h4>${v2ReleaseTeamLeaders(record,'away')}</div><div class="v2-release-leader-team"><h4>${gameEscape(record.home?.name||'Home')}</h4>${v2ReleaseTeamLeaders(record,'home')}</div></section></div></div>`
 }
 function ensureV2ReleaseRecap(){
   let host=document.querySelector('#v2GameDayRecap');if(host)return host;const next=document.querySelector('#nextGameCard');if(!next)return null;
@@ -16538,7 +16586,7 @@ function v2GameDayUIDecision(session){
     const hint=calls?V2_GAMEDAY_CALL_HINTS[o.id]:'',current=d.type==='drive_call'&&o.id===d.lastCall,cls=[o.id===d.staffRecommendation?'recommended':'',calls&&o.id!=='delegate'?'v2-gameday-call':''].filter(Boolean).join(' ');
     return`<button type="button" data-v2-gameday-choice="${gameEscape(o.id)}"${cls?` class="${cls}"`:''}><span>${gameEscape(o.label)}</span>${hint?`<small>${gameEscape(hint)}</small>`:''}${current?'<em>Last drive</em>':''}</button>`
   };
-  return`<div class="v2-gameday-decision" data-decision-type="${gameEscape(d.type)}"><div class="eyebrow">${gameEscape(V2_GAMEDAY_DECISION_TITLES[d.type]||'HEAD COACH DECISION')}</div><h3>${gameEscape(d.situation)}</h3><div class="muted">Staff recommendation: <strong>${gameEscape(staff)}</strong>${d.reason?` (${gameEscape(d.reason)})`:''}${win!=null?` · Win chance now <strong>${win}%</strong>`:''}</div><div class="button-row${calls?' v2-gameday-calls':''}">${d.options.map(option).join('')}</div></div>`
+  return`<div class="v2-gameday-decision" data-decision-type="${gameEscape(d.type)}">${d.type==='fourth_down'?(globalThis.DynastyArt?.img('goalposts','dl-art dl-art-decision')||''):''}<div class="eyebrow">${gameEscape(V2_GAMEDAY_DECISION_TITLES[d.type]||'HEAD COACH DECISION')}</div><h3>${gameEscape(d.situation)}</h3><div class="muted">Staff recommendation: <strong>${gameEscape(staff)}</strong>${d.reason?` (${gameEscape(d.reason)})`:''}${win!=null?` · Win chance now <strong>${win}%</strong>`:''}</div><div class="button-row${calls?' v2-gameday-calls':''}">${d.options.map(option).join('')}</div></div>`
 }
 // The field: where the ball is, which way the offense is going and where the first down is. Home defends the right
 // end zone, so the home offense drives left to right.
@@ -16583,7 +16631,7 @@ function renderV2InteractiveGameDay(){
   if(!ctx||!api){host.innerHTML=`<div class="muted">${typeof openingPreseason==='function'&&openingPreseason()?'Choose Begin Season in This Week to open your first matchup.':'Your next scheduled game will appear here.'}</div>`;return}
   if(!v2InteractiveGameDay){
     const lockAttr=(hasPendingCareerChoice()||hasPendingWeeklyDecisions())?' disabled title="Resolve the Coach’s Desk decisions before playing this week."':'';
-    host.innerHTML=`<div class="section-head"><div><div class="eyebrow">LIVE GAME DAY</div><h3>Coach the next game live</h3><div class="muted">${lockAttr?'Resolve this week’s Coach’s Desk decisions in This Week first.':'Call every drive and the big defensive downs, or stop only for the big moments. The result counts as soon as the game ends.'}</div></div><div class="button-row"><button type="button" data-v2-gameday-start class="bi-primary"${lockAttr}>Coach It Live</button><button type="button" data-v2-gameday-moments${lockAttr}>Coach big moments</button></div></div>`;
+    host.innerHTML=`<div class="section-head has-art">${globalThis.DynastyArt?.img('coin-toss','dl-art dl-art-head')||''}<div><div class="eyebrow">LIVE GAME DAY</div><h3>Coach the next game live</h3><div class="muted">${lockAttr?'Resolve this week’s Coach’s Desk decisions in This Week first.':'Call every drive and the big defensive downs, or stop only for the big moments. The result counts as soon as the game ends.'}</div></div><div class="button-row"><button type="button" data-v2-gameday-start class="bi-primary"${lockAttr}>Coach It Live</button><button type="button" data-v2-gameday-moments${lockAttr}>Coach big moments</button></div></div>`;
     host.querySelector('[data-v2-gameday-moments]').onclick=()=>{try{v2GameDayUIStartBigMoments()}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}};
     host.querySelector('[data-v2-gameday-start]').onclick=()=>{try{v2GameDayUIAssertStartable();v2GameDayUIPrepare()}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}};return
   }
@@ -18875,7 +18923,25 @@ globalThis.DynastyLivingWorldSnapshot=Object.freeze({
 // v0.20 — the offseason used to be seven presses of the same button. Three of its stages hold a real decision, and the
 // Next button on This Week now stops once before each of them to say what is at stake and offer the way to act on it.
 // Only that button stops: the Offseason screen's own controls, Sim Season and the engine advance as before.
-const OFFSEASON_STOP_PHASES=['departures','signing','portal'];
+const OFFSEASON_STOP_PHASES=['departures','signing','portal','spring'];
+// v0.26 — portal day. When the portal is resolved, each outcome that touches the coach's program is kept in
+// universe.portalDay (players leaving first, arrivals last). The stop before spring practice announces them one at a
+// time, the way signing day is announced. Every move was already made; announcing changes nothing.
+function portalDayLeft(){const d=universe?.portalDay;return d&&d.year===universe.year?d.board.slice(d.revealed||0):[]}
+function portalDayShown(){const d=universe?.portalDay;return d&&d.year===universe.year?d.board.slice(0,d.revealed||0):[]}
+function revealNextPortal(){const d=universe?.portalDay;if(!d||d.year!==universe.year||(d.revealed||0)>=d.board.length)return null;d.revealed=(d.revealed||0)+1;return d.board[d.revealed-1]}
+function portalDayLine(x){
+ const who=`${gameEscape(x.pos)} ${gameEscape(x.name)}`;
+ if(x.kind==='in')return{good:true,who,what:`joins from ${gameEscape(x.from)}`};
+ if(x.kind==='out')return{good:false,who,what:`leaves for ${gameEscape(x.to)}`};
+ if(x.kind==='returned')return{good:true,who,what:'found no landing spot and stays'};
+ return{good:false,who,what:'found no landing spot and leaves football'};
+}
+function portalRevealHTML(){
+ const shown=portalDayShown(),left=portalDayLeft().length;
+ const row=x=>{const l=portalDayLine(x);return`<li class="signing-${l.good?'good':'bad'}"><span>${l.who}</span><strong>${l.what}</strong></li>`};
+ return`<ol class="offseason-signing" aria-live="polite">${shown.map(row).join('')}</ol>${left?`<div class="button-row"><button type="button" class="bi-primary" data-offseason-portal="next">Announce the next move</button><button type="button" data-offseason-portal="all">Announce the rest</button></div>`:''}`;
+}
 // Signing day entries still to be announced that involve the coach's program, either as the school he committed to
 // or as the one trying to flip him. The outcome of each was decided and stored when the board was built.
 function mySigningDayLeft(t){
@@ -18930,7 +18996,27 @@ function offseasonStopFacts(phase,t){
    text:`You have not pursued any of them. You have ${portalAttentionLeft()} attention to spend on calls, pitches and visits. Left alone, your staff take whoever fits and is still available.`,
    act:{label:'Work the portal',tab:'offseason'},go:'Let the staff handle it'};
  }
+ if(phase==='spring'){
+  const d=universe.portalDay;if(!d||d.year!==universe.year||!d.board.length)return null;
+  const left=portalDayLeft().length,shown=portalDayShown();
+  if(left)return{title:`${d.board.length} portal decision${d.board.length===1?' involves':'s involve'} your program`,
+   text:`The transfer portal has closed. Players leaving are announced first and new arrivals last. Every move is already made; announce them one at a time, then start spring practice.`,
+   act:{label:'See the roster',tab:'roster'},go:'Start spring practice',portal:true};
+  const joined=shown.filter(x=>x.kind==='in').length,lost=shown.filter(x=>x.kind==='out'||x.kind==='left').length,stayed=shown.filter(x=>x.kind==='returned').length;
+  return{title:`Portal day: ${joined} joined, ${lost} left`,text:`${stayed?`${stayed} found no landing spot and stay${stayed===1?'s':''}. `:''}Your roster for spring practice is set.`,
+   act:{label:'See the roster',tab:'roster'},go:'Start spring practice',portal:true};
+ }
  return null;
+}
+// v0.26: the portal is resolved by the press that follows its stop, so the portal day opens straight after it.
+function offseasonStopAfterAdvance(){
+ try{
+  if(universe?.phase!=='complete'||commissionerMode?.())return false;
+  const phase=normalizeOffseasonState().phase,state=offseasonStopState();
+  if(phase!=='spring'||state.seen.spring||!portalDayLeft().length)return false;
+  state.seen.spring=true;state.open='spring';renderOffseasonStop();
+  setStatus(`${universe.portalDay.board.length} portal decisions involve your program.`);return true;
+ }catch(err){console.error(err);return false}
 }
 // True when the press was used to show a stop instead of advancing.
 function offseasonStopBeforeAdvance(){
@@ -18952,21 +19038,28 @@ function renderOffseasonStop(){
  if(!facts){if(state&&state.open&&state.open!==phase)state.open=null;card?.remove();return}
  if(!card){card=document.createElement('section');card.id='offseasonStop';card.className='offseason-stop';card.setAttribute('role','region');card.setAttribute('aria-label','Offseason decision');host.insertAdjacentElement('beforebegin',card)}
  const t=selected(),signing=facts.signing||(open==='signing'&&universe.signingDay?.year===universe.year&&universe.signingDay.board.slice(0,universe.signingDay.revealed).some(x=>x.from===t?.name||x.challenger===t?.name));
- card.innerHTML=`${globalThis.DynastyArt?.img(globalThis.DynastyArt.stopKey(open),'dl-art dl-art-stop')||''}<div class="eyebrow">${signing?'SIGNING DAY':'BEFORE YOU MOVE ON'}</div><h3>${gameEscape(facts.title)}</h3><p>${gameEscape(facts.text)}</p>${signing?signingRevealHTML(t):''}<div class="button-row"><button type="button" class="bi-primary" data-offseason-stop-act>${gameEscape(facts.act.label)}</button><button type="button" data-offseason-stop-go>${gameEscape(facts.go)}</button></div>`;
+ card.innerHTML=`${globalThis.DynastyArt?.img(globalThis.DynastyArt.stopKey(open),'dl-art dl-art-stop')||''}<div class="eyebrow">${signing?'SIGNING DAY':facts.portal?'PORTAL DAY':'BEFORE YOU MOVE ON'}</div><h3>${gameEscape(facts.title)}</h3><p>${gameEscape(facts.text)}</p>${signing?signingRevealHTML(t):''}${facts.portal?portalRevealHTML():''}<div class="button-row"><button type="button" class="bi-primary" data-offseason-stop-act>${gameEscape(facts.act.label)}</button><button type="button" data-offseason-stop-go>${gameEscape(facts.go)}</button></div>`;
  card.querySelector('[data-offseason-stop-act]').onclick=()=>goToTab(facts.act.tab);
  card.querySelectorAll('[data-offseason-sign]').forEach(b=>b.onclick=()=>{
   if(b.dataset.offseasonSign==='all'){for(let i=0;i<40&&mySigningDayLeft(t).length;i++)revealNextSigning()}else revealNextSigning();
   autosaveAfter('management');renderOffseasonStop();if(typeof renderSigningDay==='function')renderSigningDay();
   card.querySelector('[data-offseason-sign="next"]')?.focus();
  });
+ card.querySelectorAll('[data-offseason-portal]').forEach(b=>b.onclick=()=>{
+  if(b.dataset.offseasonPortal==='all'){for(let i=0;i<80&&portalDayLeft().length;i++)revealNextPortal()}else revealNextPortal();
+  autosaveAfter('management');renderOffseasonStop();
+  card.querySelector('[data-offseason-portal="next"]')?.focus();
+ });
  // The stop is spent, so pressing Next again (here or on the main button) processes the stage.
  card.querySelector('[data-offseason-stop-go]').onclick=()=>{state.open=null;card.remove();$('#hubAdvance')?.click()};
 }
 extendRender('dashboard',renderOffseasonStop);
 if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.offseasonStops=()=>JSON.parse(JSON.stringify(universe?.offseasonStops||null));
+if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.portalDay=()=>JSON.parse(JSON.stringify(universe?.portalDay||null));
 if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.offseasonStopFacts=phase=>{const t=selected();return{facts:offseasonStopFacts(phase,t),risks:t.roster.map(p=>transferRisk(p)).sort((a,b)=>b-a).slice(0,5),sch:scholarshipSummary(t),field:portalCandidates().length,targets:(ensurePortalCycle().targets||[]).length,status:ensurePortalCycle().status}};
 // The Next button's controller (next-action.js) reaches this module through one global.
 globalThis.DynastyOffseasonStop=offseasonStopBeforeAdvance;
+globalThis.DynastyOffseasonStopAfter=offseasonStopAfterAdvance;
 // Test fixture: a signing day board on which the coach's program is contested. Every entry holds (no flip), so the
 // fixture announces decisions without moving any commitment.
 if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.signingDayFixture=(n=3)=>{
@@ -18976,6 +19069,13 @@ if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.signingDay
  const others=(universe.recruits||[]).filter(r=>r.committed&&r.committed!==t.name&&r.committed!==rival.name).slice(0,3).map(r=>entry(r,r.committed,rival.name));
  universe.signingDay={year:universe.year,board:[...others,...mine.map(r=>entry(r,t.name,rival.name)),...theirs.map(r=>entry(r,rival.name,t.name))],revealed:0};
  return universe.signingDay.board.length;
+};
+// Test fixture: a portal day of three entries from the coach's own roster (two leaving, one arriving). Entries are
+// presentation only, so the fixture moves nobody. The spring stop is re-armed so the next press opens it.
+if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.portalDayFixture=()=>{
+ const t=selected(),[a,b,c]=t.roster,other=universe.teams.find(x=>x.name!==t.name).name,e=(p,kind,from,to)=>({playerId:p.id,name:p.name,pos:p.pos,from,to,kind,reason:'Playing opportunity'});
+ universe.portalDay={year:universe.year,board:[e(a,'out',t.name,other),e(b,'returned',t.name,null),e(c,'in',other,t.name)],revealed:0};
+ const s=offseasonStopState();s.seen.spring=false;s.open=null;renderOffseasonStop();return universe.portalDay.board.length;
 };
 
 loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});[...new Set(schools.map(t=>t.conference))].forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();bindNewDynastySetup();applyTitlePreferences();showTitleScreen();refreshTitleSave().then(restoreNewDynastySetupDraft);}).catch(e=>{$('#titleStatus').textContent='Could not initialize Dynasty Lab. '+e.message});
@@ -19002,7 +19102,7 @@ loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.crea
   const KICKER={INJURY:'first-aid',MEDICAL:'first-aid',RECRUITING:'envelope-letter','TOP TARGET':'envelope-letter',WAVERING:'envelope-letter',COMMITMENT:'envelope-letter',FLIP:'envelope-letter',DECOMMIT:'envelope-letter','OFFER PULLED':'envelope-letter','RECRUITING BATTLE':'envelope-letter','SIGNING DAY':'contract-pen',SIGNED:'contract-pen',TRANSFER:'transfer-duffel',RIVALRY:'pennant','RIVALRY WEEK':'pennant',FINAL:'football',HEADLINE:'newspaper',RANKINGS:'gold-star',BOWL:'bowl-laurel','BOWL WATCH':'bowl-laurel',HONOR:'gold-medal',DRAFT:'helmet-plain',ACADEMICS:'graduation-cap','ACADEMIC WATCH':'graduation-cap','COLLEGE CAREER ENDED':'graduation-cap',ADMINISTRATION:'program-key','SEASON GOALS':'program-key',BOOSTERS:'money-bag','COACHING SEARCH':'headset','COACHING TREE':'headset',STAFF:'headset',CAREER:'plaque',ROSTER:'clipboard-blank',REDSHIRTS:'clipboard-blank','LOCKER ROOM':'locker-room','PROMISE BROKEN':'locker-room','NEXT UP':'film-reel',SEASON:'scoreboard','FAMILIAR FACE':'ribbon-rosette',MOMENTUM:'megaphone'};
   const kickerKey=k=>KICKER[String(k||'').trim().toUpperCase()]||'';
   // The three offseason stops and the top three statistical leaders.
-  const STOP={departures:'graduation-cap',signing:'contract-pen',portal:'transfer-duffel'};
+  const STOP={departures:'graduation-cap',signing:'contract-pen',portal:'transfer-duffel',spring:'transfer-duffel'};
   const stopKey=phase=>STOP[phase]||'';
   const medalKey=rank=>['gold-medal','silver-medal','bronze-medal'][rank]||'';
   root.DynastyArt={FILES,src,img,rivalryKey,facilityKey,milestoneKey,kickerKey,stopKey,medalKey};
@@ -20326,7 +20426,7 @@ function helmet(id,cls){return globalThis.DynastyBrandVisuals?.helmetHTML?.(id,c
 function art(key){return globalThis.DynastyArt?.img(key,'dl-art dl-art-ceremony')||''}
 function bodyHTML(m){
  const t=m.team,record=`${t.w}-${t.l}`;
- if(m.kind==='national')return{tone:'gold',confetti:true,html:`<div class="cer-trophy" aria-hidden="true"></div><span class="cer-kicker">${m.year} College Football</span><h2>National Champions</h2><p class="cer-team">${esc(t.name)}</p><p class="cer-sub">${record} · the last team standing</p>`};
+ if(m.kind==='national')return{tone:'gold',confetti:true,html:`<div class="cer-trophy" aria-hidden="true"></div><span class="cer-kicker">${m.year} College Football</span><h2>National Champions</h2><p class="cer-team">${esc(t.name)}</p><p class="cer-sub">${record} · the last team standing</p><div class="cer-ring" aria-hidden="true"></div>`};
  if(m.kind==='conference')return{tone:'gold',confetti:true,html:`${art('conference-crown')||helmet(t.id,'cer-helmet')}<span class="cer-kicker">${m.year} · ${esc(t.conference)}</span><h2>Conference Champions</h2><p class="cer-team">${esc(t.name)}</p><p class="cer-sub">${record} · a banner for the stadium</p>`};
  if(m.kind==='bowl')return{tone:'gold',confetti:true,html:`<div class="cer-faceoff">${helmet(t.id,'cer-helmet')}<b>${esc(m.score?.[0]??'')}–${esc(m.score?.[1]??'')}</b>${helmet(m.opponent?.id,'cer-helmet is-away')}</div>${art('bowl-laurel')}<span class="cer-kicker">${m.year} · Bowl season</span><h2>${esc(m.label)} Champions</h2><p class="cer-team">${esc(t.name)}</p><p class="cer-sub">over ${esc(m.opponent?.name||'')}</p>`};
  if(m.kind==='rivalry')return{tone:'gold',confetti:true,html:`<div class="cer-faceoff">${helmet(t.id,'cer-helmet')}<b>${esc(m.score?.[0]??'')}–${esc(m.score?.[1]??'')}</b>${helmet(m.opponent?.id,'cer-helmet is-away')}</div>${art(globalThis.DynastyArt?.rivalryKey(m.trophy))}<span class="cer-kicker">${m.year} · Rivalry game</span><h2>${m.trophy?esc(m.trophy):'Rivalry won'}</h2><p class="cer-team">${m.trophy?(m.streak>1?`stays with ${esc(t.name)}`:`comes home to ${esc(t.name)}`):`${esc(t.name)} beats ${esc(m.opponent?.name||'')}`}</p><p class="cer-sub">${m.streak>1?`${m.streak} straight over ${esc(m.opponent?.name||'')}`:`over ${esc(m.opponent?.name||'')}`}</p>`};
@@ -20910,7 +21010,7 @@ queue();
     // v0.20: three offseason stages stop once here to say what is at stake before they are processed.
     if(typeof root.DynastyOffseasonStop==='function'&&root.DynastyOffseasonStop())return;
     const key=state.guidance.forecast?.key,selector=GUIDANCE_ACTIONS[key],action=selector?doc.querySelector(selector):null;
-    if(action&&!action.disabled){action.click();return}
+    if(action&&!action.disabled){action.click();if(typeof root.DynastyOffseasonStopAfter==="function")root.DynastyOffseasonStopAfter();return}
     const tab=state.guidance.forecast?.destination?.tab;if(tab&&typeof root.goToTab==='function')root.goToTab(tab);
     return;
    }

@@ -2,7 +2,7 @@
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.25.0';
+const APP_VERSION='0.26.0';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi','Aiden','Alex','Amari','Andrew','Anthony','Antonio','Armani','Ashton','Austin','Avery','Bennett','Blake','Brady','Brandon','Brayden','Brennan','Brock','Bryson','Cade','Caden','Calvin','Cameron','Carson','Cedric','Chase','Christian','Cody','Colby','Collin','Connor','Corey','Damian','Damon','Daniel','Davion','Dawson','Deandre','Demarcus','Derek','Desmond','Dillon','Drew','Dylan','Elijah','Ethan','Ezra','Garrett','Grady','Graham','Grant','Hayden','Hunter','Ian','Isaac','Jabari','Jace','Jackson','Jacob','Jaden','Jake','Jamar','Jameson','Jared','Jarrett','Javon','Jaxon','Jay','Jermaine','Jesse','Joel','Jonah','Josiah','Julian','Justin','Kaden','Kai','Kamari','Keegan','Keenan','Kendall','Kendrick','Kevin','Kobe','Kyle','Kyler','Lamar','Landon','Lane','Lawrence','Leon','Levi','Lincoln','Lucas','Marco','Mario','Mateo','Matthew','Maurice','Max','Myles','Nate','Nathan','Nolan','Omar','Owen','Parker','Patrick','Preston','Quentin','Quincy','Reggie','Riley','Ryan','Sam','Sean','Seth','Shane','Silas','Solomon','Spencer','Sterling','Terrell','Theo','Tobias','Travis','Tristan','Troy','Tucker','Tyrese','Victor','Wade','Walker','Wes','Wyatt','Zach','Zane','Andres','Diego','Rafael','Tevita','Sione','Manu','Keoni','Kenji','Darnell'];
@@ -1534,11 +1534,27 @@ function compactGameArchive({horizon=GAME_DETAIL_HORIZON}={}){
  return {games,dropped};
 }
 
+// v0.26: real quarter-by-quarter scores. Only games whose scoring drives recorded their period (Game Engine 2 games
+// archived from v0.26) have them, and only when the drives add up to the final score; otherwise nothing is shown.
+function gameLineScore(g){
+ const drives=(g?.drives||[]).filter(d=>Number(d.points)>0);if(!drives.length||drives.some(d=>!(Number(d.q)>0)))return null;
+ const last=Math.max(4,...drives.map(d=>Number(d.q))),row=()=>Array(last).fill(0),out={periods:last,home:row(),away:row()};
+ for(const d of drives){if(!out[d.side])return null;out[d.side][Number(d.q)-1]+=Number(d.points)}
+ const sum=r=>r.reduce((n,v)=>n+v,0);if(sum(out.home)!==Number(g.score?.home)||sum(out.away)!==Number(g.score?.away))return null;
+ return out;
+}
+function gamePeriodLabel(q){q=Number(q);return q>4?(q===5?'OT':`${q-4}OT`):`Q${q}`}
+function gameLineScoreHTML(g,cls='line-score'){
+ const ls=gameLineScore(g);if(!ls)return'';
+ const head=Array.from({length:ls.periods},(_,i)=>`<th scope="col">${i<4?i+1:gamePeriodLabel(i+1)}</th>`).join('');
+ const row=side=>`<tr><th scope="row">${gameEscape(g[side]?.name||side)}</th>${ls[side].map(v=>`<td>${v}</td>`).join('')}<td class="line-score-total">${Number(g.score?.[side])||0}</td></tr>`;
+ return`<table class="${cls}" aria-label="Score by quarter"><thead><tr><th scope="col"><span class="sr-only">Team</span></th>${head}<th scope="col">T</th></tr></thead><tbody>${row('away')}${row('home')}</tbody></table>`;
+}
 function gameSummaryHTML(g){
  const winner=g.score.home>g.score.away?g.home:g.away;
- let html=`<p class="recap">${gameRecap(g).body}</p><p><strong>${gameEscape(winner.name)} wins by ${Math.abs(g.score.home-g.score.away)}.</strong> Total offense: ${gameEscape(g.away.name)} ${g.teamStats.away.passYds+g.teamStats.away.rushYds} yards; ${gameEscape(g.home.name)} ${g.teamStats.home.passYds+g.teamStats.home.rushYds} yards.</p><p class="muted">The recap above is written from this box score. Quarter-by-quarter scores, attendance and the game clock are not recorded for this game.</p>${coachingReportHTML(g)}<h3>Game leaders</h3>`;
+ let html=`<p class="recap">${gameRecap(g).body}</p><p><strong>${gameEscape(winner.name)} wins by ${Math.abs(g.score.home-g.score.away)}.</strong> Total offense: ${gameEscape(g.away.name)} ${g.teamStats.away.passYds+g.teamStats.away.rushYds} yards; ${gameEscape(g.home.name)} ${g.teamStats.home.passYds+g.teamStats.home.rushYds} yards.</p>${gameLineScoreHTML(g)||'<p class="muted">The recap above is written from this box score. Quarter-by-quarter scores, attendance and the game clock are not recorded for this game.</p>'}${coachingReportHTML(g)}<h3>Game leaders</h3>`;
  for(const side of ['away','home']){html+=`<h4>${gameEscape(g[side].name)}</h4>`;for(const [label,key] of [['Passing','passYds'],['Rushing','rushYds'],['Receiving','recYds'],['Tackles','tackles']]){const p=g.playerStats[side].slice().sort((a,b)=>(b.stats[key]||0)-(a.stats[key]||0))[0];if(p?.stats[key])html+=`<div class="lineitem"><span>${label} · ${gameEscape(p.name)}</span><strong>${p.stats[key]}${key==='tackles'?'':' yds'}</strong></div>`}}
- html+='<h3>Scoring summary</h3>';const scoring=(g.drives||[]).filter(d=>d.points);html+=scoring.length?scoring.map(d=>`<div class="lineitem"><span>${gameEscape(d.label)} · ${gameEscape(g[d.side].name)}</span><strong>${gameEscape(d.result)} +${d.points}</strong></div>`).join(''):'<p class="muted">Individual scoring plays were not retained for this simulation.</p>';
+ html+='<h3>Scoring summary</h3>';const scoring=(g.drives||[]).filter(d=>d.points);html+=scoring.length?scoring.map(d=>`<div class="lineitem"><span>${d.q?`${gamePeriodLabel(d.q)} · `:''}${gameEscape(d.label)} · ${gameEscape(g[d.side].name)}</span><strong>${gameEscape(d.result)} +${d.points}</strong></div>`).join(''):'<p class="muted">Individual scoring plays were not retained for this simulation.</p>';
  for(const s of ['away','home'])if(g.scoreAdjustment?.[s])html+=`<p class="muted">${gameEscape(g[s].name)}: ${g.scoreAdjustment[s]} additional simulation points (home-field/tiebreak adjustment; no scoring play recorded).</p>`;
  if(g.formerPlayers?.length)html+='<h3>Familiar faces</h3>'+g.formerPlayers.map(p=>`<p>${gameEscape(p.name)} appeared for ${gameEscape(p.school)} against former school ${gameEscape(p.formerSchool)}.</p>`).join('');
  html+='<h3>Injuries recorded in this game</h3>'+(g.injuries?.length?g.injuries.map(i=>`<p>${gameEscape(i.name)} · ${gameEscape(i.school)} · ${gameEscape(i.type)}, ${i.weeks} week(s)</p>`).join(''):'<p class="muted">None recorded.</p>');return html;
@@ -3096,9 +3112,19 @@ function resolveUnplacedPortal(entry){
  addToArchive(p,from,'No landing spot');
  return {outcome:'exited',team:from};
 }
+// One portal outcome for the coach's program: a player of his leaving (out), one returning or leaving football after
+// finding no landing spot, or a player arriving (in). Presentation only; the move itself is already made.
+function portalDayNote(x,destName,unplaced){
+ const pd=universe.portalDay,me=$('#userTeam')?.value;if(!pd?.collecting||!x?.p||!me)return;
+ const kind=unplaced?(unplaced==='returned'?'returned':'left'):destName===me?'in':x.from===me?'out':null;if(!kind||(kind!=='in'&&x.from!==me))return;
+ if(pd.board.some(b=>b.playerId===x.p.id))return;
+ pd.board.push({playerId:x.p.id,name:x.p.name,pos:x.p.pos,from:x.from,to:destName||null,kind,reason:transferReasonLabel(x.reason)});
+}
 function offseasonPortal(){
  const os=normalizeOffseasonState();
  if(offseasonPhaseDone('portal')){if(os.phase==='portal')os.phase='spring';return true}
+ // v0.26: every portal outcome that touches the coach's program is kept so the offseason stop can announce them in turn.
+ universe.portalDay={year:universe.year,board:[],revealed:0,collecting:true};
  // Place announced decisions before the draft or any fallback draws, exactly as the Finalize button does.
  if((universe.transferPortal||[]).some(x=>x.decision)){
   const {blocked}=resolvePortalCommitments();
@@ -3109,9 +3135,10 @@ function offseasonPortal(){
  const portal=[...(universe.transferPortal||[])];universe.transferPortal=[];
  let placedCount=universe.portalCycle?.year===universe.year?(universe.portalCycle.finalizedCount||0):0,returnedCount=0,exitedCount=0;
  portal.forEach(x=>{x.p.stats=newStats();x.p.year=CLASS_NAMES[Math.min(3,eligibilityBase(x.p))]||'SR';const dest=placeTransfer(x);
-  if(dest){placedCount++;if(x.from===controlled||dest.name===controlled)movement.push(`${x.p.pos} ${x.p.name}: ${x.from} → ${dest.name} (${transferReasonLabel(x.reason)})`);return}
+  if(dest){placedCount++;portalDayNote(x,dest.name);if(x.from===controlled||dest.name===controlled)movement.push(`${x.p.pos} ${x.p.name}: ${x.from} → ${dest.name} (${transferReasonLabel(x.reason)})`);return}
   const outcome=resolveUnplacedPortal(x);
   if(!outcome){universe.transferPortal.push(x);return}
+  portalDayNote(x,null,outcome.outcome);
   if(outcome.outcome==='returned'){returnedCount++;if(x.from===controlled)movement.push(`${x.p.pos} ${x.p.name}: no landing spot, returned to ${x.from}`)}
   else{exitedCount++;if(x.from===controlled)movement.push(`${x.p.pos} ${x.p.name}: no landing spot, left the program`)}
  });
@@ -3119,6 +3146,7 @@ function offseasonPortal(){
   universe.portalCycle.status='resolved';
   portalLog('Offseason advanced. Remaining transfers resolved.');
  }
+ if(universe.portalDay){const pd=universe.portalDay,order={out:0,returned:1,left:2,in:3};pd.board.sort((x,y)=>order[x.kind]-order[y.kind]);delete pd.collecting}
  updateCareerRecords();
  movement.push(...(os.reports.review?.carouselLog||[]).filter(x=>x.includes(controlled)));
  universe.movementLog=movement.slice(0,100);
@@ -3462,6 +3490,7 @@ function resolvePortalCommitments(){
   if(os?.reports&&(entry.from===controlled||landed.name===controlled)){
    (os.reports.movement??=[]).push(`${entry.p.pos} ${entry.p.name}: ${entry.from} → ${landed.name} (${transferReasonLabel(entry.reason)})`);
   }
+  portalDayNote(entry,landed.name);
   placed.push({candidateId:entry.candidateId,playerId:entry.p.id,schoolId:landed.id});
  }
  universe.transferPortal=(universe.transferPortal||[]).filter(x=>!x.placed);

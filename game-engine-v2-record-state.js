@@ -63,6 +63,8 @@ function v2RecordArchiveText(event,names){
 function v2RecordDriveArchive(preview){
   const events=preview?.state?.events||[],names=preview?.names||{},counts={home:0,away:0},drives=[];let drive=null;
   const valid=s=>s==='home'||s==='away';
+  // v0.26: the period of the drive's score (5+ is overtime), so the archive can show real quarter-by-quarter scores.
+  const scoredIn=e=>{const q=Number(e.state?.period);if(drive&&Number.isFinite(q)&&q>0)drive.q=q};
   const finish=()=>{if(drive&&(drive.plays||drive.playByPlay.length)){if(!drive.result)drive.result='END';drives.push(drive)}drive=null};
   const start=(side,overtime=false)=>{if(valid(side))drive={side,label:`${side==='home'?'H':'A'}${++counts[side]}`,points:0,result:'',plays:0,overtime:!!overtime,playByPlay:[]}};
   for(const e of events){
@@ -72,12 +74,12 @@ function v2RecordDriveArchive(preview){
     const side=valid(e.team)?e.team:null;if(side&&(!drive||drive.side!==side)){finish();start(side,(e.state?.period||0)>4)}if(!drive)continue;
     if(['scrimmage','interception','fumble'].includes(e.type)){drive.plays++;drive.playByPlay.push(v2RecordArchiveText(e,names));if(e.type==='interception')drive.result='INT';if(e.type==='fumble')drive.result='FUMBLE'}
     else if(e.type==='coaching_decision'||e.type==='penalty'||e.type==='timeout'){drive.playByPlay.push(v2RecordArchiveText(e,names))}
-    else if(e.type==='touchdown'){drive.points+=6;drive.result='TD';drive.playByPlay.push(v2RecordArchiveText(e,names))}
-    else if(e.type==='extra_point'){if(e.made!==false)drive.points++;drive.playByPlay.push(v2RecordArchiveText(e,names))}
-    else if(e.type==='two_point'){if(e.made)drive.points+=2;drive.playByPlay.push(v2RecordArchiveText(e,names))}
-    else if(e.type==='field_goal'){if(e.made){drive.points+=3;drive.result='FG'}else drive.result='MISS';drive.playByPlay.push(v2RecordArchiveText(e,names))}
+    else if(e.type==='touchdown'){drive.points+=6;scoredIn(e);drive.result='TD';drive.playByPlay.push(v2RecordArchiveText(e,names))}
+    else if(e.type==='extra_point'){if(e.made!==false){drive.points++;scoredIn(e)}drive.playByPlay.push(v2RecordArchiveText(e,names))}
+    else if(e.type==='two_point'){if(e.made){drive.points+=2;scoredIn(e)}drive.playByPlay.push(v2RecordArchiveText(e,names))}
+    else if(e.type==='field_goal'){if(e.made){drive.points+=3;scoredIn(e);drive.result='FG'}else drive.result='MISS';drive.playByPlay.push(v2RecordArchiveText(e,names))}
     else if(e.type==='punt'){drive.result='PUNT';drive.playByPlay.push(v2RecordArchiveText(e,names))}
-    else if(e.type==='safety'){drive.points+=2;drive.result='SAFETY';drive.playByPlay.push(v2RecordArchiveText(e,names))}
+    else if(e.type==='safety'){drive.points+=2;scoredIn(e);drive.result='SAFETY';drive.playByPlay.push(v2RecordArchiveText(e,names))}
   }
   finish();return drives.slice(-40)
 }

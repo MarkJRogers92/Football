@@ -19,7 +19,7 @@
   const KICKER={INJURY:'first-aid',MEDICAL:'first-aid',RECRUITING:'envelope-letter','TOP TARGET':'envelope-letter',WAVERING:'envelope-letter',COMMITMENT:'envelope-letter',FLIP:'envelope-letter',DECOMMIT:'envelope-letter','OFFER PULLED':'envelope-letter','RECRUITING BATTLE':'envelope-letter','SIGNING DAY':'contract-pen',SIGNED:'contract-pen',TRANSFER:'transfer-duffel',RIVALRY:'pennant','RIVALRY WEEK':'pennant',FINAL:'football',HEADLINE:'newspaper',RANKINGS:'gold-star',BOWL:'bowl-laurel','BOWL WATCH':'bowl-laurel',HONOR:'gold-medal',DRAFT:'helmet-plain',ACADEMICS:'graduation-cap','ACADEMIC WATCH':'graduation-cap','COLLEGE CAREER ENDED':'graduation-cap',ADMINISTRATION:'program-key','SEASON GOALS':'program-key',BOOSTERS:'money-bag','COACHING SEARCH':'headset','COACHING TREE':'headset',STAFF:'headset',CAREER:'plaque',ROSTER:'clipboard-blank',REDSHIRTS:'clipboard-blank','LOCKER ROOM':'locker-room','PROMISE BROKEN':'locker-room','NEXT UP':'film-reel',SEASON:'scoreboard','FAMILIAR FACE':'ribbon-rosette',MOMENTUM:'megaphone'};
   const kickerKey=k=>KICKER[String(k||'').trim().toUpperCase()]||'';
   // The three offseason stops and the top three statistical leaders.
-  const STOP={departures:'graduation-cap',signing:'contract-pen',portal:'transfer-duffel'};
+  const STOP={departures:'graduation-cap',signing:'contract-pen',portal:'transfer-duffel',spring:'transfer-duffel'};
   const stopKey=phase=>STOP[phase]||'';
   const medalKey=rank=>['gold-medal','silver-medal','bronze-medal'][rank]||'';
   root.DynastyArt={FILES,src,img,rivalryKey,facilityKey,milestoneKey,kickerKey,stopKey,medalKey};

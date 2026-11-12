@@ -15,10 +15,10 @@ const key=new THREE.DirectionalLight(0xffe8c8,2.2);key.position.set(3,5,4);scene
 const rim=new THREE.DirectionalLight(0xbfd4ff,1.2);rim.position.set(-4,3,-3);scene.add(rim);
 let m;if(q.get('proc')){m=(await import('./models.js')).build(q.get('proc'))}else{m=(await new GLTFLoader().loadAsync(q.get('glb'))).scene}
 const box=new THREE.Box3().setFromObject(m);const c=box.getCenter(new THREE.Vector3());const sz=box.getSize(new THREE.Vector3());
-m.position.sub(c);const s=2/Math.max(sz.x,sz.y,sz.z);const piv=new THREE.Group();piv.add(m);piv.scale.setScalar(s);piv.rotation.y=+(q.get('turn')||0)*Math.PI/180;scene.add(piv);
+m.position.sub(c);const s=2/Math.max(sz.x,sz.y,sz.z);const piv=new THREE.Group();piv.add(m);piv.scale.setScalar(s);scene.add(piv);
 const cam=new THREE.PerspectiveCamera(22,1,0.1,100);const d=6.2;
 cam.position.set(d*Math.cos(pitch)*Math.sin(yaw),d*Math.sin(pitch),d*Math.cos(pitch)*Math.cos(yaw));cam.lookAt(0,0,0);
 piv.updateMatrixWorld(true);const sph=new THREE.Box3().setFromObject(piv).getBoundingSphere(new THREE.Sphere());
-const dist=sph.radius/Math.sin(cam.fov*Math.PI/360)*0.92;const dir=cam.position.clone().normalize();cam.position.copy(sph.center).addScaledVector(dir,dist);cam.lookAt(sph.center);cam.updateProjectionMatrix();
+sph.radius=new THREE.Box3().setFromObject(piv).getSize(new THREE.Vector3()).length()/2;const dist=sph.radius/Math.sin(cam.fov*Math.PI/360)*0.92;const dir=cam.position.clone().normalize();cam.position.copy(sph.center).addScaledVector(dir,dist);cam.lookAt(sph.center);cam.updateProjectionMatrix();piv.rotation.y=+(q.get('turn')||0)*Math.PI/180;
 r.render(scene,cam);window.DONE=true;
 </script></body></html>

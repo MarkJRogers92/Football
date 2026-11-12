@@ -1,7 +1,25 @@
 // v0.20 — the offseason used to be seven presses of the same button. Three of its stages hold a real decision, and the
 // Next button on This Week now stops once before each of them to say what is at stake and offer the way to act on it.
 // Only that button stops: the Offseason screen's own controls, Sim Season and the engine advance as before.
-const OFFSEASON_STOP_PHASES=['departures','signing','portal'];
+const OFFSEASON_STOP_PHASES=['departures','signing','portal','spring'];
+// v0.26 — portal day. When the portal is resolved, each outcome that touches the coach's program is kept in
+// universe.portalDay (players leaving first, arrivals last). The stop before spring practice announces them one at a
+// time, the way signing day is announced. Every move was already made; announcing changes nothing.
+function portalDayLeft(){const d=universe?.portalDay;return d&&d.year===universe.year?d.board.slice(d.revealed||0):[]}
+function portalDayShown(){const d=universe?.portalDay;return d&&d.year===universe.year?d.board.slice(0,d.revealed||0):[]}
+function revealNextPortal(){const d=universe?.portalDay;if(!d||d.year!==universe.year||(d.revealed||0)>=d.board.length)return null;d.revealed=(d.revealed||0)+1;return d.board[d.revealed-1]}
+function portalDayLine(x){
+ const who=`${gameEscape(x.pos)} ${gameEscape(x.name)}`;
+ if(x.kind==='in')return{good:true,who,what:`joins from ${gameEscape(x.from)}`};
+ if(x.kind==='out')return{good:false,who,what:`leaves for ${gameEscape(x.to)}`};
+ if(x.kind==='returned')return{good:true,who,what:'found no landing spot and stays'};
+ return{good:false,who,what:'found no landing spot and leaves football'};
+}
+function portalRevealHTML(){
+ const shown=portalDayShown(),left=portalDayLeft().length;
+ const row=x=>{const l=portalDayLine(x);return`<li class="signing-${l.good?'good':'bad'}"><span>${l.who}</span><strong>${l.what}</strong></li>`};
+ return`<ol class="offseason-signing" aria-live="polite">${shown.map(row).join('')}</ol>${left?`<div class="button-row"><button type="button" class="bi-primary" data-offseason-portal="next">Announce the next move</button><button type="button" data-offseason-portal="all">Announce the rest</button></div>`:''}`;
+}
 // Signing day entries still to be announced that involve the coach's program, either as the school he committed to
 // or as the one trying to flip him. The outcome of each was decided and stored when the board was built.
 function mySigningDayLeft(t){
@@ -56,7 +74,27 @@ function offseasonStopFacts(phase,t){
    text:`You have not pursued any of them. You have ${portalAttentionLeft()} attention to spend on calls, pitches and visits. Left alone, your staff take whoever fits and is still available.`,
    act:{label:'Work the portal',tab:'offseason'},go:'Let the staff handle it'};
  }
+ if(phase==='spring'){
+  const d=universe.portalDay;if(!d||d.year!==universe.year||!d.board.length)return null;
+  const left=portalDayLeft().length,shown=portalDayShown();
+  if(left)return{title:`${d.board.length} portal decision${d.board.length===1?' involves':'s involve'} your program`,
+   text:`The transfer portal has closed. Players leaving are announced first and new arrivals last. Every move is already made; announce them one at a time, then start spring practice.`,
+   act:{label:'See the roster',tab:'roster'},go:'Start spring practice',portal:true};
+  const joined=shown.filter(x=>x.kind==='in').length,lost=shown.filter(x=>x.kind==='out'||x.kind==='left').length,stayed=shown.filter(x=>x.kind==='returned').length;
+  return{title:`Portal day: ${joined} joined, ${lost} left`,text:`${stayed?`${stayed} found no landing spot and stay${stayed===1?'s':''}. `:''}Your roster for spring practice is set.`,
+   act:{label:'See the roster',tab:'roster'},go:'Start spring practice',portal:true};
+ }
  return null;
+}
+// v0.26: the portal is resolved by the press that follows its stop, so the portal day opens straight after it.
+function offseasonStopAfterAdvance(){
+ try{
+  if(universe?.phase!=='complete'||commissionerMode?.())return false;
+  const phase=normalizeOffseasonState().phase,state=offseasonStopState();
+  if(phase!=='spring'||state.seen.spring||!portalDayLeft().length)return false;
+  state.seen.spring=true;state.open='spring';renderOffseasonStop();
+  setStatus(`${universe.portalDay.board.length} portal decisions involve your program.`);return true;
+ }catch(err){console.error(err);return false}
 }
 // True when the press was used to show a stop instead of advancing.
 function offseasonStopBeforeAdvance(){
@@ -78,21 +116,28 @@ function renderOffseasonStop(){
  if(!facts){if(state&&state.open&&state.open!==phase)state.open=null;card?.remove();return}
  if(!card){card=document.createElement('section');card.id='offseasonStop';card.className='offseason-stop';card.setAttribute('role','region');card.setAttribute('aria-label','Offseason decision');host.insertAdjacentElement('beforebegin',card)}
  const t=selected(),signing=facts.signing||(open==='signing'&&universe.signingDay?.year===universe.year&&universe.signingDay.board.slice(0,universe.signingDay.revealed).some(x=>x.from===t?.name||x.challenger===t?.name));
- card.innerHTML=`${globalThis.DynastyArt?.img(globalThis.DynastyArt.stopKey(open),'dl-art dl-art-stop')||''}<div class="eyebrow">${signing?'SIGNING DAY':'BEFORE YOU MOVE ON'}</div><h3>${gameEscape(facts.title)}</h3><p>${gameEscape(facts.text)}</p>${signing?signingRevealHTML(t):''}<div class="button-row"><button type="button" class="bi-primary" data-offseason-stop-act>${gameEscape(facts.act.label)}</button><button type="button" data-offseason-stop-go>${gameEscape(facts.go)}</button></div>`;
+ card.innerHTML=`${globalThis.DynastyArt?.img(globalThis.DynastyArt.stopKey(open),'dl-art dl-art-stop')||''}<div class="eyebrow">${signing?'SIGNING DAY':facts.portal?'PORTAL DAY':'BEFORE YOU MOVE ON'}</div><h3>${gameEscape(facts.title)}</h3><p>${gameEscape(facts.text)}</p>${signing?signingRevealHTML(t):''}${facts.portal?portalRevealHTML():''}<div class="button-row"><button type="button" class="bi-primary" data-offseason-stop-act>${gameEscape(facts.act.label)}</button><button type="button" data-offseason-stop-go>${gameEscape(facts.go)}</button></div>`;
  card.querySelector('[data-offseason-stop-act]').onclick=()=>goToTab(facts.act.tab);
  card.querySelectorAll('[data-offseason-sign]').forEach(b=>b.onclick=()=>{
   if(b.dataset.offseasonSign==='all'){for(let i=0;i<40&&mySigningDayLeft(t).length;i++)revealNextSigning()}else revealNextSigning();
   autosaveAfter('management');renderOffseasonStop();if(typeof renderSigningDay==='function')renderSigningDay();
   card.querySelector('[data-offseason-sign="next"]')?.focus();
  });
+ card.querySelectorAll('[data-offseason-portal]').forEach(b=>b.onclick=()=>{
+  if(b.dataset.offseasonPortal==='all'){for(let i=0;i<80&&portalDayLeft().length;i++)revealNextPortal()}else revealNextPortal();
+  autosaveAfter('management');renderOffseasonStop();
+  card.querySelector('[data-offseason-portal="next"]')?.focus();
+ });
  // The stop is spent, so pressing Next again (here or on the main button) processes the stage.
  card.querySelector('[data-offseason-stop-go]').onclick=()=>{state.open=null;card.remove();$('#hubAdvance')?.click()};
 }
 extendRender('dashboard',renderOffseasonStop);
 if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.offseasonStops=()=>JSON.parse(JSON.stringify(universe?.offseasonStops||null));
+if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.portalDay=()=>JSON.parse(JSON.stringify(universe?.portalDay||null));
 if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.offseasonStopFacts=phase=>{const t=selected();return{facts:offseasonStopFacts(phase,t),risks:t.roster.map(p=>transferRisk(p)).sort((a,b)=>b-a).slice(0,5),sch:scholarshipSummary(t),field:portalCandidates().length,targets:(ensurePortalCycle().targets||[]).length,status:ensurePortalCycle().status}};
 // The Next button's controller (next-action.js) reaches this module through one global.
 globalThis.DynastyOffseasonStop=offseasonStopBeforeAdvance;
+globalThis.DynastyOffseasonStopAfter=offseasonStopAfterAdvance;
 // Test fixture: a signing day board on which the coach's program is contested. Every entry holds (no flip), so the
 // fixture announces decisions without moving any commitment.
 if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.signingDayFixture=(n=3)=>{
@@ -102,4 +147,11 @@ if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.signingDay
  const others=(universe.recruits||[]).filter(r=>r.committed&&r.committed!==t.name&&r.committed!==rival.name).slice(0,3).map(r=>entry(r,r.committed,rival.name));
  universe.signingDay={year:universe.year,board:[...others,...mine.map(r=>entry(r,t.name,rival.name)),...theirs.map(r=>entry(r,rival.name,t.name))],revealed:0};
  return universe.signingDay.board.length;
+};
+// Test fixture: a portal day of three entries from the coach's own roster (two leaving, one arriving). Entries are
+// presentation only, so the fixture moves nobody. The spring stop is re-armed so the next press opens it.
+if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.portalDayFixture=()=>{
+ const t=selected(),[a,b,c]=t.roster,other=universe.teams.find(x=>x.name!==t.name).name,e=(p,kind,from,to)=>({playerId:p.id,name:p.name,pos:p.pos,from,to,kind,reason:'Playing opportunity'});
+ universe.portalDay={year:universe.year,board:[e(a,'out',t.name,other),e(b,'returned',t.name,null),e(c,'in',other,t.name)],revealed:0};
+ const s=offseasonStopState();s.seen.spring=false;s.open=null;renderOffseasonStop();return universe.portalDay.board.length;
 };
