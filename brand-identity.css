@@ -700,7 +700,7 @@ h3:has(>.dl-art-h3){display:flex;align-items:center;gap:8px}
 .offseason-stop>.dl-art-stop{position:absolute;top:12px;right:14px;width:84px;height:84px}
 .ceremony.is-draft .dl-art-ceremony{width:110px;height:110px}
 @media(max-width:760px){.offseason-stop:has(>.dl-art-stop){padding-right:76px}.offseason-stop>.dl-art-stop{width:56px;height:56px}}
-@media(max-width:760px){.section-head.has-art{flex-direction:row!important;flex-wrap:wrap!important;align-items:center!important}.section-head.has-art>.dl-art-head+div{flex:1 1 calc(100% - 64px)}.section-head.has-art>.dl-art-head{width:44px;height:44px}.dl-art-ceremony{width:96px;height:96px}.cer-turn{--s:96px}}
+@media(max-width:760px){.section-head.has-art{flex-direction:row!important;flex-wrap:wrap!important;align-items:center!important}.section-head.has-art>.dl-art-head+div{flex:1 1 calc(100% - 64px)}.section-head.has-art>.dl-art-head{width:44px;height:44px}.dl-art-ceremony{width:96px;height:96px}}
 
 /* v0.26 — quarter-by-quarter line score (only for games that recorded each score's quarter). */
 .line-score{border-collapse:collapse;margin:8px 0 14px;font-variant-numeric:tabular-nums;min-width:260px}
@@ -722,3 +722,4 @@ h3:has(>.dl-art-h3){display:flex;align-items:center;gap:8px}
 @keyframes cer-turn{to{background-position:calc(var(--s)*-36) 0}}
 @media(prefers-reduced-motion:reduce){.cer-turn{animation:cer-rise .9s var(--bi-ease) .2s both}}
 .motion-reduced .cer-turn{animation:none}
+@media(max-width:760px){.cer-turn{--s:96px}}

@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.26.0</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.27.0</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -3264,6 +3264,12 @@ h3:has(>.dl-art-h3){display:flex;align-items:center;gap:8px}
 .cer-ring{width:120px;height:120px;margin:6px auto 0;background:url("assets/ring-turn-v1.webp") 0 0/4320px 120px no-repeat;filter:drop-shadow(0 10px 18px rgba(0,0,0,.55)) drop-shadow(0 0 18px rgba(var(--bi-gold-rgb),.35));animation:cer-ring-turn 6s steps(36) infinite,cer-rise .9s var(--bi-ease) .25s both}
 @keyframes cer-ring-turn{to{background-position:-4320px 0}}
 @media(prefers-reduced-motion:reduce){.cer-ring{animation:none}}
+/* Turntable strips (assets/turntables, 36 frames in one row): rivalry trophies and season honors. With reduced motion the first frame, the usual three-quarter view, stays still. */
+.cer-turn{--s:132px;width:var(--s);height:var(--s);margin:0 auto 6px;background:var(--turn) 0 0/calc(var(--s)*36) var(--s) no-repeat;filter:drop-shadow(0 12px 20px rgba(0,0,0,.55)) drop-shadow(0 0 18px rgba(var(--bi-gold-rgb),.3));animation:cer-turn 7.2s steps(36) infinite,cer-rise .9s var(--bi-ease) .2s both}
+@keyframes cer-turn{to{background-position:calc(var(--s)*-36) 0}}
+@media(prefers-reduced-motion:reduce){.cer-turn{animation:cer-rise .9s var(--bi-ease) .2s both}}
+.motion-reduced .cer-turn{animation:none}
+@media(max-width:760px){.cer-turn{--s:96px}}
 
 /* A quiet sports briefing. The existing advance control remains the only primary action. */
 .lw-world{margin:14px 0;border-top:1px solid var(--line);padding-top:12px;min-width:0}
@@ -3504,7 +3510,7 @@ select{min-width:44px}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.26.0</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.27.0</b></span></footer>
   </div>
 </section>
 
@@ -3531,7 +3537,7 @@ select{min-width:44px}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.26.0</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.27.0</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -7480,7 +7486,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.26.0';
+const APP_VERSION='0.27.0';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi','Aiden','Alex','Amari','Andrew','Anthony','Antonio','Armani','Ashton','Austin','Avery','Bennett','Blake','Brady','Brandon','Brayden','Brennan','Brock','Bryson','Cade','Caden','Calvin','Cameron','Carson','Cedric','Chase','Christian','Cody','Colby','Collin','Connor','Corey','Damian','Damon','Daniel','Davion','Dawson','Deandre','Demarcus','Derek','Desmond','Dillon','Drew','Dylan','Elijah','Ethan','Ezra','Garrett','Grady','Graham','Grant','Hayden','Hunter','Ian','Isaac','Jabari','Jace','Jackson','Jacob','Jaden','Jake','Jamar','Jameson','Jared','Jarrett','Javon','Jaxon','Jay','Jermaine','Jesse','Joel','Jonah','Josiah','Julian','Justin','Kaden','Kai','Kamari','Keegan','Keenan','Kendall','Kendrick','Kevin','Kobe','Kyle','Kyler','Lamar','Landon','Lane','Lawrence','Leon','Levi','Lincoln','Lucas','Marco','Mario','Mateo','Matthew','Maurice','Max','Myles','Nate','Nathan','Nolan','Omar','Owen','Parker','Patrick','Preston','Quentin','Quincy','Reggie','Riley','Ryan','Sam','Sean','Seth','Shane','Silas','Solomon','Spencer','Sterling','Terrell','Theo','Tobias','Travis','Tristan','Troy','Tucker','Tyrese','Victor','Wade','Walker','Wes','Wyatt','Zach','Zane','Andres','Diego','Rafael','Tevita','Sione','Manu','Keoni','Kenji','Darnell'];
@@ -18616,7 +18622,7 @@ globalThis.DynastyRivalSnapshot=Object.freeze({
 });
 
 // Ceremony milestones read-only bridge. Engine extension: lists this season's real milestones for the
-// controlled program (titles, bowl wins, a completed signing day, draft picks). Copies only; no writes,
+// controlled program (titles, bowl wins, rivalry trophies, national awards, a completed signing day, draft picks). Copies only; no writes,
 // no time advance, no randomness.
 globalThis.DynastyCeremonySnapshot=Object.freeze({
  read(){
@@ -18629,6 +18635,9 @@ globalThis.DynastyCeremonySnapshot=Object.freeze({
    if(universe.champion===u.name&&(universe.history||[]).some(h=>h.type==='season'&&h.year===year&&h.championId===u.id))out.push({key:`${year}:national`,kind:'national',year,team});
    const rival=rivalOf(u),meet=rival&&(u.schedule||[]).find(g=>g.played&&(g.home===rival.name||g.away===rival.name));
    if(meet&&meet.winner===u.name){const home=meet.home===u.name,sc=meet.score||[0,0],streak=u.rivalry?.series?.streak||1;out.push({key:`${year}:rivalry`,kind:'rivalry',year,team,trophy:u.rivalry?.trophy||null,opponent:{id:rival.id,name:rival.name},score:[Number(sc[home?1:0])||0,Number(sc[home?0:1])||0],streak})}
+   // National awards are settled in the offseason review (finalizeSeasonHonors), before the year turns over.
+   const honors=(universe.awards?.[year]||[]).filter(a=>a&&a.team===u.name);
+   if(honors.length)out.push({key:`${year}:awards`,kind:'awards',year,team,awards:honors.map(a=>({name:a.name,playerId:a.playerId??null,playerName:a.playerName,pos:a.pos||''}))});
    const sd=universe.signingDay;
    if(sd&&sd.year===year&&sd.board?.length&&sd.revealed>=sd.board.length){
     const signed=(universe.recruits||[]).filter(r=>r.committed===u.name).sort((a,b)=>(b.stars||0)-(a.stars||0)||(a.rank||999)-(b.rank||999));
@@ -19109,7 +19118,10 @@ loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.crea
   const STOP={departures:'graduation-cap',signing:'contract-pen',portal:'transfer-duffel',spring:'transfer-duffel'};
   const stopKey=phase=>STOP[phase]||'';
   const medalKey=rank=>['gold-medal','silver-medal','bronze-medal'][rank]||'';
-  root.DynastyArt={FILES,src,img,rivalryKey,facilityKey,milestoneKey,kickerKey,stopKey,medalKey};
+  // Turntable strips (36 frames of 192px in one row) for the ceremonies, rendered by tools/blender/turntable.py.
+  const TURNS=['rivalry-anvil','rivalry-axe','rivalry-barrel','rivalry-bell','rivalry-boot','rivalry-bucket','rivalry-cannon','rivalry-jug','rivalry-lantern','rivalry-shield','rivalry-spade','player-of-year'];
+  const turnSrc=key=>TURNS.includes(key)?`assets/turntables/${key}.webp`:'';
+  root.DynastyArt={FILES,TURNS,turnSrc,src,img,rivalryKey,facilityKey,milestoneKey,kickerKey,stopKey,medalKey};
 })(typeof globalThis!=='undefined'?globalThis:this);
 
 (() => {
@@ -20402,7 +20414,7 @@ function mount(){
 return{highlightsHTML,yearbookHTML,openYearbook,mount};
 });
 
-// Ceremonies: the big beats of a dynasty get a moment on screen.
+// Ceremonies: the big beats of a dynasty get a moment on screen (titles, bowls, rivalry trophies, national awards, signing day, the draft).
 // A ceremony plays only when a real milestone (DynastyCeremonySnapshot) appears during this session, so
 // loading a save never replays old ones. Presentation only: no saves, no randomness, nothing advanced.
 (function(root,factory){
@@ -20412,7 +20424,7 @@ return{highlightsHTML,yearbookHTML,openYearbook,mount};
 })(typeof window!=='undefined'?window:this,function(){
 'use strict';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const ORDER={national:0,conference:1,bowl:2,rivalry:3,signing:4,draft:5};
+const ORDER={national:0,conference:1,bowl:2,rivalry:3,awards:4,signing:5,draft:6};
 // Milestones that are new since the previous snapshot, biggest first. A missing baseline, another
 // program or another season means "just loaded or switched": nothing is new, so old milestones never replay.
 function newMilestones(prev,next){
@@ -20428,12 +20440,16 @@ function confettiHTML(n=56){
 const stars=n=>'★'.repeat(Math.max(0,Math.min(5,Number(n)||0)));
 function helmet(id,cls){return globalThis.DynastyBrandVisuals?.helmetHTML?.(id,cls)||''}
 function art(key){return globalThis.DynastyArt?.img(key,'dl-art dl-art-ceremony')||''}
+// A turning version of the art when there is a turntable strip for it (assets/turntables), else the still.
+function turn(key){const src=globalThis.DynastyArt?.turnSrc?.(key);return src?`<div class="cer-turn" style="--turn:url('${esc(src)}')" aria-hidden="true"></div>`:art(key)}
+const face=a=>a.playerId==null?'':`<canvas class="portrait portrait-list" width="44" height="44" data-portrait="${esc(a.playerId)}" data-portrait-size="44" data-portrait-frame="list" data-portrait-kind="player" aria-hidden="true"></canvas>`;
 function bodyHTML(m){
  const t=m.team,record=`${t.w}-${t.l}`;
  if(m.kind==='national')return{tone:'gold',confetti:true,html:`<div class="cer-trophy" aria-hidden="true"></div><span class="cer-kicker">${m.year} College Football</span><h2>National Champions</h2><p class="cer-team">${esc(t.name)}</p><p class="cer-sub">${record} · the last team standing</p><div class="cer-ring" aria-hidden="true"></div>`};
  if(m.kind==='conference')return{tone:'gold',confetti:true,html:`${art('conference-crown')||helmet(t.id,'cer-helmet')}<span class="cer-kicker">${m.year} · ${esc(t.conference)}</span><h2>Conference Champions</h2><p class="cer-team">${esc(t.name)}</p><p class="cer-sub">${record} · a banner for the stadium</p>`};
  if(m.kind==='bowl')return{tone:'gold',confetti:true,html:`<div class="cer-faceoff">${helmet(t.id,'cer-helmet')}<b>${esc(m.score?.[0]??'')}–${esc(m.score?.[1]??'')}</b>${helmet(m.opponent?.id,'cer-helmet is-away')}</div>${art('bowl-laurel')}<span class="cer-kicker">${m.year} · Bowl season</span><h2>${esc(m.label)} Champions</h2><p class="cer-team">${esc(t.name)}</p><p class="cer-sub">over ${esc(m.opponent?.name||'')}</p>`};
- if(m.kind==='rivalry')return{tone:'gold',confetti:true,html:`<div class="cer-faceoff">${helmet(t.id,'cer-helmet')}<b>${esc(m.score?.[0]??'')}–${esc(m.score?.[1]??'')}</b>${helmet(m.opponent?.id,'cer-helmet is-away')}</div>${art(globalThis.DynastyArt?.rivalryKey(m.trophy))}<span class="cer-kicker">${m.year} · Rivalry game</span><h2>${m.trophy?esc(m.trophy):'Rivalry won'}</h2><p class="cer-team">${m.trophy?(m.streak>1?`stays with ${esc(t.name)}`:`comes home to ${esc(t.name)}`):`${esc(t.name)} beats ${esc(m.opponent?.name||'')}`}</p><p class="cer-sub">${m.streak>1?`${m.streak} straight over ${esc(m.opponent?.name||'')}`:`over ${esc(m.opponent?.name||'')}`}</p>`};
+ if(m.kind==='rivalry')return{tone:'gold',confetti:true,html:`<div class="cer-faceoff">${helmet(t.id,'cer-helmet')}<b>${esc(m.score?.[0]??'')}–${esc(m.score?.[1]??'')}</b>${helmet(m.opponent?.id,'cer-helmet is-away')}</div>${turn(globalThis.DynastyArt?.rivalryKey(m.trophy))}<span class="cer-kicker">${m.year} · Rivalry game</span><h2>${m.trophy?esc(m.trophy):'Rivalry won'}</h2><p class="cer-team">${m.trophy?(m.streak>1?`stays with ${esc(t.name)}`:`comes home to ${esc(t.name)}`):`${esc(t.name)} beats ${esc(m.opponent?.name||'')}`}</p><p class="cer-sub">${m.streak>1?`${m.streak} straight over ${esc(m.opponent?.name||'')}`:`over ${esc(m.opponent?.name||'')}`}</p>`};
+ if(m.kind==='awards'){const list=m.awards||[],top=list[0];if(!top)return null;const one=list.length===1;return{tone:'gold',confetti:true,html:`${turn('player-of-year')}<span class="cer-kicker">${m.year} · Season honors</span><h2>${one?esc(top.name):'Award Winners'}</h2><p class="cer-team">${one?`${esc(top.playerName)} · ${esc(t.name)}`:`${esc(t.name)} · ${list.length} national awards`}</p>${one?`<p class="cer-sub">${esc(top.pos==='HC'?'Head coach':top.pos)}</p>`:`<ol class="cer-list">${list.map((a,i)=>`<li style="--i:${i}">${face(a)}<span><b>${esc(a.playerName)}</b><small>${esc(a.pos)} · ${esc(a.name)}</small></span></li>`).join('')}</ol>`}`}}
  if(m.kind==='signing'){const [s5,s4,s3]=m.stars||[0,0,0];return{tone:'team',confetti:false,html:`${art('signing-cap')}<span class="cer-kicker">${m.year} · Signing Day</span><h2>The Class Is In</h2><p class="cer-team">${esc(t.name)} signs ${m.count}</p><div class="cer-stars"><span><b>${s5}</b>5★</span><span><b>${s4}</b>4★</span><span><b>${s3}</b>3★</span></div><ol class="cer-list">${(m.top||[]).map((r,i)=>`<li style="--i:${i}"><canvas class="portrait portrait-list" width="44" height="44" data-portrait="${esc(r.id)}" data-portrait-size="44" data-portrait-frame="list" data-portrait-kind="recruit" aria-hidden="true"></canvas><span><b>${esc(r.name)}</b><small>${esc(r.pos)} · ${stars(r.stars)}</small></span></li>`).join('')}</ol>`}}
  if(m.kind==='draft')return{tone:'team',confetti:false,html:`${art('helmet-plain')}<span class="cer-kicker">${m.year} · Draft Night</span><h2>Your Players Go Pro</h2><p class="cer-team">${esc(t.name)} · ${m.picks.length} drafted</p><ol class="cer-list">${m.picks.map((p,i)=>`<li style="--i:${i}"><span class="cer-pick">R${esc(p.round)}<small>#${esc(p.pick)}</small></span><span><b>${esc(p.name)}</b><small>${esc(p.pos)} · ${esc(p.label)}</small></span></li>`).join('')}</ol>`};
  return null;
