@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **Every rivalry trophy has its own art.** Rivalry trophies named after an axe, jug, barrel, anvil, spade, bucket or cannon now show that trophy in Rival Watch and the rivalry ceremony; before, they all borrowed the shield. The seven new pieces were modelled and rendered in Blender (`tools/blender/rivalry_trophies.py`), about 70 KB.
+
 ## v0.26.0 — Portal day, real quarter scores
 
 - **Portal day.** When the transfer portal closes, the Next button stops before spring practice and announces every move that touches your program, one at a time: your players leaving first, then anyone who found no landing spot, then your new arrivals. "Announce the rest" shows them all, and the card ends with how many joined and how many left. Every move was already made when the portal was resolved; announcing them changes nothing.

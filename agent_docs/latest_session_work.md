@@ -1,5 +1,9 @@
 # Latest Session Work
 
+## Unreleased: rivalry trophy art from Blender — 2026-11-12
+
+- Seven sprites `assets/awards/rivalry-{axe,jug,barrel,anvil,spade,bucket,cannon}.webp`, so every noun in `TROPHY_NOUNS` (`app.js`) has art; `DynastyArt.rivalryKey` in `program-art.js` maps them (shield is still the fallback). Built without Meshy (credits spent): modelled in code with Blender 5.0.1 as a Python module and rendered with Cycles, see `tools/blender/README.md`. Re-run `npm run build` after changing anything under `assets/` (`sw.js` lists it).
+
 ## v0.26.0 portal day, quarter scores, art — 2026-11-12
 
 - Portal day (handoff item 3, portal half): `offseasonPortal` in `app.js` opens `universe.portalDay={year,board,revealed}` and `portalDayNote` records each outcome touching the coach (kinds out, returned, left, in; sorted in that order), including commitments placed by `resolvePortalCommitments` during the advance. `offseason-stops.js` adds a `spring` stop that announces them (`revealNextPortal`, `portalRevealHTML`); `offseasonStopAfterAdvance` (called by `next-action.js` right after the advance) opens it straight after the portal resolves. Presentation only. Fixture: `__DL_TEST__.portalDayFixture()`; test `tests/portal-day-stop-browser.js`.
