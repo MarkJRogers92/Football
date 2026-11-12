@@ -1,5 +1,5 @@
 // Ceremony milestones read-only bridge. Engine extension: lists this season's real milestones for the
-// controlled program (titles, bowl wins, a completed signing day, draft picks). Copies only; no writes,
+// controlled program (titles, bowl wins, rivalry trophies, national awards, a completed signing day, draft picks). Copies only; no writes,
 // no time advance, no randomness.
 globalThis.DynastyCeremonySnapshot=Object.freeze({
  read(){
@@ -12,6 +12,9 @@ globalThis.DynastyCeremonySnapshot=Object.freeze({
    if(universe.champion===u.name&&(universe.history||[]).some(h=>h.type==='season'&&h.year===year&&h.championId===u.id))out.push({key:`${year}:national`,kind:'national',year,team});
    const rival=rivalOf(u),meet=rival&&(u.schedule||[]).find(g=>g.played&&(g.home===rival.name||g.away===rival.name));
    if(meet&&meet.winner===u.name){const home=meet.home===u.name,sc=meet.score||[0,0],streak=u.rivalry?.series?.streak||1;out.push({key:`${year}:rivalry`,kind:'rivalry',year,team,trophy:u.rivalry?.trophy||null,opponent:{id:rival.id,name:rival.name},score:[Number(sc[home?1:0])||0,Number(sc[home?0:1])||0],streak})}
+   // National awards are settled in the offseason review (finalizeSeasonHonors), before the year turns over.
+   const honors=(universe.awards?.[year]||[]).filter(a=>a&&a.team===u.name);
+   if(honors.length)out.push({key:`${year}:awards`,kind:'awards',year,team,awards:honors.map(a=>({name:a.name,playerId:a.playerId??null,playerName:a.playerName,pos:a.pos||''}))});
    const sd=universe.signingDay;
    if(sd&&sd.year===year&&sd.board?.length&&sd.revealed>=sd.board.length){
     const signed=(universe.recruits||[]).filter(r=>r.committed===u.name).sort((a,b)=>(b.stars||0)-(a.stars||0)||(a.rank||999)-(b.rank||999));

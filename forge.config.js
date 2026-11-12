@@ -6,7 +6,7 @@ module.exports = {
     asar: true,
     appBundleId: 'com.electron.dynasty-lab',
     ignore: [
-      /^\/(?:\.git|\.github|\.pages|docs|tests|tools|node_modules)(?:\/|$)/,
+      /^\/(?:\.git|\.github|\.pages|\.blender-venv|docs|tests|tools|node_modules)(?:\/|$)/,
     ],
     // macOS will abort a modified Electron bundle whose inherited signature is
     // no longer valid. This local ad-hoc signature makes the Alpha launchable;

@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.27.0 — Trophies that turn, honors and art everywhere
+
+- **Every rivalry trophy has its own art.** Rivalry trophies named after an axe, jug, barrel, anvil, spade, bucket or cannon now show that trophy in Rival Watch and the rivalry ceremony; before, they all borrowed the shield. The seven new pieces were modelled and rendered in Blender (`tools/blender/rivalry_trophies.py`), about 70 KB.
+- **More stories in The Wire have a picture.** A hard hat when a facility level opens, a compass when a recruit goes elsewhere (lost, cut or flipped), a dumbbell when a player's development pays off, a mile marker for career milestones, and a podium for record chases and broken records. New coaches and recruiting fallout use the headset and the envelope. Also modelled in Blender (`tools/blender/props.py`), about 50 KB.
+- **Season stories have pictures.** The season story cards on the home dashboard now carry art like The Wire does: the conference crown for the conference race, scales for a role battle, a seedling for an emerging player, a cornerstone for a cornerstone player, a dumbbell for development, a gold star for a breakout, and the existing first aid kit, locker room, megaphone, envelope and contract.
+- **Every card heading has art,** except the four stat leader cards, which already show medals: offensive and defensive identity, the coaching tree, schedule and results, training plans, camp risers, position battles, development candidates, the transfer log, program records, the player archive and the game archive among them.
+- **Rivalry trophies turn.** Winning a rivalry game shows the trophy turning slowly on the ceremony card, like the championship ring does, for all ten trophies and the shield. With reduced motion it stays still.
+- **A ceremony for national awards.** When your players win a national award (Player of the Year, the position awards, Freshman of the Year) or you are Coach of the Year, a ceremony names them, with the Player of the Year statue turning above. It comes after the rivalry ceremony and before signing day.
+- Six more Blender pieces for these: scales, a chalkboard play, a bonsai coaching tree, a seedling, a cornerstone with a trowel and a file cabinet (about 60 KB).
+
+Saves carry over.
+
 ## v0.26.0 — Portal day, real quarter scores
 
 - **Portal day.** When the transfer portal closes, the Next button stops before spring practice and announces every move that touches your program, one at a time: your players leaving first, then anyone who found no landing spot, then your new arrivals. "Announce the rest" shows them all, and the card ends with how many joined and how many left. Every move was already made when the portal was resolved; announcing them changes nothing.

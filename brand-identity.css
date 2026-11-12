@@ -717,3 +717,9 @@ h3:has(>.dl-art-h3){display:flex;align-items:center;gap:8px}
 .cer-ring{width:120px;height:120px;margin:6px auto 0;background:url("assets/ring-turn-v1.webp") 0 0/4320px 120px no-repeat;filter:drop-shadow(0 10px 18px rgba(0,0,0,.55)) drop-shadow(0 0 18px rgba(var(--bi-gold-rgb),.35));animation:cer-ring-turn 6s steps(36) infinite,cer-rise .9s var(--bi-ease) .25s both}
 @keyframes cer-ring-turn{to{background-position:-4320px 0}}
 @media(prefers-reduced-motion:reduce){.cer-ring{animation:none}}
+/* Turntable strips (assets/turntables, 36 frames in one row): rivalry trophies and season honors. With reduced motion the first frame, the usual three-quarter view, stays still. */
+.cer-turn{--s:132px;width:var(--s);height:var(--s);margin:0 auto 6px;background:var(--turn) 0 0/calc(var(--s)*36) var(--s) no-repeat;filter:drop-shadow(0 12px 20px rgba(0,0,0,.55)) drop-shadow(0 0 18px rgba(var(--bi-gold-rgb),.3));animation:cer-turn 7.2s steps(36) infinite,cer-rise .9s var(--bi-ease) .2s both}
+@keyframes cer-turn{to{background-position:calc(var(--s)*-36) 0}}
+@media(prefers-reduced-motion:reduce){.cer-turn{animation:cer-rise .9s var(--bi-ease) .2s both}}
+.motion-reduced .cer-turn{animation:none}
+@media(max-width:760px){.cer-turn{--s:96px}}
