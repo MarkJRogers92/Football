@@ -3,6 +3,8 @@
 ## Unreleased: rivalry trophy art from Blender — 2026-11-12
 
 - Seven sprites `assets/awards/rivalry-{axe,jug,barrel,anvil,spade,bucket,cannon}.webp`, so every noun in `TROPHY_NOUNS` (`app.js`) has art; `DynastyArt.rivalryKey` in `program-art.js` maps them (shield is still the fallback). Built without Meshy (credits spent): modelled in code with Blender 5.0.1 as a Python module and rendered with Cycles, see `tools/blender/README.md`. Re-run `npm run build` after changing anything under `assets/` (`sw.js` lists it).
+- The Wire: `KICKER` in `program-art.js` now covers FACILITIES (hard-hat), LOST/CUT/FLIPPED (compass), PAYOFF (dumbbell), MILESTONE (milestone-marker), RECORD WATCH/SCHOOL RECORD/NATIONAL RECORD (podium), COACH ARRIVAL (headset) and RECRUITING FALLOUT (envelope-letter). New sprites from `tools/blender/props.py`; shared helpers moved to `tools/blender/lib.py` (re-rendering the rivalry set reproduces the committed files). Still without art: CONFERENCE RACE and DEVELOPMENT, which are living-world stories, not Wire items.
+- Cloud environment "Football" (personal) installs Blender into `.blender-venv/` at session start; API keys were not copied to it.
 
 ## v0.26.0 portal day, quarter scores, art — 2026-11-12
 

@@ -3,6 +3,7 @@
 ## Unreleased
 
 - **Every rivalry trophy has its own art.** Rivalry trophies named after an axe, jug, barrel, anvil, spade, bucket or cannon now show that trophy in Rival Watch and the rivalry ceremony; before, they all borrowed the shield. The seven new pieces were modelled and rendered in Blender (`tools/blender/rivalry_trophies.py`), about 70 KB.
+- **More stories in The Wire have a picture.** A hard hat when a facility level opens, a compass when a recruit goes elsewhere (lost, cut or flipped), a dumbbell when a player's development pays off, a mile marker for career milestones, and a podium for record chases and broken records. New coaches and recruiting fallout use the headset and the envelope. Also modelled in Blender (`tools/blender/props.py`), about 50 KB.
 
 ## v0.26.0 — Portal day, real quarter scores
 

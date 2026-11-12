@@ -6,7 +6,8 @@ primitives, lathes and extruded profiles, renders them with Cycles and writes th
 
 ## Setup
 
-The `bpy` wheel is Blender itself as a Python module; it needs Python 3.11 and has no GUI.
+The personal cloud environment "Football" runs this at the start of every session, so there it is
+already done. Elsewhere, set it up once. The `bpy` wheel is Blender itself as a Python module; it needs Python 3.11 and has no GUI.
 
 ```bash
 uv venv -p 3.11 .blender-venv
@@ -19,9 +20,12 @@ uv pip install -p .blender-venv/bin/python bpy==5.0.1 pillow
 
 | Script | Writes | Run |
 | --- | --- | --- |
+| `lib.py` | (shared) modelling helpers, materials, plinth, renderer and `main()` | |
 | `rivalry_trophies.py` | `assets/awards/rivalry-{axe,jug,barrel,anvil,spade,bucket,cannon}.webp` | `.blender-venv/bin/python tools/blender/rivalry_trophies.py [names]` |
+| `props.py` | `assets/awards/{hard-hat,compass,dumbbell,milestone-marker,podium}.webp` (The Wire) | `.blender-venv/bin/python tools/blender/props.py [names]` |
 
-A full render (512 px, 96 samples) takes about 25 seconds a model on 4 CPUs. While iterating, use
+A full render (512 px, 128 samples, the default) takes about 25 to 30 seconds a model on 4 CPUs, and
+re-running a script reproduces the committed sprites. While iterating, use
 `--samples 16 --size 384 --no-webp --png-dir <scratch dir>` and look at the PNGs: that is fast and
 leaves the assets alone. Run `npm run build` afterwards so `sw.js` lists any new file.
 
@@ -37,6 +41,6 @@ leaves the assets alone. Run `npm run build` afterwards so `sw.js` lists any new
 
 ## Adding a model
 
-Write `model_<name>(M)` using the helpers (`plinth`, `box`, `lathe`, `band`, `slab`, `tube`,
+Write `model_<name>(M)` (in an existing script or a new one ending in `main(MODELS, prefix)`) using the helpers (`plinth`, `box`, `lathe`, `band`, `slab`, `tube`,
 `sphere`, `star`) and materials in `M`, add it to `MODELS`, then render it and compare it with
 the existing sprites side by side on the app's dark background before committing.
