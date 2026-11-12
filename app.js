@@ -1548,7 +1548,7 @@ function gameLineScoreHTML(g,cls='line-score'){
  const ls=gameLineScore(g);if(!ls)return'';
  const head=Array.from({length:ls.periods},(_,i)=>`<th scope="col">${i<4?i+1:gamePeriodLabel(i+1)}</th>`).join('');
  const row=side=>`<tr><th scope="row">${gameEscape(g[side]?.name||side)}</th>${ls[side].map(v=>`<td>${v}</td>`).join('')}<td class="line-score-total">${Number(g.score?.[side])||0}</td></tr>`;
- return`<table class="${cls}" aria-label="Score by quarter"><thead><tr><th scope="col"><span class="sr-only">Team</span></th>${head}<th scope="col">T</th></tr></thead><tbody>${row('away')}${row('home')}</tbody></table>`;
+ return`<table class="${cls}" aria-label="Score by quarter"><thead><tr><th scope="col" aria-label="Team"></th>${head}<th scope="col">T</th></tr></thead><tbody>${row('away')}${row('home')}</tbody></table>`;
 }
 function gameSummaryHTML(g){
  const winner=g.score.home>g.score.away?g.home:g.away;
