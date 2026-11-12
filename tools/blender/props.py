@@ -6,7 +6,13 @@ Writes assets/awards/<name>.webp for:
     dumbbell          PAYOFF (a player's development paid off)
     milestone-marker  MILESTONE
     podium            RECORD WATCH, SCHOOL RECORD, NATIONAL RECORD
-Mapped in program-art.js (KICKER). Setup and style: tools/blender/README.md.
+    balance-scale     ROLE BATTLE (season stories), Position Battles
+    chalkboard        Offensive / Defensive / Scheme Identity
+    coaching-tree     COACHING TREE, Coaching Tree
+    seedling          EMERGING (season stories)
+    cornerstone       CORNERSTONE (season stories)
+    file-cabinet      Player Archive
+Mapped in program-art.js (KICKER) or placed in body.html. Setup and style: tools/blender/README.md.
 Run:
     .blender-venv/bin/python tools/blender/props.py [names...] [--samples N] [--png-dir DIR] [--no-webp]
 """
@@ -16,7 +22,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lib import *  # noqa: E402,F401,F403  (helpers, materials, plinth, renderer)
-from lib import TAU, main  # noqa: E402
+from lib import TAU, D, _n, main  # noqa: E402
 
 
 def extra(M):
@@ -171,9 +177,265 @@ def model_podium(M):
              0.022, M['brass'], parent=cup)
 
 
+def extra2(M):
+    """Materials for the second batch."""
+    extra(M)
+    M['slate'] = material('slate', (0.012, 0.03, 0.022), (0.03, 0.06, 0.045), (0.75, 0.9), scale=20.0,
+                          ao=0.3, bump=0.05)
+    M['chalk'] = material('chalk', (0.70, 0.70, 0.66), (0.90, 0.90, 0.86), (0.9, 1.0), scale=80.0,
+                          ao=0.0, bump=0.2)
+    M['soil'] = material('soil', (0.025, 0.015, 0.008), (0.07, 0.045, 0.025), (0.85, 1.0), scale=70.0,
+                         detail=8.0, bump=0.6)
+    M['leaf'] = material('leaf', (0.005, 0.024, 0.005), (0.018, 0.065, 0.010), (0.45, 0.6), scale=30.0,
+                         detail=8.0, ao=0.6, bump=0.6)
+    M['bark'] = material('bark', (0.04, 0.022, 0.012), (0.12, 0.075, 0.045), (0.7, 0.9), pattern='wood',
+                         scale=18.0, distortion=12.0, detail=8.0, bump=0.5, band_dir='Z')
+    # brick: a brick texture on the wall faces (x + y runs along both walls, z is up)
+    m = D.materials.new('brick')
+    m.use_nodes = True
+    nt = m.node_tree
+    bsdf = nt.nodes['Principled BSDF']
+    tc = _n(nt, 'ShaderNodeTexCoord')
+    sep = _n(nt, 'ShaderNodeSeparateXYZ')
+    nt.links.new(tc.outputs['Object'], sep.inputs[0])
+    add = _n(nt, 'ShaderNodeMath', operation='ADD')
+    nt.links.new(sep.outputs['X'], add.inputs[0])
+    nt.links.new(sep.outputs['Y'], add.inputs[1])
+    comb = _n(nt, 'ShaderNodeCombineXYZ')
+    nt.links.new(add.outputs[0], comb.inputs['X'])
+    nt.links.new(sep.outputs['Z'], comb.inputs['Y'])
+    br = _n(nt, 'ShaderNodeTexBrick')
+    br.inputs['Color1'].default_value = (0.20, 0.045, 0.02, 1)
+    br.inputs['Color2'].default_value = (0.30, 0.08, 0.035, 1)
+    br.inputs['Mortar'].default_value = (0.38, 0.35, 0.30, 1)
+    br.inputs['Scale'].default_value = 7.0
+    br.inputs['Mortar Size'].default_value = 0.018
+    br.inputs['Brick Width'].default_value = 0.5
+    br.inputs['Row Height'].default_value = 0.18
+    nt.links.new(comb.outputs[0], br.inputs['Vector'])
+    nt.links.new(br.outputs['Color'], bsdf.inputs['Base Color'])
+    bsdf.inputs['Roughness'].default_value = 0.85
+    bp = _n(nt, 'ShaderNodeBump')
+    bp.inputs['Strength'].default_value = 0.4
+    bp.inputs['Distance'].default_value = 0.02
+    inv = _n(nt, 'ShaderNodeMath', operation='SUBTRACT')
+    inv.inputs[0].default_value = 1.0
+    nt.links.new(br.outputs['Fac'], inv.inputs[1])
+    nt.links.new(inv.outputs[0], bp.inputs['Height'])
+    nt.links.new(bp.outputs['Normal'], bsdf.inputs['Normal'])
+    M['brick'] = m
+
+
+def chain(name, a, b, mat, parent=None, links=7):
+    """A row of small brass links from a to b, drawn as a thin tube with beads."""
+    tube(name, [a, tuple((x + y) / 2 for x, y in zip(a, b)), b], 0.008, mat, parent=parent)
+    for k in range(1, links):
+        t = k / links
+        sphere(name + '_bead', 0.016, tuple(x + (y - x) * t for x, y in zip(a, b)), mat, parent=parent)
+
+
+def model_balance_scale(M):
+    extra2(M)
+    lathe('base', catmull([(0, 0), (0.42, 0), (0.44, 0.04), (0.40, 0.09), (0.30, 0.12), (0.16, 0.15),
+                           (0.07, 0.20)], 3) + [(0, 0.20)], [M['walnut']], segs=64)
+    lathe('column', catmull([(0, 0.18), (0.06, 0.18), (0.05, 0.40), (0.04, 1.30), (0.05, 1.36), (0.07, 1.40),
+                             (0.05, 1.44)], 3) + [(0, 1.44)], [M['brass']], segs=40)
+    sphere('finial', 0.06, (0, 0, 1.70), M['brass'])
+    lathe('finial_stem', [(0, 1.44), (0.025, 1.44), (0.02, 1.66), (0, 1.66)], [M['brass']], segs=24)
+    tilt = math.radians(9)  # the left pan is winning
+    beam = group('beam', (0, 0, 1.47), (0, -tilt, 0))
+    slab('beam_bar', catmull([(-0.80, -0.02), (-0.4, -0.03), (0, -0.05), (0.4, -0.03), (0.80, -0.02),
+                              (0.80, 0.02), (0.4, 0.04), (0, 0.07), (-0.4, 0.04), (-0.80, 0.02)], 1),
+         0.05, [M['brass']], parent=beam, bevel=0.008)
+    star('beam_star', 0.075, 0.032, 0.02, M['navy'], parent=beam, loc=(0, -0.03, 0.0))
+    for s in (-1, 1):
+        sphere('beam_end', 0.04, (s * 0.80, 0, 0), M['brass'], parent=beam)
+    for s in (-1, 1):
+        # pans hang straight down from the beam ends, wherever the tilt puts them
+        ex = s * 0.80 * math.cos(tilt)
+        ez = 1.47 + s * 0.80 * math.sin(tilt)
+        pan_z = ez - 0.78
+        top = (ex, 0, ez - 0.02)
+        for k in range(3):
+            a = k * TAU / 3 + 0.4
+            chain('chain', top, (ex + 0.27 * math.cos(a), 0.27 * math.sin(a), pan_z + 0.09), M['brass'])
+        lathe('pan', catmull([(0, pan_z), (0.18, pan_z + 0.005), (0.28, pan_z + 0.05), (0.31, pan_z + 0.10),
+                              (0.29, pan_z + 0.10), (0.26, pan_z + 0.06), (0.16, pan_z + 0.03)], 3)
+              + [(0, pan_z + 0.025)], [M['brass']], loc=(ex, 0, 0), segs=64)
+    # a gold star weight on the heavier pan, a smaller silver one on the other
+    lz = 1.47 - 0.80 * math.sin(tilt) - 0.78
+    star('weight_l', 0.13, 0.055, 0.06, M['brass'], loc=(-0.80 * math.cos(tilt), 0, lz + 0.155), rot=(0, 0, 0))
+    rz = 1.47 + 0.80 * math.sin(tilt) - 0.78
+    star('weight_r', 0.09, 0.038, 0.05, M['silver'], loc=(0.80 * math.cos(tilt), 0, rz + 0.12))
+
+
+def model_chalkboard(M):
+    extra2(M)
+    b = group('board', (0, 0, 0.0), (math.radians(-8), 0, 0))
+    W, H, z0 = 1.6, 1.05, 0.55
+    box('slate', (W, 0.04, H), (0, 0, z0 + H / 2), M['slate'], 0.004, parent=b)
+    for (sx, sz, x, z) in ((W + 0.12, 0.08, 0, z0 - 0.02), (W + 0.12, 0.08, 0, z0 + H + 0.02),
+                           (0.08, H + 0.12, -W / 2 - 0.02, z0 + H / 2), (0.08, H + 0.12, W / 2 + 0.02, z0 + H / 2)):
+        box('frame', (sx, 0.09, sz), (x, 0, z), M['walnut'], 0.015, parent=b)
+    box('tray', (W - 0.1, 0.16, 0.035), (0, -0.09, z0 - 0.045), M['walnut'], 0.01, parent=b)
+    lathe('chalk_stick', [(0, -0.07), (0.016, -0.07), (0.016, 0.07), (0, 0.07)], [M['chalk']], parent=b,
+          loc=(0.35, -0.10, z0 - 0.01), rot=(0, math.pi / 2, 0.2), segs=12)
+    box('eraser', (0.24, 0.09, 0.07), (-0.45, -0.10, z0 + 0.0), M['navy'], 0.012, parent=b)
+    box('eraser_felt', (0.23, 0.085, 0.02), (-0.45, -0.10, z0 - 0.035), M['chalk'], 0.005, parent=b)
+    y = -0.022  # just in front of the slate
+    # offence: a line of circles; defence: triangles; routes: arrows
+    for k, x in enumerate((-0.40, -0.20, 0.0, 0.20, 0.40)):
+        lathe('o', [(0.045, -0.006), (0.065, -0.006), (0.065, 0.006), (0.045, 0.006)], [M['chalk']], parent=b,
+              loc=(x, y, z0 + 0.30), rot=(math.pi / 2, 0, 0), segs=24, closed=True)
+    for x, zz in ((-0.55, 0.62), (-0.15, 0.68), (0.25, 0.68), (0.6, 0.62)):
+        slab('tri', [(-0.06, -0.04), (0.06, -0.04), (0.0, 0.06)], 0.012, [M['chalk']], parent=b,
+             loc=(x, y, z0 + zz), bevel=0.0)
+    routes = (((-0.40, 0.36), (-0.45, 0.62), (-0.70, 0.86)), ((0.40, 0.36), (0.48, 0.60), (0.72, 0.70)),
+              ((0.0, 0.36), (0.05, 0.55), (0.30, 0.90)))
+    for pts in routes:
+        tube('route', [(px, y, z0 + pz) for px, pz in pts], 0.011, M['chalk'], parent=b)
+        (ax, az), (bx, bz) = pts[-2], pts[-1]
+        ang = math.atan2(bz - az, bx - ax)
+        slab('arrow', [(0.0, -0.045), (0.08, 0.0), (0.0, 0.045)], 0.012, [M['chalk']], parent=b,
+             loc=(bx, y, z0 + bz), rot=(0, -ang, 0), bevel=0.0)
+    # easel legs
+    for x in (-0.55, 0.55):
+        box('leg', (0.07, 0.07, 1.75), (x, 0.085, 0.86), M['walnut'], 0.012, parent=b)
+    box('back_leg', (0.07, 0.07, 1.7), (0, 0.36, 0.80), M['walnut'], 0.012, parent=b, rot=(0.34, 0, 0))
+
+
+def pot(M, parent, r=0.42, h=0.42, shape='round'):
+    """A navy glazed pot with a gold rim and soil, base at z=0; returns the soil height."""
+    if shape == 'round':
+        prof = catmull([(0, 0), (r * 0.62, 0), (r * 0.8, 0.04), (r * 0.98, h * 0.55), (r, h * 0.9),
+                        (r * 1.06, h), (r * 0.93, h)], 3) + [(r * 0.9, h * 0.85), (0, h * 0.85)]
+        lathe('pot', prof, [M['navy']], parent=parent, segs=64)
+        band('pot_rim', lambda _: r * 1.04, h - 0.035, h + 0.005, M['brass'], out=0.012, parent=parent)
+        lathe('soil', [(r * 0.92, h * 0.88), (0, h * 0.9)], [M['soil']], parent=parent, segs=64)
+        return h * 0.9
+    box('pot', (r * 2.2, r * 1.4, h), (0, 0, h / 2 + 0.05), M['navy'], 0.02, parent=parent, taper=(1.08, 1.1))
+    for sx, sy, w, d in ((0, -1, r * 2.42, 0.06), (0, 1, r * 2.42, 0.06), (-1, 0, 0.06, r * 1.58), (1, 0, 0.06, r * 1.58)):
+        box('pot_rim', (w, d, 0.04), (sx * (r * 1.21 - 0.03), sy * (r * 0.79 - 0.03), h + 0.05), M['brass'], 0.008,
+            parent=parent)
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            box('pot_foot', (0.09, 0.09, 0.06), (sx * r * 0.85, sy * r * 0.5, 0.03), M['brass'], 0.01,
+                parent=parent)
+    box('soil', (r * 2.3, r * 1.46, 0.03), (0, 0, h + 0.045), M['soil'], 0.0, parent=parent)
+    return h + 0.04
+
+
+def foliage(name, loc, size, M, parent=None, seed=0):
+    """A bonsai foliage pad: a cluster of flattened spheres."""
+    import random
+    rnd = random.Random(seed)
+    for k in range(7):
+        dx, dy = rnd.uniform(-1, 1) * size * 0.6, rnd.uniform(-1, 1) * size * 0.45
+        dz = rnd.uniform(-0.2, 0.25) * size
+        r = size * rnd.uniform(0.38, 0.55)
+        sphere(name, r, (loc[0] + dx, loc[1] + dy, loc[2] + dz), M['leaf'], parent=parent, scale=(1.2, 1.1, 0.62))
+
+
+def model_coaching_tree(M):
+    extra2(M)
+    g = group('bonsai', (0, 0, 0), (0, 0, math.radians(15)))
+    top = pot(M, g, r=0.48, h=0.30, shape='rect')
+    # trunk: an S curve built from tubes that thin as they rise
+    trunk = [(0.0, 0, top - 0.02), (0.10, 0, top + 0.25), (-0.08, 0.02, top + 0.55), (0.05, 0, top + 0.85),
+             (0.0, 0, top + 1.05)]
+    for k, rad in enumerate((0.095, 0.075, 0.058, 0.045)):
+        tube('trunk', [trunk[k], tuple((a + b) / 2 for a, b in zip(trunk[k], trunk[k + 1])), trunk[k + 1]],
+             rad, M['bark'], parent=g)
+        sphere('knot', rad, trunk[k + 1], M['bark'], parent=g)
+    sphere('root_flare', 0.13, (0, 0, top - 0.02), M['bark'], parent=g, scale=(1.3, 1.1, 0.45))
+    branches = (((0.10, 0, top + 0.25), (0.45, 0.02, top + 0.42), 0.035, (0.50, 0.0, top + 0.50), 0.36, 1),
+                ((-0.08, 0.02, top + 0.55), (-0.45, 0.0, top + 0.70), 0.03, (-0.50, 0.0, top + 0.78), 0.32, 2),
+                ((0.05, 0, top + 0.85), (0.30, -0.05, top + 0.98), 0.025, (0.30, -0.05, top + 1.04), 0.28, 3))
+    for a, b, rad, pad, size, seed in branches:
+        tube('branch', [a, ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2 + 0.05), b], rad,
+             M['bark'], parent=g)
+        foliage('pad', pad, size, M, parent=g, seed=seed)
+    foliage('crown', (0.0, 0, top + 1.13), 0.34, M, parent=g, seed=4)
+    for x, y in ((0.28, 0.12), (-0.3, -0.1), (0.15, -0.2)):
+        sphere('moss', 0.06, (x, y, top + 0.01), M['turf'], parent=g, scale=(1.4, 1.2, 0.35))
+
+
+def model_seedling(M):
+    extra2(M)
+    g = group('seedling', (0, 0, 0), (0, 0, math.radians(25)))
+    top = pot(M, g, r=0.36, h=0.48)
+    tube('stem', [(0, 0, top - 0.02), (0.02, 0, top + 0.25), (-0.02, 0, top + 0.45), (0.0, 0, top + 0.58)],
+         0.022, M['leaf'], parent=g)
+    leaf = catmull([(0, 0), (0.10, 0.06), (0.22, 0.07), (0.34, 0.03), (0.40, 0.0), (0.33, -0.035),
+                    (0.20, -0.05), (0.09, -0.04)], 2)
+
+    def curl(co):
+        co.z += 0.5 * co.x * co.x
+        co.y += 0.08 * co.x
+
+    for s, z, a in ((1, 0.55, 0.15), (-1, 0.42, 0.25)):
+        slab('leaf', leaf, 0.012, [M['leaf']], parent=g, loc=(0, 0, top + z),
+             rot=(0, -a, 0 if s > 0 else math.pi), cuts_x=(0.1, 0.2, 0.3), shape=curl, bevel=0.003)
+    # a small gold plant tag, blank
+    tag = group('tag', (-0.18, -0.12, top - 0.05), (0.12, 0.2, 0.2), g)
+    box('tag_stake', (0.025, 0.012, 0.32), (0, 0, 0.12), M['brass'], 0.004, parent=tag)
+    box('tag_plate', (0.16, 0.014, 0.10), (0, 0, 0.30), M['brass'], 0.006, parent=tag)
+
+
+def model_cornerstone(M):
+    extra2(M)
+    H = 0.95
+    box('wall_a', (1.30, 0.32, H), (-0.49, 0, H / 2), M['brick'], 0.01)
+    box('wall_b', (0.32, 0.98, H), (0, 0.65, H / 2), M['brick'], 0.01)
+    box('cap_a', (1.36, 0.38, 0.07), (-0.49, 0, H + 0.035), M['granite'], 0.012)
+    box('cap_b', (0.38, 1.0, 0.07), (0, 0.68, H + 0.035), M['granite'], 0.012)
+    box('cornerstone', (0.62, 0.62, 0.42), (-0.14, 0.14, 0.21), M['granite'], 0.015)
+    box('stone_plate', (0.30, 0.02, 0.18), (-0.18, -0.172, 0.22), M['plate'], 0.006)
+    star('stone_star', 0.06, 0.025, 0.02, M['brass'], loc=(0.172, 0.18, 0.22), rot=(0, 0, math.pi / 2))
+    # a brass trowel resting on the cap
+    t = group('trowel', (-0.55, -0.02, H + 0.075), (0, 0, math.radians(-20)))
+    slab('blade', [(0, -0.13), (0.34, 0.0), (0, 0.13)], 0.012, [M['brass']], parent=t, rot=(math.pi / 2, 0, 0),
+         loc=(0, 0, 0.008), bevel=0.003)
+    tube('shank', [(0.0, 0, 0.012), (-0.06, 0, 0.09), (-0.12, 0, 0.10)], 0.012, M['iron'], parent=t)
+    lathe('trowel_handle', catmull([(0, 0), (0.028, 0), (0.035, 0.08), (0.03, 0.17), (0, 0.18)], 2),
+          [M['hickory']], parent=t, loc=(-0.12, 0, 0.10), rot=(0, -math.pi / 2, 0), segs=20)
+
+
+def model_file_cabinet(M):
+    extra2(M)
+    W, Dp, H = 0.78, 0.82, 1.55
+    g = group('cabinet', (0, 0, 0), (0, 0, math.radians(-8)))
+    box('body', (W, Dp, H), (0, 0, H / 2 + 0.04), M['navy'], 0.02, parent=g)
+    box('top', (W + 0.05, Dp + 0.05, 0.04), (0, 0, H + 0.06), M['walnut'], 0.012, parent=g)
+    box('plinth', (W - 0.04, Dp - 0.04, 0.05), (0, 0, 0.025), M['walnut'], 0.01, parent=g)
+    dh = (H - 0.10) / 3
+    for k in range(3):
+        zc = 0.04 + 0.05 + dh * (k + 0.5)
+        pull = 0.42 if k == 2 else 0.0
+        d = group('drawer', (0, -pull, zc), (0, 0, 0), g)
+        box('front', (W - 0.08, 0.05, dh - 0.05), (0, -Dp / 2 - 0.005, 0), M['navy'], 0.012, parent=d)
+        box('label', (0.20, 0.012, 0.075), (0, -Dp / 2 - 0.034, dh * 0.22), M['brass'], 0.004, parent=d)
+        box('label_card', (0.17, 0.01, 0.05), (0, -Dp / 2 - 0.04, dh * 0.22), M['paper'], 0.002, parent=d)
+        tube('handle', [(-0.12, -Dp / 2 - 0.03, 0.0), (0, -Dp / 2 - 0.09, 0.0), (0.12, -Dp / 2 - 0.03, 0.0)],
+             0.016, M['brass'], parent=d)
+        if pull:
+            # the open drawer's sides and a row of folders
+            for sx in (-1, 1):
+                box('side', (0.03, 0.62, dh - 0.12), (sx * (W / 2 - 0.07), -Dp / 2 + 0.31, -0.02), M['navy'],
+                    0.006, parent=d)
+            for i in range(7):
+                y = -Dp / 2 + 0.08 + i * 0.075
+                col = M['paper'] if i % 2 else M['blueprint']
+                box('folder', (W - 0.2, 0.02, dh - 0.10), (0, y, 0.03), col, 0.004, parent=d, rot=(0.12, 0, 0))
+                box('tab', (0.14, 0.021, 0.05), (-0.18 + (i % 3) * 0.18, y + 0.006, 0.03 + (dh - 0.10) / 2 + 0.02),
+                    col, 0.003, parent=d, rot=(0.12, 0, 0))
+
+
 MODELS = {
     'hard-hat': model_hard_hat, 'compass': model_compass, 'dumbbell': model_dumbbell,
     'milestone-marker': model_milestone_marker, 'podium': model_podium,
+    'balance-scale': model_balance_scale, 'chalkboard': model_chalkboard, 'coaching-tree': model_coaching_tree,
+    'seedling': model_seedling, 'cornerstone': model_cornerstone, 'file-cabinet': model_file_cabinet,
 }
 
 if __name__ == '__main__':
