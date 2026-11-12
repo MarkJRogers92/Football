@@ -70,7 +70,7 @@
     // v0.20: three offseason stages stop once here to say what is at stake before they are processed.
     if(typeof root.DynastyOffseasonStop==='function'&&root.DynastyOffseasonStop())return;
     const key=state.guidance.forecast?.key,selector=GUIDANCE_ACTIONS[key],action=selector?doc.querySelector(selector):null;
-    if(action&&!action.disabled){action.click();return}
+    if(action&&!action.disabled){action.click();if(typeof root.DynastyOffseasonStopAfter==="function")root.DynastyOffseasonStopAfter();return}
     const tab=state.guidance.forecast?.destination?.tab;if(tab&&typeof root.goToTab==='function')root.goToTab(tab);
     return;
    }

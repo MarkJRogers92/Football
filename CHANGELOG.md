@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.26.0 — Portal day, real quarter scores
+
+- **Portal day.** When the transfer portal closes, the Next button stops before spring practice and announces every move that touches your program, one at a time: your players leaving first, then anyone who found no landing spot, then your new arrivals. "Announce the rest" shows them all, and the card ends with how many joined and how many left. Every move was already made when the portal was resolved; announcing them changes nothing.
+- **Real quarter-by-quarter scores.** Games played from this version record the quarter of every score. The Game Day recap and the game summary show a line score by quarter (and overtime), and each scoring play says which quarter it came in. Games played before this version, and any game whose scores cannot be matched to quarters, still say that quarter scores were not recorded rather than guessing.
+- **More art in play.** A coin toss on the live Game Day card, goalposts on fourth-down decisions, a money bag on Facilities & Boosters, the locker room on Transfer Watch, and a championship ring that turns beneath the trophy when you win the national title.
+
+Saves carry over.
+
 ## v0.25.0 — Art on every screen
 
 - **Every main screen has header art.** Roster, Roles & Packages, Game Day, Season, Newsletter, Statistics, Your Program, Player Development, the Offseason Lab, the Transfer Portal and History now each open with a small piece of art like Staff, Recruiting, Awards and Legacy already did. On a phone the art sits beside the title instead of above it, on those four screens too.

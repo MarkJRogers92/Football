@@ -1,5 +1,12 @@
 # Latest Session Work
 
+## v0.26.0 portal day, quarter scores, art — 2026-11-12
+
+- Portal day (handoff item 3, portal half): `offseasonPortal` in `app.js` opens `universe.portalDay={year,board,revealed}` and `portalDayNote` records each outcome touching the coach (kinds out, returned, left, in; sorted in that order), including commitments placed by `resolvePortalCommitments` during the advance. `offseason-stops.js` adds a `spring` stop that announces them (`revealNextPortal`, `portalRevealHTML`); `offseasonStopAfterAdvance` (called by `next-action.js` right after the advance) opens it straight after the portal resolves. Presentation only. Fixture: `__DL_TEST__.portalDayFixture()`; test `tests/portal-day-stop-browser.js`.
+- Quarter scores: `v2RecordDriveArchive` stores `drive.q` (period of the drive's score, 5+ is overtime). `gameLineScore(g)` in `app.js` returns per-period points only when every scoring drive has `q` and the drives sum to the final score; legacy-engine and pre-0.26 archives show the old "not recorded" note. Shown in the v2 recap and the game summary; scoring rows say the quarter. Test `tests/line-score-browser.js`.
+- Art: coin toss (live Game Day card), goalposts (fourth_down decision card), money bag (Facilities & Boosters head), locker room (Transfer Watch), ring turntable `assets/ring-turn-v1.webp` (36 x 192px frames, `.cer-ring` on the national title ceremony, rendered by `tools/procedural-art`).
+
+
 ## v0.25.0 art on every screen — 2026-11-12
 
 38 sprites in `assets/awards/` (34 Meshy text-to-3D with PBR refine, 4 modelled in code), registered in `program-art.js` `DynastyArt.FILES`. Meshy task ids and prompts: `docs/art-pack-2026-11-12.json` (GLBs not committed). Renderer for both kinds: `tools/procedural-art` (three.js r169 in Playwright, camera yaw 35 pitch 24, 512px then 256px WebP q82). Placements: `.section-head.has-art` headers in `body.html` on 11 more screens; `dl-art-h3` icons on 16 card headings; `DynastyArt.kickerKey` icons in The Wire (`renderWeeklyHub`, the image adds no text so kicker text matching still works); `medalKey` on the top three leader rows (`statLeaderRows`); `stopKey` art on the offseason stop card; helmet on Draft Night; new milestone keys. Phone `.section-head.has-art` is a wrapping row (it had stacked and centred). Unused in the UI so far: coin-toss, goalposts and money-bag (money-bag marks BOOSTERS items in The Wire). Meshy credits are spent (16 left).
