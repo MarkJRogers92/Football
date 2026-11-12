@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.25.0 — Art on every screen
+
+- **Every main screen has header art.** Roster, Roles & Packages, Game Day, Season, Newsletter, Statistics, Your Program, Player Development, the Offseason Lab, the Transfer Portal and History now each open with a small piece of art like Staff, Recruiting, Awards and Legacy already did. On a phone the art sits beside the title instead of above it, on those four screens too.
+- **The Wire marks each story.** Each item in the weekly briefing has a small picture for its kind of story: a first aid kit for injuries, an envelope for recruiting, a contract for signing day, a duffel bag for transfers, a pennant for rivalries, a film reel for the next opponent and so on.
+- **Medals for the top three.** The passing, rushing, receiving and defensive leader boards show gold, silver and bronze medals beside the top three.
+- **Offseason stops and Draft Night have art**: a graduation cap before departures, a contract before signing, a duffel bag before the portal, and a helmet on Draft Night.
+- **Card headings with art** on sixteen cards, including Season Goals, Top 15, Coaching Staff, Key Matchups, the drive log, Conference Standings, Camp Results, Awards Watch and the record books.
+- **New milestone art**: a championship ring for a national title, a gold football statue for back-to-back titles, a gold star for a perfect season, a trophy cup for ten wins and a key for holding three posts.
+- 38 new pieces in all, about 390 KB, kept for offline play. Thirty-four were generated with Meshy; the ring, pylon, football statue and key were modelled in code (`tools/procedural-art`).
+
+Saves carry over.
+
 ## v0.24.0 — Signing day where you decide
 
 - **Signing day is announced in the offseason.** When recruits committed to you are being pushed by a rival, or you are pushing someone else's commit, the Next button stops before the class enrolls and announces those decisions one at a time, yours first. "Announce the rest" shows them all. The card then says how many you kept or won and what is left of your class before you enroll it. Every decision was already made when the season ended; announcing them changes nothing about who signs where.

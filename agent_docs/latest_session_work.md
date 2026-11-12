@@ -1,5 +1,10 @@
 # Latest Session Work
 
+## v0.25.0 art on every screen — 2026-11-12
+
+38 sprites in `assets/awards/` (34 Meshy text-to-3D with PBR refine, 4 modelled in code), registered in `program-art.js` `DynastyArt.FILES`. Meshy task ids and prompts: `docs/art-pack-2026-11-12.json` (GLBs not committed). Renderer for both kinds: `tools/procedural-art` (three.js r169 in Playwright, camera yaw 35 pitch 24, 512px then 256px WebP q82). Placements: `.section-head.has-art` headers in `body.html` on 11 more screens; `dl-art-h3` icons on 16 card headings; `DynastyArt.kickerKey` icons in The Wire (`renderWeeklyHub`, the image adds no text so kicker text matching still works); `medalKey` on the top three leader rows (`statLeaderRows`); `stopKey` art on the offseason stop card; helmet on Draft Night; new milestone keys. Phone `.section-head.has-art` is a wrapping row (it had stacked and centred). Unused in the UI so far: coin-toss, goalposts and money-bag (money-bag marks BOOSTERS items in The Wire). Meshy credits are spent (16 left).
+
+
 ## v0.24.0 signing day in the offseason — 2026-11-11
 
 Item 3 of the handoff, for signing day: `offseason-stops.js` (`mySigningDayLeft`, `signingDayMineFirst`, `signingRevealHTML`) announces the coach's contested signing day entries inside the signing stop, reusing `revealNextSigning` from `app.js`. Outcomes are still decided in `buildSigningDay`. `__DL_TEST__.signingDayFixture` builds a board where the coach is contested (every entry holds, so no commitment moves); `tests/signing-day-stop-browser.js` covers it. The transfer portal half of item 3 is not done: the portal stop still routes to the Offseason screen.
