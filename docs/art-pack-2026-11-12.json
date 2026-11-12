@@ -1,0 +1,142 @@
+{
+ "style_suffix": ", stylized miniature game prop, clean hand-painted toy look, warm walnut wood, navy blue and gold accents, isolated object, no text, no letters, no logos",
+ "render": "three.js r169, RoomEnvironment + key/rim lights, camera yaw 35 pitch 24, 512px then 256px WebP q82",
+ "assets": {
+  "bronze-medal": {
+   "meshy_refine_task": "01a1cd7d-7d2a-72b0-8359-39cfb91b6b66",
+   "prompt": "A bronze medal with a star in the centre hanging from a navy ribbon"
+  },
+  "campus-gate": {
+   "meshy_refine_task": "01a1cd79-d388-72b6-ac0f-c66773a7d8d0",
+   "prompt": "A miniature brick university campus gate with two pillars, a gold arch and a small clock tower behind it, with a lawn patch"
+  },
+  "clipboard-blank": {
+   "meshy_refine_task": "01a1cd7d-933e-72c4-8796-733d29d1f90c",
+   "prompt": "A coach's wooden clipboard with a blank sheet of paper and a pen clipped on"
+  },
+  "coin-toss": {
+   "meshy_refine_task": "01a1cd7d-912a-74dc-a588-af08cce76936",
+   "prompt": "A large gold coin standing on its edge with a star embossed on the face, on a small patch of turf"
+  },
+  "contract-pen": {
+   "meshy_refine_task": "01a1cd7d-8f38-7391-a028-a6c13a8fa279",
+   "prompt": "A signed contract document with a fountain pen lying across it, blank lines, on a small leather pad"
+  },
+  "envelope-letter": {
+   "meshy_refine_task": "01a1cd7d-8d40-741a-863a-06b420529f9a",
+   "prompt": "A cream envelope sealed with a red wax seal, with a folded letter partly sticking out, blank paper"
+  },
+  "film-reel": {
+   "meshy_refine_task": "01a1cd7d-9737-72b9-a0b2-142b4dcc362c",
+   "prompt": "A vintage film reel with a strip of film unspooling, beside a small film canister"
+  },
+  "first-aid": {
+   "meshy_refine_task": "01a1cd80-00e1-7602-bfa1-3bc4436ae9c5",
+   "prompt": "A red and white sports first aid kit case with a white cross, with a rolled bandage and ice pack beside it"
+  },
+  "football": {
+   "meshy_refine_task": "01a1cd7d-74c8-733d-9d37-e649eaa606e6",
+   "prompt": "A single brown leather American football with white laces and white stripes near the tips, lying on its side"
+  },
+  "goalposts": {
+   "meshy_refine_task": "01a1cd7d-7900-71b4-96b8-38d4ca1a15cd",
+   "prompt": "A miniature yellow American football goalpost on a small patch of green turf with white end zone line"
+  },
+  "gold-medal": {
+   "meshy_refine_task": "01a1cd7d-7a63-7457-883a-1eb17f52b1ba",
+   "prompt": "A gold medal with a star in the centre hanging from a navy and gold striped ribbon"
+  },
+  "gold-star": {
+   "meshy_refine_task": "01a1cd7d-7fee-7403-ac07-653950d11adb",
+   "prompt": "A chunky polished gold five pointed star standing upright on a small walnut base"
+  },
+  "graduation-cap": {
+   "meshy_refine_task": "01a1cd7f-87c4-75ae-98e6-1a9c5157f8bf",
+   "prompt": "A black graduation mortarboard cap with a gold tassel resting on a rolled diploma tied with a ribbon"
+  },
+  "headset": {
+   "meshy_refine_task": "01a1cd7d-952a-704a-980c-1ecf3748e9d8",
+   "prompt": "A coach's sideline headset with a boom microphone, black with gold accents"
+  },
+  "helmet-plain": {
+   "meshy_refine_task": "01a1cd7d-762e-7433-b472-3a0ae161db1c",
+   "prompt": "A plain glossy white American football helmet with a grey facemask, side view three quarters, blank shell with no decals"
+  },
+  "history-book": {
+   "meshy_refine_task": "01a1cd79-d7f5-7660-a9b4-069797471e50",
+   "prompt": "A thick leather-bound scrapbook with gold corners and gold page edges, slightly open, with old photographs and a ribbon bookmark"
+  },
+  "kickoff-tee": {
+   "meshy_refine_task": "01a1cd79-d67a-75c2-bdf3-99171c97b77d",
+   "prompt": "A brown leather American football standing upright on an orange kicking tee, on a small square of green turf with a white yard line"
+  },
+  "megaphone": {
+   "meshy_refine_task": "01a1cd7d-834b-76a2-8aa0-1ad360b0c066",
+   "prompt": "A navy and gold cheerleader megaphone cone lying on its side"
+  },
+  "money-bag": {
+   "meshy_refine_task": "01a1cd7d-8b4a-7042-aa9f-4d06b4c8bfdd",
+   "prompt": "A canvas money sack tied with gold rope with gold coins spilling beside it, no symbols"
+  },
+  "newspaper": {
+   "meshy_refine_task": "01a1cd79-d72f-7726-b0e3-c7e2de97e69c",
+   "prompt": "A rolled and folded sports newspaper tied with string, with blank headline columns and a blank photo box, lying on a small wooden block"
+  },
+  "pennant": {
+   "meshy_refine_task": "01a1cd7d-814a-7176-96ea-af09a3f83449",
+   "prompt": "A triangular felt sports pennant in navy blue with gold trim on a short wooden stick, blank, no text"
+  },
+  "plaque": {
+   "meshy_refine_task": "01a1cd7d-874f-709f-8351-898ef62abcf9",
+   "prompt": "A walnut wall plaque with a blank engraved gold plate and a small gold football relief"
+  },
+  "playbook-clipboard": {
+   "meshy_refine_task": "01a1cd79-cf22-774e-abb3-089f22af40ae",
+   "prompt": "A football coach's clipboard holding a play diagram sheet with chalk X and O marks and arrows, a pencil lying across it, propped on a small stand"
+  },
+  "ribbon-rosette": {
+   "meshy_refine_task": "01a1cd7d-7e91-74f7-9ede-a79241035a21",
+   "prompt": "A blue award rosette ribbon with gold centre button and two hanging tails, blank centre"
+  },
+  "roster-jersey": {
+   "meshy_refine_task": "01a1cd79-cfd5-716c-a4ab-639ce90091c9",
+   "prompt": "A folded American football jersey in navy blue with gold trim and a large blank number panel, resting on a small display shelf, framed shadow-box style"
+  },
+  "scoreboard": {
+   "meshy_refine_task": "01a1cd79-d224-70e6-a73b-fad7731917f5",
+   "prompt": "A miniature old-fashioned stadium scoreboard on two posts, navy panel with gold frame, blank score windows and a small clock, no text"
+  },
+  "silver-medal": {
+   "meshy_refine_task": "01a1cd7d-7bc2-709d-8155-d50641feb831",
+   "prompt": "A silver medal with a star in the centre hanging from a navy ribbon"
+  },
+  "stadium-lights": {
+   "meshy_refine_task": "01a1cd7d-894a-73b7-b04f-d8ad765c014f",
+   "prompt": "A tall stadium floodlight tower with a bank of glowing lamps on top, on a small base"
+  },
+  "stopwatch": {
+   "meshy_refine_task": "01a1cd79-d2d7-712f-b96b-7af6f736510f",
+   "prompt": "A classic chrome coach's stopwatch with a navy lanyard coiled around it, lying on a small stack of statistics notebooks"
+  },
+  "training-cones": {
+   "meshy_refine_task": "01a1cd79-d43f-706f-bd74-bfd3bd314d36",
+   "prompt": "Orange agility training cones and a yellow speed ladder on a small patch of green turf, with a football beside them"
+  },
+  "transfer-duffel": {
+   "meshy_refine_task": "01a1cd79-d5b3-72f4-969f-cc93c4803bd2",
+   "prompt": "A navy blue sports duffel bag with gold stripes, zipped, with a football helmet resting on top of it and a luggage tag, no logos"
+  },
+  "trophy-cup": {
+   "meshy_refine_task": "01a1cd7d-8559-7213-8c20-ff61613cc0f0",
+   "prompt": "A classic gold two handled loving cup trophy on a stepped black and walnut base with a blank gold plaque"
+  },
+  "wall-calendar": {
+   "meshy_refine_task": "01a1cd79-d4f3-76df-9663-769a869f3ec7",
+   "prompt": "A wall calendar on a small easel with a blank grid of days, a few days circled in red, with a gold binder ring at the top, no text"
+  },
+  "whistle": {
+   "meshy_refine_task": "01a1cd7d-7776-745b-a8a7-4d52015756f4",
+   "prompt": "A chrome referee whistle on a coiled navy lanyard"
+  }
+ }
+}

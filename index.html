@@ -3227,6 +3227,8 @@ html.bi-brand #history .historyrow span{min-width:0;overflow-wrap:anywhere}
 .dl-art{display:block;object-fit:contain;filter:drop-shadow(0 6px 14px rgba(0,0,0,.45));pointer-events:none;user-select:none}
 .section-head.has-art{display:flex;align-items:center;gap:14px}
 .section-head.has-art>.dl-art-head{width:64px;height:64px;flex:none}
+.section-head.has-art>.dl-art-head+div{margin-right:auto;min-width:0}
+.section-head.has-art>.dl-art-head:has(+div>h3){width:48px;height:48px}
 .dl-art-ceremony{width:132px;height:132px;margin:0 auto 6px}
 .dl-art-inline{display:inline-block;width:28px;height:28px;vertical-align:middle;margin-right:6px;filter:none}
 .fb-track-head{display:flex;align-items:center;gap:10px}
@@ -3235,7 +3237,7 @@ html.bi-brand #history .historyrow span{min-width:0;overflow-wrap:anywhere}
 .milestone:has(>.dl-art-milestone){position:relative;padding-right:64px}
 .milestone>.dl-art-milestone{position:absolute;top:10px;right:10px;width:44px;height:44px;margin:0;opacity:.55;filter:grayscale(.85)}
 .milestone.is-done>.dl-art-milestone{opacity:1;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4))}
-@media(max-width:720px){.section-head.has-art>.dl-art-head{width:44px;height:44px}.dl-art-ceremony{width:96px;height:96px}}
+@media(max-width:760px){.section-head.has-art{flex-direction:row!important;flex-wrap:wrap!important;align-items:center!important}.section-head.has-art>.dl-art-head+div{flex:1 1 calc(100% - 64px)}.section-head.has-art>.dl-art-head{width:44px;height:44px}.dl-art-ceremony{width:96px;height:96px}}
 
 /* A quiet sports briefing. The existing advance control remains the only primary action. */
 .lw-world{margin:14px 0;border-top:1px solid var(--line);padding-top:12px;min-width:0}
@@ -3603,7 +3605,7 @@ select{min-width:44px}
     </section>
 
     <section id="roster" class="panel tab stacked-table">
-      <div class="section-head">
+      <div class="section-head has-art"><img class="dl-art dl-art-head" src="assets/awards/roster-jersey.webp" alt="" aria-hidden="true" width="256" height="256">
         <div><h2>Roster</h2><div class="muted">Grades are your staff&#39;s estimates. The bar shows how sure they are.</div></div>
         <select id="positionFilter" aria-label="Filter roster by position"><option value="ALL">All positions</option></select>
       </div>
@@ -3614,7 +3616,7 @@ select{min-width:44px}
 
 
     <section id="depth" class="panel tab">
-      <div class="section-head">
+      <div class="section-head has-art"><img class="dl-art dl-art-head" src="assets/awards/playbook-clipboard.webp" alt="" aria-hidden="true" width="256" height="256">
         <div><h2>Roles &amp; Packages</h2><div class="muted">Pick who plays each role. Injured or redshirting players drop to the next option automatically.</div></div>
         <button id="autoDepth">Auto-Set Role Fits</button>
       </div>
@@ -3638,7 +3640,7 @@ select{min-width:44px}
     </section>
 
     <section id="newsletter" class="panel tab">
-      <div class="section-head"><div><h2>Weekly Newsletter</h2><div class="muted">This week&#39;s stories, written from the real box scores.</div></div></div>
+      <div class="section-head has-art"><img class="dl-art dl-art-head" src="assets/awards/newspaper.webp" alt="" aria-hidden="true" width="256" height="256"><div><h2>Weekly Newsletter</h2><div class="muted">This week&#39;s stories, written from the real box scores.</div></div></div>
       <div class="card">
         <div class="editor-grid">
           <label>Week<select id="newsWeek"></select></label>
@@ -3653,7 +3655,7 @@ select{min-width:44px}
     </section>
 
     <section id="gamelab" class="panel tab">
-      <div class="section-head">
+      <div class="section-head has-art"><img class="dl-art dl-art-head" src="assets/awards/kickoff-tee.webp" alt="" aria-hidden="true" width="256" height="256">
         <div><h2>Game Day</h2><div class="muted">Coach your next game live below, or watch or sim it.</div></div>
         <div class="button-row"><button id="watchDetailedGame">Watch</button><button id="simDetailedGame">Sim Instantly</button></div>
       </div>
@@ -3667,7 +3669,7 @@ select{min-width:44px}
     </section>
 
     <section id="season" class="panel tab">
-      <div class="section-head">
+      <div class="section-head has-art"><img class="dl-art dl-art-head" src="assets/awards/scoreboard.webp" alt="" aria-hidden="true" width="256" height="256">
         <div><h2>Season</h2><div id="seasonPhase" class="muted">2027 Regular Season</div></div>
         <div class="button-row">
           <button id="seasonWeek">Sim Week</button>
@@ -3685,7 +3687,7 @@ select{min-width:44px}
 
 
     <section id="stats" class="panel tab">
-      <div class="section-head"><div><h2>Statistics Center</h2><div class="muted">National and team leaders this season.</div></div><select id="statsScope" aria-label="Statistics scope"><option value="national">National</option><option value="team">My Program</option></select></div>
+      <div class="section-head has-art"><img class="dl-art dl-art-head" src="assets/awards/stopwatch.webp" alt="" aria-hidden="true" width="256" height="256"><div><h2>Statistics Center</h2><div class="muted">National and team leaders this season.</div></div><select id="statsScope" aria-label="Statistics scope"><option value="national">National</option><option value="team">My Program</option></select></div>
       <div class="stats-grid">
         <div class="card"><h3>Passing Leaders</h3><div id="passingLeaders"></div></div>
         <div class="card"><h3>Rushing Leaders</h3><div id="rushingLeaders"></div></div>
@@ -3710,7 +3712,7 @@ select{min-width:44px}
     </section>
 
     <section id="program" class="panel tab">
-      <div class="section-head"><div><h2>Your Program</h2><div class="muted">Your job security, season goals and program profile.</div></div></div><div class="card"><div class="eyebrow">PROGRAM OVERVIEW</div><div id="programOverview"></div></div>
+      <div class="section-head has-art"><img class="dl-art dl-art-head" src="assets/awards/campus-gate.webp" alt="" aria-hidden="true" width="256" height="256"><div><h2>Your Program</h2><div class="muted">Your job security, season goals and program profile.</div></div></div><div class="card"><div class="eyebrow">PROGRAM OVERVIEW</div><div id="programOverview"></div></div>
       <div class="card" id="programAttributes"></div>
       <div class="card facilities-boosters" id="facilitiesBoosters"></div>
       <div class="card" id="programTrends"></div>
@@ -3735,7 +3737,7 @@ select{min-width:44px}
     </section>
 
     <section id="development" class="panel tab stacked-table">
-      <div class="section-head">
+      <div class="section-head has-art"><img class="dl-art dl-art-head" src="assets/awards/training-cones.webp" alt="" aria-hidden="true" width="256" height="256">
         <div><h2>Player Development</h2><div class="muted">Training improves the odds, not the outcome.</div></div>
         <div class="button-row"><button id="runSpringCamp">Run Spring Development</button><button id="runFallCamp">Run Fall Camp</button><button id="applyCampWinners">Use Staff Recommendations</button></div>
       </div>
@@ -3775,7 +3777,7 @@ select{min-width:44px}
     </section>
 
     <section id="offseason" class="panel tab">
-      <div class="section-head">
+      <div class="section-head has-art"><img class="dl-art dl-art-head" src="assets/awards/wall-calendar.webp" alt="" aria-hidden="true" width="256" height="256">
         <div><h2>Offseason Lab</h2><div class="muted">Graduation, transfers, the draft, staff moves and the incoming class.</div></div>
         <button id="runOffseason" disabled>Advance Offseason Phase</button>
       </div>
@@ -3785,7 +3787,7 @@ select{min-width:44px}
       </div>
       <div class="card"><h3>Offseason Report</h3><div id="offseasonReport" class="muted">Complete the season first.</div></div>
       <div class="card portal-shell stacked-table">
-        <div class="section-head">
+        <div class="section-head has-art"><img class="dl-art dl-art-head" src="assets/awards/transfer-duffel.webp" alt="" aria-hidden="true" width="256" height="256">
           <div><h3>Transfer Portal</h3><div id="portalStatus" class="muted">The portal opens after departures and signing.</div></div>
           <div class="portal-actions">
             <button id="portalOpen">Open Portal</button>
@@ -3831,7 +3833,7 @@ select{min-width:44px}
       <div id="legacyBoard"></div>
     </section>
     <section id="history" class="panel tab">
-      <div class="section-head"><div><h2>History</h2><div class="muted">Every season, champion and milestone of your dynasty.</div></div></div>
+      <div class="section-head has-art"><img class="dl-art dl-art-head" src="assets/awards/history-book.webp" alt="" aria-hidden="true" width="256" height="256"><div><h2>History</h2><div class="muted">Every season, champion and milestone of your dynasty.</div></div></div>
       <div class="card">
         <div class="section-head"><div><h3>Player Archive</h3><div class="muted">Search active and retired players preserved by the dynasty database.</div></div></div>
         <input id="archiveSearch" class="wide-input" type="search" placeholder="Search player name">
@@ -18971,10 +18973,12 @@ loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.crea
 
 // v0.23 — the award and facility sprites from the November 11 art pack (release dynasty-assets-2026-11-11). Each is
 // a 256px transparent WebP rendered from a Meshy model; the models themselves stay in the release as source files.
+// The November 12 pack (docs/art-pack-2026-11-12.json): eleven screen-header pieces and 23 general props
+// adds (medals, football, whistle, trophy cup, envelope, coin...) any screen can show with DynastyArt.img('<name>').
 // Everything here is decorative (empty alt): the text next to each image already says what it is.
 (function(root){
   'use strict';
-  const FILES=['bowl-laurel','coach-headset','coach-legacy','conference-crown','game-ball','locker-room','player-of-year','practice-facility','rivalry-bell','rivalry-boot','rivalry-lantern','rivalry-shield','scouting-folio','signing-cap','stadium-miniature','weight-room'];
+  const FILES=['bowl-laurel','bronze-medal','campus-gate','clipboard-blank','coach-headset','coach-legacy','coin-toss','conference-crown','contract-pen','envelope-letter','film-reel','first-aid','football','game-ball','goalposts','gold-medal','gold-star','graduation-cap','headset','helmet-plain','history-book','kickoff-tee','locker-room','megaphone','money-bag','newspaper','pennant','plaque','playbook-clipboard','player-of-year','practice-facility','ribbon-rosette','rivalry-bell','rivalry-boot','rivalry-lantern','rivalry-shield','roster-jersey','scoreboard','scouting-folio','signing-cap','silver-medal','stadium-lights','stadium-miniature','stopwatch','training-cones','transfer-duffel','trophy-cup','wall-calendar','weight-room','whistle'];
   const src=key=>FILES.includes(key)?`assets/awards/${key}.webp`:'';
   const attr=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function img(key,cls='dl-art'){const s=src(key);return s?`<img class="${attr(cls)}" src="${s}" alt="" aria-hidden="true" loading="lazy" decoding="async" width="256" height="256">`:''}
