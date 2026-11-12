@@ -40,3 +40,32 @@ test('ceremony bodies escape names and confetti is deterministic',()=>{
  assert.equal(C.confettiHTML(10),C.confettiHTML(10));
  assert.equal(C.bodyHTML({kind:'unknown',team}),null);
 });
+
+test('national awards get their own ceremony, after the rivalry and before signing day',()=>{
+ const team={id:1,name:'State',w:11,l:2};
+ const a={teamId:1,year:2027,milestones:[{key:'2027:signing',kind:'signing'}]};
+ const b={teamId:1,year:2027,milestones:[...a.milestones,{key:'2027:awards',kind:'awards'},{key:'2027:rivalry',kind:'rivalry'}]};
+ assert.deepEqual(C.newMilestones(a,b).map(m=>m.kind),['rivalry','awards']);
+ const one=C.bodyHTML({kind:'awards',year:2027,team,awards:[{name:'National Player of the Year',playerId:7,playerName:'Jay <Doe>',pos:'QB'}]});
+ assert.match(one.html,/<h2>National Player of the Year<\/h2>/);assert.match(one.html,/Jay &lt;Doe&gt; · State/);
+ const coach=C.bodyHTML({kind:'awards',year:2027,team,awards:[{name:'Coach of the Year',playerId:null,playerName:'Pat Coach',pos:'HC'}]});
+ assert.match(coach.html,/Head coach/);assert.doesNotMatch(coach.html,/data-portrait=/,'a coach has no player portrait');
+ const many=C.bodyHTML({kind:'awards',year:2027,team,awards:[{name:'National Player of the Year',playerId:7,playerName:'Jay Doe',pos:'QB'},{name:'Coach of the Year',playerId:null,playerName:'Pat Coach',pos:'HC'}]});
+ assert.match(many.html,/Award Winners/);assert.match(many.html,/State · 2 national awards/);assert.equal((many.html.match(/<li /g)||[]).length,2);
+ assert.equal(C.bodyHTML({kind:'awards',year:2027,team,awards:[]}),null,'no winners, no ceremony');
+});
+
+test('rivalry trophies and season honors turn when a turntable strip exists, else show the still',()=>{
+ const team={id:1,name:'State',w:9,l:3};
+ globalThis.DynastyArt={turnSrc:k=>k==='rivalry-axe'?'assets/turntables/rivalry-axe.webp':'',rivalryKey:t=>/axe/i.test(t)?'rivalry-axe':'rivalry-shield',img:k=>`<img src="assets/awards/${k}.webp">`};
+ try{
+  const axe=C.bodyHTML({kind:'rivalry',year:2027,team,trophy:'The River Axe',opponent:{id:2,name:'Rival'},score:[21,17],streak:1}).html;
+  assert.match(axe,/class="cer-turn" style="--turn:url\('assets\/turntables\/rivalry-axe.webp'\)"/);
+  const other=C.bodyHTML({kind:'rivalry',year:2027,team,trophy:'The Old Thing',opponent:{id:2,name:'Rival'},score:[21,17],streak:1}).html;
+  assert.match(other,/assets\/awards\/rivalry-shield.webp/);assert.doesNotMatch(other,/cer-turn/);
+ }finally{delete globalThis.DynastyArt}
+ require('../program-art.js');const A=globalThis.DynastyArt;  // sets the global, like the browser
+ const fs=require('node:fs'),path=require('node:path');
+ for(const k of A.TURNS)assert.ok(fs.existsSync(path.join(__dirname,'..',A.turnSrc(k))),`${k} has a strip`);
+ for(const n of ['bell','axe','boot','jug','barrel','anvil','lantern','spade','bucket','cannon'])assert.ok(A.turnSrc(A.rivalryKey(`The Test ${n}`)),`${n} turns`);
+});

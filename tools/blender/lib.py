@@ -387,8 +387,11 @@ def add_light(name, loc, energy, color, size):
     ob.rotation_euler = (Vector((0, 0, 0)) - Vector(loc)).to_track_quat('-Z', 'Y').to_euler()
 
 
-def frame_and_light(yaw=35, pitch=24, fov=22):
-    """Normalise the model to a 2-unit box at the origin, then place lights and camera like render.html."""
+def frame_and_light(yaw=35, pitch=24, fov=22, spin=False):
+    """Normalise the model to a 2-unit box at the origin, then place lights and camera like render.html.
+
+    With spin=True the model is centred on a vertical axis and framed for every angle of a full turn;
+    rotate the returned empty about Z to turn it."""
     sc = bpy.context.scene
     dg = bpy.context.evaluated_depsgraph_get()
     roots = [o for o in sc.objects if o.parent is None and o.type in {'MESH', 'CURVE', 'EMPTY'}]
@@ -402,14 +405,27 @@ def frame_and_light(yaw=35, pitch=24, fov=22):
     lo = Vector((min(p.x for p in pts), min(p.y for p in pts), min(p.z for p in pts)))
     hi = Vector((max(p.x for p in pts), max(p.y for p in pts), max(p.z for p in pts)))
     c, size = (lo + hi) / 2, hi - lo
-    s = 2 / max(size)
-    rig = D.objects.new('rig', None)
-    link(rig)
-    for o in roots:
-        o.parent = rig
-    rig.scale = (s, s, s)
-    rig.location = -c * s
-    radius = (size * s).length / 2
+    if spin:
+        # the widest the model gets as it turns about its centre line, and its height
+        rh = max(math.hypot(q.x - c.x, q.y - c.y) for q in pts)
+        s = 2 / max(2 * rh, size.z)
+        centre = link(D.objects.new('centre', None))
+        centre.location = -c
+        for o in roots:
+            o.parent = centre
+        rig = link(D.objects.new('rig', None))
+        centre.parent = rig
+        rig.scale = (s, s, s)
+        radius = math.hypot(rh * s, size.z * s / 2)
+    else:
+        rig = D.objects.new('rig', None)
+        link(rig)
+        for o in roots:
+            o.parent = rig
+        s = 2 / max(size)
+        rig.scale = (s, s, s)
+        rig.location = -c * s
+        radius = (size * s).length / 2
     y, p = math.radians(yaw), math.radians(pitch)
     d = Vector((math.cos(p) * math.sin(y), -math.cos(p) * math.cos(y), math.sin(p)))
     cam_d = D.cameras.new('cam')
@@ -421,6 +437,7 @@ def frame_and_light(yaw=35, pitch=24, fov=22):
     add_light('key', (3.6, -4.8, 6.0), 1400, (1.0, 0.91, 0.78), 3.5)
     add_light('rim', (-4.8, 3.6, 3.6), 900, (0.75, 0.83, 1.0), 3.0)
     add_light('fill', (-3.0, -5.5, 1.2), 300, (1.0, 0.95, 0.9), 4.0)
+    return rig
 
 
 def main(models, prefix=''):

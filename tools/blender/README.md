@@ -22,12 +22,21 @@ uv pip install -p .blender-venv/bin/python bpy==5.0.1 pillow
 | --- | --- | --- |
 | `lib.py` | (shared) modelling helpers, materials, plinth, renderer and `main()` | |
 | `rivalry_trophies.py` | `assets/awards/rivalry-{axe,jug,barrel,anvil,spade,bucket,cannon}.webp` | `.blender-venv/bin/python tools/blender/rivalry_trophies.py [names]` |
+| `turntable.py` | `assets/turntables/<name>.webp`, 36 frames of 192 px in a row (rivalry ceremony, season honors) | `.blender-venv/bin/python tools/blender/turntable.py [names] --glb-dir <pack>/models` |
 | `props.py` | `assets/awards/{hard-hat,compass,dumbbell,milestone-marker,podium,balance-scale,chalkboard,coaching-tree,seedling,cornerstone,file-cabinet}.webp` (The Wire, Season stories, card headings) | `.blender-venv/bin/python tools/blender/props.py [names]` |
 
 A full render (512 px, 128 samples, the default) takes about 25 to 30 seconds a model on 4 CPUs, and
 re-running a script reproduces the committed sprites. While iterating, use
 `--samples 16 --size 384 --no-webp --png-dir <scratch dir>` and look at the PNGs: that is fast and
 leaves the assets alone. Run `npm run build` afterwards so `sw.js` lists any new file.
+
+## Meshy models
+
+The 16 models from the Meshy art pack (the bell, boot, lantern and shield trophies, Player of the
+Year, the conference crown and others) are not in the repository. They are in the
+`Dynasty-Lab-16-Asset-Pack.zip` asset of the GitHub release `dynasty-assets-2026-11-11`. Unzip it
+anywhere outside the repository and pass its `models/` folder to `turntable.py --glb-dir`.
+Blender's glTF importer keeps their textures, and their front faces −Y like the coded models.
 
 ## House style (matches the Meshy art pack and `tools/procedural-art`)
 

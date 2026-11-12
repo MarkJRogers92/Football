@@ -1,4 +1,4 @@
-// Ceremonies: the big beats of a dynasty get a moment on screen.
+// Ceremonies: the big beats of a dynasty get a moment on screen (titles, bowls, rivalry trophies, national awards, signing day, the draft).
 // A ceremony plays only when a real milestone (DynastyCeremonySnapshot) appears during this session, so
 // loading a save never replays old ones. Presentation only: no saves, no randomness, nothing advanced.
 (function(root,factory){
@@ -8,7 +8,7 @@
 })(typeof window!=='undefined'?window:this,function(){
 'use strict';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const ORDER={national:0,conference:1,bowl:2,rivalry:3,signing:4,draft:5};
+const ORDER={national:0,conference:1,bowl:2,rivalry:3,awards:4,signing:5,draft:6};
 // Milestones that are new since the previous snapshot, biggest first. A missing baseline, another
 // program or another season means "just loaded or switched": nothing is new, so old milestones never replay.
 function newMilestones(prev,next){
@@ -24,12 +24,16 @@ function confettiHTML(n=56){
 const stars=n=>'★'.repeat(Math.max(0,Math.min(5,Number(n)||0)));
 function helmet(id,cls){return globalThis.DynastyBrandVisuals?.helmetHTML?.(id,cls)||''}
 function art(key){return globalThis.DynastyArt?.img(key,'dl-art dl-art-ceremony')||''}
+// A turning version of the art when there is a turntable strip for it (assets/turntables), else the still.
+function turn(key){const src=globalThis.DynastyArt?.turnSrc?.(key);return src?`<div class="cer-turn" style="--turn:url('${esc(src)}')" aria-hidden="true"></div>`:art(key)}
+const face=a=>a.playerId==null?'':`<canvas class="portrait portrait-list" width="44" height="44" data-portrait="${esc(a.playerId)}" data-portrait-size="44" data-portrait-frame="list" data-portrait-kind="player" aria-hidden="true"></canvas>`;
 function bodyHTML(m){
  const t=m.team,record=`${t.w}-${t.l}`;
  if(m.kind==='national')return{tone:'gold',confetti:true,html:`<div class="cer-trophy" aria-hidden="true"></div><span class="cer-kicker">${m.year} College Football</span><h2>National Champions</h2><p class="cer-team">${esc(t.name)}</p><p class="cer-sub">${record} · the last team standing</p><div class="cer-ring" aria-hidden="true"></div>`};
  if(m.kind==='conference')return{tone:'gold',confetti:true,html:`${art('conference-crown')||helmet(t.id,'cer-helmet')}<span class="cer-kicker">${m.year} · ${esc(t.conference)}</span><h2>Conference Champions</h2><p class="cer-team">${esc(t.name)}</p><p class="cer-sub">${record} · a banner for the stadium</p>`};
  if(m.kind==='bowl')return{tone:'gold',confetti:true,html:`<div class="cer-faceoff">${helmet(t.id,'cer-helmet')}<b>${esc(m.score?.[0]??'')}–${esc(m.score?.[1]??'')}</b>${helmet(m.opponent?.id,'cer-helmet is-away')}</div>${art('bowl-laurel')}<span class="cer-kicker">${m.year} · Bowl season</span><h2>${esc(m.label)} Champions</h2><p class="cer-team">${esc(t.name)}</p><p class="cer-sub">over ${esc(m.opponent?.name||'')}</p>`};
- if(m.kind==='rivalry')return{tone:'gold',confetti:true,html:`<div class="cer-faceoff">${helmet(t.id,'cer-helmet')}<b>${esc(m.score?.[0]??'')}–${esc(m.score?.[1]??'')}</b>${helmet(m.opponent?.id,'cer-helmet is-away')}</div>${art(globalThis.DynastyArt?.rivalryKey(m.trophy))}<span class="cer-kicker">${m.year} · Rivalry game</span><h2>${m.trophy?esc(m.trophy):'Rivalry won'}</h2><p class="cer-team">${m.trophy?(m.streak>1?`stays with ${esc(t.name)}`:`comes home to ${esc(t.name)}`):`${esc(t.name)} beats ${esc(m.opponent?.name||'')}`}</p><p class="cer-sub">${m.streak>1?`${m.streak} straight over ${esc(m.opponent?.name||'')}`:`over ${esc(m.opponent?.name||'')}`}</p>`};
+ if(m.kind==='rivalry')return{tone:'gold',confetti:true,html:`<div class="cer-faceoff">${helmet(t.id,'cer-helmet')}<b>${esc(m.score?.[0]??'')}–${esc(m.score?.[1]??'')}</b>${helmet(m.opponent?.id,'cer-helmet is-away')}</div>${turn(globalThis.DynastyArt?.rivalryKey(m.trophy))}<span class="cer-kicker">${m.year} · Rivalry game</span><h2>${m.trophy?esc(m.trophy):'Rivalry won'}</h2><p class="cer-team">${m.trophy?(m.streak>1?`stays with ${esc(t.name)}`:`comes home to ${esc(t.name)}`):`${esc(t.name)} beats ${esc(m.opponent?.name||'')}`}</p><p class="cer-sub">${m.streak>1?`${m.streak} straight over ${esc(m.opponent?.name||'')}`:`over ${esc(m.opponent?.name||'')}`}</p>`};
+ if(m.kind==='awards'){const list=m.awards||[],top=list[0];if(!top)return null;const one=list.length===1;return{tone:'gold',confetti:true,html:`${turn('player-of-year')}<span class="cer-kicker">${m.year} · Season honors</span><h2>${one?esc(top.name):'Award Winners'}</h2><p class="cer-team">${one?`${esc(top.playerName)} · ${esc(t.name)}`:`${esc(t.name)} · ${list.length} national awards`}</p>${one?`<p class="cer-sub">${esc(top.pos==='HC'?'Head coach':top.pos)}</p>`:`<ol class="cer-list">${list.map((a,i)=>`<li style="--i:${i}">${face(a)}<span><b>${esc(a.playerName)}</b><small>${esc(a.pos)} · ${esc(a.name)}</small></span></li>`).join('')}</ol>`}`}}
  if(m.kind==='signing'){const [s5,s4,s3]=m.stars||[0,0,0];return{tone:'team',confetti:false,html:`${art('signing-cap')}<span class="cer-kicker">${m.year} · Signing Day</span><h2>The Class Is In</h2><p class="cer-team">${esc(t.name)} signs ${m.count}</p><div class="cer-stars"><span><b>${s5}</b>5★</span><span><b>${s4}</b>4★</span><span><b>${s3}</b>3★</span></div><ol class="cer-list">${(m.top||[]).map((r,i)=>`<li style="--i:${i}"><canvas class="portrait portrait-list" width="44" height="44" data-portrait="${esc(r.id)}" data-portrait-size="44" data-portrait-frame="list" data-portrait-kind="recruit" aria-hidden="true"></canvas><span><b>${esc(r.name)}</b><small>${esc(r.pos)} · ${stars(r.stars)}</small></span></li>`).join('')}</ol>`}}
  if(m.kind==='draft')return{tone:'team',confetti:false,html:`${art('helmet-plain')}<span class="cer-kicker">${m.year} · Draft Night</span><h2>Your Players Go Pro</h2><p class="cer-team">${esc(t.name)} · ${m.picks.length} drafted</p><ol class="cer-list">${m.picks.map((p,i)=>`<li style="--i:${i}"><span class="cer-pick">R${esc(p.round)}<small>#${esc(p.pick)}</small></span><span><b>${esc(p.name)}</b><small>${esc(p.pos)} · ${esc(p.label)}</small></span></li>`).join('')}</ol>`};
  return null;

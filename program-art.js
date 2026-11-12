@@ -27,5 +27,8 @@
   const STOP={departures:'graduation-cap',signing:'contract-pen',portal:'transfer-duffel',spring:'transfer-duffel'};
   const stopKey=phase=>STOP[phase]||'';
   const medalKey=rank=>['gold-medal','silver-medal','bronze-medal'][rank]||'';
-  root.DynastyArt={FILES,src,img,rivalryKey,facilityKey,milestoneKey,kickerKey,stopKey,medalKey};
+  // Turntable strips (36 frames of 192px in one row) for the ceremonies, rendered by tools/blender/turntable.py.
+  const TURNS=['rivalry-anvil','rivalry-axe','rivalry-barrel','rivalry-bell','rivalry-boot','rivalry-bucket','rivalry-cannon','rivalry-jug','rivalry-lantern','rivalry-shield','rivalry-spade','player-of-year'];
+  const turnSrc=key=>TURNS.includes(key)?`assets/turntables/${key}.webp`:'';
+  root.DynastyArt={FILES,TURNS,turnSrc,src,img,rivalryKey,facilityKey,milestoneKey,kickerKey,stopKey,medalKey};
 })(typeof globalThis!=='undefined'?globalThis:this);
