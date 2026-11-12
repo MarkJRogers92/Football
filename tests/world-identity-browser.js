@@ -54,6 +54,15 @@ const {startNewDynasty}=require('./helpers/start-new-dynasty');
     }
     await page.locator('#offseasonStop [data-offseason-stop-go]').click();
     await page.waitForFunction(old=>document.querySelector('#hubAdvance').textContent!==old,label,{timeout:60000});
+    // v0.26: resolving the portal opens portal day when moves touch the coach's program. It is a different card,
+    // announced and passed here; the portal stop itself is still shown only once.
+    if(stage==='Portal'&&await page.locator('#offseasonStop').count()){
+     assert.match(await page.locator('#offseasonStop').innerText(),/PORTAL DAY/,'only portal day may follow the portal stop');stops.push('Portal day');
+     if(await page.locator('[data-offseason-portal="all"]').count())await page.click('[data-offseason-portal="all"]');
+     const day=await page.locator('#hubAdvance').innerText();
+     await page.locator('#offseasonStop [data-offseason-stop-go]').click();
+     await page.waitForFunction(old=>document.querySelector('#hubAdvance').textContent!==old||window.__DL_TEST__.preseasonDebug().phase==='regular',day,{timeout:60000});
+    }
     assert.equal(await page.locator('#offseasonStop').count(),0,'a stop is shown once');
    }else await page.waitForFunction(old=>document.querySelector('#hubAdvance').textContent!==old||window.__DL_TEST__.preseasonDebug().phase==='regular',label,{timeout:60000});
   }
