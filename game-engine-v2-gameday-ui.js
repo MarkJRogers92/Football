@@ -124,6 +124,26 @@ function v2GameDayUIField(session){
   const marks=[10,20,30,40,50,60,70,80,90].map(v=>`<i style="left:${pct(v)}%"><b>${v<=50?v:100-v}</b></i>`).join('');
   return`<div class="v2-live-field" role="img" aria-label="${gameEscape(text)}" data-direction="${home?'right':'left'}"><div class="v2-live-turf"></div><div class="v2-live-endzone away"><span>${gameEscape(globalThis.DynastyMascots?.nickname(s.away?.id)||session.names.away)}</span></div><div class="v2-live-endzone home"><span>${gameEscape(globalThis.DynastyMascots?.nickname(s.home?.id)||session.names.home)}</span></div>${marks}${s.period<=4&&line<100?`<u style="left:${pct(lx)}%" title="First down"></u>`:''}<s style="left:${pct(x)}%"><span>${home?'▶':'◀'}</span></s></div>`
 }
+// v0.28: the animated field. The live screen is redrawn after every action, so the angled 3D field
+// (game-cast-field.js) is remounted each time with the plays so far, animating only those added since the last draw
+// and then holding on the next snap. The 2D strip stays as the fallback (before kickoff, or without a canvas) and its
+// description becomes the field's accessible name. Presentation only: nothing here touches the session.
+function v2GameDayUIMountField(host,session){
+  const field=globalThis.DynastyGameCastField,slot=host.querySelector('[data-v2-live-field3d]');if(!field||!slot)return false;
+  try{
+    const names=v2GameDayUINames(session),rows=v2PlayLogProjection(session.state,{playActors:names.actors||{}});
+    if(!rows.length){slot.remove();return false}
+    const s=session.state,brand=id=>globalThis.DynastyProgramBranding?.brandFor?.(id)||null,ui=v2InteractiveGameDay;
+    const rest=s.status!=='final'&&s.possession&&s.fieldPosition!=null?{side:s.possession,los:s.fieldPosition,toGo:s.period<=4?s.distance:0}:null;
+    const fromRow=ui?.fieldRows??rows.length;
+    const ctrl=field.mount(slot,{rows,live:true,fromRow,rest,meta:{names:names.players||{},home:{name:session.names.home,brand:brand(s.home?.id)},away:{name:session.names.away,brand:brand(s.away?.id)}}});
+    if(!ctrl){slot.remove();return false}
+    if(ui)ui.fieldRows=rows.length;
+    const strip=host.querySelector('.v2-live-field'),label=strip?.getAttribute('aria-label');
+    if(label)slot.querySelector('canvas')?.setAttribute('aria-label',label);
+    strip?.remove();return true;
+  }catch(err){console.error(err);slot.remove();return false}
+}
 // What the last call led to: the play that followed it and how the win chance moved.
 function v2GameDayUIConsequence(session){
   const last=v2InteractiveGameDay?.lastCall,events=session.state.events||[];if(!last||events.length<=last.at)return'';
@@ -163,7 +183,10 @@ function renderV2InteractiveGameDay(){
     host.querySelector('[data-v2-gameday-start]').onclick=()=>{try{v2GameDayUIAssertStartable();v2GameDayUIPrepare()}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}};return
   }
   const session=v2InteractiveGameDay.session,d=api.pendingDecision(session),final=session.state.status==='final';
-  host.innerHTML=`<div class="v2-gameday-head"><div><div class="eyebrow">LIVE GAME DAY${v2InteractiveGameDay.mode==='moments'?' · BIG MOMENTS':''}${final?' · FINAL':''}</div><h3>${gameEscape(session.names.away)} at ${gameEscape(session.names.home)}</h3></div></div>${v2GameDayUIScoreboard(session)}${v2GameDayUIField(session)}${v2GameDayUIDecision(session)}${v2GameDayUIConsequence(session)}<div class="v2-gameday-controls button-row">${!final&&!d?'<button type="button" data-v2-gameday-next>Next Play</button><button type="button" data-v2-gameday-decision>Advance to Next Decision</button>':''}${!final?'<button type="button" data-v2-gameday-delegate>Delegate Rest</button>':''}${final?'<button type="button" data-v2-gameday-record class="recommended">Record Final</button>':''}${!final?`<button type="button" class="v2-gameday-prep-toggle" data-v2-gameday-prep aria-pressed="${v2GameDayShowPrep}">${v2GameDayShowPrep?'Hide scouting and prep':'Show scouting and prep'}</button>`:''}</div>${v2GameDayUIConditions(session)}${v2GameDayUIMomentum(session)}<div class="v2-gameday-feed"><div class="v2-gameday-feed-head"><strong>Game feed</strong><span class="muted">Newest first</span></div>${v2GameDayUIFeed(session)}</div><div class="v2-shadow-safety"><strong>${final?'Final whistle.':'Live game.'}</strong> ${final?'Record the final to keep this result.':'Saved as you play. Your staff can finish this game when you advance the week.'}</div>`;
+  // On a phone a pending decision comes first and the field follows it, so the whole decision fits on the first screen.
+  const fieldHTML=`<div class="v2-live-field3d" data-v2-live-field3d></div>${v2GameDayUIField(session)}`,fieldBelow=!!d&&!!globalThis.matchMedia?.('(max-width: 720px)').matches;
+  host.innerHTML=`<div class="v2-gameday-head"><div><div class="eyebrow">LIVE GAME DAY${v2InteractiveGameDay.mode==='moments'?' · BIG MOMENTS':''}${final?' · FINAL':''}</div><h3>${gameEscape(session.names.away)} at ${gameEscape(session.names.home)}</h3></div></div>${v2GameDayUIScoreboard(session)}${fieldBelow?'':fieldHTML}${v2GameDayUIDecision(session)}${v2GameDayUIConsequence(session)}${fieldBelow?fieldHTML:''}<div class="v2-gameday-controls button-row">${!final&&!d?'<button type="button" data-v2-gameday-next>Next Play</button><button type="button" data-v2-gameday-decision>Advance to Next Decision</button>':''}${!final?'<button type="button" data-v2-gameday-delegate>Delegate Rest</button>':''}${final?'<button type="button" data-v2-gameday-record class="recommended">Record Final</button>':''}${!final?`<button type="button" class="v2-gameday-prep-toggle" data-v2-gameday-prep aria-pressed="${v2GameDayShowPrep}">${v2GameDayShowPrep?'Hide scouting and prep':'Show scouting and prep'}</button>`:''}</div>${v2GameDayUIConditions(session)}${v2GameDayUIMomentum(session)}<div class="v2-gameday-feed"><div class="v2-gameday-feed-head"><strong>Game feed</strong><span class="muted">Newest first</span></div>${v2GameDayUIFeed(session)}</div><div class="v2-shadow-safety"><strong>${final?'Final whistle.':'Live game.'}</strong> ${final?'Record the final to keep this result.':'Saved as you play. Your staff can finish this game when you advance the week.'}</div>`;
+  v2GameDayUIMountField(host,session);
   host.querySelector('[data-v2-gameday-prep]')?.addEventListener('click',()=>{v2GameDayShowPrep=!v2GameDayShowPrep;renderV2InteractiveGameDay()});
   host.querySelector('[data-v2-gameday-next]')?.addEventListener('click',()=>{try{v2GameDayUIRun('next')}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}});
   host.querySelector('[data-v2-gameday-decision]')?.addEventListener('click',()=>{try{v2GameDayUIRun('decision')}catch(err){console.error(err);setStatus(`Game Day stopped: ${err.message||err}`)}});
