@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.29.0 — Recruiting on their own timeline
+
+- Most recruits keep their decision timing private. Relationships provide clues, and a minority publicly announce a week with occasional explained changes.
+- School fit, competition, completed visits, personality and seeded uncertainty shape readiness. Adding a prospect to the board no longer switches him to a fixed countdown.
+- Top 5 and Top 3 cuts no longer reveal upcoming dates. Signing periods, scholarship rules and commitment flips remain in place.
+- Existing saves keep their offers, lists, cuts and commitments. Midseason transitions are staggered, with no new storage schema.
+
+Saves carry over. Timing changes apply when advancing recruiting; back up a dynasty before switching builds.
+
 ## v0.28.1 — New Dynasty Lab identity
 
 - The approved wide logo now appears on the title screen, new-dynasty setup and navigation rail. The stacked alternate appears in About.

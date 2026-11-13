@@ -377,3 +377,18 @@ may be half-updated when an error fires, and a backup of that state could be wor
 
 **Storage warning.** Dynasty & Saves shows how much storage the saves use, and a save that leaves the browser at
 80% or more of its quota says so once per session.
+
+## v0.29.0 natural recruiting timelines
+
+Current-class `recruit.funnel.version: 2` stores the last evaluated week, private
+readiness, completed-visit evidence, published Top 5/Top 3 lists, cuts, decisions,
+and optional public announcement/update. These fields use the existing core
+save/portable JSON path, with no IndexedDB schema change. Timing derives from the
+saved dynasty seed, class year, recruit ID and week; reading a card never draws
+randomness. Repeated evaluation within a week is idempotent.
+
+Legacy lists, cuts, offers and commitments remain intact. Synthetic
+`decisionWeek` deadlines are retired, not reclassified as public announcements.
+A season-qualified migration marker spreads midseason transitions over the next
+few advances and cannot delay future classes. Reopened recruitment gets a week
+to hear from schools; signing-day and flip rules still resolve independently.

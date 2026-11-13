@@ -21,7 +21,7 @@ function makePlayerArcSystem(env){
   const f=r.funnel&&r.funnel.season===universe().year?r.funnel:null;
   const finalists=(f?.top3||f?.top5||[]).filter(n=>n!==t.name);
   const out={hours,topic,inHome:!!rec.inHome||hist.some(x=>x.kind==='inhome'),visit:hist.some(x=>x.kind==='visit'),
-   offerWeek:rec.offerWeek??null,beat:finalists[0]||null,decisionWeek:f?.decisionWeek??null};
+   offerWeek:rec.offerWeek??null,beat:finalists[0]||null,decisionWeek:f?.decided?.week??r.commitWeek??null};
   return out.hours||out.offerWeek!=null||out.beat?out:null;
  }
 
