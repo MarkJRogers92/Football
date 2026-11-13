@@ -5,7 +5,7 @@
 // Everything here is decorative (empty alt): the text next to each image already says what it is.
 (function(root){
   'use strict';
-  const FILES=['balance-scale','bowl-laurel','chalkboard','coaching-tree','cornerstone','file-cabinet','seedling','championship-ring','endzone-pylon','gold-football-statue','program-key','bronze-medal','campus-gate','clipboard-blank','coach-headset','coach-legacy','coin-toss','conference-crown','contract-pen','envelope-letter','film-reel','first-aid','football','game-ball','goalposts','gold-medal','gold-star','graduation-cap','hard-hat','headset','helmet-plain','history-book','kickoff-tee','locker-room','compass','dumbbell','megaphone','milestone-marker','money-bag','newspaper','pennant','plaque','playbook-clipboard','player-of-year','podium','practice-facility','ribbon-rosette','rivalry-anvil','rivalry-axe','rivalry-barrel','rivalry-bell','rivalry-boot','rivalry-bucket','rivalry-cannon','rivalry-jug','rivalry-lantern','rivalry-shield','rivalry-spade','roster-jersey','scoreboard','scouting-folio','signing-cap','silver-medal','stadium-lights','stadium-miniature','stopwatch','training-cones','transfer-duffel','trophy-cup','wall-calendar','weight-room','whistle'];
+  const FILES=['balance-scale','bowl-laurel','chalkboard','coaching-tree','cornerstone','file-cabinet','seedling','championship-ring','endzone-pylon','gold-football-statue','program-key','bronze-medal','campus-gate','clipboard-blank','coach-headset','coach-legacy','coin-toss','conference-crown','contract-pen','envelope-letter','film-reel','first-aid','football','game-ball','goalposts','gold-medal','gold-star','graduation-cap','hard-hat','headset','helmet-plain','history-book','kickoff-tee','locker-room','compass','dumbbell','megaphone','milestone-marker','money-bag','newspaper','pennant','plaque','playbook-clipboard','player-of-year','podium','practice-facility','ribbon-rosette','rivalry-anvil','rivalry-axe','rivalry-barrel','rivalry-bell','rivalry-boot','rivalry-bucket','rivalry-cannon','rivalry-jug','rivalry-lantern','rivalry-shield','rivalry-spade','roster-jersey','scoreboard','scouting-folio','signing-cap','silver-medal','stadium-lights','stadium-miniature','stopwatch','training-cones','transfer-duffel','binoculars','globe','trophy-cup','wall-calendar','weight-room','whistle'];
   const src=key=>FILES.includes(key)?`assets/awards/${key}.webp`:'';
   const attr=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function img(key,cls='dl-art'){const s=src(key);return s?`<img class="${attr(cls)}" src="${s}" alt="" aria-hidden="true" loading="lazy" decoding="async" width="256" height="256">`:''}
@@ -30,5 +30,9 @@
   // Turntable strips (36 frames of 192px in one row) for the ceremonies, rendered by tools/blender/turntable.py.
   const TURNS=['rivalry-anvil','rivalry-axe','rivalry-barrel','rivalry-bell','rivalry-boot','rivalry-bucket','rivalry-cannon','rivalry-jug','rivalry-lantern','rivalry-shield','rivalry-spade','player-of-year'];
   const turnSrc=key=>TURNS.includes(key)?`assets/turntables/${key}.webp`:'';
-  root.DynastyArt={FILES,TURNS,turnSrc,src,img,rivalryKey,facilityKey,milestoneKey,kickerKey,stopKey,medalKey};
+  // Around Your Program briefing (living-world.js): one prop per kind of item. Binoculars and the globe are modelled
+  // in Blender by tools/blender/props.py.
+  const BRIEF={matchup:'pennant',callback:'ribbon-rosette',following:'binoculars',team:'roster-jersey',league:'globe'};
+  const briefKey=kind=>BRIEF[kind]||'';
+  root.DynastyArt={FILES,TURNS,turnSrc,src,img,rivalryKey,facilityKey,milestoneKey,kickerKey,stopKey,medalKey,briefKey};
 })(typeof globalThis!=='undefined'?globalThis:this);

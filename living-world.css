@@ -29,3 +29,7 @@ button.lw-follow[aria-pressed="true"]{color:var(--text);border-color:var(--team-
  button.lw-follow{min-height:44px;padding:8px 12px}
  .lw-cast>summary{min-height:36px;padding:8px 0}
 }
+
+/* v0.28: a small prop beside each briefing tag (DynastyArt.briefKey) */
+.lw-tag{display:flex;align-items:center;gap:6px}
+.lw-tag>.dl-art-kicker{width:22px;height:22px}

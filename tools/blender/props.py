@@ -12,6 +12,8 @@ Writes assets/awards/<name>.webp for:
     seedling          EMERGING (season stories)
     cornerstone       CORNERSTONE (season stories)
     file-cabinet      Player Archive
+    binoculars        Following (Around Your Program briefing)
+    globe             League (Around Your Program briefing)
 Mapped in program-art.js (KICKER) or placed in body.html. Setup and style: tools/blender/README.md.
 Run:
     .blender-venv/bin/python tools/blender/props.py [names...] [--samples N] [--png-dir DIR] [--no-webp]
@@ -431,11 +433,74 @@ def model_file_cabinet(M):
                     col, 0.003, parent=d, rot=(0.12, 0, 0))
 
 
+def model_binoculars(M):
+    """Field binoculars resting on a folded navy strap, objectives toward the camera."""
+    extra(M)
+    M['leather'] = material('leather', (0.012, 0.008, 0.006), (0.04, 0.026, 0.018), (0.55, 0.75), scale=40.0,
+                            detail=8.0, ao=0.5, bump=0.18)
+    box('strap', (1.5, 0.22, 0.03), (0.05, 0.42, 0.015), M['navy'], 0.01, rot=(0, 0, 0.25))
+    box('strap2', (0.9, 0.22, 0.03), (-0.35, -0.48, 0.015), M['navy'], 0.01, rot=(0, 0, -0.4))
+    b = group('binoculars', (0, 0, 0.27), (math.radians(-8), 0, math.radians(-14)))
+    # lathe along local z, turned so +z points at the camera (-Y)
+    prof = [(0, -0.62), (0.10, -0.62), (0.12, -0.58), (0.12, -0.42), (0.17, -0.34), (0.20, -0.10),
+            (0.205, 0.30), (0.23, 0.36), (0.23, 0.52), (0.20, 0.55), (0, 0.55)]
+    for x in (-0.25, 0.25):
+        tb = group('barrel', (x, 0, 0), (math.pi / 2, 0, 0), b)
+        lathe('body', prof, [M['leather']], parent=tb, segs=64, sharp=35)
+        band('front_ring', lambda _: 0.23, 0.36, 0.53, M['iron'], out=0.012, parent=tb)
+        lathe('objective', [(0, 0.552), (0.19, 0.552)], [M['glass']], parent=tb, segs=64)
+        lathe('objective_back', [(0.19, 0.50), (0, 0.50)], [M['blueprint']], parent=tb, segs=64)
+        band('eye_ring', lambda _: 0.12, -0.60, -0.45, M['iron'], out=0.02, parent=tb)
+        band('trim', lambda _: 0.205, 0.05, 0.09, M['brass'], out=0.008, parent=tb)
+    # hinge bridge and focus wheel between the barrels
+    for z in (0.12, -0.18):
+        box('bridge', (0.36, 0.10, 0.10), (0, z, 0.0), M['iron'], 0.03, parent=b)
+    wheel = group('wheel', (0, -0.36, 0.06), (0, math.pi / 2, 0), b)
+    lathe('focus', [(0, -0.07), (0.09, -0.07), (0.09, 0.07), (0, 0.07)], [M['brass']], parent=wheel, segs=24,
+          sharp=20)
+    for x in (-0.25, 0.25):
+        sphere('lug', 0.035, (x + (0.21 if x > 0 else -0.21), -0.30, 0.0), M['brass'], parent=b)
+
+
+def model_globe(M):
+    """A desk globe on a brass meridian and walnut base: navy seas, gold graticule, no continents or text."""
+    extra(M)
+    lathe('base', catmull([(0, 0), (0.62, 0), (0.64, 0.04), (0.58, 0.10), (0.40, 0.14), (0.22, 0.20),
+                           (0.14, 0.28)], 3) + [(0, 0.28)], [M['walnut']], segs=96)
+    band('base_ring', lambda _: 0.60, 0.02, 0.07, M['brass'], out=0.02)
+    lathe('stem', catmull([(0, 0.27), (0.08, 0.27), (0.05, 0.40), (0.07, 0.52), (0.045, 0.62)], 3) + [(0, 0.62)],
+          [M['brass']], segs=48)
+    R, cz = 0.62, 1.30
+    g = group('globe', (0, 0, cz), (0, math.radians(23.4), math.radians(-25)))
+    sphere('sea', R, (0, 0, 0), M['blueprint'], parent=g)
+    # graticule: parallels and meridians standing just proud of the sea
+    for lat in (-60, -30, 0, 30, 60):
+        a = math.radians(lat)
+        r, z = R * math.cos(a), R * math.sin(a)
+        lathe('parallel', [(r + 0.004, z - 0.006), (r + 0.012, z - 0.006), (r + 0.012, z + 0.006),
+                           (r + 0.004, z + 0.006)], [M['paint_gold' if lat else 'brass']], parent=g, segs=96,
+              closed=True)
+    for k in range(6):
+        m = group('meridian', (0, 0, 0), (0, 0, k * math.pi / 6), g)
+        lathe('meridian_ring', [(R + 0.004, -0.006), (R + 0.012, -0.006), (R + 0.012, 0.006), (R + 0.004, 0.006)],
+              [M['paint_gold']], parent=m, segs=96, closed=True, rot=(math.pi / 2, 0, 0))
+    # the brass meridian half-ring and axis pins
+    mer = group('stand_ring', (0, 0, 0), (0, 0, 0), g)
+    pts = [(math.sin(t) * (R + 0.07), 0, math.cos(t) * (R + 0.07)) for t in
+           [math.radians(d) for d in range(-10, 191, 20)]]
+    tube('half_ring', pts, 0.028, M['brass'], parent=mer)
+    for s in (-1, 1):
+        lathe('pin', [(0, 0), (0.03, 0), (0.03, 0.09), (0, 0.09)], [M['brass']], parent=g,
+              loc=(0, 0, s * (R - 0.01)), rot=(0 if s > 0 else math.pi, 0, 0), segs=16)
+    box('cradle', (0.10, 0.10, 0.14), (0, 0, 0.66), M['brass'], 0.02)
+
+
 MODELS = {
     'hard-hat': model_hard_hat, 'compass': model_compass, 'dumbbell': model_dumbbell,
     'milestone-marker': model_milestone_marker, 'podium': model_podium,
     'balance-scale': model_balance_scale, 'chalkboard': model_chalkboard, 'coaching-tree': model_coaching_tree,
     'seedling': model_seedling, 'cornerstone': model_cornerstone, 'file-cabinet': model_file_cabinet,
+    'binoculars': model_binoculars, 'globe': model_globe,
 }
 
 if __name__ == '__main__':
