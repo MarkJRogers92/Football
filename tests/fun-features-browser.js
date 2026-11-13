@@ -61,7 +61,8 @@ const {chromium}=require('playwright-core'),{chromiumPath}=require('./helpers/ch
    await page.close();
   }
 
-  // Ceremonies fire for exactly the real milestones that happen while playing, and never on load.
+  // Ceremonies fire for exactly the real milestones that happen while playing, and never on load. v0.27 added the
+  // national awards ceremony (kind 'awards'), which plays in this run when the coach's players win honors.
   const page=await browser.newPage({viewport:{width:1280,height:900},reducedMotion:'reduce'}),errors=[];
   page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
   await page.goto('file://'+path.join(__dirname,'..','index.html'));await startNewDynasty(page);
@@ -73,7 +74,7 @@ const {chromium}=require('playwright-core'),{chromiumPath}=require('./helpers/ch
    await page.evaluate(s=>document.querySelector(s).click(),id);await page.waitForTimeout(1500);
   }
   await page.waitForFunction(()=>document.querySelector('#simPlayoff').disabled,{timeout:60000});await page.waitForTimeout(1500);
-  const milestones=await page.evaluate(()=>window.DynastyCeremonySnapshot.read().milestones.filter(m=>['conference','bowl','national','rivalry'].includes(m.kind)).map(m=>m.key).sort());
+  const milestones=await page.evaluate(()=>window.DynastyCeremonySnapshot.read().milestones.filter(m=>['conference','bowl','national','rivalry','awards'].includes(m.kind)).map(m=>m.key).sort());
   const shown=await page.evaluate(()=>window.__shown.slice().sort());
   assert.deepEqual(shown,milestones,'a ceremony plays for each real postseason milestone and no others');
   await page.reload();await page.waitForSelector('#titleNew');
