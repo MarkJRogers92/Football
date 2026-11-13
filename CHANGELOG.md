@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.28.1 — New Dynasty Lab identity
+
+- The approved wide logo now appears on the title screen, new-dynasty setup and navigation rail. The stacked alternate appears in About.
+- Setup progress has its own row on phones, and both logos remain available offline.
+- Desktop, 390px and 320px browser checks cover the new branding and setup re-entry.
+
+Saves carry over. No simulation or save-format changes.
+
 ## v0.28.0 — Decide in the offseason, watch the live game
 
 - **The offseason stops hold the decision, not just the news.** Before departures, the card lists the players closest to leaving with an NIL offer beside each. Offer a deal and the player's risk drops on the spot; release it and the money comes back. Before signing, a class that is over the limit lists its commitments lowest-rated first with a Release button, until it fits. Before the portal, the card shows the transfers who fit your program best: pursue them, put more attention on one, or drop one. When you move on, the portal's rounds play out, so the players you chased answer before the portal closes. The full screens are still a button away for everything else (promises, portal NIL, the whole list).
