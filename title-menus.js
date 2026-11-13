@@ -110,7 +110,7 @@
     panel.innerHTML=`
       <div class="title-panel-head"><div><span>ABOUT</span><h2 id="titleAboutHeading">Dynasty Lab</h2></div><button type="button" data-title-about-back aria-label="Back to main menu">Back</button></div>
       <div class="title-about-hero">
-        <div class="title-about-mark" aria-hidden="true">DL</div>
+        <img class="dynasty-logo title-about-logo" src="assets/brand/dynasty-lab-stacked-v1.png" alt="Dynasty Lab" width="1254" height="1254">
         <div><div class="title-about-kicker">FICTIONAL COLLEGE FOOTBALL DYNASTY SIMULATOR</div><h3>Build the program. Own the era.</h3><p>Run a program across seasons, recruiting classes, coaching changes, player development and Game Day — then live with the history you create.</p></div>
       </div>
       <div class="title-about-facts" aria-label="Build information">

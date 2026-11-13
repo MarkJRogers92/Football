@@ -45,7 +45,7 @@
   rail.className='client-rail';
   rail.setAttribute('aria-label','Dynasty Lab navigation');
   rail.innerHTML=`
-    <div class="client-rail-brand"><strong>DYNASTY LAB</strong><span>Front Office</span></div>
+    <div class="client-rail-brand"><img class="dynasty-logo dynasty-logo-wide client-rail-logo" src="assets/brand/dynasty-lab-primary-v1.png" alt="Dynasty Lab" width="1774" height="887"><span>Front Office</span></div>
     <nav class="client-rail-nav">${NAV.map(group=>`<section class="client-nav-group"><div class="client-nav-label">${group.label}</div>${group.items.map(([tab,label])=>navButton(tab,label)).join('')}</section>`).join('')}</nav>
     <div class="client-rail-footer">
       <details class="client-utilities">

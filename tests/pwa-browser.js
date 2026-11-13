@@ -50,8 +50,10 @@ function serve(){
   await page.reload();await page.waitForSelector('#titleContinue:not([disabled])',{timeout:30000});
   assert.match(await page.locator('#titleContinueMeta').innerText(),/2027/,'the saved dynasty is offered offline');
   await page.click('#titleContinue');await page.locator('#app').waitFor({state:'visible'});
-  const helmet=await page.evaluate(()=>new Promise(resolve=>{const img=new Image();img.onload=()=>resolve(true);img.onerror=()=>resolve(false);img.src='assets/team-helmets-meshy-atlas-128.webp'}));
-  assert.equal(helmet,true,'art is served from the cache offline');
+  for(const src of ['assets/team-helmets-meshy-atlas-128.webp','assets/brand/dynasty-lab-primary-v1.png','assets/brand/dynasty-lab-stacked-v1.png']){
+   const loaded=await page.evaluate(src=>new Promise(resolve=>{const img=new Image();img.onload=()=>resolve(true);img.onerror=()=>resolve(false);img.src=src}),src);
+   assert.equal(loaded,true,`${src} is served from the cache offline`);
+  }
   assert.deepEqual(problems.filter(p=>!/favicon/.test(p)),[],'nothing failed offline');
   console.log(`PWA browser test passed (v${version}: installs, policy clean, plays offline)`);
  }finally{await browser.close();server.close()}

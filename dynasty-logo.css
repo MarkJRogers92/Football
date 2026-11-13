@@ -1,0 +1,39 @@
+/* Approved Dynasty Lab artwork. Presentation only; school branding stays independent.
+   Keep versioned filenames: the offline service worker caches artwork by URL. */
+.dynasty-logo{display:block;max-width:100%;height:auto;object-fit:contain}
+/* The supplied wide PNG has transparent top/bottom padding. Fit only that
+   padding out of the layout without stretching or altering the approved art. */
+.dynasty-logo-wide{aspect-ratio:3.55/1;object-fit:cover;object-position:center}
+
+.title-brand{display:block;width:min(610px,100%);margin-bottom:clamp(22px,3vh,32px)}
+.title-brand h1{width:100%;margin:0;line-height:1;text-shadow:none}
+.title-brand h1 .dynasty-logo{width:100%;filter:drop-shadow(0 6px 18px rgba(0,0,0,.45))}
+.title-brand p{margin:12px 0 0;text-align:center;line-height:1.5}
+
+.setup-brand{display:grid;justify-items:start;gap:4px;min-width:0}
+.setup-brand-logo{width:158px}
+.setup-brand>small{padding-left:4px}
+
+html.bi-brand .client-rail-brand{padding:0 8px 14px;gap:6px}
+html.bi-brand .client-rail-brand::before{content:none}
+.client-rail-logo{width:188px}
+.client-rail-brand>span{text-align:center}
+
+.title-about-hero{grid-template-columns:104px minmax(0,1fr)}
+.title-about-logo{width:104px}
+
+@media(max-width:700px){
+ .title-brand p{font-size:11px;letter-spacing:.12em;margin-top:8px}
+ /* Give progress its own row rather than squeezing seven steps between the
+    wordmark and Exit Setup at narrow phone widths. */
+ .setup-header{grid-template-columns:minmax(0,1fr) auto;row-gap:8px}
+ .setup-brand{grid-column:1;grid-row:1}
+ .setup-brand-logo{width:132px}
+ .setup-exit{grid-column:2;grid-row:1;justify-self:end}
+ .setup-progress{grid-column:1/-1;grid-row:2;max-width:100%}
+ .setup-brand>small{display:none}
+}
+@media(max-width:430px){
+ .title-about-hero{grid-template-columns:76px minmax(0,1fr);gap:10px}
+ .title-about-logo{width:76px}
+}
