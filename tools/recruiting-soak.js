@@ -2,7 +2,7 @@
 //
 // The ordinary long-run tools use the engine without its extensions, so they never exercise the desk. This
 // drives the controlled program through many full seasons with the desk working a board every week, and checks
-// what a long dynasty could break: save growth, stuck funnels, bad numbers, class-count drift and leftovers
+// what a long dynasty could break: save growth, invalid timelines, bad numbers, class-count drift and leftovers
 // from past classes.
 //
 //   node tools/recruiting-soak.js                      30 seasons, staff-run, seed 7
@@ -86,13 +86,19 @@ async function runSoak({ seasons = 30, seed = 7, policy = 'staff', board = 25, l
     // ---- invariants at the end of the regular season, before signing day settles everything ----
     const T = user();
     const board0 = targets;
-    const stuck = board0.filter(r => !r.committed && A.funnelState(r) && !A.funnelState(r).decided && !A.funnelState(r).cut).length;
+    // Waiting through the regular season is valid; signing day resolves the remaining market.
+    const unsigned = board0.filter(r => !r.committed).length;
     for (const r of u().recruits) {
       if (!finite(r.interest, r.relationship) || r.interest < 1 || r.interest > 100 || r.relationship < 0 || r.relationship > 100) {
         fail(year, `${r.name} has interest ${r.interest} / relationship ${r.relationship}`); break;
       }
       const f = r.funnel;
-      if (f && f.season === year && (!Number.isInteger(f.decisionWeek) || f.decisionWeek < 5 || f.decisionWeek > 11)) { fail(year, `${r.name} has decision week ${f.decisionWeek}`); break; }
+      if (f && f.season === year) {
+        if (f.version !== 2 || !Number.isFinite(f.readiness) || !Number.isInteger(f.lastWeek) || f.lastWeek > u().week || 'decisionWeek' in f) { fail(year, `${r.name} has invalid timeline state`); break; }
+        if (f.top3 && (!f.top5 || !f.top3.every(name => f.top5.includes(name)))) { fail(year, `${r.name} has finalists outside his Top 5`); break; }
+        if (f.decided && (f.decided.week < 5 || !r.committed)) { fail(year, `${r.name} has an invalid timeline decision`); break; }
+        if (f.announcement && (!(Number.isInteger(f.announcement.week) || (f.announcement.week === null && typeof f.announcement.reason === 'string' && f.announcement.reason.length > 0)) || !Number.isInteger(f.announcement.announcedAt))) { fail(year, `${r.name} has an invalid public announcement`); break; }
+      }
     }
     const limit = A.offerLimit(T), out = A.offersOut(u().recruits, T);
     if (out > limit) fail(year, `${out} offers out against a limit of ${limit}`);
@@ -129,10 +135,10 @@ async function runSoak({ seasons = 30, seed = 7, policy = 'staff', board = 25, l
     rows.push({
       year, seconds: (Date.now() - started) / 1000, class: mine.length, blue: mine.filter(r => r.stars >= 4).length,
       hours: desk?.hours ?? 0, budget: desk?.budget ?? 0, won: desk?.won ?? 0, lost: desk?.lost ?? 0, cut: desk?.cut ?? 0, flipped: desk?.flipped ?? 0,
-      neverOffered: desk?.neverOffered ?? 0, stuck, deskKb: deskBytes / 1024, ledgerBytes, teamsWithLedger, saveMb, heapMb: mb(process.memoryUsage().heapUsed),
+      neverOffered: desk?.neverOffered ?? 0, unsigned, deskKb: deskBytes / 1024, ledgerBytes, teamsWithLedger, saveMb, heapMb: mb(process.memoryUsage().heapUsed),
     });
     const r = rows.at(-1);
-    log(`${String(year).padEnd(5)}| class ${String(r.class).padStart(2)} (${r.blue} blue) | hours ${String(r.hours).padStart(3)}/${String(r.budget).padEnd(3)} | won ${r.won} lost ${r.lost} cut ${r.cut} flipped ${r.flipped} | never offered ${r.neverOffered} | stuck ${r.stuck} | desk ${r.deskKb.toFixed(0)} KB | save ${r.saveMb == null ? 'too large to measure' : r.saveMb.toFixed(1) + ' MB'} | heap ${r.heapMb.toFixed(0)} MB | ${r.seconds.toFixed(1)}s`);
+    log(`${String(year).padEnd(5)}| class ${String(r.class).padStart(2)} (${r.blue} blue) | hours ${String(r.hours).padStart(3)}/${String(r.budget).padEnd(3)} | won ${r.won} lost ${r.lost} cut ${r.cut} flipped ${r.flipped} | never offered ${r.neverOffered} | unsigned ${r.unsigned} | desk ${r.deskKb.toFixed(0)} KB | save ${r.saveMb == null ? 'too large to measure' : r.saveMb.toFixed(1) + ' MB'} | heap ${r.heapMb.toFixed(0)} MB | ${r.seconds.toFixed(1)}s`);
   }
 
   // ---- drift over the whole run ----

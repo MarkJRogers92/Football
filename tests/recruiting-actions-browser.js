@@ -57,7 +57,7 @@ const hoursLeft=async page=>{await page.waitForFunction(()=>/^\d+\s*\/\s*\d+/.te
   const m2=await motives();
   check(`[${label}] two contacts uncover his second priority and say what is left`,!/Second priority\s*not yet/i.test(m2)&&/Dealbreaker\s*not yet — 2 more contacts/i.test(m2),m2.replace(/\s+/g,' '));
   const fn=await page.locator('.recruit-workspace-dossier .ra-funnel').innerText();
-  check(`[${label}] the desk shows when he decides and when his next cut comes`,/Decides\s*week \d+/i.test(fn)&&/Next cut\s*Top 5 in week \d+/i.test(fn),fn.replace(/\s+/g,' '));
+  check(`[${label}] the desk keeps unannounced dates private`,/Recruitment/i.test(fn)&&/No public decision date/i.test(fn)&&!/Next cut|Decides\s*week|weeks? left/i.test(fn),fn.replace(/\s+/g,' '));
   check(`[${label}] the card carries a decision badge and the desk says an offer is needed`,await page.locator('.recruit-workspace-card.active .ra-decision-badge').count()===1&&/cannot choose you without a scholarship offer/.test(await page.locator('.recruit-workspace-dossier').innerText()));
   const status2=await page.evaluate(()=>document.body.innerText);
   check(`[${label}] the status line announces what was learned`,/Learned: His second priority is/.test(status2));

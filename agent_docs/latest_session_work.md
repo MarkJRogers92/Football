@@ -1,5 +1,12 @@
 # Latest Session Work
 
+## v0.29.0 natural recruiting timelines — 2026-11-13
+
+- The private deterministic timeline now applies to all uncommitted recruits. Readiness combines calendar, fit, competition, completed visits and stable personality; public status reveals only clues and voluntary announcements. Existing signing and flip mechanisms remain.
+- Migration preserves current offers/lists/cuts/commitments, removes synthetic deadlines and staggers the current class only. Public-date changes include reasons, reopenings get time to hear from schools, and repeated evaluation cannot reroll outcomes.
+- The focused 102-case recruiting checks passed across the complete run and corrected late-fixture rerun; 42 player-history/signing/rising-class regressions passed. Full repository validation and publication are pending. Local Chromium is blocked at launch by socket EPERM, so browser checks must run in CI.
+- Source and save contract: `docs/RECRUITING_TIMELINES.md` and `STORAGE.md`. User authorized pushing, merging and publishing after validation.
+
 ## v0.28.1 approved logo refresh — 2026-11-13
 
 - PR #56 integrated the approved wide logo into the title screen, setup header and navigation rail, and the stacked alternate into About. The original artwork is unchanged; phone setup progress has its own row. Both assets are precached offline.
