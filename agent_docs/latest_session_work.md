@@ -1,5 +1,11 @@
 # Latest Session Work
 
+## v0.28.1 approved logo refresh — 2026-11-13
+
+- PR #56 integrated the approved wide logo into the title screen, setup header and navigation rail, and the stacked alternate into About. The original artwork is unchanged; phone setup progress has its own row. Both assets are precached offline.
+- CI for the logo integration passed all seven jobs, including 869 unit tests, desktop/390px/320px logo checks, offline coverage, both desktop packages and simulation audit.
+- Release metadata is v0.28.1 because production v0.28.0 already exists and the publisher prevents overwriting a version with different content. Publication is pending validation of this release stamp. Saves and simulation behavior are unchanged.
+
 ## v0.28.0 decisions on the stop cards, live 3D field — 2026-11-13
 
 - Offseason stops (`offseason-stops.js`): `offseasonStopFacts` now returns `decide` ('departures', 'signing', 'portal'), and `renderOffseasonStop` adds `departuresDecideHTML` (NIL offer/release through `signNilDeal`/`cancelNilDeal`, rows sorted by risk before relief so they do not jump), `signingCutHTML` (shown only when `scholarshipSummary(t).over`, staff cut order, `pullOffer`) and `portalDecideHTML` (best `portalFit` scores; `stopPortalPursue` opens the cycle with `openPortalCycle` before the first `targetPortalCandidate`, since opening resets finalists). Moving on from the portal stop runs `stopPortalPlayOut` (the remaining `advancePortalRound`s) before the advance resolves decisions. While a stop is open its facts stay non-null after the decision is made (e.g. "Your class fits"), so the card does not vanish. With a decision on the card the move-on button is the primary one. Fixtures: `departuresRiskFixture`, `signingOverFixture`, `portalStopState`. Test `tests/offseason-decide-browser.js` (in `test:browser-extended`); `tests/world-identity-browser.js` now counts only the card's own button row.
