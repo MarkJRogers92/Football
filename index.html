@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.28.0</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.28.1</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -3429,6 +3429,46 @@ button.lw-follow[aria-pressed="true"]{color:var(--text);border-color:var(--team-
 .stop-rows button[aria-pressed="true"]{border-color:var(--good,#4ade80)}
 .stop-note{font-size:.8rem;margin:6px 0 0!important}
 
+/* Approved Dynasty Lab artwork. Presentation only; school branding stays independent.
+   Keep versioned filenames: the offline service worker caches artwork by URL. */
+.dynasty-logo{display:block;max-width:100%;height:auto;object-fit:contain}
+/* The supplied wide PNG has transparent top/bottom padding. Fit only that
+   padding out of the layout without stretching or altering the approved art. */
+.dynasty-logo-wide{aspect-ratio:3.55/1;object-fit:cover;object-position:center}
+
+.title-brand{display:block;width:min(610px,100%);margin-bottom:clamp(22px,3vh,32px)}
+.title-brand h1{width:100%;margin:0;line-height:1;text-shadow:none}
+.title-brand h1 .dynasty-logo{width:100%;filter:drop-shadow(0 6px 18px rgba(0,0,0,.45))}
+.title-brand p{margin:12px 0 0;text-align:center;line-height:1.5}
+
+.setup-brand{display:grid;justify-items:start;gap:4px;min-width:0}
+.setup-brand-logo{width:158px}
+.setup-brand>small{padding-left:4px}
+
+html.bi-brand .client-rail-brand{padding:0 8px 14px;gap:6px}
+html.bi-brand .client-rail-brand::before{content:none}
+.client-rail-logo{width:188px}
+.client-rail-brand>span{text-align:center}
+
+.title-about-hero{grid-template-columns:104px minmax(0,1fr)}
+.title-about-logo{width:104px}
+
+@media(max-width:700px){
+ .title-brand p{font-size:11px;letter-spacing:.12em;margin-top:8px}
+ /* Give progress its own row rather than squeezing seven steps between the
+    wordmark and Exit Setup at narrow phone widths. */
+ .setup-header{grid-template-columns:minmax(0,1fr) auto;row-gap:8px}
+ .setup-brand{grid-column:1;grid-row:1}
+ .setup-brand-logo{width:132px}
+ .setup-exit{grid-column:2;grid-row:1;justify-self:end}
+ .setup-progress{grid-column:1/-1;grid-row:2;max-width:100%}
+ .setup-brand>small{display:none}
+}
+@media(max-width:430px){
+ .title-about-hero{grid-template-columns:76px minmax(0,1fr);gap:10px}
+ .title-about-logo{width:76px}
+}
+
 /* v0.21 — phone floor for touch and reading. At phone width every control is at least 44px tall (icon buttons 44px
    wide) and no text is under 12px. Loaded last so it holds whatever a feature stylesheet says. Desktop is untouched. */
 @media(max-width:720px){
@@ -3483,12 +3523,8 @@ select{min-width:44px}
   <div class="title-trophy" aria-hidden="true"><span class="trophy-turn"><span class="trophy-frame"></span><span class="trophy-frame trophy-next"></span></span></div>
   <div class="title-screen-content">
     <header class="title-brand">
-      <div class="title-crest" aria-hidden="true"><span>DL</span></div>
-      <div>
-        <div class="title-rule"></div>
-        <h1 id="titleGameName">Dynasty <em>Lab</em></h1>
-        <p>Build the program. Own the era.</p>
-      </div>
+      <h1 id="titleGameName" aria-label="Dynasty Lab"><img class="dynasty-logo dynasty-logo-wide" src="assets/brand/dynasty-lab-primary-v1.png" alt="Dynasty Lab" width="1774" height="887" fetchpriority="high"></h1>
+      <p>Build the program. Own the era.</p>
     </header>
 
     <div class="title-menu-shell">
@@ -3533,7 +3569,7 @@ select{min-width:44px}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.28.0</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.28.1</b></span></footer>
   </div>
 </section>
 
@@ -3541,7 +3577,7 @@ select{min-width:44px}
   <div class="setup-backdrop" aria-hidden="true"></div>
   <div class="setup-frame">
     <header class="setup-header">
-      <div class="setup-brand"><span class="setup-brand-mark" aria-hidden="true">DL</span><span><b>DYNASTY LAB</b><small>NEW DYNASTY</small></span></div>
+      <div class="setup-brand"><img class="dynasty-logo dynasty-logo-wide setup-brand-logo" src="assets/brand/dynasty-lab-primary-v1.png" alt="Dynasty Lab" width="1774" height="887"><small>NEW DYNASTY</small></div>
       <div id="setupProgress" class="setup-progress" aria-label="Setup progress"></div>
       <button id="setupExit" class="setup-exit" type="button">Exit Setup</button>
     </header>
@@ -3560,7 +3596,7 @@ select{min-width:44px}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.28.0</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.28.1</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -7509,7 +7545,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.28.0';
+const APP_VERSION='0.28.1';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi','Aiden','Alex','Amari','Andrew','Anthony','Antonio','Armani','Ashton','Austin','Avery','Bennett','Blake','Brady','Brandon','Brayden','Brennan','Brock','Bryson','Cade','Caden','Calvin','Cameron','Carson','Cedric','Chase','Christian','Cody','Colby','Collin','Connor','Corey','Damian','Damon','Daniel','Davion','Dawson','Deandre','Demarcus','Derek','Desmond','Dillon','Drew','Dylan','Elijah','Ethan','Ezra','Garrett','Grady','Graham','Grant','Hayden','Hunter','Ian','Isaac','Jabari','Jace','Jackson','Jacob','Jaden','Jake','Jamar','Jameson','Jared','Jarrett','Javon','Jaxon','Jay','Jermaine','Jesse','Joel','Jonah','Josiah','Julian','Justin','Kaden','Kai','Kamari','Keegan','Keenan','Kendall','Kendrick','Kevin','Kobe','Kyle','Kyler','Lamar','Landon','Lane','Lawrence','Leon','Levi','Lincoln','Lucas','Marco','Mario','Mateo','Matthew','Maurice','Max','Myles','Nate','Nathan','Nolan','Omar','Owen','Parker','Patrick','Preston','Quentin','Quincy','Reggie','Riley','Ryan','Sam','Sean','Seth','Shane','Silas','Solomon','Spencer','Sterling','Terrell','Theo','Tobias','Travis','Tristan','Troy','Tucker','Tyrese','Victor','Wade','Walker','Wes','Wyatt','Zach','Zane','Andres','Diego','Rafael','Tevita','Sione','Manu','Keoni','Kenji','Darnell'];
@@ -21604,7 +21640,7 @@ queue();
   rail.className='client-rail';
   rail.setAttribute('aria-label','Dynasty Lab navigation');
   rail.innerHTML=`
-    <div class="client-rail-brand"><strong>DYNASTY LAB</strong><span>Front Office</span></div>
+    <div class="client-rail-brand"><img class="dynasty-logo dynasty-logo-wide client-rail-logo" src="assets/brand/dynasty-lab-primary-v1.png" alt="Dynasty Lab" width="1774" height="887"><span>Front Office</span></div>
     <nav class="client-rail-nav">${NAV.map(group=>`<section class="client-nav-group"><div class="client-nav-label">${group.label}</div>${group.items.map(([tab,label])=>navButton(tab,label)).join('')}</section>`).join('')}</nav>
     <div class="client-rail-footer">
       <details class="client-utilities">
@@ -21805,7 +21841,7 @@ queue();
     panel.innerHTML=`
       <div class="title-panel-head"><div><span>ABOUT</span><h2 id="titleAboutHeading">Dynasty Lab</h2></div><button type="button" data-title-about-back aria-label="Back to main menu">Back</button></div>
       <div class="title-about-hero">
-        <div class="title-about-mark" aria-hidden="true">DL</div>
+        <img class="dynasty-logo title-about-logo" src="assets/brand/dynasty-lab-stacked-v1.png" alt="Dynasty Lab" width="1254" height="1254">
         <div><div class="title-about-kicker">FICTIONAL COLLEGE FOOTBALL DYNASTY SIMULATOR</div><h3>Build the program. Own the era.</h3><p>Run a program across seasons, recruiting classes, coaching changes, player development and Game Day — then live with the history you create.</p></div>
       </div>
       <div class="title-about-facts" aria-label="Build information">
