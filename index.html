@@ -3405,6 +3405,20 @@ button.lw-follow[aria-pressed="true"]{color:var(--text);border-color:var(--team-
 .offseason-signing li.signing-good{border-left-color:var(--good,#4ade80)}
 .offseason-signing li.signing-bad{border-left-color:var(--bad,#f08a8a)}
 @media(prefers-reduced-motion:no-preference){.offseason-signing li:last-child{animation:dl-value-in .35s ease both}}
+/* v0.28: decisions inside the offseason stop card */
+.stop-decide{margin:0 0 12px;max-width:70ch}
+.stop-decide-head{display:flex;justify-content:space-between;gap:12px;font-size:.85rem;color:var(--muted,#9ca8b8);margin:0 0 6px}
+.stop-decide-head strong{color:var(--text,#e8edf3);font-variant-numeric:tabular-nums}
+.stop-rows{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.stop-rows li{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.03);border-left:3px solid var(--line,#2b3440)}
+.stop-rows li.stop-risk{border-left-color:var(--warn,#f3ca78)}
+.stop-rows li.stop-held{border-left-color:var(--good,#4ade80)}
+.stop-who{display:flex;flex-direction:column;gap:2px;min-width:0}
+.stop-who small{color:var(--muted,#9ca8b8);font-size:.8rem}
+.stop-btns{display:flex;gap:6px;flex-wrap:wrap}
+.stop-rows button{min-width:7.5rem}
+.stop-rows button[aria-pressed="true"]{border-color:var(--good,#4ade80)}
+.stop-note{font-size:.8rem;margin:6px 0 0!important}
 
 /* v0.21 — phone floor for touch and reading. At phone width every control is at least 44px tall (icon buttons 44px
    wide) and no text is under 12px. Loaded last so it holds whatever a feature stylesheet says. Desktop is untouched. */
@@ -18967,6 +18981,67 @@ function signingRevealHTML(t){
  const row=x=>{const good=(x.flipped&&x.challenger===t.name)||(!x.flipped&&x.from===t.name);return`<li class="signing-${good?'good':'bad'}"><span>${'★'.repeat(x.stars)} ${gameEscape(x.pos)} ${gameEscape(x.name)}</span><strong>${x.flipped?`flips to ${gameEscape(x.challenger)}`:`stays with ${gameEscape(x.from)}`}</strong></li>`};
  return`<ol class="offseason-signing" aria-live="polite">${shown.map(row).join('')}</ol>${left?`<div class="button-row"><button type="button" class="bi-primary" data-offseason-sign="next">Announce the next name</button><button type="button" data-offseason-sign="all">Announce the rest</button></div>`:''}`;
 }
+// v0.28 — the stops used to describe a decision and send the coach to another screen to make it. Each now carries the
+// decision itself: NIL deals for the players closest to leaving, releasing commitments when the class is over the
+// limit, and pursuing the best fits in the transfer portal. Every action calls the same engine function the full
+// screen uses, so the rules (budget, attention, roster room) are enforced in one place. The full screen stays one
+// press away for everything the card leaves out.
+const STOP_ROWS=5;
+const stopSeniors=['SR','RS SR'];
+// Sorted by risk before any NIL relief, so a row does not jump when its deal is signed.
+function stopRiskRows(t){
+ return t.roster.filter(p=>!stopSeniors.includes(eligibilityLabel(p))).map(p=>({p,risk:transferRisk(p),raw:transferRisk(p)+nilRetentionRelief(p),deal:nilDealActive(p,t)}))
+  .filter(x=>x.risk>=40||x.deal).sort((a,b)=>b.raw-a.raw||String(a.p.id).localeCompare(String(b.p.id)));
+}
+function departuresDecideHTML(t){
+ const rows=stopRiskRows(t).slice(0,STOP_ROWS),left=nilRemaining(t);
+ if(!rows.length)return'';
+ const row=x=>{const cost=nilDealCost(x.p,false),who=`${gameEscape(x.p.pos)} ${gameEscape(x.p.name)}`;
+  return`<li class="${x.deal?'stop-held':'stop-risk'}"><span class="stop-who">${who}<small>${x.deal?`Risk ${x.risk} with the deal`:`Risk ${x.risk}`}</small></span>${x.deal
+   ?`<button type="button" data-stop-nil="${gameEscape(x.p.id)}" aria-pressed="true" aria-label="Release ${who}'s NIL deal (${x.deal.amount} back)">Held · ${x.deal.amount}</button>`
+   :`<button type="button" data-stop-nil="${gameEscape(x.p.id)}" aria-pressed="false" ${cost>left?'disabled':''} aria-label="Offer ${who} an NIL deal for ${cost}">Offer NIL · ${cost}</button>`}</li>`};
+ return`<div class="stop-decide" role="group" aria-label="Hold players with NIL deals"><div class="stop-decide-head"><span>NIL left this year</span><strong data-stop-budget>${left} of ${nilBudgetFor(t)}</strong></div><ul class="stop-rows">${rows.map(row).join('')}</ul></div>`;
+}
+// The staff's own cut order (enforceScholarshipLimits): lowest scouted grade and upside first.
+function stopCutRows(t){
+ return(universe.recruits||[]).filter(r=>r.committed===t.name).sort((a,b)=>(a.scoutUp+a.scout*.55)-(b.scoutUp+b.scout*.55));
+}
+function signingCutHTML(t){
+ const sch=scholarshipSummary(t);if(!sch.over)return'';
+ const rows=stopCutRows(t).slice(0,Math.max(STOP_ROWS,sch.over+2));
+ const row=r=>{const who=`${'★'.repeat(r.stars||0)} ${gameEscape(r.pos)} ${gameEscape(r.name)}`;
+  return`<li class="stop-risk"><span class="stop-who">${who}<small>Scouted ${grade(r.scout)}, upside ${grade(r.scoutUp)}</small></span><button type="button" data-stop-release="${gameEscape(r.id)}" aria-label="Release ${gameEscape(r.name)}'s commitment">Release</button></li>`};
+ return`<div class="stop-decide" role="group" aria-label="Release commitments"><div class="stop-decide-head"><span>Over the limit</span><strong>${sch.over}</strong></div><ul class="stop-rows">${rows.map(row).join('')}</ul><p class="stop-note">A released recruit will not come back, and his home region's pipeline notices.</p></div>`;
+}
+function stopPortalRows(u){
+ const fits=portalCandidates().filter(x=>!x.decision&&!x.placed&&x.fromSchoolId!==u.id).map(x=>({x,fit:portalFit(x,u)})).filter(y=>y.fit);
+ const targeted=fits.filter(y=>portalTargetFor(y.x.candidateId));
+ const rest=fits.filter(y=>!portalTargetFor(y.x.candidateId)).sort((a,b)=>b.fit.score-a.fit.score||b.x.p.perceived-a.x.p.perceived);
+ return[...targeted,...rest].slice(0,Math.max(STOP_ROWS,targeted.length));
+}
+function portalDecideHTML(u){
+ const rows=stopPortalRows(u),left=portalAttentionLeft(),cap=ensurePortalCycle().targets.length>=PORTAL_TARGET_CAP;
+ if(!rows.length)return'';
+ const row=({x})=>{const tg=portalTargetFor(x.candidateId),who=`${gameEscape(x.p.pos)} ${gameEscape(x.p.name)}`,from=portalOrigin(x)?.name||x.from,mine=x.interest?.[u.id];
+  const info=`${grade(x.p.perceived)} · ${gameEscape(x.p.year)} · from ${gameEscape(from)}${mine!=null?` · interest ${mine}%`:''}`;
+  const btns=tg?`<button type="button" data-stop-att="${gameEscape(x.candidateId)}" data-dir="up" ${left<1||tg.attention>=PORTAL_ATTENTION_MAX?'disabled':''} aria-label="More attention on ${who} (now ${tg.attention})">Attention ${tg.attention} · add</button><button type="button" data-stop-att="${gameEscape(x.candidateId)}" data-dir="drop" aria-label="Stop pursuing ${who}">Drop</button>`
+   :`<button type="button" data-stop-att="${gameEscape(x.candidateId)}" data-dir="up" ${left<1||cap?'disabled':''} aria-label="Pursue ${who}">Pursue</button>`;
+  return`<li class="${tg?'stop-held':''}"><span class="stop-who">${who}<small>${info}</small></span><span class="stop-btns">${btns}</span></li>`};
+ return`<div class="stop-decide" role="group" aria-label="Pursue transfers"><div class="stop-decide-head"><span>Best fits for your program · attention left</span><strong data-stop-budget>${left} of ${PORTAL_ATTENTION_POOL}</strong></div><ul class="stop-rows">${rows.map(row).join('')}</ul></div>`;
+}
+// Pursuing someone opens the portal's rounds (the same path as Open portal on the Offseason screen); moving on plays
+// out whatever rounds are left so the players chased get their answer before the portal is resolved.
+function stopPortalPursue(id,dir){
+ const c=ensurePortalCycle();
+ if(dir==='drop')return untargetPortalCandidate(id);
+ if(c.status==='idle')openPortalCycle();
+ const tg=portalTargetFor(id);
+ return targetPortalCandidate(id,(tg?.attention||0)+1);
+}
+function stopPortalPlayOut(){
+ const c=ensurePortalCycle();
+ for(let i=0;i<=PORTAL_ROUNDS&&c.status==='open';i++)advancePortalRound();
+}
 function offseasonStopState(){
  if(!universe)return null;
  if(!universe.offseasonStops||universe.offseasonStops.year!==universe.year)universe.offseasonStops={year:universe.year,seen:{},open:null};
@@ -18975,12 +19050,13 @@ function offseasonStopState(){
 function offseasonStopFacts(phase,t){
  if(!t)return null;
  if(phase==='departures'){
-  const risks=t.roster.map(p=>({p,risk:transferRisk(p)})).filter(x=>x.risk>=40&&!['SR','RS SR'].includes(eligibilityLabel(x.p))).sort((a,b)=>b.risk-a.risk);
-  if(!risks.length)return null;
-  const names=risks.slice(0,3).map(x=>`${x.p.pos} ${x.p.name} (${x.risk})`).join(', ');
+  const rows=stopRiskRows(t),risks=rows.filter(x=>x.risk>=40),open=universe.offseasonStops?.open==='departures';
+  if(!risks.length&&!open)return null;
+  if(!risks.length)return{title:'Nobody is close to leaving now',text:`Every player who was at risk has an NIL deal. Deals last this season; you can still release one and get the money back before departures are processed.`,
+   act:{label:'See the full list',tab:'offseason'},go:'Process departures',decide:'departures'};
   return{title:`${risks.length} player${risks.length===1?' is':'s are'} close to leaving`,
-   text:`${names}${risks.length>3?` and ${risks.length-3} more`:''}. Once departures are processed, anyone who enters the portal is gone from your roster. A conversation or an NIL deal now can still change a mind.`,
-   act:{label:'See who is at risk',tab:'offseason'},go:'Process departures'};
+   text:`Once departures are processed, anyone who enters the portal is gone from your roster. An NIL deal now lowers a player's risk; the money comes from the same budget as recruiting.`,
+   act:{label:'See the full list',tab:'offseason'},go:'Process departures',decide:'departures'};
  }
  if(phase==='signing'){
   const sch=scholarshipSummary(t),commits=(universe.recruits||[]).filter(r=>r.committed===t.name).length,mine=mySigningDayLeft(t);
@@ -18992,17 +19068,20 @@ function offseasonStopFacts(phase,t){
   if(told.length&&universe.offseasonStops?.open==='signing'){const won=told.filter(x=>(x.flipped&&x.challenger===t.name)||(!x.flipped&&x.from===t.name)).length;
    return{title:`Signing day: you kept or won ${won} of ${told.length}`,text:`Every contested decision involving your program is in. ${sch.over?`Your class is ${sch.over} over the limit; the last to commit will be turned away.`:sch.room?`${sch.room} scholarship${sch.room===1?' is':'s are'} still open and will be filled with whoever is left.`:'The class is full.'}`,
     act:{label:'Review the class',tab:'recruiting'},go:'Enroll the class',signing:true}}
-  if(!sch.room&&!sch.over)return null;
-  return{title:sch.over?`Your class is ${sch.over} over the limit`:`${sch.room} scholarship${sch.room===1?' is':'s are'} still open`,
-   text:sch.over?`${commits} recruits have committed and only ${sch.capacity} can enroll. Decide who signs, or the last to commit are turned away.`:`${commits} recruit${commits===1?' has':'s have'} committed. Enrolling the class closes this recruiting cycle; open places are filled with whoever is left.`,
+  if(!sch.room&&!sch.over)return universe.offseasonStops?.open==='signing'?{title:`Your class fits: ${commits} signee${commits===1?'':'s'}`,text:'Every scholarship is spoken for and nobody is over the limit. Enrolling the class closes this recruiting cycle.',act:{label:'Review the class',tab:'recruiting'},go:'Enroll the class'}:null;
+  return{decide:sch.over?'signing':null,title:sch.over?`Your class is ${sch.over} over the limit`:`${sch.room} scholarship${sch.room===1?' is':'s are'} still open`,
+   text:sch.over?`${commits} recruits have committed and only ${sch.capacity} can enroll. Release who you choose, lowest-rated listed first.`:`${commits} recruit${commits===1?' has':'s have'} committed. Enrolling the class closes this recruiting cycle; open places are filled with whoever is left.`,
    act:{label:'Review the class',tab:'recruiting'},go:'Enroll the class'};
  }
  if(phase==='portal'){
-  const cycle=ensurePortalCycle(),field=portalCandidates().length,targets=(cycle.targets||[]).length;
-  if(!field||targets)return null;
+  const cycle=ensurePortalCycle(),u=selected(),field=portalCandidates().filter(x=>!x.decision).length,targets=(cycle.targets||[]).length,open=universe.offseasonStops?.open==='portal';
+  if(!field||(targets&&!open))return null;
+  if(targets)return{title:`You are pursuing ${targets} transfer${targets===1?'':'s'}`,
+   text:`${portalAttentionLeft()} attention left. Moving on plays out the portal's remaining rounds: each round the players you chase hear from you, then everyone picks a school.`,
+   act:{label:'Work the full portal',tab:'offseason'},go:'Resolve the portal',decide:'portal'};
   return{title:`${field} players are in the transfer portal`,
-   text:`You have not pursued any of them. You have ${portalAttentionLeft()} attention to spend on calls, pitches and visits. Left alone, your staff take whoever fits and is still available.`,
-   act:{label:'Work the portal',tab:'offseason'},go:'Let the staff handle it'};
+   text:`You have not pursued any of them. You have ${portalAttentionLeft()} attention to spend; these fit your program best. Left alone, your staff take whoever fits and is still available.`,
+   act:{label:'Work the full portal',tab:'offseason'},go:'Let the staff handle it',decide:u?'portal':null};
  }
  if(phase==='spring'){
   const d=universe.portalDay;if(!d||d.year!==universe.year||!d.board.length)return null;
@@ -19046,8 +19125,27 @@ function renderOffseasonStop(){
  if(!facts){if(state&&state.open&&state.open!==phase)state.open=null;card?.remove();return}
  if(!card){card=document.createElement('section');card.id='offseasonStop';card.className='offseason-stop';card.setAttribute('role','region');card.setAttribute('aria-label','Offseason decision');host.insertAdjacentElement('beforebegin',card)}
  const t=selected(),signing=facts.signing||(open==='signing'&&universe.signingDay?.year===universe.year&&universe.signingDay.board.slice(0,universe.signingDay.revealed).some(x=>x.from===t?.name||x.challenger===t?.name));
- card.innerHTML=`${globalThis.DynastyArt?.img(globalThis.DynastyArt.stopKey(open),'dl-art dl-art-stop')||''}<div class="eyebrow">${signing?'SIGNING DAY':facts.portal?'PORTAL DAY':'BEFORE YOU MOVE ON'}</div><h3>${gameEscape(facts.title)}</h3><p>${gameEscape(facts.text)}</p>${signing?signingRevealHTML(t):''}${facts.portal?portalRevealHTML():''}<div class="button-row"><button type="button" class="bi-primary" data-offseason-stop-act>${gameEscape(facts.act.label)}</button><button type="button" data-offseason-stop-go>${gameEscape(facts.go)}</button></div>`;
+ card.innerHTML=`${globalThis.DynastyArt?.img(globalThis.DynastyArt.stopKey(open),'dl-art dl-art-stop')||''}<div class="eyebrow">${signing?'SIGNING DAY':facts.portal?'PORTAL DAY':'BEFORE YOU MOVE ON'}</div><h3>${gameEscape(facts.title)}</h3><p>${gameEscape(facts.text)}</p>${facts.decide==='departures'?departuresDecideHTML(t):''}${facts.decide==='signing'?signingCutHTML(t):''}${facts.decide==='portal'?portalDecideHTML(t):''}${signing?signingRevealHTML(t):''}${facts.portal?portalRevealHTML():''}<div class="button-row">${facts.decide?`<button type="button" class="bi-primary" data-offseason-stop-go>${gameEscape(facts.go)}</button><button type="button" data-offseason-stop-act>${gameEscape(facts.act.label)}</button>`:`<button type="button" class="bi-primary" data-offseason-stop-act>${gameEscape(facts.act.label)}</button><button type="button" data-offseason-stop-go>${gameEscape(facts.go)}</button>`}</div>`;
  card.querySelector('[data-offseason-stop-act]').onclick=()=>goToTab(facts.act.tab);
+ // Re-render, then put focus back on the row that was acted on (or the first enabled control) so keyboard users keep
+ // their place.
+ const refocus=(attr,id)=>{const c=$('#offseasonStop');if(!c)return;const same=[...c.querySelectorAll(`[${attr}]`)].filter(b=>b.getAttribute(attr)===id&&!b.disabled);(same[0]||c.querySelector('.stop-rows button:not([disabled])')||c.querySelector('[data-offseason-stop-go]'))?.focus()};
+ card.querySelectorAll('[data-stop-nil]').forEach(b=>b.onclick=()=>{
+  const id=b.dataset.stopNil,p=t.roster.find(x=>String(x.id)===id);if(!p)return;
+  const r=nilDealActive(p,t)?cancelNilDeal(t,p):signNilDeal(t,p,false);
+  setStatus(r.ok?(r.refund!=null?`Released ${p.name}'s NIL deal: ${r.refund} back. ${nilSummaryText(t)}.`:`${p.name} signed for ${r.cost}. Risk now ${transferRisk(p)}. ${nilSummaryText(t)}.`):r.reason);
+  autosaveAfter('management');renderOffseasonStop();refocus('data-stop-nil',id);
+ });
+ card.querySelectorAll('[data-stop-release]').forEach(b=>b.onclick=()=>{
+  const id=b.dataset.stopRelease,r=(universe.recruits||[]).find(x=>String(x.id)===id);if(!r)return;
+  if(pullOffer(r,t.name,'Released at the signing stop'))setStatus(`Released ${r.name}. ${scholarshipSummary(t).over?`${scholarshipSummary(t).over} still over the limit.`:'The class now fits.'}`);
+  autosaveAfter('management');renderOffseasonStop();refocus('data-stop-release','');
+ });
+ card.querySelectorAll('[data-stop-att]').forEach(b=>b.onclick=()=>{
+  const id=b.dataset.stopAtt,name=portalEntry(id)?.p.name||'That player',err=stopPortalPursue(id,b.dataset.dir);
+  setStatus(err||(b.dataset.dir==='drop'?`Stopped pursuing ${name}. ${portalAttentionLeft()} attention left.`:`Pursuing ${name} (${portalTargetFor(id)?.attention||0}). ${portalAttentionLeft()} attention left.`));
+  autosaveAfter('management');renderOffseasonStop();refocus('data-stop-att',id);
+ });
  card.querySelectorAll('[data-offseason-sign]').forEach(b=>b.onclick=()=>{
   if(b.dataset.offseasonSign==='all'){for(let i=0;i<40&&mySigningDayLeft(t).length;i++)revealNextSigning()}else revealNextSigning();
   autosaveAfter('management');renderOffseasonStop();if(typeof renderSigningDay==='function')renderSigningDay();
@@ -19059,7 +19157,7 @@ function renderOffseasonStop(){
   card.querySelector('[data-offseason-portal="next"]')?.focus();
  });
  // The stop is spent, so pressing Next again (here or on the main button) processes the stage.
- card.querySelector('[data-offseason-stop-go]').onclick=()=>{state.open=null;card.remove();$('#hubAdvance')?.click()};
+ card.querySelector('[data-offseason-stop-go]').onclick=()=>{if(open==='portal')stopPortalPlayOut();state.open=null;card.remove();$('#hubAdvance')?.click()};
 }
 extendRender('dashboard',renderOffseasonStop);
 if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.offseasonStops=()=>JSON.parse(JSON.stringify(universe?.offseasonStops||null));
@@ -19085,6 +19183,19 @@ if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.portalDayF
  universe.portalDay={year:universe.year,board:[e(a,'out',t.name,other),e(b,'returned',t.name,null),e(c,'in',other,t.name)],revealed:0};
  const s=offseasonStopState();s.seen.spring=false;s.open=null;renderOffseasonStop();return universe.portalDay.board.length;
 };
+// Test fixtures for the v0.28 decisions. Departures: three non-seniors with low morale, so they are at risk. Signing:
+// commit uncommitted recruits directly until the class is `n` over its limit.
+if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.departuresRiskFixture=()=>{
+ const t=selected(),ps=t.roster.filter(p=>!stopSeniors.includes(eligibilityLabel(p))).slice(0,3);
+ ps.forEach(p=>{p.morale=10});t.nilSpent=0;return ps.map(p=>({id:p.id,risk:transferRisk(p)}));
+};
+if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.signingOverFixture=(n=2)=>{
+ const t=selected();
+ for(const r of universe.recruits||[]){if(scholarshipSummary(t).over>=n)break;if(r.committed||recruitBlocked(t,r))continue;
+  r.committed=t.name;r.commitWeek=universe.week;universe.recruitClassCounts??={};universe.recruitClassCounts[t.name]=classCommitCount(t.name)+1}
+ const s=offseasonStopState();s.seen.signing=false;s.open=null;return scholarshipSummary(t);
+};
+if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.portalStopState=()=>{const c=ensurePortalCycle();return{status:c.status,round:c.round,targets:c.targets.map(x=>({...x})),left:portalAttentionLeft(),decided:portalCandidates().filter(x=>x.decision).length}};
 
 loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});[...new Set(schools.map(t=>t.conference))].forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();bindNewDynastySetup();applyTitlePreferences();showTitleScreen();refreshTitleSave().then(restoreNewDynastySetupDraft);}).catch(e=>{$('#titleStatus').textContent='Could not initialize Dynasty Lab. '+e.message});
 })();

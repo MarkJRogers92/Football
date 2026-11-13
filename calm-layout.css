@@ -31,3 +31,17 @@
 .offseason-signing li.signing-good{border-left-color:var(--good,#4ade80)}
 .offseason-signing li.signing-bad{border-left-color:var(--bad,#f08a8a)}
 @media(prefers-reduced-motion:no-preference){.offseason-signing li:last-child{animation:dl-value-in .35s ease both}}
+/* v0.28: decisions inside the offseason stop card */
+.stop-decide{margin:0 0 12px;max-width:70ch}
+.stop-decide-head{display:flex;justify-content:space-between;gap:12px;font-size:.85rem;color:var(--muted,#9ca8b8);margin:0 0 6px}
+.stop-decide-head strong{color:var(--text,#e8edf3);font-variant-numeric:tabular-nums}
+.stop-rows{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.stop-rows li{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.03);border-left:3px solid var(--line,#2b3440)}
+.stop-rows li.stop-risk{border-left-color:var(--warn,#f3ca78)}
+.stop-rows li.stop-held{border-left-color:var(--good,#4ade80)}
+.stop-who{display:flex;flex-direction:column;gap:2px;min-width:0}
+.stop-who small{color:var(--muted,#9ca8b8);font-size:.8rem}
+.stop-btns{display:flex;gap:6px;flex-wrap:wrap}
+.stop-rows button{min-width:7.5rem}
+.stop-rows button[aria-pressed="true"]{border-color:var(--good,#4ade80)}
+.stop-note{font-size:.8rem;margin:6px 0 0!important}

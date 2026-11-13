@@ -45,7 +45,8 @@ const {startNewDynasty}=require('./helpers/start-new-dynasty');
     await page.locator('#offseasonStop').waitFor({state:'visible'});
     assert.equal(await page.locator('#hubAdvance').innerText(),label,'the stage is not processed while the stop is showing');
     const text=await page.locator('#offseasonStop').innerText();stops.push(stage);
-    assert.match(text,/BEFORE YOU MOVE ON/);assert.equal(await page.locator('#offseasonStop button').count(),2,'one way to act and one way to move on');
+    assert.match(text,/BEFORE YOU MOVE ON/);// v0.28: decision rows (NIL, release, pursue) sit on the card; outside them there is one way to the full screen and one way to move on.
+    assert.equal(await page.locator('#offseasonStop > .button-row button').count(),2,'one way to the full screen and one way to move on');
     if(stage==='Portal'){
      await page.locator('#offseasonStop [data-offseason-stop-act]').click();
      assert.ok(await page.locator('#offseason').evaluate(node=>node.classList.contains('active')),'"Work the portal" opens the Offseason screen');
