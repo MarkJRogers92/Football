@@ -23,7 +23,7 @@ uv pip install -p .blender-venv/bin/python bpy==5.0.1 pillow
 | `lib.py` | (shared) modelling helpers, materials, plinth, renderer and `main()` | |
 | `rivalry_trophies.py` | `assets/awards/rivalry-{axe,jug,barrel,anvil,spade,bucket,cannon}.webp` | `.blender-venv/bin/python tools/blender/rivalry_trophies.py [names]` |
 | `turntable.py` | `assets/turntables/<name>.webp`, 36 frames of 192 px in a row (rivalry ceremony, season honors) | `.blender-venv/bin/python tools/blender/turntable.py [names] --glb-dir <pack>/models` |
-| `props.py` | `assets/awards/{hard-hat,compass,dumbbell,milestone-marker,podium,balance-scale,chalkboard,coaching-tree,seedling,cornerstone,file-cabinet}.webp` (The Wire, Season stories, card headings) | `.blender-venv/bin/python tools/blender/props.py [names]` |
+| `props.py` | `assets/awards/{hard-hat,compass,dumbbell,milestone-marker,podium,balance-scale,chalkboard,coaching-tree,seedling,cornerstone,file-cabinet,binoculars,globe}.webp` (The Wire, Season stories, card headings, Around Your Program) | `.blender-venv/bin/python tools/blender/props.py [names]` |
 
 A full render (512 px, 128 samples, the default) takes about 25 to 30 seconds a model on 4 CPUs, and
 re-running a script reproduces the committed sprites. While iterating, use

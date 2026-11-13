@@ -69,3 +69,12 @@ test('rivalry trophies and season honors turn when a turntable strip exists, els
  for(const k of A.TURNS)assert.ok(fs.existsSync(path.join(__dirname,'..',A.turnSrc(k))),`${k} has a strip`);
  for(const n of ['bell','axe','boot','jug','barrel','anvil','lantern','spade','bucket','cannon'])assert.ok(A.turnSrc(A.rivalryKey(`The Test ${n}`)),`${n} turns`);
 });
+
+test('every Around Your Program briefing kind has art that exists',()=>{
+ require('../program-art.js');const A=globalThis.DynastyArt,fs=require('node:fs'),path=require('node:path');
+ for(const kind of ['matchup','callback','following','team','league']){
+  const src=A.src(A.briefKey(kind));assert.ok(src,`${kind} maps to a registered file`);
+  assert.ok(fs.existsSync(path.join(__dirname,'..',src)),`${src} exists`);
+ }
+ assert.equal(A.briefKey('nothing'),'');
+});

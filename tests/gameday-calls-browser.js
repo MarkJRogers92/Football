@@ -21,13 +21,16 @@ const {startLiveGame}=require('./helpers/start-live-game');
    const order=await page.evaluate(()=>{const hero=document.querySelector('#gamedayEventHero'),live=document.querySelector('#v2InteractiveGameDay'),prep=document.querySelector('#v2MatchupIntelligence');return{afterHero:hero.nextElementSibling===live,beforePrep:!!(live.compareDocumentPosition(prep)&Node.DOCUMENT_POSITION_FOLLOWING)}});
    assert.deepEqual(order,{afterHero:true,beforePrep:true},'Coach It Live comes before the page of preparation');
    await startLiveGame(page);
-   await page.locator('#v2InteractiveGameDay .v2-live-field').waitFor({state:'visible'});
+   // v0.28: the animated 3D field replaces the 2D strip once there is a play to show; the strip is the fallback.
+   const fieldSel='#v2InteractiveGameDay .v2-live-field3d canvas, #v2InteractiveGameDay .v2-live-field';
+   await page.locator(fieldSel).first().waitFor({state:'visible'});
    // The game takes the screen.
    assert.equal(await page.evaluate(()=>[...document.querySelector('#gamelab').children].filter(el=>el.id!=='v2InteractiveGameDay'&&el.offsetParent).length),0,'only the live game is on screen');
-   assert.match(await page.locator('.v2-live-field').getAttribute('aria-label'),/ball, .*yards from the end zone/);
+   assert.match(await page.locator(fieldSel).first().getAttribute('aria-label'),/ball, .*yards from the end zone/);
+   const field3d=await page.locator('#v2InteractiveGameDay .v2-live-field3d canvas').count();
 
    const types={},nav=await page.locator('.client-mobile-nav').isVisible().catch(()=>false),limit=height-(nav?72:0);
-   let decisions=0,sawConsequence=false,checkedPrep=false;
+   let decisions=0,sawConsequence=false,checkedPrep=false,sawField3d=false;
    for(let guard=0;guard<600;guard++){
     if(await page.evaluate(()=>window.__DL_TEST__.preseasonDebug().played)>0)break;
     const card=page.locator('.v2-gameday-decision');
@@ -47,6 +50,8 @@ const {startLiveGame}=require('./helpers/start-live-game');
      }
      const pick=type==='drive_call'?['ground','shots','quick','balanced'][decisions%4]:type==='defense_call'?['pressure','coverage','run_stop','base'][decisions%4]:'delegate';
      await card.locator(`[data-v2-gameday-choice="${pick}"]`).click();decisions++;
+     if(!sawField3d&&await page.locator('#v2InteractiveGameDay .v2-live-field3d canvas').count()){sawField3d=true;
+      const st=await page.evaluate(()=>document.querySelector('#v2InteractiveGameDay .v2-live-field3d').__gcf.state);assert.equal(st.live,true)}
      if(!sawConsequence&&await page.locator('.v2-gameday-consequence').count()){sawConsequence=true;assert.match(await page.locator('.v2-gameday-consequence').innerText(),/Your call: .+Next play: /s)}
      continue;
     }
@@ -57,6 +62,7 @@ const {startLiveGame}=require('./helpers/start-live-game');
    assert.ok(types.drive_call>=6,`several drives were called: ${JSON.stringify(types)}`);
    assert.ok(decisions>=10&&decisions<=30,`a coached game is 10 to 30 decisions, saw ${decisions}`);
    assert.ok(sawConsequence,'a call is followed by what it led to');
+   assert.ok(sawField3d||field3d,'the animated field is shown during the game');
    assert.equal(await page.locator('#gamelab').evaluate(node=>node.classList.contains('v2-live')),false,'the rest of Game Day returns at the final');
    assert.ok(await page.locator('#v2GameDayRecap .v2-release-score').isVisible(),'the recap follows the final');
    assert.match(await page.locator('#detailedLog').innerText(),/coach (chooses|delegates)/,'the calls are in the archived play-by-play');

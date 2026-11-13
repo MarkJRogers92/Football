@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.28.0 — Decide in the offseason, watch the live game
+
+- **The offseason stops hold the decision, not just the news.** Before departures, the card lists the players closest to leaving with an NIL offer beside each. Offer a deal and the player's risk drops on the spot; release it and the money comes back. Before signing, a class that is over the limit lists its commitments lowest-rated first with a Release button, until it fits. Before the portal, the card shows the transfers who fit your program best: pursue them, put more attention on one, or drop one. When you move on, the portal's rounds play out, so the players you chased answer before the portal closes. The full screens are still a button away for everything else (promises, portal NIL, the whole list).
+- **The live game has a field you can watch.** Coach It Live and Coach big moments now show the angled 3D field from the game replay instead of the flat strip. Each new play is acted out (the last four, if you advance several at once), then the field holds on the next snap with the line of scrimmage and the first-down line marked. The ball carrier is named. When a decision is waiting for you it comes first, under the score, and the field sits below it, so the score and the whole decision fit on the screen. With reduced motion the field shows the new formation without the animation. Before kickoff the strip is still there.
+- **Pictures in Around Your Program.** Each item in the home dashboard's short briefing now has a small picture, like The Wire: a pennant for the next game, a rosette for a familiar face, binoculars for someone you follow, a jersey for your team and a globe for news from around the league. The binoculars and globe are new, modelled in Blender (about 16 KB).
+
+Saves carry over.
+
 ## v0.27.0 — Trophies that turn, honors and art everywhere
 
 - **Every rivalry trophy has its own art.** Rivalry trophies named after an axe, jug, barrel, anvil, spade, bucket or cannon now show that trophy in Rival Watch and the rivalry ceremony; before, they all borrowed the shield. The seven new pieces were modelled and rendered in Blender (`tools/blender/rivalry_trophies.py`), about 70 KB.

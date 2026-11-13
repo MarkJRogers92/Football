@@ -62,3 +62,8 @@
 .v2-gameday-calls button{min-height:56px;padding:8px 10px}
 .v2-gameday-calls button small{font-size:11.5px;line-height:1.3}
 }
+/* v0.28: the animated 3D field on the live screen. Only the canvas shows; the live screen has its own score, feed and controls. */
+.v2-live-field3d{margin:10px 0;border-radius:12px;overflow:hidden;min-width:0}
+.v2-live-field3d:empty{display:none}
+.gcf-live .gcf-bug,.gcf-live .gcf-controls,.gcf-live .gcf-play,.gcf-live .gcf-drive,.gcf-live .gcf-log{display:none}
+.gcf-live{gap:0}

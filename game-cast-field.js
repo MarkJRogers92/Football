@@ -328,10 +328,14 @@ function teamColors(meta){
  }
  return out;
 }
-function mount(host,{rows,meta,onStep}={}){
+// v0.28 live mode: the live Game Day screen remounts the field after every action with the plays so far. It animates
+// only the plays added since the last mount (at most `maxSnaps` snaps), then holds on the next snap's formation with
+// its line of scrimmage and first-down line (`rest`: {side,los,toGo}). Replay controls, the score bug and the play log
+// are hidden; the live screen has its own.
+function mount(host,{rows,meta,onStep,live=false,fromRow=0,maxSnaps=4,rest=null}={}){
  const tl=timeline(rows,meta),steps=tl.steps,colors=teamColors(meta),names={home:meta.home?.name||'Home',away:meta.away?.name||'Away'},nm=id=>(id!=null&&meta.names?.[id])||null;
  if(!steps.length)return null;
- host.innerHTML=`<div class="gcf">
+ host.innerHTML=`<div class="gcf${live?' gcf-live':''}">
   <div class="gcf-bug"><span class="gcf-team away" style="--gcf-team:${esc(colors.away.ui)}"><b>${esc(names.away)}</b><strong data-gcf-score="away">0</strong></span>
    <span class="gcf-situation"><b data-gcf-clock>Q1 15:00</b><span data-gcf-down></span></span>
    <span class="gcf-team home" style="--gcf-team:${esc(colors.home.ui)}"><strong data-gcf-score="home">0</strong><b>${esc(names.home)}</b></span></div>
@@ -360,7 +364,7 @@ function mount(host,{rows,meta,onStep}={}){
  const rateFor=()=>speed==='4'?4:speed==='key'?keyRate(tl):1;
  const total=s=>{const d=durations(s),k=speed==='key';return(k?d.pre*.5:d.pre)+d.play+d.post};
  const nextIndex=i=>{let j=i+1;while(j<steps.length&&(durations(steps[j]).post+durations(steps[j]).play===0||(speed==='key'&&!isKey(steps[j]))))j++;return j};
- const resize=()=>{const w=Math.max(260,host.clientWidth||canvas.parentElement.clientWidth||640);W=w;H=Math.round(clampN(w*(w<520?.66:.52),220,400));dpr=Math.min(2,window.devicePixelRatio||1);canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);canvas.style.width=`${W}px`;canvas.style.height=`${H}px`};
+ const resize=()=>{const w=Math.max(260,host.clientWidth||canvas.parentElement.clientWidth||640);W=w;H=Math.round(live?clampN(w*(w<520?.4:.34),140,300):clampN(w*(w<520?.66:.52),220,400));dpr=Math.min(2,window.devicePixelRatio||1);canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);canvas.style.width=`${W}px`;canvas.style.height=`${H}px`};
  const sceneAt=(s,ms)=>{
   const d=durations(s),pre=speed==='key'?d.pre*.5:d.pre;
   if(SNAP_KINDS.has(s.kind)){const t=ms<pre?0:clampN((ms-pre)/Math.max(1,d.play),0,1);return{phase:ms<pre?'pre':ms<pre+d.play?'play':'post',t,sc:s.kind==='punt'||s.kind==='fg'?kickScene(s,t):scene(s,t)}}
@@ -368,11 +372,15 @@ function mount(host,{rows,meta,onStep}={}){
   const side=s.post.poss||s.pre.poss;return{phase:'post',t:1,sc:restScene(side,s.post.spot>=100?75:s.post.spot,s.seq)};
  };
  const render=()=>{
-  const s=steps[si];if(!s)return;const {phase,t,sc}=sceneAt(s,pt);
+  const s=steps[si];if(!s)return;const atRest=!!(live&&rest&&!playing&&nextIndex(si)>=steps.length&&pt>=total(s));
+  const {phase,t,sc}=atRest?{phase:'pre',t:0,sc:restScene(rest.side,rest.los,(Number(s.seq)||0)+1)}:sceneAt(s,pt);
   const cam=camera(W,H,0);cam.dpr=dpr;const want=clampCam(cam,sc.camX);
   if(camX==null)camX=want;cam.x=camX;
   ctx.setTransform(dpr,0,0,dpr,0,0);drawField(ctx,cam,colors,names);
-  if(SNAP_KINDS.has(s.kind)&&s.kind!=='punt'&&s.kind!=='fg'){
+  if(atRest){
+   const L=worldX(rest.side,rest.los);quad(ctx,cam,L-.18,0,L+.18,FIELD_W,'rgba(70,140,255,.85)',.01);
+   const fd=rest.los+(rest.toGo||10);if(fd<100&&rest.toGo)quad(ctx,cam,worldX(rest.side,fd)-.18,0,worldX(rest.side,fd)+.18,FIELD_W,'rgba(255,214,10,.9)',.01);
+  }else if(SNAP_KINDS.has(s.kind)&&s.kind!=='punt'&&s.kind!=='fg'){
    const L=worldX(s.side,s.los);quad(ctx,cam,L-.18,0,L+.18,FIELD_W,'rgba(70,140,255,.85)',.01);
    const fd=s.los+s.toGo;if(fd<100&&phase!=='post')quad(ctx,cam,worldX(s.side,fd)-.18,0,worldX(s.side,fd)+.18,FIELD_W,'rgba(255,214,10,.9)',.01);
   }
@@ -442,7 +450,7 @@ function mount(host,{rows,meta,onStep}={}){
  $q('[data-gcf-fwd]').onclick=()=>stepPlay(1);
  $q('[data-gcf-back]').onclick=()=>stepPlay(-1);
  drivePick.onchange=()=>{const dr=tl.drives[Number(drivePick.value)];if(dr){pause();seek(dr.start)}};
- host.tabIndex=0;
+ if(!live)host.tabIndex=0;
  host.addEventListener('keydown',ev=>{
   if(ev.target.closest?.('select,input')&&ev.key!==' ')return;
   if(ev.key===' '||ev.key==='k'){ev.preventDefault();playing?pause():play()}
@@ -460,10 +468,21 @@ function mount(host,{rows,meta,onStep}={}){
  if(window.ResizeObserver){ro=new ResizeObserver(()=>{if(!host.isConnected)return destroy();const w=host.clientWidth;if(w&&Math.abs(w-W)>4){resize();shownPhase='';render()}});ro.observe(host)}
  function destroy(){destroyed=true;playing=false;if(raf)cancelAnimationFrame(raf);raf=null;ro?.disconnect();document.removeEventListener('visibilitychange',onVis)}
  resize();render();
+ if(live){
+  // Start at the first new play, but no further back than `maxSnaps` snaps from the end. With reduced motion, or with
+  // nothing new, go straight to the resting frame.
+  const fresh=steps.filter(x=>x.row>=fromRow&&x.kind!=='mark'),snaps=fresh.filter(x=>SNAP_KINDS.has(x.kind));
+  let start=fresh.length?fresh[0].i:steps.length;
+  if(snaps.length>maxSnaps)start=snaps[snaps.length-maxSnaps].i;
+  const still=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  let lastI=steps.length-1;while(lastI>0&&steps[lastI].kind==='mark')lastI--;
+  if(still||start>=steps.length){si=lastI;pt=total(steps[lastI]);camX=null;shownPhase='';render()}
+  else{si=start;pt=0;camX=null;playing=true;last=null;kick()}
+ }
  const ctrl={timeline:tl,seek:i=>{pause();seek(i)},play,pause,destroy,
   seekElapsed(e){let best=0;steps.forEach((s,i)=>{if(s.kind!=='mark'&&Math.abs(s.elapsed-e)<Math.abs(steps[best].elapsed-e))best=i});pause();seek(best)},
   setSpeed(v){speedSel.value=String(v);speedSel.onchange()},
-  get state(){return{step:si,ms:pt,playing,speed,steps:steps.length,drive:steps[si]?.drive,kind:steps[si]?.kind,score:(pt>0?steps[si].post:steps[si].pre).score}},
+  get state(){return{live,step:si,ms:pt,playing,speed,steps:steps.length,drive:steps[si]?.drive,kind:steps[si]?.kind,score:(pt>0?steps[si].post:steps[si].pre).score}},
   keyDurationMs(){return steps.filter(isKey).reduce((n,s)=>n+total(s),0)/keyRate(tl)}};
  host.__gcf=ctrl;return ctrl;
 }
