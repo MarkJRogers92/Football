@@ -1,12 +1,19 @@
 # Changelog
 
+## v0.29.1 — Recruiting timeline fixes
+
+- A prospect you never pursued no longer cuts you from his list. In v0.29.0 every prospect who published a Top 5 without you cut you, even if you had never contacted him, and a cut blocks all recruiting actions on him.
+- Arrive late with an offer and strong interest and he can still add you to his Top 5 before he names his finalists. The card now says when you are off his list or not a finalist.
+- Public decision dates never fall after the last recruiting week. A recruit who would postpone past it says he will decide on signing day, and a date already saved past the season comes due in week 12.
+
+Saves carry over. No storage schema change.
+
 ## v0.29.0 — Recruiting on their own timeline
 
 - Most recruits keep their decision timing private. Relationships provide clues, and a minority publicly announce a week with occasional explained changes.
 - School fit, competition, completed visits, personality and seeded uncertainty shape readiness. Adding a prospect to the board no longer switches him to a fixed countdown.
 - Top 5 and Top 3 cuts no longer reveal upcoming dates. Signing periods, scholarship rules and commitment flips remain in place.
 - Existing saves keep their offers, lists, cuts and commitments. Midseason transitions are staggered, with no new storage schema.
-- A prospect you never pursued no longer cuts you from his list, so you can still work him later in the season. Arrive late with an offer and strong interest and he can still add you to his Top 5 before he names his finalists; the card says when you are off his list. Public dates never fall after the last recruiting week; a recruit who would postpone past it says he will decide on signing day.
 
 Saves carry over. Timing changes apply when advancing recruiting; back up a dynasty before switching builds.
 

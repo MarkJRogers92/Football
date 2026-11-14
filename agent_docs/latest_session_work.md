@@ -1,5 +1,12 @@
 # Latest Session Work
 
+## v0.29.1 recruiting timeline fixes — 2026-11-14
+
+- Review of v0.29.0 found two bugs in `recruiting-actions.js`. (1) Cuts ran for every prospect, so the controlled program was cut (and blocked from every action) on prospects it never pursued. Cuts now only record when the program was pursuing him (targeted or holding an offer). (2) Announcements in weeks 10–12 could name week 13–14, which never comes. No date is set past `LAST_WEEK` (12); a postponement past it sets `funnel.signingDay`; v0.29.0 dates past the season come due on the final pass.
+- Improvement: before a Top 3, a pursuing program with an offer, interest ≥ 65 and no unmet dealbreaker takes the fifth Top 5 spot (`funnel.added`). The card explains when you are off his list or not a finalist.
+- Four new regressions in `tests/recruit-timelines.js` (21 total).
+- Not changed, flag for Mark: v0.29.0 dropped the +10 board bonus from decision standings (deliberate target neutrality).
+
 ## v0.29.0 natural recruiting timelines — 2026-11-13
 
 - The private deterministic timeline now applies to all uncommitted recruits. Readiness combines calendar, fit, competition, completed visits and stable personality; public status reveals only clues and voluntary announcements. Existing signing and flip mechanisms remain.
