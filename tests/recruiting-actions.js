@@ -925,3 +925,19 @@ test('simulating the season hands the board to the staff instead of letting it c
  e.simWeek(true);
  assert.ok(pool.some(r=>A.workedThisWeek(r,team())||A.record(r,team(),false).lastWorkedWeek===0),'the staff worked the board before the week was played');
 });
+
+test('v0.31: a board prospect close to his Top 5 warns on the card, the badge and the weekly reminder',async()=>{
+ const {e,A,team}=await engine(7131),u=e.universe,t=team(),D=globalThis.DynastyRecruitingDesk;
+ const a=u.recruits.find(r=>!r.committed);a.targeted=true;a.interest=40;u.week=5;
+ // Readiness well past any Top 5 band, list not yet named: the warning is due.
+ a.funnel={version:2,season:u.year,readiness:200,lastWeek:5,top5:null,top3:null,cut:null,decided:null,announcement:null};
+ assert.equal(A.funnelStatus(a,t).narrowing.list,'top5');
+ assert.match(D.html(a.id),/Narrowing his list/);assert.match(D.html(a.id),/Offer a scholarship now/);
+ assert.match(D.badge(a.id),/Narrowing his list · no offer from you/);
+ assert.equal(globalThis.DynastyRecruitingNarrowing(t).count>=1,true);
+ A.perform(a,t,'offer');
+ assert.match(D.html(a.id),/interest in you needs to reach 65/);assert.match(D.badge(a.id),/interest below 65/);
+ a.interest=80;
+ assert.doesNotMatch(D.html(a.id),/Narrowing his list/,'an offer and interest of 65 make the place safe');
+ assert.doesNotMatch(D.badge(a.id),/Narrowing/);
+});

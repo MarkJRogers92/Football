@@ -486,9 +486,27 @@ function makeRecruitingActionSystem(env){
   const pending=Number.isInteger(r.visitWeek)&&r.visitWeek>universe().week;
   const clue=r.committed?'Committed':a?.week!=null?`Announced week ${a.week}`:waiting?'Waiting for signing day':pending?'Taking visits':near?'A decision could come soon':f?.top3?'Weighing his finalists':f?.top5?'Narrowing his list':'Exploring his options';
   const detail=!close?null:f?.context==='visit'?'He wants to finish his visits before settling on a school.':f?.context==='competition'?'He is comparing closely matched schools.':f?.context==='patient'?'He prefers to take his time and be sure.':'Finding the right fit is bringing him closer to a choice.';
+  // v0.31: a prospect on your board who is close to his next cut. Qualitative only: which list is coming and
+  // whether your visible standing (an offer, interest of 65 or more) holds a place; never a week or a number.
+  const narrowing=narrowingFor(r,t,f,profile);
   return{on:true,stage,top5:f?.top5||null,top3:f?.top3||null,cut:f?.cut||null,announcedWeek:a?.week??null,
    announcement:a?{week:a.week,announcedAt:a.announcedAt,postponed:a.postponed,reason:a.reason}:null,clue,detail,
-   soon:!r.committed&&!f?.cut&&((a?.week!=null&&a.week<=universe().week+1)||near)};
+   soon:!r.committed&&!f?.cut&&((a?.week!=null&&a.week<=universe().week+1)||near),narrowing};
+ }
+ const NARROWING_MARGIN=.12;
+ function narrowingFor(r,t,f,profile){
+  if(!t||!r?.targeted||r.committed||f?.version!==2||f.cut||f.signingDay||!Number.isFinite(f.readiness))return null;
+  const ratio=f.readiness/profile.threshold;
+  const list=!f.top5&&ratio>=profile.wide-NARROWING_MARGIN?'top5':f.top5&&!f.top3&&f.top5.includes(t.name)&&ratio>=profile.narrow-NARROWING_MARGIN?'top3':null;
+  if(!list)return null;
+  const offered=hasOffer(r,t),interested=(r.interest||0)>=SAFETY_INTEREST;
+  // Interest and offers are on the card already; a hidden dealbreaker is never revealed here.
+  return{list,offered,interested,safe:offered&&interested};
+ }
+ function narrowingWithoutYou(recruits,t){
+  const out=[];
+  for(const r of recruits||[]){if(!r?.targeted||r.committed)continue;const n=funnelStatus(r,t).narrowing;if(n&&!n.safe)out.push({recruit:r,...n})}
+  return out.sort((a,b)=>(a.recruit.nationalRank||1e9)-(b.recruit.nationalRank||1e9));
  }
  function decisionsDue(recruits,t,within=1){
   const w=universe().week,out=[];
@@ -631,7 +649,7 @@ function makeRecruitingActionSystem(env){
 
  return{COSTS,LABELS,INHOME,OFFER,hoursBudgetFor,weekInfo,ensureWeek,hoursLeft,isActive,record,weekState,workedThisWeek,
   offerLimit,offersOut,hasOffer,topicStrength,motivesFor,dealbreakerUnmet,intel,knownBlock,pitchProjection,pitchOptions,availability,perform,withdrawOffer,
-  effort,previewEffort,effortFromSince,weeksSinceWorked,mayCommit,pitchBoost,status,workload,staffPlan,isAuto,setAuto,funnelOn,funnelState,funnelStatus,runFunnel,holds,decisionsDue,keepBoost,noteWeek,newsItems,deskSummary,rivalHeat,rivalPressure,addRivalEvent,generateRivals,answerRivals,rivalMoves,liveMoves,unansweredMoves,grandfather};
+  effort,previewEffort,effortFromSince,weeksSinceWorked,mayCommit,pitchBoost,status,workload,staffPlan,isAuto,setAuto,funnelOn,funnelState,funnelStatus,narrowingWithoutYou,runFunnel,holds,decisionsDue,keepBoost,noteWeek,newsItems,deskSummary,rivalHeat,rivalPressure,addRivalEvent,generateRivals,answerRivals,rivalMoves,liveMoves,unansweredMoves,grandfather};
 }
 
 if(typeof module==='object'&&module.exports){
@@ -683,6 +701,12 @@ if(typeof module==='object'&&module.exports){
   if(!t||!universe?.recruits)return null;
   const rows=recruitingActions.decisionsDue(universe.recruits,t,1);
   return{count:rows.length,names:rows.slice(0,3).map(x=>x.recruit.name),unoffered:rows.filter(x=>!recruitingActions.hasOffer(x.recruit,t)).length};
+ };
+ // v0.31: board prospects close to a cut that your offer and interest would not yet survive.
+ globalThis.DynastyRecruitingNarrowing=t=>{
+  if(!t||!universe?.recruits)return null;
+  const rows=recruitingActions.narrowingWithoutYou(universe.recruits,t);
+  return{count:rows.length,names:rows.slice(0,3).map(x=>x.recruit.name),unoffered:rows.filter(x=>!x.offered).length};
  };
  globalThis.DynastyRecruitingWeek=t=>t&&!recruitingActions.isAuto(universe)?recruitingActions.weekInfo(t):null;
 
@@ -821,6 +845,9 @@ if(typeof module==='object'&&module.exports){
    if(!f.top5)cells.push('<span><b>His list</b>Still open</span>');
    else if(r.targeted&&!f.top3&&!f.top5.includes(t.name))cells.push('<span class="ra-warn-text"><b>Not on his list</b>An offer and strong interest can still earn a spot before he narrows to his finalists.</span>');
    else if(r.targeted&&f.top3&&!f.top3.includes(t.name))cells.push('<span class="ra-warn-text"><b>Not a finalist</b>He would only turn to you if his finalists run out of room.</span>');
+   const n=f.narrowing;
+   if(n&&!n.safe){const which=n.list==='top5'?'naming his Top 5':'naming his finalists';
+    cells.push(`<span class="ra-warn-text"><b>Narrowing his list</b>He is close to ${which}. ${!n.offered?'Offer a scholarship now or you will likely miss the cut.':'Your offer is in, but his interest in you needs to reach 65 to be sure of a place.'}</span>`)}
   }
   const offer=!f.cut&&r.targeted&&!recruitingActions.hasOffer(r,t)?'<small class="ra-warn-text">He cannot choose you without a scholarship offer.</small>':'';
   return`<div class="ra-funnel">${cells.join('')}</div>${offer}`;
@@ -903,7 +930,9 @@ if(typeof module==='object'&&module.exports){
   if(m)return`<small class="ra-rival-badge">⚑ ${r.committed?'Committed · ':''}${raEsc(m.team)} ${raEsc(m.verb)}</small>`;
   if(r.committed||!r.targeted||!recruitingActions.funnelOn())return'';
   const f=recruitingActions.funnelStatus(r,selected());
-  return f.cut?'<small class="ra-rival-badge">✂ Cut you from his list</small>':`<small class="ra-decision-badge">${raEsc(f.clue)}</small>`;
+  if(f.cut)return'<small class="ra-rival-badge">✂ Cut you from his list</small>';
+  if(f.narrowing&&!f.narrowing.safe)return`<small class="ra-rival-badge">⚠ Narrowing his list${f.narrowing.offered?' · interest below 65':' · no offer from you'}</small>`;
+  return`<small class="ra-decision-badge">${raEsc(f.clue)}</small>`;
  }
  globalThis.DynastyRecruitingDesk={html:deskHTML,nav:navHTML,badge:badgeHTML,recruit:raRecruit,team:()=>selected(),bind:root=>{bindDesk(root);bindStaff(root)}};
  // What the funnel did last week: who chose you, who chose someone else, who cut you.

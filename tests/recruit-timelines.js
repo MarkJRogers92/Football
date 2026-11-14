@@ -158,3 +158,32 @@ test('a late offer with strong interest earns a Top 5 spot before he narrows, no
  for(let w=1;w<=12&&!q.funnel?.top3&&!q.committed;w++){u.week=w;api.runFunnel([q],t)}
  if(q.funnel.top5&&!q.committed)assert.equal(q.funnel.top5.includes('User'),false,'interest without an offer earns nothing');
 });
+// v0.31: a board prospect close to his next cut says so, qualitatively, while you can still act.
+test('a board prospect close to his Top 5 warns while an offer can still keep you in',()=>{
+ const {api,u,t,r}=setup(),p=r('narrowing');p.targeted=true;
+ let warned=null;
+ for(let w=1;w<=12&&!p.funnel?.top5&&!p.committed;w++){
+  u.week=w;api.runFunnel([p],t);
+  const s=api.funnelStatus(p,t);
+  if(!p.funnel.top5&&s.narrowing){warned=s.narrowing;break}
+ }
+ assert.ok(warned,'the warning comes before his Top 5 is named');
+ assert.deepEqual(warned,{list:'top5',offered:false,interested:false,safe:false});
+ const s=api.funnelStatus(p,t);
+ for(const key of ['readiness','threshold','weeksLeft','decisionWeek'])assert.equal(key in s.narrowing,false,key);
+ assert.deepEqual(api.narrowingWithoutYou([p],t).map(x=>x.recruit.id),['narrowing']);
+ // An offer and real interest make the place safe, and the board stops flagging him.
+ p.interest=80;p.recruitingActions={[String(t.id)]:{season:u.year,offered:true,history:[],contacts:0,known:{secondary:true,dealbreaker:true}}};
+ assert.equal(api.funnelStatus(p,t).narrowing.safe,true);
+ assert.deepEqual(api.narrowingWithoutYou([p],t),[]);
+ const q=r('not-mine');Object.assign(q,{funnel:JSON.parse(JSON.stringify(p.funnel)),targeted:false});
+ assert.equal(api.funnelStatus(q,t).narrowing,null,'never shown for a prospect you are not recruiting');
+});
+test('a cut, a commitment or a signing-day hold clears the warning',()=>{
+ const {api,u,t,r}=setup(),p=r('cleared');p.targeted=true;
+ for(let w=1;w<=12&&!api.funnelStatus(p,t).narrowing;w++){u.week=w;api.runFunnel([p],t)}
+ const f=p.funnel;assert.ok(api.funnelStatus(p,t).narrowing);
+ f.cut={week:u.week,at:'top5'};assert.equal(api.funnelStatus(p,t).narrowing,null);f.cut=null;
+ f.signingDay=true;assert.equal(api.funnelStatus(p,t).narrowing,null);f.signingDay=false;
+ p.committed='A';assert.equal(api.funnelStatus(p,t).narrowing,null);
+});

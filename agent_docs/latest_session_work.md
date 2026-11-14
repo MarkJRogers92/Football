@@ -1,5 +1,12 @@
 # Latest Session Work
 
+## v0.31.0 narrowing warning, deep game tier, lint — 2026-11-14
+
+- `recruiting-actions.js`: `funnelStatus().narrowing` (list, offered, interested, safe) for targeted prospects within 0.12 of the next readiness band; card cell, badge, `DynastyRecruitingNarrowing` and a guidance item (skipped when staff run recruiting). Soak with a policy reading it showed no cut reduction (11.8 vs 11.9); documented in docs/RECRUITING_TIMELINES.md; soak policy unchanged.
+- `app/07-game-center.js`: `GAME_DEEP_HORIZON = 8`, `deepCompactGame` keeps leaders (trimmed to their categories), drops other lines and injuries, shortens standard game-plan labels. Box score explains it. Measured in docs/SAVE_SIZE_MEASUREMENT.md.
+- `tools/lint.js` + `npm run lint` + `tests/lint.js`: errors-only ESLint (eslint 10.14.0, globals 17.13.0; 10.15.0 fixes a moderate minimatch advisory but was one day old). Lints the built index.html script mapped back to source, and Node files individually. Found `developmentPlanSystem` and `developmentTendencySystem` block-scoped and unreachable from `app/10` and `development-visualization-adapter.js`; now via `DynastyLabDevelopmentPlans.countFor/limit` and `DynastyLabDevelopmentTendencies.clue`. `app-health.js` dead `APP_VERSION` branch removed.
+- Not done yet: faster local `npm test` (per-file timing started, then stopped for the release).
+
 ## v0.30.1 staff delegation fix — 2026-11-14
 
 - The v0.30.0 publish run failed once in `tests/live-game-lock-browser.js` (`ready:false` after staff delegation). `delegateWeeklyDecisions` (`app/14-weekly-decisions.js`) returned at the first refused decision, and the optional WEEKLY_GAMEPLAN (ignored by `hasPendingWeeklyDecisions`) could be that refusal, stranding required decisions. Not reproduced in 32 browser runs or 1,100 headless weeks; fixed structurally.

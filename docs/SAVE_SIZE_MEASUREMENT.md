@@ -389,3 +389,25 @@ same 23,344 archived players:
 
 Existing archived records are not rewritten. The remaining growth is real history
 (season rows, camps, recruitment) and `gameArchive`.
+
+## v0.31.0: deep tier for very old games (2026-11-14)
+
+Unprotected games (another program's regular-season game; never the coach's, a
+rivalry or the postseason) older than `GAME_DEEP_HORIZON` (8 seasons) keep the
+score, team statistics and the passing, rushing and receiving leaders, each with
+the stats of the category he led. Other scorer lines and the injury list go;
+season and career totals, records and injury history stay on the player. Game
+plans keep their key and the box score looks the label up.
+
+Per game (one season, seed 7): compacted 2,441 B → deep 1,851 B (−24%).
+`ANALYZE=1 SEASONS=10 SEED=7`:
+
+| Season | gameArchive before | after |
+|---|---|---|
+| 2035 | 30.6 MB | 30.6 MB |
+| 2036 | 33.1 MB | 32.8 MB |
+| 2037 | 35.7 MB | 34.9 MB |
+
+From season nine each rollover deep-compacts one more season, so growth falls
+by about 0.4 MB a season (+2.6 → +2.1 MB, about 16%). Team statistics (483 B a
+game) are now the largest part of an old game and are kept.
