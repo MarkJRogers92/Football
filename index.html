@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.30.1</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.31.0</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -3582,7 +3582,7 @@ select{min-width:44px}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.30.1</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.31.0</b></span></footer>
   </div>
 </section>
 
@@ -3609,7 +3609,7 @@ select{min-width:44px}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.30.1</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.31.0</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -7558,7 +7558,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.30.1';
+const APP_VERSION='0.31.0';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi','Aiden','Alex','Amari','Andrew','Anthony','Antonio','Armani','Ashton','Austin','Avery','Bennett','Blake','Brady','Brandon','Brayden','Brennan','Brock','Bryson','Cade','Caden','Calvin','Cameron','Carson','Cedric','Chase','Christian','Cody','Colby','Collin','Connor','Corey','Damian','Damon','Daniel','Davion','Dawson','Deandre','Demarcus','Derek','Desmond','Dillon','Drew','Dylan','Elijah','Ethan','Ezra','Garrett','Grady','Graham','Grant','Hayden','Hunter','Ian','Isaac','Jabari','Jace','Jackson','Jacob','Jaden','Jake','Jamar','Jameson','Jared','Jarrett','Javon','Jaxon','Jay','Jermaine','Jesse','Joel','Jonah','Josiah','Julian','Justin','Kaden','Kai','Kamari','Keegan','Keenan','Kendall','Kendrick','Kevin','Kobe','Kyle','Kyler','Lamar','Landon','Lane','Lawrence','Leon','Levi','Lincoln','Lucas','Marco','Mario','Mateo','Matthew','Maurice','Max','Myles','Nate','Nathan','Nolan','Omar','Owen','Parker','Patrick','Preston','Quentin','Quincy','Reggie','Riley','Ryan','Sam','Sean','Seth','Shane','Silas','Solomon','Spencer','Sterling','Terrell','Theo','Tobias','Travis','Tristan','Troy','Tucker','Tyrese','Victor','Wade','Walker','Wes','Wyatt','Zach','Zane','Andres','Diego','Rafael','Tevita','Sione','Manu','Keoni','Kenji','Darnell'];
@@ -9011,7 +9011,7 @@ function gameBoxHTML(g){
  const conditionLine=g.conditions&&globalThis.DynastyGameConditions?globalThis.DynastyGameConditions.describe(g.conditions):null,conditionsNote=conditionLine?`<p class="game-conditions muted" data-severity="${conditionLine.severity}"><strong>${gameEscape(conditionLine.headline)}</strong>${conditionLine.notes.length?` · ${gameEscape(conditionLine.notes.join(' · '))}`:''}</p>`:'';
  // A compacted game keeps its leaders and scorers; say so rather than let the shorter list
  // read as a quiet night from everyone else.
- const compactNote=g.compacted?`<p class="muted">Individual lines for this game were compacted to its leaders and scorers to keep long dynasties small. Team statistics, the score and injuries are unchanged.</p>`:'';
+ const compactNote=g.compacted?(g.compacted.deep?`<p class="muted">This older game keeps its passing, rushing and receiving leaders to keep long dynasties small. Team statistics and the score are unchanged; every player's season totals and injury history are kept on his record.</p>`:`<p class="muted">Individual lines for this game were compacted to its leaders and scorers to keep long dynasties small. Team statistics, the score and injuries are unchanged.</p>`):'';
  const groups=[['Passing',['Cmp','Att','Yds','TD','INT','Sacks'],['passComp','passAtt','passYds','passTD','int','sacksTaken'],'passAtt',4],['Rushing',['Car','Yds','Avg','TD'],['rushAtt','rushYds','rushAvg','rushTD'],'rushAtt',3],['Receiving',['Rec','Targets','Yds','Avg','TD'],['receptions','targets','recYds','recAvg','recTD'],'targets',4],['Defense',['Tkl','TFL','Sack','INT','PD','Pressures'],['tackles','tfl','sacks','intDef','passBreakups','pressures'],'tackles',2],['Kicking',['FGM','FGA'],['fgMade','fgAtt'],'fgAtt',2],['Punting',['Punts','Yds','Avg'],['punts','puntYds','puntAvg'],'punts',3],['Returns',['Ret','Yds','Avg','TD'],['returns','returnYds','retAvg','returnTD'],'returns',2],['Penalties',['Flags'],['penalties'],'penalties',1]];
  const filters=`<div class="game-box-controls" aria-label="Box score filters"><label>Player team<select data-game-box-team><option value="all">Both teams</option><option value="away">${gameEscape(g.away.name)}</option><option value="home">${gameEscape(g.home.name)}</option></select></label><label>Category<select data-game-box-category><option value="all">All categories</option>${groups.map(([title])=>`<option value="${title.toLowerCase()}">${title}</option>`).join('')}</select></label><output data-game-box-status aria-live="polite">Showing both teams · all categories</output></div>`;
  let html=conditionsNote+compactNote+filters+'<h3>Team statistics</h3>'+gameTable(['Statistic',g.away.name,g.home.name],rows)+`<p class="muted">The game does not record quarter scores, possession time, third and fourth downs${recordsFlags?'':', penalties'} or long gains. Player stat lines are distributed from each team’s production.</p><div class="game-player-stats">`;
@@ -9032,7 +9032,7 @@ function coachingReportHTML(g){
   if(!s||!o)return `<section><h4>${gameEscape(g[side]?.name)}</h4><p>Coaching report unavailable: no recorded box score.</p></section>`;
   const known=x=>Number.isFinite(x),n=x=>known(x)?String(x):'unavailable';
   const ypc=known(o.rushYds)&&o.rushAtt>0?(o.rushYds/o.rushAtt).toFixed(1):'unavailable';
-  const plan=g[side]?.gameplan,planText=plan?plan.label:'Not recorded for this older game';
+  const plan=g[side]?.gameplan,planText=plan?(plan.label||GAMEPLAN_TIERS[plan.prep]?.label||'Not recorded for this older game'):'Not recorded for this older game';
   let next='Keep the balanced approach available; choose the next plan from the next opponent’s tendencies.';
   if(known(s.turnovers)&&s.turnovers>=2)next='Review ball security and quarterback decisions before chasing a more aggressive plan.';
   else if(known(s.sacksTaken)&&s.sacksTaken>=3)next='Review protection and your offensive-line depth chart before next week.';
@@ -9050,6 +9050,8 @@ function coachingReportHTML(g){
 // 0.0% of routine games because only the Game Day's detailed engine ever produces it — so
 // the packet's own tiering is applied to the field that actually holds the bytes instead.
 const GAME_DETAIL_HORIZON=3,COMPACTION_MANIFEST_CAP=40;
+// v0.31: a second tier for the same unprotected games once they are this many seasons old (see compactGameArchive).
+const GAME_DEEP_HORIZON=8;
 // Never compacted: anything a player would go back and read. Everything the permanent tier
 // names — score, participants, context, team box, injuries, leaders — is kept either way.
 function gameIsProtected(g,userTeamName){
@@ -9089,15 +9091,42 @@ function compactGame(g){
  g.compacted={season:universe.year,dropped,kept:kept.home.length+kept.away.length};
  return g.compacted;
 }
+// v0.31 deep tier: an unprotected game (another program's regular-season game, never the coach's, a rivalry or the
+// postseason) older than GAME_DEEP_HORIZON keeps its score, team statistics and its passing, rushing and receiving
+// leaders. Other scorer lines and the injury list go; every player's season and career totals, records and injury
+// history are kept on the player. This is the part of the archive that grows forever (about 2.5 KB a game).
+// Each leader keeps the stats of the category he led (a quarterback who also led rushing keeps both).
+const LEADER_STATS={passYds:['passAtt','passComp','passYds','passTD','int'],rushYds:['rushAtt','rushYds','rushTD'],recYds:['targets','receptions','recYds','recTD']};
+function gameLeaderLines(lines){
+ if(!Array.isArray(lines)||!lines.length)return lines||[];
+ const keep=new Map();
+ for(const [key,fields] of Object.entries(LEADER_STATS)){
+  let best=null,bestVal=0;for(const p of lines){const v=p.stats?.[key]||0;if(v>bestVal){bestVal=v;best=p}}
+  if(best)keep.set(best,[...(keep.get(best)||['games','starts']),...fields]);
+ }
+ return lines.filter(p=>keep.has(p)).map(p=>{const stats={};for(const k of keep.get(p))if(p.stats?.[k]!=null)stats[k]=p.stats[k];return{...p,stats}});
+}
+function deepCompactGame(g){
+ if(!g||g.compacted?.deep||!g.playerStats)return null;
+ const before={home:g.playerStats.home||[],away:g.playerStats.away||[]};
+ const kept={home:gameLeaderLines(before.home),away:gameLeaderLines(before.away)};
+ const dropped=(before.home.length-kept.home.length)+(before.away.length-kept.away.length),injuries=Array.isArray(g.injuries)?g.injuries.length:0;
+ g.playerStats=kept;if(injuries)g.injuries=[];
+ // A game plan keeps its key; the box score looks the label up.
+ for(const side of ['home','away']){const plan=g[side]?.gameplan;if(plan?.prep&&GAMEPLAN_TIERS[plan.prep]?.label===plan.label)g[side].gameplan={prep:plan.prep}}
+ g.compacted={...(g.compacted||{season:universe.year,dropped:0}),dropped:(g.compacted?.dropped||0)+dropped,kept:kept.home.length+kept.away.length,deep:{season:universe.year,dropped,injuries}};
+ return {dropped};
+}
 // Runs over seasons older than the horizon. Game ids and every link to them are untouched.
-function compactGameArchive({horizon=GAME_DETAIL_HORIZON}={}){
- const cutoff=universe.year-horizon,user=$('#userTeam')?.value||null;
+function compactGameArchive({horizon=GAME_DETAIL_HORIZON,deepHorizon=GAME_DEEP_HORIZON}={}){
+ const cutoff=universe.year-horizon,deepCutoff=universe.year-deepHorizon,user=$('#userTeam')?.value||null;
  let games=0,dropped=0;
  for(const g of universe.gameArchive||[]){
   if((g.season??universe.year)>cutoff)continue;
   if(gameIsProtected(g,user))continue;
   const res=compactGame(g);
   if(res){games++;dropped+=res.dropped}
+  if((g.season??universe.year)<=deepCutoff){const deep=deepCompactGame(g);if(deep){if(!res)games++;dropped+=deep.dropped}}
  }
  if(games){
   universe.compactionManifest??=[];
@@ -10282,8 +10311,14 @@ function guidanceModel(t=selected()){
  if(rivalWatch&&rivalWatch.count>0)add({id:guidanceItemId(t,'recruiting-rivals',`${universe.year}-${universe.week}`),occurrence:`${universe.year}-${universe.week}`,meaning:'staff_recommendation',category:'recruiting',priority:164,title:`${rivalWatch.count} rival move${rivalWatch.count===1?'':'s'} on your board`,cause:`Rivals have made moves on ${rivalWatch.names.join(', ')}${rivalWatch.count>rivalWatch.names.length?' and others':''}. An unanswered move adds to their pitch.`,affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'recruiting',focus:'recruiting-board'},boundary:null,consequence:optional});
  const decisionsSoon=universe.phase==='regular'&&targets?globalThis.DynastyRecruitingDecisions?.(t):null;
  if(decisionsSoon&&decisionsSoon.count>0)add({id:guidanceItemId(t,'recruiting-decisions',`${universe.year}-${universe.week}`),occurrence:`${universe.year}-${universe.week}`,meaning:'staff_recommendation',category:'recruiting',priority:166,title:`${decisionsSoon.count} recruit${decisionsSoon.count===1?'':'s'} may choose a school soon`,cause:`${decisionsSoon.names.join(', ')}${decisionsSoon.count>decisionsSoon.names.length?' and others':''} may be approaching a decision. Only an announced date is public, and plans can change.${decisionsSoon.unoffered?` ${decisionsSoon.unoffered} of them ${decisionsSoon.unoffered===1?'has':'have'} no offer from you, and a recruit cannot choose you without one.`:''}`,affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'recruiting',focus:'recruiting-board'},boundary:null,consequence:optional});
+ // v0.31: prospects close to a cut you would not yet survive. Only when the coach runs the board; the staff plan offers on its own.
+ const narrowing=universe.phase==='regular'&&targets&&!globalThis.DynastyRecruitingActions?.isAuto?.(universe)?globalThis.DynastyRecruitingNarrowing?.(t):null;
+ if(narrowing&&narrowing.count>0)add({id:guidanceItemId(t,'recruiting-narrowing',`${universe.year}-${universe.week}`),occurrence:`${universe.year}-${universe.week}`,meaning:'staff_recommendation',category:'recruiting',priority:167,title:`${narrowing.count} target${narrowing.count===1?' is':'s are'} narrowing ${narrowing.count===1?'his':'their'} list`,cause:`${narrowing.names.join(', ')}${narrowing.count>narrowing.names.length?' and others':''} ${narrowing.count===1?'is':'are'} close to a cut.${narrowing.unoffered?` ${narrowing.unoffered} ${narrowing.unoffered===1?'has':'have'} no offer from you; an offer and interest of 65 or more keep you on the list.`:' Interest of 65 or more with your offer keeps you on the list.'}`,affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'recruiting',focus:'recruiting-board'},boundary:null,consequence:optional});
  if(inSeason&&t.trainingFocusSeason!==universe.year)add({id:guidanceItemId(t,'training-focus',String(universe.year)),occurrence:String(universe.year),meaning:'staff_recommendation',category:'development',priority:150,title:'Set a training focus',cause:`Practice is running the default ${t.trainingFocus||'Balanced'} plan.`,affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'development',focus:'training-focus'},boundary:null,consequence:optional});
- if(universe.phase==='complete'&&typeof developmentPlanSystem!=='undefined'&&!(universe.developmentState?.year===universe.year&&universe.developmentState.springRun)){const used=developmentPlanSystem.count(t.roster||[],universe),open=developmentPlanSystem.LIMIT-used;if(open>0)add({id:guidanceItemId(t,'featured-plans',String(universe.year)),occurrence:String(universe.year),meaning:'staff_recommendation',category:'development',priority:175,title:`Choose featured development plans (${used}/${developmentPlanSystem.LIMIT})`,cause:`${open} featured plan slot${open===1?' is':'s are'} open before spring development.`,affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'development',focus:'featured-plans'},boundary:null,consequence:optional})}
+ // v0.31: the plan system is block scoped inside development-plans.js; this reminder could never see it until it
+ // read the published bridge (found by the new lint).
+ const plans=globalThis.DynastyLabDevelopmentPlans;
+ if(universe.phase==='complete'&&plans?.countFor&&!(universe.developmentState?.year===universe.year&&universe.developmentState.springRun)){const used=plans.countFor(t.roster||[]),open=plans.limit-used;if(open>0)add({id:guidanceItemId(t,'featured-plans',String(universe.year)),occurrence:String(universe.year),meaning:'staff_recommendation',category:'development',priority:175,title:`Choose featured development plans (${used}/${plans.limit})`,cause:`${open} featured plan slot${open===1?' is':'s are'} open before spring development.`,affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'development',focus:'featured-plans'},boundary:null,consequence:optional})}
  const state=guidanceStateFor(t),stamp=guidanceCalendarStamp();
  for(const item of items){item.familiarity=Number(state.familiarity?.[item.category])||0;item.deferred=['staff_recommendation','monitoring'].includes(item.meaning)&&state.deferred?.[item.id]?.stamp===stamp}
  const meaningRank={must_resolve:4,decision_due:3,staff_recommendation:2,monitoring:1};
@@ -13324,6 +13359,8 @@ function makeDevelopmentTendencySystem(env){
 if(typeof module==='object'&&module.exports){module.exports={makeDevelopmentTendencySystem};}
 else{
  const developmentTendencySystem=makeDevelopmentTendencySystem({});
+ // Block scoped; other modules read the clue through this bridge (v0.31).
+ globalThis.DynastyLabDevelopmentTendencies={clue:p=>developmentTendencySystem.clue(p)};
  function developmentTendencyBadge(p){const x=developmentTendencySystem.clue(p);if(x.code==='LEARNING'||x.code==='TRACKING')return'';return `<span class="development-tendency-badge development-tendency-${x.tone}" title="${String(x.summary).replace(/"/g,'&quot;')}">${x.label}</span>`}
  function renderDevelopmentTendencyBadges(){
   const t=selected(),body=$('#rosterBody');if(!t||!body)return;
@@ -13870,9 +13907,27 @@ function makeRecruitingActionSystem(env){
   const pending=Number.isInteger(r.visitWeek)&&r.visitWeek>universe().week;
   const clue=r.committed?'Committed':a?.week!=null?`Announced week ${a.week}`:waiting?'Waiting for signing day':pending?'Taking visits':near?'A decision could come soon':f?.top3?'Weighing his finalists':f?.top5?'Narrowing his list':'Exploring his options';
   const detail=!close?null:f?.context==='visit'?'He wants to finish his visits before settling on a school.':f?.context==='competition'?'He is comparing closely matched schools.':f?.context==='patient'?'He prefers to take his time and be sure.':'Finding the right fit is bringing him closer to a choice.';
+  // v0.31: a prospect on your board who is close to his next cut. Qualitative only: which list is coming and
+  // whether your visible standing (an offer, interest of 65 or more) holds a place; never a week or a number.
+  const narrowing=narrowingFor(r,t,f,profile);
   return{on:true,stage,top5:f?.top5||null,top3:f?.top3||null,cut:f?.cut||null,announcedWeek:a?.week??null,
    announcement:a?{week:a.week,announcedAt:a.announcedAt,postponed:a.postponed,reason:a.reason}:null,clue,detail,
-   soon:!r.committed&&!f?.cut&&((a?.week!=null&&a.week<=universe().week+1)||near)};
+   soon:!r.committed&&!f?.cut&&((a?.week!=null&&a.week<=universe().week+1)||near),narrowing};
+ }
+ const NARROWING_MARGIN=.12;
+ function narrowingFor(r,t,f,profile){
+  if(!t||!r?.targeted||r.committed||f?.version!==2||f.cut||f.signingDay||!Number.isFinite(f.readiness))return null;
+  const ratio=f.readiness/profile.threshold;
+  const list=!f.top5&&ratio>=profile.wide-NARROWING_MARGIN?'top5':f.top5&&!f.top3&&f.top5.includes(t.name)&&ratio>=profile.narrow-NARROWING_MARGIN?'top3':null;
+  if(!list)return null;
+  const offered=hasOffer(r,t),interested=(r.interest||0)>=SAFETY_INTEREST;
+  // Interest and offers are on the card already; a hidden dealbreaker is never revealed here.
+  return{list,offered,interested,safe:offered&&interested};
+ }
+ function narrowingWithoutYou(recruits,t){
+  const out=[];
+  for(const r of recruits||[]){if(!r?.targeted||r.committed)continue;const n=funnelStatus(r,t).narrowing;if(n&&!n.safe)out.push({recruit:r,...n})}
+  return out.sort((a,b)=>(a.recruit.nationalRank||1e9)-(b.recruit.nationalRank||1e9));
  }
  function decisionsDue(recruits,t,within=1){
   const w=universe().week,out=[];
@@ -14015,7 +14070,7 @@ function makeRecruitingActionSystem(env){
 
  return{COSTS,LABELS,INHOME,OFFER,hoursBudgetFor,weekInfo,ensureWeek,hoursLeft,isActive,record,weekState,workedThisWeek,
   offerLimit,offersOut,hasOffer,topicStrength,motivesFor,dealbreakerUnmet,intel,knownBlock,pitchProjection,pitchOptions,availability,perform,withdrawOffer,
-  effort,previewEffort,effortFromSince,weeksSinceWorked,mayCommit,pitchBoost,status,workload,staffPlan,isAuto,setAuto,funnelOn,funnelState,funnelStatus,runFunnel,holds,decisionsDue,keepBoost,noteWeek,newsItems,deskSummary,rivalHeat,rivalPressure,addRivalEvent,generateRivals,answerRivals,rivalMoves,liveMoves,unansweredMoves,grandfather};
+  effort,previewEffort,effortFromSince,weeksSinceWorked,mayCommit,pitchBoost,status,workload,staffPlan,isAuto,setAuto,funnelOn,funnelState,funnelStatus,narrowingWithoutYou,runFunnel,holds,decisionsDue,keepBoost,noteWeek,newsItems,deskSummary,rivalHeat,rivalPressure,addRivalEvent,generateRivals,answerRivals,rivalMoves,liveMoves,unansweredMoves,grandfather};
 }
 
 if(typeof module==='object'&&module.exports){
@@ -14067,6 +14122,12 @@ if(typeof module==='object'&&module.exports){
   if(!t||!universe?.recruits)return null;
   const rows=recruitingActions.decisionsDue(universe.recruits,t,1);
   return{count:rows.length,names:rows.slice(0,3).map(x=>x.recruit.name),unoffered:rows.filter(x=>!recruitingActions.hasOffer(x.recruit,t)).length};
+ };
+ // v0.31: board prospects close to a cut that your offer and interest would not yet survive.
+ globalThis.DynastyRecruitingNarrowing=t=>{
+  if(!t||!universe?.recruits)return null;
+  const rows=recruitingActions.narrowingWithoutYou(universe.recruits,t);
+  return{count:rows.length,names:rows.slice(0,3).map(x=>x.recruit.name),unoffered:rows.filter(x=>!x.offered).length};
  };
  globalThis.DynastyRecruitingWeek=t=>t&&!recruitingActions.isAuto(universe)?recruitingActions.weekInfo(t):null;
 
@@ -14205,6 +14266,9 @@ if(typeof module==='object'&&module.exports){
    if(!f.top5)cells.push('<span><b>His list</b>Still open</span>');
    else if(r.targeted&&!f.top3&&!f.top5.includes(t.name))cells.push('<span class="ra-warn-text"><b>Not on his list</b>An offer and strong interest can still earn a spot before he narrows to his finalists.</span>');
    else if(r.targeted&&f.top3&&!f.top3.includes(t.name))cells.push('<span class="ra-warn-text"><b>Not a finalist</b>He would only turn to you if his finalists run out of room.</span>');
+   const n=f.narrowing;
+   if(n&&!n.safe){const which=n.list==='top5'?'naming his Top 5':'naming his finalists';
+    cells.push(`<span class="ra-warn-text"><b>Narrowing his list</b>He is close to ${which}. ${!n.offered?'Offer a scholarship now or you will likely miss the cut.':'Your offer is in, but his interest in you needs to reach 65 to be sure of a place.'}</span>`)}
   }
   const offer=!f.cut&&r.targeted&&!recruitingActions.hasOffer(r,t)?'<small class="ra-warn-text">He cannot choose you without a scholarship offer.</small>':'';
   return`<div class="ra-funnel">${cells.join('')}</div>${offer}`;
@@ -14287,7 +14351,9 @@ if(typeof module==='object'&&module.exports){
   if(m)return`<small class="ra-rival-badge">⚑ ${r.committed?'Committed · ':''}${raEsc(m.team)} ${raEsc(m.verb)}</small>`;
   if(r.committed||!r.targeted||!recruitingActions.funnelOn())return'';
   const f=recruitingActions.funnelStatus(r,selected());
-  return f.cut?'<small class="ra-rival-badge">✂ Cut you from his list</small>':`<small class="ra-decision-badge">${raEsc(f.clue)}</small>`;
+  if(f.cut)return'<small class="ra-rival-badge">✂ Cut you from his list</small>';
+  if(f.narrowing&&!f.narrowing.safe)return`<small class="ra-rival-badge">⚠ Narrowing his list${f.narrowing.offered?' · interest below 65':' · no offer from you'}</small>`;
+  return`<small class="ra-decision-badge">${raEsc(f.clue)}</small>`;
  }
  globalThis.DynastyRecruitingDesk={html:deskHTML,nav:navHTML,badge:badgeHTML,recruit:raRecruit,team:()=>selected(),bind:root=>{bindDesk(root);bindStaff(root)}};
  // What the funnel did last week: who chose you, who chose someone else, who cut you.
@@ -15765,7 +15831,7 @@ else{
  }
  function augmentTrainingPlanControls(){const t=selected(),ds=ensureDevelopmentState();for(const s of $$('[data-training]')){const p=t.roster.find(x=>String(x.id)===String(s.dataset.training)),cell=s.closest('td');if(!p||!cell||cell.querySelector('[data-feature-development]'))continue;const plan=developmentPlanSystem.activePlan(p,universe),used=developmentPlanSystem.count(t.roster,universe),disabled=ds.springRun||(!plan&&used>=developmentPlanSystem.LIMIT)||universe.phase!=='complete';cell.insertAdjacentHTML('beforeend',`<button type="button" class="development-feature-btn${plan?' active':''}" data-feature-development="${devPlanEscape(p.id)}" ${disabled?'disabled':''}>${plan?'Featured Plan':'Feature Plan'}</button>${plan?`<div class="small muted">${devPlanEscape(planResultText(plan))}</div>`:''}`);if(plan)s.onchange=()=>{s.value=plan.focus;setStatus(`${p.name}'s featured plan is locked to ${plan.focus} for this training cycle.`)}}bindDevelopmentPlanButtons()}
  extendRender('development',()=>{renderDevelopmentPlanBoard();augmentTrainingPlanControls()});
- globalThis.DynastyLabDevelopmentPlans={active:p=>developmentPlanSystem.activePlan(p,universe),count:()=>developmentPlanSystem.count(selected()?.roster||[],universe),recordResults};
+ globalThis.DynastyLabDevelopmentPlans={active:p=>developmentPlanSystem.activePlan(p,universe),count:()=>developmentPlanSystem.count(selected()?.roster||[],universe),countFor:roster=>developmentPlanSystem.count(roster||[],universe),limit:developmentPlanSystem.LIMIT,recordResults};
 }
 
 function makeDevelopmentVisualizationModel(){
@@ -15802,7 +15868,7 @@ if(typeof module==='object'&&module.exports){module.exports={makeDevelopmentVisu
 else{
  const developmentVisualizationModel=makeDevelopmentVisualizationModel();
  function developmentVisualizationReady(){return !!universe&&Array.isArray(universe.teams)}
- function developmentVisualizationPlayer(p){const tendency=(typeof developmentTendencySystem==='object'&&developmentTendencySystem?.clue)?developmentTendencySystem.clue(p):null;return developmentVisualizationModel.player(p,tendency)}
+ function developmentVisualizationPlayer(p){const tendency=globalThis.DynastyLabDevelopmentTendencies?.clue?.(p)??null;return developmentVisualizationModel.player(p,tendency)}
  globalThis.DynastyLabDevelopmentView={
   snapshot:()=>{if(!developmentVisualizationReady())return null;const t=selected?.();if(!t)return null;const players=(t.roster||[]).map(p=>{const x=developmentVisualizationPlayer(p);return{id:x.id,name:x.name,pos:x.pos,currentRead:x.currentRead,confidence:x.confidence,historyCount:x.history.length,totalDelta:x.totalDelta,tendency:x.tendency}});return{team:{id:t.id,name:t.name,development:t.development},year:universe.year,phase:universe.phase,summary:developmentVisualizationModel.team(t.roster||[]),players};},
   player:id=>{if(!developmentVisualizationReady())return null;const t=selected?.(),p=t?.roster?.find(x=>String(x.id)===String(id));return developmentVisualizationPlayer(p)},
@@ -22520,7 +22586,8 @@ attach();setTimeout(attach,0);setTimeout(attach,150);
   const isNewer=(a,b)=>{for(let i=0;i<3;i++){if((a[i]||0)!==(b[i]||0))return (a[i]||0)>(b[i]||0)}return false};
   async function check(){
     let current='';
-    try{current=typeof APP_VERSION==='string'?APP_VERSION:(document.querySelector('[data-title-version]')?.textContent||'')}catch{}
+    // APP_VERSION lives inside the app closure and is never visible here; the build stamps the version into the page.
+    try{current=document.querySelector('[data-title-version]')?.textContent||''}catch{}
     if(!/^\d+\./.test(String(current).replace(/^v/i,'')))return;
     try{
       // The shell performs the request in the main process; a blocked update check
