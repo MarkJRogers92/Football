@@ -371,3 +371,21 @@ eight seasons the postseason takes 2.8 s instead of 5.9 s.
 Not changed: `playerArchive` (about +5 MB a season, chunked, deferred in the
 browser) and `gameArchive` (about +2.5 MB a season after compaction). They cost
 memory and load time in long saves, not the desktop limit.
+
+## v0.30.0: lossless archive trims (2026-11-14)
+
+Instead of the rejected rollup, newly archived players drop `coachDeparturePressure`
+(only an active player's transfer risk and portal choice read it) and keep
+`recruitingMemory` home coordinates to four decimals. `ANALYZE=1 SEASONS=10 SEED=7`,
+same 23,344 archived players:
+
+| Season ten | Before | After |
+|---|---|---|
+| Total save | 117.6 MB | 116.2 MB |
+| playerArchive | 42.8 MB | 41.4 MB (−3.3%) |
+| Average archived record | 1,919 B | 1,857 B |
+| recruitingMemory | 3.2 MB | 3.0 MB |
+| coachDeparturePressure | 0.9 MB | 0 |
+
+Existing archived records are not rewritten. The remaining growth is real history
+(season rows, camps, recruitment) and `gameArchive`.
