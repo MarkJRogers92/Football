@@ -1,0 +1,23 @@
+{
+ "note": "Ordered parts spliced into app.js at its @app-parts marker. Order matters: top-level const/let run in sequence.",
+ "parts": [
+  "app/01-identity-rng.js",
+  "app/02-players-scouting.js",
+  "app/03-staff-hiring.js",
+  "app/04-recruiting-pitch.js",
+  "app/05-schedule.js",
+  "app/06-recaps-news.js",
+  "app/07-game-center.js",
+  "app/08-game-sim-awards-draft.js",
+  "app/09-careers-bowls.js",
+  "app/10-program-gameplan-hub.js",
+  "app/11-recruiting-commitments.js",
+  "app/12-offseason-enrollment.js",
+  "app/13-transfer-portal.js",
+  "app/14-weekly-decisions.js",
+  "app/15-render-program-recruiting.js",
+  "app/16-history-save-format.js",
+  "app/17-save-validation.js",
+  "app/18-persistence-session.js"
+ ]
+}

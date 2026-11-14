@@ -74,7 +74,7 @@ test('play logs default to empty for old saves and roll over with the season', a
   delete e.universe.playLogs;
   e.normalizeUniverse();
   assert.deepEqual(e.universe.playLogs, {}, 'an old save loads with an empty play-log map');
-  const src = require('fs').readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8');
+  const src = require('../tools/app-source').readAppSource();
   assert.match(src, /universe\.lastDetailedGame=null;universe\.playLogs=\{\};/, 'the season rollover clears play logs');
 });
 

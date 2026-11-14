@@ -44,7 +44,7 @@ const corr = (x,y) => { const mx=mean(x),my=mean(y);
   const byP=[...u.teams].sort((a,b)=>b.prestige-a.prestige);
   const blueChip = t => u.recruits.filter(r=>r.committed===t.name&&r.stars>=4).length;
   console.log(`4-5 star signees: top20 prestige ${mean(byP.slice(0,20).map(blueChip)).toFixed(1)}/class, bottom20 ${mean(byP.slice(-20).map(blueChip)).toFixed(1)}/class`);
-  console.log(`decommits/flips possible: ${/decommit|flip/i.test(require('fs').readFileSync(__dirname+'/../app.js','utf8')) ? 'yes' : 'NO — commitments are permanent'}`);
+  console.log(`decommits/flips possible: ${/decommit|flip/i.test(require('./app-source').readAppSource()) ? 'yes' : 'NO — commitments are permanent'}`);
 
   // --- development over four years
   e.runSpringCamp(); e.runFallCamp(); e.runOffseason();

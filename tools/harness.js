@@ -83,7 +83,8 @@ function loadEngine({ seed, stubRender = true, indexedDB, fullRuntime = false } 
     try{for(const file of runtimeDependencies)(0,eval)(fs.readFileSync(path.join(__dirname,'..',file),'utf8'))}finally{global.module=nodeModule}
     fullRuntimeDependenciesLoaded=true;
   }
-  let src = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  // app.js plus its ordered parts under app/; app.js is read first so a test can still wrap that one file.
+  let src = require('./app-source').assembleAppSource(fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8'));
   if(fullRuntime){
     const anchor='loadSchools().then(',at=src.lastIndexOf(anchor);
     if(at<0)throw new Error('runtime extension anchor not found');

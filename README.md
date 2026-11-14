@@ -19,7 +19,7 @@ version bump or a change under `assets/`.
 
 | Path | Role |
 | --- | --- |
-| `app.js` | Engine and UI core. Source of truth. |
+| `app.js` + `app/*.js` | Engine and UI core, split into ordered parts (`app/manifest.json`) that the build splices back into one closure. Source of truth. |
 | `*.js` / `*.css` feature modules | Feature extensions (recruiting, scouting, game-engine-v2, weekly coaching, presentation, guidance, etc.). `tools/build.js` injects them into `app.js` (engine extensions) or appends them after it (presentation modules) in a fixed, dependency-ordered list. A new module must be added to that list. |
 | `schools-data.js` | The 120 fictional programs every new universe starts from (`DynastySchools`). |
 | `mascots.js` | A nickname for each program, keyed by school id (`DynastyMascots`). |
