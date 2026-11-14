@@ -58,3 +58,22 @@ test('summary records survive normalization', async()=>{
  assert.deepEqual(row.awards,[]);
  assert.deepEqual(row.seasonHistory,[]);
 });
+
+// v0.30: lossless trims for newly archived players, played or not.
+test('archived records drop coach departure pressure and keep home coordinates to four decimals', async()=>{
+ const e=await setup(9409),u=e.universe,t=u.teams[0];
+ const pressure={coachId:'c1',fromSchoolId:t.id,toSchoolId:2,strength:30,season:2030};
+ const memory={schoolId:t.id,season:2028,stars:3,homeRegion:'Pacific',lat:21.283248493511696,lon:-157.92391415222895};
+ const played={...t.roster[0],id:'trim-played',career:career(12),stats:career(12),coachDeparturePressure:pressure,recruitingMemory:memory};
+ const unplayed={...t.roster[1],id:'trim-unplayed',career:career(0),stats:career(0),coachDeparturePressure:pressure,recruitingMemory:memory};
+ e.addToArchive(played,t,'Graduated');e.addToArchive(unplayed,t,'Roster cut');
+ for(const id of ['trim-played','trim-unplayed']){
+  const row=u.playerArchive.find(x=>x.id===id);
+  assert.equal(row.coachDeparturePressure,undefined,`${id}: departure pressure only matters to an active player`);
+  assert.deepEqual(row.recruitingMemory,{...memory,lat:21.2832,lon:-157.9239},`${id}: everything else in the recruitment is kept`);
+ }
+ assert.equal(played.recruitingMemory.lat,memory.lat,'the departing player object is not changed');
+ assert.equal(played.coachDeparturePressure,pressure);
+ const save=JSON.parse(JSON.stringify({userTeam:t.name,universe:e.packUniverse(u)}));e.installSave(save);
+ assert.deepEqual(e.universe.playerArchive.find(x=>x.id==='trim-played').recruitingMemory,{...memory,lat:21.2832,lon:-157.9239},'stable through reload');
+});

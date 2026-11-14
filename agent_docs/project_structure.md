@@ -11,7 +11,7 @@
 
 ## Modules and Responsibilities
 
-- `app.js` owns the main universe state, simulation orchestration, gameplay UI, new-dynasty flow, and save/import/export coordination.
+- `app.js` plus its ordered parts in `app/` (listed in `app/manifest.json`) own the main universe state, simulation orchestration, gameplay UI, new-dynasty flow, and save/import/export coordination. `app.js` keeps the version constant, the shared helpers at the top and the bootstrap; the parts are spliced in at its `/*@app-parts …*/` marker by `tools/app-source.js`, so they share one closure. Parts are plain top-level code, not modules: add a function to the part that matches its domain, keep top-level `const`/`let` after anything they depend on, and read the core through `readAppSource()` rather than `app.js` alone. `tests/app-parts.js` guards the split.
 - Game Engine 2 behavior is split across `game-engine-v2*.js`; `rng.js` provides deterministic gameplay randomness. Weekly coaching, player stories, recruiting, scouting, development, career, and presentation features are separate root modules.
 - Branding, sports/game-day, client-shell, and other presentation modules enhance rendered UI; the build injects extension modules into the app closure where shared state is required.
 - `storage.js` provides the browser/desktop-neutral `DynastyStorage` contract. Browser saves use IndexedDB; `desktop/storage.js` provides native file-backed storage through the preload bridge.

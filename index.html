@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.29.1</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.30.0</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -1184,6 +1184,19 @@ tr[hidden]{display:none!important}
 .legacy-arc-bar:hover .legacy-arc-col{outline:1px solid rgba(255,255,255,.18)}
 @media(max-width:520px){.legacy-arc-bar{grid-template-rows:72px auto;flex-basis:12px}.legacy-arc-head{display:grid;gap:2px}.legacy-arc-bar:not(.is-title) .legacy-arc-rank{display:none}}
 @media(prefers-reduced-motion:reduce){.legacy-arc-col i{transition:none}}
+/* v0.30 national timeline: one season per champion row, with its awards, upsets and standing records folded below. */
+.timeline-season{display:grid;gap:4px}
+.timeline-detail{border:1px solid #1d2a38;border-radius:10px;padding:0 12px;background:rgba(10,18,27,.3)}
+.timeline-detail>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;color:#93a5ba;font-size:12px}
+.timeline-detail[open]{padding-bottom:10px}
+.timeline-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:4px 18px;align-items:start}
+.timeline-block{margin-top:8px;min-width:0}
+.timeline-block ul{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:2px}
+.timeline-link{display:grid;gap:1px;width:100%;min-height:44px;text-align:left;background:none;border:0;border-radius:8px;padding:6px 8px;color:inherit;font:inherit;font-size:12.5px;cursor:pointer;overflow-wrap:anywhere}
+.timeline-link b{font-weight:600}
+.timeline-link small{color:#93a5ba;font-size:11px}
+.timeline-link:is(:hover,:focus-visible):not([disabled]){background:rgba(18,32,46,.75)}
+.timeline-link[disabled]{cursor:default}
 
 .v2-lab-card{border-color:#40506a;background:linear-gradient(180deg,#171e29,#141a22)}
 .v2-lab-head{align-items:center}.v2-shadow-score{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:14px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);margin-bottom:10px}.v2-shadow-score>div:first-child{text-align:left}.v2-shadow-score>div:last-child{text-align:right}.v2-shadow-score span{display:block;color:var(--muted);font-size:12px}.v2-shadow-score strong{font-size:32px;line-height:1}.v2-shadow-final{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--muted);text-align:center}.v2-shadow-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px}.v2-shadow-metrics>div{padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}.v2-shadow-metrics span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em}.v2-shadow-metrics strong{font-size:18px}.v2-shadow-safety{padding:9px 10px;border-left:3px solid var(--accent2);background:rgba(143,177,255,.06);font-size:12px;margin:10px 0}.v2-transaction-proof{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:10px 12px;margin:10px 0;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}.v2-transaction-proof>div:first-child{min-width:0}.v2-proof-records{display:flex;gap:7px;align-items:center;white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:750}.v2-leader-card{padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}.v2-event-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:14px 0 6px}.v2-event-feed{max-height:480px;overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}.v2-event-line{display:grid;grid-template-columns:76px minmax(0,1fr) 52px;gap:10px;align-items:start;padding:8px 10px;border-bottom:1px solid var(--line)}.v2-event-line:last-child{border-bottom:0}.v2-event-clock{font-variant-numeric:tabular-nums;font-size:11px;color:var(--muted);white-space:nowrap}.v2-event-copy{min-width:0;font-size:12px}.v2-event-copy strong,.v2-event-copy small{display:block}.v2-event-copy small{color:var(--muted);margin-top:2px}.v2-event-score{text-align:right;font-variant-numeric:tabular-nums;font-weight:750;font-size:12px}
@@ -3569,7 +3582,7 @@ select{min-width:44px}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.29.1</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.30.0</b></span></footer>
   </div>
 </section>
 
@@ -3596,7 +3609,7 @@ select{min-width:44px}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.29.1</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.30.0</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -7545,11 +7558,12 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.29.1';
+const APP_VERSION='0.30.0';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi','Aiden','Alex','Amari','Andrew','Anthony','Antonio','Armani','Ashton','Austin','Avery','Bennett','Blake','Brady','Brandon','Brayden','Brennan','Brock','Bryson','Cade','Caden','Calvin','Cameron','Carson','Cedric','Chase','Christian','Cody','Colby','Collin','Connor','Corey','Damian','Damon','Daniel','Davion','Dawson','Deandre','Demarcus','Derek','Desmond','Dillon','Drew','Dylan','Elijah','Ethan','Ezra','Garrett','Grady','Graham','Grant','Hayden','Hunter','Ian','Isaac','Jabari','Jace','Jackson','Jacob','Jaden','Jake','Jamar','Jameson','Jared','Jarrett','Javon','Jaxon','Jay','Jermaine','Jesse','Joel','Jonah','Josiah','Julian','Justin','Kaden','Kai','Kamari','Keegan','Keenan','Kendall','Kendrick','Kevin','Kobe','Kyle','Kyler','Lamar','Landon','Lane','Lawrence','Leon','Levi','Lincoln','Lucas','Marco','Mario','Mateo','Matthew','Maurice','Max','Myles','Nate','Nathan','Nolan','Omar','Owen','Parker','Patrick','Preston','Quentin','Quincy','Reggie','Riley','Ryan','Sam','Sean','Seth','Shane','Silas','Solomon','Spencer','Sterling','Terrell','Theo','Tobias','Travis','Tristan','Troy','Tucker','Tyrese','Victor','Wade','Walker','Wes','Wyatt','Zach','Zane','Andres','Diego','Rafael','Tevita','Sione','Manu','Keoni','Kenji','Darnell'];
 const LAST=['Grant','Brooks','Coleman','Hayes','Wallace','Kemp','Voss','Rourke','Price','Banks','Foster','Bell','Crawford','Morris','King','Lewis','Dawson','Cross','Reed','Marsh','Holloway','Cole','Harper','Bennett','Rivers','Stone','Woods','Bryant','Knox','Mercer','Hawkins','Maddox','Sutton','Parker','Monroe','Whitaker','Adams','Aldridge','Allen','Alvarez','Armstrong','Atkins','Bailey','Baker','Baldwin','Barnes','Barrett','Battle','Baxter','Beasley','Benson','Bishop','Blackwell','Blair','Bowen','Boyd','Bradford','Bradley','Branch','Brennan','Briggs','Broussard','Buchanan','Burke','Burns','Butler','Caldwell','Calloway','Campbell','Carr','Carroll','Carter','Castillo','Chambers','Chandler','Clark','Clayton','Cobb','Collier','Collins','Conley','Cooper','Copeland','Cortez','Craig','Cunningham','Curry','Dalton','Daniels','Davenport','Delgado','Dixon','Donovan','Douglas','Drake','Dunn','Easley','Edwards','Ellis','Emerson','Evans','Farrell','Fields','Fisher','Fleming','Fletcher','Flores','Ford','Fowler','Franklin','Freeman','Fuller','Gaines','Garner','Garrett','Gibson','Gilbert','Glover','Goodwin','Gordon','Graves','Green','Griffin','Guerrero','Hale','Hamilton','Hampton','Hardy','Harmon','Harris','Hart','Henderson','Hicks','Hill','Hines','Hobbs','Holland','Holt','Hopkins','Horton','Howard','Hudson','Hughes','Hunt','Ingram','Jackson','Jefferson','Jenkins','Jennings','Johnson','Jordan','Kelly','Kennedy','Kerr','Kirby','Lambert','Lane','Lawson','Leblanc','Lockett','Logan','Lowe','Lyons','Mack','Malone','Mann','Martin','Matthews','Maxwell','McBride','McCoy','McDaniel','McKenzie','Meadows','Miles','Miller','Mitchell','Moody','Moore','Moreno','Morgan','Moss','Murphy','Nash','Neal','Nelson','Newton','Nichols','Norris','Oliver','Ortiz','Owens','Patterson','Payne','Pearson','Perkins','Perry','Peters','Phillips','Pierce','Porter','Powell','Quinn','Ramsey','Randall','Reese','Reynolds','Rhodes','Richards','Riley','Robinson','Rogers','Ross','Russell','Sanders','Santos','Saunders','Shaw','Simmons','Slater','Smith','Spencer','Stanley','Steele','Stephens','Stewart','Strickland','Sullivan','Tate','Taylor','Terry','Thomas','Thompson','Tolbert','Townsend','Tucker','Turner','Underwood','Vance','Vaughn','Walker','Walton','Ward','Warren','Washington','Watkins','Watson','Webb','Wells','West','Wheeler','White','Wilkins','Williams','Willis','Wilson','Wright','Young','Fifita','Tuiasosopo','Mauga','Nakamura'];
+// app/01-identity-rng.js: Names, archetypes and the seeded gameplay random stream. Part of app.js; see tools/app-source.js.
 // A fictional name from the pools; never 'Cole Cole'. Pass a Set of names already in use to avoid repeating one.
 function personName(taken){let name='';for(let tries=0;tries<16;tries++){const f=pick(FIRST);let l=pick(LAST);while(l===f)l=pick(LAST);name=`${f} ${l}`;if(!taken||!taken.has(name))break}if(taken)taken.add(name);return name}
 // Rename any repeats in a list of people, keeping the first holder of each name.
@@ -7690,6 +7704,7 @@ function gauss(){let u=0,v=0;while(!u)u=gameplayRandom();while(!v)v=gameplayRand
 function uid(){return (crypto&&crypto.randomUUID)?crypto.randomUUID():`${Date.now()}-${Math.random()}`}
 function grade(v){return v>=94?'A+':v>=90?'A':v>=86?'A-':v>=82?'B+':v>=78?'B':v>=74?'B-':v>=70?'C+':v>=66?'C':v>=62?'C-':v>=57?'D+':v>=52?'D':'F'}
 function stars(v){return v>=91?5:v>=82?4:v>=70?3:v>=58?2:1}
+// app/02-players-scouting.js: Recruit stars, player traits, staff evaluation and scouting. Part of app.js; see tools/app-source.js.
 // Recruit star bands are calibrated against the generator's own distribution so
 // the pool resembles a real signing class. The generic stars() thresholds put
 // half of every class at one star and produced seven five-stars nationally.
@@ -7978,6 +7993,7 @@ function coachProfileHTML(c){const totals=coachCareerTotals(c),stints=(c.careerH
 function showCoachProfile(id){const found=coachById(id);if(!found)return;const c=found.coach,t=found.team;$('#coachDialogName').textContent=c.name;$('#coachDialogMeta').textContent=`Age ${c.age} · ${c.role} · ${found.active?(t?.name||c.schoolName):c.status==='RETIRED'?'Retired':`Formerly ${c.schoolName||'in the dynasty'}`}`;$('#coachDialogBody').innerHTML=coachProfileHTML(c);const d=$('#coachDialog');d.dataset.lwEntity=`coach:${c.id}`;if(d.showModal)d.showModal();else d.setAttribute('open','')}
 function renderCoachHistory(t){const current=new Set(Object.values(t.staff||{}).map(c=>c.id)),rows=(universe.coachArchive||[]).filter(c=>!current.has(c.id)&&(c.careerHistory||[]).some(s=>s.schoolId===t.id)).sort((a,b)=>Math.max(...(b.careerHistory||[]).map(s=>s.endSeason||9999))-Math.max(...(a.careerHistory||[]).map(s=>s.endSeason||9999))).slice(0,12);$('#coachHistoryList').innerHTML=rows.length?rows.map(c=>{const last=(c.careerHistory||[]).filter(s=>s.schoolId===t.id).at(-1),tot=coachCareerTotals(c);return `<div class="lineitem"><span><button class="player-button" data-coach="${coachEscape(c.id)}">${coachEscape(c.name)}</button> · ${coachEscape(last?.role||c.role)}</span><span>${tot.wins}–${tot.losses} career · ${coachEscape(c.status||'Departed')}</span></div>`}).join(''):'<span class="muted">Former coaches will appear as the carousel develops.</span>'}
 function attachCoachLinks(){$$('[data-coach]').forEach(b=>{const open=()=>showCoachProfile(b.dataset.coach);b.onclick=open;b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}}})}
+// app/03-staff-hiring.js: Staff budgets, coaching candidates, openings and hires. Part of app.js; see tools/app-source.js.
 // v0.9.6: coaching market. AI teams still auto-fill instantly (unchanged carousel behavior);
 // only the controlled team's vacancies become an Opening the user works through.
 function teamStaffBaseline(t){return ['Head Coach','Offensive Coordinator','Defensive Coordinator','Recruiting Coordinator','Strength & Performance'].reduce((s,role)=>s+(0.35+t.resources/35+t.prestige/45+(role==='Head Coach'?2.4:role.includes('Coordinator')?0.9:0)),0)}
@@ -8159,13 +8175,22 @@ function paintPortraits(scope){
 }
 globalThis.DynastyLabPortraits={paint:paintPortraits};
 function ensurePortrait(p){if(!p)return p;p.portraitSeed??=portraitSeedFor();p.portraitVersion??=PORTRAIT_VERSION;p.jerseyNumber??=jerseyFor(p.pos,p.portraitSeed);return p}
-const ARCHIVE_FIELDS=['id','name','pos','style','portraitSeed','portraitVersion','jerseyNumber','height','weight','year','eligibilityUsed','redshirtUsed','redshirtSeason','perceived','perceivedUpside','speed','power','technique','iq','health','wear','origin','recruitingMemory','primaryRecruiterCoachId','coachRelationships','coachDeparturePressure','transferHistory','promise','promises','staffTrust','currentSchoolId','trainingFocus','scoutConfidence','scoutingDomains','scoutingHistory','positionFamiliarity','requestedPositionChange','seasonHistory','campHistory','injuryHistory','awards'];
+const ARCHIVE_FIELDS=['id','name','pos','style','portraitSeed','portraitVersion','jerseyNumber','height','weight','year','eligibilityUsed','redshirtUsed','redshirtSeason','perceived','perceivedUpside','speed','power','technique','iq','health','wear','origin','recruitingMemory','primaryRecruiterCoachId','coachRelationships','transferHistory','promise','promises','staffTrust','currentSchoolId','trainingFocus','scoutConfidence','scoutingDomains','scoutingHistory','positionFamiliarity','requestedPositionChange','seasonHistory','campHistory','injuryHistory','awards'];
 // v0.12.16 — measured: players who never took a snap are 30.5% of the archive and
 // 27.9% of its bytes (10.6 MB at season ten). Their scouting trails, relationships
 // are compacted for careers with no games. Recorded off-field events still count
 // as history: keep recruitment, seasons, camps, transfers, injuries and evaluations.
 // Played careers are archived exactly as before.
 const ARCHIVE_SUMMARY_FIELDS=['id','name','pos','style','portraitSeed','portraitVersion','jerseyNumber','height','weight','year','eligibilityUsed','redshirtUsed','redshirtSeason','perceived','perceivedUpside','origin','promise','promises','staffTrust'];
+// v0.30: two lossless trims for newly archived players. coachDeparturePressure only feeds an active player's transfer
+// risk and portal choice, and nothing ever reads an archived record back into play, so it is not copied (above). The
+// recruit's home coordinates are kept to four decimals (about 11 m), which every map and distance reads the same.
+const ARCHIVE_COORD=1e4;
+function archiveMemory(memory){
+ if(!memory||typeof memory!=='object')return memory;
+ const round=v=>Number.isFinite(v)?Math.round(v*ARCHIVE_COORD)/ARCHIVE_COORD:v;
+ return Number.isFinite(memory.lat)||Number.isFinite(memory.lon)?{...memory,lat:round(memory.lat),lon:round(memory.lon)}:memory;
+}
 function archiveRecord(p,team,reason){
  const played=(p.career?.games||0)>0||(p.stats?.games||0)>0;
  if(!played){
@@ -8175,16 +8200,18 @@ function archiveRecord(p,team,reason){
    injury:null,injuryWeeks:0,stats:packStats(p.stats),career:packStats(p.career),recordTier:'summary',
    awards:p.awards||[],seasonHistory:[],coachRelationships:{},primaryRecruiterCoachId:p.primaryRecruiterCoachId??null};
   for(const key of ARCHIVE_SUMMARY_FIELDS)if(p[key]!==undefined)out[key]=p[key];
-  for(const key of ['recruitingMemory','seasonHistory','campHistory','transferHistory','injuryHistory','scoutingHistory','coachRelationships','coachDeparturePressure']){
+  for(const key of ['recruitingMemory','seasonHistory','campHistory','transferHistory','injuryHistory','scoutingHistory','coachRelationships']){
    const value=p[key];
    if(value&&Object.keys(value).length)out[key]=value;
   }
   if(p.awards?.length)out.awards=p.awards;
+  if(out.recruitingMemory)out.recruitingMemory=archiveMemory(out.recruitingMemory);
   if(p.draftResult)out.draftResult={year:p.draftResult.year,label:p.draftResult.label,round:p.draftResult.round,pick:p.draftResult.pick};
   return out;
  }
  let out={lastTeam:team.name,retiredYear:universe.year,exitReason:reason,redshirtActive:false,injury:null,injuryWeeks:0,stats:packStats(p.stats),career:packStats(p.career)};
  for(const k of ARCHIVE_FIELDS)if(p[k]!==undefined)out[k]=p[k];
+ if(out.recruitingMemory)out.recruitingMemory=archiveMemory(out.recruitingMemory);
  if(p.draftResult)out.draftResult={year:p.draftResult.year,label:p.draftResult.label,round:p.draftResult.round,pick:p.draftResult.pick};
  return out;
 }
@@ -8228,6 +8255,7 @@ function recruitPitchBreakdown(t,r){
  return items;
 }
 function sample(arr,n){if(arr.length<=n)return arr.slice();let seen=new Set(),out=[];while(out.length<n){let j=gi(0,arr.length-1);if(seen.has(j))continue;seen.add(j);out.push(arr[j])}return out}
+// app/04-recruiting-pitch.js: Recruit consideration lists, geography, recruiter relationships and the pitch. Part of app.js; see tools/app-source.js.
 // A recruit's real list: the programs that pitch him best. Before this, every choice was made among a random 20 of the
 // 120 programs, so a blue-blood was in the running for a given prospect only a sixth of the time and elite talent
 // spread almost evenly across the league. Cached per recruit and refreshed at the season's turn and at midseason
@@ -8529,6 +8557,7 @@ function profiles(t){
  return {qb,skill,ol,front,coverage,offFit,defFit,offense,defense,overall:(offense+defense)/2};
 }
 function circlePair(arr,round){let a=[...arr],fixed=a[0],rest=a.slice(1);for(let r=0;r<round;r++)rest=[rest.at(-1),...rest.slice(0,-1)];a=[fixed,...rest];let o=[];for(let i=0;i<a.length/2;i++)o.push([a[i],a[a.length-1-i]]);return o}
+// app/05-schedule.js: Schedule validation, rivalries, rotation and game links. Part of app.js; see tools/app-source.js.
 // --- v0.9.48 commit 1: a pure schedule validator ------------------------------
 // Reports problems instead of throwing, and reads only what it is handed, so it can check
 // a freshly built schedule, a loaded save, or an archived season without side effects.
@@ -8769,6 +8798,7 @@ function gameTable(headers,rows,{sortable=false,defaultSort=null}={}){
  const body=ordered.map(row=>`<tr>${row.map(x=>`<td data-sort-value="${gameEscape(x??'')}">${gameEscape(x??'—')}</td>`).join('')}</tr>`).join('');
  return `<div class="table-wrap game-table"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
 }
+// app/06-recaps-news.js: Deterministic game recaps and news headlines. Part of app.js; see tools/app-source.js.
 // --- v0.9.7: deterministic game recaps -------------------------------------
 // Prose is derived from the archived box score on demand and never stored, so
 // recaps appear for every game already in an old save and cost nothing to keep.
@@ -9013,6 +9043,7 @@ function coachingReportHTML(g){
  });
  return `<section class="coaching-report"><h3>Postgame coaching report</h3><p class="muted">Recorded results and suggestions for next week. These numbers do not isolate the effect of a gameplan.</p><div class="profile-sections">${sections.join('')}</div></section>`;
 }
+// app/07-game-center.js: Game archive compaction, box scores and the game center. Part of app.js; see tools/app-source.js.
 // --- v0.9.49 commit 4: tiered game-detail compaction --------------------------
 // Measured first (docs/SAVE_GROWTH_V0949.md): per-game player deltas are 87.9% of the game
 // archive and ~44% of all save growth. The packet's proposed target, drive/play detail, is
@@ -9141,6 +9172,7 @@ function renderGameArchive(){
 
 function recordGame(home,away,hp,ap,conf,H=profiles(home),A=profiles(away)){const win=hp>ap?home:away,lose=win===home?away:home;win.w++;lose.l++;if(conf){win.cw++;lose.cl++}home.pf+=hp;home.pa+=ap;away.pf+=ap;away.pa+=hp;home.sos+=A.overall;away.sos+=H.overall;return win}
 function applyStarterStats(team,s,opp=null){applyGameStats(team,s,opp||{})}
+// app/08-game-sim-awards-draft.js: Game simulation, awards, records and the draft. Part of app.js; see tools/app-source.js.
 // Quick-simulated league games. A zero-sum 'game flow' swing between the two teams (plus a small independent form
 // factor on yardage) gives the one-score/blowout mix of the live Game Engine 2 (mean margin ~13 against 9 before),
 // and the larger rating-edge term keeps the better team winning about as often as it does there.
@@ -9576,6 +9608,7 @@ function closeTenure(reason){
  universe.jobOffers=hiringMarket();
  return universe.careerHistory[universe.careerHistory.length-1];
 }
+// app/09-careers-bowls.js: Coaching career posts, bowls, fan support and home field. Part of app.js; see tools/app-source.js.
 // Taking a post is the only thing that clears the offer list, so the run cannot silently continue
 // at a school that already let you go.
 function acceptPost(schoolId){
@@ -9962,6 +9995,7 @@ function recordSeasonInHistory(t,w,l,wonConf,wonNational){
  if(wonConf)r.confTitles++;
  if(wonNational)r.natTitles++;
 }
+// app/10-program-gameplan-hub.js: Program history, game plans, matchups and the weekly hub. Part of app.js; see tools/app-source.js.
 // Every coach who has ever held a stint at this school, in order — works for any program, not just
 // the one the player runs, because it reads the same careerHistory the coaching tree already reads.
 function programCoachingLineage(t){
@@ -10411,6 +10445,7 @@ function enforceScholarshipLimits(protect=null){
  }
 }
 function classCommitCount(name){return universe.recruitClassCounts?.[name]||0}
+// app/11-recruiting-commitments.js: Class limits, commitments, the weekly recruiting pass and signing. Part of app.js; see tools/app-source.js.
 // Some programs over-sign on purpose, betting on attrition they cannot name
 // yet; signing day settles the bet. Appetite is stable per program per class,
 // and impatient, high-profile programs are the ones that push the limit.
@@ -10595,6 +10630,7 @@ function offseasonDepartures(){
  finishOffseasonPhase('departures','signing',{draftPool,teams});
  return true;
 }
+// app/12-offseason-enrollment.js: Enrollment, the late market, roster repair and history compaction. Part of app.js; see tools/app-source.js.
 // A recruit becomes a rostered player the same way at signing day and in the late market.
 function recruitOriginLabel(r){return `${r.stars}-star recruit from ${r.highSchool||r.homeRegion} (${r.homeCity||r.homeRegion}, ${r.homeState||''})${r.flippedFrom?` · flipped from ${r.flippedFrom}`:''}`}
 function playerFromRecruit(r,t,origin=recruitOriginLabel(r)){const p=generatePlayer(t,r.pos,99);Object.assign(p,{name:r.name,style:r.style,trueNow:r.trueNow,upside:r.upside,perceived:r.scout,perceivedUpside:r.scoutUp,year:'FR',eligibilityUsed:0,redshirtUsed:false,redshirtActive:false,origin,promise:r.promise&&r.promise!=='None'?r.promise:null,promiseBaseline:r.scout,portraitSeed:r.portraitSeed||p.portraitSeed,portraitVersion:r.portraitVersion||PORTRAIT_VERSION,scoutConfidence:r.scoutConfidence??p.scoutConfidence,scoutingDomains:r.scoutingDomains?JSON.parse(JSON.stringify(r.scoutingDomains)):undefined,scoutingHistory:r.scoutingHistory?JSON.parse(JSON.stringify(r.scoutingHistory)):[]});return p}
@@ -10852,6 +10888,7 @@ function captureRecruitment(r,t){
 }
 function transferReason(p){return promisePenalty(p)>0?'BROKEN_PROMISE':(p.stats?.starts||0)<4?'PLAYING_TIME':'FRESH_START'}
 function transferReasonLabel(reason){return {BROKEN_PROMISE:'Broken promise',PLAYING_TIME:'Playing opportunity',FRESH_START:'Fresh start',ROSTER_RELEASE:'Roster release'}[reason]||reason}
+// app/13-transfer-portal.js: The transfer portal cycle. Part of app.js; see tools/app-source.js.
 // --- Transfer portal cycle (v0.9.47 commit 1: state + migration only) ---------
 // The portal entry keeps owning its player record; nothing here copies p.
 const PORTAL_ROUNDS=3,PORTAL_LOG_CAP=60,PORTAL_TARGET_CAP=8,PORTAL_STATUSES=['idle','open','resolved'];
@@ -11284,6 +11321,7 @@ function render(){
 function attachPlayerLinks(){$$('[data-player]').forEach(b=>b.onclick=()=>showPlayerProfile(b.dataset.player));paintPortraits()}
 function showArchetypeGuide(style){const meta=archetypeMeta(style),pos=archetypePosition(style),traitNames={speed:'Speed',power:'Power',technique:'Technique',iq:'Processing',composure:'Composure',durability:'Durability',versatility:'Versatility'};$('#archetypeDialogName').textContent=meta.display;$('#archetypeDialogMeta').textContent=`${pos||'Player'} archetype · internal identity preserved as ${style}`;$('#archetypeDialogBody').innerHTML=`<div class="archetype-guide"><p class="archetype-guide-lead">${meta.short}</p><section><div class="eyebrow">WINS WITH</div><div class="archetype-strengths">${meta.strengths.map(x=>`<span class="pill">${traitNames[x]||x}</span>`).join('')}</div></section><section><div class="eyebrow">SIMULATION ROLE</div><p>${styleDescription({style,pos})}</p></section></div>`;const d=$('#archetypeDialog');if(d.showModal)d.showModal();else d.setAttribute('open','')}
 
+// app/14-weekly-decisions.js: Weekly decisions, player agency and promises. Part of app.js; see tools/app-source.js.
 // --- v0.9.14: the coach's desk --------------------------------------------
 // A few state-backed choices sit above the existing weekly checklist. They
 // persist with the universe, resolve through mechanics the game already owns,
@@ -11579,6 +11617,7 @@ function renderMatchupStrategy(){
 }
 TAB_RENDERERS.gamelab=()=>runRender('gamelab',()=>{renderGameLab();renderMatchupStrategy()});
 function renderSeason(){const u=selected();$('#seasonPhase').textContent=openingPreseason()?`${universe.year} · Preseason`:`${universe.year} · ${seasonStageLabel()}`;$('#confStandings').innerHTML=confStand(u.conference).map((t,i)=>`<div class="rankrow ${t.name===u.name?'strong':''}"><div>${i+1}. ${teamLogoHTML(t.id,20,'team-logo--inline')} ${t.name}</div><div>${t.cw}-${t.cl} · ${t.w}-${t.l}</div></div>`).join('');$('#latestResults').innerHTML=universe.latest.length?universe.latest.slice(-12).reverse().map(r=>`<div class="resultrow ${r.label?'champ':''}"><div>${r.label?`<span class="small muted">${r.label}</span><br>`:''}${teamLogoHTML(T(r.away)?.id,18,'team-logo--inline')} ${r.away}</div><div><strong>${r.ap}</strong> – <strong>${r.hp}</strong> ${teamLogoHTML(T(r.home)?.id,18,'team-logo--inline')} ${r.home} ${gameLink(r.gameId)}</div></div>`).join(''):'<div class="muted">No results yet.</div>';$('#teamSchedule').innerHTML=u.schedule.map(g=>{let opp=g.home===u.name?g.away:g.home,loc=g.home===u.name?'vs':'@',score=g.played?`${g.score[0]}-${g.score[1]}`:'—';return `<div class="resultrow"><div>Wk ${g.week} · ${loc} ${teamLogoHTML(T(opp)?.id,18,'team-logo--inline')} ${opp}${g.detailed?' <span class="pill">Detailed</span>':''}</div><div>${g.played?gameLink(g.gameId,`${g.winner===u.name?'W':'L'} ${g.home===u.name?g.score[1]:g.score[0]}–${g.home===u.name?g.score[0]:g.score[1]}`):score}</div></div>`}).join('')}
+// app/15-render-program-recruiting.js: Recruiting board, program, development and offseason rendering. Part of app.js; see tools/app-source.js.
 // v0.9.12: the recruiting board is long, so its headers sort it. Ascending on
 // first click, descending on the second, and the whole pool is ordered before
 // the visible slice is taken so sorting surfaces the real leaders.
@@ -11786,8 +11825,40 @@ function championTimeline({limit=25}={}){
    record:h.championRecord||(record?`${record.w}-${record.l}`:h.top10?.find(r=>r.name===h.champion)?.record)||null};
  });
 }
+// v0.30: national timeline. Everything is derived from what each season already archived: the season history entry
+// (champion, awards), the game archive (both teams' rankings at kickoff) and the national season records (the year a
+// standing record was set). No save field is added.
+const TIMELINE_UPSETS=3;
+function isRankedValue(rank){const n=Number(rank);return Number.isInteger(n)&&n>=1&&n<=25}
+function seasonUpsets(year,limit=TIMELINE_UPSETS){
+ const out=[];
+ for(const g of universe?.gameArchive||[]){
+  if(g?.season!==year||!g.final||!g.score)continue;
+  const hs=Number(g.score.home),as=Number(g.score.away);if(!Number.isFinite(hs)||!Number.isFinite(as)||hs===as)continue;
+  const [win,lose,ws,ls]=hs>as?[g.home,g.away,hs,as]:[g.away,g.home,as,hs];
+  const loserRank=isRankedValue(lose?.rank)?Number(lose.rank):null;if(!loserRank||loserRank>10)continue;
+  const winnerRank=isRankedValue(win?.rank)?Number(win.rank):null;
+  // An upset: a top-10 team loses to an unranked team, or to a team at least 12 places below it.
+  const gap=(winnerRank??40)-loserRank;if(gap<12)continue;
+  out.push({gameId:g.id,week:g.week??null,label:g.label||null,winner:win?.name||'',winnerId:win?.id??null,winnerRank,loser:lose?.name||'',loserId:lose?.id??null,loserRank,score:`${ws}-${ls}`,gap});
+ }
+ return out.sort((a,b)=>a.loserRank-b.loserRank||b.gap-a.gap||String(a.gameId).localeCompare(String(b.gameId))).slice(0,limit).map(({gap,...x})=>x);
+}
+function seasonRecordsSet(year){
+ return Object.entries(universe?.records?.nationalSeason||{}).filter(([,r])=>r&&r.year===year)
+  .map(([key,r])=>({key,label:r.label||key,value:r.value,playerId:r.playerId??null,playerName:r.playerName||'',team:r.team||''}));
+}
+function nationalTimeline({limit=25}={}){
+ const champions=new Map(championTimeline({limit:1e6}).map(x=>[x.year,x]));
+ return (universe?.history||[]).filter(h=>h.type==='season').slice().sort((a,b)=>b.year-a.year).slice(0,limit).map(h=>({
+  year:h.year,...(champions.get(h.year)||{champion:null,championId:null,runnerUp:null,record:null}),
+  awards:(Array.isArray(h.awards)?h.awards:[]).map(a=>({name:a.name,playerId:a.playerId??null,playerName:a.playerName||'',team:a.team||'',pos:a.pos||''})),
+  // Older browser saves keep past games in a deferred archive; null asks the page to load them first.
+  upsets:gamesAreDeferred()?null:seasonUpsets(h.year),records:seasonRecordsSet(h.year)
+ }));
+}
 // App scope is not global by design; the history module reaches these through this bridge.
-if(typeof globalThis!=='undefined')globalThis.DynastyHistoryIndex=Object.freeze({coaches:coachIndexRows,champions:championTimeline,openCoach:showCoachProfile});
+if(typeof globalThis!=='undefined')globalThis.DynastyHistoryIndex=Object.freeze({coaches:coachIndexRows,champions:championTimeline,timeline:nationalTimeline,gamesDeferred:gamesAreDeferred,loadGames:ensureGamesLoaded,openCoach:showCoachProfile});
 // Recruiting-needs bridge: only POS_COUNTS, roster positions/years and committed counts leave app scope.
 if(typeof globalThis!=='undefined')globalThis.DynastyRecruitingNeeds=Object.freeze({posCounts:POS_COUNTS,snapshot:()=>{
  if(!universe)return null;const t=selected();if(!t)return null;
@@ -11851,6 +11922,7 @@ function hallOfFame({limit=24}={}){
 }
 if(typeof globalThis!=='undefined'&&globalThis.DynastyHistoryIndex)
  globalThis.DynastyHistoryIndex=Object.freeze({...globalThis.DynastyHistoryIndex,hallOfFame,openPlayer:showPlayerProfile});
+// app/16-history-save-format.js: Conference history, the encyclopedia, records and save packing. Part of app.js; see tools/app-source.js.
 // v0.12.15 — conference history from the season records the save already keeps.
 // New archives freeze membership; old saves can only estimate it from today's teams.
 function historySeasons(){ return (universe?.history||[]).filter(h=>h.type==='season').map(h=>h.year); }
@@ -12052,6 +12124,7 @@ function setActiveSaveSlot(slot){
  renderTitleState();return slot;
 }
 function archiveIsDeferred(){const s=currentArchiveState();return !!s&&!s.loaded}
+// app/17-save-validation.js: Deferred archives, save validation and installation. Part of app.js; see tools/app-source.js.
 // v0.9.12: permanent box scores live in their own append-only chunks. They are
 // immutable once written, so an ordinary save appends only the week just played
 // instead of rewriting every season of history.
@@ -12183,6 +12256,7 @@ function saveBrowser(){return storageOperation(async()=>{
   if(target===universe&&slot===activeSaveSlot)setStatus(`Saved ${universe.year}, ${seasonStageLabel()} to ${activeSlotMeta()?.label||savedDynastyLabel()} ${storageLocation()}.`);
 })}
 
+// app/18-persistence-session.js: Autosave, browser saves, export/import and session state. Part of app.js; see tools/app-source.js.
 // Autosave fires only after a completed atomic action, never mid-transaction. The debounce
 // coalesces a burst (simming a season fires one per week) into a single write.
 const AUTOSAVE_DEBOUNCE_MS=900;
@@ -21133,7 +21207,7 @@ queue();
    <div id="coachIndexList" class="history-list">Loading coaches…</div>
   </section>
   <section class="card history-card">
-   <div class="section-head"><div><h3>National champions</h3><div class="muted">Archived seasons in this dynasty.</div></div></div>
+   <div class="section-head"><div><h3>National timeline</h3><div class="muted">Each archived season: the champion, then its award winners, biggest upsets and records still standing.</div></div></div>
    <div id="championTimeline" class="history-list">Loading champions…</div>
   </section>
   <section class="card history-card">
@@ -21165,14 +21239,34 @@ queue();
    :'<span class="muted">No coach matches that search.</span>';
   list.querySelectorAll('[data-coach-id]').forEach(button=>{button.onclick=()=>api.openCoach(button.dataset.coachId)});
  }
+ // v0.30: each champion row opens that season's awards, upsets (top-10 losses to unranked or much lower-ranked
+ // teams) and the national season records set that year that still stand. Open seasons survive a re-render.
+ const openYears=new Set();
+ const rank=n=>n?`#${n} `:'';
+ function seasonDetail(r){
+  const awards=(r.awards||[]).map(a=>`<li><button type="button" class="timeline-link" data-player-id="${esc(a.playerId??'')}"${a.playerId==null?' disabled':''}><b>${esc(a.name)}</b> ${esc(a.playerName)}<small>${esc(a.pos)}${a.pos&&a.team?' · ':''}${esc(a.team)}</small></button></li>`).join('');
+  const upsets=r.upsets==null
+   ?'<li><button type="button" class="timeline-link" data-load-games>Load past games to see upsets</button></li>'
+   :r.upsets.map(u=>`<li><button type="button" class="timeline-link" data-game-id="${esc(u.gameId)}"><b>${rank(u.winnerRank)||'Unranked '}${esc(u.winner)}</b> beat ${rank(u.loserRank)}${esc(u.loser)} ${esc(u.score)}<small>${u.week!=null&&u.label==='Regular season'?`Week ${esc(u.week)}`:esc(u.label||'')}</small></button></li>`).join('');
+  const records=(r.records||[]).map(x=>`<li><button type="button" class="timeline-link" data-player-id="${esc(x.playerId??'')}"${x.playerId==null?' disabled':''}><b>${esc(x.label)}: ${esc(x.value)}</b> ${esc(x.playerName)}<small>${esc(x.team)}</small></button></li>`).join('');
+  const block=(title,items,empty)=>`<div class="timeline-block"><span class="eyebrow">${title}</span>${items?`<ul>${items}</ul>`:`<p class="muted small">${empty}</p>`}</div>`;
+  return`<details class="timeline-detail" data-year="${r.year}"${openYears.has(r.year)?' open':''}><summary>${r.year} awards, upsets and records</summary><div class="timeline-grid">`+
+   block('AWARDS',awards,'No awards were recorded for this season.')+
+   block('UPSETS',upsets,'No top-10 team lost to an unranked or much lower-ranked opponent.')+
+   block('RECORDS STILL STANDING',records,'No national season record from this year still stands.')+'</div></details>';
+ }
  function renderChampions(){
-  const rows=api.champions({limit:25});
+  const rows=(api.timeline?api.timeline({limit:25}):api.champions({limit:25}).map(r=>({...r,awards:[],upsets:[],records:[]})));
   champs.innerHTML=rows.length
-   ?rows.map(r=>`<button type="button" class="history-row" data-champ="${esc(r.champion)}" data-school-id="${esc(r.championId??'')}"><span class="history-who"><strong>${esc(r.champion)}</strong><small>${r.year}${r.record?' · '+esc(r.record):''}</small></span><span class="history-record">${r.runnerUp?esc(r.runnerUp):'—'}<small>${r.runnerUp?'runner-up':'no runner-up recorded'}</small></span></button>`).join('')
+   ?rows.map(r=>`<div class="timeline-season">${r.champion?`<button type="button" class="history-row" data-champ="${esc(r.champion)}" data-school-id="${esc(r.championId??'')}"><span class="history-who"><strong>${esc(r.champion)}</strong><small>${r.year}${r.record?' · '+esc(r.record):''}</small></span><span class="history-record">${r.runnerUp?esc(r.runnerUp):'—'}<small>${r.runnerUp?'runner-up':'no runner-up recorded'}</small></span></button>`:`<div class="history-row"><span class="history-who"><strong>${r.year}</strong><small>No champion recorded</small></span></div>`}${seasonDetail(r)}</div>`).join('')
    :'<span class="muted">Champions appear once a season is archived.</span>';
   champs.querySelectorAll('[data-champ]').forEach(button=>{
    button.onclick=()=>globalThis.DynastyEncyclopedia?.open({kind:'team',id:button.dataset.schoolId||undefined,name:button.dataset.champ});
   });
+  champs.querySelectorAll('details.timeline-detail').forEach(d=>d.addEventListener('toggle',()=>{const y=Number(d.dataset.year);d.open?openYears.add(y):openYears.delete(y)}));
+  champs.querySelectorAll('[data-player-id]:not([disabled])').forEach(b=>{b.onclick=()=>api.openPlayer?.(b.dataset.playerId)});
+  champs.querySelectorAll('[data-game-id]').forEach(b=>{b.onclick=()=>globalThis.DynastyLabOpenGame?.(b.dataset.gameId)});
+  champs.querySelectorAll('[data-load-games]').forEach(b=>{b.onclick=async()=>{b.disabled=true;b.textContent='Loading past games…';try{await api.loadGames?.()}finally{renderChampions()}}});
  }
  function renderHall(){
   const all=api.hallOfFame?.({limit:1000})||[];

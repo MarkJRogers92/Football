@@ -27,7 +27,7 @@ test('v0.9.44 defines ten distinct canonical conference identities',()=>{
 });
 
 test('Game Lab exposes only real engine facts to the presentation layer',()=>{
- const app=read('app.js');
+ const app=require('../tools/app-source').readAppSource();
  for(const field of ['data-user-record','data-opponent-record','data-user-rank','data-opponent-rank','data-user-conference','data-opponent-conference','data-venue','data-stakes','data-rivalry','data-active-plan','data-recommended-plan'])
   assert.ok(app.includes(field),`${field} is present on the structured game-day handoff`);
  assert.ok(app.includes('rivalrySeriesText(u)'),'rivalry presentation uses the persisted series, not invented copy');

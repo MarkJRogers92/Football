@@ -1,11 +1,12 @@
 // Builds the standalone HTML from the real source files. Engine extensions are injected immediately
-// before app.js bootstraps so they share its closure without turning the 460KB core into a merge hotspot.
+// before app.js bootstraps so they share its closure. The core itself is app.js plus ordered parts under app/.
 const fs = require('fs');
 const path = require('path');
 const root = path.join(__dirname, '..');
 const read = f => fs.readFileSync(path.join(root, f), 'utf8');
 const version = read('VERSION.txt').trim().replace(/^Dynasty Lab\s*/, '').replace(/^v/, '');
-const baseAppSource=read('app.js');
+// app.js plus its ordered parts under app/ (see tools/app-source.js).
+const baseAppSource=require('./app-source').readAppSource();
 const engineExtensionFiles=['staff-scouting-core.js','scouting-actions.js','scouting-trail.js','recruiting-filters.js','rising-class.js','table-folding.js','recruit-compare.js','recruiting-shortlist.js','scouting-receipts.js','staff-scouting-ui.js','recruiting-history.js','development-tendencies.js','recruiting-battles.js','recruiting-actions.js','portal-desk.js','player-arcs.js','staff-assignments.js','facilities-boosters.js','situational-playbook.js','tutorial.js','recruiting-workspace-adapter.js','development-plans.js','development-visualization-adapter.js','roster-depth-presentation-adapter.js','staff-organization-adapter.js','player-identity-adapter.js','season-presentation-adapter.js','world-history-presentation-adapter.js','game-engine-v2-lab-integration.js','game-engine-v2-record-state.js','game-engine-v2-record-run.js','game-engine-v2-record-ui.js','game-engine-v2-cutover.js','game-engine-v2-postseason.js','career-history-fix.js','game-engine-v2-presentation.js','game-engine-v2-gameday-prep.js','game-engine-v2-gameday-record.js','game-engine-v2-gameday-ui.js','game-engine-v2-gameday-prep-bridge.js','game-engine-v2-matchup-ui.js','game-engine-v2-gameday-soak.js','weekly-coaching-loop.js','weekly-personnel-decisions.js','decision-room.js','weekly-player-stories.js','guidance-system-ui.js','player-evidence-adapter.js','first-season-flow-ui.js','season-review.js','admin-outlook.js','game-settings.js','career-milestones.js','game-cast.js','game-cast-field.js','recruit-map.js','new-dynasty-setup.js','brand-snapshot-adapter.js','rival-snapshot-adapter.js','ceremony-snapshot-adapter.js','storyline-snapshot-adapter.js','legacy-snapshot-adapter.js','season-moments-adapter.js','living-world-adapter.js','offseason-stops.js'];
 const engineExtensionAnchor='loadSchools().then(';
 const engineExtensionAt=baseAppSource.lastIndexOf(engineExtensionAnchor);

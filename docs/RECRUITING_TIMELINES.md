@@ -54,3 +54,22 @@ dates, about 6% of all prospects), 1,947–1,977 regular-season commitments and
 2,124–2,135 signed prospects. The controlled classes held 16–19 recruits.
 Elite-program mean stars stayed above low-prestige programs in every sample.
 This is a reproducible balance smoke check, not a promise about every dynasty.
+
+## Ten-season soak, v0.28.1 vs v0.29.1 (2026-11-14)
+
+`node tools/recruiting-soak.js --seasons 10 --seed 7 --policy <staff|skilled>` on
+v0.28.1 (fixed countdowns) and v0.29.1 (private timelines). No invariant
+violations in any run. Save size was identical (128.3–128.7 MB at season ten).
+
+| Per season (mean) | Staff v0.28.1 | Staff v0.29.1 | Skilled v0.28.1 | Skilled v0.29.1 |
+|---|---|---|---|---|
+| Class size | 17.2 | 17.4 | 17.2 | 16.7 |
+| 4–5 star signees | 8.1 | 9.6 | 8.7 | 7.4 |
+| Board recruits lost | 8.4 | 5.6 | 26.1 | 11.1 |
+| Cut from a list | 1.2 | 2.5 | 8.6 | 11.9 |
+| Board unsigned after week 12 | not measured | 1.5 | not measured | 1.7 |
+
+The staff plan does better under private timelines. The scripted "skilled"
+policy only offers once interest reaches 45, so it is often cut before it offers
+when a Top 5 forms early; that is the script's rule, not the game's. One or two
+board prospects per season now wait for signing day, which the timelines allow.
