@@ -50,11 +50,16 @@ function compactGame(g){
 // postseason) older than GAME_DEEP_HORIZON keeps its score, team statistics and its passing, rushing and receiving
 // leaders. Other scorer lines and the injury list go; every player's season and career totals, records and injury
 // history are kept on the player. This is the part of the archive that grows forever (about 2.5 KB a game).
+// Each leader keeps the stats of the category he led (a quarterback who also led rushing keeps both).
+const LEADER_STATS={passYds:['passAtt','passComp','passYds','passTD','int'],rushYds:['rushAtt','rushYds','rushTD'],recYds:['targets','receptions','recYds','recTD']};
 function gameLeaderLines(lines){
  if(!Array.isArray(lines)||!lines.length)return lines||[];
- const keep=new Set();
- for(const key of ['passYds','rushYds','recYds']){let best=null,bestVal=0;for(const p of lines){const v=p.stats?.[key]||0;if(v>bestVal){bestVal=v;best=p}}if(best)keep.add(best)}
- return lines.filter(p=>keep.has(p));
+ const keep=new Map();
+ for(const [key,fields] of Object.entries(LEADER_STATS)){
+  let best=null,bestVal=0;for(const p of lines){const v=p.stats?.[key]||0;if(v>bestVal){bestVal=v;best=p}}
+  if(best)keep.set(best,[...(keep.get(best)||['games','starts']),...fields]);
+ }
+ return lines.filter(p=>keep.has(p)).map(p=>{const stats={};for(const k of keep.get(p))if(p.stats?.[k]!=null)stats[k]=p.stats[k];return{...p,stats}});
 }
 function deepCompactGame(g){
  if(!g||g.compacted?.deep||!g.playerStats)return null;
@@ -62,6 +67,8 @@ function deepCompactGame(g){
  const kept={home:gameLeaderLines(before.home),away:gameLeaderLines(before.away)};
  const dropped=(before.home.length-kept.home.length)+(before.away.length-kept.away.length),injuries=Array.isArray(g.injuries)?g.injuries.length:0;
  g.playerStats=kept;if(injuries)g.injuries=[];
+ // A game plan keeps its key; the box score looks the label up.
+ for(const side of ['home','away']){const plan=g[side]?.gameplan;if(plan?.prep&&GAMEPLAN_TIERS[plan.prep]?.label===plan.label)g[side].gameplan={prep:plan.prep}}
  g.compacted={...(g.compacted||{season:universe.year,dropped:0}),dropped:(g.compacted?.dropped||0)+dropped,kept:kept.home.length+kept.away.length,deep:{season:universe.year,dropped,injuries}};
  return {dropped};
 }

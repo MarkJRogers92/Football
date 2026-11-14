@@ -9032,7 +9032,7 @@ function coachingReportHTML(g){
   if(!s||!o)return `<section><h4>${gameEscape(g[side]?.name)}</h4><p>Coaching report unavailable: no recorded box score.</p></section>`;
   const known=x=>Number.isFinite(x),n=x=>known(x)?String(x):'unavailable';
   const ypc=known(o.rushYds)&&o.rushAtt>0?(o.rushYds/o.rushAtt).toFixed(1):'unavailable';
-  const plan=g[side]?.gameplan,planText=plan?plan.label:'Not recorded for this older game';
+  const plan=g[side]?.gameplan,planText=plan?(plan.label||GAMEPLAN_TIERS[plan.prep]?.label||'Not recorded for this older game'):'Not recorded for this older game';
   let next='Keep the balanced approach available; choose the next plan from the next opponent’s tendencies.';
   if(known(s.turnovers)&&s.turnovers>=2)next='Review ball security and quarterback decisions before chasing a more aggressive plan.';
   else if(known(s.sacksTaken)&&s.sacksTaken>=3)next='Review protection and your offensive-line depth chart before next week.';
@@ -9095,11 +9095,16 @@ function compactGame(g){
 // postseason) older than GAME_DEEP_HORIZON keeps its score, team statistics and its passing, rushing and receiving
 // leaders. Other scorer lines and the injury list go; every player's season and career totals, records and injury
 // history are kept on the player. This is the part of the archive that grows forever (about 2.5 KB a game).
+// Each leader keeps the stats of the category he led (a quarterback who also led rushing keeps both).
+const LEADER_STATS={passYds:['passAtt','passComp','passYds','passTD','int'],rushYds:['rushAtt','rushYds','rushTD'],recYds:['targets','receptions','recYds','recTD']};
 function gameLeaderLines(lines){
  if(!Array.isArray(lines)||!lines.length)return lines||[];
- const keep=new Set();
- for(const key of ['passYds','rushYds','recYds']){let best=null,bestVal=0;for(const p of lines){const v=p.stats?.[key]||0;if(v>bestVal){bestVal=v;best=p}}if(best)keep.add(best)}
- return lines.filter(p=>keep.has(p));
+ const keep=new Map();
+ for(const [key,fields] of Object.entries(LEADER_STATS)){
+  let best=null,bestVal=0;for(const p of lines){const v=p.stats?.[key]||0;if(v>bestVal){bestVal=v;best=p}}
+  if(best)keep.set(best,[...(keep.get(best)||['games','starts']),...fields]);
+ }
+ return lines.filter(p=>keep.has(p)).map(p=>{const stats={};for(const k of keep.get(p))if(p.stats?.[k]!=null)stats[k]=p.stats[k];return{...p,stats}});
 }
 function deepCompactGame(g){
  if(!g||g.compacted?.deep||!g.playerStats)return null;
@@ -9107,6 +9112,8 @@ function deepCompactGame(g){
  const kept={home:gameLeaderLines(before.home),away:gameLeaderLines(before.away)};
  const dropped=(before.home.length-kept.home.length)+(before.away.length-kept.away.length),injuries=Array.isArray(g.injuries)?g.injuries.length:0;
  g.playerStats=kept;if(injuries)g.injuries=[];
+ // A game plan keeps its key; the box score looks the label up.
+ for(const side of ['home','away']){const plan=g[side]?.gameplan;if(plan?.prep&&GAMEPLAN_TIERS[plan.prep]?.label===plan.label)g[side].gameplan={prep:plan.prep}}
  g.compacted={...(g.compacted||{season:universe.year,dropped:0}),dropped:(g.compacted?.dropped||0)+dropped,kept:kept.home.length+kept.away.length,deep:{season:universe.year,dropped,injuries}};
  return {dropped};
 }
@@ -10308,7 +10315,10 @@ function guidanceModel(t=selected()){
  const narrowing=universe.phase==='regular'&&targets&&!globalThis.DynastyRecruitingActions?.isAuto?.(universe)?globalThis.DynastyRecruitingNarrowing?.(t):null;
  if(narrowing&&narrowing.count>0)add({id:guidanceItemId(t,'recruiting-narrowing',`${universe.year}-${universe.week}`),occurrence:`${universe.year}-${universe.week}`,meaning:'staff_recommendation',category:'recruiting',priority:167,title:`${narrowing.count} target${narrowing.count===1?' is':'s are'} narrowing ${narrowing.count===1?'his':'their'} list`,cause:`${narrowing.names.join(', ')}${narrowing.count>narrowing.names.length?' and others':''} ${narrowing.count===1?'is':'are'} close to a cut.${narrowing.unoffered?` ${narrowing.unoffered} ${narrowing.unoffered===1?'has':'have'} no offer from you; an offer and interest of 65 or more keep you on the list.`:' Interest of 65 or more with your offer keeps you on the list.'}`,affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'recruiting',focus:'recruiting-board'},boundary:null,consequence:optional});
  if(inSeason&&t.trainingFocusSeason!==universe.year)add({id:guidanceItemId(t,'training-focus',String(universe.year)),occurrence:String(universe.year),meaning:'staff_recommendation',category:'development',priority:150,title:'Set a training focus',cause:`Practice is running the default ${t.trainingFocus||'Balanced'} plan.`,affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'development',focus:'training-focus'},boundary:null,consequence:optional});
- if(universe.phase==='complete'&&typeof developmentPlanSystem!=='undefined'&&!(universe.developmentState?.year===universe.year&&universe.developmentState.springRun)){const used=developmentPlanSystem.count(t.roster||[],universe),open=developmentPlanSystem.LIMIT-used;if(open>0)add({id:guidanceItemId(t,'featured-plans',String(universe.year)),occurrence:String(universe.year),meaning:'staff_recommendation',category:'development',priority:175,title:`Choose featured development plans (${used}/${developmentPlanSystem.LIMIT})`,cause:`${open} featured plan slot${open===1?' is':'s are'} open before spring development.`,affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'development',focus:'featured-plans'},boundary:null,consequence:optional})}
+ // v0.31: the plan system is block scoped inside development-plans.js; this reminder could never see it until it
+ // read the published bridge (found by the new lint).
+ const plans=globalThis.DynastyLabDevelopmentPlans;
+ if(universe.phase==='complete'&&plans?.countFor&&!(universe.developmentState?.year===universe.year&&universe.developmentState.springRun)){const used=plans.countFor(t.roster||[]),open=plans.limit-used;if(open>0)add({id:guidanceItemId(t,'featured-plans',String(universe.year)),occurrence:String(universe.year),meaning:'staff_recommendation',category:'development',priority:175,title:`Choose featured development plans (${used}/${plans.limit})`,cause:`${open} featured plan slot${open===1?' is':'s are'} open before spring development.`,affectedEntity:{type:'team',id:t.id,label:t.name},destination:{tab:'development',focus:'featured-plans'},boundary:null,consequence:optional})}
  const state=guidanceStateFor(t),stamp=guidanceCalendarStamp();
  for(const item of items){item.familiarity=Number(state.familiarity?.[item.category])||0;item.deferred=['staff_recommendation','monitoring'].includes(item.meaning)&&state.deferred?.[item.id]?.stamp===stamp}
  const meaningRank={must_resolve:4,decision_due:3,staff_recommendation:2,monitoring:1};
@@ -13349,6 +13359,8 @@ function makeDevelopmentTendencySystem(env){
 if(typeof module==='object'&&module.exports){module.exports={makeDevelopmentTendencySystem};}
 else{
  const developmentTendencySystem=makeDevelopmentTendencySystem({});
+ // Block scoped; other modules read the clue through this bridge (v0.31).
+ globalThis.DynastyLabDevelopmentTendencies={clue:p=>developmentTendencySystem.clue(p)};
  function developmentTendencyBadge(p){const x=developmentTendencySystem.clue(p);if(x.code==='LEARNING'||x.code==='TRACKING')return'';return `<span class="development-tendency-badge development-tendency-${x.tone}" title="${String(x.summary).replace(/"/g,'&quot;')}">${x.label}</span>`}
  function renderDevelopmentTendencyBadges(){
   const t=selected(),body=$('#rosterBody');if(!t||!body)return;
@@ -15819,7 +15831,7 @@ else{
  }
  function augmentTrainingPlanControls(){const t=selected(),ds=ensureDevelopmentState();for(const s of $$('[data-training]')){const p=t.roster.find(x=>String(x.id)===String(s.dataset.training)),cell=s.closest('td');if(!p||!cell||cell.querySelector('[data-feature-development]'))continue;const plan=developmentPlanSystem.activePlan(p,universe),used=developmentPlanSystem.count(t.roster,universe),disabled=ds.springRun||(!plan&&used>=developmentPlanSystem.LIMIT)||universe.phase!=='complete';cell.insertAdjacentHTML('beforeend',`<button type="button" class="development-feature-btn${plan?' active':''}" data-feature-development="${devPlanEscape(p.id)}" ${disabled?'disabled':''}>${plan?'Featured Plan':'Feature Plan'}</button>${plan?`<div class="small muted">${devPlanEscape(planResultText(plan))}</div>`:''}`);if(plan)s.onchange=()=>{s.value=plan.focus;setStatus(`${p.name}'s featured plan is locked to ${plan.focus} for this training cycle.`)}}bindDevelopmentPlanButtons()}
  extendRender('development',()=>{renderDevelopmentPlanBoard();augmentTrainingPlanControls()});
- globalThis.DynastyLabDevelopmentPlans={active:p=>developmentPlanSystem.activePlan(p,universe),count:()=>developmentPlanSystem.count(selected()?.roster||[],universe),recordResults};
+ globalThis.DynastyLabDevelopmentPlans={active:p=>developmentPlanSystem.activePlan(p,universe),count:()=>developmentPlanSystem.count(selected()?.roster||[],universe),countFor:roster=>developmentPlanSystem.count(roster||[],universe),limit:developmentPlanSystem.LIMIT,recordResults};
 }
 
 function makeDevelopmentVisualizationModel(){
@@ -15856,7 +15868,7 @@ if(typeof module==='object'&&module.exports){module.exports={makeDevelopmentVisu
 else{
  const developmentVisualizationModel=makeDevelopmentVisualizationModel();
  function developmentVisualizationReady(){return !!universe&&Array.isArray(universe.teams)}
- function developmentVisualizationPlayer(p){const tendency=(typeof developmentTendencySystem==='object'&&developmentTendencySystem?.clue)?developmentTendencySystem.clue(p):null;return developmentVisualizationModel.player(p,tendency)}
+ function developmentVisualizationPlayer(p){const tendency=globalThis.DynastyLabDevelopmentTendencies?.clue?.(p)??null;return developmentVisualizationModel.player(p,tendency)}
  globalThis.DynastyLabDevelopmentView={
   snapshot:()=>{if(!developmentVisualizationReady())return null;const t=selected?.();if(!t)return null;const players=(t.roster||[]).map(p=>{const x=developmentVisualizationPlayer(p);return{id:x.id,name:x.name,pos:x.pos,currentRead:x.currentRead,confidence:x.confidence,historyCount:x.history.length,totalDelta:x.totalDelta,tendency:x.tendency}});return{team:{id:t.id,name:t.name,development:t.development},year:universe.year,phase:universe.phase,summary:developmentVisualizationModel.team(t.roster||[]),players};},
   player:id=>{if(!developmentVisualizationReady())return null;const t=selected?.(),p=t?.roster?.find(x=>String(x.id)===String(id));return developmentVisualizationPlayer(p)},
@@ -22574,7 +22586,8 @@ attach();setTimeout(attach,0);setTimeout(attach,150);
   const isNewer=(a,b)=>{for(let i=0;i<3;i++){if((a[i]||0)!==(b[i]||0))return (a[i]||0)>(b[i]||0)}return false};
   async function check(){
     let current='';
-    try{current=typeof APP_VERSION==='string'?APP_VERSION:(document.querySelector('[data-title-version]')?.textContent||'')}catch{}
+    // APP_VERSION lives inside the app closure and is never visible here; the build stamps the version into the page.
+    try{current=document.querySelector('[data-title-version]')?.textContent||''}catch{}
     if(!/^\d+\./.test(String(current).replace(/^v/i,'')))return;
     try{
       // The shell performs the request in the main process; a blocked update check

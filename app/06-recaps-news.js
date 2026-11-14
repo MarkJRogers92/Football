@@ -232,7 +232,7 @@ function coachingReportHTML(g){
   if(!s||!o)return `<section><h4>${gameEscape(g[side]?.name)}</h4><p>Coaching report unavailable: no recorded box score.</p></section>`;
   const known=x=>Number.isFinite(x),n=x=>known(x)?String(x):'unavailable';
   const ypc=known(o.rushYds)&&o.rushAtt>0?(o.rushYds/o.rushAtt).toFixed(1):'unavailable';
-  const plan=g[side]?.gameplan,planText=plan?plan.label:'Not recorded for this older game';
+  const plan=g[side]?.gameplan,planText=plan?(plan.label||GAMEPLAN_TIERS[plan.prep]?.label||'Not recorded for this older game'):'Not recorded for this older game';
   let next='Keep the balanced approach available; choose the next plan from the next opponent’s tendencies.';
   if(known(s.turnovers)&&s.turnovers>=2)next='Review ball security and quarterback decisions before chasing a more aggressive plan.';
   else if(known(s.sacksTaken)&&s.sacksTaken>=3)next='Review protection and your offensive-line depth chart before next week.';

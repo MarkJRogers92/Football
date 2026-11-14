@@ -1,3 +1,4 @@
+/* global correctnessTest -- defined inside the page by the injected hook below */
 const {testPageURL}=require('./helpers/browser-url');
 // Synthetic, disposable browser profile: no user saves or remote service is used.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');

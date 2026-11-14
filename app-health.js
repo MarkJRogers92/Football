@@ -78,7 +78,8 @@
   const isNewer=(a,b)=>{for(let i=0;i<3;i++){if((a[i]||0)!==(b[i]||0))return (a[i]||0)>(b[i]||0)}return false};
   async function check(){
     let current='';
-    try{current=typeof APP_VERSION==='string'?APP_VERSION:(document.querySelector('[data-title-version]')?.textContent||'')}catch{}
+    // APP_VERSION lives inside the app closure and is never visible here; the build stamps the version into the page.
+    try{current=document.querySelector('[data-title-version]')?.textContent||''}catch{}
     if(!/^\d+\./.test(String(current).replace(/^v/i,'')))return;
     try{
       // The shell performs the request in the main process; a blocked update check

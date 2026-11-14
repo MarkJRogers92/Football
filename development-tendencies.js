@@ -31,6 +31,8 @@ function makeDevelopmentTendencySystem(env){
 if(typeof module==='object'&&module.exports){module.exports={makeDevelopmentTendencySystem};}
 else{
  const developmentTendencySystem=makeDevelopmentTendencySystem({});
+ // Block scoped; other modules read the clue through this bridge (v0.31).
+ globalThis.DynastyLabDevelopmentTendencies={clue:p=>developmentTendencySystem.clue(p)};
  function developmentTendencyBadge(p){const x=developmentTendencySystem.clue(p);if(x.code==='LEARNING'||x.code==='TRACKING')return'';return `<span class="development-tendency-badge development-tendency-${x.tone}" title="${String(x.summary).replace(/"/g,'&quot;')}">${x.label}</span>`}
  function renderDevelopmentTendencyBadges(){
   const t=selected(),body=$('#rosterBody');if(!t||!body)return;
