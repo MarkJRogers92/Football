@@ -28,6 +28,8 @@ function makeRecruitingActionSystem(env){
  // Timelines are private readiness, not appointments. Identity/year hashes provide stable personality
  // and weekly uncertainty without consuming gameplay randomness or changing when a card is inspected.
  const TOP_WIDE=5,TOP_NARROW=3,DECIDE_NOISE=4;
+ // The final weekly recruiting pass. A public date after it could never arrive, so none is set.
+ const LAST_WEEK=Number.isInteger(env.lastRecruitingWeek)?env.lastRecruitingWeek:12;
  // Flip defense: a check-in on a recruit who has committed to you answers the moves aimed at him and holds him for two weeks.
  const KEEP={relationship:2,boost:8,boostFade:4,fromWeek:5};
  // Rival programs stand with him on the strength of their pitch. You also stand on the work you have put
@@ -398,7 +400,10 @@ function makeRecruitingActionSystem(env){
  // Cuts follow independently varied readiness bands, not "three weeks until a decision".
  function applyCuts(r,t,f,ranked,profile){
   const w=universe().week,ratio=f.readiness/profile.threshold;
-  const note=kind=>{if(!f.cut&&!f[kind].includes(t.name))f.cut={week:w,at:kind}};
+  // A list published before you showed any interest does not shut you out of his recruitment.
+  // You are only cut when you were pursuing him (on your board or holding your offer).
+  const involved=r.targeted||hasOffer(r,t);
+  const note=kind=>{if(involved&&!f.cut&&!f[kind].includes(t.name))f.cut={week:w,at:kind}};
   const keepsYou=()=>hasOffer(r,t)&&(r.interest||0)>=SAFETY_INTEREST&&!dealbreakerUnmet(r,t);
   const pick=(names,size)=>{const list=names.slice(0,size);if(!list.includes(t.name)&&names.includes(t.name)&&keepsYou())list[Math.min(size-1,list.length)]=t.name;return list};
   if(!f.top5&&w>=3&&ratio>=profile.wide){f.top5=pick(ranked.map(x=>x.name),TOP_WIDE);note('top5')}
@@ -425,7 +430,7 @@ function makeRecruitingActionSystem(env){
    // A reopened recruitment gets a fresh list and at least one week to hear from schools. Do not
    // undo the engine's decommitment by recommitting him in the same advance.
    const justReopened=(u.decommitLog||[]).some(e=>e.id===r.id&&e.year===u.year&&e.week===w&&!e.to);
-   if(f.decided||justReopened){f.decided=null;f.top5=null;f.top3=null;f.cut=null;f.announcement=null;f.reopenedWeek=w;continue}
+   if(f.decided||justReopened){f.decided=null;f.top5=null;f.top3=null;f.cut=null;f.announcement=null;f.signingDay=false;f.reopenedWeek=w;continue}
    const profile=timelineProfile(r),ranked=standings(r,t),read=timingRead(r,t,f,ranked,profile);
    f.readiness=read.readiness;if(read.visitDone)f.visitCompleted=true;f.context=read.pendingVisit?'visit':read.gap<8?'competition':profile.patient?'patient':'fit';
    applyCuts(r,t,f,ranked,profile);
@@ -435,16 +440,22 @@ function makeRecruitingActionSystem(env){
    const migration=u.recruitingActions?.timelineMigrationWeek;
    if(u.recruitingActions?.timelineMigrationYear===u.year&&Number.isInteger(migration)&&w<=migration+hash(`${profile.seed}|migration`)%3)continue;
    if(w<5)continue;
-   if(profile.public&&!f.announcement&&f.readiness>=profile.threshold-12){
-    f.announcement={week:w+2+hash(`${profile.seed}|notice`)%2,announcedAt:w,postponed:false,reason:null,leader:read.leader};
+   // He pushed his decision past the regular season; signing day settles it.
+   if(f.signingDay)continue;
+   const notice=w+2+hash(`${profile.seed}|notice`)%2;
+   if(profile.public&&!f.announcement&&notice<=LAST_WEEK&&f.readiness>=profile.threshold-12){
+    f.announcement={week:notice,announcedAt:w,postponed:false,reason:null,leader:read.leader};
    }
    const a=f.announcement;
    if(a?.week!=null){
-    if(w<a.week)continue;
+    // A date past the last recruiting week (saved by v0.29.0) comes due on the final pass.
+    if(w<a.week&&w<LAST_WEEK)continue;
     const changed=a.leader&&read.leader!==a.leader;
     const close=read.gap<8&&hash(`${profile.seed}|delay`)%100<18;
     if(!a.postponed&&(read.pendingVisit||(changed&&f.readiness<profile.threshold+5)||close||f.readiness<profile.threshold)){
-     a.week=w+1+hash(`${profile.seed}|delay-length`)%2;a.postponed=true;
+     const later=w+1+hash(`${profile.seed}|delay-length`)%2;a.postponed=true;
+     if(later>LAST_WEEK){a.week=null;f.signingDay=true;a.reason='He has pushed his decision to signing day.';continue}
+     a.week=later;
      a.reason=read.pendingVisit?'He wants to finish his scheduled visit.':changed?'The schools at the top of his list have changed.':close?'He is still weighing a close race.':'He wants more time to be sure of his fit.';
      continue;
     }
@@ -467,9 +478,10 @@ function makeRecruitingActionSystem(env){
   const f=funnelState(r),a=f?.version===2?f.announcement:null;
   const stage=r.committed?'decided':f?.cut?'cut':f?.top3?'top3':f?.top5?'top5':'open';
   const close=(r.relationship||0)>=55;
-  const profile=timelineProfile(r),near=close&&f?.version===2&&f.readiness>=profile.threshold-12;
+  const waiting=!r.committed&&!!f?.signingDay;
+  const profile=timelineProfile(r),near=close&&!waiting&&f?.version===2&&f.readiness>=profile.threshold-12;
   const pending=Number.isInteger(r.visitWeek)&&r.visitWeek>universe().week;
-  const clue=r.committed?'Committed':a?.week!=null?`Announced week ${a.week}`:pending?'Taking visits':near?'A decision could come soon':f?.top3?'Weighing his finalists':f?.top5?'Narrowing his list':'Exploring his options';
+  const clue=r.committed?'Committed':a?.week!=null?`Announced week ${a.week}`:waiting?'Waiting for signing day':pending?'Taking visits':near?'A decision could come soon':f?.top3?'Weighing his finalists':f?.top5?'Narrowing his list':'Exploring his options';
   const detail=!close?null:f?.context==='visit'?'He wants to finish his visits before settling on a school.':f?.context==='competition'?'He is comparing closely matched schools.':f?.context==='patient'?'He prefers to take his time and be sure.':'Finding the right fit is bringing him closer to a choice.';
   return{on:true,stage,top5:f?.top5||null,top3:f?.top3||null,cut:f?.cut||null,announcedWeek:a?.week??null,
    announcement:a?{week:a.week,announcedAt:a.announcedAt,postponed:a.postponed,reason:a.reason}:null,clue,detail,

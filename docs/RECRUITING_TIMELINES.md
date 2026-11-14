@@ -8,7 +8,13 @@ it never exposes a hidden week or certainty percentage.
 About 23% have a personality inclined toward an announcement. They name a week
 only when approaching readiness. A close race, changed options or a remaining
 visit can explain a postponement. If a postponed date no longer fits, the recruit
-withdraws it with an explanation instead of leaving an overdue countdown.
+withdraws it with an explanation instead of leaving an overdue countdown. No date
+is named after the final recruiting week (12); a postponement that would pass it
+becomes "waiting for signing day", and signing day resolves him.
+
+A program is only cut when it was pursuing the recruit (on the board or holding
+an offer) at the time of the cut. Lists published before you showed interest stand,
+but do not lock you out of working him.
 
 Timing combines a stable personal threshold and tempo with current school fit,
 competition, completed visits and bounded seeded weekly uncertainty. Every
