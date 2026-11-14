@@ -117,3 +117,44 @@ test('real engine ranking stays target-neutral and does not draw randomness duri
  const before=JSON.stringify(e.syncGameplayRng());A.runFunnel([a],t);A.runFunnel([b],t);
  assert.equal(a.funnel.readiness,b.funnel.readiness);assert.deepEqual(a.funnel.top5,b.funnel.top5);assert.equal(JSON.stringify(e.syncGameplayRng()),before);
 });
+test('a prospect you never pursued does not cut you or lock you out of working him',()=>{
+ const {api,u,t,r}=setup(),pool=Array.from({length:60},(_,i)=>r('untouched'+i));
+ for(let w=1;w<=8;w++){u.week=w;api.runFunnel(pool,t)}
+ const listed=pool.filter(p=>!p.committed&&p.funnel.top5);
+ assert.ok(listed.length>0,'some lists were published');
+ for(const p of listed){assert.equal(p.funnel.cut,null);assert.equal(api.funnelStatus(p,t).stage==='cut',false)}
+ const target=r('pursued');target.targeted=true;
+ for(let w=1;w<=8&&!target.funnel?.cut;w++){u.week=w;api.runFunnel([target],t)}
+ assert.ok(target.funnel.cut,'a prospect on your board still cuts a program outside his list');
+});
+test('no public date or postponement lands after the final recruiting week',()=>{
+ const {api,u,t,r,setRanks}=setup(),pool=Array.from({length:400},(_,i)=>r('late'+i));
+ setRanks([{name:'A',score:90},{name:'B',score:86},{name:'C',score:80},{name:'User',score:40}]);
+ for(let w=1;w<=12;w++){
+  u.week=w;api.runFunnel(pool,t);
+  for(const p of pool){const a=p.funnel?.announcement;if(!p.committed&&a?.week!=null)assert.ok(a.week<=12&&a.week>=w,`${p.id} announced week ${a.week} in week ${w}`)}
+ }
+ for(const p of pool.filter(p=>!p.committed&&p.funnel?.announcement)){
+  assert.equal(p.funnel.announcement.week,null);assert.ok(p.funnel.announcement.reason);
+ }
+ const waiting=pool.filter(p=>p.funnel?.signingDay);
+ for(const p of waiting){assert.equal(p.committed,null);assert.equal(api.funnelStatus(p,t).clue,'Waiting for signing day')}
+});
+test('a v0.29.0 date saved past the season comes due on the final pass',()=>{
+ const {api,u,t,r}=setup(),p=r('dangling');u.week=12;
+ p.funnel={version:2,season:2027,readiness:0,lastWeek:11,top5:null,top3:null,cut:null,decided:null,announcement:{week:14,announcedAt:11,postponed:false,reason:null,leader:'A'}};
+ api.runFunnel([p],t);
+ assert.ok(p.committed||(p.funnel.announcement.week===null&&p.funnel.announcement.reason));
+});
+test('a late offer with strong interest earns a Top 5 spot before he narrows, not after',()=>{
+ const {api,u,t,r}=setup(),p=r('late-offer');
+ for(let w=1;w<=12&&!p.funnel?.top5;w++){u.week=w;api.runFunnel([p],t)}
+ assert.ok(p.funnel.top5&&!p.funnel.top5.includes('User')&&!p.funnel.top3,'his Top 5 was published without you');
+ p.targeted=true;p.interest=80;p.recruitingActions={[String(t.id)]:{season:u.year,offered:true,history:[],contacts:0,known:{secondary:true,dealbreaker:true}}};
+ u.week++;api.runFunnel([p],t);
+ assert.ok(p.committed||p.funnel.top5.includes('User'),'you join his Top 5');
+ if(!p.committed){assert.equal(p.funnel.top5.length,5);assert.equal(p.funnel.cut,null);assert.deepEqual(p.funnel.added,{week:u.week,at:'top5'})}
+ const q=r('late-no-offer');q.targeted=true;
+ for(let w=1;w<=12&&!q.funnel?.top3&&!q.committed;w++){u.week=w;api.runFunnel([q],t)}
+ if(q.funnel.top5&&!q.committed)assert.equal(q.funnel.top5.includes('User'),false,'interest without an offer earns nothing');
+});
