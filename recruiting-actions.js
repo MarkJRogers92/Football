@@ -406,6 +406,9 @@ function makeRecruitingActionSystem(env){
   const note=kind=>{if(involved&&!f.cut&&!f[kind].includes(t.name))f.cut={week:w,at:kind}};
   const keepsYou=()=>hasOffer(r,t)&&(r.interest||0)>=SAFETY_INTEREST&&!dealbreakerUnmet(r,t);
   const pick=(names,size)=>{const list=names.slice(0,size);if(!list.includes(t.name)&&names.includes(t.name)&&keepsYou())list[Math.min(size-1,list.length)]=t.name;return list};
+  // Late interest: a program that arrives after his Top 5 is out can still earn a place with an
+  // offer and real interest, until he narrows to his finalists. It takes his fifth spot.
+  if(involved&&f.top5&&!f.top3&&!f.cut&&!f.top5.includes(t.name)&&keepsYou()){f.top5=[...f.top5.slice(0,TOP_WIDE-1),t.name];f.added={week:w,at:'top5'}}
   if(!f.top5&&w>=3&&ratio>=profile.wide){f.top5=pick(ranked.map(x=>x.name),TOP_WIDE);note('top5')}
   if(!f.top3&&f.top5&&w>=4&&ratio>=profile.narrow){f.top3=pick(ranked.map(x=>x.name).filter(n=>f.top5.includes(n)),TOP_NARROW);note('top3')}
  }
@@ -816,6 +819,8 @@ if(typeof module==='object'&&module.exports){
    if(f.top3)cells.push(`<span><b>His Top 3</b>${names(f.top3)}</span>`);
    else if(f.top5)cells.push(`<span><b>His Top 5</b>${names(f.top5)}</span>`);
    if(!f.top5)cells.push('<span><b>His list</b>Still open</span>');
+   else if(r.targeted&&!f.top3&&!f.top5.includes(t.name))cells.push('<span class="ra-warn-text"><b>Not on his list</b>An offer and strong interest can still earn a spot before he narrows to his finalists.</span>');
+   else if(r.targeted&&f.top3&&!f.top3.includes(t.name))cells.push('<span class="ra-warn-text"><b>Not a finalist</b>He would only turn to you if his finalists run out of room.</span>');
   }
   const offer=!f.cut&&r.targeted&&!recruitingActions.hasOffer(r,t)?'<small class="ra-warn-text">He cannot choose you without a scholarship offer.</small>':'';
   return`<div class="ra-funnel">${cells.join('')}</div>${offer}`;

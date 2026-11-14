@@ -6,7 +6,7 @@
 - School fit, competition, completed visits, personality and seeded uncertainty shape readiness. Adding a prospect to the board no longer switches him to a fixed countdown.
 - Top 5 and Top 3 cuts no longer reveal upcoming dates. Signing periods, scholarship rules and commitment flips remain in place.
 - Existing saves keep their offers, lists, cuts and commitments. Midseason transitions are staggered, with no new storage schema.
-- A prospect you never pursued no longer cuts you from his list, so you can still work him later in the season. Public dates never fall after the last recruiting week; a recruit who would postpone past it says he will decide on signing day.
+- A prospect you never pursued no longer cuts you from his list, so you can still work him later in the season. Arrive late with an offer and strong interest and he can still add you to his Top 5 before he names his finalists; the card says when you are off his list. Public dates never fall after the last recruiting week; a recruit who would postpone past it says he will decide on signing day.
 
 Saves carry over. Timing changes apply when advancing recruiting; back up a dynasty before switching builds.
 

@@ -14,7 +14,9 @@ becomes "waiting for signing day", and signing day resolves him.
 
 A program is only cut when it was pursuing the recruit (on the board or holding
 an offer) at the time of the cut. Lists published before you showed interest stand,
-but do not lock you out of working him.
+but do not lock you out of working him. Before he narrows to a Top 3, a pursuing
+program with an offer, interest of at least 65 and no unmet dealbreaker takes his
+fifth Top 5 spot (`funnel.added`).
 
 Timing combines a stable personal threshold and tempo with current school fit,
 competition, completed visits and bounded seeded weekly uncertainty. Every

@@ -382,7 +382,7 @@ may be half-updated when an error fires, and a backup of that state could be wor
 
 Current-class `recruit.funnel.version: 2` stores the last evaluated week, private
 readiness, completed-visit evidence, published Top 5/Top 3 lists, cuts, decisions,
-optional public announcement/update and an optional `signingDay` hold. These fields use the existing core
+optional public announcement/update and an optional `signingDay` hold and `added` (a late Top 5 entry). These fields use the existing core
 save/portable JSON path, with no IndexedDB schema change. Timing derives from the
 saved dynasty seed, class year, recruit ID and week; reading a card never draws
 randomness. Repeated evaluation within a week is idempotent.

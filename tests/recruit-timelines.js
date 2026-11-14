@@ -146,3 +146,15 @@ test('a v0.29.0 date saved past the season comes due on the final pass',()=>{
  api.runFunnel([p],t);
  assert.ok(p.committed||(p.funnel.announcement.week===null&&p.funnel.announcement.reason));
 });
+test('a late offer with strong interest earns a Top 5 spot before he narrows, not after',()=>{
+ const {api,u,t,r}=setup(),p=r('late-offer');
+ for(let w=1;w<=12&&!p.funnel?.top5;w++){u.week=w;api.runFunnel([p],t)}
+ assert.ok(p.funnel.top5&&!p.funnel.top5.includes('User')&&!p.funnel.top3,'his Top 5 was published without you');
+ p.targeted=true;p.interest=80;p.recruitingActions={[String(t.id)]:{season:u.year,offered:true,history:[],contacts:0,known:{secondary:true,dealbreaker:true}}};
+ u.week++;api.runFunnel([p],t);
+ assert.ok(p.committed||p.funnel.top5.includes('User'),'you join his Top 5');
+ if(!p.committed){assert.equal(p.funnel.top5.length,5);assert.equal(p.funnel.cut,null);assert.deepEqual(p.funnel.added,{week:u.week,at:'top5'})}
+ const q=r('late-no-offer');q.targeted=true;
+ for(let w=1;w<=12&&!q.funnel?.top3&&!q.committed;w++){u.week=w;api.runFunnel([q],t)}
+ if(q.funnel.top5&&!q.committed)assert.equal(q.funnel.top5.includes('User'),false,'interest without an offer earns nothing');
+});
