@@ -180,13 +180,22 @@ function paintPortraits(scope){
 }
 globalThis.DynastyLabPortraits={paint:paintPortraits};
 function ensurePortrait(p){if(!p)return p;p.portraitSeed??=portraitSeedFor();p.portraitVersion??=PORTRAIT_VERSION;p.jerseyNumber??=jerseyFor(p.pos,p.portraitSeed);return p}
-const ARCHIVE_FIELDS=['id','name','pos','style','portraitSeed','portraitVersion','jerseyNumber','height','weight','year','eligibilityUsed','redshirtUsed','redshirtSeason','perceived','perceivedUpside','speed','power','technique','iq','health','wear','origin','recruitingMemory','primaryRecruiterCoachId','coachRelationships','coachDeparturePressure','transferHistory','promise','promises','staffTrust','currentSchoolId','trainingFocus','scoutConfidence','scoutingDomains','scoutingHistory','positionFamiliarity','requestedPositionChange','seasonHistory','campHistory','injuryHistory','awards'];
+const ARCHIVE_FIELDS=['id','name','pos','style','portraitSeed','portraitVersion','jerseyNumber','height','weight','year','eligibilityUsed','redshirtUsed','redshirtSeason','perceived','perceivedUpside','speed','power','technique','iq','health','wear','origin','recruitingMemory','primaryRecruiterCoachId','coachRelationships','transferHistory','promise','promises','staffTrust','currentSchoolId','trainingFocus','scoutConfidence','scoutingDomains','scoutingHistory','positionFamiliarity','requestedPositionChange','seasonHistory','campHistory','injuryHistory','awards'];
 // v0.12.16 — measured: players who never took a snap are 30.5% of the archive and
 // 27.9% of its bytes (10.6 MB at season ten). Their scouting trails, relationships
 // are compacted for careers with no games. Recorded off-field events still count
 // as history: keep recruitment, seasons, camps, transfers, injuries and evaluations.
 // Played careers are archived exactly as before.
 const ARCHIVE_SUMMARY_FIELDS=['id','name','pos','style','portraitSeed','portraitVersion','jerseyNumber','height','weight','year','eligibilityUsed','redshirtUsed','redshirtSeason','perceived','perceivedUpside','origin','promise','promises','staffTrust'];
+// v0.30: two lossless trims for newly archived players. coachDeparturePressure only feeds an active player's transfer
+// risk and portal choice, and nothing ever reads an archived record back into play, so it is not copied (above). The
+// recruit's home coordinates are kept to four decimals (about 11 m), which every map and distance reads the same.
+const ARCHIVE_COORD=1e4;
+function archiveMemory(memory){
+ if(!memory||typeof memory!=='object')return memory;
+ const round=v=>Number.isFinite(v)?Math.round(v*ARCHIVE_COORD)/ARCHIVE_COORD:v;
+ return Number.isFinite(memory.lat)||Number.isFinite(memory.lon)?{...memory,lat:round(memory.lat),lon:round(memory.lon)}:memory;
+}
 function archiveRecord(p,team,reason){
  const played=(p.career?.games||0)>0||(p.stats?.games||0)>0;
  if(!played){
@@ -196,16 +205,18 @@ function archiveRecord(p,team,reason){
    injury:null,injuryWeeks:0,stats:packStats(p.stats),career:packStats(p.career),recordTier:'summary',
    awards:p.awards||[],seasonHistory:[],coachRelationships:{},primaryRecruiterCoachId:p.primaryRecruiterCoachId??null};
   for(const key of ARCHIVE_SUMMARY_FIELDS)if(p[key]!==undefined)out[key]=p[key];
-  for(const key of ['recruitingMemory','seasonHistory','campHistory','transferHistory','injuryHistory','scoutingHistory','coachRelationships','coachDeparturePressure']){
+  for(const key of ['recruitingMemory','seasonHistory','campHistory','transferHistory','injuryHistory','scoutingHistory','coachRelationships']){
    const value=p[key];
    if(value&&Object.keys(value).length)out[key]=value;
   }
   if(p.awards?.length)out.awards=p.awards;
+  if(out.recruitingMemory)out.recruitingMemory=archiveMemory(out.recruitingMemory);
   if(p.draftResult)out.draftResult={year:p.draftResult.year,label:p.draftResult.label,round:p.draftResult.round,pick:p.draftResult.pick};
   return out;
  }
  let out={lastTeam:team.name,retiredYear:universe.year,exitReason:reason,redshirtActive:false,injury:null,injuryWeeks:0,stats:packStats(p.stats),career:packStats(p.career)};
  for(const k of ARCHIVE_FIELDS)if(p[k]!==undefined)out[k]=p[k];
+ if(out.recruitingMemory)out.recruitingMemory=archiveMemory(out.recruitingMemory);
  if(p.draftResult)out.draftResult={year:p.draftResult.year,label:p.draftResult.label,round:p.draftResult.round,pick:p.draftResult.pick};
  return out;
 }
