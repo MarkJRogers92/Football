@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.31.0 — Know when a recruit is narrowing his list
+
+- **A warning before you miss a cut.** When a prospect on your board is close to naming his Top 5 or his finalists and your standing would not keep you in (no offer from you, or his interest below 65), his card, his board badge and the weekly reminder say so. It never shows a week or a number. The reminder stays quiet when the staff run recruiting.
+- **Two features that never appeared now do.** The offseason reminder to choose featured development plans, and the development tendency clue in the development view, could not see the systems behind them. They work now.
+- **Older games take less space.** Other programs' regular-season games more than eight seasons old keep the score, team statistics and their passing, rushing and receiving leaders. Your games, rivalry games and the postseason are untouched, and each player's season totals, records and injury history are kept on his record. From season nine this slows game-archive growth by about 16%.
+- **Engineering.** `npm run lint` runs an errors-only ESLint over the built game and the Node scripts; it found the two features above.
+
+Saves carry over. No storage schema change.
+
 ## v0.30.1 — Staff finish the week's decisions
 
 - When the staff handle the week, they now work through every open decision. Before, one choice they could not apply stopped them, and because the optional game plan was handled first, a refused game plan could leave the required decisions open and keep the week's game from starting.
