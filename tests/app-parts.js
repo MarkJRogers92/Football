@@ -32,3 +32,11 @@ test('the assembled core parses and contains every part in order',()=>{
  let at=-1;
  for(const file of appPartFiles()){const header=fs.readFileSync(path.join(root,file),'utf8').split('\n')[0];const next=src.indexOf(header);assert.ok(next>at,`${file} follows the part before it`);at=next}
 });
+test('CRLF checkouts (Windows) assemble the same core, and an unreadable marker fails loudly',()=>{
+ const {assembleAppSource}=require('../tools/app-source');
+ const crlf=t=>t.replace(/\n/g,'\r\n');
+ const head=crlf(fs.readFileSync(path.join(root,'app.js'),'utf8'));
+ const out=assembleAppSource(head,f=>crlf(fs.readFileSync(path.join(root,f),'utf8')));
+ assert.equal(out.replace(/\r\n/g,'\n'),readAppSource(),'CRLF and LF checkouts build the same core');
+ assert.throws(()=>assembleAppSource('(()=>{\n/*@app-parts */\n})();'),/could not be read/);
+});

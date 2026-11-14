@@ -4,11 +4,16 @@
 const fs = require('fs');
 const path = require('path');
 const ROOT = path.join(__dirname, '..');
-const MARKER = /^\/\*@app-parts ([^*\n]+)\*\/\n/m;
+// Windows checkouts may use CRLF line endings, so the marker line accepts either.
+const MARKER = /^\/\*@app-parts ([^*\r\n]+)\*\/\r?\n/m;
 // `read` is looked up at call time so a test that wraps fs.readFileSync still sees every part.
 function assembleAppSource(head, read = file => fs.readFileSync(path.join(ROOT, file), 'utf8')) {
   const match = head.match(MARKER);
-  if (!match) return head;
+  if (!match) {
+    // Never fall back to app.js alone: without its parts the game is broken, and that must fail the build.
+    if (head.includes('@app-parts')) throw new Error('app.js has an @app-parts marker that could not be read');
+    return head;
+  }
   const manifest = JSON.parse(read(match[1].trim()));
   if (!Array.isArray(manifest.parts) || !manifest.parts.length) throw new Error('app/manifest.json lists no parts');
   const parts = manifest.parts.map(file => {
