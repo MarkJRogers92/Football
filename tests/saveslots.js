@@ -331,3 +331,28 @@ test('season-boundary compaction is written back to the active slot',async()=>{
  await e.loadBrowser();await e.ensureGamesLoaded();
  assert.ok(e.universe.gameArchive.some(g=>g.compacted),'the rewritten game chunks retain compaction after reload');
 });
+
+test('v0.31 deep tier: very old unprotected games keep only their leaders, protected games are untouched',async()=>{
+ const e=await engine(4931);rollSeasons(e,1);
+ const user=e.T('Chicago Metropolitan')?.name,size=o=>Buffer.byteLength(JSON.stringify(o));
+ const protectedBefore=JSON.stringify(e.universe.gameArchive.filter(g=>g.label!=='Regular season'||g.home.name===user||g.away.name===user));
+ const ids=e.universe.gameArchive.map(g=>g.id),before=size(e.universe.gameArchive);
+ const first=e.compactGameArchive({horizon:0,deepHorizon:0});
+ assert.ok(first.games>0,'the deep pass did work');
+ const deep=e.universe.gameArchive.filter(g=>g.compacted?.deep);
+ assert.ok(deep.length>0);
+ for(const g of deep){
+  for(const side of ['home','away'])assert.ok(g.playerStats[side].length<=3,'at most the three yardage leaders per side');
+  assert.deepEqual(g.injuries||[],[]);assert.ok(g.teamStats&&g.score,'team statistics and the score are kept');
+  assert.match(e.gameBoxHTML(g),/keeps its passing, rushing and receiving leaders/);
+ }
+ assert.equal(JSON.stringify(e.universe.gameArchive.filter(g=>g.label!=='Regular season'||g.home.name===user||g.away.name===user)),protectedBefore,'the coach\'s games and the postseason are untouched');
+ assert.deepEqual(e.universe.gameArchive.map(g=>g.id),ids,'every game is still present, in order');
+ assert.ok(size(e.universe.gameArchive)<before);
+ assert.equal(e.compactGameArchive({horizon:0,deepHorizon:0}).games,0,'idempotent');
+});
+test('v0.31 deep tier waits for the deep horizon',async()=>{
+ const e=await engine(4932);rollSeasons(e,1);
+ e.compactGameArchive();
+ assert.equal(e.universe.gameArchive.some(g=>g.compacted?.deep),false,'a one-season dynasty has nothing old enough');
+});
