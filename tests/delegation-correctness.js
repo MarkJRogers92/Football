@@ -91,3 +91,40 @@ test('a standing medical instruction rests worn starters across reload and still
  const saved=e.universe.weeklyDecisions.find(x=>x.id===d.id);assert.equal(saved.resolvedOptionId,'sit');assert.equal(events(e.universe,d.id).length,1);
  e.universe=JSON.parse(before);e.normalizeUniverse();const manualTeam=e.T(t.name),manualPlayer=manualTeam.roster.find(x=>x.id===p.id);assert.equal(e.resolveWeeklyDecision(d.id,'limited'),true);assert.equal(e.delegateWeeklyDecisions(manualTeam),true);assert.equal(manualPlayer.weeklyAvailability.role,'limited');assert.equal(e.universe.weeklyDecisions.find(x=>x.id===d.id).selectedBy,'coach');
 });
+
+// v0.30.1: one refused staff choice used to stop delegation, leaving the rest of the week's decisions open.
+function gameplanDecision(e,u,t){
+ const g=u.schedule[u.week].find(x=>!x.played&&(x.home===t.name||x.away===t.name));const opp=g.home===t.name?g.away:g.home;
+ return {opp,d:{id:`WD_${u.year}_${u.week}_${t.id}_WEEKLY_GAMEPLAN_null`,season:u.year,week:u.week,teamId:t.id,type:'WEEKLY_GAMEPLAN',source:'STAFF',title:`Gameplan for ${opp}`,
+  options:[{id:'standard',label:'Standard',recommended:true},{id:'protect_pass',label:'Protect against the pass'}],resolved:false}};
+}
+test('a game plan already chosen for the opponent answers the optional decision and never blocks the rest',async()=>{
+ const {e,u,t}=await setup(1411),{p,d:hurt}=injury(e,t),{opp,d:plan}=gameplanDecision(e,u,t);
+ // The plan was set for this opponent while the optional decision stayed open; it comes first in the list.
+ t.gameplan={year:u.year,week:u.week,opponent:opp,prep:'protect_pass',wearPending:[],wearApplied:false};
+ u.weeklyDecisions=[plan,hurt];
+ assert.equal(e.delegateWeeklyDecisions(t),true,'staff settle the week');
+ assert.equal(e.hasPendingWeeklyDecisions(t),false,'the required decision after the game plan is resolved');
+ assert.equal(u.weeklyDecisions.find(x=>x.id===hurt.id).resolvedOptionId,'limited');
+ assert.equal(u.weeklyDecisions.find(x=>x.id===plan.id).resolvedOptionId,'protect_pass','the existing plan is recorded, not replaced');
+ assert.equal(t.gameplan.prep,'protect_pass');assert.equal(p.weeklyAvailability.role,'limited');
+});
+test('a refused preferred choice falls back to a safe option instead of leaving the decision open',async()=>{
+ const {e,u,t}=await setup(1412);
+ const pair=u.recruits.filter(r=>!r.committed).slice(0,2);pair.forEach(r=>{r.targeted=true;r.visitWeek=null});
+ const d={id:`WD_${u.year}_${u.week}_${t.id}_RECRUITING_PRIORITY_x`,season:u.year,week:u.week,teamId:t.id,type:'RECRUITING_PRIORITY',source:'STAFF',title:'Choose this week’s recruiting priority',
+  recruitIds:pair.map(r=>r.id),options:[{id:`prioritize_${pair[0].id}`,label:'A',recommended:true},{id:`prioritize_${pair[1].id}`,label:'B'},{id:'hold',label:'Hold'}],resolved:false};
+ u.weeklyDecisions=[d];
+ pair[0].visitWeek=u.week+1; // the recommended recruit already has a visit booked, so prioritizing him is refused
+ assert.equal(e.delegateWeeklyDecisions(t),true);
+ assert.equal(u.weeklyDecisions[0].resolvedOptionId,'hold','staff hold rather than leave the decision open');
+});
+test('staff never fall back to a choice that commits the coach',async()=>{
+ const {e,u,t}=await setup(1413);
+ const p=t.roster.find(x=>!x.redshirtActive);
+ const d={id:`WD_${u.year}_${u.week}_${t.id}_PLAYER_ROLE_REQUEST_${p.id}`,season:u.year,week:u.week,teamId:t.id,type:'PLAYER_ROLE_REQUEST',source:'PLAYER',title:'Role request',playerId:p.id,
+  options:[{id:'grant',label:'Grant'}],resolved:false};
+ u.weeklyDecisions=[d];
+ assert.equal(e.delegateWeeklyDecisions(t),false,'only a committing option exists, so staff leave it to the coach');
+ assert.equal(u.weeklyDecisions[0].resolved,false);
+});

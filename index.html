@@ -11417,14 +11417,34 @@ function weeklyDecisionReceipts(t=selected()){
  return (universe.events||[]).filter(e=>e.type==='WEEKLY_DECISION_RESOLVED'&&e.metadata?.selectedBy==='staff'&&e.season===universe.year&&
   (e.week===universe.week||e.week===universe.week-1)&&e.schoolIds?.includes(t?.id)).slice().reverse().map(e=>({kind:'staff',text:`Staff: ${e.summary}`,decisionId:e.metadata.decisionId}));
 }
+// v0.30.1: staff work every open decision. One refused choice used to stop the loop, so an optional game plan
+// that could not be applied left every required decision after it open and the week could not be played. Now
+// the staff try their preferred option, then the other options their policy allows. Staff never fall back to a
+// choice that commits the coach (a promise, a granted role, an approved move or a full workload on an injury).
+function delegatedWeeklyCandidates(d,t){
+ const first=delegatedWeeklyOption(d,t),ids=[first?.id];
+ const policies={INJURED_STARTER:['limited','sit'],ACADEMIC_WATCH:['balance','study','practice'],REDSHIRT_DECISION:['continue','preserve'],
+  PLAYING_TIME_CONCERN:['rotation','keep'],PLAYER_PLAYING_TIME_COMPLAINT:['rotation','keep'],PLAYER_TRANSFER_CONCERN:['reassure','no_guarantees'],
+  PLAYER_ROLE_REQUEST:['rotation','decline'],PLAYER_REDSHIRT_DISCUSSION:['continue','preserve','revisit'],PLAYER_POSITION_CHANGE_REQUEST:['defer','decline'],
+  RECRUITING_PRIORITY:['hold'],STARTER_CHALLENGE:['stay','split','promote'],WEEKLY_GAMEPLAN:['standard',...Object.keys(GAMEPLAN_TIERS)]};
+ // Own keys only: a decision type such as 'constructor' must not reach Object.prototype.
+ const policy=Object.hasOwn(policies,d.type)&&Array.isArray(policies[d.type])?policies[d.type]:[];
+ ids.push(...policy);
+ return [...new Set(ids.filter(Boolean))].map(id=>d.options?.find(o=>o.id===id)).filter(Boolean);
+}
 function delegateWeeklyDecisions(t=selected()){
  if(!t||t.id!==selected()?.id||!t.staff?.HC?.id)return false;
+ const actor={selectedBy:'staff',coachId:t.staff.HC.id},stuck=[];
  for(const d of ensureWeeklyDecisions(t).filter(x=>guidanceDecisionIsLive(t,x))){
-  const option=delegatedWeeklyOption(d,t);
-  if(!option||!applyWeeklyDecision(d.id,option.id,{selectedBy:'staff',coachId:t.staff.HC.id})){
-   setStatus(`Staff could not resolve ${d.title}. Review this decision before advancing.`);return false;
+  // A game plan already chosen for this opponent answers the optional preparation decision.
+  if(d.type==='WEEKLY_GAMEPLAN'){
+   const g=universe.schedule[universe.week]?.find(x=>!x.played&&(x.home===t.name||x.away===t.name)),plan=g&&teamGameplanFor(t,g.home===t.name?g.away:g.home);
+   const chosen=plan&&d.options?.find(o=>o.id===plan.prep);
+   if(chosen){finishWeeklyDecision(d,chosen,t,actor);continue}
   }
+  if(!delegatedWeeklyCandidates(d,t).some(option=>applyWeeklyDecision(d.id,option.id,actor))&&d.type!=='WEEKLY_GAMEPLAN')stuck.push(d);
  }
+ if(stuck.length){setStatus(`Staff could not resolve ${stuck[0].title}${stuck.length>1?` and ${stuck.length-1} more`:''}. Review ${stuck.length>1?'these decisions':'this decision'} before advancing.`);return false}
  return true;
 }
 function weeklyDecisionContext(id,optionId,{selectedBy='coach',coachId=null}={}){
