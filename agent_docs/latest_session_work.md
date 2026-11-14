@@ -1,5 +1,11 @@
 # Latest Session Work
 
+## v0.30.1 staff delegation fix — 2026-11-14
+
+- The v0.30.0 publish run failed once in `tests/live-game-lock-browser.js` (`ready:false` after staff delegation). `delegateWeeklyDecisions` (`app/14-weekly-decisions.js`) returned at the first refused decision, and the optional WEEKLY_GAMEPLAN (ignored by `hasPendingWeeklyDecisions`) could be that refusal, stranding required decisions. Not reproduced in 32 browser runs or 1,100 headless weeks; fixed structurally.
+- Staff now work every decision, record an existing game plan for the opponent, and fall back through non-committal policy options (`delegatedWeeklyCandidates`); committing options (promise, grant, approve, full workload) are never fallbacks. Policy lookup uses own keys only.
+- Three new cases in `tests/delegation-correctness.js`. Local `npm test`: 900 pass.
+
 ## v0.30.0 national timeline, archive trims, app.js split — 2026-11-14
 
 - National timeline in History (`history-index.js`, `nationalTimeline` in `app/15-render-program-recruiting.js`): per archived season, awards, upsets (top-10 loser; unranked winner or 12+ places lower; max 3) and national season records set that year that still stand. Derived only; no save change. Deferred browser game archives show a load button. `tests/history-index.js`, `tests/national-timeline-browser.js` (in test:browser-extended).

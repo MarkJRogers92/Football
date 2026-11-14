@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.30.1 — Staff finish the week's decisions
+
+- When the staff handle the week, they now work through every open decision. Before, one choice they could not apply stopped them, and because the optional game plan was handled first, a refused game plan could leave the required decisions open and keep the week's game from starting.
+- A game plan you already chose for the opponent now counts as that week's preparation decision.
+- If the staff's first choice is no longer possible (for example, the recruit they would prioritize already has a visit booked), they take another safe option. They still never make a promise, grant a role, approve a position change or give an injured starter a full workload on your behalf.
+
+Saves carry over. No storage schema change.
+
 ## v0.30.0 — A national timeline
 
 - **History has a national timeline.** Each archived season under the champion now opens to its award winners, its biggest upsets (a top-10 team beaten by an unranked team or one at least 12 places lower, using both rankings at kickoff) and the national season records set that year that still stand. Every entry opens the player's profile or the game's box score. Older browser saves can load past games from the timeline to see upsets.
