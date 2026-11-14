@@ -73,3 +73,18 @@ The staff plan does better under private timelines. The scripted "skilled"
 policy only offers once interest reaches 45, so it is often cut before it offers
 when a Top 5 forms early; that is the script's rule, not the game's. One or two
 board prospects per season now wait for signing day, which the timelines allow.
+
+## Narrowing warning (v0.31.0)
+
+A prospect on your board who is close to naming his Top 5 or his finalists now
+says so on his card, his board badge and the weekly reminder, when your visible
+standing would not hold a place (no offer from you, or interest below 65). It
+never shows a week, a number or a hidden dealbreaker. The reminder is skipped
+when the staff run recruiting.
+
+Measured with the soak's scripted "skilled" coach also offering whenever the
+warning appeared (10 seasons, seed 7): cuts 11.8 vs 11.9 a season, 4–5 star
+signees 6.3 vs 7.4. Most cuts are not a missing offer: a place needs an offer
+and interest of 65, and the script's 25-prospect board holds many long shots,
+so extra offers mostly spent offer slots. The warning is information for the
+coach, not a balance change; the soak keeps its original policy.
