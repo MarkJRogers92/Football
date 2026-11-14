@@ -1,5 +1,13 @@
 # Latest Session Work
 
+## v0.30.0 national timeline, archive trims, app.js split — 2026-11-14
+
+- National timeline in History (`history-index.js`, `nationalTimeline` in `app/15-render-program-recruiting.js`): per archived season, awards, upsets (top-10 loser; unranked winner or 12+ places lower; max 3) and national season records set that year that still stand. Derived only; no save change. Deferred browser game archives show a load button. `tests/history-index.js`, `tests/national-timeline-browser.js` (in test:browser-extended).
+- Archive: new records drop `coachDeparturePressure` and round `recruitingMemory` lat/lon to 4 decimals. Season ten: playerArchive 42.8 → 41.4 MB. The seasonHistory rollup remains declined.
+- `app.js` split into 18 parts under `app/`, spliced by `tools/app-source.js` at the `@app-parts` marker; build output identical apart from part header comments. Use `readAppSource()` in tests. `tests/app-parts.js` guards it.
+- Ten-season recruiting soak v0.28.1 vs v0.29.1 in `docs/RECRUITING_TIMELINES.md`.
+- Local `npm test`: 896 pass. Local Chromium works in this container; history browser tests pass.
+
 ## v0.29.1 recruiting timeline fixes — 2026-11-14
 
 - Review of v0.29.0 found two bugs in `recruiting-actions.js`. (1) Cuts ran for every prospect, so the controlled program was cut (and blocked from every action) on prospects it never pursued. Cuts now only record when the program was pursuing him (targeted or holding an offer). (2) Announcements in weeks 10–12 could name week 13–14, which never comes. No date is set past `LAST_WEEK` (12); a postponement past it sets `funnel.signingDay`; v0.29.0 dates past the season come due on the final pass.

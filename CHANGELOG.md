@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.30.0 — A national timeline
+
+- **History has a national timeline.** Each archived season under the champion now opens to its award winners, its biggest upsets (a top-10 team beaten by an unranked team or one at least 12 places lower, using both rankings at kickoff) and the national season records set that year that still stand. Every entry opens the player's profile or the game's box score. Older browser saves can load past games from the timeline to see upsets.
+- **Smaller archives for new departures.** Players archived from now on no longer carry an internal transfer-pressure note that only active players use, and their home coordinates are kept to about 11 metres. Nothing visible changes; existing archived players are untouched.
+- **Engineering.** The 570 KB `app.js` core is split into 18 ordered parts under `app/`, spliced back into one closure at build time; the built game is unchanged apart from comments. A ten-season recruiting soak comparing v0.28.1 and v0.29.1 is recorded in `docs/RECRUITING_TIMELINES.md`.
+
+Saves carry over. No storage schema change.
+
 ## v0.29.1 — Recruiting timeline fixes
 
 - A prospect you never pursued no longer cuts you from his list. In v0.29.0 every prospect who published a Top 5 without you cut you, even if you had never contacted him, and a cut blocks all recruiting actions on him.

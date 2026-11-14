@@ -5,7 +5,7 @@ ability, role-based depth charts, recruiting with real geography, scouting and
 development, coaching careers, weekly game-day play and permanent program
 history. It ships as a standalone web build and as an Electron desktop alpha.
 
-Current version: **0.29.1** (see `VERSION.txt`). `CHANGELOG.md` has the
+Current version: **0.30.0** (see `VERSION.txt`). `CHANGELOG.md` has the
 version-by-version record.
 
 The game includes the **One More Saturday** experience pass: a compact weekly desk, factual postgame stopping points, quieter football presentation, personal history, and safe saved-state/re-entry feedback. See `agent_docs/ONE_MORE_SATURDAY_PLAN.md` for scope and `agent_docs/latest_session_work.md` for verified delivery status.
