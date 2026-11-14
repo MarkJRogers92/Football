@@ -1184,6 +1184,19 @@ tr[hidden]{display:none!important}
 .legacy-arc-bar:hover .legacy-arc-col{outline:1px solid rgba(255,255,255,.18)}
 @media(max-width:520px){.legacy-arc-bar{grid-template-rows:72px auto;flex-basis:12px}.legacy-arc-head{display:grid;gap:2px}.legacy-arc-bar:not(.is-title) .legacy-arc-rank{display:none}}
 @media(prefers-reduced-motion:reduce){.legacy-arc-col i{transition:none}}
+/* v0.30 national timeline: one season per champion row, with its awards, upsets and standing records folded below. */
+.timeline-season{display:grid;gap:4px}
+.timeline-detail{border:1px solid #1d2a38;border-radius:10px;padding:0 12px;background:rgba(10,18,27,.3)}
+.timeline-detail>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;color:#93a5ba;font-size:12px}
+.timeline-detail[open]{padding-bottom:10px}
+.timeline-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:4px 18px;align-items:start}
+.timeline-block{margin-top:8px;min-width:0}
+.timeline-block ul{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:2px}
+.timeline-link{display:grid;gap:1px;width:100%;min-height:44px;text-align:left;background:none;border:0;border-radius:8px;padding:6px 8px;color:inherit;font:inherit;font-size:12.5px;cursor:pointer;overflow-wrap:anywhere}
+.timeline-link b{font-weight:600}
+.timeline-link small{color:#93a5ba;font-size:11px}
+.timeline-link:is(:hover,:focus-visible):not([disabled]){background:rgba(18,32,46,.75)}
+.timeline-link[disabled]{cursor:default}
 
 .v2-lab-card{border-color:#40506a;background:linear-gradient(180deg,#171e29,#141a22)}
 .v2-lab-head{align-items:center}.v2-shadow-score{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:14px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);margin-bottom:10px}.v2-shadow-score>div:first-child{text-align:left}.v2-shadow-score>div:last-child{text-align:right}.v2-shadow-score span{display:block;color:var(--muted);font-size:12px}.v2-shadow-score strong{font-size:32px;line-height:1}.v2-shadow-final{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--muted);text-align:center}.v2-shadow-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px}.v2-shadow-metrics>div{padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}.v2-shadow-metrics span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em}.v2-shadow-metrics strong{font-size:18px}.v2-shadow-safety{padding:9px 10px;border-left:3px solid var(--accent2);background:rgba(143,177,255,.06);font-size:12px;margin:10px 0}.v2-transaction-proof{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:10px 12px;margin:10px 0;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}.v2-transaction-proof>div:first-child{min-width:0}.v2-proof-records{display:flex;gap:7px;align-items:center;white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:750}.v2-leader-card{padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}.v2-event-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:14px 0 6px}.v2-event-feed{max-height:480px;overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}.v2-event-line{display:grid;grid-template-columns:76px minmax(0,1fr) 52px;gap:10px;align-items:start;padding:8px 10px;border-bottom:1px solid var(--line)}.v2-event-line:last-child{border-bottom:0}.v2-event-clock{font-variant-numeric:tabular-nums;font-size:11px;color:var(--muted);white-space:nowrap}.v2-event-copy{min-width:0;font-size:12px}.v2-event-copy strong,.v2-event-copy small{display:block}.v2-event-copy small{color:var(--muted);margin-top:2px}.v2-event-score{text-align:right;font-variant-numeric:tabular-nums;font-weight:750;font-size:12px}
@@ -11786,8 +11799,40 @@ function championTimeline({limit=25}={}){
    record:h.championRecord||(record?`${record.w}-${record.l}`:h.top10?.find(r=>r.name===h.champion)?.record)||null};
  });
 }
+// v0.30: national timeline. Everything is derived from what each season already archived: the season history entry
+// (champion, awards), the game archive (both teams' rankings at kickoff) and the national season records (the year a
+// standing record was set). No save field is added.
+const TIMELINE_UPSETS=3;
+function isRankedValue(rank){const n=Number(rank);return Number.isInteger(n)&&n>=1&&n<=25}
+function seasonUpsets(year,limit=TIMELINE_UPSETS){
+ const out=[];
+ for(const g of universe?.gameArchive||[]){
+  if(g?.season!==year||!g.final||!g.score)continue;
+  const hs=Number(g.score.home),as=Number(g.score.away);if(!Number.isFinite(hs)||!Number.isFinite(as)||hs===as)continue;
+  const [win,lose,ws,ls]=hs>as?[g.home,g.away,hs,as]:[g.away,g.home,as,hs];
+  const loserRank=isRankedValue(lose?.rank)?Number(lose.rank):null;if(!loserRank||loserRank>10)continue;
+  const winnerRank=isRankedValue(win?.rank)?Number(win.rank):null;
+  // An upset: a top-10 team loses to an unranked team, or to a team at least 12 places below it.
+  const gap=(winnerRank??40)-loserRank;if(gap<12)continue;
+  out.push({gameId:g.id,week:g.week??null,label:g.label||null,winner:win?.name||'',winnerId:win?.id??null,winnerRank,loser:lose?.name||'',loserId:lose?.id??null,loserRank,score:`${ws}-${ls}`,gap});
+ }
+ return out.sort((a,b)=>a.loserRank-b.loserRank||b.gap-a.gap||String(a.gameId).localeCompare(String(b.gameId))).slice(0,limit).map(({gap,...x})=>x);
+}
+function seasonRecordsSet(year){
+ return Object.entries(universe?.records?.nationalSeason||{}).filter(([,r])=>r&&r.year===year)
+  .map(([key,r])=>({key,label:r.label||key,value:r.value,playerId:r.playerId??null,playerName:r.playerName||'',team:r.team||''}));
+}
+function nationalTimeline({limit=25}={}){
+ const champions=new Map(championTimeline({limit:1e6}).map(x=>[x.year,x]));
+ return (universe?.history||[]).filter(h=>h.type==='season').slice().sort((a,b)=>b.year-a.year).slice(0,limit).map(h=>({
+  year:h.year,...(champions.get(h.year)||{champion:null,championId:null,runnerUp:null,record:null}),
+  awards:(Array.isArray(h.awards)?h.awards:[]).map(a=>({name:a.name,playerId:a.playerId??null,playerName:a.playerName||'',team:a.team||'',pos:a.pos||''})),
+  // Older browser saves keep past games in a deferred archive; null asks the page to load them first.
+  upsets:gamesAreDeferred()?null:seasonUpsets(h.year),records:seasonRecordsSet(h.year)
+ }));
+}
 // App scope is not global by design; the history module reaches these through this bridge.
-if(typeof globalThis!=='undefined')globalThis.DynastyHistoryIndex=Object.freeze({coaches:coachIndexRows,champions:championTimeline,openCoach:showCoachProfile});
+if(typeof globalThis!=='undefined')globalThis.DynastyHistoryIndex=Object.freeze({coaches:coachIndexRows,champions:championTimeline,timeline:nationalTimeline,gamesDeferred:gamesAreDeferred,loadGames:ensureGamesLoaded,openCoach:showCoachProfile});
 // Recruiting-needs bridge: only POS_COUNTS, roster positions/years and committed counts leave app scope.
 if(typeof globalThis!=='undefined')globalThis.DynastyRecruitingNeeds=Object.freeze({posCounts:POS_COUNTS,snapshot:()=>{
  if(!universe)return null;const t=selected();if(!t)return null;
@@ -21133,7 +21178,7 @@ queue();
    <div id="coachIndexList" class="history-list">Loading coaches…</div>
   </section>
   <section class="card history-card">
-   <div class="section-head"><div><h3>National champions</h3><div class="muted">Archived seasons in this dynasty.</div></div></div>
+   <div class="section-head"><div><h3>National timeline</h3><div class="muted">Each archived season: the champion, then its award winners, biggest upsets and records still standing.</div></div></div>
    <div id="championTimeline" class="history-list">Loading champions…</div>
   </section>
   <section class="card history-card">
@@ -21165,14 +21210,34 @@ queue();
    :'<span class="muted">No coach matches that search.</span>';
   list.querySelectorAll('[data-coach-id]').forEach(button=>{button.onclick=()=>api.openCoach(button.dataset.coachId)});
  }
+ // v0.30: each champion row opens that season's awards, upsets (top-10 losses to unranked or much lower-ranked
+ // teams) and the national season records set that year that still stand. Open seasons survive a re-render.
+ const openYears=new Set();
+ const rank=n=>n?`#${n} `:'';
+ function seasonDetail(r){
+  const awards=(r.awards||[]).map(a=>`<li><button type="button" class="timeline-link" data-player-id="${esc(a.playerId??'')}"${a.playerId==null?' disabled':''}><b>${esc(a.name)}</b> ${esc(a.playerName)}<small>${esc(a.pos)}${a.pos&&a.team?' · ':''}${esc(a.team)}</small></button></li>`).join('');
+  const upsets=r.upsets==null
+   ?'<li><button type="button" class="timeline-link" data-load-games>Load past games to see upsets</button></li>'
+   :r.upsets.map(u=>`<li><button type="button" class="timeline-link" data-game-id="${esc(u.gameId)}"><b>${rank(u.winnerRank)||'Unranked '}${esc(u.winner)}</b> beat ${rank(u.loserRank)}${esc(u.loser)} ${esc(u.score)}<small>${u.week!=null&&u.label==='Regular season'?`Week ${esc(u.week)}`:esc(u.label||'')}</small></button></li>`).join('');
+  const records=(r.records||[]).map(x=>`<li><button type="button" class="timeline-link" data-player-id="${esc(x.playerId??'')}"${x.playerId==null?' disabled':''}><b>${esc(x.label)}: ${esc(x.value)}</b> ${esc(x.playerName)}<small>${esc(x.team)}</small></button></li>`).join('');
+  const block=(title,items,empty)=>`<div class="timeline-block"><span class="eyebrow">${title}</span>${items?`<ul>${items}</ul>`:`<p class="muted small">${empty}</p>`}</div>`;
+  return`<details class="timeline-detail" data-year="${r.year}"${openYears.has(r.year)?' open':''}><summary>${r.year} awards, upsets and records</summary><div class="timeline-grid">`+
+   block('AWARDS',awards,'No awards were recorded for this season.')+
+   block('UPSETS',upsets,'No top-10 team lost to an unranked or much lower-ranked opponent.')+
+   block('RECORDS STILL STANDING',records,'No national season record from this year still stands.')+'</div></details>';
+ }
  function renderChampions(){
-  const rows=api.champions({limit:25});
+  const rows=(api.timeline?api.timeline({limit:25}):api.champions({limit:25}).map(r=>({...r,awards:[],upsets:[],records:[]})));
   champs.innerHTML=rows.length
-   ?rows.map(r=>`<button type="button" class="history-row" data-champ="${esc(r.champion)}" data-school-id="${esc(r.championId??'')}"><span class="history-who"><strong>${esc(r.champion)}</strong><small>${r.year}${r.record?' · '+esc(r.record):''}</small></span><span class="history-record">${r.runnerUp?esc(r.runnerUp):'—'}<small>${r.runnerUp?'runner-up':'no runner-up recorded'}</small></span></button>`).join('')
+   ?rows.map(r=>`<div class="timeline-season">${r.champion?`<button type="button" class="history-row" data-champ="${esc(r.champion)}" data-school-id="${esc(r.championId??'')}"><span class="history-who"><strong>${esc(r.champion)}</strong><small>${r.year}${r.record?' · '+esc(r.record):''}</small></span><span class="history-record">${r.runnerUp?esc(r.runnerUp):'—'}<small>${r.runnerUp?'runner-up':'no runner-up recorded'}</small></span></button>`:`<div class="history-row"><span class="history-who"><strong>${r.year}</strong><small>No champion recorded</small></span></div>`}${seasonDetail(r)}</div>`).join('')
    :'<span class="muted">Champions appear once a season is archived.</span>';
   champs.querySelectorAll('[data-champ]').forEach(button=>{
    button.onclick=()=>globalThis.DynastyEncyclopedia?.open({kind:'team',id:button.dataset.schoolId||undefined,name:button.dataset.champ});
   });
+  champs.querySelectorAll('details.timeline-detail').forEach(d=>d.addEventListener('toggle',()=>{const y=Number(d.dataset.year);d.open?openYears.add(y):openYears.delete(y)}));
+  champs.querySelectorAll('[data-player-id]:not([disabled])').forEach(b=>{b.onclick=()=>api.openPlayer?.(b.dataset.playerId)});
+  champs.querySelectorAll('[data-game-id]').forEach(b=>{b.onclick=()=>globalThis.DynastyLabOpenGame?.(b.dataset.gameId)});
+  champs.querySelectorAll('[data-load-games]').forEach(b=>{b.onclick=async()=>{b.disabled=true;b.textContent='Loading past games…';try{await api.loadGames?.()}finally{renderChampions()}}});
  }
  function renderHall(){
   const all=api.hallOfFame?.({limit:1000})||[];

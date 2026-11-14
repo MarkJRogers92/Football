@@ -164,3 +164,37 @@ test('two major awards carry a career without a draft result', async()=>{
   career:{tackles:410,sacks:38}});
  assert.ok(e.hallOfFame().some(r=>r.id==='hof-two'),'two major awards are a career argument');
 });
+
+// v0.30: the national timeline derives awards, upsets and standing records from what each season archived.
+test('the national timeline lists awards, real upsets and records set that season', async()=>{
+ const e=await setup(9601),u=e.universe;
+ assert.deepEqual(e.nationalTimeline(),[]);
+ const award={name:'National Player of the Year',playerId:'p1',playerName:'Ace Back',team:'Tidewater State',pos:'RB'};
+ u.history=[{type:'season',year:2031,champion:'Tidewater State',top10:[{name:'Tidewater State',record:'13-1'}],awards:[award]},
+  {type:'season',year:2030,champion:'Old Champ',top10:[],awards:[]}];
+ const game=(id,season,home,away,hs,as)=>({id,season,week:5,label:'Regular season',final:true,home,away,score:{home:hs,away:as}});
+ u.gameArchive=[
+  game('G1',2031,{id:1,name:'Unranked U',rank:44},{id:2,name:'Top Dog',rank:2},24,21),   // unranked over #2
+  game('G2',2031,{id:3,name:'Close Call',rank:9},{id:4,name:'Number Four',rank:4},30,27), // only 5 places: not an upset
+  game('G3',2031,{id:5,name:'Number Eleven',rank:11},{id:6,name:'Number One',rank:1},17,14), // 10 places: not an upset
+  game('G4',2031,{id:7,name:'Number Twenty',rank:20},{id:8,name:'Number Six',rank:6},28,10), // 14 places: upset
+  game('G5',2031,{id:9,name:'Top Dog',rank:2},{id:10,name:'Unranked V',rank:50},45,3),    // favorite won
+  game('G6',2030,{id:11,name:'Last Year',rank:60},{id:12,name:'Number Three',rank:3},20,17)];
+ u.records={nationalSeason:{rushYds:{label:'Rushing Yards',value:2400,playerId:'p1',playerName:'Ace Back',team:'Tidewater State',year:2031},passYds:{label:'Passing Yards',value:5000,playerId:'p9',playerName:'Old Arm',team:'Old Champ',year:2030}}};
+ const before=JSON.stringify(u.gameArchive);
+ const [y2031,y2030]=e.nationalTimeline();
+ assert.equal(y2031.year,2031);assert.equal(y2031.champion,'Tidewater State');
+ assert.deepEqual(y2031.awards,[award]);
+ assert.deepEqual(y2031.upsets.map(x=>x.gameId),['G1','G4'],'ordered by the loser\'s ranking; close and expected results excluded');
+ assert.equal(y2031.upsets[0].winnerRank,null,'an unranked winner has no rank');
+ assert.equal(y2031.upsets[0].score,'24-21');
+ assert.deepEqual(y2031.records.map(r=>r.key),['rushYds']);
+ assert.deepEqual(y2030.upsets.map(x=>x.gameId),['G6']);assert.deepEqual(y2030.records.map(r=>r.key),['passYds']);
+ assert.equal(JSON.stringify(u.gameArchive),before,'reading the timeline never changes the archive');
+});
+test('the national timeline keeps at most three upsets per season', async()=>{
+ const e=await setup(9602),u=e.universe;
+ u.history=[{type:'season',year:2031,champion:'X',top10:[],awards:[]}];
+ u.gameArchive=Array.from({length:6},(_,i)=>({id:'U'+i,season:2031,week:i+1,label:'Regular season',final:true,home:{id:i,name:'Low '+i,rank:99},away:{id:100+i,name:'High '+i,rank:i+1},score:{home:21,away:20}}));
+ assert.deepEqual(e.nationalTimeline()[0].upsets.map(x=>x.gameId),['U0','U1','U2']);
+});

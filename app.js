@@ -4243,8 +4243,40 @@ function championTimeline({limit=25}={}){
    record:h.championRecord||(record?`${record.w}-${record.l}`:h.top10?.find(r=>r.name===h.champion)?.record)||null};
  });
 }
+// v0.30: national timeline. Everything is derived from what each season already archived: the season history entry
+// (champion, awards), the game archive (both teams' rankings at kickoff) and the national season records (the year a
+// standing record was set). No save field is added.
+const TIMELINE_UPSETS=3;
+function isRankedValue(rank){const n=Number(rank);return Number.isInteger(n)&&n>=1&&n<=25}
+function seasonUpsets(year,limit=TIMELINE_UPSETS){
+ const out=[];
+ for(const g of universe?.gameArchive||[]){
+  if(g?.season!==year||!g.final||!g.score)continue;
+  const hs=Number(g.score.home),as=Number(g.score.away);if(!Number.isFinite(hs)||!Number.isFinite(as)||hs===as)continue;
+  const [win,lose,ws,ls]=hs>as?[g.home,g.away,hs,as]:[g.away,g.home,as,hs];
+  const loserRank=isRankedValue(lose?.rank)?Number(lose.rank):null;if(!loserRank||loserRank>10)continue;
+  const winnerRank=isRankedValue(win?.rank)?Number(win.rank):null;
+  // An upset: a top-10 team loses to an unranked team, or to a team at least 12 places below it.
+  const gap=(winnerRank??40)-loserRank;if(gap<12)continue;
+  out.push({gameId:g.id,week:g.week??null,label:g.label||null,winner:win?.name||'',winnerId:win?.id??null,winnerRank,loser:lose?.name||'',loserId:lose?.id??null,loserRank,score:`${ws}-${ls}`,gap});
+ }
+ return out.sort((a,b)=>a.loserRank-b.loserRank||b.gap-a.gap||String(a.gameId).localeCompare(String(b.gameId))).slice(0,limit).map(({gap,...x})=>x);
+}
+function seasonRecordsSet(year){
+ return Object.entries(universe?.records?.nationalSeason||{}).filter(([,r])=>r&&r.year===year)
+  .map(([key,r])=>({key,label:r.label||key,value:r.value,playerId:r.playerId??null,playerName:r.playerName||'',team:r.team||''}));
+}
+function nationalTimeline({limit=25}={}){
+ const champions=new Map(championTimeline({limit:1e6}).map(x=>[x.year,x]));
+ return (universe?.history||[]).filter(h=>h.type==='season').slice().sort((a,b)=>b.year-a.year).slice(0,limit).map(h=>({
+  year:h.year,...(champions.get(h.year)||{champion:null,championId:null,runnerUp:null,record:null}),
+  awards:(Array.isArray(h.awards)?h.awards:[]).map(a=>({name:a.name,playerId:a.playerId??null,playerName:a.playerName||'',team:a.team||'',pos:a.pos||''})),
+  // Older browser saves keep past games in a deferred archive; null asks the page to load them first.
+  upsets:gamesAreDeferred()?null:seasonUpsets(h.year),records:seasonRecordsSet(h.year)
+ }));
+}
 // App scope is not global by design; the history module reaches these through this bridge.
-if(typeof globalThis!=='undefined')globalThis.DynastyHistoryIndex=Object.freeze({coaches:coachIndexRows,champions:championTimeline,openCoach:showCoachProfile});
+if(typeof globalThis!=='undefined')globalThis.DynastyHistoryIndex=Object.freeze({coaches:coachIndexRows,champions:championTimeline,timeline:nationalTimeline,gamesDeferred:gamesAreDeferred,loadGames:ensureGamesLoaded,openCoach:showCoachProfile});
 // Recruiting-needs bridge: only POS_COUNTS, roster positions/years and committed counts leave app scope.
 if(typeof globalThis!=='undefined')globalThis.DynastyRecruitingNeeds=Object.freeze({posCounts:POS_COUNTS,snapshot:()=>{
  if(!universe)return null;const t=selected();if(!t)return null;
