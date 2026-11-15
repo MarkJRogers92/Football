@@ -1,5 +1,26 @@
 # Latest session work
 
+## v0.34.0 overnight branch — 2026-11-15 (not merged, not published)
+
+Branch `claude/overnight-v034`, based on the v0.33.1 merge `457bef7`. Plan and the full idea list: `docs/NEXT_IDEAS_2026-11-15.md`. All new gameplay-facing code is engine extensions (both lists in `tools/build.js` and `tools/harness.js`, after `dynasty-world-news.js`), hashed randomness only.
+
+- `coach-rivals.js`: `universe.coachRivals {v, rows}`, one row per coached game `[gameId, season, week, coachId, coachName, oppSchoolId, oppSchool, us, them, mySchool]`, upserted by game id from a `finishGame` wrap; one-time backfill from the loaded game archive via coaches' `careerHistory` head-coach stints. Nemesis (3+ meetings, 3+ losses, ≤1/3 won), favourite (3+ wins, ≤1/4 lost). `#coachRivalWeek` on This Week, `#coachRivals` on Program.
+- `senior-day.js`: derived; `#seniorDay` on This Week the week before the last regular-season home game. Top six get a career line; the rest are named.
+- `pro-alumni-coaches.js`: wraps `generateCandidatePool` (coach's program, non-HC slots only), `materializeCandidateCoach` (`coach.formerPlayer`), `candidateSourceLabel`, `candidateCardHTML`. Retired pros, 3+ seasons, retired 1+ year, side of the ball matches.
+- `trophy-case.js`: derived; `#trophyCase` on Program.
+- `saw-him-first.js`: wraps `runDraft` and `finalizeSeasonHonors`; `SCOUTING_VINDICATED` events (added to `dynasty-world-news.js` TYPES).
+- `week-stakes.js`: `#trapGame` on This Week; `STATEMENT_WIN` events from a `finishGame` wrap (stamped with the week The Wire shows them in). `tests/week-stakes.js`.
+- `season-card.js`: "Save season card" button in `#seasonReview`; canvas 1200×630 PNG download. `tests/season-card.js`, `tests/season-card-browser.js` (in `test:browser-extended`).
+- `nfl-pipeline.js`: `classNote(year)` and `#draftClassNote` on the Records page.
+- `legacy.js`: `combine`, `exportStore`, `importStore`; `exportSave`/`importSave` (app part 18) carry and merge `legacy`. Documented in `STORAGE.md`.
+- `recruiting-actions.js`: the capacity cache now covers `runFunnel` and rival moves (identical universes on seeds 9108/4711; season 9.0 → 6.8 s).
+- Pitfall found: a `function render(){}` declared inside an extension's `else` block replaced the app's global `render` (sloppy-mode block function hoisting). Give block-level functions unique names.
+- Measurements: `docs/DYNASTY_WORLD_MEASUREMENTS.md` (v0.34 sections). League check on seeds 7 and 11 matched the v0.33 table exactly.
+
+## v0.33.1 publication — 2026-11-15
+
+PR #66 merged into the default branch at `457bef7e676fa840bd12e498126a343f9d42cd12`. Publish workflow run 43686148276 (production, full validation in CI) succeeded at 07:06 UTC. Production commit on `gh-pages`: `bf94d7d` ("Publish production: 0.33.1"). Its `index.html` SHA-256 `8b76c0b9f15036fa2a1df879dea4e9a6684b4bae0ef3260469121e5cb747ce7e` matches the release source exactly. The live URL could not be fetched from the session container (proxy), so no live-page check was made from here.
+
 ## v0.33.1 outlook leak and Hall of Fame — 2026-11-15
 
 - `nfl-pipeline.js`: `grade(p,t,seen)` takes an optional scouted view; `outlook(p,t,current,upside)` builds a round/grade/ceiling range from the staff's `scoutRange` low and high ends with traits as shrunken offsets (same `.45` the scouting domains use), no hashed scouts' read and mean ceiling jitter. The chronology's NFL OUTLOOK uses it (`data-nfl-outlook`). Draft and early declarations still use the true grade.

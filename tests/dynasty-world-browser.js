@@ -51,6 +51,61 @@ const shots=process.env.DW_SHOTS;
    assert.ok(await overflow(page)<=1,`[${label}] roster page fits`);
    if(shots)await page.locator('#lockerRoom').screenshot({path:path.join(shots,`locker-room-${label}.png`)});
 
+   // --- Coaching rivals: the Program page card, and This Week names a nemesis before the next meeting.
+   await open(page,'program','program');
+   await page.waitForSelector('#coachRivals',{timeout:15000});
+   assert.match(await page.locator('#coachRivals').textContent(),/COACHING RIVALS/,`[${label}] the coaching rivals card is on the Program page`);
+   await page.waitForSelector('#trophyCase .tc-shelf',{timeout:15000});
+   const tc=await page.locator('#trophyCase').textContent();
+   assert.match(tc,/TROPHY CASE[\s\S]*National titles[\s\S]*Conference titles[\s\S]*Bowl wins/,`[${label}] the trophy case is on the Program page`);
+   assert.ok(await page.locator('#trophyCase .tc-shelf').count()>=5,`[${label}] every shelf is shown, empty or not`);
+   assert.ok(await overflow(page)<=1,`[${label}] trophy case fits`);
+   if(shots)await page.locator('#trophyCase').screenshot({path:path.join(shots,`trophy-case-${label}.png`)});
+   await open(page,'home','dashboard');
+   const nemesis=await page.evaluate(()=>window.__DL_TEST__.coachRivalsFixture());
+   await page.waitForSelector('#coachRivalWeek',{timeout:15000});
+   const h2h=await page.locator('#coachRivalWeek').innerText();
+   assert.ok(h2h.includes(nemesis)&&/NEMESIS/.test(h2h)&&/0-3/.test(h2h),`[${label}] This Week names the nemesis: ${h2h}`);
+   assert.equal((await page.evaluate(()=>window.__DL_TEST__.coachRivals())).nemesis,nemesis);
+   assert.ok(await overflow(page)<=1,`[${label}] head-to-head card fits`);
+   if(shots)await page.locator('#coachRivalWeek').screenshot({path:path.join(shots,`coach-rival-${label}.png`)});
+
+   // --- Senior Day: the week before the last home game, This Week lists the seniors.
+   const seniors=await page.evaluate(()=>window.__DL_TEST__.seniorDayFixture(true));
+   assert.ok(seniors>0,`[${label}] the roster has seniors`);
+   await page.waitForSelector('#seniorDay [data-senior]',{timeout:15000});
+   assert.equal(await page.locator('#seniorDay [data-senior]').count(),seniors,`[${label}] every senior is named`);
+   assert.match(await page.locator('#seniorDay').innerText(),/SENIOR DAY · WEEK \d+/);
+   assert.ok(await overflow(page)<=1,`[${label}] Senior Day fits`);
+   if(shots)await page.locator('#seniorDay').screenshot({path:path.join(shots,`senior-day-${label}.png`)});
+   await page.evaluate(()=>window.__DL_TEST__.seniorDayFixture(false));
+   await page.waitForSelector('#seniorDay',{state:'detached',timeout:15000});
+
+   // --- Staff: a retired pro from the program applies for a coordinator job.
+   const alum=await page.evaluate(()=>window.__DL_TEST__.alumniCoachFixture());
+   assert.ok(alum,`[${label}] an alumni candidate is in the pool`);
+   await open(page,'program','staff');
+   await page.waitForSelector('[data-alumni-coach]',{timeout:15000});
+   const alumCard=await page.locator('.candidate-card',{has:page.locator('[data-alumni-coach]')}).innerText();
+   assert.ok(alumCard.includes(alum)&&/Former player/.test(alumCard)&&/pro seasons/.test(alumCard),`[${label}] the card shows his pro career: ${alumCard}`);
+   assert.ok(await overflow(page)<=1,`[${label}] staff page fits`);
+   if(shots)await page.locator('.candidate-card',{has:page.locator('[data-alumni-coach]')}).screenshot({path:path.join(shots,`alumni-coach-${label}.png`)});
+   await open(page,'home','dashboard');
+
+   // --- Records: the draft board says when a class of early entrants is thin.
+   await page.evaluate(()=>{const dh={},y=2020;for(let k=0;k<4;k++)dh[y+k]=Array.from({length:k===3?2:12},(_,i)=>({year:y+k,playerId:`dc${k}_${i}`,playerName:'Early '+i,pos:'WR',school:'X',reason:'Declared early for draft',round:1,pick:i+1,status:'Drafted',label:'R1'}));window.__DL_TEST__.setDraftHistory?.(dh)});
+   await open(page,'world','records');
+   await page.waitForSelector('#draftClassNote',{timeout:15000});
+   assert.match(await page.locator('#draftClassNote').textContent(),/2023 class: a thin one\. Only 2 underclassmen declared early, against 12 a class before it/,`[${label}] the draft board explains a thin class`);
+   await open(page,'home','dashboard');
+
+   // --- This Week: a trap game before a big one.
+   const trapOpp=await page.evaluate(()=>window.__DL_TEST__.trapGameFixture());
+   await page.waitForSelector('#trapGame',{timeout:15000});
+   const trapText=await page.locator('#trapGame').innerText();
+   assert.ok(trapText.includes(trapOpp)&&/TRAP GAME/.test(trapText)&&/#4 /.test(trapText),`[${label}] the trap game is flagged: ${trapText}`);
+   assert.ok(await overflow(page)<=1,`[${label}] trap game card fits`);
+
    // --- This Week: a flashpoint waits for an answer.
    await open(page,'home','dashboard');
    await page.evaluate(()=>window.__DL_TEST__.lockerRoomFlashpointFixture());

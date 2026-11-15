@@ -10,7 +10,13 @@ them. First access materializes the full archive once for the current session.
 No players or historical fields are intentionally removed by this change.
 
 Portable Export remains `{version, userTeam, universe}` with an inlined
-`universe.playerArchive`. Import remains compatible with that format and the
+`universe.playerArchive`. From v0.34 it also carries `legacy`: a copy of this
+device's Legacy store (`localStorage` key `dynastyLabLegacy`: achievements,
+cross-save records, the Legacy hall of fame and challenges). Import merges it
+into the device's store with `DynastyLegacy.combine` (earliest unlock, best
+record, union of honours, furthest challenge state) and never erases what the
+device already has. Unsafe markup in a backup's `legacy` drops the merge, not
+the import. Backups without `legacy` import exactly as before. Import remains compatible with that format and the
 existing `normalizeUniverse()` migration path. Storage references never appear
 in a portable export; raw browser records with detached history cannot be imported
 as if they were complete backups.

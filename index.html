@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.33.1</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.34.0</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -1107,6 +1107,28 @@ tr[hidden]{display:none!important}
 .noncon-week>summary{cursor:pointer}
 .noncon-week>summary .noncon-week-head{display:inline-flex;width:calc(100% - 22px);vertical-align:top}
 .pro-career{margin-top:12px;padding-top:10px;border-top:1px solid var(--line,rgba(255,255,255,.14))}
+/* v0.34: coaching rivals (This Week and Program page). */
+.coach-rival-week{margin:8px 0;padding:9px 12px;border-radius:6px;border:1px solid var(--line,rgba(255,255,255,.14));border-left:4px solid var(--accent,#d9a441)}
+.coach-rival-week p{margin:4px 0 0}
+/* v0.34: Senior Day (This Week). */
+.senior-day{margin:8px 0;padding:10px 12px;border-radius:6px;border:1px solid var(--line,rgba(255,255,255,.14));border-left:4px solid #5fae7a}
+.senior-day h3{margin:2px 0 6px}
+.senior-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:4px 16px}
+.senior-list li{padding:3px 0}
+.senior-list small{display:block;opacity:.75}
+.senior-day .player-button{padding:0;min-height:0}
+.senior-rest{margin:8px 0 0;line-height:1.6}
+.draft-class-note{text-transform:none;letter-spacing:normal;margin:4px 0 8px}
+/* v0.34: trophy case (Program page). */
+.tc-shelves{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0}
+.tc-shelf{padding:10px 12px;border:1px solid var(--accent,#d9a441);border-radius:6px;display:flex;flex-direction:column;gap:2px;background:rgba(217,164,65,.06)}
+.tc-shelf strong{font-size:1.5rem;line-height:1.1}
+.tc-shelf small{opacity:.8;overflow-wrap:anywhere}
+.tc-shelf.is-empty{border-style:dashed;border-color:var(--line,rgba(255,255,255,.2));background:transparent;opacity:.75}
+.trophy-case-card p.small,.coach-rivals-card p.small{text-transform:none;letter-spacing:normal}
+/* v0.34: trap game (This Week). */
+.trap-game{margin:8px 0;padding:9px 12px;border-radius:6px;border:1px solid var(--line,rgba(255,255,255,.14));border-left:4px solid #d0605a}
+.trap-game p{margin:4px 0 0}
 
 .situational-playbook{display:grid;gap:8px}
 .situational-playbook>p{margin:0}
@@ -3623,7 +3645,7 @@ select{min-width:44px}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.33.1</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.34.0</b></span></footer>
   </div>
 </section>
 
@@ -3650,7 +3672,7 @@ select{min-width:44px}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.33.1</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.34.0</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -7599,7 +7621,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.33.1';
+const APP_VERSION='0.34.0';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi','Aiden','Alex','Amari','Andrew','Anthony','Antonio','Armani','Ashton','Austin','Avery','Bennett','Blake','Brady','Brandon','Brayden','Brennan','Brock','Bryson','Cade','Caden','Calvin','Cameron','Carson','Cedric','Chase','Christian','Cody','Colby','Collin','Connor','Corey','Damian','Damon','Daniel','Davion','Dawson','Deandre','Demarcus','Derek','Desmond','Dillon','Drew','Dylan','Elijah','Ethan','Ezra','Garrett','Grady','Graham','Grant','Hayden','Hunter','Ian','Isaac','Jabari','Jace','Jackson','Jacob','Jaden','Jake','Jamar','Jameson','Jared','Jarrett','Javon','Jaxon','Jay','Jermaine','Jesse','Joel','Jonah','Josiah','Julian','Justin','Kaden','Kai','Kamari','Keegan','Keenan','Kendall','Kendrick','Kevin','Kobe','Kyle','Kyler','Lamar','Landon','Lane','Lawrence','Leon','Levi','Lincoln','Lucas','Marco','Mario','Mateo','Matthew','Maurice','Max','Myles','Nate','Nathan','Nolan','Omar','Owen','Parker','Patrick','Preston','Quentin','Quincy','Reggie','Riley','Ryan','Sam','Sean','Seth','Shane','Silas','Solomon','Spencer','Sterling','Terrell','Theo','Tobias','Travis','Tristan','Troy','Tucker','Tyrese','Victor','Wade','Walker','Wes','Wyatt','Zach','Zane','Andres','Diego','Rafael','Tevita','Sione','Manu','Keoni','Kenji','Darnell'];
@@ -12469,7 +12491,7 @@ async function saveFileText(file){
 }
 function exportSave(){return storageOperation(async()=>{
   await ensureArchiveLoaded();await ensureGamesLoaded();
-  const plain=new Blob(saveJsonParts({version:APP_VERSION,userTeam:$('#userTeam').value,universe:packUniverse(universe)}),{type:'application/json'}),zipped=await gzipBlob(plain),blob=zipped?new Blob([zipped],{type:'application/gzip'}):plain,a=document.createElement('a');
+  const plain=new Blob(saveJsonParts({version:APP_VERSION,userTeam:$('#userTeam').value,legacy:globalThis.DynastyLegacy?.exportStore?.(),universe:packUniverse(universe)}),{type:'application/json'}),zipped=await gzipBlob(plain),blob=zipped?new Blob([zipped],{type:'application/gzip'}):plain,a=document.createElement('a');
   a.href=URL.createObjectURL(blob);a.download=`dynasty-lab-${universe.year}-week-${universe.week+1}.json${zipped?'.gz':''}`;a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);const size=Number.isFinite(blob.size)?` (${slotBytes(blob.size)})`:'';setStatus(zipped?`Save exported as a compressed backup${size}. Import it here as it is.`:`Save exported as JSON${size}.`);
 })}
@@ -12478,7 +12500,11 @@ function importSave(file){return storageOperation(async()=>{
   let d;try{d=JSON.parse(text)}catch{throw new Error('That file is not a Dynasty Lab save.')}
   if(d.storageVersion||d.archiveRef)throw new Error('Import a complete exported JSON save, not an app storage record.');
   validateImportedSaveText(d?.universe||d);
-  installSave(d);setStatus('Imported save file successfully.');
+  // A backup from v0.34 on carries this device's Legacy; merge it rather than replace what is here.
+  let legacy=null;if(d?.legacy&&typeof d.legacy==='object'){try{validateImportedSaveText(d.legacy);legacy=d.legacy}catch{legacy=null}}
+  installSave(d);
+  const merged=legacy?globalThis.DynastyLegacy?.importStore?.(legacy):null;
+  setStatus(merged?.ok?`Imported save file successfully. Legacy merged${merged.added>0?`: ${merged.added} achievement${merged.added===1?'':'s'} added`:''}.`:'Imported save file successfully.');
   return true;
 })}
 function refreshTeamOptions(sel){$('#userTeam').innerHTML='';universe.teams.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(s=>{let o=document.createElement('option');o.value=s.name;o.textContent=s.name;$('#userTeam').appendChild(o)});$('#userTeam').value=T(sel)?sel:universe.teams[0].name;renderControlMode()}
@@ -14227,9 +14253,11 @@ if(typeof module==='object'&&module.exports){
   // Existing commitments still get flip pressure; visits and this week's work update before readiness.
   const held=t?new Set(universe.recruits.filter(r=>r.committed===t.name).map(r=>r.id)):null;
   const out=advanceRecruitingBeforeRecruitingActions();
-  const funnel=recruitingActions.runFunnel(universe.recruits,t);
+  // v0.34: the funnel and rival moves ask every program's scholarship limit for every prospect. Rosters cannot change
+  // here either (commitments fill classes, not rosters), so the pass's capacity cache covers them too.
+  let funnel,rivalMoves=0;passCapacity=new Map();
+  try{funnel=recruitingActions.runFunnel(universe.recruits,t);if(t)rivalMoves=recruitingActions.generateRivals(universe.recruits,t).length}finally{passCapacity=null}
   if(t){
-   const rivalMoves=recruitingActions.generateRivals(universe.recruits,t).length;
    // The hours ledger still describes the week just played, because the counter has already moved on.
    const w=t.recruitingWeek&&t.recruitingWeek.year===universe.year&&t.recruitingWeek.week===playedWeek?t.recruitingWeek:null;
    t.recruitingLastWeek={year:universe.year,week:playedWeek,spent:w?w.spent:0,budget:recruitingActions.hoursBudgetFor(t),cooled:passCooled.slice(0,12),cooledCount:passCooled.length,rivalMoves,
@@ -20549,9 +20577,21 @@ function makeNflPipeline(env){
   }
   return out.sort((a,b)=>b.importance-a.importance).slice(0,MILESTONES_PER_YEAR);
  }
+ // How many underclassmen declared early in a class, against the classes before it. Early entry swings a lot from
+ // year to year (2 to 22 in ten-season measurements), so the draft board says when a class is unusually thin or deep.
+ const EARLY='Declared early for draft',CLASS_MIN_HISTORY=3;
+ function classNote(year){
+  const dh=universe().draftHistory||{},count=y=>(dh[y]||[]).filter(r=>r.reason===EARLY).length;
+  if(!dh[year])return null;
+  const n=count(year),past=Object.keys(dh).map(Number).filter(y=>y<year).map(count);
+  if(past.length<CLASS_MIN_HISTORY)return{year,count:n,average:null,kind:'normal'};
+  const avg=past.reduce((a,b)=>a+b,0)/past.length;
+  const kind=n<=Math.max(1,avg*.6)?'thin':n>=avg*1.4&&n-avg>=3?'deep':'normal';
+  return{year,count:n,average:Math.round(avg*10)/10,kind};
+ }
  function recordFor(playerId){for(const list of Object.values(universe().draftHistory||{}))for(const r of list||[])if(String(r.playerId)===String(playerId))return r;return null}
 
- return{POS_VALUE,NFL_TRAITS,STYLE_NFL,CAREER,UDFA_KEEP,HOF_WAIT,PITCH_MAX,GIFT_MAX,hallWorthy,hash,unit,traitScore,scoutedTraits,grade,outlook,boardScore,roundFor,projection,gradeOf,ceilingOf,seasonsDone,career,careerAt,schoolIdentity,rememberSchool,allSchools,school,pitchFor,alumniGift,milestones,recordFor,clearCache:()=>{cache=null}};
+ return{POS_VALUE,NFL_TRAITS,STYLE_NFL,CAREER,UDFA_KEEP,HOF_WAIT,PITCH_MAX,GIFT_MAX,hallWorthy,hash,unit,traitScore,scoutedTraits,grade,outlook,boardScore,roundFor,projection,gradeOf,ceilingOf,seasonsDone,career,careerAt,schoolIdentity,rememberSchool,allSchools,school,pitchFor,alumniGift,milestones,classNote,recordFor,clearCache:()=>{cache=null}};
 }
 
 if(typeof module==='object'&&module.exports){
@@ -20655,13 +20695,30 @@ if(typeof module==='object'&&module.exports){
   }catch(err){console.error(err)}
   return base;
  };
- if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.proPipeline=()=>{const t=selected();const s=nfl.school(t.name);return{pros:s.pros,active:s.active,rank:s.rank,pitch:s.pitch}};
+ // The draft board on the Records page says how this class compares.
+ function noteText(n){
+  if(!n)return'';const who=`${n.count} underclassm${n.count===1?'an':'en'} declared early`;
+  if(n.average==null)return`${n.year} class: ${who}.`;
+  return n.kind==='thin'?`${n.year} class: a thin one. Only ${who}, against ${n.average} a class before it; more juniors stayed in school.`:n.kind==='deep'?`${n.year} class: a deep one. ${who}, against ${n.average} a class before it.`:`${n.year} class: ${who} (${n.average} a class before it).`;
+ }
+ // renderRecords does not go through runRender, so the tab renderer is wrapped.
+ const renderRecordsBeforeNfl=TAB_RENDERERS.records;
+ TAB_RENDERERS.records=()=>{renderRecordsBeforeNfl();renderDraftClassNote()};
+ function renderDraftClassNote(){
+  const board=$('#draftBoard');if(!board?.insertAdjacentElement)return;
+  const years=Object.keys(universe.draftHistory||{}).map(Number).sort((a,b)=>b-a),text=years.length?noteText(nfl.classNote(years[0])):'';
+  let note=$('#draftClassNote');
+  if(!text){if(note?.isConnected)note.remove();return}
+  if(!note||!note.isConnected){note=document.createElement('p');note.id='draftClassNote';note.className='small muted draft-class-note';board.insertAdjacentElement('beforebegin',note)}
+  note.textContent=text;note.dataset.kind=nfl.classNote(years[0])?.kind||'normal';
+ }
+ if(typeof window!=='undefined'&&window.__DL_TEST__){window.__DL_TEST__.setDraftHistory=dh=>{universe.draftHistory=dh;nfl.clearCache()};window.__DL_TEST__.proPipeline=()=>{const t=selected();const s=nfl.school(t.name);return{pros:s.pros,active:s.active,rank:s.rank,pitch:s.pitch}};}
 }
 
 // Optional, current facts shared by the Wire and the short weekly briefing.
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.DynastyWorldNews=api})(typeof globalThis!=='undefined'?globalThis:this,function(){
  'use strict';
- const TYPES={PRO_MILESTONE:{kicker:'PRO ALUMNI',tab:'program'},LOCKER_ROOM_MEETING:{kicker:'LOCKER ROOM',tab:'roster'},LOCKER_ROOM_FLASHPOINT:{kicker:'LOCKER ROOM',tab:'roster'},LOCKER_ROOM_RESOLVED:{kicker:'LOCKER ROOM',tab:'roster'}};
+ const TYPES={PRO_MILESTONE:{kicker:'PRO ALUMNI',tab:'program'},LOCKER_ROOM_MEETING:{kicker:'LOCKER ROOM',tab:'roster'},LOCKER_ROOM_FLASHPOINT:{kicker:'LOCKER ROOM',tab:'roster'},LOCKER_ROOM_RESOLVED:{kicker:'LOCKER ROOM',tab:'roster'},SCOUTING_VINDICATED:{kicker:'YOU SAW HIM FIRST',tab:'recruiting'},STATEMENT_WIN:{kicker:'STATEMENT WIN',tab:'season'}};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function items(u,t){
   if(!u||!t)return[];
@@ -20677,6 +20734,649 @@ if(typeof module==='object'&&module.exports){
  function wireItems(u,t){return items(u,t).map(e=>({worldEventId:e.id,kicker:e.kicker,main:esc(e.title),sub:'',tab:e.tab,type:'news'}))}
  return{items,wireItems};
 });
+
+// v0.34 — coaching rivals. The game already knows every head coach you have faced; now it says so. Your record
+// against each opposing head coach is kept across schools, and two of them earn a name:
+//
+//   Nemesis       the coach you cannot beat: at least three meetings, at least three losses, winning no more than a
+//                 third of them. If two qualify, the one with more losses (then the more recent) is the nemesis.
+//   Favourite     the coach you always beat: at least three meetings and three wins, losing no more than a quarter.
+//
+// Before you face a coach you have met before, This Week says how it has gone; the Program page lists the coaches
+// you have faced most. A coach is followed by his id, so the record carries over when he changes jobs, and so does
+// yours when you change schools.
+//
+// State: universe.coachRivals {v, rows}. One small row per game you coach (about 1 KB a season), written as each game
+// finishes and replaced if the same game is played again after a rollback. Older saves are backfilled once from the
+// game archive, finding who was head coach of each opponent that season from the coaches' career records.
+function makeCoachRivals(env){
+ 'use strict';
+ const universe=()=>env.getUniverse();
+ const NEMESIS={meetings:3,losses:3,maxPct:1/3},FAVOURITE={meetings:3,wins:3,minPct:.75},LIST=6,VERSION=1;
+ // Row: [gameId, season, week, coachId, coachName, oppSchoolId, oppSchool, us, them, mySchool]
+ const rowObj=r=>({gameId:r[0],season:r[1],week:r[2],coachId:r[3],coachName:r[4],oppId:r[5],opp:r[6],us:r[7],them:r[8],mine:r[9],won:r[7]>r[8]});
+ function state(){const u=universe();const s=u.coachRivals??={v:0,rows:[]};if(!Array.isArray(s.rows))s.rows=[];return s}
+ function allCoaches(){const u=universe(),out=[];for(const t of u.teams||[])for(const c of Object.values(t.staff||{}))if(c)out.push(c);for(const c of u.coachArchive||[])if(c)out.push(c);return out}
+ // Who was head coach at a school in a season, from the career stints every coach keeps.
+ function headCoachAt(schoolId,season){
+  let best=null;
+  for(const c of allCoaches())for(const st of c.careerHistory||[]){
+   if(st.role!=='Head Coach'||String(st.schoolId)!==String(schoolId))continue;
+   const end=st.endSeason==null?Infinity:st.endSeason;
+   if(season>=st.startSeason&&season<=end&&(!best||st.startSeason>best.start))best={id:c.id,name:c.name,start:st.startSeason};
+  }
+  return best;
+ }
+ // The coach's head coaching posts by school name and season range.
+ function posts(){
+  const u=universe(),out=(u.careerHistory||[]).map(p=>({school:p.school,from:p.startYear,to:p.endYear}));
+  if(u.tenure&&!u.tenure.closed)out.push({school:u.tenure.school,from:u.tenure.startYear,to:Infinity});
+  // A first season can begin before the tenure record exists: the current program is the only post so far.
+  else if(!u.tenure){const me=env.selected?.();if(me)out.push({school:me.name,from:-Infinity,to:Infinity})}
+  return out;
+ }
+ function mySideOf(g,list=posts()){
+  for(const side of ['home','away']){const name=g?.[side]?.name;if(name&&list.some(p=>p.school===name&&g.season>=p.from&&g.season<=p.to))return side}
+  return null;
+ }
+ function upsert(row){const s=state(),i=s.rows.findIndex(r=>r[0]===row[0]);if(i>=0)s.rows[i]=row;else s.rows.push(row);cache=null}
+ // A finished game: who coached the other side, and the score from your side.
+ function record(game,me,opp,coach){
+  if(!game?.id||!game.score||!me||!opp)return null;
+  const side=game.home?.id===me.id?'home':game.away?.id===me.id?'away':null;if(!side)return null;
+  const other=side==='home'?'away':'home';
+  const c=coach||headCoachAt(opp.id,game.season);if(!c?.id)return null;
+  const row=[game.id,game.season,game.week,c.id,c.name,opp.id,opp.name,Number(game.score[side])||0,Number(game.score[other])||0,me.name];
+  upsert(row);return rowObj(row);
+ }
+ // Older saves: rebuild from whatever part of the game archive is loaded, once.
+ function backfill(){
+  const s=state();if(s.v>=VERSION)return false;
+  const u=universe(),list=posts(),teams=new Map((u.teams||[]).map(t=>[String(t.id),t]));
+  for(const g of u.gameArchive||[]){
+   if(!g?.final||!g.score)continue;const side=mySideOf(g,list);if(!side)continue;
+   const other=side==='home'?'away':'home',oppId=g[other]?.id,c=headCoachAt(oppId,g.season);if(!c)continue;
+   if(s.rows.some(r=>r[0]===g.id))continue;
+   s.rows.push([g.id,g.season,g.week,c.id,c.name,oppId,teams.get(String(oppId))?.name||g[other].name,Number(g.score[side])||0,Number(g.score[other])||0,g[side].name]);
+  }
+  s.v=VERSION;cache=null;return true;
+ }
+ let cache=null;
+ function series(){
+  const s=state();if(cache&&cache.n===s.rows.length&&cache.rows===s.rows)return cache.list;
+  const by=new Map();
+  for(const r of s.rows.map(rowObj).sort((a,b)=>a.season-b.season||a.week-b.week)){
+   let x=by.get(r.coachId);if(!x){x={coachId:r.coachId,name:r.coachName,w:0,l:0,t:0,games:[]};by.set(r.coachId,x)}
+   if(r.us>r.them)x.w++;else if(r.us<r.them)x.l++;else x.t++;x.games.push(r);x.name=r.coachName;
+  }
+  const list=[...by.values()].map(x=>{const n=x.w+x.l+x.t;return{...x,meetings:n,pct:n?x.w/n:0,last:x.games.at(-1),streak:streakOf(x.games)}});
+  cache={n:s.rows.length,rows:s.rows,list};return list;
+ }
+ function streakOf(games){let k=0,kind=null;for(let i=games.length-1;i>=0;i--){const g=games[i],w=g.us>g.them?'W':g.us<g.them?'L':'T';if(kind&&w!==kind)break;kind=w;k++}return kind?{kind,count:k}:null}
+ const recent=(a,b)=>(b.last?.season||0)-(a.last?.season||0)||(b.last?.week||0)-(a.last?.week||0);
+ function nemesis(){return series().filter(x=>x.meetings>=NEMESIS.meetings&&x.l>=NEMESIS.losses&&x.pct<=NEMESIS.maxPct).sort((a,b)=>b.l-a.l||recent(a,b))[0]||null}
+ function favourite(){const n=nemesis();return series().filter(x=>x!==n&&x.meetings>=FAVOURITE.meetings&&x.w>=FAVOURITE.wins&&(x.l/x.meetings)<=1-FAVOURITE.minPct).sort((a,b)=>b.w-a.w||recent(a,b))[0]||null}
+ function against(coachId){return series().find(x=>x.coachId===coachId)||null}
+ function mostFaced(n=LIST){return series().slice().sort((a,b)=>b.meetings-a.meetings||recent(a,b)).slice(0,n)}
+ function tag(x){if(!x)return null;const n=nemesis(),f=favourite();return n&&n.coachId===x.coachId?'Nemesis':f&&f.coachId===x.coachId?'Favourite opponent':null}
+ return{NEMESIS,FAVOURITE,VERSION,state,headCoachAt,posts,record,backfill,series,nemesis,favourite,against,mostFaced,tag,clearCache:()=>{cache=null}};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeCoachRivals};
+}else{
+ const rivals=makeCoachRivals({getUniverse:()=>universe,selected:()=>selected()});
+ globalThis.DynastyCoachRivals=rivals;
+ const crEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const ready=()=>{if(!universe?.teams)return false;try{rivals.backfill()}catch(err){console.error(err)}return true};
+
+ // Every finished game the coach's program plays is recorded against the other side's head coach at kickoff.
+ const finishGameBeforeRivals=finishGame;
+ finishGame=function finishGameWithRivals(before,home,away){
+  const out=finishGameBeforeRivals.apply(this,arguments);
+  try{
+   const me=selected();
+   if(me&&(home===me||away===me)&&out?.gameId){
+    ready();const opp=home===me?away:home,hc=opp.staff?.HC;
+    const g=(universe.gameArchive||[]).at(-1);
+    if(g?.id===out.gameId)rivals.record(g,me,opp,hc?.id?{id:hc.id,name:hc.name}:null);
+   }
+  }catch(err){console.error(err)}
+  return out;
+ };
+
+ const scoreText=g=>`${g.won?'W':g.us<g.them?'L':'T'} ${g.us}-${g.them}`;
+ const recordText=x=>`${x.w}-${x.l}${x.t?`-${x.t}`:''}`;
+ // This week's opponent's head coach, if you have met him before.
+ function rivalsThisWeek(){
+  const me=selected();if(!me||universe.phase!=='regular')return null;
+  const g=(universe.schedule?.[universe.week]||[]).find(x=>!x.played&&(x.home===me.name||x.away===me.name));if(!g)return null;
+  const opp=universe.teams.find(t=>t.name===(g.home===me.name?g.away:g.home)),hc=opp?.staff?.HC;if(!hc?.id)return null;
+  const x=rivals.against(hc.id);return x?{x,opp,hc,tag:rivals.tag(x)}:null;
+ }
+ function renderRivalsWeekCard(){
+  const host=$('#weeklyDecisions');if(!host?.insertAdjacentElement)return;
+  let card=$('#coachRivalWeek');const info=ready()?rivalsThisWeek():null;
+  if(!info){if(card?.isConnected)card.remove();return}
+  if(!card||!card.isConnected){card=document.createElement('section');card.id='coachRivalWeek';card.className='coach-rival-week';card.setAttribute('role','region');card.setAttribute('aria-label','Head-to-head');host.insertAdjacentElement('beforebegin',card)}
+  const {x,opp,hc,tag}=info,last=x.last,moved=last&&last.oppId!=null&&String(last.oppId)!==String(opp.id);
+  const lead=tag==='Nemesis'?`${crEsc(hc.name)} is your nemesis.`:tag?`${crEsc(hc.name)} is your favourite opponent.`:`You have faced ${crEsc(hc.name)} before.`;
+  card.innerHTML=`<div class="eyebrow">HEAD TO HEAD${tag?` · ${crEsc(tag.toUpperCase())}`:''}</div><p><strong>${lead}</strong> You are ${recordText(x)} against him${x.streak&&x.streak.count>=2?` (${x.streak.count} straight ${x.streak.kind==='W'?'wins':x.streak.kind==='L'?'losses':'ties'})`:''}. Last meeting: ${scoreText(last)} in ${last.season}${moved?`, when he coached ${crEsc(last.opp)}`:''}${last.mine!==selected().name?` and you coached ${crEsc(last.mine)}`:''}.</p>`;
+ }
+ extendRender('dashboard',renderRivalsWeekCard);
+
+ function rivalsCardHTML(){
+  const list=rivals.mostFaced(),n=rivals.nemesis(),f=rivals.favourite();
+  const coachNow=id=>{for(const t of universe.teams)if(t.staff?.HC?.id===id)return t.name;return null};
+  const row=x=>{const now=coachNow(x.coachId),tag=rivals.tag(x);return`<li><span class="stop-who">${crEsc(x.name)} ${tag?`<span class="lr-tag">${crEsc(tag)}</span>`:''}<small>${recordText(x)} in ${x.meetings} meeting${x.meetings===1?'':'s'} · last ${scoreText(x.last)} in ${x.last.season} · ${now?`now head coach at ${crEsc(now)}`:'no longer a head coach'}</small></span></li>`};
+  const head=n?`${crEsc(n.name)} has your number: ${recordText(n)}.`:f?`You own ${crEsc(f.name)}: ${recordText(f)}.`:list.length?'No nemesis yet.':'No opposing head coach faced yet.';
+  return`<div class="section-head"><div><div class="eyebrow">COACHING RIVALS</div><h3>${head}</h3><div class="muted">Your record against each head coach you have faced, at every school either of you has coached. A nemesis takes three meetings and three losses with no more than a third won; a favourite opponent takes three wins and no more than a quarter lost.</div></div></div>${list.length?`<ul class="stop-rows">${list.map(row).join('')}</ul>`:'<p class="small muted">Head coaches you face appear here after your first game.</p>'}`;
+ }
+ function renderRivalsCard(){
+  if(!ready())return;
+  let host=$('#coachRivals');
+  if((!host||!host.isConnected)&&typeof document!=='undefined'&&document.getElementById){
+   const anchor=document.getElementById('proPipeline')||document.getElementById('conferenceOutlook')||document.getElementById('facilitiesBoosters');
+   if(anchor?.insertAdjacentElement){host=document.createElement('div');host.id='coachRivals';host.className='card coach-rivals-card';anchor.insertAdjacentElement('afterend',host)}
+  }
+  if(host)host.innerHTML=rivalsCardHTML();
+ }
+ const renderProgramBeforeRivals=TAB_RENDERERS.program;
+ TAB_RENDERERS.program=()=>{renderProgramBeforeRivals();renderRivalsCard()};
+ if(typeof window!=='undefined'&&window.__DL_TEST__){
+  window.__DL_TEST__.coachRivals=()=>({rows:rivals.state().rows.length,nemesis:rivals.nemesis()?.name||null,favourite:rivals.favourite()?.name||null});
+  // Three earlier losses to this week's opposing head coach (test pages only).
+  window.__DL_TEST__.coachRivalsFixture=()=>{
+   ready();const me=selected(),g=(universe.schedule?.[universe.week]||[]).find(x=>x.home===me.name||x.away===me.name);
+   const opp=universe.teams.find(t=>t.name===(g.home===me.name?g.away:g.home)),hc=opp.staff.HC;
+   for(let i=1;i<=3;i++)rivals.record({id:`FIX_${i}`,season:universe.year-i,week:2,home:{id:me.id,name:me.name},away:{id:opp.id,name:opp.name},score:{home:10+i,away:24}},me,opp,{id:hc.id,name:hc.name});
+   render();return hc.name;
+  };
+ }
+}
+
+// v0.34 — Senior Day. The last regular-season home game opens with the seniors: every player in his final season of
+// eligibility, each with one line from his career (starts, his best numbers, honours, how he arrived). There is no
+// decision to make. The roster the coach built gets a goodbye before it leaves for the draft or graduation.
+//
+// Nothing is stored. The card reads the schedule, the roster, career and season statistics and awards, and appears on
+// This Week only in the week before that game.
+function makeSeniorDay(env){
+ 'use strict';
+ const universe=()=>env.getUniverse();
+ const FEATURE=6;
+ const num=v=>Number(v)||0;
+ // The program's last regular-season home game, by week (1-based), or null.
+ function seniorWeek(t){
+  const u=universe();let week=null;
+  (u.schedule||[]).forEach((games,i)=>{if((games||[]).some(g=>g.home===t.name&&!g.neutral))week=i+1});
+  return week;
+ }
+ // A senior is in his last season of eligibility: three seasons used, so this is his fourth.
+ const isSenior=p=>env.eligibilityBase(p)===3&&!p.redshirtActive;
+ function total(p){const out={},c=p.career||{},s=p.stats||{};for(const k of new Set([...Object.keys(c),...Object.keys(s)]))out[k]=num(c[k])+num(s[k]);return out}
+ // His best numbers, in the terms his position is judged by.
+ function bestLine(p,c){
+  const parts=[];
+  if(c.passYds>=500)parts.push(`${c.passYds.toLocaleString('en-US')} passing yards, ${c.passTD} TD`);
+  if(c.rushYds>=300)parts.push(`${c.rushYds.toLocaleString('en-US')} rushing yards, ${c.rushTD} TD`);
+  if(c.recYds>=300)parts.push(`${c.recYds.toLocaleString('en-US')} receiving yards, ${c.recTD} TD`);
+  if(c.sacks>=3)parts.push(`${Math.round(c.sacks*10)/10} sacks`);
+  if(c.intDef>=2)parts.push(`${c.intDef} interceptions`);
+  if(!parts.length&&c.tackles>=40)parts.push(`${c.tackles} tackles`);
+  if(!parts.length&&c.fgAtt>=8)parts.push(`${c.fgMade} of ${c.fgAtt} field goals`);
+  return parts.slice(0,2).join(' · ');
+ }
+ function arrival(p){
+  const t=(p.transferHistory||[]).at(-1);if(t?.fromSchool)return`transferred from ${t.fromSchool}`;
+  if(/walk/i.test(p.origin||''))return'walked on';
+  const stars=p.recruitingMemory?.stars;return stars?`${stars}-star signee`:'';
+ }
+ function line(p){
+  const c=total(p),honours=(p.awards||[]).map(a=>a.name).filter(Boolean);
+  const best=honours.find(n=>/Heisman|Player of the Year|All-American/i.test(n))||honours.at(-1);
+  return{id:p.id,name:p.name,pos:p.pos,label:env.eligibilityLabel(p),starts:num(c.starts),games:num(c.games),best:bestLine(p,c),honour:best||'',honours:honours.length,arrival:arrival(p),captain:!!p.captainYear&&p.captainYear===universe().year};
+ }
+ // Seniors in order of what they gave: starts first, then honours and games.
+ function seniors(t){return(t?.roster||[]).filter(isSenior).map(line).sort((a,b)=>b.starts-a.starts||b.honours-a.honours||b.games-a.games||a.name.localeCompare(b.name))}
+ // What This Week shows: only when the next game is Senior Day.
+ function upcoming(t){
+  const u=universe();if(!t||u.phase!=='regular')return null;
+  const week=seniorWeek(t);if(!week||u.week+1!==week)return null;
+  const g=(u.schedule[week-1]||[]).find(x=>x.home===t.name);if(!g||g.played)return null;
+  return{week,opponent:g.away,seniors:seniors(t)};
+ }
+ return{FEATURE,seniorWeek,isSenior,seniors,line,upcoming};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeSeniorDay};
+}else{
+ const senior=makeSeniorDay({getUniverse:()=>universe,eligibilityBase:p=>eligibilityBase(p),eligibilityLabel:p=>eligibilityLabel(p)});
+ globalThis.DynastySeniorDay=senior;
+ const sdEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function renderSeniorDayCard(){
+  const host=$('#weeklyDecisions');if(!host?.insertAdjacentElement)return;
+  let card=$('#seniorDay');const info=universe?.teams?senior.upcoming(selected()):null;
+  if(!info||!info.seniors.length){if(card?.isConnected)card.remove();return}
+  if(!card||!card.isConnected){card=document.createElement('section');card.id='seniorDay';card.className='senior-day';card.setAttribute('role','region');card.setAttribute('aria-label','Senior Day');host.insertAdjacentElement('beforebegin',card)}
+  // The six who gave most get a line each; everyone else is named in one sentence, so a big class stays short.
+  const shown=info.seniors.slice(0,senior.FEATURE),rest=info.seniors.slice(senior.FEATURE);
+  const detail=s=>[s.starts?`${s.starts} career start${s.starts===1?'':'s'}`:s.games?`${s.games} game${s.games===1?'':'s'}`:'',s.best,s.honour,s.arrival].filter(Boolean).map(sdEsc).join(' · ');
+  const btn=s=>`<button type="button" class="player-button" data-player="${sdEsc(s.id)}">${sdEsc(s.pos)} ${sdEsc(s.name)}</button>`;
+  const row=s=>`<li data-senior="${sdEsc(s.id)}">${btn(s)}${s.captain?' <span class="lr-tag">Captain</span>':''}${detail(s)?`<small>${detail(s)}</small>`:''}</li>`;
+  card.innerHTML=`<div class="eyebrow">SENIOR DAY · WEEK ${info.week} VS ${sdEsc(String(info.opponent).toUpperCase())}</div><h3>${info.seniors.length} senior${info.seniors.length===1?'':'s'} play their last home game</h3><ul class="senior-list">${shown.map(row).join('')}</ul>${rest.length?`<p class="senior-rest small">Also honoured: ${rest.map(s=>`<span data-senior="${sdEsc(s.id)}">${btn(s)}</span>`).join(', ')}.</p>`:''}`;
+  card.querySelectorAll('[data-player]').forEach(b=>b.onclick=()=>showPlayerProfile(b.dataset.player));
+ }
+ extendRender('dashboard',renderSeniorDayCard);
+ // Test pages only: jump This Week to the week before Senior Day and back.
+ if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.seniorDayFixture=(on=true)=>{const t=selected();if(on){window.__sdWeek=universe.week;universe.week=senior.seniorWeek(t)-1}else universe.week=window.__sdWeek;render();return senior.upcoming(t)?.seniors.length||0};
+}
+
+// v0.34 — pro alumni come home to coach. When the coach's program opens a coordinator, strength or recruiting job,
+// a former player of the program who has finished a pro career of three seasons or more may apply. He is listed as a
+// former player with his draft and pro career on his card, he knows the program (higher loyalty, a small discount on
+// his asking salary and a homecoming bump to fit), and his name helps on the recruiting trail in proportion to what he
+// did as a pro. An offensive player applies for offensive jobs, a defensive player for defensive ones; anyone can run
+// strength or recruiting.
+//
+// Only the coach's program gets these candidates, so AI hiring is unchanged. His ratings come from a hash of his id,
+// never the gameplay random stream, so opening a job draws nothing new. A hired alum keeps formerPlayer on his coach
+// record; the candidate entry carries the same few fields.
+function makeProAlumniCoaches(env){
+ 'use strict';
+ const universe=()=>env.getUniverse(),clamp=env.clamp,nfl=()=>env.nfl();
+ const MIN_SEASONS=3,MIN_WAIT=1,MAX_AGE=62,DRAFT_AGE=22,OFF=new Set(['QB','RB','WR','TE','OT','OG','C']),DEF=new Set(['EDGE','DT','LB','CB','S']);
+ const SLOT_FITS={OC:p=>OFF.has(p),DC:p=>DEF.has(p),RC:()=>true,SC:p=>!['K','P'].includes(p)};
+ function hired(){const ids=new Set();const add=c=>{if(c?.formerPlayer?.id!=null)ids.add(String(c.formerPlayer.id))};for(const t of universe().teams||[])for(const c of Object.values(t.staff||{}))add(c);for(const c of universe().coachArchive||[])add(c);return ids}
+ // Former players of this program who could apply for this job now.
+ function eligible(t,slot){
+  const fits=SLOT_FITS[slot];if(!t||!fits)return[];
+  const u=universe(),N=nfl(),taken=hired(),out=[];
+  for(const list of Object.values(u.draftHistory||{}))for(const r of list||[]){
+   if(!(r.round||r.status==='UDFA')||!fits(r.pos)||taken.has(String(r.playerId)))continue;
+   if(String(N.schoolIdentity(r).id)!==String(t.id))continue;
+   const c=N.careerAt(r,u.year,true);if(!c?.retired||c.length<MIN_SEASONS||u.year-c.retiredYear<MIN_WAIT)continue;
+   const age=DRAFT_AGE+(u.year-r.year);if(age>MAX_AGE)continue;
+   out.push({r,c,age});
+  }
+  return out.sort((a,b)=>b.c.legacy-a.c.legacy||a.age-b.age||String(a.r.playerId).localeCompare(String(b.r.playerId)));
+ }
+ // A candidate entry in the hiring market's own shape.
+ function candidate(t,slot,pick){
+  const N=nfl(),{r,c,age}=pick,id=r.playerId,u=(...k)=>N.unit(id,'coach',...k);
+  const base=56+num(t.prestige,60)*.16+num(t.resources,60)*.08,rate=(k,bonus=0)=>clamp(Math.round(base+(u(k)-.5)*22+bonus),35,95);
+  const fame=Math.min(8,c.proBowls*1.5+c.allPros+(c.hof?3:0)+c.starts*.3);
+  const side=slot==='OC'||slot==='DC';
+  const out={recruiting:rate('recruiting',3+fame),development:rate('development',side?3:0),evaluation:rate('evaluation',side?2:0),playCall:rate('playCall',side?2:-4),adaptability:rate('adaptability'),
+   loyalty:clamp(Math.round(84+u('loyalty')*12),60,99),ambition:clamp(Math.round(52+u('ambition')*30),25,95)};
+  const salaryBase=.35+num(t.resources,60)/35+num(t.prestige,60)/45+(slot==='OC'||slot==='DC'?.9:0);
+  const formerPlayer={id,name:r.playerName,pos:r.pos,school:r.school,draftYear:r.year,round:r.round||null,pick:r.pick||null,proSeasons:c.length,proBowls:c.proBowls,allPros:c.allPros,rings:c.rings,hof:!!c.hof,retiredYear:c.retiredYear};
+  return{candidateId:`CAND_ALUM_${id}_${universe().year}`,source:'alumni',coachId:null,name:r.playerName,age,...out,
+   specialties:env.specialties({...out}),askSalary:Math.round(env.askSalary(salaryBase,out.ambition)*.9*10)/10,askYears:3,wantsAuthority:out.ambition>=70?'full':'shared',
+   fitScore:env.fitScore(t,slot,out)+3,formerPlayer};
+ }
+ const num=(v,d)=>Number.isFinite(Number(v))?Number(v):d;
+ // The best eligible alum for this job, if any.
+ function forOpening(t,slot){const list=eligible(t,slot);return list.length?candidate(t,slot,list[0]):null}
+ function careerText(fp){
+  const draft=fp.round?`${fp.draftYear} draft, round ${fp.round}${fp.pick?`, pick ${fp.pick}`:''}`:`undrafted in ${fp.draftYear}`;
+  const honours=[fp.proBowls?`${fp.proBowls} Pro Bowl${fp.proBowls===1?'':'s'}`:'',fp.allPros?`${fp.allPros}× All-Pro`:'',fp.rings?`${fp.rings} ring${fp.rings===1?'':'s'}`:'',fp.hof?'Pro Hall of Fame':''].filter(Boolean).join(', ');
+  return`${fp.pos} at ${fp.school} · ${draft} · ${fp.proSeasons} pro seasons${honours?` · ${honours}`:''}`;
+ }
+ return{MIN_SEASONS,SLOT_FITS,eligible,candidate,forOpening,careerText};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeProAlumniCoaches};
+}else{
+ const alumniCoaches=makeProAlumniCoaches({getUniverse:()=>universe,clamp,nfl:()=>globalThis.DynastyNfl,specialties:c=>coachSpecialties(c),askSalary:(b,a)=>candidateAskSalary(b,a),fitScore:(t,slot,c)=>candidateFitScore(t,slot,c)});
+ globalThis.DynastyProAlumniCoaches=alumniCoaches;
+ const paEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ // The coach's own openings may draw one former player.
+ const poolBeforeAlumni=generateCandidatePool;
+ generateCandidatePool=function generateCandidatePoolWithAlumni(t,slot){
+  const out=poolBeforeAlumni.apply(this,arguments);
+  try{if(t&&t===selected()&&globalThis.DynastyNfl){const c=alumniCoaches.forOpening(t,slot);if(c)out.push({...c,interviewed:false,status:'AVAILABLE'})}}catch(err){console.error(err)}
+  return out;
+ };
+ // A hired alum keeps who he was.
+ const materializeBeforeAlumni=materializeCandidateCoach;
+ materializeCandidateCoach=function materializeCandidateCoachWithAlumni(t,slot,cand){
+  const c=materializeBeforeAlumni.apply(this,arguments);
+  if(cand?.formerPlayer)c.formerPlayer={...cand.formerPlayer};
+  return c;
+ };
+ const sourceBeforeAlumni=candidateSourceLabel;
+ candidateSourceLabel=function candidateSourceLabelWithAlumni(c){return c?.formerPlayer?'Former player':sourceBeforeAlumni.apply(this,arguments)};
+ const cardBeforeAlumni=candidateCardHTML;
+ candidateCardHTML=function candidateCardHTMLWithAlumni(o,c){
+  const html=cardBeforeAlumni.apply(this,arguments);if(!c?.formerPlayer)return html;
+  const at=html.indexOf('</div>');if(at<0)return html;
+  return html.slice(0,at+6)+`<div class="compact alumni-coach" data-alumni-coach>${paEsc(alumniCoaches.careerText(c.formerPlayer))}. He knows the program: loyal, a small salary discount, and his name helps on the recruiting trail.</div>`+html.slice(at+6);
+ };
+ // Test pages only: a retired pro from this program and an open coordinator job.
+ if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.alumniCoachFixture=()=>{
+  const t=selected(),N=globalThis.DynastyNfl,year=universe.year-14;
+  for(let i=0;i<2000;i++){const r={year,school:t.name,schoolId:t.id,playerId:`ALUMFIX${i}`,playerName:`Alum Fixture ${i}`,pos:'QB',round:1,pick:5,pg:95,pc:101};const c=N.careerAt(r,universe.year,true);
+   if(c?.retired&&c.length>=3&&universe.year-c.retiredYear>=1){universe.draftHistory[year]=[...(universe.draftHistory[year]||[]),r];N.clearCache();break}}
+  const o=createOpening(t,'OC','Test vacancy');return(universe.candidateMarket[o.id]||[]).find(c=>c.source==='alumni')?.name||null;
+ };
+}
+
+// v0.34 — the trophy case. One Program page section with everything the program has won since the dynasty began:
+// national and conference titles, bowl wins, the rivalry trophy (and who has it now), national awards won by its
+// players, Coach of the Year, and alumni in the Pro Football Hall of Fame. Empty shelves stay visible, so the case
+// shows what is still to win.
+//
+// Nothing is stored. Each shelf reads a record the game already keeps: the season archive (national titles), head
+// coaches' season rows (conference titles and Coach of the Year), BOWL_RESULT events, the rivalry series, the awards
+// table and the pro pipeline.
+function makeTrophyCase(env){
+ 'use strict';
+ const universe=()=>env.getUniverse();
+ const same=(a,b)=>a!=null&&b!=null&&String(a)===String(b);
+ const years=list=>[...new Set(list)].sort((a,b)=>b-a);
+ function headCoachSeasons(t){
+  const u=universe(),rows=[],seen=new Set();
+  const coaches=[...(u.teams||[]).flatMap(x=>Object.values(x.staff||{})),...(u.coachArchive||[])];
+  for(const c of coaches)for(const s of c?.seasons||[]){if(s.role!=='Head Coach'||!same(s.schoolId,t.id))continue;const k=`${c.id}|${s.year}`;if(seen.has(k))continue;seen.add(k);rows.push({...s,coach:c.name})}
+  return rows;
+ }
+ function national(t){return years((universe().history||[]).filter(h=>h.type==='season'&&(same(h.championId,t.id)||(h.championId==null&&h.champion===t.name))).map(h=>h.year))}
+ function conference(t,hc){
+  const ys=years(hc.filter(s=>s.conferenceTitle).map(s=>s.year));
+  // Seasons before coaches kept season rows still count in the program's all-time record.
+  const total=Math.max(ys.length,Number(t.allTimeRecord?.confTitles)||0);
+  return{years:ys,total};
+ }
+ function bowls(t){return(universe().events||[]).filter(e=>e?.type==='BOWL_RESULT'&&same(e.metadata?.winnerId,t.id)).map(e=>({year:e.season,label:e.metadata?.label||'Bowl'})).sort((a,b)=>b.year-a.year)}
+ function awards(t){
+  const out=[];
+  for(const [y,list] of Object.entries(universe().awards||{}))for(const a of list||[])if(a&&a.team===t.name&&a.playerName)out.push({year:Number(y),name:a.name,player:a.playerName,pos:a.pos,playerId:a.playerId});
+  return out.sort((a,b)=>b.year-a.year||a.name.localeCompare(b.name));
+ }
+ function rivalry(t){
+  const r=t.rivalry;if(!r?.rivalId&&r?.rivalId!==0)return null;
+  const rival=(universe().teams||[]).find(x=>same(x.id,r.rivalId)),s=r.series||{};
+  return{trophy:r.trophy||'Rivalry trophy',rival:rival?.name||'Rival',held:same(s.holderId,t.id),played:(s.w||0)+(s.l||0)>0,w:s.w||0,l:s.l||0,lastYear:s.lastYear||null};
+ }
+ function proHall(t){
+  const N=env.nfl?.();if(!N)return[];
+  return(N.school(t.name).top||[]).map(x=>x.c).filter(c=>c?.hof).map(c=>({name:c.name,pos:c.pos,draftYear:c.draftYear}));
+ }
+ function read(t){
+  if(!t)return null;
+  const hc=headCoachSeasons(t);
+  return{national:national(t),conference:conference(t,hc),bowls:bowls(t),awards:awards(t),coachOfYear:years(hc.filter(s=>s.coachOfYear).map(s=>s.year)),rivalry:rivalry(t),proHall:proHall(t)};
+ }
+ return{read};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeTrophyCase};
+}else{
+ const trophies=makeTrophyCase({getUniverse:()=>universe,nfl:()=>globalThis.DynastyNfl});
+ globalThis.DynastyTrophyCase=trophies;
+ const tcEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const yearList=ys=>ys.length?ys.map(tcEsc).join(', '):'';
+ function trophyCaseHTML(t){
+  const c=trophies.read(t),r=c.rivalry;
+  const shelf=(label,count,detail,key)=>`<div class="tc-shelf${count?'':' is-empty'}" data-tc="${key}"><span class="small muted">${tcEsc(label)}</span><strong>${count}</strong><small>${detail||'Still to win'}</small></div>`;
+  const awardRows=c.awards.slice(0,10).map(a=>`<li><span class="stop-who">${a.playerId?`<button type="button" class="player-button" data-player="${tcEsc(a.playerId)}">${tcEsc(a.pos)} ${tcEsc(a.player)}</button>`:`${tcEsc(a.pos)} ${tcEsc(a.player)}`}<small>${tcEsc(a.year)} ${tcEsc(a.name)}</small></span></li>`).join('');
+  const bowlText=c.bowls.slice(0,6).map(b=>`${b.year} ${b.label}`).join(', ')+(c.bowls.length>6?`, and ${c.bowls.length-6} more`:'');
+  const rivalText=r?(r.held?`On campus. ${r.w}-${r.l} in the series.`:r.played?`Held by ${r.rival}. ${r.w}-${r.l} in the series.`:`Not yet played for against ${r.rival}.`):'';
+  const total=c.national.length+c.conference.total+c.bowls.length+c.awards.length+c.coachOfYear.length+c.proHall.length+(r?.held?1:0);
+  return`<div class="section-head has-art">${globalThis.DynastyArt?.img('championship-ring','dl-art dl-art-head')||''}<div><div class="eyebrow">TROPHY CASE</div><h3>${total?`${total} piece${total===1?'':'s'} of hardware`:'An empty case, for now'}</h3><div class="muted">Everything ${tcEsc(t.name)} has won since the dynasty began.</div></div></div>
+  <div class="tc-shelves">
+   ${shelf('National titles',c.national.length,yearList(c.national),'national')}
+   ${shelf('Conference titles',c.conference.total,yearList(c.conference.years)||(c.conference.total?'Before coaches\' records were kept':''),'conference')}
+   ${shelf('Bowl wins',c.bowls.length,bowlText,'bowls')}
+   ${r?`<div class="tc-shelf${r.held?'':' is-empty'}" data-tc="rivalry"><span class="small muted">${tcEsc(r.trophy)}</span><strong>${r.held?'Home':r.played?'Away':'—'}</strong><small>${tcEsc(rivalText)}</small></div>`:''}
+   ${shelf('Coach of the Year',c.coachOfYear.length,yearList(c.coachOfYear),'coy')}
+   ${shelf('Pro Hall of Fame',c.proHall.length,c.proHall.map(h=>`${h.pos} ${h.name}`).map(tcEsc).join(', '),'prohall')}
+  </div>
+  <h4>National awards</h4>${awardRows?`<ul class="stop-rows">${awardRows}</ul>${c.awards.length>10?`<p class="small muted">And ${c.awards.length-10} more.</p>`:''}`:'<p class="small muted">No national award winners yet.</p>'}`;
+ }
+ function renderTrophyCase(){
+  if(!universe?.teams)return;const t=selected();if(!t)return;
+  let host=$('#trophyCase');
+  if((!host||!host.isConnected)&&typeof document!=='undefined'&&document.getElementById){
+   const anchor=document.getElementById('coachRivals')||document.getElementById('proPipeline')||document.getElementById('conferenceOutlook');
+   if(anchor?.insertAdjacentElement){host=document.createElement('div');host.id='trophyCase';host.className='card trophy-case-card';anchor.insertAdjacentElement('afterend',host)}
+  }
+  if(!host)return;host.innerHTML=trophyCaseHTML(t);
+  host.querySelectorAll('[data-player]').forEach(b=>b.onclick=()=>showPlayerProfile(b.dataset.player));
+ }
+ const renderProgramBeforeTrophies=TAB_RENDERERS.program;
+ TAB_RENDERERS.program=()=>{renderProgramBeforeTrophies();renderTrophyCase()};
+}
+
+// v0.34 — "You saw him first." When a player the coach signed without much fanfare (three stars or fewer, or a
+// staff grade of 73 or lower at signing) goes in the first three rounds of the draft or wins a national award, the
+// game says so and quotes the scouting receipt frozen when he signed: his stars, his national rank, and what the staff
+// thought of him then. The news goes in The Wire for that week and in the event ledger, so it stays in history.
+//
+// Nothing new is stored on players. One SCOUTING_VINDICATED event per player per kind (draft, award), at most three a
+// draft and two an awards night.
+function makeSawHimFirst(env){
+ 'use strict';
+ const universe=()=>env.getUniverse();
+ const MAX_STARS=3,MAX_VERDICT=73,MAX_ROUND=3,PER_DRAFT=3,PER_AWARDS=2;
+ const WORDS=['zero','one','two','three','four','five'];
+ function receiptOf(p){return p?.recruitingMemory?.scoutingReceipt||null}
+ // A modest signing: few stars, or the staff did not think much of him.
+ function overlooked(rec){if(!rec)return false;const stars=Number(rec.stars);return(Number.isFinite(stars)&&stars<=MAX_STARS)||Number(rec.verdictScore)<=MAX_VERDICT}
+ function signingText(rec){
+  const stars=Number(rec.stars),rank=Number(rec.nationalRank);
+  const who=Number.isFinite(stars)?`a ${WORDS[stars]||stars}-star prospect`:'a prospect';
+  const label=String(rec.verdictLabel||'').toLowerCase();
+  return`signed in ${rec.season} as ${who}${Number.isFinite(rank)&&rank>0?`, No. ${rank} nationally`:''}, graded ${rec.currentRead}${label?` (${label})`:''} by your staff`;
+ }
+ function already(kind,playerId){return(universe().events||[]).some(e=>e?.type==='SCOUTING_VINDICATED'&&e.metadata?.kind===kind&&(e.playerIds||[]).includes(playerId))}
+ function push(kind,p,t,rec,text,importance){
+  const u=universe();u.events??=[];
+  const e={id:`EVT_SAW_${kind}_${u.year}_${p.id}`,type:'SCOUTING_VINDICATED',season:u.year,week:u.week,schoolIds:[t.id],playerIds:[p.id],coachIds:[],gameIds:[],importance,summary:text,metadata:{kind,stars:rec.stars??null,verdictScore:rec.verdictScore??null,signed:rec.season}};
+  u.events.push(e);return e;
+ }
+ // Draft night: the coach's overlooked signees taken in the first three rounds.
+ function afterDraft(records,t,findPlayer){
+  if(!t)return[];const out=[];
+  for(const r of(records||[]).filter(r=>String(r.schoolId)===String(t.id)&&r.round&&r.round<=MAX_ROUND).sort((a,b)=>a.round-b.round||a.pick-b.pick)){
+   if(out.length>=PER_DRAFT)break;
+   const p=findPlayer(r.playerId),rec=receiptOf(p);if(!overlooked(rec)||already('draft',r.playerId)||String(rec.schoolId)!==String(t.id))continue;
+   out.push(push('draft',p,t,rec,`You saw him first: ${r.pos} ${r.playerName} ${signingText(rec)}. He went in round ${r.round} of the draft.`,r.round===1?72:66));
+  }
+  return out;
+ }
+ // Awards night: the coach's overlooked signees who won a national award.
+ function afterAwards(awards,t,findPlayer){
+  if(!t)return[];const out=[];
+  for(const a of(awards||[]).filter(a=>a?.team===t.name&&a.playerId)){
+   if(out.length>=PER_AWARDS)break;
+   const p=findPlayer(a.playerId),rec=receiptOf(p);if(!overlooked(rec)||already('award',a.playerId)||String(rec.schoolId)!==String(t.id))continue;
+   out.push(push('award',p,t,rec,`You saw him first: ${a.pos} ${a.playerName} ${signingText(rec)}. He is the ${a.name}.`,70));
+  }
+  return out;
+ }
+ return{overlooked,signingText,afterDraft,afterAwards};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeSawHimFirst};
+}else{
+ const sawHimFirst=makeSawHimFirst({getUniverse:()=>universe});
+ globalThis.DynastySawHimFirst=sawHimFirst;
+ const playerById=id=>{const f=findPlayer(id);return f?.p||null};
+ const runDraftBeforeSaw=runDraft;
+ runDraft=function runDraftWithReceipts(){
+  const out=runDraftBeforeSaw.apply(this,arguments);
+  try{sawHimFirst.afterDraft(out,selected(),playerById)}catch(err){console.error(err)}
+  return out;
+ };
+ const honorsBeforeSaw=finalizeSeasonHonors;
+ finalizeSeasonHonors=function finalizeSeasonHonorsWithReceipts(){
+  const had=!!universe.awards?.[universe.year],out=honorsBeforeSaw.apply(this,arguments);
+  try{if(!had)sawHimFirst.afterAwards(out,selected(),playerById)}catch(err){console.error(err)}
+  return out;
+ };
+}
+
+// v0.34 — a season card to share. The Season in Review gets a "Save season card" button that draws one image of the
+// year (1200×630, the size social sites preview) in the program's colours: the outcome, record, final ranking, the
+// defining moment, team leaders and awards. It is saved to the device as a PNG; nothing is uploaded and nothing is
+// stored in the dynasty.
+function makeSeasonCard(){
+ 'use strict';
+ const W=1200,H=630;
+ // What the card says, as plain lines, from the Season in Review model. Pure, so it can be checked without a canvas.
+ function lines(m,t){
+  if(!m)return null;
+  const best=(m.moments||[]).find(x=>x.kind==='best')||(m.moments||[]).find(x=>x.kind==='rivalry')||null;
+  const leaders=(m.leaders||[]).slice(0,3).map(x=>`${x.label}: ${x.pos} ${x.name}, ${x.line}`);
+  const awards=(m.awards||[]).slice(0,3).map(a=>`${a.name}: ${a.playerName}`);
+  const wins=(m.games||[]).filter(g=>g.win).length,losses=(m.games||[]).length-wins;
+  return{kicker:`${m.year} SEASON`,team:String(m.team||t?.name||''),headline:String(m.outcome||''),record:String(m.record||''),conference:String(m.conference||''),rank:`Final ranking ${m.rank}`,
+   moment:best?`${best.title}: ${best.text}`:'',leaders,awards,strip:(m.games||[]).map(g=>g.win?'W':'L'),wins,losses,champion:!!m.champion,
+   colors:{primary:t?.primary||'#1f3a5f',secondary:t?.secondary||'#d9a441'},file:`dynasty-lab-${String(m.team||'season').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}-${m.year}.png`};
+ }
+ function fit(ctx,text,max,size,weight='700',family='Inter, Arial, sans-serif'){
+  let s=size;do{ctx.font=`${weight} ${s}px ${family}`;if(ctx.measureText(text).width<=max)break;s-=2}while(s>14);
+  if(ctx.measureText(text).width>max){let cut=text;while(cut.length>4&&ctx.measureText(cut+'…').width>max)cut=cut.slice(0,-1);return cut+'…'}
+  return text;
+ }
+ function draw(canvas,c){
+  canvas.width=W;canvas.height=H;const ctx=canvas.getContext('2d');if(!ctx)return false;
+  const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,c.colors.primary);g.addColorStop(1,'#0b0f17');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle=c.colors.secondary;ctx.fillRect(0,0,W,10);ctx.fillRect(0,H-10,W,10);
+  ctx.textBaseline='top';ctx.fillStyle=c.colors.secondary;ctx.font='700 26px Inter, Arial, sans-serif';ctx.fillText(c.kicker+(c.champion?' · NATIONAL CHAMPIONS':''),60,48);
+  ctx.fillStyle='#ffffff';ctx.fillText(fit(ctx,c.team.toUpperCase(),1080,64,'800'),60,86);
+  ctx.fillStyle='#ffffff';const headline=fit(ctx,c.headline,1080,44,'700');ctx.fillText(headline,60,166);
+  ctx.fillStyle='rgba(255,255,255,.82)';ctx.font='500 28px Inter, Arial, sans-serif';ctx.fillText(fit(ctx,`${c.record} · ${c.conference} · ${c.rank}`,1080,28,'500'),60,224);
+  // The season, game by game.
+  const box=Math.min(56,Math.floor(1080/Math.max(1,c.strip.length))-6);
+  c.strip.forEach((r,i)=>{const x=60+i*(box+6),y=280;ctx.fillStyle=r==='W'?'#5fae7a':'#d0605a';ctx.fillRect(x,y,box,box);ctx.fillStyle='#0b0f17';ctx.font=`800 ${Math.round(box*.5)}px Inter, Arial, sans-serif`;const tw=ctx.measureText(r).width;ctx.fillText(r,x+(box-tw)/2,y+box*.22)});
+  let y=370;
+  if(c.moment){ctx.fillStyle=c.colors.secondary;ctx.fillText(fit(ctx,c.moment,1080,30,'700'),60,y);y+=48}
+  ctx.fillStyle='rgba(255,255,255,.9)';
+  for(const line of [...c.leaders,...c.awards].slice(0,4)){ctx.fillText(fit(ctx,line,1080,24,'500'),60,y);y+=36}
+  ctx.fillStyle='rgba(255,255,255,.55)';ctx.font='600 20px Inter, Arial, sans-serif';const mark='DYNASTY LAB';ctx.fillText(mark,W-60-ctx.measureText(mark).width,H-46);
+  return true;
+ }
+ return{W,H,lines,draw};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeSeasonCard};
+}else{
+ const seasonCard=makeSeasonCard();
+ globalThis.DynastySeasonCard=seasonCard;
+ function saveSeasonCard(){
+  const t=selected(),c=seasonCard.lines(globalThis.DynastySeasonReview?.model?.(),t);if(!c)return;
+  const canvas=document.createElement('canvas');if(!seasonCard.draw(canvas,c)){setStatus('This browser cannot draw the season card.');return}
+  canvas.toBlob(blob=>{
+   if(!blob){setStatus('The season card could not be saved.');return}
+   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=c.file;document.body.append(a);a.click();a.remove();
+   setTimeout(()=>URL.revokeObjectURL(a.href),1000);setStatus(`Season card saved as ${c.file}.`);
+  },'image/png');
+ }
+ function addSeasonCardButton(){
+  const host=$('#seasonReview');if(!host||host.hidden||host.querySelector('[data-season-card]'))return;
+  const head=host.querySelector('.section-head');if(!head)return;
+  const b=document.createElement('button');b.type='button';b.className='dw-button season-card-button';b.dataset.seasonCard='1';b.textContent='Save season card';
+  b.setAttribute('aria-label','Save an image of this season to your device');b.onclick=saveSeasonCard;head.append(b);
+ }
+ extendRender('dashboard',addSeasonCardButton);
+}
+
+// v0.34 — trap games and statement wins. Ordinary weeks get stakes without a new decision.
+//
+//   Trap game       This Week warns when a ranked team (yours) hosts or visits an unranked opponent with a .500 record
+//                   or better, either right before a big game (a top-15 opponent or your rival next week) or right
+//                   after a win over a top-10 team.
+//   Statement win   when you beat a top-10 team at kickoff while unranked or ranked at least ten places lower, the
+//                   win goes in The Wire and the event ledger as a STATEMENT_WIN.
+//
+// Rankings come from the game records (rank at kickoff) and the current poll. Nothing else is stored.
+function makeWeekStakes(env){
+ 'use strict';
+ const universe=()=>env.getUniverse();
+ const RANKED=25,BIG_NEXT=15,TOP=10,GAP=10;
+ const isRanked=r=>Number.isFinite(r)&&r>=1&&r<=RANKED;
+ function gameOf(t,week){return(universe().schedule?.[week]||[]).find(g=>g.home===t.name||g.away===t.name)||null}
+ const opponentName=(g,t)=>g.home===t.name?g.away:g.home;
+ const team=n=>(universe().teams||[]).find(x=>x.name===n)||null;
+ // This week's game, if it has the look of a trap.
+ function trap(t){
+  const u=universe();if(!t||u.phase!=='regular'||!isRanked(t.rank))return null;
+  const g=gameOf(t,u.week);if(!g||g.played)return null;
+  const opp=team(opponentName(g,t));if(!opp||isRanked(opp.rank)||(opp.w||0)<(opp.l||0))return null;
+  const next=gameOf(t,u.week+1),nextOpp=next?team(opponentName(next,t)):null,rivalId=t.rivalry?.rivalId;
+  const lookahead=nextOpp&&(isRanked(nextOpp.rank)&&nextOpp.rank<=BIG_NEXT||(rivalId!=null&&String(nextOpp.id)===String(rivalId)))?nextOpp:null;
+  const last=gameOf(t,u.week-1),lastOpp=last?.played?team(opponentName(last,t)):null;
+  const lastRank=last?.played&&last.winner===t.name?rankAtKickoff(last,lastOpp):null;
+  const letdown=Number.isFinite(lastRank)&&lastRank<=TOP?{opp:lastOpp,rank:lastRank}:null;
+  if(!lookahead&&!letdown)return null;
+  return{opp,home:g.home===t.name,lookahead:lookahead?{name:lookahead.name,rank:isRanked(lookahead.rank)?lookahead.rank:null,rival:String(lookahead.id)===String(rivalId)}:null,letdown:letdown?{name:letdown.opp?.name,rank:letdown.rank}:null};
+ }
+ // An opponent's ranking when the game kicked off, from the archived game record when there is one.
+ function rankAtKickoff(g,opp){
+  const rec=(universe().gameArchive||[]).find(x=>x.id===g.gameId);
+  const side=rec?(rec.home?.id===opp?.id?rec.home:rec.away?.id===opp?.id?rec.away:null):null;
+  return Number.isFinite(side?.rank)?side.rank:opp?.rank;
+ }
+ // A finished game record: was it a statement win for this program?
+ function statement(rec,t){
+  if(!rec?.score||!t)return null;
+  const side=rec.home?.id===t.id?'home':rec.away?.id===t.id?'away':null;if(!side)return null;
+  const other=side==='home'?'away':'home',us=Number(rec.score[side]),them=Number(rec.score[other]);if(!(us>them))return null;
+  const oppRank=rec[other]?.rank,myRank=rec[side]?.rank;
+  if(!Number.isFinite(oppRank)||oppRank>TOP)return null;
+  if(isRanked(myRank)&&myRank-oppRank<GAP)return null;
+  return{oppName:rec[other].name,oppRank,myRank:isRanked(myRank)?myRank:null,us,them,label:rec.label};
+ }
+ function recordStatement(rec,t){
+  const s=statement(rec,t);if(!s)return null;
+  const u=universe(),id=`EVT_STATEMENT_${rec.id}`;if((u.events||[]).some(e=>e.id===id))return null;
+  const who=s.myRank?`#${s.myRank} ${t.name}`:`Unranked ${t.name}`;
+  // A regular-season game finishes before the week counter moves on; The Wire reads the week it is shown in.
+  const e={id,type:'STATEMENT_WIN',season:rec.season??u.year,week:u.phase==='regular'?u.week+1:u.week,schoolIds:[t.id],playerIds:[],coachIds:[],gameIds:[rec.id],importance:68,
+   summary:`Statement win: ${who} beat #${s.oppRank} ${s.oppName} ${s.us}–${s.them}.`,metadata:{oppRank:s.oppRank,myRank:s.myRank}};
+  (u.events??=[]).push(e);return e;
+ }
+ return{trap,statement,recordStatement};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeWeekStakes};
+}else{
+ const stakes=makeWeekStakes({getUniverse:()=>universe});
+ globalThis.DynastyWeekStakes=stakes;
+ const wsEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ // Your finished games are checked for a statement win as they are recorded.
+ const finishGameBeforeStakes=finishGame;
+ finishGame=function finishGameWithStakes(before,home,away){
+  const out=finishGameBeforeStakes.apply(this,arguments);
+  try{const me=selected();if(me&&(home===me||away===me)){const rec=(universe.gameArchive||[]).at(-1);if(rec?.id===out?.gameId)stakes.recordStatement(rec,me)}}catch(err){console.error(err)}
+  return out;
+ };
+ function renderTrapCard(){
+  const host=$('#weeklyDecisions');if(!host?.insertAdjacentElement)return;
+  let card=$('#trapGame');const t=universe?.teams?selected():null,info=t?stakes.trap(t):null;
+  if(!info){if(card?.isConnected)card.remove();return}
+  if(!card||!card.isConnected){card=document.createElement('section');card.id='trapGame';card.className='trap-game';card.setAttribute('role','region');card.setAttribute('aria-label','Trap game');host.insertAdjacentElement('beforebegin',card)}
+  const o=info.opp,why=[info.letdown?`coming off the win over #${info.letdown.rank} ${wsEsc(info.letdown.name)}`:'',info.lookahead?`with ${info.lookahead.rival?`your rival ${wsEsc(info.lookahead.name)}`:`#${info.lookahead.rank} ${wsEsc(info.lookahead.name)}`} next week`:''].filter(Boolean).join(' and ');
+  card.innerHTML=`<div class="eyebrow">TRAP GAME</div><p><strong>${info.home?'Unranked':'At unranked'} ${wsEsc(o.name)} (${o.w||0}-${o.l||0})</strong>, ${why}. Ranked teams drop more of these than anyone admits.</p>`;
+ }
+ extendRender('dashboard',renderTrapCard);
+ // Test pages only: rank this program, make this week's opponent an unranked .500 team and next week's a top-5 one.
+ if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.trapGameFixture=()=>{
+  const t=selected(),w=universe.week,g=universe.schedule[w].find(x=>x.home===t.name||x.away===t.name),n=universe.schedule[w+1].find(x=>x.home===t.name||x.away===t.name);
+  const opp=universe.teams.find(x=>x.name===(g.home===t.name?g.away:g.home)),next=universe.teams.find(x=>x.name===(n.home===t.name?n.away:n.home));
+  // render() recomputes the poll, so this paints only the card from the fixture rankings.
+  t.rank=8;opp.rank=50;opp.w=2;opp.l=1;next.rank=4;renderTrapCard();return opp.name;
+ };
+}
 
 loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});[...new Set(schools.map(t=>t.conference))].forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();bindNewDynastySetup();applyTitlePreferences();showTitleScreen();refreshTitleSave().then(restoreNewDynastySetupDraft);}).catch(e=>{$('#titleStatus').textContent='Could not initialize Dynasty Lab. '+e.message});
 })();
@@ -21908,7 +22608,36 @@ function mount(){
  const start=()=>{for(const sel of ['#recordBig','#weekLine','#teamName','#saveStatus'])document.querySelectorAll(sel).forEach(el=>new MutationObserver(schedule).observe(el,{childList:true,subtree:true,characterData:true}));const tab=document.querySelector('#legacy');if(tab)new MutationObserver(schedule).observe(tab,{attributes:true,attributeFilter:['class']});schedule()};
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 }
-return{ACHIEVEMENTS,CHALLENGES,emptyStore,merge,accept,pageHTML,mount,KEY};
+// ---------- Backups (v0.34) ----------
+// Legacy lives on this device, so a save export carries a copy and an import merges it back: nothing is lost moving
+// between browsers or between the web and desktop builds, and importing never erases what this device already has.
+const CHALLENGE_RANK={complete:3,active:2,failed:1};
+function valid(s){return!!s&&typeof s==='object'&&s.version===VERSION&&s.achievements&&typeof s.achievements==='object'}
+// An older store still holding v1 title evidence is set aside the same way merge() does, before it is combined.
+function normalize(store){const s=JSON.parse(JSON.stringify({...emptyStore(),...store,titleFactsVersion:store?.titleFactsVersion||0}));if(s.titleFactsVersion!==2){const r=merge(s,null).store;r.unverifiedTitles={records:{},achievements:{},challenges:{}};for(const k of ['titles','confTitles']){if(r.records[k])r.unverifiedTitles.records[k]=r.records[k];delete r.records[k]}for(const k of ['national_champ','dynasty']){if(r.achievements[k])r.unverifiedTitles.achievements[k]=r.achievements[k];delete r.achievements[k]}if(r.challenges.win_now?.status==='complete'){r.unverifiedTitles.challenges.win_now=r.challenges.win_now;delete r.challenges.win_now}r.titleFactsVersion=2;return r}return s}
+// Pure: the union of two stores. The earlier unlock of an achievement, the better value of each record, every Hall of
+// Fame entry with every honour, and for a challenge the furthest it got (complete, then active, then failed).
+function combine(a,b){
+ const x=normalize(valid(a)?a:emptyStore()),y=normalize(valid(b)?b:emptyStore()),out=x;
+ for(const [id,v] of Object.entries(y.achievements||{})){const cur=out.achievements[id];if(!cur||(Number(v?.year)||Infinity)<(Number(cur.year)||Infinity))out.achievements[id]=v}
+ for(const [k,v] of Object.entries(y.records||{})){const cur=out.records[k];if(!cur||(Number(v?.value)||0)>(Number(cur.value)||0))out.records[k]=v}
+ const hof=new Map((out.hallOfFame||[]).map(h=>[`${h.program}|${h.playerId}`,{...h,honors:[...(h.honors||[])]}]));
+ for(const h of y.hallOfFame||[]){const k=`${h.program}|${h.playerId}`,cur=hof.get(k);if(!cur)hof.set(k,{...h,honors:[...(h.honors||[])]});else for(const n of h.honors||[])if(!cur.honors.includes(n))cur.honors.push(n)}
+ out.hallOfFame=[...hof.values()].sort((p,q)=>q.honors.length-p.honors.length||String(p.name).localeCompare(String(q.name))).slice(0,60);
+ for(const [id,c] of Object.entries(y.challenges||{})){const cur=out.challenges[id];if(!cur||(CHALLENGE_RANK[c?.status]||0)>(CHALLENGE_RANK[cur.status]||0))out.challenges[id]=c}
+ for(const [k,m] of Object.entries(y.memory||{}))out.memory[k]={...(m||{}),...(out.memory[k]||{}),lowConfidence:!!(m?.lowConfidence||out.memory[k]?.lowConfidence)};
+ if(y.unverifiedTitles&&!out.unverifiedTitles)out.unverifiedTitles=y.unverifiedTitles;
+ return out;
+}
+function exportStore(){return store||load()}
+// Merge a backup's Legacy into this device. Returns how many achievements it added.
+function importStore(incoming){
+ if(!valid(incoming))return{ok:false,added:0};
+ const before=store||load(),next=combine(before,incoming),added=Object.keys(next.achievements).length-Object.keys(before.achievements).length;
+ store=next;save(store);lastSig='';if(typeof document!=='undefined')schedule();
+ return{ok:true,added};
+}
+return{ACHIEVEMENTS,CHALLENGES,emptyStore,merge,accept,pageHTML,mount,KEY,combine,exportStore,importStore};
 });
 
 // Season moments: last-game highlights, Rivalry Week and the season yearbook.

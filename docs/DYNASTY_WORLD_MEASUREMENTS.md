@@ -110,3 +110,34 @@ Draft classes from `FULL=1 SEASONS=5 node tools/league-health.js` at seeds 7, 11
 | v0.33.1: 5 AP, or 9 PB + 2 AP, or 7 PB + 3 AP + ring | 2.20 | 0–4 |
 
 The wait after retirement is now five seasons (was three). Measurement only; players never see projected careers.
+
+## v0.34 faster recruiting weeks
+
+Profile of one full-runtime regular season (seed 9108): `scholarshipCapacity` was 17% of the season by itself,
+reached through `canTakeCommit` from the recruiting funnel (`runFunnel`) and rival moves in `recruiting-actions.js`.
+Those run after the core weekly pass, outside the per-pass capacity cache added in v0.31.1. Rosters cannot change
+during them (commitments fill classes, not rosters), so the same cache now covers them.
+
+| Seed | Regular season before / after | Universe SHA-256 after season + postseason (first 16 hex) |
+| --- | --- | --- |
+| 9108 | 9.0 s / 6.8 s | `c56cd5e6dbb32dae` both |
+| 4711 | 9.3 s / 6.9 s | `2f02c8eb9cac653b` both |
+
+Identical universes, about 25% less time per season. The next cost is `rankTeams` in the funnel (every program's
+pitch for every open prospect, ~15%); caching it needs invalidation on interest and commitment changes inside a pass.
+
+## v0.34 overnight branch: league check and the Hall of Fame on ten-season runs
+
+`FULL=1 SEED=<seed> SEASONS=10 node tools/league-health.js` on `claude/overnight-v034` (coaching rivals, Senior Day,
+pro alumni coaches, Legacy backups, the draft class note, already loaded; none of them changes simulation):
+
+| Seed | Champions | Playoff programs | Conference champions | Unplaced portal entrants | Early declarations per class | Eventual pro Hall per class |
+| --- | --- | --- | --- | --- | --- | --- |
+| 7 | 7 | 67 | 53 | 6.8% | 12.2 | 2.0 (0–5) |
+| 11 | 8 | 64 | 50 | 8.5% | 13.4 | 4.1 (1–7) |
+
+The first four columns are identical to the v0.33.0 final table above, as expected. The Hall of Fame column uses the
+v0.33.1 rule: against v0.33.0's 3.5 and 6.1 per class on the same seeds, about a third fewer. The 2.2-per-class figure
+in the v0.33.1 section came from five-season runs, whose classes are mostly drafted from the generated starting rosters;
+classes from recruited players produce more stars, so ten-season runs read higher. If 4 a class on some seeds still
+feels generous, the next lever is the Pro Bowl curve (`pbCenter`/`pbMax` in `CAREER`), which drives both paths.

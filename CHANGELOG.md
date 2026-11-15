@@ -1,9 +1,24 @@
 # Changelog
 
+## v0.34.0 — Rivals, goodbyes and hardware
+
+- **Coaching rivals.** The game keeps your record against every opposing head coach, following him by id across schools (and you across yours). A coach you cannot beat (three or more meetings, three or more losses, a third or fewer won) becomes your **nemesis**; one you always beat becomes your **favourite opponent**. This Week says how it has gone before you meet a coach again, and the Program page lists the coaches you have faced most. Older saves are filled in once from the game archive.
+- **Senior Day.** In the week before the last regular-season home game, This Week lists the seniors playing their last home game, with career starts, best numbers, honours and how each one arrived.
+- **Pro alumni come home to coach.** A former player of your program who finished a pro career of three or more seasons may apply for your coordinator, strength or recruiting jobs (on his side of the ball). His card shows his draft and pro career; he is loyal, asks a little less and his name helps recruiting. AI programs' hiring is unchanged.
+- **Trophy case.** A Program page section with every national and conference title, bowl win, the rivalry trophy (and who holds it), national awards, Coach of the Year and pro Hall of Famers. Empty shelves stay visible.
+- **Season card.** The Season in Review has a "Save season card" button: one 1200×630 image of the year in your colours (outcome, record, ranking, the season game by game, the defining win, leaders and awards), saved to the device as a PNG. Nothing is uploaded.
+- **Trap games and statement wins.** This Week warns when your ranked team plays an unranked .500-or-better opponent right before a top-15 opponent or your rival, or right after a top-10 win. Beating a top-10 team while unranked (or ten places lower) goes in The Wire as a statement win.
+- **"You saw him first."** When a player you signed as a three-star or lower (or with a modest staff grade) goes in the first three rounds or wins a national award, The Wire says so and quotes his scouting receipt from signing day.
+- **Thin and deep draft classes are explained.** The draft board on the Records page says how many underclassmen declared early against the classes before it.
+- **Legacy travels with your backups.** Achievements, cross-save records, the Legacy hall of fame and challenges were kept only on the device, so an export or a move between the web and desktop builds lost them. Exports now carry them, and an import merges them in without erasing what the device already has.
+- **Faster weeks.** The recruiting funnel reuses each program's scholarship limit within a week instead of recounting it for every prospect: about 25% less time per season, with identical results for a fixed seed.
+
+Saves carry over. The coaching-rival ledger adds about 1 KB a season; nothing else new is stored.
+
 ## v0.33.1 — Honest NFL outlooks and a harder Hall of Fame
 
 - **The NFL outlook no longer reveals true ratings.** The outlook in a draft-eligible player's career chronology printed his true ability, true NFL traits and true room to grow, on any team's roster, which bypassed scouting. It is now built only from your staff's scouting ranges for current ability and upside (the same ranges the profile shows) and gives a projected round range, a grade range and a ceiling range. Better scouting narrows it. The pro scouts' hidden read stays out. The real draft still uses the true grade.
-- **The Pro Football Hall of Fame takes sustained greatness.** Eight Pro Bowls alone, or six plus two rings, no longer qualifies. Induction now takes five All-Pro seasons, nine Pro Bowls with two All-Pro seasons, or seven Pro Bowls with three All-Pro seasons and a ring, after the real five-year wait (was three). Measured on 15 real draft classes: about 2.2 inductees per class (0–4), down from 3.6 (0–7).
+- **The Pro Football Hall of Fame takes sustained greatness.** Eight Pro Bowls alone, or six plus two rings, no longer qualifies. Induction now takes five All-Pro seasons, nine Pro Bowls with two All-Pro seasons, or seven Pro Bowls with three All-Pro seasons and a ring, after the real five-year wait (was three). Measured on 15 draft classes from five-season runs: about 2.2 inductees per class (0–4), down from 3.6 (0–7). Ten-season runs read higher (2.0 and 4.1 a class on seeds 7 and 11, against 3.5 and 6.1 before); see `docs/DYNASTY_WORLD_MEASUREMENTS.md`.
 - **A marquee home game no longer hides the week's result.** Since v0.32.0 the booster payout message replaced the "Week N final" status line, so the result never showed and the win or loss sound never played. The payout is now added after the result. This also fixes an intermittent failure in `tests/season-features-browser.js`.
 
 Saves carry over. Careers are derived, so existing alumni are re-judged under the new rule; anyone previously shown as a Hall of Famer who no longer qualifies stops being listed.

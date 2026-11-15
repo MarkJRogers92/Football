@@ -36,3 +36,25 @@
 .noncon-week>summary{cursor:pointer}
 .noncon-week>summary .noncon-week-head{display:inline-flex;width:calc(100% - 22px);vertical-align:top}
 .pro-career{margin-top:12px;padding-top:10px;border-top:1px solid var(--line,rgba(255,255,255,.14))}
+/* v0.34: coaching rivals (This Week and Program page). */
+.coach-rival-week{margin:8px 0;padding:9px 12px;border-radius:6px;border:1px solid var(--line,rgba(255,255,255,.14));border-left:4px solid var(--accent,#d9a441)}
+.coach-rival-week p{margin:4px 0 0}
+/* v0.34: Senior Day (This Week). */
+.senior-day{margin:8px 0;padding:10px 12px;border-radius:6px;border:1px solid var(--line,rgba(255,255,255,.14));border-left:4px solid #5fae7a}
+.senior-day h3{margin:2px 0 6px}
+.senior-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:4px 16px}
+.senior-list li{padding:3px 0}
+.senior-list small{display:block;opacity:.75}
+.senior-day .player-button{padding:0;min-height:0}
+.senior-rest{margin:8px 0 0;line-height:1.6}
+.draft-class-note{text-transform:none;letter-spacing:normal;margin:4px 0 8px}
+/* v0.34: trophy case (Program page). */
+.tc-shelves{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0}
+.tc-shelf{padding:10px 12px;border:1px solid var(--accent,#d9a441);border-radius:6px;display:flex;flex-direction:column;gap:2px;background:rgba(217,164,65,.06)}
+.tc-shelf strong{font-size:1.5rem;line-height:1.1}
+.tc-shelf small{opacity:.8;overflow-wrap:anywhere}
+.tc-shelf.is-empty{border-style:dashed;border-color:var(--line,rgba(255,255,255,.2));background:transparent;opacity:.75}
+.trophy-case-card p.small,.coach-rivals-card p.small{text-transform:none;letter-spacing:normal}
+/* v0.34: trap game (This Week). */
+.trap-game{margin:8px 0;padding:9px 12px;border-radius:6px;border:1px solid var(--line,rgba(255,255,255,.14));border-left:4px solid #d0605a}
+.trap-game p{margin:4px 0 0}
