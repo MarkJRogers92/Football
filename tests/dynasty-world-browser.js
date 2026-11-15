@@ -119,6 +119,13 @@ const shots=process.env.DW_SHOTS;
    if(shots)await page.locator('#dynastyPage').screenshot({path:path.join(shots,`dynasty-page-${label}.png`)});
    await open(page,'home','dashboard');
 
+   // --- This Week: last week's national Players of the Week.
+   const potwName=await page.evaluate(()=>window.__DL_TEST__.playersOfWeekFixture());
+   await page.waitForSelector('#playersOfWeek .is-mine',{timeout:15000});
+   const potwText=await page.locator('#playersOfWeek').textContent();
+   assert.ok(/NATIONAL PLAYERS OF THE WEEK/.test(potwText)&&potwText.includes(potwName)&&/412 pass yds/.test(potwText),`[${label}] players of the week: ${potwText}`);
+   assert.ok(await overflow(page)<=1,`[${label}] players of the week fits`);
+
    // --- This Week: a long home streak is named.
    const hs=await page.evaluate(()=>window.__DL_TEST__.homeStreakFixture(12));
    await page.waitForSelector('#homeStreak',{timeout:15000});
