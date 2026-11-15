@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.32.0 — A world that changes, a locker room and your own schedule
+
+- **Conferences realign.** Every fourth offseason the conferences renegotiate their media deals. A conference's media value is the average brand of its members (prestige, fan support, facilities), and membership follows the money: the best brand in a weaker conference trades places with the weakest in the conference above, at most two swaps per window. Distance counts against a move (a point of appeal per 250 miles), every conference keeps twelve members, and rivalries split by a move are recorded and re-paired inside the new conference. Media rank pays every member 0-4 units into the booster fund each offseason.
+- **Your program can be invited, or dropped.** An invitation is announced on This Week with the payout, schedule and rivalry it would change; the Next button stops once for it, and no answer by the preseason keeps you where you are. Being dropped is not a choice, but the new conference card on the Program page shows your media rank, payout, brand standing and whether you are invitation-likely or at risk long before the window opens.
+- **The locker room.** Every player has a personality (Leader, Competitor, Steady, Quiet or Volatile) and a leadership score. Each team names four captains before Week 1; the staff pick two a side and you can change them on the Roster page. Chemistry moves every week with the captains' leadership, the core's morale, recent results, unhappy Volatile players and contented Leaders. It is worth up to +1.0, or costs up to -1.5, on offense and defense for every program, and a strong or broken room moves morale. A captain is less likely to transfer in his year.
+- **Flashpoints.** An unhappy Volatile player can blow up at practice. Discipline him, back him, or leave it to the captains (who take it if you play the next week without answering). Two straight losses with a Leader captain can bring a players-only meeting instead.
+- **Build your nonconference slate.** On the Season page, trade up to two nonconference dates a season, for games more than a week away: a marquee opponent for the rankings, a buy game for a likely win (one booster unit for the guarantee check), or a regional draw. The opponent swaps with another nonconference game that week on the same side, so home and away counts and every schedule rule hold. A marquee home game pays the boosters goodwill and the crowd when it is played. The card shows your nonconference strength of schedule against all 120 programs.
+
+Saves carry over: realignment starts its four-season cycle from the season an older save is first played in, and chemistry starts neutral.
+
 ## v0.31.1 — Faster weeks
 
 - **Weeks simulate faster.** The weekly recruiting pass did the same work for every program and recruit over and over; it now remembers what cannot change during the pass. A season simulates about a quarter faster. Results are identical: the same seed produces the same dynasty, down to the byte.

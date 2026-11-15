@@ -1,4 +1,16 @@
-# Latest Session Work
+# Latest session work
+
+## v0.32.0 (2026-11-15): realignment, locker room, nonconference scheduling
+
+- `realignment.js`: media value, rank-based payouts, swaps every four seasons in the offseason review, invitations
+  (answered on This Week, settled at the preseason), Program page conference card. Tests: `tests/realignment.js`.
+- `locker-room.js`: hashed personalities, leadership, captains, weekly chemistry (wraps `profiles`, `transferRisk`,
+  `simWeek`, `offseasonPreseason`), flashpoints and players-only meetings. Tests: `tests/locker-room.js`.
+- `noncon-schedule.js`: same-side opponent trades for nonconference games more than a week away, buy-game cost,
+  marquee home payoff, strength of schedule. Tests: `tests/noncon-schedule.js`.
+- Shared styles in `dynasty-world.css`; browser check `tests/dynasty-world-browser.js` (desktop and phone).
+- All three are engine extensions (build and full-runtime harness only) and draw no gameplay randomness.
+
 
 ## v0.31.1 faster weeks — 2026-11-14
 
