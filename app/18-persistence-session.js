@@ -108,7 +108,7 @@ async function saveFileText(file){
 }
 function exportSave(){return storageOperation(async()=>{
   await ensureArchiveLoaded();await ensureGamesLoaded();
-  const plain=new Blob(saveJsonParts({version:APP_VERSION,userTeam:$('#userTeam').value,universe:packUniverse(universe)}),{type:'application/json'}),zipped=await gzipBlob(plain),blob=zipped?new Blob([zipped],{type:'application/gzip'}):plain,a=document.createElement('a');
+  const plain=new Blob(saveJsonParts({version:APP_VERSION,userTeam:$('#userTeam').value,legacy:globalThis.DynastyLegacy?.exportStore?.(),universe:packUniverse(universe)}),{type:'application/json'}),zipped=await gzipBlob(plain),blob=zipped?new Blob([zipped],{type:'application/gzip'}):plain,a=document.createElement('a');
   a.href=URL.createObjectURL(blob);a.download=`dynasty-lab-${universe.year}-week-${universe.week+1}.json${zipped?'.gz':''}`;a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);const size=Number.isFinite(blob.size)?` (${slotBytes(blob.size)})`:'';setStatus(zipped?`Save exported as a compressed backup${size}. Import it here as it is.`:`Save exported as JSON${size}.`);
 })}
@@ -117,7 +117,11 @@ function importSave(file){return storageOperation(async()=>{
   let d;try{d=JSON.parse(text)}catch{throw new Error('That file is not a Dynasty Lab save.')}
   if(d.storageVersion||d.archiveRef)throw new Error('Import a complete exported JSON save, not an app storage record.');
   validateImportedSaveText(d?.universe||d);
-  installSave(d);setStatus('Imported save file successfully.');
+  // A backup from v0.34 on carries this device's Legacy; merge it rather than replace what is here.
+  let legacy=null;if(d?.legacy&&typeof d.legacy==='object'){try{validateImportedSaveText(d.legacy);legacy=d.legacy}catch{legacy=null}}
+  installSave(d);
+  const merged=legacy?globalThis.DynastyLegacy?.importStore?.(legacy):null;
+  setStatus(merged?.ok?`Imported save file successfully. Legacy merged${merged.added>0?`: ${merged.added} achievement${merged.added===1?'':'s'} added`:''}.`:'Imported save file successfully.');
   return true;
 })}
 function refreshTeamOptions(sel){$('#userTeam').innerHTML='';universe.teams.slice().sort((a,b)=>a.name.localeCompare(b.name)).forEach(s=>{let o=document.createElement('option');o.value=s.name;o.textContent=s.name;$('#userTeam').appendChild(o)});$('#userTeam').value=T(sel)?sel:universe.teams[0].name;renderControlMode()}

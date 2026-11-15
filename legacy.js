@@ -98,5 +98,34 @@ function mount(){
  const start=()=>{for(const sel of ['#recordBig','#weekLine','#teamName','#saveStatus'])document.querySelectorAll(sel).forEach(el=>new MutationObserver(schedule).observe(el,{childList:true,subtree:true,characterData:true}));const tab=document.querySelector('#legacy');if(tab)new MutationObserver(schedule).observe(tab,{attributes:true,attributeFilter:['class']});schedule()};
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 }
-return{ACHIEVEMENTS,CHALLENGES,emptyStore,merge,accept,pageHTML,mount,KEY};
+// ---------- Backups (v0.34) ----------
+// Legacy lives on this device, so a save export carries a copy and an import merges it back: nothing is lost moving
+// between browsers or between the web and desktop builds, and importing never erases what this device already has.
+const CHALLENGE_RANK={complete:3,active:2,failed:1};
+function valid(s){return!!s&&typeof s==='object'&&s.version===VERSION&&s.achievements&&typeof s.achievements==='object'}
+// An older store still holding v1 title evidence is set aside the same way merge() does, before it is combined.
+function normalize(store){const s=JSON.parse(JSON.stringify({...emptyStore(),...store,titleFactsVersion:store?.titleFactsVersion||0}));if(s.titleFactsVersion!==2){const r=merge(s,null).store;r.unverifiedTitles={records:{},achievements:{},challenges:{}};for(const k of ['titles','confTitles']){if(r.records[k])r.unverifiedTitles.records[k]=r.records[k];delete r.records[k]}for(const k of ['national_champ','dynasty']){if(r.achievements[k])r.unverifiedTitles.achievements[k]=r.achievements[k];delete r.achievements[k]}if(r.challenges.win_now?.status==='complete'){r.unverifiedTitles.challenges.win_now=r.challenges.win_now;delete r.challenges.win_now}r.titleFactsVersion=2;return r}return s}
+// Pure: the union of two stores. The earlier unlock of an achievement, the better value of each record, every Hall of
+// Fame entry with every honour, and for a challenge the furthest it got (complete, then active, then failed).
+function combine(a,b){
+ const x=normalize(valid(a)?a:emptyStore()),y=normalize(valid(b)?b:emptyStore()),out=x;
+ for(const [id,v] of Object.entries(y.achievements||{})){const cur=out.achievements[id];if(!cur||(Number(v?.year)||Infinity)<(Number(cur.year)||Infinity))out.achievements[id]=v}
+ for(const [k,v] of Object.entries(y.records||{})){const cur=out.records[k];if(!cur||(Number(v?.value)||0)>(Number(cur.value)||0))out.records[k]=v}
+ const hof=new Map((out.hallOfFame||[]).map(h=>[`${h.program}|${h.playerId}`,{...h,honors:[...(h.honors||[])]}]));
+ for(const h of y.hallOfFame||[]){const k=`${h.program}|${h.playerId}`,cur=hof.get(k);if(!cur)hof.set(k,{...h,honors:[...(h.honors||[])]});else for(const n of h.honors||[])if(!cur.honors.includes(n))cur.honors.push(n)}
+ out.hallOfFame=[...hof.values()].sort((p,q)=>q.honors.length-p.honors.length||String(p.name).localeCompare(String(q.name))).slice(0,60);
+ for(const [id,c] of Object.entries(y.challenges||{})){const cur=out.challenges[id];if(!cur||(CHALLENGE_RANK[c?.status]||0)>(CHALLENGE_RANK[cur.status]||0))out.challenges[id]=c}
+ for(const [k,m] of Object.entries(y.memory||{}))out.memory[k]={...(m||{}),...(out.memory[k]||{}),lowConfidence:!!(m?.lowConfidence||out.memory[k]?.lowConfidence)};
+ if(y.unverifiedTitles&&!out.unverifiedTitles)out.unverifiedTitles=y.unverifiedTitles;
+ return out;
+}
+function exportStore(){return store||load()}
+// Merge a backup's Legacy into this device. Returns how many achievements it added.
+function importStore(incoming){
+ if(!valid(incoming))return{ok:false,added:0};
+ const before=store||load(),next=combine(before,incoming),added=Object.keys(next.achievements).length-Object.keys(before.achievements).length;
+ store=next;save(store);lastSig='';if(typeof document!=='undefined')schedule();
+ return{ok:true,added};
+}
+return{ACHIEVEMENTS,CHALLENGES,emptyStore,merge,accept,pageHTML,mount,KEY,combine,exportStore,importStore};
 });
