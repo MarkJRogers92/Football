@@ -16,7 +16,7 @@ const REASON_LABEL = { BROKEN_PROMISE: 'broken promise', PLAYING_TIME: 'playing 
 const pad = (v, n) => String(v).padEnd(n);
 
 (async () => {
-  const e = loadEngine({ seed: SEED });
+  const e = loadEngine({ seed: SEED, fullRuntime: process.env.FULL === '1' });
   const groups = POS_GROUPS.map(([label, positions]) => ({
     label, positions,
     // POS_COUNTS is the engine's designed roster shape per position.

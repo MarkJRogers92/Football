@@ -1,9 +1,9 @@
 /* v0.32: conference realignment (Program page and This Week), the locker room (Roster page and This Week) and the
    nonconference schedule (Season page). Shares the summary tiles with Facilities & Boosters. */
-.realignment-card .fb-summary,.locker-room-card .fb-summary,.noncon-card .fb-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:10px 0}
-.realignment-card .fb-summary>div,.locker-room-card .fb-summary>div,.noncon-card .fb-summary>div{padding:9px 11px;border:1px solid var(--line,rgba(255,255,255,.14));border-radius:6px;display:flex;flex-direction:column;gap:2px}
-.realignment-card .fb-summary strong,.locker-room-card .fb-summary strong,.noncon-card .fb-summary strong{font-size:1.35rem;line-height:1.1}
-.realignment-card .fb-summary small,.locker-room-card .fb-summary small,.noncon-card .fb-summary small{font-size:.72rem;font-weight:500;opacity:.7;margin-left:3px}
+.realignment-card .fb-summary,.locker-room-card .fb-summary,.noncon-card .fb-summary,.pro-pipeline-card .fb-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:10px 0}
+.realignment-card .fb-summary>div,.locker-room-card .fb-summary>div,.noncon-card .fb-summary>div,.pro-pipeline-card .fb-summary>div{padding:9px 11px;border:1px solid var(--line,rgba(255,255,255,.14));border-radius:6px;display:flex;flex-direction:column;gap:2px}
+.realignment-card .fb-summary strong,.locker-room-card .fb-summary strong,.noncon-card .fb-summary strong,.pro-pipeline-card .fb-summary strong{font-size:1.35rem;line-height:1.1}
+.realignment-card .fb-summary small,.locker-room-card .fb-summary small,.noncon-card .fb-summary small,.pro-pipeline-card .fb-summary small{font-size:.72rem;font-weight:500;opacity:.7;margin-left:3px}
 .dw-button{padding:6px 10px;min-height:32px;border-radius:5px;border:1px solid var(--line,rgba(255,255,255,.25));background:rgba(255,255,255,.06);color:inherit;font:inherit;font-size:.85rem;cursor:pointer}
 .dw-button:hover:not(:disabled){background:rgba(255,255,255,.14)}
 .dw-button:disabled{opacity:.45;cursor:not-allowed}
@@ -35,3 +35,4 @@
 @media (max-width:560px){.lr-captains{grid-template-columns:1fr}.noncon-options li{flex-direction:column;align-items:flex-start}}
 .noncon-week>summary{cursor:pointer}
 .noncon-week>summary .noncon-week-head{display:inline-flex;width:calc(100% - 22px);vertical-align:top}
+.pro-career{margin-top:12px;padding-top:10px;border-top:1px solid var(--line,rgba(255,255,255,.14))}

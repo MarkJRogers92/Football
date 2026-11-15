@@ -197,3 +197,10 @@ more than a week away. `t.nonconPlan {year, trades, paid}`.
 
 Next candidates: let AI programs answer realignment invitations with their own boards (declines), conference
 expansion beyond twelve (needs a schedule builder for uneven sizes), and a locker-room line in the weekly Wire.
+
+## G. The pro pipeline (shipped in v0.33.0, `nfl-pipeline.js`)
+Pro grade replaces `draftProjection`; positional value orders the board. Careers are a pure function of the draft record
+(`pg`, `pc`, round, pick, position) and hashes of the player id, tuned to real-league shape (first-round Pro Bowl rate
+about a third, late picks rare, undrafted mostly never stick, a few Hall of Famers per class). Zero save growth beyond
+two numbers per drafted record. Possible follow-ups: pro teams and a pro standings page (a real league, much bigger),
+a Ring of Honor ceremony, and pro alumni coming back as coaching candidates.

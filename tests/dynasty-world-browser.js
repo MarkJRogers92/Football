@@ -30,6 +30,12 @@ const shots=process.env.DW_SHOTS;
    assert.equal(await page.locator('#conferenceOutlook [data-ra-status]').count(),1,`[${label}] a realignment outlook is stated`);
    assert.ok(await overflow(page)<=1,`[${label}] program page fits`);
    if(shots)await page.locator('#conferenceOutlook').screenshot({path:path.join(shots,`conference-${label}.png`)});
+   // --- Program page: the pro pipeline.
+   await page.waitForSelector('#proPipeline .fb-summary',{timeout:15000});
+   assert.match(await page.locator('#proPipeline').textContent(),/PRO PIPELINE[\s\S]*Active pros[\s\S]*Pro Bowlers[\s\S]*National rank/,`[${label}] the pro pipeline card is on the Program page`);
+   const pro=await page.evaluate(()=>window.__DL_TEST__.proPipeline());
+   assert.equal(pro.pros,0,`[${label}] no pros before the first draft`);
+   if(shots)await page.locator('#proPipeline').screenshot({path:path.join(shots,`pro-pipeline-${label}.png`)});
 
    // --- Roster page: the locker room, with four captains the coach can change before Week 1.
    await open(page,'program','roster');

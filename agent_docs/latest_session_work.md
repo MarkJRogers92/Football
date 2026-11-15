@@ -1,5 +1,15 @@
 # Latest session work
 
+## v0.33.0 (2026-11-15): the pro pipeline
+
+- `nfl-pipeline.js`: replaces `draftProjection` with a pro grade (ability, position traits, production, room, durability,
+  style, exposure, a hashed scouts' read) plus positional value on the board; `runDraft` stores `pg`/`pc` on drafted
+  records (and undrafted ones graded 74+). Careers are derived on read from the record and a hash of the player id;
+  nothing else is saved. Feeds a "Pro pipeline" row in `recruitPitchBreakdown`, alumni booster gifts, PRO_MILESTONE
+  events, a Program page card and the career chronology. Tests: `tests/nfl-pipeline.js`.
+- Balance and cost measurements: `docs/DYNASTY_WORLD_MEASUREMENTS.md`. `tools/league-health.js` takes `FULL=1` to load
+  the engine extensions.
+
 ## v0.32.0 (2026-11-15): realignment, locker room, nonconference scheduling
 
 - `realignment.js`: media value, rank-based payouts, swaps every four seasons in the offseason review, invitations
