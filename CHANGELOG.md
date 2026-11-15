@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.34.0 — Rivals, goodbyes and hardware
+
+- **Coaching rivals.** The game keeps your record against every opposing head coach, following him by id across schools (and you across yours). A coach you cannot beat (three or more meetings, three or more losses, a third or fewer won) becomes your **nemesis**; one you always beat becomes your **favourite opponent**. This Week says how it has gone before you meet a coach again, and the Program page lists the coaches you have faced most. Older saves are filled in once from the game archive.
+- **Senior Day.** In the week before the last regular-season home game, This Week lists the seniors playing their last home game, with career starts, best numbers, honours and how each one arrived.
+- **Pro alumni come home to coach.** A former player of your program who finished a pro career of three or more seasons may apply for your coordinator, strength or recruiting jobs (on his side of the ball). His card shows his draft and pro career; he is loyal, asks a little less and his name helps recruiting. AI programs' hiring is unchanged.
+- **Trophy case.** A Program page section with every national and conference title, bowl win, the rivalry trophy (and who holds it), national awards, Coach of the Year and pro Hall of Famers. Empty shelves stay visible.
+- **"You saw him first."** When a player you signed as a three-star or lower (or with a modest staff grade) goes in the first three rounds or wins a national award, The Wire says so and quotes his scouting receipt from signing day.
+- **Thin and deep draft classes are explained.** The draft board on the Records page says how many underclassmen declared early against the classes before it.
+- **Legacy travels with your backups.** Achievements, cross-save records, the Legacy hall of fame and challenges were kept only on the device, so an export or a move between the web and desktop builds lost them. Exports now carry them, and an import merges them in without erasing what the device already has.
+- **Faster weeks.** The recruiting funnel reuses each program's scholarship limit within a week instead of recounting it for every prospect: about 25% less time per season, with identical results for a fixed seed.
+
+Saves carry over. The coaching-rival ledger adds about 1 KB a season; nothing else new is stored.
+
 ## v0.33.1 — Honest NFL outlooks and a harder Hall of Fame
 
 - **The NFL outlook no longer reveals true ratings.** The outlook in a draft-eligible player's career chronology printed his true ability, true NFL traits and true room to grow, on any team's roster, which bypassed scouting. It is now built only from your staff's scouting ranges for current ability and upside (the same ranges the profile shows) and gives a projected round range, a grade range and a ceiling range. Better scouting narrows it. The pro scouts' hidden read stays out. The real draft still uses the true grade.
