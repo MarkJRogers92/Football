@@ -8,7 +8,10 @@ function oversignAppetite(t){
  const nerve=clamp(((100-(t.admin_patience??60))+(t.prestige??60))/5,4,38);
  return h%100<nerve?1+(h>>7&1):0;
 }
-function canTakeCommit(name){const t=T(name);return t?classCommitCount(name)<scholarshipCapacity(t)+oversignAppetite(t):false}
+// v0.31.1: capacity scans the whole roster, and the weekly pass asks for every program for every recruit. Rosters and
+// eligibility cannot change inside one pass, so the pass remembers each program's limit; outside it nothing is cached.
+let passCapacity=null;
+function canTakeCommit(name){const t=T(name);if(!t)return false;let cap=passCapacity?.get(t.id);if(cap===undefined){cap=scholarshipCapacity(t)+oversignAppetite(t);passCapacity?.set(t.id,cap)}return classCommitCount(name)<cap}
 function commitRecruit(r,name){if(r.committed||!canTakeCommit(name))return false;let t=T(name);if(recruitBlocked(t,r))return false;assignPrimaryRecruiter(r,t,t.name===selected()?.name?r.relationship:null);r.committed=name;r.commitWeek=universe.week;r.challenger=null;r.pressure=0;r.signedPromise=r.promiseOffer?.schoolId===t.id?{...r.promiseOffer}:null;universe.recruitClassCounts??={};universe.recruitClassCounts[name]=classCommitCount(name)+1;t.commits??=[];t.commits.push(r);r.recruitingMemory=captureRecruitment(r,t);return true}
 // v0.15.0: recruiting-actions.js reassigns both of these. The defaults keep the engine standalone:
 // no effort model (targets drift for free) and no scholarship-offer gate on commitments.
@@ -18,7 +21,8 @@ function userMayCommit(r,t){return true}
 // happens in that pass; a check-in continues to strengthen existing commitments against flips.
 function recruitHolds(r,u){return false}
 function recruitKeepBoost(r,u){return 0}
-function advanceRecruiting(){const u=selected();clearUnitCache();universe.recruits.forEach(r=>{ensureRecruitRelationships(r);if(r.committed){pressureCommit(r,u);return}r.prevInterest=r.interest;let pool=recruitConsideration(r).map(t=>({t,pitch:recruitPitch(t,r)})).sort((a,b)=>b.pitch-a.pitch).map(x=>x.t),top=pool.find(t=>canTakeCommit(t.name)&&aiWantsRecruit(t,r))||pool.find(t=>canTakeCommit(t.name))||pool[0];r.leader=top.name;let promiseBoost=recruitPromiseBoost(r,u),visitBoost=0;if(r.visitWeek===universe.week){let g=u.schedule.find(g=>g.week===universe.week&&g.home===u.name);visitBoost=g&&g.played?(g.winner===u.name?13:5):7;r.visit=false}let us=recruitPitch(u,r)+(r.targeted?10:0)+r.relationship*.12+visitBoost+promiseBoost,ais=recruitPitch(top,r);if(r.targeted){firstRecruitEvaluation(r,u);refreshScoutingIntel(r,u,2+(visitBoost?4:0),'RECRUITING',true);
+function advanceRecruiting(){passCapacity=new Map();try{return advanceRecruitingPass()}finally{passCapacity=null}}
+function advanceRecruitingPass(){const u=selected();clearUnitCache();universe.recruits.forEach(r=>{ensureRecruitRelationships(r);if(r.committed){pressureCommit(r,u);return}r.prevInterest=r.interest;let pool=recruitConsideration(r).map(t=>({t,pitch:recruitPitch(t,r)})).sort((a,b)=>b.pitch-a.pitch).map(x=>x.t),top=pool.find(t=>canTakeCommit(t.name)&&aiWantsRecruit(t,r))||pool.find(t=>canTakeCommit(t.name))||pool[0];r.leader=top.name;let promiseBoost=recruitPromiseBoost(r,u),visitBoost=0;if(r.visitWeek===universe.week){let g=u.schedule.find(g=>g.week===universe.week&&g.home===u.name);visitBoost=g&&g.played?(g.winner===u.name?13:5):7;r.visit=false}let us=recruitPitch(u,r)+(r.targeted?10:0)+r.relationship*.12+visitBoost+promiseBoost,ais=recruitPitch(top,r);if(r.targeted){firstRecruitEvaluation(r,u);refreshScoutingIntel(r,u,2+(visitBoost?4:0),'RECRUITING',true);
  // Draw order is part of the seeded contract: gain, bump, noise. recruitEffort() only scales what was drawn.
  let gain=gi(2,6),bump=gi(1,5),noise=gauss()*2,drift=(us-ais)*.065,cool=0;const eff=recruitEffort(r,u);
  if(eff){gain=Math.round(gain*eff.relScale);bump*=eff.bumpScale;noise*=eff.noiseScale;if(eff.freeze)drift=Math.min(0,drift);cool=eff.cool}
