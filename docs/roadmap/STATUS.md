@@ -1,6 +1,6 @@
 # Roadmap execution status
 
-Last reconciled: 2026-11-15, source `200eb03` (`v0.33.0`).
+Last reconciled: 2026-11-15, source `d2efc15` (`v0.33.1`).
 
 ## Current source and publication
 

@@ -121,7 +121,7 @@ test('the shape of a draft class looks like the real league',()=>{
  assert.ok(r1.reduce((n,c)=>n+c.length,0)/r1.length>r7.reduce((n,c)=>n+c.length,0)/r7.length+2);
  assert.ok(share(u,c=>c.length===0)>.7,'most undrafted players never make a roster');
  const hof=cls.map(r=>N.careerAt(r,r.year+30,true)).filter(c=>c?.hof).length/3;
- assert.ok(hof<=8,`Hall of Famers per class ${hof}`);
+ assert.ok(hof<=4,`Hall of Famers per class ${hof} (the synthetic class is denser than a real one; real classes measure about two)`);
 });
 
 test('programs are ranked by their alumni, which feeds the recruiting pitch and alumni gifts',()=>{
@@ -192,4 +192,45 @@ test('departures consider juniors and redshirt sophomores, never ordinary sophom
  assert.equal(groups.soph.filter(id=>early.has(id)).length,0,'two ordinary college seasons cannot qualify');
  assert.ok(groups.junior.some(id=>early.has(id)),'third-season juniors are considered');
  assert.ok(groups.redshirt.some(id=>early.has(id)),'a redshirt year counts toward the three-year clock');
+});
+
+test('the NFL outlook reads only the staff\'s scouting ranges, never true ratings or the hidden scouts\' read',()=>{
+ const {N}=pipeline(),t={prestige:70},cur=[80,86],up=[86,92];
+ const base=player(),view=N.outlook(base,t,cur,up);
+ // The same scouted ranges give the same outlook however good he really is: shift his true overall and every
+ // trait together, or change his true upside.
+ const shift=d=>player({trueNow:base.trueNow+d,upside:base.upside+d,speed:base.speed+d,power:base.power+d,technique:base.technique+d,iq:base.iq+d,composure:base.composure+d});
+ assert.deepEqual(N.outlook(shift(-25),t,cur,up),view,'a much worse true player reads the same');
+ assert.deepEqual(N.outlook(shift(10),t,cur,up),view,'a much better true player reads the same');
+ assert.deepEqual(N.outlook(player({upside:99}),t,cur,up),view,'true upside is not read');
+ assert.deepEqual(N.outlook(player({id:'someone-else'}),t,cur,up),view,'the hashed scouts\' read is not part of it');
+ assert.deepEqual(view.parts.ability,cur);assert.deepEqual(view.parts.upside,up);
+ assert.ok(view.grade[0]<=view.grade[1]&&view.ceiling[0]<=view.ceiling[1]);
+ // Better scouting narrows the range; a better estimate raises it.
+ const narrow=N.outlook(base,t,[82,84],[88,90]);
+ assert.ok(narrow.grade[1]-narrow.grade[0]<view.grade[1]-view.grade[0]);
+ assert.ok(N.outlook(base,t,[88,94],[92,97]).grade[0]>view.grade[1]);
+ assert.ok(!('traits' in view.parts)&&!('room' in view.parts)&&!('read' in view.parts));
+});
+
+test('the outlook in a player\'s chronology does not change with his true rating',async()=>{
+ const e=loadEngine({seed:7101,fullRuntime:true});await e.loadSchools();e.setUserTeam('Chicago Metropolitan');e.initUniverse();
+ const t=e.T('Chicago Metropolitan'),p=t.roster.find(x=>e.eligibilityBase(x)>=2&&!x.draftResult);
+ assert.ok(p,'an upperclassman is on the roster');
+ const html=()=>{const s=e.careerChronologyHTML(p);return s.slice(s.indexOf('data-nfl-outlook'))};
+ const before=html();
+ assert.match(before,/NFL OUTLOOK/);assert.match(before,/staff's evaluation/);
+ const keys=['trueNow','upside','speed','power','technique','iq','composure'],saved=Object.fromEntries(keys.map(k=>[k,p[k]]));
+ for(const k of keys)p[k]=saved[k]+9;
+ assert.equal(html(),before,'raising every true rating leaves the visible outlook unchanged');
+ Object.assign(p,saved);
+});
+
+test('the Pro Hall of Fame takes sustained greatness, not a pile of Pro Bowls, and the five-year wait',()=>{
+ const {N}=pipeline();
+ assert.equal(N.HOF_WAIT,5);
+ assert.equal(N.hallWorthy(8,0,0),false,'eight Pro Bowls without All-Pro seasons is not enough');
+ assert.equal(N.hallWorthy(6,1,2),false,'rings do not carry a good career');
+ assert.equal(N.hallWorthy(4,4,0),false,'four All-Pro seasons alone fall short');
+ assert.ok(N.hallWorthy(9,2,0)&&N.hallWorthy(5,5,0)&&N.hallWorthy(7,3,1));
 });

@@ -99,3 +99,14 @@ Each seed had four completed swaps across its two windows, alongside 13–14 rec
 `SEASONS=30 SEED=17 ROUNDTRIP=15 node tools/facilities-soak.js`, with save and metrics output enabled, completed 2027–2056 and reached the 2057 preseason with **no invariant problems**. It used the full runtime and played 430 user games through Game Engine 2, including a serialization roundtrip after season 15. There were 11 distinct national champions.
 
 The portable save reached **311.8 MB**, growing about 9.7 MB per season; facility plans accounted for 40,915 bytes. Seasons averaged 14.8 seconds on the test host (13.0 first, 21.4 last). This is evidence that the run completes, not that the existing archive growth or long-save cost is solved. Browser import/reload timings are recorded in the session handoff; real-device checks remain separate.
+
+## v0.33.1 Hall of Fame tightening
+
+Draft classes from `FULL=1 SEASONS=5 node tools/league-health.js` at seeds 7, 11 and 23 (15 classes), each projected 40 years ahead. Pro Bowls cluster heavily on a few elite careers (of about 3,500 retired pros, 46 had eight or more), so a Pro Bowl count alone let in too many.
+
+| Rule | Inductees per class (mean) | Range |
+| --- | --- | --- |
+| v0.33.0: 8 PB, or 4 AP, or 6 PB + 2 rings | 3.60 | 0–7 |
+| v0.33.1: 5 AP, or 9 PB + 2 AP, or 7 PB + 3 AP + ring | 2.20 | 0–4 |
+
+The wait after retirement is now five seasons (was three). Measurement only; players never see projected careers.
