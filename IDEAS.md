@@ -170,3 +170,37 @@ p.nilDeal / r.nilDeal       // {amount, year} on players and recruits
 **Constraints.** The budget is finite and resets each offseason, so it is a real
 allocation problem: hold the disgruntled starter or sign the blue-chip, not both.
 Spending must be visible and reversible before the week is simmed.
+
+---
+
+# v0.32 — the next three (shipped in v0.32.0)
+
+Chosen after v0.31 because the roadmap was exhausted and long dynasties had nothing that changed the world itself.
+
+## D. Conference realignment (`realignment.js`)
+Every 4th offseason (counted from the dynasty's first season), after the season is archived. Brand =
+prestige×.6 + fan support×.25 + facilities×.15; media value = conference mean brand; payout by media rank
+(4,4,3,3,2,2,1,1,0,0 units into the booster fund). Neighbouring conferences in the ranking trade one-for-one: the
+stronger takes the weaker's most appealing of its top three brands (−1 per 250 miles to the conference centre) if it
+is 8+ points clear of its own weakest member. Max two swaps, one per conference. Sizes stay 12, so `buildSchedule`
+is untouched. State: `universe.realignment {startYear, history, pending, lastWindow, lastPayout}`.
+
+## E. Locker room (`locker-room.js`)
+Personality from a hash of the player id (no save field). `t.lockerRoom {chemistry, captains, captainsYear,
+incident, log}`; `p.captainYear`. Chemistry blends 25% a week toward a target; edge on offense/defense is
+clamp((chem−55)/20, −1.5, +1.0). Flashpoints only for the coach's program, odds from a hash of program/season/week.
+
+## F. Nonconference scheduling (`noncon-schedule.js`)
+A trade swaps the coach's opponent with the same-side team from another nonconference game that week, so home
+counts never change; `validateSchedule()` runs after each trade and reverts on any problem. Two per season, games
+more than a week away. `t.nonconPlan {year, trades, paid}`.
+
+Next candidates: let AI programs answer realignment invitations with their own boards (declines), conference
+expansion beyond twelve (needs a schedule builder for uneven sizes), and a locker-room line in the weekly Wire.
+
+## G. The pro pipeline (shipped in v0.33.0, `nfl-pipeline.js`)
+Pro grade replaces `draftProjection`; positional value orders the board. Careers are a pure function of the draft record
+(`pg`, `pc`, round, pick, position) and hashes of the player id, tuned to real-league shape (first-round Pro Bowl rate
+about a third, late picks rare, undrafted mostly never stick, a few Hall of Famers per class). Zero save growth beyond
+two numbers per drafted record. Possible follow-ups: pro teams and a pro standings page (a real league, much bigger),
+a Ring of Honor ceremony, and pro alumni coming back as coaching candidates.

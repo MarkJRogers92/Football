@@ -932,12 +932,36 @@ test('v0.31: a board prospect close to his Top 5 warns on the card, the badge an
  // Readiness well past any Top 5 band, list not yet named: the warning is due.
  a.funnel={version:2,season:u.year,readiness:200,lastWeek:5,top5:null,top3:null,cut:null,decided:null,announcement:null};
  assert.equal(A.funnelStatus(a,t).narrowing.list,'top5');
- assert.match(D.html(a.id),/Narrowing his list/);assert.match(D.html(a.id),/Offer a scholarship now/);
+ assert.match(D.html(a.id),/Narrowing his list/);assert.match(D.html(a.id),/class="ra-next-action" data-ra-action="offer"/);
  assert.match(D.badge(a.id),/Narrowing his list · no offer from you/);
  assert.equal(globalThis.DynastyRecruitingNarrowing(t).count>=1,true);
  A.perform(a,t,'offer');
- assert.match(D.html(a.id),/interest in you needs to reach 65/);assert.match(D.badge(a.id),/interest below 65/);
+ assert.match(D.html(a.id),/data-ra-action=/);assert.match(D.html(a.id),/does not guarantee/);assert.match(D.badge(a.id),/interest below 65/);
  a.interest=80;
- assert.doesNotMatch(D.html(a.id),/Narrowing his list/,'an offer and interest of 65 make the place safe');
+ assert.doesNotMatch(D.html(a.id),/Narrowing his list/,'the warning threshold clears once offered interest reaches 65');
  assert.doesNotMatch(D.badge(a.id),/Narrowing/);
 });
+
+test('narrowing advice offers a legal response and does not promise a finalist place',()=>{
+ const {api,universe}=fixture(),t=team(),r=recruit('advice',{targeted:true,interest:60});universe.recruits=[r];
+ const before=JSON.stringify({t,r,universe});
+ const a=api.narrowingAdvice(r,t);assert.equal(a.kind,'offer');assert.ok(api.availability(r,t,a.kind).ok);assert.match(a.text,/not guarantee/);
+ assert.equal(JSON.stringify({t,r,universe}),before);
+ assert.ok(api.perform(r,t,a.kind).ok);
+ const b=api.narrowingAdvice(r,t);assert.ok(['pitch','call','inhome'].includes(b.kind));
+ assert.ok(api.availability(r,t,b.kind,{topic:b.topic}).ok);
+});
+test('narrowing advice admits when hours, a cut or a disclosed dealbreaker prevent rescue',()=>{
+ const {api,universe}=fixture(),t=team(),r=recruit('blocked-advice',{targeted:true});universe.recruits=[r];
+ api.ensureWeek(t).spent=api.hoursBudgetFor(t);
+ assert.equal(api.narrowingAdvice(r,t).kind,null);assert.match(api.narrowingAdvice(r,t).text,/hour/);
+ r.funnel={season:2027,cut:{at:'top5',week:1}};
+ assert.equal(api.narrowingAdvice(r,t).kind,null);assert.match(api.narrowingAdvice(r,t).text,/cut|backup/i);
+});
+
+ test('narrowing advice reveals a dealbreaker only after contact discloses it',()=>{
+ const {api}=fixture(),weak=weakTeam(),r=findMotive(api,m=>m.dealbreaker&&CONTROLLABLE.includes(m.dealbreaker));
+ assert.equal(api.narrowingAdvice(r,weak).kind,'offer');
+ api.record(r,weak).known.dealbreaker=true;
+ const a=api.narrowingAdvice(r,weak);assert.equal(a.kind,null);assert.match(a.text,/disclosed/);assert.ok(a.text.includes(api.motivesFor(r).dealbreaker));
+ });

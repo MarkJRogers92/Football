@@ -1,5 +1,34 @@
 # Changelog
 
+## Unreleased — World follow-ups
+
+- Current locker-room and pro milestones appear in the existing Wire and short briefing; resolved incidents replace their original flashpoint.
+- AI programs weigh media gains, travel, rivalry and competition before accepting a conference invitation. A declined offer can move to another eligible program.
+- Earned pro Hall of Fame inductions receive a restrained Ring of Honor ceremony. Alumni survive program renames; profiles show only completed pro seasons.
+- Early draft entry checks the completed college clock correctly, including redshirt years. Ordinary sophomores cannot leave after just two seasons; juniors are considered.
+- Recruiting narrowing warnings offer a legal next action using disclosed information and explain when there is no useful immediate response.
+- Build checks catch unassigned tests and inconsistent full/fast/slow lists. Current documentation distinguishes source changes from publication.
+
+## v0.33.0 — The pro pipeline
+
+- **Every prospect has an NFL grade.** The draft grade is built from how a player's game translates: true ability, the traits the NFL pays for at his position (processing and accuracy for a quarterback, speed for a corner, power for a guard), college production, room still to grow, durability and injuries, how his style translates (a Long-Frame Project grades lower now with a higher ceiling; an Island Protector is ready now), exposure from his program, and a scouts' read that is fixed for each player. The draft board adds the value of his position, so a quarterback, edge rusher or tackle goes before an equally good guard or back, and kickers and punters no longer fill the first round. Early declarations read the same grade.
+- **Every pro career is followed.** After the draft each player's career plays out a season a year: how far he develops toward his ceiling, boom or bust, the chances his draft slot buys him, how long he lasts at his position, seasons starting, Pro Bowls, All-Pro teams, rings and the Pro Football Hall of Fame. About a third of first-rounders make a Pro Bowl, late picks rarely do (but a few late bloomers become stars), and most undrafted players never make a roster.
+- **Pros pay the program back.** A national pipeline ranking gives programs that produce pros up to +4 in every recruiting pitch (shown in the pitch breakdown as "Pro pipeline"), and up to +1.5 more with recruits at positions where recent alumni are active pros. It builds over a few seasons. Alumni with active Pro Bowlers give one or two units a season to the booster fund.
+- **See it.** A Pro Pipeline card on the Program page (pros produced, active pros, Pro Bowlers, rings, Hall of Famers, national rank, notable alumni with Steal and Bust tags), a pro career section in every drafted player's career chronology, an NFL outlook (grade, ceiling and what drives them) for draft-eligible players still in college, and your alumni's first Pro Bowls, rings, retirements and Hall of Fame elections in the news.
+- **Cheap by design.** Careers are never stored: they are worked out from the draft record and a hash of the player's id, so the same record always gives the same career. Each drafted player's record gains two numbers (grade and ceiling), as does an undrafted player with a real chance to stick. Measured over six seasons: about 20 KB a season with every undrafted player included, less after that trim, against roughly 10 MB a season of total save growth; offseason time unchanged.
+
+Saves carry over. Players drafted before this version have no stored grade; their careers are read from their draft score.
+
+## v0.32.0 — A world that changes, a locker room and your own schedule
+
+- **Conferences realign.** Every fourth offseason the conferences renegotiate their media deals. A conference's media value is the average brand of its members (prestige, fan support, facilities), and membership follows the money: the best brand in a weaker conference trades places with the weakest in the conference above, at most two swaps per window. Distance counts against a move (a point of appeal per 250 miles), every conference keeps twelve members, and rivalries split by a move are recorded and re-paired inside the new conference. Media rank pays every member 0-4 units into the booster fund each offseason.
+- **Your program can be invited, or dropped.** An invitation is announced on This Week with the payout, schedule and rivalry it would change; the Next button stops once for it, and no answer by the preseason keeps you where you are. Being dropped is not a choice, but the new conference card on the Program page shows your media rank, payout, brand standing and whether you are invitation-likely or at risk long before the window opens.
+- **The locker room.** Every player has a personality (Leader, Competitor, Steady, Quiet or Volatile) and a leadership score. Each team names four captains before Week 1; the staff pick two a side and you can change them on the Roster page. Chemistry moves every week with the captains' leadership, the core's morale, recent results, unhappy Volatile players and contented Leaders. It is worth up to +1.0, or costs up to -1.5, on offense and defense for every program, and a strong or broken room moves morale. A captain is less likely to transfer in his year.
+- **Flashpoints.** An unhappy Volatile player can blow up at practice. Discipline him, back him, or leave it to the captains (who take it if you play the next week without answering). Two straight losses with a Leader captain can bring a players-only meeting instead.
+- **Build your nonconference slate.** On the Season page, trade up to two nonconference dates a season, for games more than a week away: a marquee opponent for the rankings, a buy game for a likely win (one booster unit for the guarantee check), or a regional draw. The opponent swaps with another nonconference game that week on the same side, so home and away counts and every schedule rule hold. A marquee home game pays the boosters goodwill and the crowd when it is played. The card shows your nonconference strength of schedule against all 120 programs.
+
+Saves carry over: realignment starts its four-season cycle from the season an older save is first played in, and chemistry starts neutral.
+
 ## v0.31.1 — Faster weeks
 
 - **Weeks simulate faster.** The weekly recruiting pass did the same work for every program and recruit over and over; it now remembers what cannot change during the pass. A season simulates about a quarter faster. Results are identical: the same seed produces the same dynasty, down to the byte.

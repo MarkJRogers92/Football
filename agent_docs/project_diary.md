@@ -2,6 +2,15 @@
 
 ## Decisions and Lessons
 
+- A refusal should not consume a completed-deal quota. For realignment, value recurring payouts over the contract cycle and reserve conference slots only after acceptance or a pending user offer.
+
+- Check the caller’s clock before enforcing class-based eligibility. Departures has already charged the current season; early draft entry therefore reads completed seasons plus redshirt time, not the preseason class index.
+
+- Separate derived lifetime simulation data from the public career-to-date view. A deterministic future is still hidden information until its season happens.
+- Preserve draft-time names as historical labels; use stable school IDs for current alumni attribution, with a read-only legacy fallback and cache invalidation on rename.
+- Keep optional world stories bounded and current. A resolved incident replaces its original flashpoint in the short briefing.
+- Test scripts are executable coverage policy: check every test file has a command and full/fast/slow lists agree. A green suite cannot cover files never assigned to it.
+
 - A storage completion event and visible UI paint are separate boundaries. Await the visible saved indicator before browser assertions; preserve the exact persistence and cold-reload checks.
 - Match release documentation to the real GitHub ancestry. Reconstructed local commits can have identical trees but different commit IDs; preserve actual remote parents when integrating.
 - A new save scope needs a usable recruiting default before the opening save captures UI preferences, not only after rows first render. Initialize All Recruits; restore an explicit My Board preference when a matching saved view exists.

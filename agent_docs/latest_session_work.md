@@ -1,4 +1,39 @@
-# Latest Session Work
+# Latest session work
+
+## World follow-ups — 2026-11-15 (unpublished)
+
+Based on PR #64 head `5c12a9cfb840524e507d39f62bee548e103438fb`, v0.33.0. Branch `codex/world-followups`, isolated checkout `.session-artifacts/world-followups`. The outer checkout is older and contains unrelated user edits.
+
+Implemented the early-entry eligibility correction (completed college seasons plus redshirt time), optional current-week world news, deterministic AI realignment refusals/replacement invitations, Ring of Honor ceremonies, school-ID alumni continuity with legacy-name fallback, pro profiles limited to completed seasons, useful recruiting warning actions, and a build-time test-list coverage check. Historical archives retain draft-time labels. No fatigue/difficulty/playoff-format expansion.
+
+Verification: full unit run **980/980**, final realignment **14/14**, final lint/docs/test-list checks **9/9**, and final world browser flows at 1280/390px passed. Phone floor: 15 screens; accessibility: 16 screens at both widths, no serious/critical findings. Main and extended browser matrices completed; all six browser persistence scenarios passed without console errors. The 30-season campaign (seed 17, full runtime, 430 user games, roundtrip at season 15) completed with no invariant problems. Its 311.8 MB portable save imported, saved to real IndexedDB, reloaded and played in desktop (1280px) and phone (390px) Chromium layouts without console errors. Import: 5.21/5.20s; save: 4.38/4.51s; load: 1.46/1.23s; reported JS heap: 468 MB in each layout. Program, Game Day and history remained usable. The full suite loaded the realignment test file before its final fallback case was added; the separate 14-test run covers that final change.
+
+Four final full-runtime ten-season runs (7, 11, 23, 31) completed after both gameplay fixes. Canonical results and methodology: `docs/DYNASTY_WORLD_MEASUREMENTS.md`. The corrected eligibility test excludes ordinary sophomores and considers juniors/redshirt sophomores. Earlier provisional soaks are superseded, not final evidence.
+
+Release-artifact verification passed: the committed `index.html` reproduces exactly from source. No publication or merge was performed. Review branch `codex/world-followups` is based on PR #64; target that branch first, or retarget after #64 merges. The upstream PR remained open at the final check. Real iPhone/Safari, screen-reader and packaged-desktop checks were not run. Long-save archive growth remains a measured limitation, not a solved issue.
+
+
+## v0.33.0 (2026-11-15): the pro pipeline
+
+- `nfl-pipeline.js`: replaces `draftProjection` with a pro grade (ability, position traits, production, room, durability,
+  style, exposure, a hashed scouts' read) plus positional value on the board; `runDraft` stores `pg`/`pc` on drafted
+  records (and undrafted ones graded 74+). Careers are derived on read from the record and a hash of the player id;
+  nothing else is saved. Feeds a "Pro pipeline" row in `recruitPitchBreakdown`, alumni booster gifts, PRO_MILESTONE
+  events, a Program page card and the career chronology. Tests: `tests/nfl-pipeline.js`.
+- Balance and cost measurements: `docs/DYNASTY_WORLD_MEASUREMENTS.md`. `tools/league-health.js` takes `FULL=1` to load
+  the engine extensions.
+
+## v0.32.0 (2026-11-15): realignment, locker room, nonconference scheduling
+
+- `realignment.js`: media value, rank-based payouts, swaps every four seasons in the offseason review, invitations
+  (answered on This Week, settled at the preseason), Program page conference card. Tests: `tests/realignment.js`.
+- `locker-room.js`: hashed personalities, leadership, captains, weekly chemistry (wraps `profiles`, `transferRisk`,
+  `simWeek`, `offseasonPreseason`), flashpoints and players-only meetings. Tests: `tests/locker-room.js`.
+- `noncon-schedule.js`: same-side opponent trades for nonconference games more than a week away, buy-game cost,
+  marquee home payoff, strength of schedule. Tests: `tests/noncon-schedule.js`.
+- Shared styles in `dynasty-world.css`; browser check `tests/dynasty-world-browser.js` (desktop and phone).
+- All three are engine extensions (build and full-runtime harness only) and draw no gameplay randomness.
+
 
 ## v0.31.1 faster weeks — 2026-11-14
 

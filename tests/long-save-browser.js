@@ -2,7 +2,8 @@
 // A long dynasty in a real browser. Not part of the normal matrix: the save is too large to commit.
 //
 //   node tools/facilities-soak.js with SAVE_OUT=/path/save.json SEASONS=20   (makes the save)
-//   LONG_SAVE=/path/save.json node tests/long-save-browser.js                (this test)
+//   LONG_SAVE=/path/save.json node tests/long-save-browser.js                (20 seasons: year 2047)
+//   LONG_SAVE_YEAR=2057 LONG_SAVE=/path/save.json node tests/long-save-browser.js (30 seasons)
 //
 // Imports the packed save through the app's own file input, saves it to the real IndexedDB slot, loads it back,
 // and checks that the Program page, Game Day (with its conditions), the archive and the season pages still work,
@@ -12,6 +13,7 @@ const {chromium} = require('playwright-core'), {chromiumPath} = require('./helpe
 const {startLiveGame}=require('./helpers/start-live-game');
 const SAVE = process.env.LONG_SAVE;
 if (!SAVE || !fs.existsSync(SAVE)) { console.log('SKIP long-save browser test: set LONG_SAVE to a packed save (see the header).'); process.exit(0); }
+const expectedYear=Number(process.env.LONG_SAVE_YEAR||2047);
 const TAB_GROUP = {dashboard: 'home', program: 'program', history: 'world', roster: 'program', season: 'season', gamelab: 'season', stats: 'season', staff: 'program', recruiting: 'recruiting'};
 const goTab = (page, id) => page.evaluate(({id, group}) => { const g = document.querySelector(`.tab-groups button[data-group="${group}"]`); if (g && !g.classList.contains('active')) g.click(); document.querySelector(`.tabs button[data-tab="${id}"]`)?.click(); }, {id, group: TAB_GROUP[id]});
 
@@ -33,7 +35,7 @@ const goTab = (page, id) => page.evaluate(({id, group}) => { const g = document.
       t0 = Date.now(); await clickShellUtility(page, '#loadBrowser'); await status('^Loaded'); t.load = (Date.now() - t0) / 1000;
       const world = await page.evaluate(() => { const u = window.__DL_TEST__.preseasonDebug(), me = window.__DL_TEST__.selected(); return {phase: u.phase, year: document.querySelector('#weekLine')?.textContent, team: me.name, plan: me.facilityPlan ? {levels: me.facilityPlan.levels, fund: me.facilityPlan.fund, goodwill: me.facilityPlan.goodwill} : null}; });
       assert.ok(world.plan && Object.values(world.plan.levels).reduce((a, b) => a + b, 0) >= 10, `[${label}] the facility plan survived: ${JSON.stringify(world.plan)}`);
-      assert.match(world.year, /20(4[5-9])/, `[${label}] the year is the end of a long dynasty (${world.year})`);
+      assert.match(world.year, new RegExp('\\b'+expectedYear+'\\b'), `[${label}] the year is the end of a long dynasty (${world.year})`);
 
       // --- Program page: the facilities card renders from the loaded plan.
       t0 = Date.now(); await goTab(page, 'program'); await page.waitForSelector('#facilitiesBoosters .fb-track', {timeout: 60000}); t.programPage = (Date.now() - t0) / 1000;

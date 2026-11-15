@@ -69,3 +69,5 @@
 .ra-funnel .ra-warn-text,.recruiting-desk>small.ra-warn-text{color:var(--warn)}
 .ra-care{border-color:var(--good)}
 .ra-decision-badge{display:block;color:var(--muted);font-size:.68rem;overflow-wrap:anywhere}
+
+.ra-next-action{display:block;min-height:44px;margin-top:8px;white-space:normal}

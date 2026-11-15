@@ -78,3 +78,14 @@ test('every Around Your Program briefing kind has art that exists',()=>{
  }
  assert.equal(A.briefKey('nothing'),'');
 });
+
+test('Ring of Honor celebrates an earned induction quietly and never replays on load',()=>{
+ const team={id:1,name:'Home',w:0,l:0},m={key:'2050:honor:p1',kind:'honor',year:2050,team,alumni:[{playerId:'p1',name:'Alex <One>',pos:'QB',proBowls:8,allPros:4,rings:1}]};
+ const body=C.bodyHTML(m);assert.ok(body);assert.equal(body.confetti,false);
+ assert.match(body.html,/Ring of Honor/);assert.match(body.html,/Alex &lt;One&gt;/);
+ assert.doesNotMatch(body.html,/cer-turn/,'a still, restrained tribute');
+ const next={teamId:1,year:2050,milestones:[m]};
+ assert.deepEqual(C.newMilestones(null,next),[]);
+ assert.equal(C.newMilestones({...next,milestones:[]},next).length,1);
+ assert.deepEqual(C.newMilestones(next,next),[]);
+});

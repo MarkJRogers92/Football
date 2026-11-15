@@ -1,66 +1,22 @@
 # Roadmap execution status
 
-Last reconciled: 2026-11-14, source `8530b26` (`v0.31.1`) for a faster weekly recruiting pass (results byte-identical) and one test worker per core (validation and publication pending). Before that: source `792403e` (`v0.31.0`) for the recruiting narrowing warning, the deep game-archive tier, errors-only lint and two revived development features (published). Before that: source `ec24a04` (`v0.30.1`) for staff delegation that settles every weekly decision instead of stopping at the first refusal (published). Before that: source `6d3d0ac` (`v0.30.0`) for the national timeline (awards, upsets and standing records per season), lossless archive trims and the app.js split into app/ parts (published). History index, Hall of Fame and conference pages were already shipped; the playerArchive rollup stays declined (see docs/SAVE_SIZE_MEASUREMENT.md). Before that: recruiting timeline fixes: no cuts on prospects you never pursued, no public dates after week 12, and late offers can earn a Top 5 spot (published). Before that: source `af9778c` (`v0.29.0`) for hidden recruiting timelines, relationship-informed clues, voluntary public announcements and old-save migration (PR #58; validation and publication pending). Before that: the approved Dynasty Lab logo refresh in v0.28.1. Before that: for decisions made on the offseason stop cards (NIL holds, releasing commitments, pursuing transfers) and the animated 3D field on the live Game Day screen. Before that: for turning rivalry trophies, an awards ceremony and Blender-modelled art across The Wire, season stories and card headings. Before that: for portal day (the portal half of handoff item 3), quarter-by-quarter scores recorded per scoring drive, and more of the art pack in play. Before that: for art on every screen (the November 12 art pack: header art, briefing story icons, leader medals, offseason stop and milestone art). Before that: for signing day announced in the offseason stop (v0.23.0 added timeouts and the award art). Before that: for timeouts, the award art pack, test hooks only under automation and the fast test tier. Before that: for the installable offline web build, security policy and problem reporting (v0.21.0 added the phone floors and accessibility test). Before that: for the phone touch and text floors and the automated accessibility check (v0.20.0 added nicknames and offseason stops). Before that: for nicknames, offseason stops, staff recruiting by default and a clearer administration review (v0.19.0 added drive and defensive calls). Before that: for drive calls, defensive calls and the live-game screen (v0.18.0 added compressed backups and the crash screen). Before that: for compressed backups, the crash screen and save-size warnings (v0.17.2 fixed the visible Game Day defects). Before that: for the visible Game Day fixes (postgame clipping, field-goal range, one week label), first release of docs/RELEASE_GAMEPLAN_2026-11-11.md. Before that: for the Mac downloads release (universal macOS build, desktop update notices that read prereleases, install steps on every release, web download link) on top of v0.17.0 (source `83cb221`, merged PR #45: review fixes, league and recruiting upgrades, play-by-play names, generation and polish). Gameplay is unchanged from v0.17.0. Earlier work arrived on
-`claude/eager-albattani-agpo72` (v0.14.5: locked-in coached games, Decision Room, setup reminders and calmer layouts; v0.14.4 published from `claude/review-improvement-dwjemy`). See `agent_docs/HANDOFF_2026-11-07_v0.14.4.md` and `CHANGELOG.md`. One More Saturday is complete; full 642-test/browser/storage/audit/desktop validation and live Pages evidence are recorded in `agent_docs/latest_session_work.md`. Current continuation is `agent_docs/HANDOFF_2026-11-07_v0.14.3.md`. History carries coach index, champion
-timeline, Hall of Fame with filtering and show-all, and conference standings.
-v0.12.24 adds the championship trophy and team helmets (presentation only); v0.12.26 swaps in the image-to-3D trophy as a turntable; v0.12.27 makes the turn continuous (crossfaded, 30s). Published 0.14.1 (with 0.14.0): web run 41775769252, GitHub Release v0.14.1 (prerelease, no desktop assets; release workflow run 41851458748). Published 0.13.1: web run 41764427559 (no GitHub Release or desktop build). Published 0.13.0: web run 41584185384, GitHub Release v0.13.0 (prerelease, no desktop assets; release workflow run 41610639932). Published 0.12.29: web run 41571572439 (no GitHub Release, desktop build or Mac install yet). Published 0.12.28: web run 40822227655, desktop artifacts from validate run 40822099911, GitHub Release pending (agent_docs/HANDOFF_2026-10-29_v0.12.28.md). Published 0.12.24: web run 40450856688; Mac installed from artifact 12709339863 and release v0.12.24 created. The playerArchive rollup was investigated and
-rejected on measurement (docs/SAVE_SIZE_MEASUREMENT.md). The kicker/punter
-availability gap found by the health metrics is fixed and re-measured: thin K/P
-team-seasons 36/47 → 0/0 over three seasons on two seeds. The next named packet is
-the portal's placement behaviour (no entrant is ever left unplaced)
-(docs/LEAGUE_HEALTH_2026-10-25.md), measured before and after.
+Last reconciled: 2026-11-15, source `5c12a9c` (`v0.33.0`).
 
-| Packet | Status | Notes |
-| --- | --- | --- |
-| v0.9.45 stabilization | SHIPPED | baseline release path |
-| v0.9.46 offseason calendar | SHIPPED | |
-| v0.9.47 transfer portal | SHIPPED | |
-| v0.9.48 schedules/rivalries | SHIPPED | |
-| v0.9.49 saves/storage | SHIPPED | multi-slot + autosave + chunked archives |
-| v0.9.50 modules/RNG | SHIPPED | all gameplay domains routed through `gameplayRandom()` |
-| v0.9.51-55 goals/recruiting/development | SHIPPED | |
-| v0.10 Game Engine 2 | SHIPPED | interactive, recorded, postseason, 3D replay |
-| v0.11 program economy | SHIPPED | |
-| v0.11.8 audit maintenance | SHIPPED | source reconciliation + publish guard |
-| v0.12 premium client | SHIPPED | milestones A-J of docs/DYNASTY_LAB_PREMIUM_CLIENT_DESIGN_ROADMAP.md |
-| v0.12 encyclopedia | SHIPPED | Playbook search (v0.12.10), coach index and champion timeline (v0.12.13), Hall of Fame (v0.12.14), conference standings (v0.12.15) |
-| storage reduction | IN PROGRESS | compaction (v0.9.49) + never-played summary records (v0.12.16); ten-season measurement in docs/SAVE_SIZE_MEASUREMENT.md |
-| league health | SHIPPED v0.12.17 | `tools/league-health.js`; ten-season findings in docs/LEAGUE_HEALTH_2026-10-25.md; Hall of Fame selectivity fixed |
+## Current source and publication
 
-`SHIPPED` means the packet is in the released source and reachable from the
-default branch. The "v0.12" label in the encyclopedia packet is historical; the
-actual v0.12 series shipped the client and guidance work instead, so the packet
-should be sliced under a new version number.
+PR #64 (`claude/wonderful-hypatia-fwi914`) contains the v0.32 world systems and v0.33 pro pipeline. Its reviewed head is `5c12a9cfb840524e507d39f62bee548e103438fb`; it was open and unmerged when checked. The default branch was v0.31.1 (`2cc65d8`). Source version is not evidence of publication.
+
+The `codex/world-followups` branch builds directly on that head. It adds optional world news, deliberate AI realignment decisions, Ring of Honor presentation, alumni rename continuity, chronological pro profiles and actionable recruiting warnings. Fable's bounded documentation and test-coverage housekeeping are included. Verification and continuation evidence belong in `agent_docs/latest_session_work.md`.
 
 ## Next action
 
-**Current (2026-11-11):** follow "What is left" in `agent_docs/HANDOFF_2026-11-11_v0.22.0.md`. The list below predates v0.17.2 and is kept for history.
+Review `codex/world-followups` against PR #64, then integrate the follow-ups with the upstream PR. Publication remains a separate step. Do not rebuild systems already present in v0.33.
 
-One bounded packet at a time, in this order:
+## Remaining work
 
-1. **History surfaces** (`09-v012-encyclopedia.md` remainder): coach index,
-   conference and season pages, national timeline, Hall of Fame. Search already
-   ships; extend the same read-only pattern, keep stable IDs and change no save
-   shape.
-2. **playerArchive rollup**: retired players who never recorded a meaningful snap
-   keep a full `seasonHistory`. Collapse those to career totals while keeping
-   awards, draft result, last team and exit reason, then re-measure at ten
-   seasons. Read docs/SAVE_SIZE_MEASUREMENT.md and STORAGE.md first.
+- Real iPhone/Safari and screen-reader checks; automated desktop mobile viewports do not establish these.
+- Human playtesting for session length, onboarding and whether the world stays enjoyable without chores.
+- Fatigue, difficulty presets and alternate playoff formats are separate design/balance decisions, not part of this pass.
+- Signed installers and a licence/pricing decision were previously declined or deferred by the owner; do not silently reopen them as blockers.
 
-Do not tune prestige or simulation balance from a single season; the five-season
-audit is stable.
-
-## Update protocol
-
-When work begins, change only that row to `IN PROGRESS` and record the branch.
-When released, change it to `SHIPPED <version/commit>` and advance Next action.
-If a different branch ships overlapping work, mark the packet `RECONCILE`
-rather than starting it again.
-
-## Resume prompt
-
-> Read `docs/roadmap/STATUS.md` and only the packet named in Next action.
-> Inspect the current default branch before coding. Create a bounded local
-> branch, implement one named commit, run its targeted tests, and stop.
-> Do not push, publish, deploy, merge, or edit unrelated packets without an
-> explicit instruction.
+Use `CHANGELOG.md` for release history and `docs/DYNASTY_WORLD_MEASUREMENTS.md` for balance evidence. Historical release plans are not current task lists.
