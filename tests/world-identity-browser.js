@@ -45,7 +45,13 @@ const {startNewDynasty}=require('./helpers/start-new-dynasty');
     await page.locator('#offseasonStop').waitFor({state:'visible'});
     assert.equal(await page.locator('#hubAdvance').innerText(),label,'the stage is not processed while the stop is showing');
     const text=await page.locator('#offseasonStop').innerText();stops.push(stage);
-    assert.match(text,/BEFORE YOU MOVE ON/);// v0.28: decision rows (NIL, release, pursue) sit on the card; outside them there is one way to the full screen and one way to move on.
+    // When one of the coach's commits is still contested at season's end, the signing stage is signing day's
+    // announcer instead of the generic card (it depends on the random dynasty). Announce the names, then the card
+    // has the same two ways out as every stop.
+    if(stage==='Signing'&&/SIGNING DAY/.test(text)){
+     if(await page.locator('[data-offseason-sign="all"]').count())await page.click('[data-offseason-sign="all"]');
+     assert.equal(await page.locator('[data-offseason-sign]').count(),0,'every name is announced');
+    }else assert.match(text,/BEFORE YOU MOVE ON/);// v0.28: decision rows (NIL, release, pursue) sit on the card; outside them there is one way to the full screen and one way to move on.
     assert.equal(await page.locator('#offseasonStop > .button-row button').count(),2,'one way to the full screen and one way to move on');
     if(stage==='Portal'){
      await page.locator('#offseasonStop [data-offseason-stop-act]').click();

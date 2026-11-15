@@ -19374,7 +19374,7 @@ function offseasonStopFacts(phase,t){
  if(phase==='signing'){
   const sch=scholarshipSummary(t),commits=(universe.recruits||[]).filter(r=>r.committed===t.name).length,mine=mySigningDayLeft(t);
   // v0.24: signing day's contested commitments are announced here, the coach's own first, before the class enrolls.
-  if(mine.length)return{title:`${mine.length} of your recruit${mine.length===1?' is':'s are'} still deciding`,
+  if(mine.length)return{title:`${mine.length} of your recruits ${mine.length===1?'is':'are'} still deciding`,
    text:`${mine.length===1?'He has':'They have'} committed to one program and a rival is still pushing. Each decision was made when the season ended; announce them one at a time, then enroll the class.`,
    act:{label:'Review the class',tab:'recruiting'},go:'Enroll the class',signing:true};
   const sd=universe.signingDay,told=sd?.year===universe.year?sd.board.slice(0,sd.revealed).filter(x=>x.from===t.name||x.challenger===t.name):[];
