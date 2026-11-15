@@ -14250,9 +14250,11 @@ if(typeof module==='object'&&module.exports){
   // Existing commitments still get flip pressure; visits and this week's work update before readiness.
   const held=t?new Set(universe.recruits.filter(r=>r.committed===t.name).map(r=>r.id)):null;
   const out=advanceRecruitingBeforeRecruitingActions();
-  const funnel=recruitingActions.runFunnel(universe.recruits,t);
+  // v0.34: the funnel and rival moves ask every program's scholarship limit for every prospect. Rosters cannot change
+  // here either (commitments fill classes, not rosters), so the pass's capacity cache covers them too.
+  let funnel,rivalMoves=0;passCapacity=new Map();
+  try{funnel=recruitingActions.runFunnel(universe.recruits,t);if(t)rivalMoves=recruitingActions.generateRivals(universe.recruits,t).length}finally{passCapacity=null}
   if(t){
-   const rivalMoves=recruitingActions.generateRivals(universe.recruits,t).length;
    // The hours ledger still describes the week just played, because the counter has already moved on.
    const w=t.recruitingWeek&&t.recruitingWeek.year===universe.year&&t.recruitingWeek.week===playedWeek?t.recruitingWeek:null;
    t.recruitingLastWeek={year:universe.year,week:playedWeek,spent:w?w.spent:0,budget:recruitingActions.hoursBudgetFor(t),cooled:passCooled.slice(0,12),cooledCount:passCooled.length,rivalMoves,

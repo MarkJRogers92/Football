@@ -110,3 +110,18 @@ Draft classes from `FULL=1 SEASONS=5 node tools/league-health.js` at seeds 7, 11
 | v0.33.1: 5 AP, or 9 PB + 2 AP, or 7 PB + 3 AP + ring | 2.20 | 0–4 |
 
 The wait after retirement is now five seasons (was three). Measurement only; players never see projected careers.
+
+## v0.34 faster recruiting weeks
+
+Profile of one full-runtime regular season (seed 9108): `scholarshipCapacity` was 17% of the season by itself,
+reached through `canTakeCommit` from the recruiting funnel (`runFunnel`) and rival moves in `recruiting-actions.js`.
+Those run after the core weekly pass, outside the per-pass capacity cache added in v0.31.1. Rosters cannot change
+during them (commitments fill classes, not rosters), so the same cache now covers them.
+
+| Seed | Regular season before / after | Universe SHA-256 after season + postseason (first 16 hex) |
+| --- | --- | --- |
+| 9108 | 9.0 s / 6.8 s | `c56cd5e6dbb32dae` both |
+| 4711 | 9.3 s / 6.9 s | `2f02c8eb9cac653b` both |
+
+Identical universes, about 25% less time per season. The next cost is `rankTeams` in the funnel (every program's
+pitch for every open prospect, ~15%); caching it needs invalidation on interest and commitment changes inside a pass.
