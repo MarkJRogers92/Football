@@ -61,3 +61,6 @@
 /* v0.35: bet with the administration (This Week). */
 .admin-wager .stop-rows li{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .admin-wager [data-wager-decline]{margin-top:10px}
+/* v0.35: home streak (This Week). */
+.home-streak{margin:8px 0;padding:9px 12px;border-radius:6px;border:1px solid var(--line,rgba(255,255,255,.14));border-left:4px solid var(--accent,#d9a441)}
+.home-streak p{margin:4px 0 0}

@@ -109,6 +109,14 @@ const shots=process.env.DW_SHOTS;
    await page.waitForSelector('#adminWager',{state:'detached',timeout:15000});
    assert.match(await page.locator('#saveStatus').textContent(),/Bet made with the board: Win at least \d+ games/);
 
+   // --- This Week: a long home streak is named.
+   const hs=await page.evaluate(()=>window.__DL_TEST__.homeStreakFixture(12));
+   await page.waitForSelector('#homeStreak',{timeout:15000});
+   const hsText=await page.locator('#homeStreak').innerText();
+   assert.ok(/HOME STREAK/.test(hsText)&&/The Fortress/.test(hsText)&&/12 straight home wins/.test(hsText),`[${label}] the streak is named: ${hsText}`);
+   assert.ok(hs.home||hsText.includes(hs.host),`[${label}] a road streak names the host`);
+   await page.evaluate(()=>window.__DL_TEST__.homeStreakFixture(0));
+
    // --- This Week: a trap game before a big one.
    const trapOpp=await page.evaluate(()=>window.__DL_TEST__.trapGameFixture());
    await page.waitForSelector('#trapGame',{timeout:15000});
