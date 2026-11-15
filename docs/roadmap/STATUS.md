@@ -1,12 +1,12 @@
 # Roadmap execution status
 
-Last reconciled: 2026-11-15, source `d2efc15` (`v0.33.1`).
+Last reconciled: 2026-11-15, source `457bef7` (`v0.33.1`).
 
 ## Current source and publication
 
-PR #65 (world follow-ups) merged into PR #64 (world systems and pro pipeline), and #64 merged into the default branch at `200eb03f8349977b296e67bb8590a90539c57dd7`. Production commit `ae44ad58b1daf60efd2e181168bd6a5fd1a5176b` serves v0.33.0 at https://markjrogers92.github.io/Football/.
+PR #66 (v0.33.1: NFL outlook from scouting ranges, tighter Pro Hall of Fame, week result line fix) merged into the default branch at `457bef7e676fa840bd12e498126a343f9d42cd12`. Production commit `bf94d7d` serves v0.33.1 at https://markjrogers92.github.io/Football/; its `index.html` matches the release source byte for byte.
 
-The live artifact matches the verified source build. The publisher's full release gate passed, followed by a live browser playthrough. Exact evidence is in `agent_docs/latest_session_work.md`.
+The publish workflow's full release gate passed in CI. Evidence is in `agent_docs/latest_session_work.md`. Work after v0.33.1 is on `claude/overnight-v034` (see `docs/NEXT_IDEAS_2026-11-15.md`).
 
 ## Next action
 

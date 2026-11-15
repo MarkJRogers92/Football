@@ -1,5 +1,9 @@
 # Latest session work
 
+## v0.33.1 publication — 2026-11-15
+
+PR #66 merged into the default branch at `457bef7e676fa840bd12e498126a343f9d42cd12`. Publish workflow run 43686148276 (production, full validation in CI) succeeded at 07:06 UTC. Production commit on `gh-pages`: `bf94d7d` ("Publish production: 0.33.1"). Its `index.html` SHA-256 `8b76c0b9f15036fa2a1df879dea4e9a6684b4bae0ef3260469121e5cb747ce7e` matches the release source exactly. The live URL could not be fetched from the session container (proxy), so no live-page check was made from here.
+
 ## v0.33.1 outlook leak and Hall of Fame — 2026-11-15
 
 - `nfl-pipeline.js`: `grade(p,t,seen)` takes an optional scouted view; `outlook(p,t,current,upside)` builds a round/grade/ceiling range from the staff's `scoutRange` low and high ends with traits as shrunken offsets (same `.45` the scouting domains use), no hashed scouts' read and mean ceiling jitter. The chronology's NFL OUTLOOK uses it (`data-nfl-outlook`). Draft and early declarations still use the true grade.
