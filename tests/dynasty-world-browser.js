@@ -99,6 +99,16 @@ const shots=process.env.DW_SHOTS;
    assert.match(await page.locator('#draftClassNote').textContent(),/2023 class: a thin one\. Only 2 underclassmen declared early, against 12 a class before it/,`[${label}] the draft board explains a thin class`);
    await open(page,'home','dashboard');
 
+   // --- This Week: the board offers a bet before the first game.
+   await open(page,'home','dashboard');
+   await page.waitForSelector('#adminWager [data-wager]',{timeout:15000});
+   assert.equal(await page.locator('#adminWager [data-wager]').count(),3,`[${label}] three promises on the table`);
+   assert.ok(await overflow(page)<=1,`[${label}] the bet card fits`);
+   if(shots)await page.locator('#adminWager').screenshot({path:path.join(shots,`admin-wager-${label}.png`)});
+   await page.locator('#adminWager [data-wager]').first().click();
+   await page.waitForSelector('#adminWager',{state:'detached',timeout:15000});
+   assert.match(await page.locator('#saveStatus').textContent(),/Bet made with the board: Win at least \d+ games/);
+
    // --- This Week: a trap game before a big one.
    const trapOpp=await page.evaluate(()=>window.__DL_TEST__.trapGameFixture());
    await page.waitForSelector('#trapGame',{timeout:15000});
