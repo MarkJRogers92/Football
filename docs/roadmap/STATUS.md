@@ -1,16 +1,16 @@
 # Roadmap execution status
 
-Last reconciled: 2026-11-15, source `5c12a9c` (`v0.33.0`).
+Last reconciled: 2026-11-15, source `200eb03` (`v0.33.0`).
 
 ## Current source and publication
 
-PR #64 (`claude/wonderful-hypatia-fwi914`) contains the v0.32 world systems and v0.33 pro pipeline. Its reviewed head is `5c12a9cfb840524e507d39f62bee548e103438fb`; it was open and unmerged when checked. The default branch was v0.31.1 (`2cc65d8`). Source version is not evidence of publication.
+PR #65 (world follow-ups) merged into PR #64 (world systems and pro pipeline), and #64 merged into the default branch at `200eb03f8349977b296e67bb8590a90539c57dd7`. Production commit `ae44ad58b1daf60efd2e181168bd6a5fd1a5176b` serves v0.33.0 at https://markjrogers92.github.io/Football/.
 
-The `codex/world-followups` branch builds directly on that head. It adds optional world news, deliberate AI realignment decisions, Ring of Honor presentation, alumni rename continuity, chronological pro profiles and actionable recruiting warnings. Fable's bounded documentation and test-coverage housekeeping are included. Verification and continuation evidence belong in `agent_docs/latest_session_work.md`.
+The live artifact matches the verified source build. The publisher's full release gate passed, followed by a live browser playthrough. Exact evidence is in `agent_docs/latest_session_work.md`.
 
 ## Next action
 
-Review `codex/world-followups` against PR #64, then integrate the follow-ups with the upstream PR. Publication remains a separate step. Do not rebuild systems already present in v0.33.
+Release work is complete. Gather playtesting feedback before expanding the simulation. Do not rebuild systems already present in v0.33.
 
 ## Remaining work
 

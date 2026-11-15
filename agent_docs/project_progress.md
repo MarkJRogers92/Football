@@ -2,10 +2,12 @@
 
 ## Goal and position
 
-Finish the authorized Dynasty Lab world follow-ups and incorporate the useful bounded items from Fable's upgrade plan. Work is on `codex/world-followups`, based on the actual PR #64 head `5c12a9cfb840524e507d39f62bee548e103438fb` (v0.33.0).
+The authorized world follow-ups are implemented, merged and published as v0.33.0. PR #65 merged into #64, then #64 merged into the default branch at `200eb03`. Production commit `ae44ad5` is live at https://markjrogers92.github.io/Football/.
 
-Implementation covers current-world briefing/Wire items, deterministic AI invitation decisions, Ring of Honor, alumni identity continuity, chronological pro profiles, actionable recruiting warnings, documentation cleanup and test-list coverage checks. The full unit suite, main/extended browser matrices, accessibility and persistence checks passed. Four ten-season comparisons and the 30-season campaign completed. The 311.8 MB long save also passed desktop/phone Chromium import, IndexedDB save/load and gameplay checks. The committed build reproduces exactly. Implementation is complete and ready for branch review; nothing has been published.
+The publisher passed all 981 unit tests, main/extended browser suites, six persistence scenarios and the five-season audit. The live artifact matches the verified build exactly; a real-browser player flow created a dynasty and advanced a week. Earlier validation also completed four ten-season balance comparisons and a 30-season save/reload campaign.
 
 ## Continuation
 
-The work checkout is `.session-artifacts/world-followups`. Preserve the outer older checkout and its unrelated edits. Exact verification results and the next action are recorded in `latest_session_work.md`; release history is in `CHANGELOG.md`.
+No release work remains. Optional next work is human playtesting and real iPhone/Safari or screen-reader checks. Long-save archive growth remains a measured limitation. See `latest_session_work.md` for release evidence and `docs/DYNASTY_WORLD_MEASUREMENTS.md` for balance results.
+
+Use `.session-artifacts/world-followups` for this source. Preserve the older outer checkout and its unrelated edits.

@@ -2,6 +2,8 @@
 
 ## Decisions and Lessons
 
+- Complete a stacked release by merging the follow-up PR into its upstream branch first, then merging upstream. Verify both the published artifact hash and a live player flow; a successful deployment push alone does not establish that the new game is served.
+
 - A refusal should not consume a completed-deal quota. For realignment, value recurring payouts over the contract cycle and reserve conference slots only after acceptance or a pending user offer.
 
 - Check the caller’s clock before enforcing class-based eligibility. Departures has already charged the current season; early draft entry therefore reads completed seasons plus redshirt time, not the preseason class index.

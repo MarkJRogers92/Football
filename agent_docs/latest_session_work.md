@@ -1,6 +1,14 @@
 # Latest session work
 
-## World follow-ups — 2026-11-15 (unpublished)
+## v0.33.0 publication — 2026-11-15
+
+PR #65 merged into #64, then #64 merged into the default branch. Release source: `200eb03f8349977b296e67bb8590a90539c57dd7`. Production commit: `ae44ad58b1daf60efd2e181168bd6a5fd1a5176b`. Live: https://markjrogers92.github.io/Football/.
+
+The publisher completed its full release gate: **981 unit tests passed, zero failures/skips**, main and extended browser suites, six browser persistence scenarios, and the five-season audit. The live HTTP response was 200 and its SHA-256 exactly matched the committed build: `0f1affc8542201cf232ccd8961925474821fa8fbaff3edc679f059878330f2b6`. The live player browser test, with debugging hooks disabled, created a dynasty and advanced through a week without console errors.
+
+Publication is complete. The source checkout is `.session-artifacts/world-followups`, on `codex/publish-world-v033`; the older outer working copy and its unrelated edits remain untouched. The details below record the preceding implementation/validation stage.
+
+## World follow-ups — 2026-11-15 (pre-publication validation)
 
 Based on PR #64 head `5c12a9cfb840524e507d39f62bee548e103438fb`, v0.33.0. Branch `codex/world-followups`, isolated checkout `.session-artifacts/world-followups`. The outer checkout is older and contains unrelated user edits.
 
@@ -10,7 +18,7 @@ Verification: full unit run **980/980**, final realignment **14/14**, final lint
 
 Four final full-runtime ten-season runs (7, 11, 23, 31) completed after both gameplay fixes. Canonical results and methodology: `docs/DYNASTY_WORLD_MEASUREMENTS.md`. The corrected eligibility test excludes ordinary sophomores and considers juniors/redshirt sophomores. Earlier provisional soaks are superseded, not final evidence.
 
-Release-artifact verification passed: the committed `index.html` reproduces exactly from source. No publication or merge was performed. Review branch `codex/world-followups` is based on PR #64; target that branch first, or retarget after #64 merges. The upstream PR remained open at the final check. Real iPhone/Safari, screen-reader and packaged-desktop checks were not run. Long-save archive growth remains a measured limitation, not a solved issue.
+Release-artifact verification passed: the committed `index.html` reproduces exactly from source. The pre-publication review branch was `codex/world-followups`, based on PR #64. Both PRs are now merged and publication is verified above. Real iPhone/Safari, screen-reader and packaged-desktop checks were not run. Long-save archive growth remains a measured limitation, not a solved issue.
 
 
 ## v0.33.0 (2026-11-15): the pro pipeline
