@@ -1,5 +1,12 @@
 # Latest session work
 
+## v0.33.1 outlook leak and Hall of Fame — 2026-11-15
+
+- `nfl-pipeline.js`: `grade(p,t,seen)` takes an optional scouted view; `outlook(p,t,current,upside)` builds a round/grade/ceiling range from the staff's `scoutRange` low and high ends with traits as shrunken offsets (same `.45` the scouting domains use), no hashed scouts' read and mean ceiling jitter. The chronology's NFL OUTLOOK uses it (`data-nfl-outlook`). Draft and early declarations still use the true grade.
+- Hall of Fame: `hallWorthy` = 5 All-Pro, or 9 PB + 2 AP, or 7 PB + 3 AP + ring; `HOF_WAIT` 3 → 5. Measured on draft classes from 5-season full-runtime runs, seeds 7/11/23: 3.6 → 2.2 per class. See `docs/DYNASTY_WORLD_MEASUREMENTS.md`.
+- `noncon-schedule.js`: the marquee home payout appended to, instead of replacing, the week's result status (it hid the result and skipped the result sound cue; `tests/season-features-browser.js` failed about 3 in 4 runs on v0.33.0). New status assertion in that test.
+- Tests: three new cases in `tests/nfl-pipeline.js` (outlook unit, outlook in a full-runtime chronology, Hall rule).
+
 ## v0.33.0 publication — 2026-11-15
 
 PR #65 merged into #64, then #64 merged into the default branch. Release source: `200eb03f8349977b296e67bb8590a90539c57dd7`. Production commit: `ae44ad58b1daf60efd2e181168bd6a5fd1a5176b`. Live: https://markjrogers92.github.io/Football/.

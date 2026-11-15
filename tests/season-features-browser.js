@@ -19,6 +19,8 @@ const simWeek=async page=>{for(let i=0;i<12;i++){const before=await page.evaluat
   assert.ok(cues.every(([,ok])=>ok),`[${label}] every cue synthesizes: ${JSON.stringify(cues)}`);
   await page.evaluate(()=>{window.DynastySound.log.length=0});
   for(let w=0;w<3;w++)await simWeek(page);
+  // A marquee home payout adds to the week's result line; it must not replace it (v0.33.1 fix).
+  assert.match(await page.locator('#saveStatus').innerText(),/^Week \d+ final: [WL] /,`[${label}] the week's result stays on the status line`);
   const log=await page.evaluate(()=>window.DynastySound.log.slice());
   const finals=await page.evaluate(()=>(window.__DL_TEST__.selected().schedule||[]).filter(g=>g.played).map(g=>g.winner===window.__DL_TEST__.selected().name?'winSting':'lossTone'));
   assert.ok(finals.every(c=>log.includes(c)),`[${label}] week finals play their result cue: ${log.join(',')}`);

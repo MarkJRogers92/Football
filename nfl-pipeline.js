@@ -29,7 +29,7 @@ function makeNflPipeline(env){
   'Penetrator':[1,1],'Range Hunter':[1,1],'Coverage Eraser':[1,1],'One-Cut Burner':[1,1],'Seam Hunter':[1,1],'Range Kicker':[1,0],
   'Gap Eater':[-1,-1],'Two-Gap Anchor':[-1,0],'Gap Hammer':[-1,-1],'Box Enforcer':[-1,-1],'Box Hammer':[-1,-1],'Inline Mauler':[-1,0],'Phone-Booth Anchor':[-1,0],'Power Pivot':[-1,0]};
  const LENGTH_ADJ={RB:-2,QB:2,K:4,P:4,OT:1,OG:1,C:1,LB:-1};
- const HOF_WAIT=3,PITCH_MAX=4,POS_PITCH=[0,.7,1.5],RECENT_DRAFTS=12,GIFT_MAX=2,MILESTONES_PER_YEAR=6,GRADE_OFFSET=1,FULL_INDEX=8,UDFA_KEEP=74;
+ const HOF_WAIT=5,PITCH_MAX=4,POS_PITCH=[0,.7,1.5],RECENT_DRAFTS=12,GIFT_MAX=2,MILESTONES_PER_YEAR=6,GRADE_OFFSET=1,FULL_INDEX=8,UDFA_KEEP=74;
  const num=(v,d)=>Number.isFinite(Number(v))?Number(v):d;
  function hash(...parts){let h=2166136261;for(const ch of parts.join('|')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}h^=h>>>13;h=Math.imul(h,1274126177);return(h^(h>>>16))>>>0}
  const unit=(...parts)=>hash(...parts)/4294967296;
@@ -38,15 +38,30 @@ function makeNflPipeline(env){
 
  // ---- The draft grade ----
  function traitScore(p){const w=NFL_TRAITS[p?.pos]||{technique:.5,power:.25,speed:.25};let s=0,n=0;for(const [k,v] of Object.entries(w)){s+=num(p[k],num(p.trueNow,60))*v;n+=v}return n?s/n:num(p?.trueNow,60)}
- function grade(p,t){
+ // The real grade reads true ratings and two hidden hashes (the pro scouts' read and the ceiling jitter). A scouted
+ // view passes `seen`: the coach's staff estimates of current ability and upside, with the hidden parts at their mean.
+ function grade(p,t,seen){
   if(!p)return null;
-  const ability=num(p.trueNow,60),traits=traitScore(p),prod=num(env.production(p),50),room=clamp(num(p.upside,ability)-ability,0,20);
+  const ability=seen?seen.ability:num(p.trueNow,60),traits=seen?scoutedTraits(p,seen.ability):traitScore(p),prod=num(env.production(p),50);
+  const room=clamp((seen?seen.upside:num(p.upside,ability))-ability,0,20);
   const dur=(num(p.durability,72)-72)*.06-Math.min(3,(p.injuryHistory?.length||0)*.5),exposure=(num(t?.prestige,60)-60)*.04;
-  const style=STYLE_NFL[p.style]||[0,0],read=bell(p.id,'scouts')*2.5;
+  const style=STYLE_NFL[p.style]||[0,0],read=seen?0:bell(p.id,'scouts')*2.5;
   const g=ability*.66+traits*.16+prod*.12+room*.2+dur+exposure+style[0]+read+GRADE_OFFSET;
-  const ceiling=g+room*.45+style[1]+unit(p.id,'ceiling')*4;
+  const ceiling=g+room*.45+style[1]+(seen?2:unit(p.id,'ceiling')*4);
   return{grade:Math.round(g*10)/10,ceiling:Math.round(Math.max(g,ceiling)*10)/10,positionValue:POS_VALUE[p.pos]??0,
    parts:{ability,traits:Math.round(traits),production:Math.round(prod),room:Math.round(room),durability:Math.round(dur*10)/10,exposure:Math.round(exposure*10)/10,style:style[0],read:Math.round(read*10)/10}};
+ }
+ // What the staff can see of his traits: the same shrunken offsets from his overall that the scouting domains use
+ // (estimate = perceived + (truth - trueNow) * .45), centred on the scouted ability instead of the true one.
+ function scoutedTraits(p,ability){return ability+(traitScore(p)-num(p.trueNow,60))*.45}
+ // The outlook a coach can see: a grade range from the low and high ends of his staff's ranges for current ability and
+ // upside. Nothing in it reads a true rating directly, and the hidden scouts' read is left out.
+ function outlook(p,t,current,upside){
+  if(!p||!current||!upside)return null;
+  const lo=grade(p,t,{ability:current[0],upside:upside[0]}),hi=grade(p,t,{ability:current[1],upside:upside[1]});
+  const value=POS_VALUE[p.pos]??0,best=roundFor(boardScore(hi)),worst=roundFor(boardScore(lo));
+  return{grade:[Math.round(lo.grade),Math.round(hi.grade)],ceiling:[Math.round(lo.ceiling),Math.round(hi.ceiling)],rounds:[best,worst],positionValue:value,
+   parts:{ability:[current[0],current[1]],upside:[upside[0],upside[1]],production:hi.parts.production,style:hi.parts.style,durability:hi.parts.durability,exposure:hi.parts.exposure}};
  }
  // Where the board puts him: his grade and what his position is worth.
  function boardScore(g){return g.grade+g.positionValue*.8}
@@ -87,13 +102,16 @@ function makeNflPipeline(env){
   }
   return{id,name:r.playerName,pos:r.pos,school:r.school,draftYear:r.year,round:r.round||null,pick:r.pick||null,label:r.label,grade:Math.round(pg),ceiling:Math.round(pc),peak:Math.round(eff),length,seasons,bust:!!bust,bloom:!!bloom};
  }
+ const hallWorthy=(proBowls,allPros,rings)=>allPros>=5||(proBowls>=9&&allPros>=2)||(proBowls>=7&&allPros>=3&&rings>=1);
  // The career as it stands in a given year.
  function careerAt(r,year,over){
   const c=career(r);if(!c)return null;
   const done=Math.min(c.length,seasonsDone(r,year,over)),played=c.seasons.slice(0,done);
   const proBowls=played.filter(s=>s.proBowl).length,allPros=played.filter(s=>s.allPro).length,rings=played.filter(s=>s.ring).length,starts=played.filter(s=>s.starter).length;
   const retired=done>=c.length&&seasonsDone(r,year,over)>c.length-1,retiredYear=retired?c.draftYear+c.length:null;
-  const hof=retired&&c.length>0&&(year-retiredYear)>=HOF_WAIT&&(proBowls>=8||allPros>=4||(proBowls>=6&&rings>=2));
+  // Canton takes sustained greatness: Pro Bowls alone are not enough without All-Pro seasons, and the real five-year
+  // wait applies. Measured at about two inductees per class (0-4) in docs/DYNASTY_WORLD_MEASUREMENTS.md.
+  const hof=retired&&c.length>0&&(year-retiredYear)>=HOF_WAIT&&hallWorthy(proBowls,allPros,rings);
   const label=c.length===0?'Never made a roster':proBowls>=5?'Franchise star':proBowls>=1?'Pro Bowler':starts>=5?'Long-time starter':starts>=1?'Starter':(c.round&&c.round<=2&&done>=3)?'Bust':'Reserve';
   const steal=(!c.round||c.round>=4)&&proBowls>=1;
   // A derived lifetime is private simulation data, not something a rookie can know.
@@ -180,7 +198,7 @@ function makeNflPipeline(env){
  }
  function recordFor(playerId){for(const list of Object.values(universe().draftHistory||{}))for(const r of list||[])if(String(r.playerId)===String(playerId))return r;return null}
 
- return{POS_VALUE,NFL_TRAITS,STYLE_NFL,CAREER,UDFA_KEEP,HOF_WAIT,PITCH_MAX,GIFT_MAX,hash,unit,traitScore,grade,boardScore,roundFor,projection,gradeOf,ceilingOf,seasonsDone,career,careerAt,schoolIdentity,rememberSchool,allSchools,school,pitchFor,alumniGift,milestones,recordFor,clearCache:()=>{cache=null}};
+ return{POS_VALUE,NFL_TRAITS,STYLE_NFL,CAREER,UDFA_KEEP,HOF_WAIT,PITCH_MAX,GIFT_MAX,hallWorthy,hash,unit,traitScore,scoutedTraits,grade,outlook,boardScore,roundFor,projection,gradeOf,ceilingOf,seasonsDone,career,careerAt,schoolIdentity,rememberSchool,allSchools,school,pitchFor,alumniGift,milestones,recordFor,clearCache:()=>{cache=null}};
 }
 
 if(typeof module==='object'&&module.exports){
@@ -275,8 +293,11 @@ if(typeof module==='object'&&module.exports){
    }
    const team=p&&!p.draftResult?universe.teams.find(t=>t.roster?.includes(p)):null;
    if(team&&eligibilityBase(p)>=2){
-    const d=nfl.projection(p,team),pr=d.parts;
-    return base+`<div class="pro-career"><div class="eyebrow">NFL OUTLOOK</div><p><strong>${nfEsc(d.round?`Round ${d.round} projection`:'Undrafted projection')}</strong> · grade ${d.grade}, ceiling ${d.ceiling}</p><p class="small muted">Ability ${pr.ability} · NFL traits ${pr.traits} · production ${pr.production} · room to grow ${pr.room} · style ${pr.style>0?'+':''}${pr.style} · position value ${d.positionValue>0?'+':''}${d.positionValue}. Pro scouts' read is part of the grade and is not shown.</p></div>`;
+    // Built only from the staff's scouting ranges, the same ones the profile shows, never the true ratings.
+    const d=nfl.outlook(p,team,scoutRange(p,team,false),scoutRange(p,team,true)),pr=d.parts;
+    const span=([a,b])=>a===b?`${a}`:`${a}–${b}`,[best,worst]=d.rounds;
+    const rounds=!best?'Undrafted projection':!worst?`Round ${best} to undrafted projection`:best===worst?`Round ${best} projection`:`Round ${best}–${worst} projection`;
+    return base+`<div class="pro-career" data-nfl-outlook><div class="eyebrow">NFL OUTLOOK</div><p><strong>${nfEsc(rounds)}</strong> · grade ${span(d.grade)}, ceiling ${span(d.ceiling)}</p><p class="small muted">From your staff's evaluation: current ${span(pr.ability)} · upside ${span(pr.upside)} · production ${pr.production} · style ${pr.style>0?'+':''}${pr.style} · position value ${d.positionValue>0?'+':''}${d.positionValue}. Better scouting narrows the range; pro scouts' own read is not shown.</p></div>`;
    }
   }catch(err){console.error(err)}
   return base;
