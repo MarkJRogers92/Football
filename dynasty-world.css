@@ -1,0 +1,35 @@
+/* v0.32: conference realignment (Program page and This Week), the locker room (Roster page and This Week) and the
+   nonconference schedule (Season page). Shares the summary tiles with Facilities & Boosters. */
+.realignment-card .fb-summary,.locker-room-card .fb-summary,.noncon-card .fb-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:10px 0}
+.realignment-card .fb-summary>div,.locker-room-card .fb-summary>div,.noncon-card .fb-summary>div{padding:9px 11px;border:1px solid var(--line,rgba(255,255,255,.14));border-radius:6px;display:flex;flex-direction:column;gap:2px}
+.realignment-card .fb-summary strong,.locker-room-card .fb-summary strong,.noncon-card .fb-summary strong{font-size:1.35rem;line-height:1.1}
+.realignment-card .fb-summary small,.locker-room-card .fb-summary small,.noncon-card .fb-summary small{font-size:.72rem;font-weight:500;opacity:.7;margin-left:3px}
+.dw-button{padding:6px 10px;min-height:32px;border-radius:5px;border:1px solid var(--line,rgba(255,255,255,.25));background:rgba(255,255,255,.06);color:inherit;font:inherit;font-size:.85rem;cursor:pointer}
+.dw-button:hover:not(:disabled){background:rgba(255,255,255,.14)}
+.dw-button:disabled{opacity:.45;cursor:not-allowed}
+.dw-button[aria-pressed="true"]{border-color:var(--accent,#d9a441);background:rgba(217,164,65,.16)}
+.dw-actions{display:flex;flex-wrap:wrap;gap:6px}
+.ra-status,.lr-status{margin:6px 0 8px;padding:9px 11px;border-radius:6px;border-left:4px solid var(--line,rgba(255,255,255,.3));background:rgba(255,255,255,.04);display:flex;flex-wrap:wrap;gap:4px 10px}
+.ra-rising,.lr-good{border-left-color:#5fae7a}
+.ra-at-risk,.lr-bad{border-left-color:#d0605a}
+.ra-watching,.lr-warn{border-left-color:#d9a441}
+.ra-invite{margin:6px 0;padding:8px 10px;border:1px solid #5fae7a;border-radius:6px}
+.ra-details{margin-top:8px}
+.ra-details table,.lr-table table,.noncon-card table{width:100%}
+.ra-details tr.is-mine td,.noncon-card tr.is-mine td{font-weight:700}
+.ra-history{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.realignment-stop .offseason-signing li{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 14px}
+.lr-meter{height:8px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden;margin:4px 0 10px}
+.lr-meter i{display:block;height:100%;background:var(--accent,#d9a441)}
+.lr-captains{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin:8px 0}
+.lr-captain{padding:8px 10px;border:1px solid var(--line,rgba(255,255,255,.14));border-radius:6px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.lr-captain small{display:block;opacity:.75}
+.lr-tag{display:inline-block;padding:1px 6px;border-radius:9px;font-size:.72rem;border:1px solid var(--line,rgba(255,255,255,.25));margin-left:4px;white-space:nowrap}
+.lr-tag-leader{border-color:#5fae7a}
+.lr-tag-volatile{border-color:#d0605a}
+.noncon-week{padding:10px 12px;border:1px solid var(--line,rgba(255,255,255,.14));border-radius:6px;margin:8px 0}
+.noncon-week-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+.noncon-options{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.noncon-options li{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px 12px}
+.noncon-options small{display:block;opacity:.75}
+@media (max-width:560px){.lr-captains{grid-template-columns:1fr}.noncon-options li{flex-direction:column;align-items:flex-start}}
