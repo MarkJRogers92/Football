@@ -110,3 +110,73 @@ Synergy items change game balance. For each one: confirm the gap, add the effect
 4. **Renaming (F9).** Worth a whole release, or keep the 120 names fixed for good.
 5. **Still open from the last plan:** signing certificates, a licence, and a person on a real phone. None of the
    work above needs them, and 1.0 does.
+
+## 7. More ideas: depth without chores
+
+Added 2026-11-15 at the owner's request. These are ideas, not findings: none has been checked against the source
+beyond knowing the system it builds on exists. Each needs the same "confirm, add small, measure" steps as section 2.
+
+**The test every idea here had to pass:**
+
+- **No new weekly task.** A new decision happens once a game or once a season, never every week.
+- **The payoff is seen, soon.** The choice is answered within the same game, or by a named moment later in the
+  season, with the player's choice credited in the text.
+- **Staff can do it.** Every choice has a default the staff take if the player ignores it, and ignoring it costs
+  nothing but the upside.
+- **It reads what is already saved** where it can, so it adds story before it adds state.
+
+### Moments that reward what the player already did
+
+| # | Idea | The gratification | Builds on | Size |
+| --- | --- | --- | --- | --- |
+| M1 | **"You saw him first."** When a prospect the player scouted or offered before he was rated highly becomes a starter, an all-conference pick or a draft pick, the game says so and shows the original scouting receipt beside the result. | Proof that the player's eye was right, years later. | Scouting receipts, player history, The Wire | Small |
+| M2 | **Senior Day.** The last home game opens with the seniors, each with one career line (first start, best game, where he ranks in the record book). No decisions. | The roster the player built gets a goodbye. | Homegrown first starts, career records, ceremonies | Small |
+| M3 | **Alumni in the pros.** Drafted players keep a one-line pro career that updates each offseason; the best appear in The Wire and on the program page. Feeds S1. | Players do not vanish at the draft. | Draft Night, player archive | Medium |
+| M4 | **Ring of honor.** When a great player leaves, the player may retire his number or add him to a ring of honor, shown on the program page and in the yearbook. A handful per decade, so each one is a choice. | A permanent mark the player placed on purpose. | Hall of Fame, program history | Small |
+| M5 | **Trophy case.** One screen with every trophy the program holds: rivalry trophies currently on campus, conference crowns, bowls, national titles, awards, with empty spaces for the ones a rival holds. | The art already made, collected in one place, with gaps that itch. | Rivalry trophies, turntables, awards art | Small |
+| M6 | **Milestone wins.** The 50th, 100th and 200th win, the first win over a top-five team and the first road win at a rival get a short ceremony and a line in the career chronology. | Long dynasties get markers. | Career milestones, ceremonies | Small |
+| M7 | **Nemesis and favourite opponent.** The game notices the coach the player cannot beat and the one they always beat, and says so before the next meeting. | Rivalries the player earned, not ones assigned. | Coach careers, series records, Around Your Program | Small |
+
+### One choice, one big answer
+
+| # | Idea | The choice | The answer | Size |
+| --- | --- | --- | --- | --- |
+| C1 | **Halftime adjustment.** | One of three at the half, each written from what actually happened in the first half ("They have run for 140: load the box"). | The third-quarter line on the live screen says what the adjustment did. | Medium |
+| C2 | **The play you saved.** | One special call a game (a trick play, a fake, an all-out blitz), held until the player chooses the moment. | Played out on the 3D field; remembered in the recap whether it worked or not. | Medium |
+| C3 | **The big visit weekend.** | Once a season, pick one home game to host the top targets on the board. | Win it and every visitor's interest jumps; lose badly and it drops. The game suddenly matters twice. | Medium |
+| C4 | **The award campaign.** | Once a season, back one player for a national award. | He gets more featured touches and more attention in the award race; the rest of the offense gets slightly fewer. The awards ceremony credits the campaign. | Small |
+| C5 | **A bet with the administration.** | Before the season, optionally promise one thing above the stated expectation (beat the rival, win the conference). | Deliver it and confidence and next year's budget rise more than usual; miss it and they fall. Skipping the bet changes nothing. | Small |
+| C6 | **Spring game.** | None required: one watchable scrimmage at the spring stop. | Camp risers and position battles are revealed on the field instead of in a list; the player may name one winner on the spot. | Medium |
+
+### A world with more faces
+
+| # | Idea | What changes | Size |
+| --- | --- | --- | --- |
+| W1 | **Legacy recruits and package deals.** A few prospects each class are the younger brother or son of a former player of some program, or the high-school teammate of another prospect. Signing one tilts the other. | Recruiting stories that write themselves, from the player's own history. | Medium |
+| W2 | **Former players return as coaches.** Some archived players reappear in the hiring pool years later, with their playing career on their card. Fits S3. | "Your 2029 quarterback wants to come home as position coach." | Medium |
+| W3 | **Trap games and statement wins.** The game flags the week a tired, ranked team visits a hungry one, and names the win that changed how the season is seen. | Ordinary weeks get stakes, with no added decision. | Small |
+| W4 | **Stadium atmosphere.** Sellout streaks, a home winning streak that gets a name once it is long enough, and night games against rivals that count for more at home. | Fan support becomes something the player can watch grow. | Small |
+| W5 | **Program traditions.** Sustained achievements unlock a named tradition (ten straight home wins, five straight over the rival, four straight top-ten classes) with a small lasting benefit that ends if the streak does. | Something to protect, not just to reach. | Medium |
+
+### Play again, show it off
+
+| # | Idea | What it is | Size |
+| --- | --- | --- | --- |
+| P1 | **The one that got away.** Re-coach any archived game of the player's own from the opening kick, outside the dynasty. Nothing in the save changes. | Medium |
+| P2 | **A season card to share.** One image of the season: record, final ranking, trophies, best player, biggest win. Saved to the device; nothing is uploaded. | Small |
+| P3 | **Dynasty in one page.** A decade summary at every tenth season: titles, best team, best player, best class, the coach's record against each rival. | Small |
+
+### Deliberately left out
+
+These add depth and would also add a chore: weekly NIL bookkeeping, practice reps set position by position,
+per-play calling, manual scheduling of every non-conference game, dorm, compliance or budget ledgers, and any
+meter that must be topped up each week to avoid a penalty.
+
+### Where they fit
+
+M1, M2, M5, M6, M7, W3 and P2 are small and read existing data: they can ride with any release in section 5.
+C1 and C2 belong with v0.33 (Saturday). C3, W1 and M3 belong with v0.32 (recruiting). M4, W2, P1 and P3 belong
+with v0.34 (career). C4, C5, C6, W4 and W5 belong with v0.35 (your rules).
+
+**If only five are built:** M1, C1, C3, M5 and W1. Together they reward scouting, make halftime a moment, make one
+home game matter twice, collect the art in one place and let recruiting tell stories from the player's own past.
