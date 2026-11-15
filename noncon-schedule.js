@@ -125,7 +125,12 @@ if(typeof module==='object'&&module.exports){
  simWeek=function simWeekWithNoncon(){
   const week=universe?.week,out=simWeekBeforeNoncon.apply(this,arguments);
   const me=selected();
-  if(me&&universe&&universe.week!==week&&week!=null){const r=noncon.settleWeek(me,week+1);if(r)setStatus(`${r.opponent} drew a crowd: boosters +${r.goodwill} goodwill, fan support +${r.fans}.`)}
+  if(me&&universe&&universe.week!==week&&week!=null){const r=noncon.settleWeek(me,week+1);if(r){
+   // Add to the week's result line rather than replace it: the result is what the coach needs to read, and the
+   // result splash and sound cues key on it ("Week N final: W ...").
+   const prior=(typeof document!=='undefined'&&document.querySelector?.('#saveStatus')?.textContent)||'';
+   setStatus(`${prior?`${prior} `:''}${r.opponent} drew a crowd: boosters +${r.goodwill} goodwill, fan support +${r.fans}.`);
+  }}
   return out;
  };
  const label=k=>`<span class="lr-tag">${ncEsc(noncon.KINDS[k])}</span>`;
