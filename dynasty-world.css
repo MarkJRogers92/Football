@@ -39,3 +39,11 @@
 /* v0.34: coaching rivals (This Week and Program page). */
 .coach-rival-week{margin:8px 0;padding:9px 12px;border-radius:6px;border:1px solid var(--line,rgba(255,255,255,.14));border-left:4px solid var(--accent,#d9a441)}
 .coach-rival-week p{margin:4px 0 0}
+/* v0.34: Senior Day (This Week). */
+.senior-day{margin:8px 0;padding:10px 12px;border-radius:6px;border:1px solid var(--line,rgba(255,255,255,.14));border-left:4px solid #5fae7a}
+.senior-day h3{margin:2px 0 6px}
+.senior-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:4px 16px}
+.senior-list li{padding:3px 0}
+.senior-list small{display:block;opacity:.75}
+.senior-day .player-button{padding:0;min-height:0}
+.senior-rest{margin:8px 0 0;line-height:1.6}

@@ -64,6 +64,17 @@ const shots=process.env.DW_SHOTS;
    assert.ok(await overflow(page)<=1,`[${label}] head-to-head card fits`);
    if(shots)await page.locator('#coachRivalWeek').screenshot({path:path.join(shots,`coach-rival-${label}.png`)});
 
+   // --- Senior Day: the week before the last home game, This Week lists the seniors.
+   const seniors=await page.evaluate(()=>window.__DL_TEST__.seniorDayFixture(true));
+   assert.ok(seniors>0,`[${label}] the roster has seniors`);
+   await page.waitForSelector('#seniorDay [data-senior]',{timeout:15000});
+   assert.equal(await page.locator('#seniorDay [data-senior]').count(),seniors,`[${label}] every senior is named`);
+   assert.match(await page.locator('#seniorDay').innerText(),/SENIOR DAY · WEEK \d+/);
+   assert.ok(await overflow(page)<=1,`[${label}] Senior Day fits`);
+   if(shots)await page.locator('#seniorDay').screenshot({path:path.join(shots,`senior-day-${label}.png`)});
+   await page.evaluate(()=>window.__DL_TEST__.seniorDayFixture(false));
+   await page.waitForSelector('#seniorDay',{state:'detached',timeout:15000});
+
    // --- This Week: a flashpoint waits for an answer.
    await open(page,'home','dashboard');
    await page.evaluate(()=>window.__DL_TEST__.lockerRoomFlashpointFixture());

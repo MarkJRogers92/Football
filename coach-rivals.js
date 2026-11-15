@@ -111,41 +111,41 @@ if(typeof module==='object'&&module.exports){
  const scoreText=g=>`${g.won?'W':g.us<g.them?'L':'T'} ${g.us}-${g.them}`;
  const recordText=x=>`${x.w}-${x.l}${x.t?`-${x.t}`:''}`;
  // This week's opponent's head coach, if you have met him before.
- function thisWeek(){
+ function rivalsThisWeek(){
   const me=selected();if(!me||universe.phase!=='regular')return null;
   const g=(universe.schedule?.[universe.week]||[]).find(x=>!x.played&&(x.home===me.name||x.away===me.name));if(!g)return null;
   const opp=universe.teams.find(t=>t.name===(g.home===me.name?g.away:g.home)),hc=opp?.staff?.HC;if(!hc?.id)return null;
   const x=rivals.against(hc.id);return x?{x,opp,hc,tag:rivals.tag(x)}:null;
  }
- function renderWeekCard(){
+ function renderRivalsWeekCard(){
   const host=$('#weeklyDecisions');if(!host?.insertAdjacentElement)return;
-  let card=$('#coachRivalWeek');const info=ready()?thisWeek():null;
+  let card=$('#coachRivalWeek');const info=ready()?rivalsThisWeek():null;
   if(!info){if(card?.isConnected)card.remove();return}
   if(!card||!card.isConnected){card=document.createElement('section');card.id='coachRivalWeek';card.className='coach-rival-week';card.setAttribute('role','region');card.setAttribute('aria-label','Head-to-head');host.insertAdjacentElement('beforebegin',card)}
   const {x,opp,hc,tag}=info,last=x.last,moved=last&&last.oppId!=null&&String(last.oppId)!==String(opp.id);
   const lead=tag==='Nemesis'?`${crEsc(hc.name)} is your nemesis.`:tag?`${crEsc(hc.name)} is your favourite opponent.`:`You have faced ${crEsc(hc.name)} before.`;
   card.innerHTML=`<div class="eyebrow">HEAD TO HEAD${tag?` · ${crEsc(tag.toUpperCase())}`:''}</div><p><strong>${lead}</strong> You are ${recordText(x)} against him${x.streak&&x.streak.count>=2?` (${x.streak.count} straight ${x.streak.kind==='W'?'wins':x.streak.kind==='L'?'losses':'ties'})`:''}. Last meeting: ${scoreText(last)} in ${last.season}${moved?`, when he coached ${crEsc(last.opp)}`:''}${last.mine!==selected().name?` and you coached ${crEsc(last.mine)}`:''}.</p>`;
  }
- extendRender('dashboard',renderWeekCard);
+ extendRender('dashboard',renderRivalsWeekCard);
 
- function programCardHTML(){
+ function rivalsCardHTML(){
   const list=rivals.mostFaced(),n=rivals.nemesis(),f=rivals.favourite();
   const coachNow=id=>{for(const t of universe.teams)if(t.staff?.HC?.id===id)return t.name;return null};
   const row=x=>{const now=coachNow(x.coachId),tag=rivals.tag(x);return`<li><span class="stop-who">${crEsc(x.name)} ${tag?`<span class="lr-tag">${crEsc(tag)}</span>`:''}<small>${recordText(x)} in ${x.meetings} meeting${x.meetings===1?'':'s'} · last ${scoreText(x.last)} in ${x.last.season} · ${now?`now head coach at ${crEsc(now)}`:'no longer a head coach'}</small></span></li>`};
   const head=n?`${crEsc(n.name)} has your number: ${recordText(n)}.`:f?`You own ${crEsc(f.name)}: ${recordText(f)}.`:list.length?'No nemesis yet.':'No opposing head coach faced yet.';
   return`<div class="section-head"><div><div class="eyebrow">COACHING RIVALS</div><h3>${head}</h3><div class="muted">Your record against each head coach you have faced, at every school either of you has coached. A nemesis takes three meetings and three losses with no more than a third won; a favourite opponent takes three wins and no more than a quarter lost.</div></div></div>${list.length?`<ul class="stop-rows">${list.map(row).join('')}</ul>`:'<p class="small muted">Head coaches you face appear here after your first game.</p>'}`;
  }
- function renderProgramCard(){
+ function renderRivalsCard(){
   if(!ready())return;
   let host=$('#coachRivals');
   if((!host||!host.isConnected)&&typeof document!=='undefined'&&document.getElementById){
    const anchor=document.getElementById('proPipeline')||document.getElementById('conferenceOutlook')||document.getElementById('facilitiesBoosters');
    if(anchor?.insertAdjacentElement){host=document.createElement('div');host.id='coachRivals';host.className='card coach-rivals-card';anchor.insertAdjacentElement('afterend',host)}
   }
-  if(host)host.innerHTML=programCardHTML();
+  if(host)host.innerHTML=rivalsCardHTML();
  }
  const renderProgramBeforeRivals=TAB_RENDERERS.program;
- TAB_RENDERERS.program=()=>{renderProgramBeforeRivals();renderProgramCard()};
+ TAB_RENDERERS.program=()=>{renderProgramBeforeRivals();renderRivalsCard()};
  if(typeof window!=='undefined'&&window.__DL_TEST__){
   window.__DL_TEST__.coachRivals=()=>({rows:rivals.state().rows.length,nemesis:rivals.nemesis()?.name||null,favourite:rivals.favourite()?.name||null});
   // Three earlier losses to this week's opposing head coach (test pages only).
