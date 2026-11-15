@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.34.0</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.35.0</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -1129,6 +1129,17 @@ tr[hidden]{display:none!important}
 /* v0.34: trap game (This Week). */
 .trap-game{margin:8px 0;padding:9px 12px;border-radius:6px;border:1px solid var(--line,rgba(255,255,255,.14));border-left:4px solid #d0605a}
 .trap-game p{margin:4px 0 0}
+/* v0.35: bet with the administration (This Week). */
+.admin-wager .stop-rows li{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.admin-wager [data-wager-decline]{margin-top:10px}
+/* v0.35: home streak (This Week). */
+.home-streak{margin:8px 0;padding:9px 12px;border-radius:6px;border:1px solid var(--line,rgba(255,255,255,.14));border-left:4px solid var(--accent,#d9a441)}
+.home-streak p{margin:4px 0 0}
+/* v0.35: your dynasty in one page (History). */
+.dp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:4px 18px;margin:8px 0}
+.dp-list{margin:4px 0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.dynasty-page-card p.small{text-transform:none;letter-spacing:normal}
+.traditions-card p.small{text-transform:none;letter-spacing:normal}
 
 .situational-playbook{display:grid;gap:8px}
 .situational-playbook>p{margin:0}
@@ -3645,7 +3656,7 @@ select{min-width:44px}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.34.0</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.35.0</b></span></footer>
   </div>
 </section>
 
@@ -3672,7 +3683,7 @@ select{min-width:44px}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.34.0</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.35.0</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -7621,7 +7632,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.34.0';
+const APP_VERSION='0.35.0';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi','Aiden','Alex','Amari','Andrew','Anthony','Antonio','Armani','Ashton','Austin','Avery','Bennett','Blake','Brady','Brandon','Brayden','Brennan','Brock','Bryson','Cade','Caden','Calvin','Cameron','Carson','Cedric','Chase','Christian','Cody','Colby','Collin','Connor','Corey','Damian','Damon','Daniel','Davion','Dawson','Deandre','Demarcus','Derek','Desmond','Dillon','Drew','Dylan','Elijah','Ethan','Ezra','Garrett','Grady','Graham','Grant','Hayden','Hunter','Ian','Isaac','Jabari','Jace','Jackson','Jacob','Jaden','Jake','Jamar','Jameson','Jared','Jarrett','Javon','Jaxon','Jay','Jermaine','Jesse','Joel','Jonah','Josiah','Julian','Justin','Kaden','Kai','Kamari','Keegan','Keenan','Kendall','Kendrick','Kevin','Kobe','Kyle','Kyler','Lamar','Landon','Lane','Lawrence','Leon','Levi','Lincoln','Lucas','Marco','Mario','Mateo','Matthew','Maurice','Max','Myles','Nate','Nathan','Nolan','Omar','Owen','Parker','Patrick','Preston','Quentin','Quincy','Reggie','Riley','Ryan','Sam','Sean','Seth','Shane','Silas','Solomon','Spencer','Sterling','Terrell','Theo','Tobias','Travis','Tristan','Troy','Tucker','Tyrese','Victor','Wade','Walker','Wes','Wyatt','Zach','Zane','Andres','Diego','Rafael','Tevita','Sione','Manu','Keoni','Kenji','Darnell'];
@@ -9312,7 +9323,9 @@ function updateCareerRecords(){universe.records??={nationalSeason:{},nationalCar
 function productionRating(p){let c=p.career||p.stats||{},v=50;if(p.pos==='QB')v+=(c.passYds||0)/650+(c.passTD||0)*.35-(c.int||0)*.12+(c.rushYds||0)/300+(c.rushTD||0)*.5;else if(p.pos==='RB')v+=(c.rushYds||0)/330+(c.rushTD||0)*.7+(c.recYds||0)/500+(c.recTD||0)*.45;else if(['WR','TE'].includes(p.pos))v+=(c.recYds||0)/350+(c.recTD||0)*.75;else if(['EDGE','DT','LB','CB','S'].includes(p.pos))v+=(c.tackles||0)/16+(c.tfl||0)*.25+(c.sacks||0)*1.8+(c.pressures||0)*.08+(c.intDef||0)*2.3+(c.passBreakups||0)*.12;else if(['OT','OG','C'].includes(p.pos))v+=(p.perceived||p.trueNow)*.18+(c.snaps||0)/700-(c.sacksAllowed||0)*.45-(c.pressuresAllowed||0)*.05;else if(p.pos==='K')v+=(c.fgMade||0)*.35-Math.max(0,(c.fgAtt||0)-(c.fgMade||0))*.25;else if(p.pos==='P')v+=(c.punts||0)?(c.puntYds/c.punts-38)*1.2:0;else v+=p.perceived*.28;return clamp(v,35,99)}
 function draftProjection(p,t){let athletic=avg([p.speed,p.power,p.technique]),score=p.trueNow*.72+athletic*.10+productionRating(p)*.12+t.prestige*.06+gauss()*2.2;let round=score>=92?1:score>=88?2:score>=85?3:score>=82?4:score>=79?5:score>=76?6:score>=72?7:null;return {score:Math.round(score),round,pick:round?gi(1,32):null,label:round?`Round ${round}, Pick ${gi(1,32)}`:'Undrafted Free Agent'}}
 function draftPlayer(p,t,reason='Eligibility exhausted'){let d=draftProjection(p,t),r={year:universe.year,playerId:p.id,playerName:p.name,pos:p.pos,school:t.name,reason,...d};return r}
-function runDraft(pool){let rankedPool=pool.slice().sort((a,b)=>b.score-a.score);universe.draftHistory[universe.year]=[];rankedPool.forEach((x,i)=>{let round=i<224?Math.floor(i/32)+1:null,pick=round?(i%32)+1:null,status=round?'Drafted':x.score>=66?'UDFA':'College Career Complete',label=round?`Round ${round}, Pick ${pick}`:status==='UDFA'?'Undrafted Free Agent':'No professional deal',r={year:universe.year,playerId:x.p.id,playerName:x.p.name,pos:x.p.pos,school:x.t.name,schoolId:x.t.id,reason:x.reason,score:Math.round(x.score),round,pick,status,label};x.p.draftResult=r;universe.draftHistory[universe.year].push(r);addToArchive(x.p,x.t,x.reason)});return universe.draftHistory[universe.year]}
+// v0.35: players with no pro deal keep their draftResult on the player record, but no draftHistory row: nothing read
+// those rows (the board and the pro pipeline skip them) and they were about half of draftHistory.
+function runDraft(pool){let rankedPool=pool.slice().sort((a,b)=>b.score-a.score);universe.draftHistory[universe.year]=[];rankedPool.forEach((x,i)=>{let round=i<224?Math.floor(i/32)+1:null,pick=round?(i%32)+1:null,status=round?'Drafted':x.score>=66?'UDFA':'College Career Complete',label=round?`Round ${round}, Pick ${pick}`:status==='UDFA'?'Undrafted Free Agent':'No professional deal',r={year:universe.year,playerId:x.p.id,playerName:x.p.name,pos:x.p.pos,school:x.t.name,schoolId:x.t.id,reason:x.reason,score:Math.round(x.score),round,pick,status,label};x.p.draftResult=r;if(status!=='College Career Complete')universe.draftHistory[universe.year].push(r);addToArchive(x.p,x.t,x.reason)});return universe.draftHistory[universe.year]}
 // Departures has already charged this season. A redshirt adds elapsed time, not used eligibility.
 function earlyDeclaration(p,t){const used=eligibilityBase(p);if(used>=4||used+(p.redshirtUsed?1:0)<3)return false;let d=draftProjection(p,t);return d.round&&d.round<=2&&gameplayRandom()<(d.round===1?.52:.24)}
 // Early in the season a single result should not throw a team across the poll: win rate and margin are blended
@@ -12143,7 +12156,7 @@ function renderRecords(){const u=selected(),final=universe.awards?.[universe.yea
 function renderHistory(){renderGameArchive();let items=[];for(const h of universe.history){if(h.type==='season'){let np=h.awards?.find(a=>a.name==='National Player of the Year');items.push(`<div class="card"><div class="historyrow champ"><span>${h.year} National Champion</span><strong>${h.champion}</strong></div>${np?`<div class="historyrow"><span>National Player of the Year</span><span>${np.playerName} · ${np.team}</span></div>`:''}${h.top10.slice(0,5).map((t,i)=>`<div class="historyrow"><span>#${i+1} ${t.name}</span><span>${t.record}</span></div>`).join('')}</div>`)}else items.push(`<div class="historyrow"><span>${h.year} ${h.event||''}</span><span>${h.detail||''}</span></div>`)}$('#historyLog').innerHTML=items.join('')||'<div class="card muted">No completed seasons yet.</div>'}
 function packPlayer(p){return {...p,stats:packStats(p.stats),career:packStats(p.career)}}
 function packUniverse(u,includeArchive=true){if(u===universe)syncGameplayRng(u);if(includeArchive&&u===universe&&archiveIsDeferred())throw new Error("Load archived careers before exporting.");const {playerArchive,...core}=u;const out={...core,confChamps:conferenceChampionIdsFor(u),playoffFieldIds:playoffFieldIdsFor(u),teams:u.teams.map(t=>({...t,roster:t.roster.map(packPlayer)}))};if(includeArchive)out.playerArchive=(playerArchive||[]).map(packPlayer);return out}
-function normalizeUniverse(){ensureGameplayRng();for(const t of universe?.teams||[])assignTeamJerseys(t);universe.phase??='regular';universe.playLogs??={};universe.gameArchive??=[];universe.gameArchiveVersion??=1;universe.gameCounter=universe.gameArchive.reduce((n,g)=>Math.max(n,Number(g.id.split('_').pop())||0),universe.gameCounter||0);universe.version=APP_VERSION;IDX.teams=null;IDX.players=null;universe.movementLog??=[];universe.lastDetailedGame??=null;normalizePortalState();ensureScheduleRotation();migrateProtectedRivals();universe.playerArchive??=[];universe.recoveredWeek??=-1;universe.weeklyHub??=[];universe.highSchools??=generateHighSchools();universe.awards??={};universe.records??={nationalSeason:{},nationalCareer:{}};universe.records.nationalSeason??={};universe.records.nationalCareer??={};universe.draftHistory??={};universe.recruitClassCounts??={};universe.risingClass??=[];universe.campHistory??={};universe.developmentState??={year:universe.year,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]};if(!Object.keys(universe.recruitClassCounts).length)for(const r of universe.recruits||[])if(r.committed)universe.recruitClassCounts[r.committed]=(universe.recruitClassCounts[r.committed]||0)+1;universe.teams.forEach(t=>{let base=schools.find(s=>s.name===t.name);if(base){t.city??=base.city;t.state??=base.state;t.lat??=base.lat;t.lon??=base.lon}t.staff??=generateStaff(t);for(const c of Object.values(t.staff)){c.contractYears??=gi(1,4);c.salary??=1.2}t.offScheme??=pick(Object.keys(OFF_SCHEMES));t.defScheme??=pick(Object.keys(DEF_SCHEMES));t.nickname??='';t.commits??=[];t.pipelines??=makePipelines(t);t.records??={};ensureSchoolColors(t);ensureTeamDevelopment(t);t.roster.forEach(p=>{p.speed??=clamp(p.trueNow+gi(-8,8),25,99);p.power??=clamp(p.trueNow+gi(-8,8),25,99);p.technique??=clamp(p.trueNow+gi(-8,8),25,99);p.iq??=clamp(p.trueNow+gi(-10,10),20,99);p.composure??=65;p.durability??=70;p.versatility??=60;p.health??=100;p.wear??=0;p.injury??=null;p.injuryWeeks??=0;p.injuryHistory??=[];p.seasonHistory??=[];p.awards??=[];p.draftResult??=null;p.promise??=null;p.promiseBaseline??=p.perceived;p.eligibilityUsed??=({FR:0,SO:1,JR:2,SR:3}[p.year]??0);p.redshirtUsed??=false;p.redshirtActive??=false;p.redshirtSeason??=null;p.stats={...newStats(),...(p.stats||{})};p.career={...newStats(),...(p.career||{})};p.year=CLASS_NAMES[Math.min(3,eligibilityBase(p))]||'SR';ensurePlayerDevelopment(p,t)});ensureDepth(t);ensureRoleDepth(t)});universe.playerArchive.forEach(p=>{p.awards??=[];p.seasonHistory??=[];p.coachRelationships??={};p.primaryRecruiterCoachId??=p.recruitingMemory?.primaryRecruiterCoachId||p.recruitingMemory?.recruiterCoachId||null;p.career={...newStats(),...(p.career||{})};p.stats={...newStats(),...(p.stats||{})};p.eligibilityUsed??=3;p.redshirtUsed??=false;p.redshirtActive=false});if(Array.isArray(universe.schedule)){universe.teams.forEach(t=>t.schedule=[]);universe.schedule.flat().forEach(g=>{T(g.home)?.schedule.push(g);T(g.away)?.schedule.push(g)})}
+function normalizeUniverse(){ensureGameplayRng();for(const t of universe?.teams||[])assignTeamJerseys(t);universe.phase??='regular';universe.playLogs??={};universe.gameArchive??=[];universe.gameArchiveVersion??=1;universe.gameCounter=universe.gameArchive.reduce((n,g)=>Math.max(n,Number(g.id.split('_').pop())||0),universe.gameCounter||0);universe.version=APP_VERSION;IDX.teams=null;IDX.players=null;universe.movementLog??=[];universe.lastDetailedGame??=null;normalizePortalState();ensureScheduleRotation();migrateProtectedRivals();universe.playerArchive??=[];universe.recoveredWeek??=-1;universe.weeklyHub??=[];universe.highSchools??=generateHighSchools();universe.awards??={};universe.records??={nationalSeason:{},nationalCareer:{}};universe.records.nationalSeason??={};universe.records.nationalCareer??={};universe.draftHistory??={};for(const [y,list] of Object.entries(universe.draftHistory))if(Array.isArray(list)&&list.some(r=>r?.status==='College Career Complete'))universe.draftHistory[y]=list.filter(r=>r?.status!=='College Career Complete');universe.recruitClassCounts??={};universe.risingClass??=[];universe.campHistory??={};universe.developmentState??={year:universe.year,springRun:false,fallRun:false,springReport:[],fallReport:[],battles:[]};if(!Object.keys(universe.recruitClassCounts).length)for(const r of universe.recruits||[])if(r.committed)universe.recruitClassCounts[r.committed]=(universe.recruitClassCounts[r.committed]||0)+1;universe.teams.forEach(t=>{let base=schools.find(s=>s.name===t.name);if(base){t.city??=base.city;t.state??=base.state;t.lat??=base.lat;t.lon??=base.lon}t.staff??=generateStaff(t);for(const c of Object.values(t.staff)){c.contractYears??=gi(1,4);c.salary??=1.2}t.offScheme??=pick(Object.keys(OFF_SCHEMES));t.defScheme??=pick(Object.keys(DEF_SCHEMES));t.nickname??='';t.commits??=[];t.pipelines??=makePipelines(t);t.records??={};ensureSchoolColors(t);ensureTeamDevelopment(t);t.roster.forEach(p=>{p.speed??=clamp(p.trueNow+gi(-8,8),25,99);p.power??=clamp(p.trueNow+gi(-8,8),25,99);p.technique??=clamp(p.trueNow+gi(-8,8),25,99);p.iq??=clamp(p.trueNow+gi(-10,10),20,99);p.composure??=65;p.durability??=70;p.versatility??=60;p.health??=100;p.wear??=0;p.injury??=null;p.injuryWeeks??=0;p.injuryHistory??=[];p.seasonHistory??=[];p.awards??=[];p.draftResult??=null;p.promise??=null;p.promiseBaseline??=p.perceived;p.eligibilityUsed??=({FR:0,SO:1,JR:2,SR:3}[p.year]??0);p.redshirtUsed??=false;p.redshirtActive??=false;p.redshirtSeason??=null;p.stats={...newStats(),...(p.stats||{})};p.career={...newStats(),...(p.career||{})};p.year=CLASS_NAMES[Math.min(3,eligibilityBase(p))]||'SR';ensurePlayerDevelopment(p,t)});ensureDepth(t);ensureRoleDepth(t)});universe.playerArchive.forEach(p=>{p.awards??=[];p.seasonHistory??=[];p.coachRelationships??={};p.primaryRecruiterCoachId??=p.recruitingMemory?.primaryRecruiterCoachId||p.recruitingMemory?.recruiterCoachId||null;p.career={...newStats(),...(p.career||{})};p.stats={...newStats(),...(p.stats||{})};p.eligibilityUsed??=3;p.redshirtUsed??=false;p.redshirtActive=false});if(Array.isArray(universe.schedule)){universe.teams.forEach(t=>t.schedule=[]);universe.schedule.flat().forEach(g=>{T(g.home)?.schedule.push(g);T(g.away)?.schedule.push(g)})}
  universe.weeklyDecisions??=[];if(!universe.teams.some(t=>t.rivalry))deriveRivalries();universe.careerHistory??=[];universe.jobOffers??=[];universe.bowls??=[];universe.signingDay??=null;normalizeConferenceChampions();normalizePlayoffField();if(!universe.academicProgression||universe.academicProgression.season!==universe.year||universe.academicProgression.week!==universe.week||!Array.isArray(universe.academicProgression.teamIds))universe.academicProgression={season:universe.year,week:universe.week,teamIds:[]};rebuildRecruitClassCounts();for(const t of universe.teams){t.fanBaseline??=t.fan_support??60;for(const p of t.roster)ensureAcademics(p,t)}for(const t of universe.teams){ensureAdminState(t);ensureNilState(t)}for(const d of universe.weeklyDecisions)d.source??='STAFF';normalizePromiseState();for(const r of universe.recruits||[])normalizeRecruitGeography(r,universe.highSchools);assignRecruitRanks(universe.recruits||[]);if(!universe.weeklyHub.length)buildPreseasonHub();rebuildIndexes()}
 function storageKind(){return DynastyStorage.kind==='desktop'?'desktop':'browser'}
 function storageLocation(){return storageKind()==='desktop'?'on this computer':'in this browser'}
@@ -20718,7 +20731,7 @@ if(typeof module==='object'&&module.exports){
 // Optional, current facts shared by the Wire and the short weekly briefing.
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.DynastyWorldNews=api})(typeof globalThis!=='undefined'?globalThis:this,function(){
  'use strict';
- const TYPES={PRO_MILESTONE:{kicker:'PRO ALUMNI',tab:'program'},LOCKER_ROOM_MEETING:{kicker:'LOCKER ROOM',tab:'roster'},LOCKER_ROOM_FLASHPOINT:{kicker:'LOCKER ROOM',tab:'roster'},LOCKER_ROOM_RESOLVED:{kicker:'LOCKER ROOM',tab:'roster'},SCOUTING_VINDICATED:{kicker:'YOU SAW HIM FIRST',tab:'recruiting'},STATEMENT_WIN:{kicker:'STATEMENT WIN',tab:'season'}};
+ const TYPES={PRO_MILESTONE:{kicker:'PRO ALUMNI',tab:'program'},LOCKER_ROOM_MEETING:{kicker:'LOCKER ROOM',tab:'roster'},LOCKER_ROOM_FLASHPOINT:{kicker:'LOCKER ROOM',tab:'roster'},LOCKER_ROOM_RESOLVED:{kicker:'LOCKER ROOM',tab:'roster'},SCOUTING_VINDICATED:{kicker:'YOU SAW HIM FIRST',tab:'recruiting'},STATEMENT_WIN:{kicker:'STATEMENT WIN',tab:'season'},ADMIN_WAGER:{kicker:'THE BOARD',tab:'program'},HOME_STREAK:{kicker:'HOME STREAK',tab:'season'},TRADITION:{kicker:'TRADITION',tab:'program'}};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function items(u,t){
   if(!u||!t)return[];
@@ -21376,6 +21389,305 @@ if(typeof module==='object'&&module.exports){
   // render() recomputes the poll, so this paints only the card from the fixture rankings.
   t.rank=8;opp.rank=50;opp.w=2;opp.l=1;next.rank=4;renderTrapCard();return opp.name;
  };
+}
+
+// v0.35 — a bet with the administration. Before the first game the coach may promise the board one thing above
+// what it expects: more wins, a higher finish, a conference title or the rival. The promise joins the season goals
+// as a Wager. Deliver it and the board's season review gains +8 confidence and the boosters +2 goodwill; miss it
+// and the review loses 6. Not betting changes nothing, and the staff never bet for you.
+//
+// State: the wager is one more entry in t.seasonGoals (weight 'Wager', id 'wager'), plus t.adminWager {year,
+// declined, settled} so the card asks once a season and the goodwill is paid once.
+function makeAdminWager(env){
+ 'use strict';
+ const universe=()=>env.getUniverse();
+ const WIN=8,LOSE=6,GOODWILL=2,WEIGHT='Wager';
+ function state(t){const s=t.adminWager;if(!s||s.year!==universe().year)t.adminWager={year:universe().year,declined:false,settled:false};return t.adminWager}
+ function current(t){return(t?.seasonGoals||[]).find(g=>g.id==='wager'&&g.year===universe().year)||null}
+ // The window: the preseason, or the first week before any game is played.
+ function open(t){const u=universe();if(!t||current(t)||state(t).declined)return false;return(u.phase==='preseason'&&u.week===0)||(u.phase==='regular'&&u.week===0&&(t.w||0)+(t.l||0)===0)}
+ // Three promises, each beyond the board's stated goals.
+ function choices(t){
+  const exp=env.expectation(t),rival=env.rivalOf(t),p=t.prestige||0,out=[];
+  out.push({key:'wins',type:'wins',label:`Win at least ${Math.min(12,exp+2)} games`,target:Math.min(12,exp+2)});
+  const rank=p>=80?5:p>=65?10:20;out.push({key:'rank',type:'rank',label:`Finish in the Top ${rank}`,target:rank});
+  if(p>=88)out.push({key:'title',type:'nationalTitle',label:'Win the national championship',target:null});
+  else if(rival&&p<70)out.push({key:'rival',type:'rivalry',label:`Beat ${rival.name}`,target:rival.id});
+  else out.push({key:'conf',type:'conferenceTitle',label:'Win the conference championship',target:null});
+  return out;
+ }
+ function accept(t,key){
+  if(!open(t))return{ok:false,reason:'The board only takes a bet before the first game.'};
+  const c=choices(t).find(x=>x.key===key);if(!c)return{ok:false,reason:'That bet is not on the table.'};
+  env.ensureGoals(t);
+  t.seasonGoals.push({id:'wager',weight:WEIGHT,tier:WEIGHT,type:c.type,label:c.label,target:c.target,year:universe().year});
+  return{ok:true,goal:c};
+ }
+ function decline(t){if(!open(t))return false;state(t).declined=true;return true}
+ // The season goals' own adjustment counts any other goal as a bonus (+4 / -1); the wager replaces that with its stakes.
+ function adjust(review,final){
+  if(!final||!review)return review;
+  for(const r of review.results||[])if(r.weight===WEIGHT)review.adjustment+=r.state==='complete'?WIN-4:-LOSE+1;
+  return review;
+ }
+ // Paid once, when the board reviews the season.
+ function settle(t,review){
+  const g=current(t),s=state(t);if(!g||s.settled)return null;
+  const r=(review?.results||[]).find(x=>x.id==='wager');if(!r)return null;
+  s.settled=true;const won=r.state==='complete';if(won)env.goodwill(t,GOODWILL);
+  return{won,label:g.label};
+ }
+ return{WIN,LOSE,GOODWILL,WEIGHT,state,current,open,choices,accept,decline,adjust,settle};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeAdminWager};
+}else{
+ const wager=makeAdminWager({getUniverse:()=>universe,expectation:t=>seasonExpectation(t),rivalOf:t=>rivalOf(t),ensureGoals:t=>ensureSeasonGoals(t),
+  goodwill:(t,n)=>{const F=globalThis.DynastyFacilities;if(F){const p=F.state(t);p.goodwill=Math.min(100,p.goodwill+n)}}});
+ globalThis.DynastyAdminWager=wager;
+ const awEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const evaluateBeforeWager=evaluateSeasonGoals;
+ evaluateSeasonGoals=function evaluateSeasonGoalsWithWager(t,final){return wager.adjust(evaluateBeforeWager.apply(this,arguments),!!final)};
+ const reviewBeforeWager=adminSeasonReview;
+ adminSeasonReview=function adminSeasonReviewWithWager(t){
+  const out=reviewBeforeWager.apply(this,arguments);
+  try{const r=wager.settle(t,evaluateSeasonGoals(t,true));if(r){universe.events??=[];universe.events.push({id:`EVT_WAGER_${universe.year}_${t.id}`,type:'ADMIN_WAGER',season:universe.year,week:universe.week,schoolIds:[t.id],playerIds:[],coachIds:[],gameIds:[],importance:60,summary:r.won?`You delivered on your bet with the board: ${r.label}. Confidence +${wager.WIN}, boosters +${wager.GOODWILL} goodwill.`:`You missed your bet with the board: ${r.label}. Confidence −${wager.LOSE}.`,metadata:{won:r.won}})}}catch(err){console.error(err)}
+  return out;
+ };
+ function renderWagerCard(){
+  const host=$('#weeklyDecisions');if(!host?.insertAdjacentElement)return;
+  let card=$('#adminWager');const t=universe?.teams?selected():null;
+  if(!t||!wager.open(t)||commissionerMode?.()){if(card?.isConnected)card.remove();return}
+  if(!card||!card.isConnected){card=document.createElement('section');card.id='adminWager';card.className='offseason-stop admin-wager';card.setAttribute('role','region');card.setAttribute('aria-label','Bet with the administration');host.insertAdjacentElement('beforebegin',card)}
+  const row=c=>`<li><span class="stop-who">${awEsc(c.label)}</span><button type="button" class="dw-button" data-wager="${awEsc(c.key)}">Promise it</button></li>`;
+  card.innerHTML=`<div class="eyebrow">THE BOARD · OPTIONAL</div><h3>Make the board a promise?</h3><p>The board expects ${awEsc(seasonExpectation(t))} wins. Promise one thing more: deliver it for <strong>+${wager.WIN} confidence</strong> and <strong>+${wager.GOODWILL} booster goodwill</strong>; miss it and lose <strong>${wager.LOSE}</strong>. Open until the first game.</p><ul class="stop-rows">${wager.choices(t).map(row).join('')}</ul><button type="button" class="dw-button" data-wager-decline>No bet this season</button>`;
+  card.querySelectorAll('[data-wager]').forEach(b=>b.onclick=()=>{const r=wager.accept(t,b.dataset.wager);setStatus(r.ok?`Bet made with the board: ${r.goal.label}.`:r.reason);if(r.ok)autosaveAfter('management');render()});
+  card.querySelector('[data-wager-decline]').onclick=()=>{wager.decline(t);setStatus('No bet this season.');autosaveAfter('management');render()};
+ }
+ extendRender('dashboard',renderWagerCard);
+}
+
+// v0.35 — home streaks. Every program's run of home wins is counted as games finish, for the whole league. Before a
+// home game This Week names your streak once it reaches four; before a road game it warns about the other program's
+// once it reaches five. Long runs get a name (Home cooking at 5, The Fortress at 10, Untouchable at 20), and The Wire
+// reports when you reach 10 or 20 straight, or end someone else's run of eight or more.
+//
+// State: universe.homeStreaks {teamId: {streak, best, bestEnded}} — one small object per program. Neutral-site games
+// do not count. Streaks start counting with this version; earlier seasons are not reconstructed.
+function makeHomeStreaks(env){
+ 'use strict';
+ const universe=()=>env.getUniverse();
+ const SHOW_MINE=4,SHOW_THEIRS=5,SNAP=8,MILESTONES=[10,20];
+ const NAMES=[[20,'Untouchable'],[10,'The Fortress'],[5,'Home cooking']];
+ function table(){return universe().homeStreaks??={}}
+ function of(id){const t=table();return t[id]??={streak:0,best:0,bestEnded:null}}
+ const nameFor=n=>NAMES.find(([at])=>n>=at)?.[1]||null;
+ // A finished game: the home side's run grows with a win and ends with a loss. Returns what changed.
+ function record(rec){
+  if(!rec?.score||!rec.home||!rec.away||/neutral/i.test(rec.venue||''))return null;
+  const h=of(rec.home.id),won=Number(rec.score.home)>Number(rec.score.away),before=h.streak;
+  if(won){h.streak++;if(h.streak>h.best)h.best=h.streak}else{if(h.streak>0)h.bestEnded=h.best===h.streak?rec.season:h.bestEnded;h.streak=0}
+  return{homeId:rec.home.id,awayId:rec.away.id,won,before,after:h.streak};
+ }
+ function line(n,whose){const name=nameFor(n);return`${name?`${name}: `:''}${whose} ${n} straight home win${n===1?'':'s'}`}
+ return{SHOW_MINE,SHOW_THEIRS,SNAP,MILESTONES,of,nameFor,record,line};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeHomeStreaks};
+}else{
+ const streaks=makeHomeStreaks({getUniverse:()=>universe});
+ globalThis.DynastyHomeStreaks=streaks;
+ const hsEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const finishGameBeforeStreaks=finishGame;
+ finishGame=function finishGameWithStreaks(before,home,away){
+  const out=finishGameBeforeStreaks.apply(this,arguments);
+  try{
+   const rec=(universe.gameArchive||[]).at(-1);if(rec?.id!==out?.gameId)return out;
+   const r=streaks.record(rec),me=selected();if(!r||!me)return out;
+   const week=universe.phase==='regular'?universe.week+1:universe.week,push=(kind,text,importance)=>{universe.events??=[];universe.events.push({id:`EVT_HOME_${kind}_${rec.id}`,type:'HOME_STREAK',season:rec.season??universe.year,week,schoolIds:[me.id],playerIds:[],coachIds:[],gameIds:[rec.id],importance,summary:text,metadata:{kind}})};
+   if(String(r.homeId)===String(me.id)&&r.won&&streaks.MILESTONES.includes(r.after))push('mine',`${me.name} have won ${r.after} straight at home${streaks.nameFor(r.after)?` (${streaks.nameFor(r.after)})`:''}.`,62);
+   if(String(r.awayId)===String(me.id)&&!r.won&&r.before>=streaks.SNAP)push('snapped',`${me.name} ended ${home.name}'s ${r.before}-game home winning streak.`,66);
+  }catch(err){console.error(err)}
+  return out;
+ };
+ function renderStreakCard(){
+  const host=$('#weeklyDecisions');if(!host?.insertAdjacentElement)return;
+  let card=$('#homeStreak');const t=universe?.teams?selected():null;
+  const g=t&&universe.phase==='regular'?(universe.schedule?.[universe.week]||[]).find(x=>!x.played&&(x.home===t.name||x.away===t.name)):null;
+  let text=null;
+  if(g){
+   const home=g.home===t.name,host=universe.teams.find(x=>x.name===g.home),n=host?streaks.of(host.id).streak:0;
+   if(home&&n>=streaks.SHOW_MINE)text=`${streaks.line(n,'you have')}. ${hsEsc(g.away)} come to town.`;
+   else if(!home&&n>=streaks.SHOW_THEIRS)text=`${streaks.line(n,`${hsEsc(g.home)} have`)}. End it and the Wire will notice.`;
+  }
+  if(!text){if(card?.isConnected)card.remove();return}
+  if(!card||!card.isConnected){card=document.createElement('section');card.id='homeStreak';card.className='home-streak';card.setAttribute('role','region');card.setAttribute('aria-label','Home streak');host.insertAdjacentElement('beforebegin',card)}
+  card.innerHTML=`<div class="eyebrow">HOME STREAK</div><p>${text}</p>`;
+ }
+ extendRender('dashboard',renderStreakCard);
+ if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.homeStreakFixture=n=>{const t=selected(),g=universe.schedule[universe.week].find(x=>x.home===t.name||x.away===t.name),host=universe.teams.find(x=>x.name===g.home);streaks.of(host.id).streak=n;render();return{home:g.home===t.name,host:host.name}};
+}
+
+// v0.35 — your dynasty in one page. The History tab opens with the coach's whole career on one card: seasons, record
+// and posts; each decade at the current program; the best team; national award winners and first-round picks coached;
+// titles; and the people that defined it (the rival, a nemesis, a favourite opponent).
+//
+// Nothing is stored. It reads the career and tenure records, the awards table, the draft history and the coaching
+// rivals ledger.
+function makeDynastyPage(env){
+ 'use strict';
+ const universe=()=>env.getUniverse();
+ // Every season coached, with the school, from the closed posts' ranges and the current tenure's season reviews.
+ function posts(){
+  const u=universe(),out=(u.careerHistory||[]).map(p=>({school:p.school,from:p.startYear,to:p.endYear,w:p.w||0,l:p.l||0,seasons:p.seasons||0,titles:p.titles||0,confTitles:p.confTitles||0,current:false}));
+  const tn=u.tenure;
+  if(tn&&!tn.closed){const s=tn.seasons||[];out.push({school:tn.school,from:tn.startYear,to:null,w:s.reduce((n,x)=>n+(x.w||0),0),l:s.reduce((n,x)=>n+(x.l||0),0),seasons:s.length,titles:s.filter(x=>x.champ).length,confTitles:s.filter(x=>x.confChamp).length,current:true,rows:s}); }
+  return out;
+ }
+ const coachedAt=(list,school,year)=>list.some(p=>p.school===school&&year>=p.from&&(p.to==null||year<=p.to));
+ function decades(rows){
+  const by=new Map();
+  for(const s of rows||[]){const d=Math.floor(s.year/10)*10;const x=by.get(d)||{from:d,to:d+9,w:0,l:0,titles:0,confTitles:0,best:null};x.w+=s.w||0;x.l+=s.l||0;if(s.champ)x.titles++;if(s.confChamp)x.confTitles++;if(!x.best||(s.w||0)>x.best.w||((s.w||0)===x.best.w&&(s.l||0)<x.best.l))x.best={year:s.year,w:s.w||0,l:s.l||0,champ:!!s.champ};by.set(d,x)}
+  return[...by.values()].sort((a,b)=>a.from-b.from);
+ }
+ function read(){
+  const u=universe(),list=posts();if(!list.length)return null;
+  const w=list.reduce((n,p)=>n+p.w,0),l=list.reduce((n,p)=>n+p.l,0),seasons=list.reduce((n,p)=>n+p.seasons,0);
+  const current=list.find(p=>p.current)||null,rows=current?.rows||[];
+  const best=rows.slice().sort((a,b)=>(b.champ?1:0)-(a.champ?1:0)||(b.w||0)-(a.w||0)||(a.l||0)-(b.l||0))[0]||null;
+  const awards=[];for(const [y,arr] of Object.entries(u.awards||{}))for(const a of arr||[])if(a?.team&&coachedAt(list,a.team,Number(y)))awards.push({year:Number(y),name:a.name,player:a.playerName,pos:a.pos,playerId:a.playerId,school:a.team});
+  const firsts=[];for(const [y,arr] of Object.entries(u.draftHistory||{}))for(const r of arr||[])if(r.round===1&&coachedAt(list,r.school,Number(y)))firsts.push({year:Number(y),player:r.playerName,pos:r.pos,pick:r.pick,school:r.school});
+  const R=env.rivals?.();
+  return{seasons,w,l,posts:list.length,titles:list.reduce((n,p)=>n+p.titles,0),confTitles:list.reduce((n,p)=>n+p.confTitles,0),list,decades:decades(rows),best,
+   awards:awards.sort((a,b)=>b.year-a.year),firsts:firsts.sort((a,b)=>b.year-a.year||a.pick-b.pick),
+   rival:env.rivalry?.()||null,nemesis:R?.nemesis()||null,favourite:R?.favourite()||null};
+ }
+ return{posts,decades,read};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeDynastyPage};
+}else{
+ const dynastyPage=makeDynastyPage({getUniverse:()=>universe,rivals:()=>globalThis.DynastyCoachRivals,
+  rivalry:()=>{const t=selected(),r=rivalOf(t),s=t?.rivalry?.series;return r&&s&&(s.w||0)+(s.l||0)>0?{name:r.name,trophy:t.rivalry.trophy,w:s.w||0,l:s.l||0}:null}});
+ globalThis.DynastyPage=dynastyPage;
+ const dpEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function dynastyPageHTML(d){
+  const pct=d.w+d.l?Math.round(d.w/(d.w+d.l)*1000)/10:0;
+  const dec=d.decades.map(x=>`<li><span class="stop-who">${x.from}s<small>${x.w}-${x.l}${x.titles?` · ${x.titles} national title${x.titles===1?'':'s'}`:''}${x.confTitles?` · ${x.confTitles} conference title${x.confTitles===1?'':'s'}`:''}${x.best?` · best ${x.best.w}-${x.best.l} in ${x.best.year}${x.best.champ?' (champions)':''}`:''}</small></span></li>`).join('');
+  const posts=d.list.map(p=>`<li><span class="stop-who">${dpEsc(p.school)}<small>${p.from}–${p.to??'present'} · ${p.w}-${p.l}${p.titles?` · ${p.titles} title${p.titles===1?'':'s'}`:''}</small></span></li>`).join('');
+  const people=[d.rival?`Rival: ${dpEsc(d.rival.name)}, ${d.rival.w}-${d.rival.l} for ${dpEsc(d.rival.trophy||'the rivalry')}`:'',d.nemesis?`Nemesis: ${dpEsc(d.nemesis.name)}, ${d.nemesis.w}-${d.nemesis.l}`:'',d.favourite?`Favourite opponent: ${dpEsc(d.favourite.name)}, ${d.favourite.w}-${d.favourite.l}`:''].filter(Boolean);
+  const stars=d.awards.slice(0,6).map(a=>`<li><span class="stop-who">${a.playerId?`<button type="button" class="player-button" data-player="${dpEsc(a.playerId)}">${dpEsc(a.pos)} ${dpEsc(a.player)}</button>`:`${dpEsc(a.pos)} ${dpEsc(a.player)}`}<small>${a.year} ${dpEsc(a.name)} · ${dpEsc(a.school)}</small></span></li>`).join('');
+  return`<div class="section-head"><div><div class="eyebrow">YOUR DYNASTY</div><h3>${d.seasons} season${d.seasons===1?'':'s'} · ${d.w}-${d.l} (${pct}%) · ${d.posts} post${d.posts===1?'':'s'}</h3><div class="muted">${d.titles} national title${d.titles===1?'':'s'} · ${d.confTitles} conference title${d.confTitles===1?'':'s'} · ${d.firsts.length} first-round pick${d.firsts.length===1?'':'s'} · ${d.awards.length} national award${d.awards.length===1?'':'s'}</div></div></div>
+  <div class="dp-grid">
+   <div><h4>Where you coached</h4><ul class="stop-rows">${posts}</ul></div>
+   ${dec?`<div><h4>By decade, current program</h4><ul class="stop-rows">${dec}</ul></div>`:''}
+   ${d.best?`<div><h4>Best team</h4><p><strong>${d.best.year}: ${d.best.w}-${d.best.l}</strong>${d.best.champ?' · national champions':d.best.confChamp?' · conference champions':''}</p></div>`:''}
+   ${people.length?`<div><h4>The people</h4><ul class="dp-list">${people.map(x=>`<li>${x}</li>`).join('')}</ul></div>`:''}
+  </div>
+  ${stars?`<h4>Award winners you coached</h4><ul class="stop-rows">${stars}</ul>`:''}`;
+ }
+ function renderDynastyPage(){
+  if(!universe?.teams)return;const d=dynastyPage.read();
+  let host=$('#dynastyPage');
+  if(!d){if(host?.isConnected)host.remove();return}
+  if((!host||!host.isConnected)&&typeof document!=='undefined'){
+   const anchor=document.querySelector('#history .section-head');
+   if(anchor?.insertAdjacentElement){host=document.createElement('div');host.id='dynastyPage';host.className='card dynasty-page-card';anchor.insertAdjacentElement('afterend',host)}
+  }
+  if(!host)return;host.innerHTML=dynastyPageHTML(d);host.querySelectorAll('[data-player]').forEach(b=>b.onclick=()=>showPlayerProfile(b.dataset.player));
+ }
+ const renderHistoryBeforeDynasty=TAB_RENDERERS.history;
+ TAB_RENDERERS.history=()=>{renderHistoryBeforeDynasty();renderDynastyPage()};
+}
+
+// v0.35 — program traditions. Sustained success becomes something to protect, not just something to reach. When a
+// streak gets long enough the program earns a named tradition; while it lasts, the fan base grows a little faster
+// (+1 fan support each offseason per tradition, at most +3), and the day it ends, the tradition is gone.
+//
+//   The Fortress          10 or more straight home wins (home-streaks.js)
+//   Owning the rivalry    5 or more straight wins over the rival
+//   Winning tradition     5 or more straight winning seasons
+//   Bowl tradition        5 or more straight bowl games
+//
+// Only the coach's program gains the fan support. Traditions are worked out from records the game already keeps; the
+// only state is t.traditions {active, since, year} so The Wire can say when one begins or ends.
+function makeTraditions(env){
+ 'use strict';
+ const universe=()=>env.getUniverse();
+ const FANS_EACH=1,FANS_MAX=3,HOME=10,RIVAL=5,WINNING=5,BOWLS=5;
+ const DEFS={
+  fortress:{name:'The Fortress',detail:n=>`${n} straight home wins`},
+  rivalry:{name:'Owning the rivalry',detail:n=>`${n} straight wins over the rival`},
+  winning:{name:'Winning tradition',detail:n=>`${n} straight winning seasons`},
+  bowls:{name:'Bowl tradition',detail:n=>`${n} straight bowl games`}
+ };
+ // Consecutive seasons, counting back from the latest archived one, that pass a test.
+ function seasonsRun(t,test){
+  const seasons=(universe().history||[]).filter(h=>h.type==='season').sort((a,b)=>b.year-a.year);let n=0,last=null;
+  for(const h of seasons){if(last!=null&&h.year!==last-1)break;const r=(h.records||[]).find(x=>String(x.schoolId)===String(t.id)||x.name===t.name);if(!r||!test(r,h))break;n++;last=h.year}
+  return n;
+ }
+ function bowlYears(t){return new Set((universe().events||[]).filter(e=>e?.type==='BOWL_RESULT'&&(e.schoolIds||[]).some(id=>String(id)===String(t.id))).map(e=>e.season))}
+ function runs(t){
+  const home=env.homeStreak?.(t)||0,rs=t.rivalry?.series?.streak||0,bowls=bowlYears(t);
+  return{fortress:home,rivalry:Math.max(0,rs),winning:seasonsRun(t,r=>(r.w||0)>(r.l||0)),bowls:seasonsRun(t,(r,h)=>bowls.has(h.year))};
+ }
+ const NEED={fortress:HOME,rivalry:RIVAL,winning:WINNING,bowls:BOWLS};
+ function active(t){const r=runs(t);return Object.keys(DEFS).filter(k=>r[k]>=NEED[k]).map(k=>({key:k,name:DEFS[k].name,detail:DEFS[k].detail(r[k]),run:r[k]}))}
+ // Closest to unlocking, for the card: the runs that are alive but short.
+ function building(t){const r=runs(t);return Object.keys(DEFS).filter(k=>r[k]>0&&r[k]<NEED[k]).map(k=>({key:k,name:DEFS[k].name,run:r[k],need:NEED[k]}))}
+ // Once a year: compare with last year's set. Returns the traditions gained and lost.
+ function review(t){
+  const u=universe(),s=t.traditions??={active:[],since:{},year:null};if(s.year===u.year)return{gained:[],lost:[],active:active(t)};
+  const now=active(t),keys=now.map(x=>x.key),gained=now.filter(x=>!s.active.includes(x.key)),lost=s.active.filter(k=>!keys.includes(k)).map(k=>({key:k,name:DEFS[k].name}));
+  for(const g of gained)s.since[g.key]=u.year;for(const l of lost)delete s.since[l.key];
+  s.active=keys;s.year=u.year;return{gained,lost,active:now};
+ }
+ const fans=t=>Math.min(FANS_MAX,active(t).length*FANS_EACH);
+ return{DEFS,NEED,FANS_EACH,FANS_MAX,runs,active,building,review,fans};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeTraditions};
+}else{
+ const traditions=makeTraditions({getUniverse:()=>universe,homeStreak:t=>globalThis.DynastyHomeStreaks?.of(t.id).streak||0});
+ globalThis.DynastyTraditions=traditions;
+ const trEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const fanBeforeTraditions=updateFanSupport;
+ updateFanSupport=function updateFanSupportWithTraditions(t){
+  const out=fanBeforeTraditions.apply(this,arguments);
+  try{
+   if(t&&t===selected()){
+    const r=traditions.review(t),n=traditions.fans(t);
+    if(n)t.fan_support=clamp(Math.round((t.fan_support??60)+n),5,100);
+    const push=(kind,key,text,importance)=>{universe.events??=[];universe.events.push({id:`EVT_TRAD_${kind}_${key}_${universe.year}_${t.id}`,type:'TRADITION',season:universe.year,week:universe.week,schoolIds:[t.id],playerIds:[],coachIds:[],gameIds:[],importance,summary:text,metadata:{kind,key}})};
+    for(const g of r.gained)push('gained',g.key,`A new tradition at ${t.name}: ${g.name} (${g.detail}).`,64);
+    for(const l of r.lost)push('lost',l.key,`${t.name}'s ${l.name} tradition has ended.`,58);
+   }
+  }catch(err){console.error(err)}
+  return out;
+ };
+ function traditionsHTML(t){
+  const now=traditions.active(t),next=traditions.building(t),since=t.traditions?.since||{};
+  const row=x=>`<li data-tradition="${trEsc(x.key)}"><span class="stop-who">${trEsc(x.name)}<small>${trEsc(x.detail)}${since[x.key]?` · since ${since[x.key]}`:''} · +${traditions.FANS_EACH} fan support a season</small></span></li>`;
+  const build=x=>`<li><span class="stop-who">${trEsc(x.name)}<small>${x.run} of ${x.need}</small></span></li>`;
+  return`<div class="section-head"><div><div class="eyebrow">TRADITIONS</div><h3>${now.length?`${now.length} living tradition${now.length===1?'':'s'}`:'No traditions yet'}</h3><div class="muted">Long runs become traditions: 10 straight home wins, 5 straight over the rival, 5 straight winning seasons, 5 straight bowls. Each one adds fan support every offseason while it lasts (up to +${traditions.FANS_MAX}).</div></div></div>
+  ${now.length?`<ul class="stop-rows">${now.map(row).join('')}</ul>`:''}${next.length?`<h4>Building</h4><ul class="stop-rows">${next.map(build).join('')}</ul>`:''}`;
+ }
+ function renderTraditions(){
+  if(!universe?.teams)return;const t=selected();if(!t)return;
+  let host=$('#traditions');
+  if((!host||!host.isConnected)&&typeof document!=='undefined'&&document.getElementById){
+   const anchor=document.getElementById('trophyCase')||document.getElementById('coachRivals')||document.getElementById('proPipeline');
+   if(anchor?.insertAdjacentElement){host=document.createElement('div');host.id='traditions';host.className='card traditions-card';anchor.insertAdjacentElement('afterend',host)}
+  }
+  if(host)host.innerHTML=traditionsHTML(t);
+ }
+ const renderProgramBeforeTraditions=TAB_RENDERERS.program;
+ TAB_RENDERERS.program=()=>{renderProgramBeforeTraditions();renderTraditions()};
 }
 
 loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});[...new Set(schools.map(t=>t.conference))].forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();bindNewDynastySetup();applyTitlePreferences();showTitleScreen();refreshTitleSave().then(restoreNewDynastySetupDraft);}).catch(e=>{$('#titleStatus').textContent='Could not initialize Dynasty Lab. '+e.message});

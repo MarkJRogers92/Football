@@ -61,6 +61,8 @@ const shots=process.env.DW_SHOTS;
    assert.ok(await page.locator('#trophyCase .tc-shelf').count()>=5,`[${label}] every shelf is shown, empty or not`);
    assert.ok(await overflow(page)<=1,`[${label}] trophy case fits`);
    if(shots)await page.locator('#trophyCase').screenshot({path:path.join(shots,`trophy-case-${label}.png`)});
+   await page.waitForSelector('#traditions',{timeout:15000});
+   assert.match(await page.locator('#traditions').textContent(),/TRADITIONS[\s\S]*10 straight home wins/,`[${label}] traditions are on the Program page`);
    await open(page,'home','dashboard');
    const nemesis=await page.evaluate(()=>window.__DL_TEST__.coachRivalsFixture());
    await page.waitForSelector('#coachRivalWeek',{timeout:15000});
@@ -98,6 +100,32 @@ const shots=process.env.DW_SHOTS;
    await page.waitForSelector('#draftClassNote',{timeout:15000});
    assert.match(await page.locator('#draftClassNote').textContent(),/2023 class: a thin one\. Only 2 underclassmen declared early, against 12 a class before it/,`[${label}] the draft board explains a thin class`);
    await open(page,'home','dashboard');
+
+   // --- This Week: the board offers a bet before the first game.
+   await open(page,'home','dashboard');
+   await page.waitForSelector('#adminWager [data-wager]',{timeout:15000});
+   assert.equal(await page.locator('#adminWager [data-wager]').count(),3,`[${label}] three promises on the table`);
+   assert.ok(await overflow(page)<=1,`[${label}] the bet card fits`);
+   if(shots)await page.locator('#adminWager').screenshot({path:path.join(shots,`admin-wager-${label}.png`)});
+   await page.locator('#adminWager [data-wager]').first().click();
+   await page.waitForSelector('#adminWager',{state:'detached',timeout:15000});
+   assert.match(await page.locator('#saveStatus').textContent(),/Bet made with the board: Win at least \d+ games/);
+
+   // --- History: your dynasty in one page (a fresh dynasty has one post and no completed season yet).
+   await open(page,'world','history');
+   await page.waitForSelector('#dynastyPage',{timeout:15000});
+   assert.match(await page.locator('#dynastyPage').textContent(),/YOUR DYNASTY[\s\S]*Where you coached/,`[${label}] the dynasty page leads History`);
+   assert.ok(await overflow(page)<=1,`[${label}] history page fits`);
+   if(shots)await page.locator('#dynastyPage').screenshot({path:path.join(shots,`dynasty-page-${label}.png`)});
+   await open(page,'home','dashboard');
+
+   // --- This Week: a long home streak is named.
+   const hs=await page.evaluate(()=>window.__DL_TEST__.homeStreakFixture(12));
+   await page.waitForSelector('#homeStreak',{timeout:15000});
+   const hsText=await page.locator('#homeStreak').innerText();
+   assert.ok(/HOME STREAK/.test(hsText)&&/The Fortress/.test(hsText)&&/12 straight home wins/.test(hsText),`[${label}] the streak is named: ${hsText}`);
+   assert.ok(hs.home||hsText.includes(hs.host),`[${label}] a road streak names the host`);
+   await page.evaluate(()=>window.__DL_TEST__.homeStreakFixture(0));
 
    // --- This Week: a trap game before a big one.
    const trapOpp=await page.evaluate(()=>window.__DL_TEST__.trapGameFixture());
