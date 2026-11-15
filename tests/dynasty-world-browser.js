@@ -75,6 +75,17 @@ const shots=process.env.DW_SHOTS;
    await page.evaluate(()=>window.__DL_TEST__.seniorDayFixture(false));
    await page.waitForSelector('#seniorDay',{state:'detached',timeout:15000});
 
+   // --- Staff: a retired pro from the program applies for a coordinator job.
+   const alum=await page.evaluate(()=>window.__DL_TEST__.alumniCoachFixture());
+   assert.ok(alum,`[${label}] an alumni candidate is in the pool`);
+   await open(page,'program','staff');
+   await page.waitForSelector('[data-alumni-coach]',{timeout:15000});
+   const alumCard=await page.locator('.candidate-card',{has:page.locator('[data-alumni-coach]')}).innerText();
+   assert.ok(alumCard.includes(alum)&&/Former player/.test(alumCard)&&/pro seasons/.test(alumCard),`[${label}] the card shows his pro career: ${alumCard}`);
+   assert.ok(await overflow(page)<=1,`[${label}] staff page fits`);
+   if(shots)await page.locator('.candidate-card',{has:page.locator('[data-alumni-coach]')}).screenshot({path:path.join(shots,`alumni-coach-${label}.png`)});
+   await open(page,'home','dashboard');
+
    // --- This Week: a flashpoint waits for an answer.
    await open(page,'home','dashboard');
    await page.evaluate(()=>window.__DL_TEST__.lockerRoomFlashpointFixture());
