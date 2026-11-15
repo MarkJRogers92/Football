@@ -194,7 +194,7 @@ test('a real season rolls the boosters forward: gifts arrive, goodwill follows t
 
   if (u.phase === 'preseason') e.beginSeason();
   e.simSeason(); e.simConferenceChampionships(); e.simBowls(); e.simPlayoff();
-  const wins = t.w, expected = e.seasonExpectation(t);
+  const wins = t.w, expected = e.seasonExpectation(t), champion = !!t.champ, confChampion = e.conferenceChampionIdsFor().includes(t.id), bowlWin = t.bowlResult?.won === true;
   let guard = 0;
   while (u.phase === 'complete' && guard++ < 30) {
     assert.equal(u.jobOffers?.length || 0, 0, 'this seed keeps the coach at the same program');
@@ -203,7 +203,7 @@ test('a real season rolls the boosters forward: gifts arrive, goodwill follows t
   }
   assert.equal(u.year, start + 1);
   assert.ok(p.fund >= gifts - 1, `the booster gifts arrived (${p.fund} for ${gifts})`);
-  const expectedGoodwill = Math.max(5, Math.min(100, Math.round(60 * .9 + 5.5 + F.goodwillShift(t, {wins, expected, champion: false, confChampion: false, bowlWin: false}))));
+  const expectedGoodwill = Math.max(5, Math.min(100, Math.round(60 * .9 + 5.5 + F.goodwillShift(t, {wins, expected, champion, confChampion, bowlWin})) + (t.nonconPlan?.paid?.length || 0) * (globalThis.DynastyNoncon?.MARQUEE_GOODWILL || 0)));
   assert.ok(Math.abs(p.goodwill - expectedGoodwill) <= 20, `goodwill moved with ${wins} wins against ${expected} expected (${p.goodwill})`);
   assert.equal(F.level(t, 'stadium'), 1, 'the stadium funded last season opened');
   assert.equal(F.nilBonus(t), 0, 'last year’s NIL gift is spent');

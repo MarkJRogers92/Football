@@ -12,7 +12,7 @@
 //                 who matter, recent results, unhappy Volatile players and contented Leaders. It adds up to +1.0 or
 //                 takes up to -1.5 from the team's offense and defense ratings, and nudges morale up or down.
 //   Flashpoints   in the coach's program, an unhappy Volatile player can blow up. The coach disciplines him, backs
-//                 him, or leaves it to the captains; left open when the next week is played, the captains handle it.
+//                 him, or leaves it to the captains; left open while the next week is played, the captains handle it.
 //                 A losing streak with a Leader among the captains can bring a players-only meeting instead.
 function makeLockerRoomSystem(env){
  'use strict';
@@ -182,15 +182,18 @@ if(typeof module==='object'&&module.exports){
   const r=transferRiskBeforeLockerRoom.apply(this,arguments);
   return p?.captainYear===universe?.year?clamp(r-6,0,100):r;
  };
- // Each played week: settle an open flashpoint (the captains take it), play the week, then the room reacts.
+ // Each played week: play it, then the room reacts. Nothing is touched before the week runs, because a live game locked
+ // in at kickoff must find the roster exactly as it was. A flashpoint still open once a later week has been played is
+ // handled by the captains, then the room settles and a new one may start.
  const simWeekBeforeLockerRoom=simWeek;
  simWeek=function simWeekWithLockerRoom(){
-  const me=selected(),week=universe?.week;
-  if(me&&universe.phase==='regular'){room.ensureCaptains(me);if(room.state(me).incident)room.respond(me,'captains','STAFF')}
+  const week=universe?.week;
   const out=simWeekBeforeLockerRoom.apply(this,arguments);
   if(universe&&universe.week!==week&&week!=null){
+   const mine=selected(),inc=mine?room.state(mine).incident:null;
+   if(inc&&inc.year===universe.year&&inc.week<universe.week)room.respond(mine,'captains','STAFF');
    for(const t of universe.teams||[])room.weekly(t);
-   const mine=selected();if(mine&&universe.phase==='regular'&&!commissionerMode())room.maybeIncident(mine);
+   if(mine&&universe.phase==='regular'&&!commissionerMode())room.maybeIncident(mine);
   }
   return out;
  };
