@@ -36,3 +36,6 @@
 .noncon-week>summary{cursor:pointer}
 .noncon-week>summary .noncon-week-head{display:inline-flex;width:calc(100% - 22px);vertical-align:top}
 .pro-career{margin-top:12px;padding-top:10px;border-top:1px solid var(--line,rgba(255,255,255,.14))}
+/* v0.34: coaching rivals (This Week and Program page). */
+.coach-rival-week{margin:8px 0;padding:9px 12px;border-radius:6px;border:1px solid var(--line,rgba(255,255,255,.14));border-left:4px solid var(--accent,#d9a441)}
+.coach-rival-week p{margin:4px 0 0}

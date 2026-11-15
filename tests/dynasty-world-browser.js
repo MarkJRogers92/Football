@@ -51,6 +51,19 @@ const shots=process.env.DW_SHOTS;
    assert.ok(await overflow(page)<=1,`[${label}] roster page fits`);
    if(shots)await page.locator('#lockerRoom').screenshot({path:path.join(shots,`locker-room-${label}.png`)});
 
+   // --- Coaching rivals: the Program page card, and This Week names a nemesis before the next meeting.
+   await open(page,'program','program');
+   await page.waitForSelector('#coachRivals',{timeout:15000});
+   assert.match(await page.locator('#coachRivals').textContent(),/COACHING RIVALS/,`[${label}] the coaching rivals card is on the Program page`);
+   await open(page,'home','dashboard');
+   const nemesis=await page.evaluate(()=>window.__DL_TEST__.coachRivalsFixture());
+   await page.waitForSelector('#coachRivalWeek',{timeout:15000});
+   const h2h=await page.locator('#coachRivalWeek').innerText();
+   assert.ok(h2h.includes(nemesis)&&/NEMESIS/.test(h2h)&&/0-3/.test(h2h),`[${label}] This Week names the nemesis: ${h2h}`);
+   assert.equal((await page.evaluate(()=>window.__DL_TEST__.coachRivals())).nemesis,nemesis);
+   assert.ok(await overflow(page)<=1,`[${label}] head-to-head card fits`);
+   if(shots)await page.locator('#coachRivalWeek').screenshot({path:path.join(shots,`coach-rival-${label}.png`)});
+
    // --- This Week: a flashpoint waits for an answer.
    await open(page,'home','dashboard');
    await page.evaluate(()=>window.__DL_TEST__.lockerRoomFlashpointFixture());
