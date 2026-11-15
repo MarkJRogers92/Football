@@ -163,7 +163,8 @@ test('in the real game the draft records a grade and ceiling, the board drafts b
  const rest=udfa.filter(r=>r.pg===undefined).map(r=>N.careerAt(r,r.year+20,true));
  assert.ok(rest.every(Boolean),'a career is still worked out from the draft score');
  assert.ok(rest.filter(c=>c.length===0).length/rest.length>.7,'and most of them never make a roster');
- assert.ok(draft.filter(r=>!r.round&&r.status!=='UDFA').every(r=>r.pg===undefined),'nothing is added for players with no pro deal');
+ assert.ok(draft.every(r=>r.round||r.status==='UDFA'),'players with no pro deal get no draftHistory row (v0.35)');
+ assert.ok(u.playerArchive.some(p=>p.draftResult?.label==='No professional deal'),'they keep their draft result on the player record');
  assert.ok(picks.filter(r=>r.round===1).filter(r=>r.pos==='K'||r.pos==='P').length<=1,'specialists do not fill the first round');
  for(let i=1;i<picks.length;i++)assert.ok(picks[i-1].score>=picks[i].score,'the board is in order');
  const pick=picks[0],p=u.playerArchive.find(x=>x.id===pick.playerId);
@@ -244,4 +245,11 @@ test('the draft board says when a class of early entrants is unusually thin or d
  u.draftHistory[2033]=early(2033,20);assert.equal(N.classNote(2033).kind,'deep');
  u.draftHistory[2033]=[...early(2033,11),{year:2033,playerId:'s',reason:'Eligibility exhausted',round:1}];
  assert.equal(N.classNote(2033).kind,'normal');assert.equal(N.classNote(2033).count,11,'seniors are not early entrants');
+});
+
+test('loading an older save drops draftHistory rows for players with no pro deal',async()=>{
+ const e=loadEngine({seed:1212});await e.loadSchools();e.setUserTeam('Chicago Metropolitan');e.initUniverse();
+ const u=e.universe;u.draftHistory={2027:[{playerId:'a',status:'Drafted',round:1},{playerId:'b',status:'UDFA'},{playerId:'c',status:'College Career Complete'}]};
+ e.normalizeUniverse();
+ assert.deepEqual(u.draftHistory[2027].map(r=>r.playerId),['a','b']);
 });
