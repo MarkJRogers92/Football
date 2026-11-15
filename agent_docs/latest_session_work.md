@@ -4,6 +4,7 @@
 
 - `admin-wager.js`: `#adminWager` on This Week before the first game; a 'Wager' goal in `t.seasonGoals`; wraps `evaluateSeasonGoals` (wager stakes +8/-6 replace the bonus-goal +4/-1) and `adminSeasonReview` (goodwill +2 once, `ADMIN_WAGER` event). `t.adminWager {year, declined, settled}`.
 - `home-streaks.js`: `universe.homeStreaks {teamId:{streak,best,bestEnded}}` from a `finishGame` wrap (neutral sites skipped); `#homeStreak` on This Week; `HOME_STREAK` events.
+- `traditions.js`: wraps `updateFanSupport` (coach's program only: +1 a season per tradition, max +3; yearly review in `t.traditions {active, since, year}`; `TRADITION` events); `#traditions` on Program.
 - `dynasty-page.js`: `#dynastyPage` at the top of History (wraps `TAB_RENDERERS.history`). Derived.
 - `runDraft` (app part 08) no longer pushes "College Career Complete" rows; `normalizeUniverse` (part 16) drops them from older saves.
 - `dynasty-world-news.js` TYPES: `ADMIN_WAGER`, `HOME_STREAK`.
