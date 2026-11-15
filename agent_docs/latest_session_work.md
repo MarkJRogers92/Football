@@ -1,5 +1,18 @@
 # Latest session work
 
+## World follow-ups — 2026-11-15 (unpublished)
+
+Based on PR #64 head `5c12a9cfb840524e507d39f62bee548e103438fb`, v0.33.0. Branch `codex/world-followups`, isolated checkout `.session-artifacts/world-followups`. The outer checkout is older and contains unrelated user edits.
+
+Implemented the early-entry eligibility correction (completed college seasons plus redshirt time), optional current-week world news, deterministic AI realignment refusals/replacement invitations, Ring of Honor ceremonies, school-ID alumni continuity with legacy-name fallback, pro profiles limited to completed seasons, useful recruiting warning actions, and a build-time test-list coverage check. Historical archives retain draft-time labels. No fatigue/difficulty/playoff-format expansion.
+
+Verification: full unit run **980/980**, final realignment **14/14**, final lint/docs/test-list checks **9/9**, and final world browser flows at 1280/390px passed. Phone floor: 15 screens; accessibility: 16 screens at both widths, no serious/critical findings. Main and extended browser matrices completed; all six browser persistence scenarios passed without console errors. The 30-season campaign (seed 17, full runtime, 430 user games, roundtrip at season 15) completed with no invariant problems. Its 311.8 MB portable save imported, saved to real IndexedDB, reloaded and played in desktop (1280px) and phone (390px) Chromium layouts without console errors. Import: 5.21/5.20s; save: 4.38/4.51s; load: 1.46/1.23s; reported JS heap: 468 MB in each layout. Program, Game Day and history remained usable. The full suite loaded the realignment test file before its final fallback case was added; the separate 14-test run covers that final change.
+
+Four final full-runtime ten-season runs (7, 11, 23, 31) completed after both gameplay fixes. Canonical results and methodology: `docs/DYNASTY_WORLD_MEASUREMENTS.md`. The corrected eligibility test excludes ordinary sophomores and considers juniors/redshirt sophomores. Earlier provisional soaks are superseded, not final evidence.
+
+Release-artifact verification passed: the committed `index.html` reproduces exactly from source. No publication or merge was performed. Review branch `codex/world-followups` is based on PR #64; target that branch first, or retarget after #64 merges. The upstream PR remained open at the final check. Real iPhone/Safari, screen-reader and packaged-desktop checks were not run. Long-save archive growth remains a measured limitation, not a solved issue.
+
+
 ## v0.33.0 (2026-11-15): the pro pipeline
 
 - `nfl-pipeline.js`: replaces `draftProjection` with a pro grade (ability, position traits, production, room, durability,

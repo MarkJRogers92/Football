@@ -49,3 +49,53 @@ One real draft class (seed 5), projected 30 seasons ahead:
 | Undrafted | 0.3 | 93% | under 1% |
 
 About four Hall of Famers per class at the 30-year horizon.
+
+## v0.33 follow-up baseline — 2026-11-15
+
+Four full-runtime ten-season runs at PR #64 head `5c12a9c`, using seeds 7, 11, 23 and 31. Each run drove the existing offseason gates and completed 2027–2036.
+
+| Seed | Distinct champions | Playoff programs | Conference champions | Top-10 class blue-chip share | Unplaced portal entrants | Final prestige mean / SD |
+| --- | --- | --- | --- | --- | --- | --- |
+| 7 | 6 | 60 | 49 | 23.9% | 7.9% | 66.4 / 15.7 |
+| 11 | 7 | 66 | 49 | 24.5% | 7.3% | 66.4 / 15.0 |
+| 23 | 8 | 63 | 47 | 22.7% | 6.9% | 66.4 / 15.2 |
+| 31 | 7 | 60 | 51 | 26.1% | 7.9% | 66.3 / 15.3 |
+
+All four final roster ranges were 85–105. These are comparisons across seeds, not proof that a particular school or save will behave identically.
+
+Measurement correction: the older driver captured its purported preseason prestige ranking after the regular season and conference championships. It now captures it before `simSeason()`. Do not compare the old table's “preseason top-10” conversion numbers directly with corrected runs. Other metrics above use the same definitions.
+
+The driver now reports early declarations and eventual pro Hall eligibility per actual draft class. The latter deliberately projects ahead for offline balance measurement only; the game's profiles remain chronological.
+
+### Early-entry clock correction
+
+The follow-up found that `offseasonDepartures` increments eligibility used before calling `earlyDeclaration`, whose old `[2,3)` gate was written as though the increment had not happened. In a controlled real-departures test, 8 of 20 ordinary sophomore first-round talents left after only two seasons. The revised check requires at least three completed college years (used seasons plus a redshirt year), with eligibility remaining. The same test now excludes ordinary sophomores and considers juniors and redshirt sophomores.
+
+This matches the three-years-out-of-high-school requirement in [NFL Football Operations' draft rules](https://operations.nfl.com/calendar-events/nfl-draft/nfl-draft-rules), within the game's existing college/redshirt model. Draft grades and declaration probabilities were not retuned. Final follow-up runs include this correction; provisional runs from before it are excluded.
+
+### Invitation decision calibration
+
+The first two provisional ten-season runs (seeds 7 and 11) produced zero swaps and 13 recorded refusals each. Those runs exposed two issues in the new decision path: it valued only one year of a four-year payout, and refused pairings consumed the proposal slots before willing alternatives could be examined. The final decision values the whole media-deal cycle and reserves a conference/window slot only for an accepted move or the coach's pending invitation. The two-swap limit and one-use-per-conference rule remain intact. Final measurements below supersede these provisional results.
+
+### Final follow-up: four seeds × ten seasons
+
+Run with `FULL=1 SEED=<seed> SEASONS=10 node tools/league-health.js`, after the eligibility and invitation fixes. All 40 seasons advanced successfully; every measured roster stayed between 85 and 105 players.
+
+| Seed | Champions | Playoff programs | Conference champions | Top-10 blue-chip share | Unplaced portal entrants | Final prestige mean / SD | Swaps / retained refusals | Early declarations | Eventual pro Hall inductees |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 7 | 7 | 67 | 53 | 24.4% | 6.8% | 66.3 / 15.2 | 4 / 14 | 122 | 35 |
+| 11 | 8 | 64 | 50 | 25.6% | 8.5% | 66.4 / 15.7 | 4 / 14 | 134 | 61 |
+| 23 | 6 | 63 | 53 | 23.3% | 7.6% | 66.4 / 15.3 | 4 / 13 | 113 | 38 |
+| 31 | 7 | 60 | 50 | 23.6% | 8.0% | 66.3 / 15.4 | 4 / 14 | 119 | 49 |
+
+Compared with the baseline, the summed per-run distinct champion count is unchanged at 28; playoff-program counts total 254 versus 249, and conference-champion counts total 206 versus 196. The average top-ten blue-chip share is 24.2% versus 24.3%. These samples do not show a reason for further concentration tuning. The runs include both the eligibility correction and AI decisions, so differences cannot be attributed to one mechanic alone.
+
+Early declarations averaged **12.2 per class** (range 2–22). Eventual pro Hall inductions averaged **4.6 per class** (range 0–11), evaluated 40 years after each class for measurement. Those are eventual outcomes, not honors already earned inside the ten-season save; players never see this projection. No grade, departure-probability or Hall threshold retuning was made. The earlier “one or two per class” source comment was inaccurate and has been removed.
+
+Each seed had four completed swaps across its two windows, alongside 13–14 recorded refusals. A refusal can move the offer to another school, or let another conference pairing proceed. Accepted/pending moves still reserve both conferences and count toward the two-swap window cap.
+
+### Thirty-season save campaign
+
+`SEASONS=30 SEED=17 ROUNDTRIP=15 node tools/facilities-soak.js`, with save and metrics output enabled, completed 2027–2056 and reached the 2057 preseason with **no invariant problems**. It used the full runtime and played 430 user games through Game Engine 2, including a serialization roundtrip after season 15. There were 11 distinct national champions.
+
+The portable save reached **311.8 MB**, growing about 9.7 MB per season; facility plans accounted for 40,915 bytes. Seasons averaged 14.8 seconds on the test host (13.0 first, 21.4 last). This is evidence that the run completes, not that the existing archive growth or long-save cost is solved. Browser import/reload timings are recorded in the session handoff; real-device checks remain separate.

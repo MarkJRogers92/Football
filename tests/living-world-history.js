@@ -5,6 +5,20 @@ function adapter(file,universe,team){
  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'..',file),'utf8'),ctx);return ctx;
 }
 const facts=over=>({key:'Home|2027|Coach',year:2027,coach:'Coach',program:{id:1,name:'Home'},seasons:[],current:{w:10,l:4,champ:false,confChamp:true,regularDone:true},adminConfidence:65,...over});
+test('Ring of Honor requires this year\'s recorded induction and verifies career timing',()=>{
+ const {makeNflPipeline}=require('../nfl-pipeline');
+ const t={id:1,name:'Home'},u={year:2060,phase:'complete',teams:[t],draftHistory:{2027:[]},events:[]};
+ const nfl=makeNflPipeline({getUniverse:()=>u,clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),production:()=>80});
+ let r;for(let i=0;i<1000;i++){const candidate={year:2027,school:'Home',schoolId:1,playerId:`hof${i}`,playerName:'Alum',pos:'QB',round:1,pick:1,pg:99,pc:105};if(nfl.careerAt(candidate,2060,true).hof){r=candidate;break}}
+ assert.ok(r);u.draftHistory[2027]=[r];
+ const elected=2027+nfl.career(r).length+nfl.HOF_WAIT;
+ u.year=elected;u.events=[{type:'PRO_MILESTONE',season:elected,schoolIds:[1],playerIds:[r.playerId],metadata:{kind:'hall-of-fame'}}];
+ const ctx=adapter('ceremony-snapshot-adapter.js',u,t);ctx.DynastyNfl=nfl;
+ const before=JSON.stringify(u);assert.equal(ctx.DynastyCeremonySnapshot.read().milestones.filter(m=>m.kind==='honor').length,1);
+ assert.equal(JSON.stringify(u),before);
+ u.year=elected-1;u.events[0].season=u.year;assert.equal(ctx.DynastyCeremonySnapshot.read().milestones.length,0,'a premature event cannot reveal a future honor');
+ u.year=elected+1;u.events[0].season=u.year;assert.equal(ctx.DynastyCeremonySnapshot.read().milestones.length,0,'an old honor does not become a fresh induction');
+});
 test('a conference title in the admin review is not a national title in Legacy',()=>{
  const team={id:1,name:'Home',staff:{HC:{name:'Coach'}},w:10,l:4};
  const u={year:2027,phase:'complete',teams:[team],champion:'Other',confChamps:[1],history:[{type:'season',year:2027,championId:2,champion:'Other'}],tenure:{school:'Home',startYear:2027,seasons:[{year:2027,w:10,l:4,champ:true,confChamp:true}]}};

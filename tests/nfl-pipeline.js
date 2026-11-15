@@ -7,6 +7,54 @@ function pipeline(u={year:2027,phase:'regular',draftHistory:{},teams:[]}){
  return{u,N:makeNflPipeline({getUniverse:()=>u,clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),production:p=>p.prod??55})};
 }
 const player=(o={})=>({id:'p1',pos:'QB',style:'Field Architect',trueNow:85,upside:92,speed:75,power:72,technique:86,iq:88,composure:84,durability:80,versatility:70,injuryHistory:[],prod:70,...o});
+
+test('a rookie view cannot reveal his eventual failure, career length or future honors',()=>{
+ const {N}=pipeline();
+ const r={year:2027,playerId:'camp-cut',playerName:'Rookie',pos:'LB',school:'Test U',status:'UDFA',pg:50,pc:55};
+ const rookie=N.careerAt(r,2028,false);
+ assert.equal(rookie.label,'Awaiting pro debut');
+ assert.equal(rookie.length,null);
+ assert.deepEqual(rookie.seasons,[]);
+ assert.equal(rookie.peak,undefined);
+ assert.equal(rookie.bust,undefined);
+ assert.equal(rookie.hof,false);
+ assert.equal(N.careerAt(r,2028,true).label,'Never made a roster');
+ const pick=draftClass()[0],view=N.careerAt(pick,2029,true);
+ assert.ok(view.seasons.every(s=>s.year<=2029));
+ assert.equal(view.length,null,'an active player has no announced final career length');
+});
+
+test('a rename preserves legacy and new alumni, gifts and recruiting under the stable school ID',()=>{
+ const team={id:7,name:'Test U'},cls=draftClass(2027);
+ const u={year:2033,phase:'complete',teams:[team,{id:8,name:'Other U'}],draftHistory:{2027:cls}};
+ const {N}=pipeline(u),before=N.school(team.name),gift=N.alumniGift(team);
+ N.rememberSchool(team,team.name);
+ team.name='Renamed U';
+ const after=N.school(team.name);
+ assert.equal(after.pros,before.pros);assert.equal(after.proBowls,before.proBowls);
+ assert.equal(after.pitch,before.pitch);assert.equal(N.alumniGift(team),gift);
+ assert.ok(cls.filter(r=>r.school==='Test U').every(r=>r.schoolId===7));
+ assert.equal(cls[0].school,'Test U','the historical name stays recorded');
+ assert.equal(N.school('Test U').pros,0,'old names do not create a second pipeline');
+ assert.ok(N.milestones(['Renamed U'],2030).every(m=>m.c.schoolId===7));
+});
+
+test('old records can resolve a renamed program through archived season IDs without changing saves',()=>{
+ const u={year:2033,phase:'complete',teams:[{id:7,name:'New U'}],draftHistory:{2027:draftClass(2027)},history:[{type:'season',year:2027,records:[{schoolId:7,name:'Test U'}]}]};
+ const {N}=pipeline(u),before=JSON.stringify(u);
+ assert.ok(N.school('New U').pros>0);
+ assert.equal(JSON.stringify(u),before);
+});
+test('the actual program editor pins legacy alumni before changing the name',async()=>{
+ const e=loadEngine({seed:9331,fullRuntime:true});await e.loadSchools();e.setUserTeam('Chicago Metropolitan');e.initUniverse();
+ const u=e.universe,t=e.T('Chicago Metropolitan'),nfl=globalThis.DynastyNfl;
+ u.year=2033;u.phase='complete';u.draftHistory={2027:draftClass(2027,t.name)};
+ const before=nfl.school(t.name);assert.ok(before.pros>0);
+ document.querySelector('#editName').value='Chicago Renamed';e.applyProgramEdit();
+ assert.equal(nfl.school('Chicago Renamed').pros,before.pros);
+ assert.ok(u.draftHistory[2027].filter(r=>r.school==='Chicago Metropolitan').every(r=>r.schoolId===t.id));
+});
+
 // A synthetic draft class: 224 picks graded from 95 down, plus undrafted players.
 function draftClass(year=2027,school='Test U'){
  const out=[];for(let i=0;i<224;i++){const pg=Math.round(90-i*.05);out.push({year,playerId:`d${year}_${i}`,playerName:`Pick ${i}`,pos:['QB','EDGE','OT','CB','WR','DT','S','LB','TE','OG','C','RB'][i%12],school:i%10===0?school:'Other U',round:Math.floor(i/32)+1,pick:i%32+1,status:'Drafted',label:'x',score:pg,pg,pc:pg+5})}
@@ -128,4 +176,20 @@ test('in the real game the draft records a grade and ceiling, the board drafts b
  const r=u.recruits.find(x=>x.pos===pick.pos)||u.recruits[0];
  const row=e.recruitPitchBreakdown(e.T(pick.school),r).find(x=>x[0]==='Pro pipeline');
  assert.ok(!row||row[1]<1,'before any pro has played a season, first-rounders alone are worth less than a point');
+});
+
+test('departures consider juniors and redshirt sophomores, never ordinary sophomores',async()=>{
+ const e=loadEngine({seed:9332,fullRuntime:true});await e.loadSchools();e.setUserTeam('Chicago Metropolitan');e.initUniverse();
+ const u=e.universe,groups={soph:[],junior:[],redshirt:[]};u.phase='complete';
+ // Many identical first-round talents make the fixed-seed eligibility check decisive.
+ const t=e.T('Chicago Metropolitan');
+ for(let i=0;i<60;i++){
+  const p=t.roster[i],kind=i<20?'soph':i<40?'junior':'redshirt';groups[kind].push(p.id);
+  Object.assign(p,{eligibilityUsed:kind==='junior'?2:1,year:kind==='junior'?'JR':'SO',redshirtUsed:kind==='redshirt',redshirtActive:false,trueNow:99,upside:99,speed:99,power:99,technique:99,iq:99,composure:99,durability:99});
+ }
+ e.offseasonDepartures();
+ const early=new Set(u.offseason.reports.departures.draftPool.filter(r=>r.reason==='Declared early for draft').map(r=>r.p.id));
+ assert.equal(groups.soph.filter(id=>early.has(id)).length,0,'two ordinary college seasons cannot qualify');
+ assert.ok(groups.junior.some(id=>early.has(id)),'third-season juniors are considered');
+ assert.ok(groups.redshirt.some(id=>early.has(id)),'a redshirt year counts toward the three-year clock');
 });

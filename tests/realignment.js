@@ -24,6 +24,42 @@ test('conferences are ranked by media value and paid by rank, top two four units
  assert.deepEqual([1,2,3,4,5,6,7,8,9,10].map(R.payoutFor),[4,4,3,3,2,2,1,1,0,0]);
 });
 
+test('AI boards value the payout over the full media-deal cycle',()=>{
+ const {R,T}=league();
+ for(const t of R.members('C'))t.prestige=t.fan_support=t.facilities=69;
+ const t=T('C0');t.rivalry={rivalId:T('C1').id,series:{w:20,l:20}};
+ assert.equal(R.conferencePayout(t),3);assert.equal(R.ranking().find(x=>x.conference==='B').payout,4);
+ assert.equal(R.invitationDecision(t,'B').accept,true,'four seasons of improved payout can justify leaving a nearby rivalry');
+});
+
+test('AI boards weigh the deal against extra travel and an established rivalry without rerolling',()=>{
+ const {R,T}=league(),t=T('B0');
+ assert.equal(R.invitationDecision(t,'A').accept,true,'a nearby stronger conference is attractive');
+ for(const m of R.members('A'))m.lon=-120;
+ t.rivalry={rivalId:T('B1').id,series:{w:20,l:19}};
+ const before=JSON.stringify(t),decision=R.invitationDecision(t,'A');
+ assert.equal(decision.accept,false);
+ assert.match(decision.reason,/travel|rivalry/i);
+ assert.deepEqual(R.invitationDecision(t,'A'),decision);
+ assert.equal(JSON.stringify(t),before);
+});
+
+test('AI declines reach the next willing candidate while every conference keeps its size',()=>{
+ const {R,u,T,events}=league();
+ // The top brand wants to keep its long rivalry; the next brand can make the same move.
+ T('B0').rivalry={rivalId:T('B2').id,series:{w:25,l:25}};
+ T('B1').prestige=T('B1').fan_support=T('B1').facilities=87;
+ for(const m of R.members('A'))m.prestige=m.fan_support=m.facilities=m.name==='A3'?60:88;
+ const out=R.runWindow();
+ assert.equal(T('B0').conference,'B');
+ assert.equal(T('B1').conference,'A');
+ assert.ok(events.some(e=>e.type==='REALIGNMENT_DECLINED'&&/rivalry/.test(e.summary)));
+ assert.ok(out.moves.length<=2);
+ assert.ok(R.conferences().every(c=>R.members(c).length===4));
+ assert.equal(R.runWindow(),null);
+ assert.equal(u.realignment.declined.filter(d=>d.schoolId===T('B0').id).length,1);
+});
+
 test('a window opens every four seasons from the start of the dynasty',()=>{
  const {R}=league();
  assert.equal(R.isWindow(2029),false);
@@ -130,7 +166,7 @@ test('in the real game a window moves programs after the season is archived, kee
  assert.ok(e.advanceOffseasonPhase(),'the review runs');
  const moved=u.teams.filter(t=>t.conference!==before.get(t.id));
  const pending=u.realignment.pending;
- assert.ok(moved.length>=2||pending,'the window moves programs or asks the coach');
+ assert.ok(moved.length>=2||pending||(u.realignment.declined||[]).some(d=>d.year===u.year&&d.reason),'the window moves programs, asks the coach, or records a reasoned AI refusal');
  assert.equal(moved.length%2,0,'moves are swaps');
  const season=u.history.find(h=>h.type==='season');
  for(const t of moved){const rec=season.records.find(r=>r.schoolId===t.id||r.name===t.name);if(rec?.conference)assert.equal(rec.conference,before.get(t.id),'the archived season keeps the conference it was played in')}
@@ -148,4 +184,16 @@ test('in the real game a window moves programs after the season is archived, kee
  assert.ok(Object.values(sizes).every(n=>n===12));
  const F=globalThis.DynastyFacilities,top=R.ranking()[0];
  assert.ok(top.payout>0&&F.state(u.teams.find(t=>t.conference===top.conference)).fund>=0);
+});
+
+test('declined pairings do not crowd willing conferences out of the real-world window',async()=>{
+ const e=loadEngine({seed:7,fullRuntime:true});await e.loadSchools();e.setUserTeam('Chicago Metropolitan');e.initUniverse();
+ const R=globalThis.DynastyRealignment,u=e.universe;R.state().startYear=u.year-3;
+ const result=R.runWindow();
+ assert.ok(u.realignment.declined.length>0,'some offers are unattractive');
+ assert.ok(result.moves.length>0,'other viable deals can still proceed');
+ const conferences=result.moves.flatMap(m=>[m.up.from,m.up.to]);
+ assert.equal(new Set(conferences).size,conferences.length,'a conference is involved only once');
+ assert.ok(result.moves.length+(result.pending?1:0)<=R.MAX_MOVES);
+ assert.ok(R.conferences().every(c=>R.members(c).length===12));
 });
