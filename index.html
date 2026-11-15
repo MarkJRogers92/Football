@@ -20709,7 +20709,7 @@ if(typeof module==='object'&&module.exports){
   if(!note||!note.isConnected){note=document.createElement('p');note.id='draftClassNote';note.className='small muted draft-class-note';board.insertAdjacentElement('beforebegin',note)}
   note.textContent=text;note.dataset.kind=nfl.classNote(years[0])?.kind||'normal';
  }
- if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.setDraftHistory=dh=>{universe.draftHistory=dh;nfl.clearCache()};window.__DL_TEST__.proPipeline=()=>{const t=selected();const s=nfl.school(t.name);return{pros:s.pros,active:s.active,rank:s.rank,pitch:s.pitch}};
+ if(typeof window!=='undefined'&&window.__DL_TEST__){window.__DL_TEST__.setDraftHistory=dh=>{universe.draftHistory=dh;nfl.clearCache()};window.__DL_TEST__.proPipeline=()=>{const t=selected();const s=nfl.school(t.name);return{pros:s.pros,active:s.active,rank:s.rank,pitch:s.pitch}};}
 }
 
 // Optional, current facts shared by the Wire and the short weekly briefing.
