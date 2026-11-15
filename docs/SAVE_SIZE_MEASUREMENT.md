@@ -411,3 +411,43 @@ Per game (one season, seed 7): compacted 2,441 B → deep 1,851 B (−24%).
 From season nine each rollover deep-compacts one more season, so growth falls
 by about 0.4 MB a season (+2.6 → +2.1 MB, about 16%). Team statistics (483 B a
 game) are now the largest part of an old game and are kept.
+
+## v0.34 measurement: where a twelve-season save goes, and what a cold tier would save
+
+`SEASONS=12 SEED=17 SAVE_OUT=… node tools/facilities-soak.js` on `claude/overnight-v034` (full runtime, coached
+games). Portable save after the 2039 season: **146.0 MB**. Measured with `Buffer.byteLength(JSON.stringify(...))`.
+Measurement only: nothing was changed.
+
+| Component | MB | Share |
+| --- | --- | --- |
+| playerArchive (27,819 records) | 53.1 | 36.4% |
+| gameArchive (9,255 games, 173 with drives) | 41.5 | 28.4% |
+| teams (live rosters) | 25.1 | 17.2% |
+| events (34,382) | 12.7 | 8.7% |
+| draftHistory | 6.4 | 4.4% |
+| campHistory | 3.1 | 2.1% |
+| everything else | 4.1 | 2.8% |
+
+**Players who never started a game are most of the archive.** 15,959 of 27,819 archived players (57%) have no
+recorded start; 15,610 of them simply ran out of eligibility. They take 27.8 MB (1.79 KB each, against 2.18 KB for
+players who started). Their largest fields: `seasonHistory` 7.3 MB, `campHistory` 3.0 MB, `recruitingMemory` 2.3 MB,
+`scoutingHistory` 1.3 MB, `draftResult` 1.0 MB.
+
+**Three other candidates, all redundant with records kept elsewhere:**
+
+| Candidate | MB at 12 seasons | Why it is redundant |
+| --- | --- | --- |
+| `PLAYER_BREAKOUT` events (12,921) | 5.4 | Mostly other programs' players; the player's own `seasonHistory` and arcs hold the story. |
+| `COLLEGE_CAREER_ENDED` events (6,753) | 3.0 | The archive record holds the exit. |
+| `draftHistory` "College Career Complete" rows (12,942) | 3.1 | Not drafted, not signed; the draft board already filters them out and the pro pipeline ignores them. |
+
+**Options, roughly by savings for the risk** (each needs the usual migration and a browser save/load check):
+
+1. A cold tier for never-started archived players: keep identity, position, school, years, awards, career totals and
+   `draftResult`; fold `seasonHistory` into one compact row a season; drop `campHistory` and `scoutingHistory`.
+   About 11–12 MB at twelve seasons (~8%), and it grows with the save.
+2. Keep other programs' `PLAYER_BREAKOUT` events for the last four seasons only: ~4 MB (~3%).
+3. Stop writing "College Career Complete" rows to `draftHistory`: ~3 MB (~2%), with no reader to migrate.
+
+Together, about 20 MB of 146 (~14%) at twelve seasons, more in longer saves. The game archive (28%) was trimmed in
+v0.31 (deep tier); its next step would be dropping box scores for other programs' games older than the deep horizon.
