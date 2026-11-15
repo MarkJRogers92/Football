@@ -8,7 +8,7 @@
 })(typeof window!=='undefined'?window:this,function(){
 'use strict';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const ORDER={national:0,conference:1,bowl:2,rivalry:3,awards:4,signing:5,draft:6};
+const ORDER={national:0,conference:1,bowl:2,rivalry:3,awards:4,honor:5,signing:6,draft:7};
 // Milestones that are new since the previous snapshot, biggest first. A missing baseline, another
 // program or another season means "just loaded or switched": nothing is new, so old milestones never replay.
 function newMilestones(prev,next){
@@ -29,6 +29,7 @@ function turn(key){const src=globalThis.DynastyArt?.turnSrc?.(key);return src?`<
 const face=a=>a.playerId==null?'':`<canvas class="portrait portrait-list" width="44" height="44" data-portrait="${esc(a.playerId)}" data-portrait-size="44" data-portrait-frame="list" data-portrait-kind="player" aria-hidden="true"></canvas>`;
 function bodyHTML(m){
  const t=m.team,record=`${t.w}-${t.l}`;
+ if(m.kind==='honor'){if(!m.alumni?.length)return null;return{tone:'gold',confetti:false,html:`${art('championship-ring')}<span class="cer-kicker">${m.year} · ${esc(t.name)}</span><h2>Ring of Honor</h2><p class="cer-sub">From this program to the Pro Football Hall of Fame.</p><ol class="cer-list">${m.alumni.map(a=>`<li><span><b>${esc(a.name)}</b><small>${esc(a.pos)} · ${a.proBowls} Pro Bowls · ${a.allPros} All-Pro selections${a.rings?` · ${a.rings} championship${a.rings===1?'':'s'}`:''}</small></span></li>`).join('')}</ol>`}}
  if(m.kind==='national')return{tone:'gold',confetti:true,html:`<div class="cer-trophy" aria-hidden="true"></div><span class="cer-kicker">${m.year} College Football</span><h2>National Champions</h2><p class="cer-team">${esc(t.name)}</p><p class="cer-sub">${record} · the last team standing</p><div class="cer-ring" aria-hidden="true"></div>`};
  if(m.kind==='conference')return{tone:'gold',confetti:true,html:`${art('conference-crown')||helmet(t.id,'cer-helmet')}<span class="cer-kicker">${m.year} · ${esc(t.conference)}</span><h2>Conference Champions</h2><p class="cer-team">${esc(t.name)}</p><p class="cer-sub">${record} · a banner for the stadium</p>`};
  if(m.kind==='bowl')return{tone:'gold',confetti:true,html:`<div class="cer-faceoff">${helmet(t.id,'cer-helmet')}<b>${esc(m.score?.[0]??'')}–${esc(m.score?.[1]??'')}</b>${helmet(m.opponent?.id,'cer-helmet is-away')}</div>${art('bowl-laurel')}<span class="cer-kicker">${m.year} · Bowl season</span><h2>${esc(m.label)} Champions</h2><p class="cer-team">${esc(t.name)}</p><p class="cer-sub">over ${esc(m.opponent?.name||'')}</p>`};

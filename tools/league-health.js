@@ -53,12 +53,12 @@ const pad = (v, n) => String(v).padEnd(n);
   for (let i = 0; i < SEASONS; i++) {
     const startedAt = u.year;
     if (u.phase === 'preseason') e.beginSeason();
+    const preseasonTop = [...u.teams].sort((a, b) => b.prestige - a.prestige).slice(0, 10).map(t => t.id);
     e.simSeason();
     e.simConferenceChampionships();
     for (const id of u.confChamps || []) bump(confTitles, nameOf(id));
     // Prestige ranking before the season decides, to test whether bluebloods convert
     // standing into titles — the dynasty-persistence question.
-    const preseasonTop = [...u.teams].sort((a, b) => b.prestige - a.prestige).slice(0, 10).map(t => t.id);
     e.simPlayoff();
     if (u.champion) bump(champions, u.champion);
     const championTeam = u.teams.find(t => t.name === u.champion);
@@ -246,5 +246,11 @@ const pad = (v, n) => String(v).padEnd(n);
   for (const row of blueChip) console.log(pad(row.year, 8) + pad(row.blue, 20) + pad(row.elite, 20) + (row.blue ? (row.elite / row.blue * 100).toFixed(1) : '0.0') + '%');
   console.log('mean top-10 share:', mean(blueChip.map(r => r.blue ? r.elite / r.blue * 100 : 0)).toFixed(1) + '%');
 
-  console.log('\nseasons detail:', JSON.stringify(seasons));
+  if(globalThis.DynastyNfl){
+    const nfl=globalThis.DynastyNfl;
+    const classes=Object.entries(u.draftHistory||{}).map(([year,records])=>({year:Number(year),pros:records.filter(r=>r.round||r.status==='UDFA').length,early:records.filter(r=>r.reason==='Declared early for draft').length,eventualHof:records.filter(r=>nfl.careerAt(r,Number(year)+40,true)?.hof).length}));
+    console.log('\npro classes (eventual Hall outcomes for measurement only):',JSON.stringify(classes));
+  }
+  console.log('realignment: moves',u.realignment?.history?.length||0,'recorded declines',u.realignment?.declined?.length||0);
+  console.log('\nseasons detail:' , JSON.stringify(seasons));
 })();

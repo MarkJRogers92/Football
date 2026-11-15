@@ -22,6 +22,20 @@ globalThis.DynastyCeremonySnapshot=Object.freeze({
    }
    const picks=(universe.draftHistory?.[year]||[]).filter(d=>d.school===u.name&&d.status==='Drafted').sort((a,b)=>(a.round-b.round)||(a.pick-b.pick));
    if(picks.length)out.push({key:`${year}:draft`,kind:'draft',year,team,picks:picks.slice(0,8).map(d=>({playerId:d.playerId,name:d.playerName,pos:d.pos,round:d.round,pick:d.pick,label:d.label}))});
+   const nfl=globalThis.DynastyNfl;
+   if(nfl&&universe.phase==='complete'){
+    const seen=new Set(),alumni=[];
+    for(const event of universe.events||[]){
+     if(event.type!=='PRO_MILESTONE'||event.metadata?.kind!=='hall-of-fame'||event.season!==year||!(event.schoolIds||[]).includes(u.id))continue;
+     for(const id of event.playerIds||[]){
+      if(seen.has(String(id)))continue;const r=nfl.recordFor(id);if(!r||nfl.schoolIdentity(r).id!==u.id)continue;
+      const c=nfl.careerAt(r,year,true),before=nfl.careerAt(r,year-1,true);
+      if(!c?.hof||before?.hof)continue;seen.add(String(id));
+      alumni.push({playerId:id,name:c.name,pos:c.pos,proBowls:c.proBowls,allPros:c.allPros,rings:c.rings});
+     }
+    }
+    if(alumni.length)out.push({key:`${year}:honor`,kind:'honor',year,team,alumni});
+   }
    return{year,teamId:u.id,milestones:out};
   }catch(e){return null}
  }

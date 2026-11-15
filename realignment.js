@@ -54,10 +54,41 @@ function makeRealignmentSystem(env){
  function conferencePayout(t){const r=ranking().find(x=>x.conference===t?.conference);return r?r.payout:0}
  function rankedMembers(c){return members(c).map(t=>({t,brand:brand(t)})).sort((a,b)=>b.brand-a.brand||a.t.id-b.t.id)}
 
+ // A school's board sees the same deal every time. No hidden coin toss on reload.
+ function invitationDecision(t,to){
+  const ranks=ranking(),from=ranks.find(x=>x.conference===t.conference),dest=ranks.find(x=>x.conference===to);
+  if(!from||!dest||to===t.conference)return{accept:false,score:0,reason:'There is no new conference deal.'};
+  // Payouts repeat throughout this deal; relocation and a lost rivalry are costs of the move.
+  const media=(dest.value-from.value)*.4,money=(dest.payout-from.payout)*CYCLE*3;
+  const extraMiles=Math.max(0,travel(t,to)-travel(t,t.conference)),travelCost=extraMiles/MILES_PER_POINT;
+  const rival=t.rivalry&&universe().teams.find(x=>x.id===t.rivalry.rivalId);
+  const series=t.rivalry?.series,played=(series?.w||0)+(series?.l||0);
+  const rivalryCost=rival&&rival.conference===t.conference?Math.min(8,2+played/5):0;
+  const competition=Math.max(0,mediaValue(to)-brand(t))*.15;
+  const score=Math.round((1+media+money-travelCost-rivalryCost-competition)*10)/10;
+  const accept=score>0;
+  const reason=accept?'The stronger media deal and exposure outweigh the costs.':rivalryCost>=travelCost&&rivalryCost>=competition?'Keeping its conference rivalry matters more than this offer.':travelCost>=competition?'The extra travel outweighs the media deal.':'The tougher competitive outlook outweighs the media deal.';
+  return{accept,score,reason,extraMiles:Math.round(extraMiles),rivalryCost};
+ }
+ function invite(p,exclude=new Set(),reason='Media deal'){
+  const u=universe(),s=state(),me=env.userTeam();
+  const candidates=rankedMembers(p.from).filter(x=>!exclude.has(x.t.id)).slice(0,CANDIDATES)
+   .map(x=>({...x,appeal:appeal(x.t,p.to)})).sort((a,b)=>b.appeal-a.appeal||a.t.id-b.t.id);
+  for(const x of candidates){
+   const gap=x.appeal-brand(p.down);if(gap<GAP)continue;
+   if(x.t===me&&!env.commissioner())return{pending:{year:u.year,schoolId:me.id,to:p.to,from:p.from,replaces:p.down.id,replacesName:p.down.name,gap}};
+   const decision=invitationDecision(x.t,p.to);
+   if(decision.accept)return{move:swap(x.t,p.down,reason)};
+   s.declined=[...(s.declined||[]),{year:u.year,schoolId:x.t.id,to:p.to,reason:decision.reason}].slice(-40);
+   env.event({type:'REALIGNMENT_DECLINED',schoolIds:[x.t.id],importance:58,summary:`${x.t.name} turns down the ${p.to}. ${decision.reason}`,metadata:{to:p.to,reason:decision.reason}});
+  }
+  return{};
+ }
+
  // The swaps the conferences would agree to today. Each pair is two neighbours in the media ranking: the weaker
  // conference's best brand against the stronger conference's weakest. Biggest gaps go first; a conference takes part
  // in one swap per window, and nobody moves twice.
- function proposals({exclude=new Set()}={}){
+ function proposals({exclude=new Set(),all=false}={}){
   const r=ranking(),year=universe().year,out=[];
   for(let i=0;i<r.length-1;i++){
    const strong=r[i].conference,weak=r[i+1].conference;
@@ -69,6 +100,7 @@ function makeRealignmentSystem(env){
    if(gap>=GAP)out.push({up:riser.t,down:faller.t,from:weak,to:strong,gap,tie:hash(riser.t.id,faller.t.id,year)});
   }
   out.sort((a,b)=>b.gap-a.gap||a.tie-b.tie);
+  if(all)return out;
   const used=new Set(),picked=[];
   for(const p of out){
    if(picked.length>=MAX_MOVES)break;
@@ -81,11 +113,11 @@ function makeRealignmentSystem(env){
  function outlook(t){
   if(!t)return null;
   const r=ranking(),me=r.find(x=>x.conference===t.conference),list=rankedMembers(t.conference),place=list.findIndex(x=>x.t===t)+1;
-  const p=proposals(),up=p.find(x=>x.up===t),down=p.find(x=>x.down===t);
+  const p=proposals({all:true}),up=p.find(x=>x.up===t),down=p.find(x=>x.down===t);
   const above=me&&me.rank>1?r[me.rank-2]:null,below=me&&me.rank<r.length?r[me.rank]:null;
   let status='settled',text='Your place in the conference is secure. Nobody is looking to move you in or out.';
-  if(up){status='rising';text=`If the window opened today, the ${up.to} would invite you to replace ${up.down.name}.`}
-  else if(down){status='at-risk';text=`If the window opened today, the ${down.to} would replace you with ${down.up.name} and you would drop to the ${down.from}.`}
+  if(up){status='rising';text=`Your brand is in range of a ${up.to} invitation to replace ${up.down.name}. The final offer depends on which other deals are accepted.`}
+  else if(down){status='at-risk';text=`The ${down.to} could replace you with ${down.up.name}, sending you to the ${down.from}, if a deal is accepted.`}
   else if(place<=CANDIDATES&&above){const weakest=rankedMembers(above.conference).at(-1);const short=Math.max(0,Math.ceil((weakest.brand+GAP-appeal(t,above.conference))*10)/10);status='watching';text=short>0?`You are among the best brands in the ${t.conference}. The ${above.conference} would need ${short} more brand points from you, after travel, to make an offer.`:`You are among the best brands in the ${t.conference} and already clear the ${above.conference}'s bar. Whether you are invited depends on which swaps the window makes; keep winning.`}
   else if(place===list.length&&below){status='watching';text=`You are the weakest brand in the ${t.conference}. Keep within ${GAP} brand points of the ${below.conference}'s best and nobody will replace you.`}
   return{status,text,brand:brand(t),place,size:list.length,conference:t.conference,rank:me?.rank||null,of:r.length,payout:me?.payout||0,value:me?.value||0,nextWindow:nextWindow(),above:above?.conference||null,below:below?.conference||null};
@@ -122,10 +154,14 @@ function makeRealignmentSystem(env){
  function runWindow(){
   const u=universe(),s=state(),year=u.year;
   if(!isWindow(year)||s.lastWindow?.year===year)return null;
-  const me=env.userTeam(),plan=proposals(),moves=[];let pending=null;
+  const me=env.userTeam(),plan=proposals({all:true}),moves=[],used=new Set();let pending=null;
   for(const p of plan){
-   if(me&&p.up===me&&!env.commissioner()){pending={year,schoolId:me.id,to:p.to,from:p.from,replaces:p.down.id,replacesName:p.down.name,gap:p.gap};continue}
-   moves.push(swap(p.up,p.down,me&&p.down===me?'Dropped for a stronger brand':'Media deal'));
+   if(moves.length+(pending?1:0)>=MAX_MOVES)break;
+   if(used.has(p.from)||used.has(p.to))continue;
+   const result=invite(p,new Set(),me&&p.down===me?'Dropped for a stronger brand':'Media deal');
+   if(result.pending||result.move){used.add(p.from);used.add(p.to)}
+   if(result.pending)pending=result.pending;
+   if(result.move)moves.push(result.move);
   }
   s.pending=pending;
   s.lastWindow={year,moves:moves.length,invited:!!pending,ack:false,ranking:ranking().map(x=>({conference:x.conference,value:x.value,payout:x.payout}))};
@@ -140,9 +176,9 @@ function makeRealignmentSystem(env){
   s.pending=null;
   if(!me||!down||me.conference!==inv.from||down.conference!==inv.to)return{ok:false,reason:'The invitation no longer applies.'};
   if(accept){const move=swap(me,down,'Accepted an invitation');return{ok:true,accepted:true,move}}
-  inv.declinedYear=u.year;s.declined=[...(s.declined||[]).slice(-9),{year:u.year,schoolId:me.id,to:inv.to}];
-  const next=rankedMembers(inv.from).filter(x=>x.t!==me).slice(0,CANDIDATES).map(x=>({...x,appeal:appeal(x.t,inv.to)})).sort((a,b)=>b.appeal-a.appeal)[0];const nextOk=next&&next.appeal-brand(down)>=GAP;
-  const move=nextOk?swap(next.t,down,'Invited after another program declined'):null;
+  inv.declinedYear=u.year;s.declined=[...(s.declined||[]).slice(-39),{year:u.year,schoolId:me.id,to:inv.to}];
+  const exclude=new Set([me.id,...(s.declined||[]).filter(d=>d.year===u.year&&d.to===inv.to).map(d=>d.schoolId)]);
+  const move=invite({from:inv.from,to:inv.to,down},exclude,'Invited after another program declined').move||null;
   env.event({type:'REALIGNMENT_DECLINED',schoolIds:[me.id],importance:64,summary:`${me.name} turns down the ${inv.to}${move?`; ${move.up.name} accepts instead`:''}.`,metadata:{to:inv.to}});
   return{ok:true,accepted:false,move};
  }
@@ -156,7 +192,7 @@ function makeRealignmentSystem(env){
   return out;
  }
 
- return{CYCLE,MAX_MOVES,GAP,PAYOUT_MAX,MILES_PER_POINT,CANDIDATES,centre,travel,appeal,state,isWindow,nextWindow,brand,conferences,members,mediaValue,ranking,payoutFor,conferencePayout,rankedMembers,proposals,outlook,swap,runWindow,answer,settle,payAll};
+ return{CYCLE,MAX_MOVES,GAP,PAYOUT_MAX,MILES_PER_POINT,CANDIDATES,centre,travel,appeal,state,isWindow,nextWindow,brand,conferences,members,mediaValue,ranking,payoutFor,conferencePayout,rankedMembers,invitationDecision,proposals,outlook,swap,runWindow,answer,settle,payAll};
 }
 
 if(typeof module==='object'&&module.exports){
@@ -199,20 +235,21 @@ if(typeof module==='object'&&module.exports){
   return out;
  };
 
- const STATUS_LABEL={rising:'Invitation likely',['at-risk']:'At risk of being dropped',watching:'On the edge',settled:'Secure'};
+ const STATUS_LABEL={rising:'In invitation range',['at-risk']:'At risk of being dropped',watching:'On the edge',settled:'Secure'};
  function programCardHTML(t){
   const o=realign.outlook(t),r=realign.ranking(),s=realign.state(),members=realign.rankedMembers(t.conference);
-  const hist=s.history.slice().reverse();
+  const hist=s.history.slice().reverse(),declined=(s.declined||[]).filter(d=>d.year===s.lastWindow?.year);
   const row=x=>`<tr class="${x.conference===t.conference?'is-mine':''}"><td>${x.rank}</td><td>${raEsc(x.conference)}</td><td>${x.value}</td><td>${x.payout}</td></tr>`;
   const mem=(x,i)=>`<tr class="${x.t===t?'is-mine':''}"><td>${i+1}</td><td>${raEsc(x.t.name)}</td><td>${x.brand}</td><td>${x.t.prestige??'—'}</td></tr>`;
   const moveLine=m=>`<li><span class="muted">${m.year}</span> <strong>${raEsc(m.up.name)}</strong> ${raEsc(m.up.from)} → ${raEsc(m.up.to)} · <strong>${raEsc(m.down.name)}</strong> ${raEsc(m.down.from)} → ${raEsc(m.down.to)}${m.brokenRivalries?.length?`<div class="small muted">Ended: ${m.brokenRivalries.map(b=>`${raEsc(b.trophy)} (${raEsc(b.school)} ${b.w}-${b.l} against ${raEsc(b.rival)})`).join('; ')}</div>`:''}</li>`;
   const pending=s.pending&&s.pending.schoolId===t.id?`<div class="ra-invite small"><strong>The ${raEsc(s.pending.to)} has invited you.</strong> Answer on This Week before the preseason.</div>`:'';
-  return`<div class="section-head has-art">${globalThis.DynastyArt?.img('globe','dl-art dl-art-head')||''}<div><div class="eyebrow">CONFERENCE &amp; REALIGNMENT</div><h3>${raEsc(t.conference)}</h3><div class="muted">Media deals are renegotiated every ${realign.CYCLE} seasons. Membership follows the money.</div></div></div>
+  return`<div class="section-head has-art">${globalThis.DynastyArt?.img('globe','dl-art dl-art-head')||''}<div><div class="eyebrow">CONFERENCE &amp; REALIGNMENT</div><h3>${raEsc(t.conference)}</h3><div class="muted">Media deals are renegotiated every ${realign.CYCLE} seasons. Programs weigh the money, travel and rivalries.</div></div></div>
   <div class="fb-summary"><div><span class="small muted">Media rank</span><strong>#${o.rank}<small> of ${o.of}</small></strong></div><div><span class="small muted">Payout</span><strong>${o.payout}<small> units a season</small></strong></div><div><span class="small muted">Your brand</span><strong>${o.brand}<small> #${o.place} of ${o.size}</small></strong></div><div><span class="small muted">Next window</span><strong>${o.nextWindow}<small> offseason</small></strong></div></div>
   <div class="ra-status ra-${o.status}" data-ra-status="${o.status}"><strong>${STATUS_LABEL[o.status]}</strong> <span>${raEsc(o.text)}</span></div>${pending}
   <p class="small muted">Brand is prestige, fan support and facilities. When the window opens, the conference above looks at the best few brands below it, takes off a point for every ${realign.MILES_PER_POINT} miles of travel, and invites one that is at least ${realign.GAP} points clear of its own weakest member; the payout goes into your booster fund each offseason.</p>
   <details class="ra-details"><summary>Media ranking</summary><div class="table-wrap"><table><thead><tr><th>#</th><th>Conference</th><th>Value</th><th>Payout</th></tr></thead><tbody>${r.map(row).join('')}</tbody></table></div></details>
   <details class="ra-details"><summary>${raEsc(t.conference)} members by brand</summary><div class="table-wrap"><table><thead><tr><th>#</th><th>Program</th><th>Brand</th><th>Prestige</th></tr></thead><tbody>${members.map(mem).join('')}</tbody></table></div></details>
+  <details class="ra-details"${declined.length?'':' hidden'}><summary>Declined invitations (${declined.length})</summary><ul class="ra-history">${declined.map(d=>`<li><strong>${raEsc(universe.teams.find(x=>x.id===d.schoolId)?.name||'Program')}</strong> · ${raEsc(d.to)}<div class="small muted">${raEsc(d.reason||'The coach chose to stay.')}</div></li>`).join('')}</ul></details>
   <details class="ra-details"${hist.length?'':' hidden'}><summary>Realignment history (${hist.length})</summary><ul class="ra-history">${hist.map(moveLine).join('')}</ul></details>`;
  }
  function renderConferenceCard(){
@@ -279,6 +316,7 @@ if(typeof module==='object'&&module.exports){
   window.__DL_TEST__.realignment=()=>JSON.parse(JSON.stringify(universe?.realignment||null));
   // Test fixture: open a window now with the coach's program invited up.
   window.__DL_TEST__.realignmentInviteFixture=()=>{
+   universe.phase='complete';
    const t=selected(),r=realign.ranking(),mine=r.find(x=>x.conference===t.conference),above=r.find(x=>x.rank===(mine.rank>1?mine.rank-1:2));
    const down=realign.rankedMembers(above.conference).at(-1).t,s=realign.state();
    s.pending={year:universe.year,schoolId:t.id,to:above.conference,from:t.conference,replaces:down.id,replacesName:down.name,gap:9};

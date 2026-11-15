@@ -43,9 +43,11 @@ globalThis.DynastyLivingWorldSnapshot=Object.freeze({
   }
   const suggestions=[...(u.roster||[]).slice().sort((a,b)=>(b.stats?.games||0)-(a.stats?.games||0)).slice(0,2).map(p=>`player:${p.id}`),...(rival?.staff?.HC?[`coach:${rival.staff.HC.id}`]:[]),...callbacks.slice(0,4).map(x=>x.key)];
   const wanted=[...new Set([...keys,...suggestions])],people=wanted.map(person).filter(Boolean);
-  const news=(universe.events||[]).filter(e=>e.season===universe.year&&e.week===universe.week&&e.summary&&(e.importance||0)>=65)
+  const worldNews=globalThis.DynastyWorldNews?.items(universe,u)||[];
+  const worldIds=new Set(worldNews.map(e=>e.id));
+  const news=[...worldNews,...(universe.events||[]).filter(e=>!worldIds.has(String(e.id))&&e.season===universe.year&&e.week===universe.week&&e.summary&&(e.importance||0)>=65)
    .map(e=>({id:String(e.id||`${e.type}:${e.summary}`),title:e.summary,detail:'',mine:(e.schoolIds||[]).includes(u.id),importance:e.importance||0}))
-   .sort((a,b)=>b.importance-a.importance||a.id.localeCompare(b.id)).slice(0,8);
+   .sort((a,b)=>b.importance-a.importance||a.id.localeCompare(b.id))].slice(0,8);
   return{worldKey:`seed:${universe.rng.seed}`,stamp:`${universe.year}:${universe.phase}:${universe.week}:${universe.offseason?.phase||''}`,year:universe.year,week:universe.week,phase:universe.phase,offseasonPhase:universe.offseason?.phase||null,
    program:{id:u.id,name:u.name},nextGame,callbacks,people,suggestions,news};
  },

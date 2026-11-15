@@ -141,6 +141,7 @@ function makeLockerRoomSystem(env){
   else{const lead=target(t).capLead;if(lead>=60){chem=4;p.morale=clamp(num(p.morale,65)+2,15,99);text=`The captains sorted it out with ${p.name}. Chemistry +4.`}else{chem=-3;text=`The captains could not settle it with ${p.name}. Chemistry -3.`}}
   s.chemistry=clamp(s.chemistry+chem,CHEM_MIN,CHEM_MAX);
   note(t,`${source==='STAFF'?'Left open: ':''}${text}`);
+  env.event({type:'LOCKER_ROOM_RESOLVED',school:t,playerIds:[p.id],importance:56,summary:`${t.name}: ${text}`,metadata:{kind,source}});
   return{ok:true,kind,chem,text,p};
  }
 

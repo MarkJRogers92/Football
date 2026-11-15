@@ -63,6 +63,11 @@ const shots=process.env.DW_SHOTS;
    const after=await page.evaluate(()=>window.__DL_TEST__.lockerRoom());
    assert.equal(after.incident,null);assert.equal(after.chemistry,Math.min(99,before+5),`[${label}] discipline lifts chemistry`);
 
+   const wire=page.locator('#weeklyHub .hub-item').filter({hasText:'You disciplined'});
+   assert.equal(await wire.count(),1,`[${label}] the resolved flashpoint appears once in the Wire`);
+   await page.locator('#weeklyDeskDetails > summary').click();
+   await wire.click();assert.equal(await page.locator('#lockerRoom').isVisible(),true,`[${label}] its link opens the roster`);
+
    // --- Season page: trade a nonconference date.
    await open(page,'season','season');
    await page.waitForSelector('#nonconSchedule .noncon-week',{timeout:15000});
@@ -77,6 +82,43 @@ const shots=process.env.DW_SHOTS;
    assert.equal(nc2.left,1,`[${label}] one trade used`);
    assert.equal(nc2.games.find(g=>g.week===week).opp,target,`[${label}] the new opponent is on the schedule`);
    assert.ok(await overflow(page)<=1,`[${label}] season page fits`);
+
+   // The invitation's two controls use the real swap/decline paths.
+   await open(page,'home','dashboard');
+   const invitation=await page.evaluate(()=>window.__DL_TEST__.realignmentInviteFixture());
+   await page.click('[data-ra-answer="decline"]');
+   assert.equal((await page.evaluate(()=>window.__DL_TEST__.selected())).conference,invitation.from);
+   assert.equal((await page.evaluate(()=>window.__DL_TEST__.realignment())).pending,null);
+   await open(page,'program','program');
+   assert.match(await page.locator('#conferenceOutlook').textContent(),/Declined invitations/);
+   await open(page,'home','dashboard');
+   const accepted=await page.evaluate(()=>window.__DL_TEST__.realignmentInviteFixture());
+   await page.click('[data-ra-answer="accept"]');
+   assert.equal((await page.evaluate(()=>window.__DL_TEST__.selected())).conference,accepted.to);
+   assert.equal((await page.evaluate(()=>window.__DL_TEST__.realignment())).pending,null);
+   assert.ok(await overflow(page)<=1,`[${label}] invitation response fits`);
+
+   // Rookie chronology must not expose an eventual camp cut or future seasons.
+   const rookieId=await page.evaluate(()=>{
+    const t=window.__DL_TEST__.selected(),p=t.roster[0],year=window.DynastyCeremonySnapshot.read().year;
+    p.draftResult={year,playerId:p.id,playerName:p.name,school:t.name,schoolId:t.id,pos:p.pos,status:'UDFA',pg:50,pc:55,label:'Undrafted Free Agent'};return p.id;
+   });
+   await open(page,'program','roster');
+   if(await page.locator('#roster .table-wrap.rd-table-collapsed').count())await page.click('[data-rd-table-toggle]');
+   await page.click(`#rosterBody [data-player="${rookieId}"]`);
+   await page.waitForSelector('#playerDialog[open] .pro-career');
+   const rookieText=await page.locator('#playerDialog .pro-career').innerText();
+   assert.match(rookieText,/Awaiting pro debut/);assert.doesNotMatch(rookieText,/Never made a roster|Retired|Hall of Fame/);
+   await page.evaluate(()=>document.querySelector('#playerDialog').close());
+
+   // Presentation-only fixture; induction eligibility is checked by the adapter tests.
+   await page.evaluate(()=>window.DynastyCeremonies.show({key:'2050:honor',kind:'honor',year:2050,team:{id:1,name:'Home',w:10,l:2},alumni:[{name:'Alex <One>',pos:'QB',proBowls:8,allPros:4,rings:1}]}));
+   await page.waitForSelector('.ceremony.is-honor');
+   assert.match(await page.locator('.ceremony.is-honor').textContent(),/Ring of Honor[\s\S]*Alex <One>/);
+   assert.equal(await page.locator('.ceremony.is-honor .cer-confetti,.ceremony.is-honor .cer-turn').count(),0);
+   assert.ok(await overflow(page)<=1,`[${label}] Ring of Honor fits`);
+   if(shots)await page.screenshot({path:path.join(shots,`ring-of-honor-${label}.png`)});
+   await page.keyboard.press('Enter');await page.waitForSelector('.ceremony.is-honor',{state:'detached'});
 
    assert.deepEqual(errors,[],`[${label}] no console errors`);
    await page.close();

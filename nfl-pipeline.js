@@ -11,8 +11,8 @@
 //   Pro career   never stored. It is worked out from the draft record and a hash of the player's id: how far he
 //                develops toward his ceiling, boom or bust, the chances his draft slot buys him, how long he lasts at
 //                his position, the seasons he starts, Pro Bowls, All-Pro teams, rings and the Pro Hall of Fame. The
-//                same record always gives the same career, so loading a save never changes it and the save does not
-//                grow beyond those two numbers.
+//                same record always gives the same career, so loading a save never changes it. Career timelines add no
+//                saved season records; the draft keeps grades and stable school identity.
 //   What it feeds  a recruiting pitch for programs that produce pros (more for a recruit's own position), booster
 //                gifts from successful alumni, milestones in the news for the coach's alumni, a Pro Pipeline card on
 //                the Program page and a pro career section in every player's career chronology.
@@ -64,8 +64,8 @@ function makeNflPipeline(env){
  // the college season of that year is over.
  function seasonsDone(r,year=universe().year,over=universe().phase==='complete'){return Math.max(0,year-r.year-1+(over?1:0))}
  // Career shape, tuned against the real league: about a third of first-rounders make a Pro Bowl, a seventh-rounder
- // lasts two or three seasons if he sticks, most undrafted players never make a roster, and a draft class sends one
- // or two players to the Hall of Fame.
+ // lasts two or three seasons if he sticks, most undrafted players never make a roster, and a small share earn
+ // the career honors required for the Hall of Fame. Measured class rates live in docs/DYNASTY_WORLD_MEASUREMENTS.md.
  const CAREER=Object.assign({boom:12,bustRate:.18,bustHit:7,bloomRate:.05,bloomHit:9,chance:.35,camp:80,campSpread:6,lenBase:75,lenDiv:2.3,lenMax:14,starterAt:89,starterEarly:92,pbFloor:96,pbCenter:97,pbScale:1.5,pbMax:.75,apAt:96,apRate:.35,ring:.034},env.career||{});
  function career(r){
   if(!pro(r))return null;
@@ -96,12 +96,32 @@ function makeNflPipeline(env){
   const hof=retired&&c.length>0&&(year-retiredYear)>=HOF_WAIT&&(proBowls>=8||allPros>=4||(proBowls>=6&&rings>=2));
   const label=c.length===0?'Never made a roster':proBowls>=5?'Franchise star':proBowls>=1?'Pro Bowler':starts>=5?'Long-time starter':starts>=1?'Starter':(c.round&&c.round<=2&&done>=3)?'Bust':'Reserve';
   const steal=(!c.round||c.round>=4)&&proBowls>=1;
-  return{...c,done,played,proBowls,allPros,rings,starts,active:!retired&&c.length>0&&done<c.length,retired:retired&&c.length>0,retiredYear,hof,label,steal,
+  // A derived lifetime is private simulation data, not something a rookie can know.
+  const elapsed=seasonsDone(r,year,over),pending=elapsed===0;
+  const {peak,bust,bloom,...known}=c;
+  return{...known,length:pending||!retired?null:c.length,seasons:played,done,played,proBowls,allPros,rings,starts,pending,active:!pending&&!retired&&c.length>0&&done<c.length,retired:retired&&c.length>0,retiredYear:pending?null:retiredYear,hof:!pending&&hof,label:pending?'Awaiting pro debut':label,steal,
    legacy:proBowls*4+allPros*4+rings*3+starts+(hof?20:0)};
  }
 
  // ---- Programs: what their alumni have done ----
  let cache=null;
+ // Draft-time names remain historical labels; IDs connect those records to today's program.
+ function schoolIdentity(r){
+  const u=universe();
+  let id=r.schoolId;
+  if(id==null){
+   id=(u.history||[]).filter(h=>h.type==='season'&&h.year===r.year).flatMap(h=>h.records||[]).find(x=>x.name===r.school)?.schoolId;
+   id??=(u.teams||[]).find(t=>t.name===r.school)?.id??env.schoolIdFor?.(r.school);
+  }
+  const t=id==null?null:(u.teams||[]).find(t=>String(t.id)===String(id));
+  return{id:id??null,name:t?.name||r.school};
+ }
+ function rememberSchool(t,oldName){
+  for(const list of Object.values(universe().draftHistory||{}))for(const r of list||[]){
+   if(r.schoolId==null&&r.school===oldName)r.schoolId=t.id;
+  }
+  cache=null;
+ }
  // The recruiting pass asks for this tens of thousands of times a week, so the check is constant time: the same
  // season, the same side of the season's end and the same draft history object. A new draft clears it.
  function fresh(){const u=universe();return cache&&cache.dh===u.draftHistory&&cache.year===u.year&&cache.over===(u.phase==='complete')}
@@ -110,7 +130,7 @@ function makeNflPipeline(env){
   const u=universe(),year=u.year,over=u.phase==='complete',schools=new Map();
   const row=name=>{let s=schools.get(name);if(!s){s={school:name,pros:0,active:0,proBowlers:0,activeProBowlers:0,proBowls:0,allPros:0,rings:0,hof:0,firstRounders:0,activeByPos:{},recentActiveByPos:{},top:[]};schools.set(name,s)}return s};
   for(const [y,list] of Object.entries(u.draftHistory||{}))for(const r of list||[]){
-   if(!pro(r))continue;const c=careerAt(r,year,over);if(!c)continue;const s=row(r.school);
+   if(!pro(r)||r.year>year)continue;const c=careerAt(r,year,over);if(!c)continue;const identity=schoolIdentity(r);c.schoolId=identity.id;const s=row(identity.name);
    if(r.round===1)s.firstRounders++;
    if(c.done>0)s.pros++;
    if(c.proBowls)s.proBowlers++;
@@ -144,8 +164,9 @@ function makeNflPipeline(env){
  function milestones(names,year=universe().year){
   const want=new Set(names.filter(Boolean)),out=[];
   for(const list of Object.values(universe().draftHistory||{}))for(const r of list||[]){
-   if(!pro(r)||!want.has(r.school))continue;
+   if(!pro(r)||!want.has(schoolIdentity(r).name))continue;
    const now=careerAt(r,year,true),before=careerAt(r,year-1,true);if(!now||!before)continue;
+   now.schoolId=schoolIdentity(r).id;
    if(now.done>before.done){
     const s=now.played.at(-1);
     if(s?.proBowl&&before.proBowls===0)out.push({kind:'first-pro-bowl',c:now,importance:60,text:`${now.pos} ${now.name} (${now.school}) made his first Pro Bowl.`});
@@ -159,13 +180,13 @@ function makeNflPipeline(env){
  }
  function recordFor(playerId){for(const list of Object.values(universe().draftHistory||{}))for(const r of list||[])if(String(r.playerId)===String(playerId))return r;return null}
 
- return{POS_VALUE,NFL_TRAITS,STYLE_NFL,CAREER,UDFA_KEEP,HOF_WAIT,PITCH_MAX,GIFT_MAX,hash,unit,traitScore,grade,boardScore,roundFor,projection,gradeOf,ceilingOf,seasonsDone,career,careerAt,allSchools,school,pitchFor,alumniGift,milestones,recordFor,clearCache:()=>{cache=null}};
+ return{POS_VALUE,NFL_TRAITS,STYLE_NFL,CAREER,UDFA_KEEP,HOF_WAIT,PITCH_MAX,GIFT_MAX,hash,unit,traitScore,grade,boardScore,roundFor,projection,gradeOf,ceilingOf,seasonsDone,career,careerAt,schoolIdentity,rememberSchool,allSchools,school,pitchFor,alumniGift,milestones,recordFor,clearCache:()=>{cache=null}};
 }
 
 if(typeof module==='object'&&module.exports){
  module.exports={makeNflPipeline};
 }else{
- const nfl=makeNflPipeline({getUniverse:()=>universe,clamp,production:p=>productionRating(p)});
+ const nfl=makeNflPipeline({getUniverse:()=>universe,clamp,production:p=>productionRating(p),schoolIdFor:name=>schools.find(t=>t.name===name)?.id});
  globalThis.DynastyNfl=nfl;
  const nfEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -209,14 +230,14 @@ if(typeof module==='object'&&module.exports){
    if(ok&&state.reviewed!==universe.year){
     state.reviewed=universe.year;
     const me=selected(),names=[me?.name,universe.tenure?.school,...(universe.careerHistory||[]).map(x=>x.school)];
-    for(const m of nfl.milestones(names)){universe.events??=[];universe.events.push({id:`EVT_PRO_${m.kind}_${universe.year}_${m.c.id}`,type:'PRO_MILESTONE',season:universe.year,week:universe.week,schoolIds:[universe.teams.find(t=>t.name===m.c.school)?.id].filter(x=>x!=null),playerIds:[m.c.id],coachIds:[],gameIds:[],importance:m.importance,summary:m.text,metadata:{kind:m.kind}})}
+    for(const m of nfl.milestones(names)){universe.events??=[];universe.events.push({id:`EVT_PRO_${m.kind}_${universe.year}_${m.c.id}`,type:'PRO_MILESTONE',season:universe.year,week:universe.week,schoolIds:[m.c.schoolId].filter(x=>x!=null),playerIds:[m.c.id],coachIds:[],gameIds:[],importance:m.importance,summary:m.text,metadata:{kind:m.kind}})}
    }
   }catch(err){console.error(err)}
   return ok;
  };
 
  const tagC=t=>`<span class="lr-tag">${nfEsc(t)}</span>`;
- function seasonsText(c){return c.length===0?'Never made a roster':c.active?`Season ${c.done+1} of his career`:c.retired?`Retired ${c.retiredYear} after ${c.length} season${c.length===1?'':'s'}`:`Rookie season ${c.draftYear+1}`}
+ function seasonsText(c){return c.pending?`Rookie season ${c.draftYear+1}`:c.length===0?'Never made a roster':c.active?`${c.done} completed pro season${c.done===1?'':'s'}`:c.retired?`Retired ${c.retiredYear} after ${c.length} season${c.length===1?'':'s'}`:`Rookie season ${c.draftYear+1}`}
  function honours(c){return[c.proBowls?`${c.proBowls} Pro Bowl${c.proBowls===1?'':'s'}`:'',c.allPros?`${c.allPros}× All-Pro`:'',c.rings?`${c.rings} ring${c.rings===1?'':'s'}`:'',c.starts?`${c.starts} season${c.starts===1?'':'s'} starting`:'',c.hof?'Pro Hall of Fame':''].filter(Boolean).join(' · ')}
  function cardHTML(t){
   const s=nfl.school(t.name),all=nfl.allSchools(),gift=nfl.alumniGift(t);

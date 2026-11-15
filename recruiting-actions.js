@@ -166,6 +166,22 @@ function makeRecruitingActionSystem(env){
  }
 
  // ---------- availability / perform ----------
+ function narrowingAdvice(r,t){
+  const none=text=>({kind:null,text});
+  if(!r||!t)return none('Choose a prospect first.');
+  if(r.committed)return none('His commitment is already decided. Look at your backup options.');
+  if(funnelState(r)?.cut)return none('He has cut your program. Work a backup rather than spending more hours here.');
+  const block=knownBlock(r,t);
+  if(block)return none(`His disclosed ${block.topic} requirement is not met. A contact cannot fix that; consider a backup.`);
+  const action=(kind,topic)=>({kind,topic:topic||null,label:LABELS[kind]+(topic?`: ${topic}`:''),cost:COSTS[kind],text:'This improves your pursuit but does not guarantee a place on his list.'});
+  if(!hasOffer(r,t)){const a=availability(r,t,'offer');return a.ok?action('offer'):none(`${a.reason} Consider a backup if you cannot make room.`)}
+  const best=pitchOptions(r,t).find(p=>p.delta>0&&availability(r,t,'pitch',{topic:p.topic}).ok);
+  if(best)return action('pitch',best.topic);
+  if(availability(r,t,'inhome').ok)return action('inhome');
+  const rec=record(r,t,false),calls=rec.week?.week===universe().week?rec.week.calls:0;
+  if((calls||0)<2&&availability(r,t,'call').ok)return action('call');
+  return none(hoursLeft(t)<COSTS.call?'No useful recruiting hours remain this week. Keep a backup ready.':'No useful immediate response is available. Keep a backup ready; repeated contacts have diminishing returns.');
+ }
  function availability(r,t,kind,opts={}){
   if(!COSTS[kind])return{ok:false,reason:'Unknown recruiting action.'};
   if(!r||!t)return{ok:false,reason:'No recruit selected.'};
@@ -648,7 +664,7 @@ function makeRecruitingActionSystem(env){
  }
 
  return{COSTS,LABELS,INHOME,OFFER,hoursBudgetFor,weekInfo,ensureWeek,hoursLeft,isActive,record,weekState,workedThisWeek,
-  offerLimit,offersOut,hasOffer,topicStrength,motivesFor,dealbreakerUnmet,intel,knownBlock,pitchProjection,pitchOptions,availability,perform,withdrawOffer,
+  offerLimit,offersOut,hasOffer,topicStrength,motivesFor,dealbreakerUnmet,intel,knownBlock,pitchProjection,pitchOptions,narrowingAdvice,availability,perform,withdrawOffer,
   effort,previewEffort,effortFromSince,weeksSinceWorked,mayCommit,pitchBoost,status,workload,staffPlan,isAuto,setAuto,funnelOn,funnelState,funnelStatus,narrowingWithoutYou,runFunnel,holds,decisionsDue,keepBoost,noteWeek,newsItems,deskSummary,rivalHeat,rivalPressure,addRivalEvent,generateRivals,answerRivals,rivalMoves,liveMoves,unansweredMoves,grandfather};
 }
 
@@ -847,7 +863,9 @@ if(typeof module==='object'&&module.exports){
    else if(r.targeted&&f.top3&&!f.top3.includes(t.name))cells.push('<span class="ra-warn-text"><b>Not a finalist</b>He would only turn to you if his finalists run out of room.</span>');
    const n=f.narrowing;
    if(n&&!n.safe){const which=n.list==='top5'?'naming his Top 5':'naming his finalists';
-    cells.push(`<span class="ra-warn-text"><b>Narrowing his list</b>He is close to ${which}. ${!n.offered?'Offer a scholarship now or you will likely miss the cut.':'Your offer is in, but his interest in you needs to reach 65 to be sure of a place.'}</span>`)}
+    const advice=recruitingActions.narrowingAdvice(r,t);
+    const response=advice.kind?`<button type="button" class="ra-next-action" data-ra-action="${raEsc(advice.kind)}" data-ra-recruit="${raEsc(r.id)}"${advice.topic?` data-ra-topic-choice="${raEsc(advice.topic)}"`:''}>${raEsc(advice.label)} · ${advice.cost}h</button>`:'';
+    cells.push(`<span class="ra-warn-text"><b>Narrowing his list</b>He is close to ${which}. ${raEsc(advice.text)}${response}</span>`)}
   }
   const offer=!f.cut&&r.targeted&&!recruitingActions.hasOffer(r,t)?'<small class="ra-warn-text">He cannot choose you without a scholarship offer.</small>':'';
   return`<div class="ra-funnel">${cells.join('')}</div>${offer}`;
@@ -892,7 +910,7 @@ if(typeof module==='object'&&module.exports){
     const dialog=b.closest?.('#recruitDialog');
     let res;
     if(kind==='withdraw'){if(!confirm(`Withdraw the scholarship offer to ${r.name}? He will cool toward your program.`))return;res=recruitingActions.withdrawOffer(r,t)}
-    else{const topic=kind==='pitch'?b.parentElement?.querySelector('select')?.value:undefined;res=recruitingActions.perform(r,t,kind,{topic})}
+    else{const topic=kind==='pitch'?(b.dataset.raTopicChoice||b.parentElement?.querySelector('select')?.value):undefined;res=recruitingActions.perform(r,t,kind,{topic})}
     if(res.ok)autosaveAfter('management');
     announce(res,r);
     renderRecruiting();

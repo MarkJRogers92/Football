@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — World follow-ups
+
+- Current locker-room and pro milestones appear in the existing Wire and short briefing; resolved incidents replace their original flashpoint.
+- AI programs weigh media gains, travel, rivalry and competition before accepting a conference invitation. A declined offer can move to another eligible program.
+- Earned pro Hall of Fame inductions receive a restrained Ring of Honor ceremony. Alumni survive program renames; profiles show only completed pro seasons.
+- Early draft entry checks the completed college clock correctly, including redshirt years. Ordinary sophomores cannot leave after just two seasons; juniors are considered.
+- Recruiting narrowing warnings offer a legal next action using disclosed information and explain when there is no useful immediate response.
+- Build checks catch unassigned tests and inconsistent full/fast/slow lists. Current documentation distinguishes source changes from publication.
+
 ## v0.33.0 — The pro pipeline
 
 - **Every prospect has an NFL grade.** The draft grade is built from how a player's game translates: true ability, the traits the NFL pays for at his position (processing and accuracy for a quarterback, speed for a corner, power for a guard), college production, room still to grow, durability and injuries, how his style translates (a Long-Frame Project grades lower now with a higher ceiling; an Island Protector is ready now), exposure from his program, and a scouts' read that is fixed for each player. The draft board adds the value of his position, so a quarterback, edge rusher or tackle goes before an equally good guard or back, and kickers and punters no longer fill the first round. Early declarations read the same grade.
