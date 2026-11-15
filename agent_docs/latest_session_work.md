@@ -1,5 +1,11 @@
 # Latest session work
 
+## v0.36.0 — 2026-11-15 (branch `claude/v036`, not merged)
+
+- `players-of-week.js`: `universe.weeklyHonors {year, rows:[{week, off, def}]}` (this season only), awarded in a `simWeek` wrap from the week's regular-season box scores; `#playersOfWeek` on This Week; `PLAYER_OF_WEEK` events.
+- `retired-numbers.js`: `t.retiredNumbers`; Program page `#retiredNumbers`; `NUMBER_RETIRED` events. `assignTeamJerseys` (app part 03) skips retired numbers for newcomers.
+- Harness exposes `assignTeamJerseys`.
+
 ## v0.35.0 publication — 2026-11-15
 
 PR #68 merged into the default branch at `a0632cfbde7faf48d4bb78f1fab6325b471a8f1c` after its CI full validation passed. Publish workflow run 43735343587 (production, full validation) succeeded at 16:56 UTC. Production commit on `gh-pages`: `ae0a4d9` ("Publish production: 0.35.0"). Its `index.html` SHA-256 `dfbc0e9dd7aac8c3fb130af76bbee5aa104c5fee2e2c23e2446239ede4abdaff` matches the release source exactly. The live URL cannot be fetched from the session container (proxy).

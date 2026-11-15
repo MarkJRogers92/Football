@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.36.0 — Players of the Week and retired numbers
+
+- **National Players of the Week.** After every regular-season week the best offensive and defensive performances in the country are named from the box scores. This Week shows last week's winners, and when one is yours The Wire says so (and counts how many he has this season).
+- **Retired numbers.** A former player with a national award or a first-round draft result who finished at your program can have his number retired from the Program page: one a season, twelve in all. No newcomer is given a retired number; a player already wearing it keeps it until he leaves. The Wire reports the ceremony.
+
+Saves carry over.
+
 ## v0.35.0 — The board, the stadium and the long view
 
 - **A bet with the administration.** Before the first game the board offers three optional promises beyond its expectations (more wins, a higher finish, the conference, the rival or the title). A promise joins your season goals as a Wager: deliver it for +8 confidence and +2 booster goodwill in the season review, miss it and lose 6. No bet changes nothing, and the staff never bet for you.

@@ -1,12 +1,12 @@
 # Roadmap execution status
 
-Last reconciled: 2026-11-15, source `a0632cf` (`v0.35.0`).
+Last reconciled: 2026-11-15, source `bdedaf7` (`v0.36.0`).
 
 ## Current source and publication
 
 PR #68 (v0.35.0: bet with the administration, home streaks, program traditions, dynasty page, smaller draft history) merged into the default branch at `a0632cfbde7faf48d4bb78f1fab6325b471a8f1c`. Production commit `ae0a4d9` serves v0.35.0 at https://markjrogers92.github.io/Football/; its `index.html` matches the release source byte for byte.
 
-The publish workflow's full release gate passed in CI. Evidence is in `agent_docs/latest_session_work.md`. Next ideas and open decisions: `docs/NEXT_IDEAS_2026-11-15.md`; save-size options: `docs/SAVE_SIZE_MEASUREMENT.md`.
+The publish workflow's full release gate passed in CI. Evidence is in `agent_docs/latest_session_work.md`. v0.36.0 (Players of the Week, retired numbers) is on `claude/v036`, not merged. Next ideas and open decisions: `docs/NEXT_IDEAS_2026-11-15.md`; save-size options: `docs/SAVE_SIZE_MEASUREMENT.md`.
 
 ## Next action
 
