@@ -1,12 +1,12 @@
 # Roadmap execution status
 
-Last reconciled: 2026-11-15, source `1ca1857` (`v0.34.0`).
+Last reconciled: 2026-11-15, source `8916e07` (`v0.34.0`).
 
 ## Current source and publication
 
-PR #66 (v0.33.1: NFL outlook from scouting ranges, tighter Pro Hall of Fame, week result line fix) merged into the default branch at `457bef7e676fa840bd12e498126a343f9d42cd12`. Production commit `bf94d7d` serves v0.33.1 at https://markjrogers92.github.io/Football/; its `index.html` matches the release source byte for byte.
+PR #67 (v0.34.0: coaching rivals, Senior Day, pro alumni coaches, trophy case, season card, trap games and statement wins, "you saw him first", draft class notes, Legacy in backups, faster recruiting weeks) merged into the default branch at `8916e0772057c8891a5f44e37173a26c2a05f750`. Production commit `9c9bf06` serves v0.34.0 at https://markjrogers92.github.io/Football/; its `index.html` matches the release source byte for byte.
 
-The publish workflow's full release gate passed in CI. Evidence is in `agent_docs/latest_session_work.md`. Work after v0.33.1 is on `claude/overnight-v034` as v0.34.0 (coaching rivals, Senior Day, pro alumni coaches, trophy case, "you saw him first", draft class notes, Legacy in backups, faster recruiting weeks). It is not merged or published; see `docs/NEXT_IDEAS_2026-11-15.md` and `agent_docs/latest_session_work.md`.
+The publish workflow's full release gate passed in CI. Evidence is in `agent_docs/latest_session_work.md`. Next ideas and open decisions: `docs/NEXT_IDEAS_2026-11-15.md`; save-size options: `docs/SAVE_SIZE_MEASUREMENT.md` (v0.34 section).
 
 ## Next action
 
