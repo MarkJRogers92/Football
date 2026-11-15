@@ -125,3 +125,19 @@ during them (commitments fill classes, not rosters), so the same cache now cover
 
 Identical universes, about 25% less time per season. The next cost is `rankTeams` in the funnel (every program's
 pitch for every open prospect, ~15%); caching it needs invalidation on interest and commitment changes inside a pass.
+
+## v0.34 overnight branch: league check and the Hall of Fame on ten-season runs
+
+`FULL=1 SEED=<seed> SEASONS=10 node tools/league-health.js` on `claude/overnight-v034` (coaching rivals, Senior Day,
+pro alumni coaches, Legacy backups, the draft class note, already loaded; none of them changes simulation):
+
+| Seed | Champions | Playoff programs | Conference champions | Unplaced portal entrants | Early declarations per class | Eventual pro Hall per class |
+| --- | --- | --- | --- | --- | --- | --- |
+| 7 | 7 | 67 | 53 | 6.8% | 12.2 | 2.0 (0–5) |
+| 11 | 8 | 64 | 50 | 8.5% | 13.4 | 4.1 (1–7) |
+
+The first four columns are identical to the v0.33.0 final table above, as expected. The Hall of Fame column uses the
+v0.33.1 rule: against v0.33.0's 3.5 and 6.1 per class on the same seeds, about a third fewer. The 2.2-per-class figure
+in the v0.33.1 section came from five-season runs, whose classes are mostly drafted from the generated starting rosters;
+classes from recruited players produce more stars, so ten-season runs read higher. If 4 a class on some seeds still
+feels generous, the next lever is the Pro Bowl curve (`pbCenter`/`pbMax` in `CAREER`), which drives both paths.
