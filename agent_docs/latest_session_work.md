@@ -9,6 +9,8 @@ Branch `claude/overnight-v034`, based on the v0.33.1 merge `457bef7`. Plan and t
 - `pro-alumni-coaches.js`: wraps `generateCandidatePool` (coach's program, non-HC slots only), `materializeCandidateCoach` (`coach.formerPlayer`), `candidateSourceLabel`, `candidateCardHTML`. Retired pros, 3+ seasons, retired 1+ year, side of the ball matches.
 - `trophy-case.js`: derived; `#trophyCase` on Program.
 - `saw-him-first.js`: wraps `runDraft` and `finalizeSeasonHonors`; `SCOUTING_VINDICATED` events (added to `dynasty-world-news.js` TYPES).
+- `week-stakes.js`: `#trapGame` on This Week; `STATEMENT_WIN` events from a `finishGame` wrap (stamped with the week The Wire shows them in). `tests/week-stakes.js`.
+- `season-card.js`: "Save season card" button in `#seasonReview`; canvas 1200×630 PNG download. `tests/season-card.js`, `tests/season-card-browser.js` (in `test:browser-extended`).
 - `nfl-pipeline.js`: `classNote(year)` and `#draftClassNote` on the Records page.
 - `legacy.js`: `combine`, `exportStore`, `importStore`; `exportSave`/`importSave` (app part 18) carry and merge `legacy`. Documented in `STORAGE.md`.
 - `recruiting-actions.js`: the capacity cache now covers `runFunnel` and rival moves (identical universes on seeds 9108/4711; season 9.0 → 6.8 s).

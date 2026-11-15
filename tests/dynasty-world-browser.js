@@ -99,6 +99,13 @@ const shots=process.env.DW_SHOTS;
    assert.match(await page.locator('#draftClassNote').textContent(),/2023 class: a thin one\. Only 2 underclassmen declared early, against 12 a class before it/,`[${label}] the draft board explains a thin class`);
    await open(page,'home','dashboard');
 
+   // --- This Week: a trap game before a big one.
+   const trapOpp=await page.evaluate(()=>window.__DL_TEST__.trapGameFixture());
+   await page.waitForSelector('#trapGame',{timeout:15000});
+   const trapText=await page.locator('#trapGame').innerText();
+   assert.ok(trapText.includes(trapOpp)&&/TRAP GAME/.test(trapText)&&/#4 /.test(trapText),`[${label}] the trap game is flagged: ${trapText}`);
+   assert.ok(await overflow(page)<=1,`[${label}] trap game card fits`);
+
    // --- This Week: a flashpoint waits for an answer.
    await open(page,'home','dashboard');
    await page.evaluate(()=>window.__DL_TEST__.lockerRoomFlashpointFixture());

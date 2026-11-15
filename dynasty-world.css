@@ -55,3 +55,6 @@
 .tc-shelf small{opacity:.8;overflow-wrap:anywhere}
 .tc-shelf.is-empty{border-style:dashed;border-color:var(--line,rgba(255,255,255,.2));background:transparent;opacity:.75}
 .trophy-case-card p.small,.coach-rivals-card p.small{text-transform:none;letter-spacing:normal}
+/* v0.34: trap game (This Week). */
+.trap-game{margin:8px 0;padding:9px 12px;border-radius:6px;border:1px solid var(--line,rgba(255,255,255,.14));border-left:4px solid #d0605a}
+.trap-game p{margin:4px 0 0}
