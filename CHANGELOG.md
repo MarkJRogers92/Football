@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.35.0 — The board, the stadium and the long view
+
+- **A bet with the administration.** Before the first game the board offers three optional promises beyond its expectations (more wins, a higher finish, the conference, the rival or the title). A promise joins your season goals as a Wager: deliver it for +8 confidence and +2 booster goodwill in the season review, miss it and lose 6. No bet changes nothing, and the staff never bet for you.
+- **Home streaks.** Every program's run of home wins is counted. This Week names yours from four straight and warns about the other program's from five; long runs get a name (Home cooking, The Fortress, Untouchable). The Wire reports reaching 10 or 20 straight, and ending someone else's run of eight or more. Streaks start counting with this version.
+- **Your dynasty in one page.** History now opens with your whole career: seasons, record and posts, the current program by decade, your best team, the award winners and first-round picks you coached, and your rival, nemesis and favourite opponent.
+- **Smaller saves.** Players who left without a pro deal no longer get a draft-history row (about half of draft history). They keep their draft result on their own record, and older saves drop the rows when loaded.
+
+Saves carry over.
+
 ## v0.34.0 — Rivals, goodbyes and hardware
 
 - **Coaching rivals.** The game keeps your record against every opposing head coach, following him by id across schools (and you across yours). A coach you cannot beat (three or more meetings, three or more losses, a third or fewer won) becomes your **nemesis**; one you always beat becomes your **favourite opponent**. This Week says how it has gone before you meet a coach again, and the Program page lists the coaches you have faced most. Older saves are filled in once from the game archive.

@@ -1,5 +1,13 @@
 # Latest session work
 
+## v0.35.0 — 2026-11-15 (branch `claude/v035`, not merged)
+
+- `admin-wager.js`: `#adminWager` on This Week before the first game; a 'Wager' goal in `t.seasonGoals`; wraps `evaluateSeasonGoals` (wager stakes +8/-6 replace the bonus-goal +4/-1) and `adminSeasonReview` (goodwill +2 once, `ADMIN_WAGER` event). `t.adminWager {year, declined, settled}`.
+- `home-streaks.js`: `universe.homeStreaks {teamId:{streak,best,bestEnded}}` from a `finishGame` wrap (neutral sites skipped); `#homeStreak` on This Week; `HOME_STREAK` events.
+- `dynasty-page.js`: `#dynastyPage` at the top of History (wraps `TAB_RENDERERS.history`). Derived.
+- `runDraft` (app part 08) no longer pushes "College Career Complete" rows; `normalizeUniverse` (part 16) drops them from older saves.
+- `dynasty-world-news.js` TYPES: `ADMIN_WAGER`, `HOME_STREAK`.
+
 ## v0.34.0 publication — 2026-11-15
 
 PR #67 merged into the default branch at `8916e0772057c8891a5f44e37173a26c2a05f750` after its CI full validation passed (validate, browser, browser-extended, audit, desktop builds). Publish workflow run 43703501782 (production, full validation) succeeded at 10:54 UTC. Production commit on `gh-pages`: `9c9bf06` ("Publish production: 0.34.0"). Its `index.html` SHA-256 `274ecee77a7cc826a166e99e4a29a438dfb36db0ad6e9e9381435c36ca3d8fde` matches the release source exactly. The live URL cannot be fetched from the session container (proxy), so no live-page check was made from here.
