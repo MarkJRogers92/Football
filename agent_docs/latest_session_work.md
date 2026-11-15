@@ -1,5 +1,11 @@
 # Latest Session Work
 
+## v0.31.1 faster weeks — 2026-11-14
+
+- Profile (seed 9108, base runtime): recruiting pitch helpers were ~27% of a season. `recruitCoachRelationshipBoost` (`app/04`) now walks the recruit's recorded relationships instead of every staff coach; `canTakeCommit` (`app/11`) caches each program's limit in `passCapacity` only while `advanceRecruiting` runs (rosters cannot change then). Regular season 5.5 s → 3.7 s. Universe SHA-256 after a season + postseason identical to the previous build in base and full runtimes.
+- `tools/node-test.js` runs `node --test` with one worker per core. Full suite 886 s → 665 s on four cores.
+- Next hot spots: `recruitPitchBreakdown`, role-depth helpers (`rolePlayers`/`roleStarter`) in game sim; caching those needs roster/position invalidation.
+
 ## v0.31.0 narrowing warning, deep game tier, lint — 2026-11-14
 
 - `recruiting-actions.js`: `funnelStatus().narrowing` (list, offered, interested, safe) for targeted prospects within 0.12 of the next readiness band; card cell, badge, `DynastyRecruitingNarrowing` and a guidance item (skipped when staff run recruiting). Soak with a policy reading it showed no cut reduction (11.8 vs 11.9); documented in docs/RECRUITING_TIMELINES.md; soak policy unchanged.

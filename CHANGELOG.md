@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.31.1 — Faster weeks
+
+- **Weeks simulate faster.** The weekly recruiting pass did the same work for every program and recruit over and over; it now remembers what cannot change during the pass. A season simulates about a quarter faster. Results are identical: the same seed produces the same dynasty, down to the byte.
+- **Engineering.** The Node test suite runs one worker per core; with the faster pass, the full suite takes about 25% less time.
+
+Saves carry over. No storage schema change.
+
 ## v0.31.0 — Know when a recruit is narrowing his list
 
 - **A warning before you miss a cut.** When a prospect on your board is close to naming his Top 5 or his finalists and your standing would not keep you in (no offer from you, or his interest below 65), his card, his board badge and the weekly reminder say so. It never shows a week or a number. The reminder stays quiet when the staff run recruiting.
