@@ -145,13 +145,15 @@ function jerseySide(pos){return ['K','P'].includes(pos)?'special':OFF_POS.has(po
 // number clashes moves to the next free number in his position's band (starting from his seeded number, so it is stable).
 function assignTeamJerseys(t){
  if(!t?.roster?.length)return t;const used={offense:new Set(),defense:new Set(),special:new Set()};
+ // v0.36: a retired number is never handed to a newcomer; a player already wearing it keeps it until he leaves.
+ const retired=new Set((t.retiredNumbers||[]).map(x=>Number(x.number)));
  const order=t.roster.slice().sort((a,b)=>eligibilityBase(b)-eligibilityBase(a)||String(a.id).localeCompare(String(b.id)));
  for(const p of order){
   ensurePortrait(p);const side=used[jerseySide(p.pos)],n=Number(p.jerseyNumber);
   if(Number.isInteger(n)&&n>=0&&n<=99&&!side.has(n)){side.add(n);continue}
   let h=0;const str=String(p.portraitSeed||p.id);for(let i=0;i<str.length;i++)h=(h*31+str.charCodeAt(i))>>>0;
   const bands=[...(JERSEY_BANDS[p.pos]||[]),[1,99],[0,0]];let got=null;
-  for(const [lo,hi] of bands){const span=hi-lo+1;for(let k=0;k<span&&got==null;k++){const c=lo+((h+k)%span);if(!side.has(c))got=c}if(got!=null)break}
+  for(const [lo,hi] of bands){const span=hi-lo+1;for(let k=0;k<span&&got==null;k++){const c=lo+((h+k)%span);if(!side.has(c)&&!retired.has(c))got=c}if(got!=null)break}
   if(got!=null){p.jerseyNumber=got;side.add(got)}
  }
  return t;
