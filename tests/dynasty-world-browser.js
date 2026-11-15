@@ -86,6 +86,13 @@ const shots=process.env.DW_SHOTS;
    if(shots)await page.locator('.candidate-card',{has:page.locator('[data-alumni-coach]')}).screenshot({path:path.join(shots,`alumni-coach-${label}.png`)});
    await open(page,'home','dashboard');
 
+   // --- Records: the draft board says when a class of early entrants is thin.
+   await page.evaluate(()=>{const dh={},y=2020;for(let k=0;k<4;k++)dh[y+k]=Array.from({length:k===3?2:12},(_,i)=>({year:y+k,playerId:`dc${k}_${i}`,playerName:'Early '+i,pos:'WR',school:'X',reason:'Declared early for draft',round:1,pick:i+1,status:'Drafted',label:'R1'}));window.__DL_TEST__.setDraftHistory?.(dh)});
+   await open(page,'world','records');
+   await page.waitForSelector('#draftClassNote',{timeout:15000});
+   assert.match(await page.locator('#draftClassNote').textContent(),/2023 class: a thin one\. Only 2 underclassmen declared early, against 12 a class before it/,`[${label}] the draft board explains a thin class`);
+   await open(page,'home','dashboard');
+
    // --- This Week: a flashpoint waits for an answer.
    await open(page,'home','dashboard');
    await page.evaluate(()=>window.__DL_TEST__.lockerRoomFlashpointFixture());

@@ -234,3 +234,14 @@ test('the Pro Hall of Fame takes sustained greatness, not a pile of Pro Bowls, a
  assert.equal(N.hallWorthy(4,4,0),false,'four All-Pro seasons alone fall short');
  assert.ok(N.hallWorthy(9,2,0)&&N.hallWorthy(5,5,0)&&N.hallWorthy(7,3,1));
 });
+
+test('the draft board says when a class of early entrants is unusually thin or deep',()=>{
+ const early=(y,n)=>Array.from({length:n},(_,i)=>({year:y,playerId:`e${y}_${i}`,reason:'Declared early for draft',round:1}));
+ const {u,N}=pipeline({year:2035,phase:'complete',teams:[],draftHistory:{2030:early(2030,12),2031:early(2031,10),2032:early(2032,14)}});
+ assert.equal(N.classNote(2029),null,'no class, no note');
+ assert.deepEqual(N.classNote(2031),{year:2031,count:10,average:null,kind:'normal'},'too little history to compare');
+ u.draftHistory[2033]=early(2033,3);assert.equal(N.classNote(2033).kind,'thin');assert.equal(N.classNote(2033).average,12);
+ u.draftHistory[2033]=early(2033,20);assert.equal(N.classNote(2033).kind,'deep');
+ u.draftHistory[2033]=[...early(2033,11),{year:2033,playerId:'s',reason:'Eligibility exhausted',round:1}];
+ assert.equal(N.classNote(2033).kind,'normal');assert.equal(N.classNote(2033).count,11,'seniors are not early entrants');
+});

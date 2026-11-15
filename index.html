@@ -1118,6 +1118,7 @@ tr[hidden]{display:none!important}
 .senior-list small{display:block;opacity:.75}
 .senior-day .player-button{padding:0;min-height:0}
 .senior-rest{margin:8px 0 0;line-height:1.6}
+.draft-class-note{text-transform:none;letter-spacing:normal;margin:4px 0 8px}
 
 .situational-playbook{display:grid;gap:8px}
 .situational-playbook>p{margin:0}
@@ -20564,9 +20565,21 @@ function makeNflPipeline(env){
   }
   return out.sort((a,b)=>b.importance-a.importance).slice(0,MILESTONES_PER_YEAR);
  }
+ // How many underclassmen declared early in a class, against the classes before it. Early entry swings a lot from
+ // year to year (2 to 22 in ten-season measurements), so the draft board says when a class is unusually thin or deep.
+ const EARLY='Declared early for draft',CLASS_MIN_HISTORY=3;
+ function classNote(year){
+  const dh=universe().draftHistory||{},count=y=>(dh[y]||[]).filter(r=>r.reason===EARLY).length;
+  if(!dh[year])return null;
+  const n=count(year),past=Object.keys(dh).map(Number).filter(y=>y<year).map(count);
+  if(past.length<CLASS_MIN_HISTORY)return{year,count:n,average:null,kind:'normal'};
+  const avg=past.reduce((a,b)=>a+b,0)/past.length;
+  const kind=n<=Math.max(1,avg*.6)?'thin':n>=avg*1.4&&n-avg>=3?'deep':'normal';
+  return{year,count:n,average:Math.round(avg*10)/10,kind};
+ }
  function recordFor(playerId){for(const list of Object.values(universe().draftHistory||{}))for(const r of list||[])if(String(r.playerId)===String(playerId))return r;return null}
 
- return{POS_VALUE,NFL_TRAITS,STYLE_NFL,CAREER,UDFA_KEEP,HOF_WAIT,PITCH_MAX,GIFT_MAX,hallWorthy,hash,unit,traitScore,scoutedTraits,grade,outlook,boardScore,roundFor,projection,gradeOf,ceilingOf,seasonsDone,career,careerAt,schoolIdentity,rememberSchool,allSchools,school,pitchFor,alumniGift,milestones,recordFor,clearCache:()=>{cache=null}};
+ return{POS_VALUE,NFL_TRAITS,STYLE_NFL,CAREER,UDFA_KEEP,HOF_WAIT,PITCH_MAX,GIFT_MAX,hallWorthy,hash,unit,traitScore,scoutedTraits,grade,outlook,boardScore,roundFor,projection,gradeOf,ceilingOf,seasonsDone,career,careerAt,schoolIdentity,rememberSchool,allSchools,school,pitchFor,alumniGift,milestones,classNote,recordFor,clearCache:()=>{cache=null}};
 }
 
 if(typeof module==='object'&&module.exports){
@@ -20670,7 +20683,24 @@ if(typeof module==='object'&&module.exports){
   }catch(err){console.error(err)}
   return base;
  };
- if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.proPipeline=()=>{const t=selected();const s=nfl.school(t.name);return{pros:s.pros,active:s.active,rank:s.rank,pitch:s.pitch}};
+ // The draft board on the Records page says how this class compares.
+ function noteText(n){
+  if(!n)return'';const who=`${n.count} underclassm${n.count===1?'an':'en'} declared early`;
+  if(n.average==null)return`${n.year} class: ${who}.`;
+  return n.kind==='thin'?`${n.year} class: a thin one. Only ${who}, against ${n.average} a class before it; more juniors stayed in school.`:n.kind==='deep'?`${n.year} class: a deep one. ${who}, against ${n.average} a class before it.`:`${n.year} class: ${who} (${n.average} a class before it).`;
+ }
+ // renderRecords does not go through runRender, so the tab renderer is wrapped.
+ const renderRecordsBeforeNfl=TAB_RENDERERS.records;
+ TAB_RENDERERS.records=()=>{renderRecordsBeforeNfl();renderDraftClassNote()};
+ function renderDraftClassNote(){
+  const board=$('#draftBoard');if(!board?.insertAdjacentElement)return;
+  const years=Object.keys(universe.draftHistory||{}).map(Number).sort((a,b)=>b-a),text=years.length?noteText(nfl.classNote(years[0])):'';
+  let note=$('#draftClassNote');
+  if(!text){if(note?.isConnected)note.remove();return}
+  if(!note||!note.isConnected){note=document.createElement('p');note.id='draftClassNote';note.className='small muted draft-class-note';board.insertAdjacentElement('beforebegin',note)}
+  note.textContent=text;note.dataset.kind=nfl.classNote(years[0])?.kind||'normal';
+ }
+ if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.setDraftHistory=dh=>{universe.draftHistory=dh;nfl.clearCache()};window.__DL_TEST__.proPipeline=()=>{const t=selected();const s=nfl.school(t.name);return{pros:s.pros,active:s.active,rank:s.rank,pitch:s.pitch}};
 }
 
 // Optional, current facts shared by the Wire and the short weekly briefing.
