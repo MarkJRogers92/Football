@@ -64,3 +64,7 @@
 /* v0.35: home streak (This Week). */
 .home-streak{margin:8px 0;padding:9px 12px;border-radius:6px;border:1px solid var(--line,rgba(255,255,255,.14));border-left:4px solid var(--accent,#d9a441)}
 .home-streak p{margin:4px 0 0}
+/* v0.35: your dynasty in one page (History). */
+.dp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:4px 18px;margin:8px 0}
+.dp-list{margin:4px 0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.dynasty-page-card p.small{text-transform:none;letter-spacing:normal}

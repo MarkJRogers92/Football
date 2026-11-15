@@ -109,6 +109,14 @@ const shots=process.env.DW_SHOTS;
    await page.waitForSelector('#adminWager',{state:'detached',timeout:15000});
    assert.match(await page.locator('#saveStatus').textContent(),/Bet made with the board: Win at least \d+ games/);
 
+   // --- History: your dynasty in one page (a fresh dynasty has one post and no completed season yet).
+   await open(page,'world','history');
+   await page.waitForSelector('#dynastyPage',{timeout:15000});
+   assert.match(await page.locator('#dynastyPage').textContent(),/YOUR DYNASTY[\s\S]*Where you coached/,`[${label}] the dynasty page leads History`);
+   assert.ok(await overflow(page)<=1,`[${label}] history page fits`);
+   if(shots)await page.locator('#dynastyPage').screenshot({path:path.join(shots,`dynasty-page-${label}.png`)});
+   await open(page,'home','dashboard');
+
    // --- This Week: a long home streak is named.
    const hs=await page.evaluate(()=>window.__DL_TEST__.homeStreakFixture(12));
    await page.waitForSelector('#homeStreak',{timeout:15000});
