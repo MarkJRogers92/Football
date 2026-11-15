@@ -68,3 +68,4 @@
 .dp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:4px 18px;margin:8px 0}
 .dp-list{margin:4px 0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
 .dynasty-page-card p.small{text-transform:none;letter-spacing:normal}
+.traditions-card p.small{text-transform:none;letter-spacing:normal}

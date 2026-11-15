@@ -61,6 +61,8 @@ const shots=process.env.DW_SHOTS;
    assert.ok(await page.locator('#trophyCase .tc-shelf').count()>=5,`[${label}] every shelf is shown, empty or not`);
    assert.ok(await overflow(page)<=1,`[${label}] trophy case fits`);
    if(shots)await page.locator('#trophyCase').screenshot({path:path.join(shots,`trophy-case-${label}.png`)});
+   await page.waitForSelector('#traditions',{timeout:15000});
+   assert.match(await page.locator('#traditions').textContent(),/TRADITIONS[\s\S]*10 straight home wins/,`[${label}] traditions are on the Program page`);
    await open(page,'home','dashboard');
    const nemesis=await page.evaluate(()=>window.__DL_TEST__.coachRivalsFixture());
    await page.waitForSelector('#coachRivalWeek',{timeout:15000});
