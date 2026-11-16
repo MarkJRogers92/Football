@@ -63,6 +63,14 @@ const shots=process.env.DW_SHOTS;
    if(shots)await page.locator('#trophyCase').screenshot({path:path.join(shots,`trophy-case-${label}.png`)});
    await page.waitForSelector('#traditions',{timeout:15000});
    assert.match(await page.locator('#traditions').textContent(),/TRADITIONS[\s\S]*10 straight home wins/,`[${label}] traditions are on the Program page`);
+   // Retired numbers: a decorated former player can be honoured, once a season.
+   const rnNumber=await page.evaluate(()=>window.__DL_TEST__.retiredNumberFixture());
+   await page.waitForSelector(`#retiredNumbers [data-retire]`,{timeout:15000});
+   await page.locator('#retiredNumbers [data-retire]').first().click();
+   await page.waitForSelector(`#retiredNumbers [data-retired="${rnNumber}"]`,{timeout:15000});
+   assert.match(await page.locator('#saveStatus').textContent(),new RegExp(`No\\. ${rnNumber} is retired`));
+   assert.ok(await overflow(page)<=1,`[${label}] retired numbers fit`);
+   if(shots)await page.locator('#retiredNumbers').screenshot({path:path.join(shots,`retired-numbers-${label}.png`)});
    await open(page,'home','dashboard');
    const nemesis=await page.evaluate(()=>window.__DL_TEST__.coachRivalsFixture());
    await page.waitForSelector('#coachRivalWeek',{timeout:15000});
@@ -118,6 +126,13 @@ const shots=process.env.DW_SHOTS;
    assert.ok(await overflow(page)<=1,`[${label}] history page fits`);
    if(shots)await page.locator('#dynastyPage').screenshot({path:path.join(shots,`dynasty-page-${label}.png`)});
    await open(page,'home','dashboard');
+
+   // --- This Week: last week's national Players of the Week.
+   const potwName=await page.evaluate(()=>window.__DL_TEST__.playersOfWeekFixture());
+   await page.waitForSelector('#playersOfWeek .is-mine',{timeout:15000});
+   const potwText=await page.locator('#playersOfWeek').textContent();
+   assert.ok(/NATIONAL PLAYERS OF THE WEEK/.test(potwText)&&potwText.includes(potwName)&&/412 pass yds/.test(potwText),`[${label}] players of the week: ${potwText}`);
+   assert.ok(await overflow(page)<=1,`[${label}] players of the week fits`);
 
    // --- This Week: a long home streak is named.
    const hs=await page.evaluate(()=>window.__DL_TEST__.homeStreakFixture(12));
