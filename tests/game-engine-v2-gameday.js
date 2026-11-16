@@ -219,3 +219,26 @@ test('timeouts are never offered in a session without calls',()=>{
   for(let i=0;i<6;i++){const s=gameday.createSession({...options,gameId:`GD-NOTO-${i}`,seed:`gameday-noto-${i}`,controlledTeamId:home.id});gameday.simulate(s,d=>{types.add(d.type);return'delegate'})}
   assert.ok(!types.has('timeout_call'));
 });
+
+test('v0.37: the coach\'s halftime approach sets the second-half play mix; balanced and old sessions are untouched',()=>{
+  let passes={aggressive:0,ball_control:0,balanced:0},plays={aggressive:0,ball_control:0,balanced:0};
+  for(let i=0;i<16;i++){
+    const base=gameday.createSession({...options,gameId:`GD-MIX-${i}`,seed:`gameday-mix-${i}`,controlledTeamId:home.id});let out;
+    for(let k=0;k<300;k++){out=gameday.advance(base);if(out.status==='final')break;if(out.status==='decision'&&out.decision.type==='halftime_adjustment')break;if(out.status==='decision')gameday.resolve(base,'delegate')}
+    if(out.status!=='decision')continue;
+    const saved=JSON.parse(JSON.stringify(gameday.snapshot(base)));
+    for(const pick of ['aggressive','ball_control','balanced']){
+      const s=gameday.restore(saved);gameday.resolve(s,pick);finishDelegated(s);
+      // Every snap after the halftime decision is a second-half snap.
+      for(const e of s.state.events.slice(saved.state.events.length))if(e.team==='home'&&['scrimmage','interception','fumble'].includes(e.type)&&e.kind){plays[pick]++;if(e.kind==='pass')passes[pick]++}
+    }
+  }
+  const rate=k=>passes[k]/Math.max(1,plays[k]);
+  assert.ok(plays.aggressive>200,'enough second-half snaps to compare');
+  assert.ok(rate('aggressive')>rate('balanced')+.02,`open it up throws more: ${rate('aggressive').toFixed(3)} vs ${rate('balanced').toFixed(3)}`);
+  assert.ok(rate('ball_control')<rate('balanced')-.02,`ball control runs more: ${rate('ball_control').toFixed(3)} vs ${rate('balanced').toFixed(3)}`);
+  // A session saved before v0.37 has no policy and never gets the mix.
+  const legacy=gameday.createSession({...options,gameId:'GD-LEGACY',seed:'gameday-legacy',controlledTeamId:home.id});delete legacy.halftimePolicy;legacy.halftimeApproach.home='aggressive';
+  const modern=gameday.restore(JSON.parse(JSON.stringify(gameday.snapshot(legacy))));
+  assert.equal(modern.halftimePolicy,undefined,'restore keeps the old rules');
+});
