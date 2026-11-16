@@ -1,5 +1,9 @@
 # Latest session work
 
+## v0.37.0 publication — 2026-11-16
+
+PR #70 merged into the default branch at `c2b59d2e9d9f1adb72c640e32811aa5da2734637` after its CI full validation passed (validate, browser, browser-extended, audit, desktop builds). Publish workflow run 43816387799 (production, full validation) succeeded at 06:54 UTC. Production commit on `gh-pages`: `b2af961` ("Publish production: 0.37.0"). Its `index.html` SHA-256 `57223fcb1bb73bca7a61004a6f102fe0bf825f5f5e2a4f4b61e8fe2a9ebbc70a` matches the release source exactly. No GitHub Release was cut (none since v0.27.0).
+
 ## v0.37.0 — 2026-11-16 (branch `claude/beautiful-clarke-4un3b2`, not merged)
 
 Eleven items from the owner's pick of the 2026-11-16 brainstorm (`docs/NEXT_IDEAS_2026-11-16.md`). New engine extensions after `retired-numbers.js` in both lists: `long-memory.js`, `facility-effects.js`, `fatigue.js`, `conversion-review.js`. Hashed randomness only.
