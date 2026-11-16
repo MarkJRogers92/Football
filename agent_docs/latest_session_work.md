@@ -1,5 +1,9 @@
 # Latest session work
 
+## v0.36.0 publication — 2026-11-16
+
+PR #69 merged into the default branch at `a2fee427522c0c877d3b5a785578b9332b298d53` after its CI full validation passed. Publish workflow run 43800916268 (production, full validation) succeeded at 04:22 UTC. Production commit on `gh-pages`: `4427616` ("Publish production: 0.36.0"). Its `index.html` SHA-256 `8594af9487ac650f0457ea2ac19cce44e40496f178b0e5413e2656ae2d68ac7a` matches the release source exactly. The live URL cannot be fetched from the session container (proxy).
+
 ## v0.36.0 — 2026-11-15 (branch `claude/v036`, not merged)
 
 - `players-of-week.js`: `universe.weeklyHonors {year, rows:[{week, off, def}]}` (this season only), awarded in a `simWeek` wrap from the week's regular-season box scores; `#playersOfWeek` on This Week; `PLAYER_OF_WEEK` events.
