@@ -7,13 +7,13 @@
 <style>
 @font-face{font-family:'Barlow Condensed';font-weight:600;src:url('../../../assets/fonts/barlow-condensed-600.woff2') format('woff2')}
 @font-face{font-family:'Barlow Condensed';font-weight:800;src:url('../../../assets/fonts/barlow-condensed-800.woff2') format('woff2')}
-:root{--bg:#07090f;--ink:#f6efdc;--muted:#a59d8a;--brass:#d6ad2f;--gold:#ffd84d;--panel:rgba(16,21,32,.86);--line:rgba(255,216,77,.18);
+:root{color-scheme:dark;--bg:#07090f;--ink:#f6efdc;--muted:#a59d8a;--brass:#d6ad2f;--gold:#ffd84d;--panel:rgba(16,21,32,.86);--line:rgba(255,216,77,.18);
   --win:#72f08a;--lose:#ff5a4f;--hot:#ff9a3c;--home:#1d3b8f;--away:#7a1f2b;--cond:'Barlow Condensed',Impact,system-ui,sans-serif}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:14px/1.35 system-ui,-apple-system,Segoe UI,sans-serif;overflow:hidden}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .cond{font-family:var(--cond);letter-spacing:.03em}
-#root{position:fixed;inset:0;display:grid;grid-template-columns:270px 1fr;grid-template-rows:auto 1fr auto;
+#root{position:fixed;inset:0;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);display:grid;grid-template-columns:270px 1fr;grid-template-rows:auto 1fr auto;
   background:radial-gradient(ellipse at 50% -10%,rgba(255,236,170,.22),transparent 55%),radial-gradient(ellipse at 15% 0%,rgba(255,236,170,.12),transparent 40%),radial-gradient(ellipse at 85% 0%,rgba(255,236,170,.12),transparent 40%),linear-gradient(180deg,#0b1020,#06080d 70%)}
 /* ---------- broadcast bug */
 #bug{grid-column:1/-1;display:flex;justify-content:center;padding:10px 12px 4px;z-index:5}

@@ -35,6 +35,8 @@ When a prototype is authorized, the recommended order is:
 | `tests/battle.test.js` | Rules tests |
 | `tools/sim-report.js` | Calibration, play variety and pacing report; `tools/latest-report.txt` is the last run |
 
+| `tools/bundle.js` | Builds the slice into one self-contained HTML file (scripts and fonts inlined) for sharing or publishing |
+
 ## Run it
 
 ```bash

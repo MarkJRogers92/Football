@@ -530,7 +530,7 @@ function title(){
   m.querySelectorAll('[data-k]').forEach(el=>el.onclick=()=>{st[el.dataset.k]=el.dataset.v;writeSave();S.tick(5);title()});
   const p=$('#play');if(p)p.onclick=()=>{S.init();scoutingReport()};
   const v=$('#pbv');if(v)v.onclick=()=>playbookView(save.playbook,'Your playbook',null);
-  const r=$('#reset');if(r)r.onclick=()=>{if(!confirm('Start a new dynasty? Your playbook, record and league reset.'))return;save={team:null,playbook:P.newPlaybook(),settings:st,combos:[],games:0};writeSave();title()};
+  const r=$('#reset');if(r)r.onclick=()=>{if(r.dataset.armed!=='1'){r.dataset.armed='1';r.textContent='TAP AGAIN: ERASE THIS DYNASTY';r.style.borderColor='var(--lose)';S.error();return}save={team:null,playbook:P.newPlaybook(),settings:st,combos:[],games:0};writeSave();title()};
 }
 function playbookView(pb,name,progId){
   const m=$('#modal');
