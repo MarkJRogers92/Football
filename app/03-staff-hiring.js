@@ -198,7 +198,23 @@ function archiveMemory(memory){
  const round=v=>Number.isFinite(v)?Math.round(v*ARCHIVE_COORD)/ARCHIVE_COORD:v;
  return Number.isFinite(memory.lat)||Number.isFinite(memory.lon)?{...memory,lat:round(memory.lat),lon:round(memory.lon)}:memory;
 }
-function archiveRecord(p,team,reason){
+// v0.37 cold tier. A player who used up his eligibility without ever starting, with no award, no draft round and no
+// Player of the Week honour, is most of a long dynasty's archive (57% of records at twelve seasons). His record keeps
+// identity, school, years, career totals, every season line (team, position, rating, games and statistics) and his
+// draft result; it drops the camp and scouting histories and per-season style and class labels, which only his
+// profile's development panels read. Marked cold:1. compactHistoryArchive applies it to older records once a season.
+const ARCHIVE_COLD_DROP=['campHistory','scoutingHistory','scoutingDomains','positionFamiliarity','trainingFocus','requestedPositionChange'];
+function archiveColdEligible(rec,source=rec){
+ return !!rec&&!rec.cold&&rec.exitReason==='Eligibility exhausted'&&!((rec.career?.starts||0)>0)&&!((source?.career?.starts||0)>0)
+  &&!(rec.awards?.length)&&!rec.draftResult?.round&&!rec.potw&&!source?.potw;
+}
+function coldArchiveRecord(rec){
+ for(const k of ARCHIVE_COLD_DROP)delete rec[k];
+ for(const s of rec.seasonHistory||[]){if(s&&typeof s==='object'){delete s.style;delete s.eligibility}}
+ rec.cold=1;return rec;
+}
+function archiveRecord(p,team,reason){const out=archiveRecordTiered(p,team,reason);if(archiveColdEligible(out,p))coldArchiveRecord(out);return out}
+function archiveRecordTiered(p,team,reason){
  const played=(p.career?.games||0)>0||(p.stats?.games||0)>0;
  if(!played){
   // Keep the keys normalizeUniverse fills in, so a summary record survives a

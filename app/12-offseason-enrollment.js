@@ -179,7 +179,10 @@ function compactHistoryArchive({horizon=EVENT_DETAIL_HORIZON}={}){
   if(Number(year)>cutoff||!ds||ds.slim)continue;
   slimCampReport(ds.springReport);slimCampReport(ds.fallReport);ds.slim=true;camps++;
  }
- return {events,dropped,camps};
+ // Older archive records move to the cold tier (v0.37), only when the archive is in memory.
+ let cold=0;
+ if(!(typeof archiveIsDeferred==='function'&&archiveIsDeferred()))for(const p of universe.playerArchive||[])if(archiveColdEligible(p)){coldArchiveRecord(p);cold++}
+ return {events,dropped,camps,cold};
 }
 function offseasonPreseason(){
  const os=normalizeOffseasonState(),ds=ensureDevelopmentState();

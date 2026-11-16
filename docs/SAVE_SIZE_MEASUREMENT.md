@@ -451,3 +451,38 @@ players who started). Their largest fields: `seasonHistory` 7.3 MB, `campHistory
 
 Together, about 20 MB of 146 (~14%) at twelve seasons, more in longer saves. The game archive (28%) was trimmed in
 v0.31 (deep tier); its next step would be dropping box scores for other programs' games older than the deep horizon.
+
+## v0.37: the cold tier, measured, and a phone-sized import
+
+Built option 1 above: an archived player who used up his eligibility without a start, an award, a draft round or a
+Player of the Week honour keeps identity, school, years, career totals, every season line (team, position, rating,
+games, statistics), recruitment, transfers, injuries and draft result, and drops `campHistory`, `scoutingHistory`,
+`scoutingDomains`, `positionFamiliarity`, `trainingFocus`, `requestedPositionChange` and the per-season `style` and
+`eligibility` labels (`cold:1`; `archiveRecord` and `compactHistoryArchive`, app parts 03 and 12).
+
+Twelve seasons, seed 17, plain harness (`tools/harness.js` without extensions, so both runs play identical games),
+before (`3ae9a15`) and after:
+
+| | Before | After |
+| --- | --- | --- |
+| Portable save | 129.41 MB | 122.88 MB (−5.0%) |
+| playerArchive | 50.97 MB | 44.44 MB (−12.8%) |
+| Archived records | 27,817 | 27,817 (15,263 cold) |
+| gameArchive / teams | 38.75 / 24.22 MB | unchanged |
+| Node `JSON.parse` + `installSave` | 734 + 165 ms | 670 + 181 ms |
+
+Smaller than the v0.34 estimate (11–12 MB): season lines are kept whole, because school career records and the
+career timeline read them.
+
+**Phone-sized import** (`PHONE_SAVE=… node tools/phone-import-measure.js`): the built page at 390×844 with Chromium's
+CPU throttled 4× (DevTools' mid-tier mobile preset), importing through the app's file input, then saving to and
+loading from IndexedDB. Desktop is unthrottled at 1280 wide.
+
+| Save | Desktop import / save / load | Phone (4× CPU) import / save / load |
+| --- | --- | --- |
+| 12 seasons, before (129.4 MB) | 3.5 / 3.5 / 1.1 s | 17.0 / 15.5 / 3.8 s |
+| 12 seasons, after (122.9 MB) | 3.4 / 3.3 / 0.8 s | 16.6 / 15.0 / 3.9 s |
+
+No errors in any run. Throttling models a slower processor only, not a phone's memory ceiling or storage speed; a
+real-device check (X3) is still needed. Import and save are dominated by parsing and writing the whole save, so they
+scale with total size; the game archive (32%) and live rosters (20%) are now the larger targets.
