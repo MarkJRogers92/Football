@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.35.0</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.36.0</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -1140,6 +1140,16 @@ tr[hidden]{display:none!important}
 .dp-list{margin:4px 0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
 .dynasty-page-card p.small{text-transform:none;letter-spacing:normal}
 .traditions-card p.small{text-transform:none;letter-spacing:normal}
+/* v0.36: national Players of the Week (This Week). */
+.players-of-week{margin:8px 0;padding:9px 12px;border-radius:6px;border:1px solid var(--line,rgba(255,255,255,.14))}
+.potw-list{list-style:none;margin:6px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:6px 16px}
+.potw-list small{display:block;opacity:.75}
+.potw-list li.is-mine{border-left:3px solid var(--accent,#d9a441);padding-left:8px}
+.players-of-week .player-button{padding:0;min-height:0}
+/* v0.36: retired numbers (Program page). */
+.rn-number{display:inline-block;align-self:flex-start;width:auto;min-width:2.2em;text-align:center;padding:1px 6px;border:1px solid var(--accent,#d9a441);border-radius:5px;margin-right:6px}
+.rn-candidates li{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.retired-numbers-card p.small{text-transform:none;letter-spacing:normal}
 
 .situational-playbook{display:grid;gap:8px}
 .situational-playbook>p{margin:0}
@@ -3656,7 +3666,7 @@ select{min-width:44px}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.35.0</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.36.0</b></span></footer>
   </div>
 </section>
 
@@ -3683,7 +3693,7 @@ select{min-width:44px}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.35.0</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.36.0</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -7632,7 +7642,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.35.0';
+const APP_VERSION='0.36.0';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi','Aiden','Alex','Amari','Andrew','Anthony','Antonio','Armani','Ashton','Austin','Avery','Bennett','Blake','Brady','Brandon','Brayden','Brennan','Brock','Bryson','Cade','Caden','Calvin','Cameron','Carson','Cedric','Chase','Christian','Cody','Colby','Collin','Connor','Corey','Damian','Damon','Daniel','Davion','Dawson','Deandre','Demarcus','Derek','Desmond','Dillon','Drew','Dylan','Elijah','Ethan','Ezra','Garrett','Grady','Graham','Grant','Hayden','Hunter','Ian','Isaac','Jabari','Jace','Jackson','Jacob','Jaden','Jake','Jamar','Jameson','Jared','Jarrett','Javon','Jaxon','Jay','Jermaine','Jesse','Joel','Jonah','Josiah','Julian','Justin','Kaden','Kai','Kamari','Keegan','Keenan','Kendall','Kendrick','Kevin','Kobe','Kyle','Kyler','Lamar','Landon','Lane','Lawrence','Leon','Levi','Lincoln','Lucas','Marco','Mario','Mateo','Matthew','Maurice','Max','Myles','Nate','Nathan','Nolan','Omar','Owen','Parker','Patrick','Preston','Quentin','Quincy','Reggie','Riley','Ryan','Sam','Sean','Seth','Shane','Silas','Solomon','Spencer','Sterling','Terrell','Theo','Tobias','Travis','Tristan','Troy','Tucker','Tyrese','Victor','Wade','Walker','Wes','Wyatt','Zach','Zane','Andres','Diego','Rafael','Tevita','Sione','Manu','Keoni','Kenji','Darnell'];
@@ -8214,13 +8224,15 @@ function jerseySide(pos){return ['K','P'].includes(pos)?'special':OFF_POS.has(po
 // number clashes moves to the next free number in his position's band (starting from his seeded number, so it is stable).
 function assignTeamJerseys(t){
  if(!t?.roster?.length)return t;const used={offense:new Set(),defense:new Set(),special:new Set()};
+ // v0.36: a retired number is never handed to a newcomer; a player already wearing it keeps it until he leaves.
+ const retired=new Set((t.retiredNumbers||[]).map(x=>Number(x.number)));
  const order=t.roster.slice().sort((a,b)=>eligibilityBase(b)-eligibilityBase(a)||String(a.id).localeCompare(String(b.id)));
  for(const p of order){
   ensurePortrait(p);const side=used[jerseySide(p.pos)],n=Number(p.jerseyNumber);
   if(Number.isInteger(n)&&n>=0&&n<=99&&!side.has(n)){side.add(n);continue}
   let h=0;const str=String(p.portraitSeed||p.id);for(let i=0;i<str.length;i++)h=(h*31+str.charCodeAt(i))>>>0;
   const bands=[...(JERSEY_BANDS[p.pos]||[]),[1,99],[0,0]];let got=null;
-  for(const [lo,hi] of bands){const span=hi-lo+1;for(let k=0;k<span&&got==null;k++){const c=lo+((h+k)%span);if(!side.has(c))got=c}if(got!=null)break}
+  for(const [lo,hi] of bands){const span=hi-lo+1;for(let k=0;k<span&&got==null;k++){const c=lo+((h+k)%span);if(!side.has(c)&&!retired.has(c))got=c}if(got!=null)break}
   if(got!=null){p.jerseyNumber=got;side.add(got)}
  }
  return t;
@@ -20731,7 +20743,7 @@ if(typeof module==='object'&&module.exports){
 // Optional, current facts shared by the Wire and the short weekly briefing.
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.DynastyWorldNews=api})(typeof globalThis!=='undefined'?globalThis:this,function(){
  'use strict';
- const TYPES={PRO_MILESTONE:{kicker:'PRO ALUMNI',tab:'program'},LOCKER_ROOM_MEETING:{kicker:'LOCKER ROOM',tab:'roster'},LOCKER_ROOM_FLASHPOINT:{kicker:'LOCKER ROOM',tab:'roster'},LOCKER_ROOM_RESOLVED:{kicker:'LOCKER ROOM',tab:'roster'},SCOUTING_VINDICATED:{kicker:'YOU SAW HIM FIRST',tab:'recruiting'},STATEMENT_WIN:{kicker:'STATEMENT WIN',tab:'season'},ADMIN_WAGER:{kicker:'THE BOARD',tab:'program'},HOME_STREAK:{kicker:'HOME STREAK',tab:'season'},TRADITION:{kicker:'TRADITION',tab:'program'}};
+ const TYPES={PRO_MILESTONE:{kicker:'PRO ALUMNI',tab:'program'},LOCKER_ROOM_MEETING:{kicker:'LOCKER ROOM',tab:'roster'},LOCKER_ROOM_FLASHPOINT:{kicker:'LOCKER ROOM',tab:'roster'},LOCKER_ROOM_RESOLVED:{kicker:'LOCKER ROOM',tab:'roster'},SCOUTING_VINDICATED:{kicker:'YOU SAW HIM FIRST',tab:'recruiting'},STATEMENT_WIN:{kicker:'STATEMENT WIN',tab:'season'},ADMIN_WAGER:{kicker:'THE BOARD',tab:'program'},HOME_STREAK:{kicker:'HOME STREAK',tab:'season'},TRADITION:{kicker:'TRADITION',tab:'program'},PLAYER_OF_WEEK:{kicker:'PLAYER OF THE WEEK',tab:'roster'},NUMBER_RETIRED:{kicker:'RETIRED NUMBER',tab:'program'}};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function items(u,t){
   if(!u||!t)return[];
@@ -21688,6 +21700,175 @@ if(typeof module==='object'&&module.exports){
  }
  const renderProgramBeforeTraditions=TAB_RENDERERS.program;
  TAB_RENDERERS.program=()=>{renderProgramBeforeTraditions();renderTraditions()};
+}
+
+// v0.36 — national Players of the Week. After each regular-season week the best offensive and the best defensive
+// performance in the country are named from the week's box scores. This Week shows last week's winners; when one of
+// them is yours, The Wire says so and the honour counts on his season line in the card.
+//
+// The score reads only the game's own statistics (a small bonus for winning), never ratings. State:
+// universe.weeklyHonors {year, rows:[{week, off, def}]}, this season only (about 2 KB), cleared when a new season starts.
+function makePlayersOfWeek(env){
+ 'use strict';
+ const universe=()=>env.getUniverse();
+ const OFF=new Set(['QB','RB','WR','TE']),DEF=new Set(['EDGE','DT','LB','CB','S']);
+ const n=v=>Number(v)||0;
+ function score(pos,s){
+  if(pos==='QB')return n(s.passYds)*.04+n(s.passTD)*4-n(s.int)*3+n(s.rushYds)*.08+n(s.rushTD)*5-n(s.fumbles)*2;
+  if(OFF.has(pos))return n(s.rushYds)*.1+n(s.rushTD)*6+n(s.recYds)*.1+n(s.recTD)*6+n(s.receptions)*.4-n(s.fumbles)*2-n(s.drops);
+  if(DEF.has(pos))return n(s.tackles)*.9+n(s.tfl)*1.5+n(s.sacks)*5+n(s.intDef)*7+n(s.passBreakups)*1.2+n(s.forcedFumbles)*4+n(s.pressures)*.3;
+  return 0;
+ }
+ function line(pos,s){
+  const parts=[];
+  if(n(s.passYds))parts.push(`${n(s.passYds)} pass yds, ${n(s.passTD)} TD${n(s.int)?`, ${n(s.int)} INT`:''}`);
+  if(n(s.rushYds)>=20||n(s.rushTD))parts.push(`${n(s.rushYds)} rush yds${n(s.rushTD)?`, ${n(s.rushTD)} TD`:''}`);
+  if(n(s.recYds))parts.push(`${n(s.receptions)} rec, ${n(s.recYds)} yds${n(s.recTD)?`, ${n(s.recTD)} TD`:''}`);
+  if(DEF.has(pos)){if(n(s.tackles))parts.push(`${n(s.tackles)} tackles`);if(n(s.sacks))parts.push(`${n(s.sacks)} sack${n(s.sacks)===1?'':'s'}`);if(n(s.intDef))parts.push(`${n(s.intDef)} INT`);if(n(s.tfl))parts.push(`${n(s.tfl)} TFL`)}
+  return parts.slice(0,3).join(' · ');
+ }
+ // The best offensive and defensive line among a week's finished games.
+ function pick(games){
+  let off=null,def=null;
+  for(const g of games||[]){
+   if(!g?.playerStats||!g.score)continue;
+   for(const side of ['home','away']){
+    const won=n(g.score[side])>n(g.score[side==='home'?'away':'home']),team=g[side];
+    for(const p of g.playerStats[side]||[]){
+     const group=OFF.has(p.pos)?'off':DEF.has(p.pos)?'def':null;if(!group)continue;
+     const v=score(p.pos,p.stats||{})+(won?3:0),row={playerId:p.id,name:p.name,pos:p.pos,team:team.name,teamId:team.id,line:line(p.pos,p.stats||{}),score:Math.round(v*10)/10,gameId:g.id};
+     if(group==='off'){if(!off||v>off.score||(v===off.score&&String(p.id)<String(off.playerId)))off=row}
+     else if(!def||v>def.score||(v===def.score&&String(p.id)<String(def.playerId)))def=row;
+    }
+   }
+  }
+  return{off,def};
+ }
+ function state(){const u=universe();if(!u.weeklyHonors||u.weeklyHonors.year!==u.year)u.weeklyHonors={year:u.year,rows:[]};return u.weeklyHonors}
+ // Name the winners for a played week (1-based). Idempotent per week.
+ function award(week){
+  const u=universe(),s=state();const had=s.rows.find(r=>r.week===week);if(had)return null;
+  const games=[];const arch=u.gameArchive||[];
+  for(let i=arch.length-1;i>=0;i--){const g=arch[i];if((g.season??u.year)!==u.year)break;if(g.week===week&&(!g.label||g.label==='Regular season'))games.push(g)}
+  const {off,def}=pick(games);if(!off&&!def)return null;
+  const row={week,off,def};s.rows.push(row);return row;
+ }
+ function last(){return state().rows.at(-1)||null}
+ function countFor(playerId){return state().rows.reduce((k,r)=>k+(r.off?.playerId===playerId?1:0)+(r.def?.playerId===playerId?1:0),0)}
+ return{score,line,pick,award,last,countFor,state};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makePlayersOfWeek};
+}else{
+ const potw=makePlayersOfWeek({getUniverse:()=>universe});
+ globalThis.DynastyPlayersOfWeek=potw;
+ const pwEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ // Your winners go in the event ledger, which The Wire reads.
+ function announcePlayersOfWeek(row){
+  const me=selected();if(!row||!me)return;
+  for(const [kind,w] of [['Offensive',row.off],['Defensive',row.def]]){
+   if(!w||String(w.teamId)!==String(me.id))continue;
+   const k=potw.countFor(w.playerId);
+   universe.events??=[];universe.events.push({id:`EVT_POTW_${universe.year}_${row.week}_${kind}`,type:'PLAYER_OF_WEEK',season:universe.year,week:universe.week,schoolIds:[me.id],playerIds:[w.playerId],coachIds:[],gameIds:w.gameId?[w.gameId]:[],importance:63,summary:`${w.pos} ${w.name} is the National ${kind} Player of the Week (${w.line})${k>1?`, his ${k===2?'second':k===3?'third':`${k}th`} this season`:''}.`,metadata:{kind,week:row.week}});
+  }
+ }
+ potw.announce=announcePlayersOfWeek;
+ const simWeekBeforePotw=simWeek;
+ simWeek=function simWeekWithPlayersOfWeek(){
+  const week=universe?.week,out=simWeekBeforePotw.apply(this,arguments);
+  try{if(universe&&week!=null&&universe.week===week+1)announcePlayersOfWeek(potw.award(week+1))}catch(err){console.error(err)}
+  return out;
+ };
+ function renderPlayersOfWeek(){
+  const host=$('#weeklyDecisions');if(!host?.insertAdjacentElement)return;
+  let card=$('#playersOfWeek');const row=universe?.teams&&universe.phase==='regular'?potw.last():null,me=row?selected():null;
+  if(!row||row.week!==universe.week){if(card?.isConnected)card.remove();return}
+  if(!card||!card.isConnected){card=document.createElement('section');card.id='playersOfWeek';card.className='players-of-week';card.setAttribute('role','region');card.setAttribute('aria-label','Players of the Week');host.insertAdjacentElement('beforebegin',card)}
+  const one=(label,w)=>w?`<li${String(w.teamId)===String(me?.id)?' class="is-mine"':''}><span class="small muted">${label}</span> <button type="button" class="player-button" data-player="${pwEsc(w.playerId)}">${pwEsc(w.pos)} ${pwEsc(w.name)}</button>, ${pwEsc(w.team)}<small>${pwEsc(w.line)}</small></li>`:'';
+  card.innerHTML=`<div class="eyebrow">NATIONAL PLAYERS OF THE WEEK · WEEK ${row.week}</div><ul class="potw-list">${one('Offense',row.off)}${one('Defense',row.def)}</ul>`;
+  card.querySelectorAll('[data-player]').forEach(b=>b.onclick=()=>showPlayerProfile(b.dataset.player));
+ }
+ extendRender('dashboard',renderPlayersOfWeek);
+ // Test pages only: last week's winners, one of them yours.
+ if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.playersOfWeekFixture=()=>{const t=selected(),p=t.roster.find(x=>x.pos==='QB');potw.state().rows.push({week:universe.week,off:{playerId:p.id,name:p.name,pos:'QB',team:t.name,teamId:t.id,line:'412 pass yds, 5 TD'},def:{playerId:'x',name:'Other Guy',pos:'LB',team:'Elsewhere',teamId:-1,line:'14 tackles · 2 sacks'}});renderPlayersOfWeek();return p.name};
+}
+
+// v0.36 — retired numbers. A program's greatest players can have their number retired: a permanent mark the coach
+// places on purpose. A former player qualifies with a national award or a first-round draft result, having finished
+// his college career at this program. One number may be retired each season, twelve in all, so each is a choice.
+//
+// A retired number is never given to a newcomer (assignTeamJerseys skips it); a player already wearing it keeps it
+// until he leaves. State: t.retiredNumbers [{number, playerId, name, pos, year, honour}].
+function makeRetiredNumbers(env){
+ 'use strict';
+ const universe=()=>env.getUniverse();
+ const MAX=12,SHOW=5;
+ const list=t=>Array.isArray(t?.retiredNumbers)?t.retiredNumbers:[];
+ function honour(p){
+  const awards=(p.awards||[]).map(a=>a.name).filter(Boolean),first=p.draftResult?.round===1;
+  if(!awards.length&&!first)return null;
+  const best=awards.find(n=>/National Player/i.test(n))||awards[0];
+  return{score:awards.length*3+(first?2:0)+(awards.some(n=>/National Player/i.test(n))?3:0),text:[best?`${awards.length>1?`${awards.length} national awards incl. `:''}${best}`:'',first?`first-round pick${p.draftResult.pick?` (#${p.draftResult.pick})`:''}`:''].filter(Boolean).join(' · ')};
+ }
+ // Former players who could be honoured, best first.
+ function candidates(t){
+  const taken=new Set(list(t).map(x=>String(x.playerId))),numbers=new Set(list(t).map(x=>Number(x.number))),out=[];
+  for(const p of universe().playerArchive||[]){
+   if(p.lastTeam!==t.name||taken.has(String(p.id)))continue;
+   const n=Number(p.jerseyNumber);if(!Number.isInteger(n)||n<0||n>99||numbers.has(n))continue;
+   const h=honour(p);if(h)out.push({playerId:p.id,name:p.name,pos:p.pos,number:n,year:p.retiredYear,honour:h.text,score:h.score});
+  }
+  return out.sort((a,b)=>b.score-a.score||(b.year||0)-(a.year||0)||String(a.playerId).localeCompare(String(b.playerId)));
+ }
+ function canRetire(t){
+  if(list(t).length>=MAX)return{ok:false,reason:`A program retires at most ${MAX} numbers.`};
+  if(list(t).some(x=>x.year===universe().year))return{ok:false,reason:'One number a season.'};
+  return{ok:true};
+ }
+ function retire(t,playerId){
+  const can=canRetire(t);if(!can.ok)return can;
+  const c=candidates(t).find(x=>String(x.playerId)===String(playerId));if(!c)return{ok:false,reason:'He does not qualify.'};
+  (t.retiredNumbers??=[]).push({number:c.number,playerId:c.playerId,name:c.name,pos:c.pos,year:universe().year,honour:c.honour});
+  return{ok:true,entry:t.retiredNumbers.at(-1)};
+ }
+ return{MAX,SHOW,list,candidates,canRetire,retire};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeRetiredNumbers};
+}else{
+ const retiredNumbers=makeRetiredNumbers({getUniverse:()=>universe});
+ globalThis.DynastyRetiredNumbers=retiredNumbers;
+ const rnEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function retiredNumbersHTML(t){
+  const have=retiredNumbers.list(t).slice().sort((a,b)=>a.number-b.number),can=retiredNumbers.canRetire(t),deferred=typeof archiveIsDeferred==='function'&&archiveIsDeferred();
+  const cands=deferred?[]:retiredNumbers.candidates(t).slice(0,retiredNumbers.SHOW);
+  const row=x=>`<li data-retired="${x.number}"><span class="stop-who"><strong class="rn-number">${x.number}</strong> <button type="button" class="player-button" data-player="${rnEsc(x.playerId)}">${rnEsc(x.pos)} ${rnEsc(x.name)}</button><small>Retired ${x.year} · ${rnEsc(x.honour)}</small></span></li>`;
+  const cand=x=>`<li><span class="stop-who"><strong class="rn-number">${x.number}</strong> <button type="button" class="player-button" data-player="${rnEsc(x.playerId)}">${rnEsc(x.pos)} ${rnEsc(x.name)}</button><small>${rnEsc(x.honour)}${x.year?` · left ${x.year}`:''}</small></span><button type="button" class="dw-button" data-retire="${rnEsc(x.playerId)}" ${can.ok?'':'disabled'}>Retire No. ${x.number}</button></li>`;
+  return`<div class="section-head"><div><div class="eyebrow">RETIRED NUMBERS</div><h3>${have.length?`${have.length} number${have.length===1?'':'s'} retired`:'No numbers retired'}</h3><div class="muted">Honour a former player with a national award or a first-round draft result. One a season, ${retiredNumbers.MAX} in all; no newcomer wears a retired number.</div></div></div>
+  ${have.length?`<ul class="stop-rows">${have.map(row).join('')}</ul>`:''}
+  ${deferred?'<p class="small muted">Open History to load past careers, then return to choose.</p>':cands.length?`<h4>Could be honoured${can.ok?'':` <small class="muted">(${rnEsc(can.reason)})</small>`}</h4><ul class="stop-rows rn-candidates">${cands.map(cand).join('')}</ul>`:(have.length?'<p class="small muted">No other former player qualifies right now.</p>':'<p class="small muted">No former player qualifies yet.</p>')}`;
+ }
+ function renderRetiredNumbers(){
+  if(!universe?.teams)return;const t=selected();if(!t)return;
+  let host=$('#retiredNumbers');
+  if((!host||!host.isConnected)&&typeof document!=='undefined'&&document.getElementById){
+   const anchor=document.getElementById('trophyCase')||document.getElementById('coachRivals')||document.getElementById('proPipeline');
+   if(anchor?.insertAdjacentElement){host=document.createElement('div');host.id='retiredNumbers';host.className='card retired-numbers-card';anchor.insertAdjacentElement('afterend',host)}
+  }
+  if(!host)return;host.innerHTML=retiredNumbersHTML(t);
+  host.querySelectorAll('[data-player]').forEach(b=>b.onclick=()=>showPlayerProfile(b.dataset.player));
+  host.querySelectorAll('[data-retire]').forEach(b=>b.onclick=()=>{
+   const r=retiredNumbers.retire(t,b.dataset.retire);
+   if(r.ok){const e=r.entry;universe.events??=[];universe.events.push({id:`EVT_RETIRED_${t.id}_${e.number}`,type:'NUMBER_RETIRED',season:universe.year,week:universe.week,schoolIds:[t.id],playerIds:[e.playerId],coachIds:[],gameIds:[],importance:66,summary:`${t.name} retire No. ${e.number} for ${e.pos} ${e.name}.`,metadata:{number:e.number}});autosaveAfter('management')}
+   setStatus(r.ok?`No. ${r.entry.number} is retired for ${r.entry.name}.`:r.reason);renderRetiredNumbers();
+  });
+ }
+ const renderProgramBeforeRetired=TAB_RENDERERS.program;
+ TAB_RENDERERS.program=()=>{renderProgramBeforeRetired();renderRetiredNumbers()};
+ // Test pages only: a decorated former player in the archive.
+ if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.retiredNumberFixture=()=>{const t=selected();(universe.playerArchive??=[]).push({id:'RNFIX',name:'Legend Fixture',pos:'QB',lastTeam:t.name,retiredYear:universe.year-2,jerseyNumber:12,awards:[{year:universe.year-2,name:'National Player of the Year'}],draftResult:{round:1,pick:3},seasonHistory:[],career:{},stats:{}});renderRetiredNumbers();return 12};
 }
 
 loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});[...new Set(schools.map(t=>t.conference))].forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();bindNewDynastySetup();applyTitlePreferences();showTitleScreen();refreshTitleSave().then(restoreNewDynastySetupDraft);}).catch(e=>{$('#titleStatus').textContent='Could not initialize Dynasty Lab. '+e.message});
