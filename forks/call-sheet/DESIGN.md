@@ -599,3 +599,81 @@ of calls, and no play-plus-tactic line exceeds 9%. Engine validation passed in e
    auto-kicks).
 5. A Dynasty Lab adapter: read real rosters (`ROLE_DEFS` depth → lineup roles, real traits and archetypes) and
    write the box score back through the Game Day record path. This is the step that becomes the real fork.
+
+---
+
+## 12. The dynasty deck: why no two programs end up the same (direction, 2026-11-16)
+
+**Mark's direction:** Balatro-style presentation with loud, over-the-top animations, effects and payoffs. *Not* a
+pick-up-and-play roguelite: every dynasty should be unique, cards are chosen strategically, and no two teams can
+be the same. Packs after games.
+
+### Where uniqueness comes from
+
+The three sources stack on each other:
+
+1. **People:** recruits, archetypes and signatures. Already unique, because every world is generated.
+2. **Playbook:** the cards you *chose* to take and keep. Scarcity forces identity.
+3. **Lineage:** the coordinators you hired and the plays the program has run for years.
+
+### Packs: after every game, not only wins
+
+Packs only after wins would make strong programs stronger every week. That's exactly the snowball the handoff warns
+against, and it makes losing streaks hopeless. Instead:
+
+| Pack | When | What it holds | The choice |
+| --- | --- | --- | --- |
+| **Game pack** | After every game | Plays, tactics, upgrades | **Win:** pick 1 of 4 · **Loss:** pick 1 of 3 from a **Film Study** pack weighted toward counters to whatever beat you |
+| **Rivalry / Bowl / Title pack** | Big wins | Rarer cards, foil, Legendary chance | Pick 1, with the full Balatro reveal |
+| **Coordinator pack** | When you hire a coordinator | His scheme's pool | Pick 3 to install |
+| **Clinic pack** | Each offseason research project | Cards from the family you studied | Pick 1–2 |
+| **Signing Day** | Recruits commit | Player cards: real people, never duplicated | Already exists in Dynasty Lab |
+
+**You always pick, never just receive.** Choosing 1 of 3 or 4 (as in Slay the Spire's card rewards) is where
+strategy and identity come from. No currency, no paid packs.
+
+### Scarcity creates identity
+
+- **Playbook slots:** the number of installed plays and tactics is limited (for example about 20, growing slowly
+  with facilities and staff). A new card often means cutting an old one, and that cut is the identity decision.
+- **Install time:** a new card needs practice weeks before it's game-ready (it starts as "Raw" with a −1 on its
+  design duel). Midseason pickups cost something.
+- **The weekly game-day deck** is chosen from the playbook for each opponent. Staff can suggest one.
+- Cards you don't install go to the binder. They aren't lost, but they don't play.
+
+### Cards that diverge between dynasties
+
+- **Mastery and branching evolution:** plays level up with reps in real games, then **branch**. For example,
+  Inside Zone at mastery 3 becomes *Duo* (power-flavored) or *Split Zone* (constraint-flavored). Two dynasties with
+  the same starting card end up with different ones.
+- **Duplicates feed mastery** instead of cluttering the binder.
+- **World-unique Legendaries:** some cards exist once per world (*The Fumblerooski*, *The Philly Special*-style
+  trick plays, under original names). AI programs open packs too, so **a rival can own the card you wanted**, and
+  you'll face it in a rivalry game.
+- **Signature cards from your people:** a developed player unlocks a personal card. It graduates with him and goes
+  to the Ring of Honor. A coordinator's scheme cards can leave with him unless they've been installed long enough
+  to become *program knowledge*.
+- **Program tradition card:** one per school, generated from its history and stadium (for example a home crowd
+  that causes false starts on 3rd down).
+
+### Keeping mature dynasties interesting (anti-snowball)
+
+- **The league adapts across seasons:** a signature play you run constantly becomes **Scouted** league-wide. It
+  loses its surprise bonus until you evolve it. This is the in-game Lean, scaled up to the dynasty.
+- Graduation and staff turnover take cards away. Playbook capacity grows slowly. Loss packs give counters. Win
+  packs are only a little better.
+
+### Presentation (Balatro with loud payoffs)
+
+- **Pack rip:** the pack shakes, tears with a burst, and cards fly out face-down. Rarity escalates the reveal:
+  common is a flip; rare gets a gold flash; signature and legendary get a foil explosion, light rays, screen shake
+  and a crowd roar. Then the pick-one moment, with the cards you're passing on burning away.
+- **In battle:** fighting-game-style duel clashes, a yardage counter that ticks up while bonuses flash in, giant
+  callouts (FIRST DOWN, SACK, TOUCHDOWN), on-fire player cards, a crowd meter, confetti and light flares on scores.
+  All skippable, with a reduced-motion version.
+
+### Next build: the vertical slice
+
+One snap in the arcade style (fanned hand, drag to call, the play running on the field, duel clashes, counted
+yards, callout), plus **On Fire**, one named combo, and a **post-game pack pick with the full rip**. This tests
+the feel of both halves of the loop: Saturday and the playbook.
