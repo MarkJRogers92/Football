@@ -26,6 +26,8 @@ When a prototype is authorized, the recommended order is:
 
 | File | Contents |
 | --- | --- |
+| `FORK_PLAN.md` | How the full fork works: a separate repo copied from Dynasty Lab, with card battles replacing coached games |
+| `core/adapter.js` | Reads a real Dynasty Lab team (roster + depth chart) into a battle lineup. Proven by `tests/adapter.test.js` on a real generated universe |
 | `DESIGN.md` | The review of the 2026-11-15 handoff, in the order its Section 18 requested, plus the unified game concept |
 | `README.md` | This file: fork strategy, how to run, and the reuse map |
 | `core/` | Rules engine (data, resolver, battle, rosters), plain JS, runs in Node and the browser |
