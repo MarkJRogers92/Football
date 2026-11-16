@@ -1,5 +1,21 @@
 # Latest session work
 
+## v0.37.0 — 2026-11-16 (branch `claude/beautiful-clarke-4un3b2`, not merged)
+
+Eleven items from the owner's pick of the 2026-11-16 brainstorm (`docs/NEXT_IDEAS_2026-11-16.md`). New engine extensions after `retired-numbers.js` in both lists: `long-memory.js`, `facility-effects.js`, `fatigue.js`, `conversion-review.js`. Hashed randomness only.
+
+- `players-of-week.js`: `seasonScore` wrap (+2.5 per honour this season, max 4), `p.potw` career count (credited in the `simWeek` wrap, carried by `archiveRecord` and `draftPlayer` wraps), `draftProjection` wrap (+0.6 board points per honour, max 2, round recomputed with `DynastyNfl.roundFor`), `hofPlayerReasons` wrap ("Three-time Player of the Week"), Draft Night label in `ceremony-snapshot-adapter.js`.
+- `long-memory.js`: `universe.longMemory {checkins, seen}`; `WHERE_NOW` event every 5th archived season (`offseasonReview` wrap); `#longMemory` on This Week (anniversary + milestone watch, derived; school career totals from `storylineSchoolRecords`, cached per week).
+- `weekly-coaching-engine.js` `weatherAdvice` (wind ≥18, rain/snow precip ≥2 or snow ≥1) feeds `buildReport` (`input.weather`, `report.weather`); `weekly-coaching-loop.js` passes the forecast (`v0102WeeklyForecast`).
+- `facility-effects.js`: recovery after each regular-season week (training level × 5%, hashed per player/season/week, all programs); `trainingAttrBoost` wrap for featured plans (+0.08 × level per focus trait); `t.facilityHelp {rows}` for the coach's program; `FACILITY_HELP` events; list under `#facilitiesBoosters`. `DynastyLabDevelopmentPlans.bonus` exported.
+- `game-engine-v2-gameday.js`: `halftimePolicy:'halftime-v2'` on new sessions; the coach's approach adds ±0.07 pass rate through `snapCall` in the second half. Balanced/delegated unchanged, so delegated sessions still match `simulateShadow`. UI hints in `game-engine-v2-gameday-ui.js`.
+- `fatigue.js`: `gameProfiles` wrap adds `fatigueOff/fatigueDef`; `game-engine-v2-adapter.js` `profileTeam` carries them only when >0, `lateGameRatings` applies them from period 4; quick sim (`gameSim` wrap) blends 25% into the rotating units. Calibration report re-stamped (deltas unchanged).
+- `conversion-review.js`: possession-model chart; `v2RecordPrepared`/`recordInteractiveV2GameDay`/`finishGame` wraps store `record.conversionReview` (≤2 rows) for the coach's game; `gameBoxHTML` wrap shows it. The engine has no onside kicks, so only conversions are reviewed.
+- Performance: `rolePlayers` uses a verified per-team id→index map (app part 02); postseason stage snapshots keep JSON text (`coreJson`). Seeded season+offseason+season hash identical.
+- Cold archive tier (app parts 03, 12, 13): `archiveColdEligible`/`coldArchiveRecord`, `cold:1` (keeps camp history); `compactHistoryArchive` returns `cold`. `tools/phone-import-measure.js`.
+- `v2RecordDriveArchive`: a safety now also marks the offense's drive SAFETY (points unchanged), matching the Game Cast replay.
+- Harness exposes `draftPlayer`, `hofPlayerReasons`, `trainingAttrBoost`, `weeklyOpponentReport`, `forecastFor`.
+
 ## v0.36.0 — 2026-11-15 (branch `claude/v036`, not merged)
 
 - `players-of-week.js`: `universe.weeklyHonors {year, rows:[{week, off, def}]}` (this season only), awarded in a `simWeek` wrap from the week's regular-season box scores; `#playersOfWeek` on This Week; `PLAYER_OF_WEEK` events.

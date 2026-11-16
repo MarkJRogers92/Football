@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.37.0 — Long memory, smarter Saturdays and smaller saves
+
+- **Players of the Week count for more.** This season's honours lift a player in the award race; a career of them nudges his draft stock (never a whole round), and a player honoured twice or more is introduced that way on Draft Night and in his Hall of Fame case.
+- **Where are they now?** Every fifth season The Wire checks in on three notable former players of your program: still playing pro football, retired, coaching somewhere, or out of the game with his college numbers standing.
+- **This week in history.** When the coming week is the 5th, 10th, 15th... anniversary of a big upset, a win over a top-five team or a rivalry win, This Week remembers it.
+- **Milestone watch.** A player within about two games of a school season record, a school career record or a national career record is named on This Week, with what he needs and whose record it is.
+- **Staff read the forecast.** When wind, rain or snow will cut into the passing game, the opponent report opens with the conditions and the staff suggest the run package (Run Blocking + Run Fits); delegated preparation follows it.
+- **The Training Center helps players by name.** Each level gives every injured player a 5% weekly chance to heal a week early (25% at level 5), and featured development plans get extra camp work. The facilities card lists who it helped, and The Wire credits the building when a player returns early.
+- **Halftime adjustments change the second half.** Open it up now throws about 7% more often and Lean ball control about 7% less, on top of the clock and yardage effects, and each option explains its trade. Staying balanced or delegating changes nothing.
+- **Fourth-quarter fatigue.** Both teams play a little below their ratings in the fourth quarter and overtime, less so with good depth behind the starters. A deep team gains about half a point late; blowout rates are unchanged (docs/FATIGUE_MEASUREMENT_2026-11-16.md).
+- **Staff calls, reviewed.** When the staff kicked an extra point that should have been a two-point try (or the reverse) by 5+ points of win chance on a late-game chart, the box score says so. Your own calls are never second-guessed.
+- **Faster seasons.** Role lookups no longer rebuild a roster map on every call, and postseason rollback copies are only parsed if a stage fails: the postseason is about a third faster, with identical results.
+- **Smaller long saves.** Archived players who used up their eligibility without starting keep every season line, career total and camp result but drop scouting detail: the player archive is about 7% smaller at twelve seasons. A twelve-season save imports in about 17 seconds on a phone-class processor (docs/SAVE_SIZE_MEASUREMENT.md).
+
+Saves carry over. Older archive records move to the smaller form at the next offseason.
+
 ## v0.36.0 — Players of the Week and retired numbers
 
 - **National Players of the Week.** After every regular-season week the best offensive and defensive performances in the country are named from the box scores. This Week shows last week's winners, and when one is yours The Wire says so (and counts how many he has this season).
