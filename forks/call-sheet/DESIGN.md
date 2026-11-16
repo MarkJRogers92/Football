@@ -777,3 +777,34 @@ Look facts they confirm). Signature cards and these new cards are built on that:
 
 **Known issue:** a run-heavy team with a hot back can pile 40–50 carries onto one player, because the sandbox has a
 single RB. A rotation or backup back is the fix.
+
+---
+
+## 16. Graduation, recruiting classes and the simplification pass (rules v0.6, 2026-11-16)
+
+**Rosters persist (`core/classes.js`, `world.js`):** every starter has a class year (FR–SR) and a career line
+built from the battle box scores. A season is 7 games, one against each AI program. Then:
+1. **Season finale:** the champion (confetti if it's you) and a **senior send-off**, with each graduating
+   starter's portrait, class and career line. Signature cards of graduating players move to the **Ring of
+   Honor**: you keep them as history but can't play them. Returning players develop (freshmen grow most,
+   about +3 overall on average).
+2. **Signing Day:** one row of cards, one per open spot, with the best recruit already chosen. Tapping a card
+   flips to the next of three prospects. Each card shows stars, archetype, and **what he changes in the card
+   game** (his archetype's card effect, or the duels he plays in). One tap signs the class. Recruits arrive as
+   freshmen, a little raw. Recruit quality nudges up with a better season.
+3. AI programs graduate, develop and sign classes the same way. Their 4★+ signings appear in league news.
+
+**Simpler flow, less reading:**
+- A 3-step *How to Play* shows once before the first kickoff, and stays available from the side panel.
+- The around-the-league screen holds the next game (opponent, identity, weather, rivalry) and a KICKOFF button,
+  replacing the separate scouting screen during the season. It shows at most 5 news cards and a top-4
+  standings table.
+- Side panel boxes only appear when they have something to show (On Fire, Combo book).
+- A Roster view shows the 22 starters with face, class year and overall, plus how many seniors leave.
+
+**How recruiting relates to Dynasty Lab:** this Signing Day is a stand-in, not Dynasty Lab's recruiting. Dynasty
+Lab has geography, scouting confidence ranges, interest, pitches, competing schools, commitments and the transfer
+portal. The bridge already exists on the battle side: every duel uses the players' actual traits and archetypes,
+and the fork's lineups use Dynasty Lab's own role definitions. Making the fork real means replacing Signing Day
+with an adapter: Dynasty Lab's recruiting workspace produces committed players, and their traits, archetypes and
+class years fill the battle lineup.

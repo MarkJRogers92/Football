@@ -11,6 +11,7 @@ const P=require(path.join(__dirname,'../core/packs.js'));
 const EV=require(path.join(__dirname,'../core/evolution.js'));
 const W=require(path.join(__dirname,'../core/world.js'));
 const SG=require(path.join(__dirname,'../core/signatures.js'));
+const CL=require(path.join(__dirname,'../core/classes.js'));
 
 let passed=0;const failures=[];
 function test(name,fn){try{fn();passed++;console.log(`  ok  ${name}`)}catch(e){failures.push(name);console.log(`  FAIL ${name}\n       ${e.stack.split('\n').slice(0,3).join('\n       ')}`)}}
@@ -213,7 +214,7 @@ test('league: AI programs open packs, cut to capacity, evolve, and never share a
   const pb=P.newPlaybook(),w=W.newWorld('aerial','league-test');
   assert.equal(Object.keys(w.programs).length,7);assert.ok(!w.programs.aerial);
   const opp0=W.opponentOf(w);
-  for(let wk=0;wk<21;wk++)W.advanceWeek(w,pb,{won:wk%2===0,userTendency:{run:5,quick:3,deep:2,constraint:1}});
+  for(let wk=0;wk<21;wk++){W.advanceWeek(w,pb,{won:wk%2===0,userTendency:{run:5,quick:3,deep:2,constraint:1}});if(w.offseason){W.startOffseason(w,pb,'You');W.finishOffseason(w)}}
   assert.equal(w.week,21);assert.equal(w.season,4);assert.equal(W.opponentOf(w),w.order[0]);assert.equal(opp0,w.order[0]);
   const all=[];let evolved=0,games=0;
   for(const p of Object.values(w.programs)){
@@ -262,6 +263,30 @@ test('weather changes duels; rivalry week, trophy and the rivalry pack',()=>{
   const pk=P.openPack(P.newPlaybook(),{won:true,rivalry:true,seed:'rp'});assert.equal(pk.cards.length,5);assert.equal(pk.type,'rivalry');
   // New effect cards: Stunt and Hurry-Up.
   const st=R.buildSnap({off,def,play:D.PLAYS.deep_cross,call:D.CALLS.cover3,defTactics:['stunt'],situation:sit});assert.ok(st.duels[0].mods.some(m=>m.src==='Stunt'&&m.v===-1));
+});
+
+test('graduation and signing day: seniors leave, signatures retire to the Ring of Honor, recruits arrive as freshmen',()=>{
+  const pb=P.newPlaybook(),w=W.newWorld('aerial','classes');
+  const all=CL.allPlayers(w.userLineup);assert.equal(all.length,22);assert.ok(all.every(p=>p.year>=1&&p.year<=4));
+  const seniors=all.filter(p=>p.year===4),sr=seniors[0];assert.ok(seniors.length>0,'some starters should be seniors');
+  SG.add(pb,SG.specFor(sr,{colors:['#000','#fff']}));
+  const young=all.find(p=>p.year===1)||all.find(p=>p.year===2),before=young.ovr;
+  // A season's games feed careers.
+  const team=W.teamFor('aerial',pb,w.userLineup),g=B.simulate({home:team,away:W.teamFor(W.opponentOf(w),null,w.programs[W.opponentOf(w)].lineup),seed:'career'});
+  CL.recordCareers(w.userLineup,g.players);assert.ok(CL.allPlayers(w.userLineup).every(p=>p.career.games===1));
+  while(!w.offseason)W.advanceWeek(w,pb,{won:true});
+  assert.equal(w.offseason.stage,'ready');
+  const o=W.startOffseason(w,pb,'You');
+  assert.equal(o.gone.length,seniors.length);assert.equal(CL.allPlayers(w.userLineup).length,22-seniors.length);
+  assert.ok(pb.ringOfHonor.some(r=>r.playerId===sr.id)&&!pb.signatures.some(s=>s.playerId===sr.id),'a graduating player\'s card retires');
+  assert.ok(young.ovr===before||true);const grown=CL.allPlayers(w.userLineup).find(p=>p.id===young.id);assert.ok(grown.ovr>before,'young players develop');
+  assert.equal(o.spots.length,seniors.length);assert.ok(o.spots.every(s=>s.prospects.length===3&&s.prospects[0].stars>=s.prospects[2].stars));
+  const res=W.finishOffseason(w,o.spots.map(()=>1));
+  assert.equal(CL.allPlayers(w.userLineup).length,22);assert.ok(res.signed.every(p=>p.year===1));
+  assert.equal(w.season,2);assert.deepEqual(w.userRecord,{w:0,l:0});assert.equal(w.history.length,1);
+  for(const p of Object.values(w.programs)){assert.equal(CL.allPlayers(p.lineup).length,22);assert.deepEqual(p.record,{w:0,l:0})}
+  // The new roster plays.
+  const g2=B.simulate({home:W.teamFor('aerial',pb,w.userLineup),away:Ro.preset('ground'),seed:'after'});assert.equal(g2.game.status,'final');
 });
 
 console.log(`\n${passed} passed, ${failures.length} failed`);

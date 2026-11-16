@@ -87,7 +87,7 @@ function breakouts(b,side){
 // The best breakout who doesn't already have a card.
 const COOLDOWN=3;
 function candidate(b,side,pb){
-  const games=(pb.record?.w||0)+(pb.record?.l||0);
+  const games=pb.gamesPlayed??((pb.record?.w||0)+(pb.record?.l||0));
   if(pb.lastSignatureGame!=null&&games-pb.lastSignatureGame<COOLDOWN)return null;
   const have=new Set((pb.signatures||[]).map(s=>s.playerId));
   return breakouts(b,side).find(t=>!have.has(t.p.id))||null;
@@ -95,7 +95,7 @@ function candidate(b,side,pb){
 function add(pb,spec,replaceIndex){
   pb.signatures??=[];
   if(pb.signatures.length>=SLOTS){if(replaceIndex==null)return{full:true};pb.signatures.splice(replaceIndex,1)}
-  pb.signatures.push(spec);register(spec);pb.lastSignatureGame=(pb.record?.w||0)+(pb.record?.l||0);(pb.history??=[]).push({id:spec.id,kind:'signature',side:spec.side});
+  pb.signatures.push(spec);register(spec);pb.lastSignatureGame=pb.gamesPlayed??((pb.record?.w||0)+(pb.record?.l||0));(pb.history??=[]).push({id:spec.id,kind:'signature',side:spec.side});
   return{full:false};
 }
 

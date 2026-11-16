@@ -1,7 +1,7 @@
 // Call Sheet vertical slice: one arcade battle screen + the post-game pack.
 (function(){
 'use strict';
-const {data:D,resolver:R,roster:Ro,battle:B,packs:P,evolution:EV,world:W,signatures:SG}=window.CallSheet;
+const {data:D,resolver:R,roster:Ro,battle:B,packs:P,evolution:EV,world:W,signatures:SG,classes:CL}=window.CallSheet;
 const FX=window.SliceFX,S=FX.sfx,PT=FX.particles,{card,esc,paintPortrait}=window.SliceCards;
 const $=s=>document.querySelector(s);
 const STORE='callsheet.slice.v1';
@@ -15,7 +15,9 @@ save.settings??={mode:'key',control:'offense',fast:false,sound:true};save.combos
 if(save.team&&!save.world)save.world=W.newWorld(save.team,`w${Date.now()%1e6}`);
 if(save.world&&!save.world.rival){save.world.rival=save.world.order[0];save.world.trophy={holder:save.world.rival,history:[]}}
 // Signature cards are generated per player, so they're re-registered on load.
-function registerSignatures(){SG.registerAll(save.playbook);if(save.world)for(const p of Object.values(save.world.programs))SG.registerAll(p.playbook)}
+// Saves from before rosters persisted get class years now.
+if(save.world&&!save.world.userLineup){save.world.userLineup=W.freshLineup(save.team);save.world.userRecord={w:0,l:0};save.world.history=[];for(const [id,p] of Object.entries(save.world.programs))p.lineup??=W.freshLineup(id)}
+function registerSignatures(){SG.registerAll(save.playbook);for(const r of save.playbook.ringOfHonor||[])SG.register(r);if(save.world)for(const p of Object.values(save.world.programs))SG.registerAll(p.playbook)}
 registerSignatures();
 
 // ================================================================ state
@@ -132,10 +134,11 @@ function renderBug(st=sitNow(),score=b.game.score){
 const sitNow=()=>({down:b.game.down,distance:b.game.distance,field:b.game.fieldPosition,period:b.game.period,clock:b.game.clock,possession:b.game.possession});
 function hotHTML(){
   const hot=[];for(const s of ['home','away'])for(const lu of ['off','def'])for(const p of Object.values(teamOf(s).lineup[lu]))if(b.fire[p.id])hot.push({p,s});
+  if(!hot.length)return'';
   return`<div class="box"><h3>On fire</h3>${hot.length?hot.map(({p,s})=>`<div class="hot"><span class="flame"></span>${esc(p.name)} <span class="mini">${esc(teamOf(s).short)} ${p.role}</span></div>`).join(''):'<div class="mini">Win every duel for three straight snaps to catch fire: +1 until you lose one.</div>'}</div>`;
 }
 const COMBOS=[{id:'establish',name:'Establish the Run',how:'Run, run, then PA Boot in one drive',reward:'Key +1 and +1 Command'},{id:'chain_gang',name:'Chain Gang',how:'Three first downs in one drive',reward:'+1 Command next series'}];
-function comboHTML(){return`<div class="box"><h3>Combo book</h3>${COMBOS.map(c=>{const f=save.combos.includes(c.id);return`<div class="combo ${f?'found':''}"><b>${f?esc(c.name):'? ? ?'}</b><br>${f?esc(c.how)+' · '+esc(c.reward):'Undiscovered'}</div>`}).join('')}</div>`}
+function comboHTML(){if(!save.combos.length)return'';return`<div class="box"><h3>Combo book</h3>${COMBOS.map(c=>{const f=save.combos.includes(c.id);return`<div class="combo ${f?'found':''}"><b>${f?esc(c.name):'? ? ?'}</b><br>${f?esc(c.how)+' · '+esc(c.reward):'Undiscovered'}</div>`}).join('')}</div>`}
 function readHTML(){
   if(!req||req.kind!=='snap')return'';
   if(!sel.play)return`<div class="box"><h3>The read</h3><div class="mini">Pick a play card. Drag it onto the field, or tap it and hit SNAP.</div></div>`;
@@ -155,9 +158,11 @@ function readHTML(){
 }
 function renderSide(){
   const pb=save.playbook;
-  $('#side').innerHTML=readHTML()+hotHTML()+comboHTML()+`<div class="box"><h3>Program</h3><div class="statline">RECORD <b>${pb.record.w}-${pb.record.l}</b> · PACKS <b>${pb.packsOpened}</b></div>
+  const ur=save.world.userRecord||pb.record;
+  $('#side').innerHTML=readHTML()+hotHTML()+comboHTML()+`<div class="box"><h3>Season ${save.world.season}</h3><div class="statline">RECORD <b>${ur.w}-${ur.l}</b> · WEEK <b>${save.world.week%save.world.order.length+1}</b> of ${save.world.order.length}</div>
    <div class="mini">vs ${esc(teamOf('away').name)} · ${esc(teamOf('away').coach.name)}</div>
-   <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><button class="tbtn" id="bFast">${save.settings.fast?'Speed: fast':'Speed: normal'}</button><button class="tbtn" id="bSound">${save.settings.sound?'Sound: on':'Sound: off'}</button><button class="tbtn" id="bSim">Sim to end</button></div></div>`;
+   <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><button class="tbtn" id="bHelp">How to play</button><button class="tbtn" id="bFast">${save.settings.fast?'Speed: fast':'Speed: normal'}</button><button class="tbtn" id="bSound">${save.settings.sound?'Sound: on':'Sound: off'}</button><button class="tbtn" id="bSim">Sim to end</button></div></div>`;
+  $('#bHelp').onclick=()=>howToPlay();
   $('#bFast').onclick=()=>{save.settings.fast=!save.settings.fast;FX.speed=save.settings.fast?.45:1;writeSave();renderSide()};
   $('#bSound').onclick=()=>{save.settings.sound=!save.settings.sound;S.on=save.settings.sound;writeSave();renderSide()};
   $('#bSim').onclick=()=>{if(busy)return;b.mode='sim';b.pending=null;FX.skipping=true;go(null)};
@@ -424,7 +429,8 @@ function fourthModal(){
 function finalScreen(){
   $('#hand').classList.add('away');$('#look').innerHTML='';renderBug();
   const won=b.game.score[b.user]>b.game.score[b.user==='home'?'away':'home'];
-  if(!b._recorded){b._recorded=true;b._breakout=SG.candidate(b,b.user,save.playbook);save.playbook.record[won?'w':'l']++;save.games++;b._gained=EV.recordReps(save.playbook,b.log,b.user);save.pending={won,userTendency:b.tend[b.user]};writeSave()}
+  if(!b._recorded){b._recorded=true;b._breakout=SG.candidate(b,b.user,save.playbook);save.playbook.record[won?'w':'l']++;save.games++;save.playbook.gamesPlayed=(save.playbook.gamesPlayed||0)+1;
+    CL.recordCareers(save.world.userLineup,b.players);const op=save.world.programs[oppId()];if(op?.lineup)CL.recordCareers(op.lineup,b.players);b._gained=EV.recordReps(save.playbook,b.log,b.user);save.pending={won,userTendency:b.tend[b.user]};writeSave()}
   const top=Object.values(b.players).filter(p=>p.side===b.user).sort((a,c)=>(c.passYds+c.rushYds*1.6+c.recYds*1.6+c.sacks*30+c.intDef*35)-(a.passYds+a.rushYds*1.6+a.recYds*1.6+a.sacks*30+a.intDef*35)).slice(0,3);
   const line=p=>[p.passAtt?`${p.comp}/${p.passAtt} · ${p.passYds} yds · ${p.passTD} TD`:'',p.rushAtt?`${p.rushAtt} car · ${p.rushYds} yds`:'',p.rec?`${p.rec} rec · ${p.recYds} yds`:'',p.sacks?`${p.sacks} sacks`:'',p.intDef?`${p.intDef} INT`:''].filter(Boolean).join(' · ');
   const m=$('#modal');
@@ -567,12 +573,102 @@ async function breakoutScreen(won){
   $('#boSkip').onclick=()=>{pb.lastSignatureGame=pb.record.w+pb.record.l;$('#boSlots').innerHTML='';done()};
 }
 
+// ================================================================ seasons, graduation, signing day
+const ROLE_NAME={QB:'Quarterback',RB:'Running back',X:'Receiver',Z:'Receiver',SLOT:'Slot receiver',TE:'Tight end',LT:'Tackle',RT:'Tackle',LG:'Guard',RG:'Guard',C:'Center',RUSH:'Edge rusher',SET:'Edge',NT:'D-tackle',DT3:'D-tackle',MIKE:'Linebacker',WILL:'Linebacker',FCB:'Corner',BCB:'Corner',NICKEL:'Nickel back',FS:'Safety',BOXS:'Safety'};
+const starStr=n=>'★'.repeat(n)+'☆'.repeat(5-n);
+// What a player changes on Saturday, in a few words: his archetype's card effect if it has one, otherwise
+// the plays whose duels he fights.
+function gameImpact(p){
+  const sg=D.SIGNATURES[p.archetype];if(sg)return sg.text;
+  const plays=Object.values(D.PLAYS).filter(pl=>!pl.signature&&!pl.evolvedFrom&&!pl.upgradeOf&&Object.values(pl.duels).some(d=>d.off.includes(p.role)||d.def.includes(p.role))).slice(0,3).map(pl=>pl.name);
+  const calls=['MIKE','WILL','RUSH','SET','NT','DT3','FCB','BCB','NICKEL','FS','BOXS'].includes(p.role)?Object.values(D.PLAYS).filter(pl=>!pl.signature&&!pl.evolvedFrom&&!pl.upgradeOf&&Object.values(pl.duels).some(d=>d.def.includes(p.role))).slice(0,3).map(pl=>pl.name):[];
+  const list=plays.length?plays:calls;return list.length?`Duels in ${list.join(', ')}`:'';
+}
+// The next game in one strip, with the kickoff button: no separate screen needed.
+function nextStrip(){
+  const oid=oppId(),sp=specOf(oid),wx=WX[weatherFor()],riv=W.isRivalry(save.world);
+  return`<div class="nextStrip ${riv?'riv':''}"><div><div class="mini">NEXT · WEEK ${save.world.week%save.world.order.length+1}${riv?' · RIVALRY':''}</div><div class="nsName" style="color:${sp.colors[0]}">${esc(sp.name)}</div><div class="mini">${esc(identity(sp))} · ${wx.icon} ${wx.label}</div></div><button class="btn go" id="nextG">KICKOFF</button></div>`;
+}
+function playerTile(p,colors,extra=''){
+  return`<div class="ptile"><canvas data-pid="${esc(p.id)}" width="72" height="72"></canvas><div class="ptName">${esc(p.name)}</div><div class="mini">${esc(ROLE_NAME[p.role]||p.role)} · <b>${CL.YEARS[p.year]||''}</b>${extra}</div></div>`;
+}
+function paintTiles(root,players,colors){for(const cv of root.querySelectorAll('canvas[data-pid]')){const p=players.find(x=>x.id===cv.dataset.pid);if(p)paintPortrait(cv,p,colors,72)}}
+// Season over: champion, then the senior send-off.
+async function seasonEndScreen(){
+  const me=specOf(save.team),o=W.startOffseason(save.world,save.playbook,me.name);writeSave();
+  const champYou=o.champion.id==='user',hist=save.world.history.at(-1),you=hist.rows.find(r=>r.id==='user');
+  const m=$('#modal');
+  m.innerHTML=`<div class="mwrap"><p class="statline">SEASON ${hist.season} COMPLETE · YOU WENT <b>${you.w}-${you.l}</b></p>
+    <p class="big ${champYou?'gold':''}" style="font-size:clamp(44px,9vw,110px)">${champYou?'CHAMPIONS!':esc(o.champion.name.toUpperCase())}</p>
+    ${champYou?'':'<p class="statline">WON THE LEAGUE</p>'}
+    <p class="statline" style="margin-top:22px">SENIOR SEND-OFF</p>
+    <div class="ptiles" id="seniors">${o.gone.map(g=>playerTile(g.player,me.colors,`<br>${esc(CL.careerLine(g.player))}${o.retired.some(r=>r.playerId===g.player.id)?'<br><span class="roh">★ RING OF HONOR</span>':''}`)).join('')||'<p class="mini">No seniors this year.</p>'}</div>
+    <p class="statline">Everyone else is a year older: <b>+${o.growth.toFixed(1)}</b> overall on average.</p>
+    <button class="btn go" id="toSign">SIGNING DAY · ${o.spots.length} SPOTS →</button></div>`;
+  m.classList.add('on');m.scrollTop=0;paintTiles(m,o.gone.map(g=>g.player),me.colors);
+  if(champYou){PT.confetti(260);S.fanfare();$('#rays').classList.add('on');setTimeout(()=>$('#rays').classList.remove('on'),2500)}else S.crowd(1.2,.3);
+  m.querySelectorAll('.ptile').forEach((t,i)=>FX.anim(t,[{opacity:0,transform:'translateY(30px)'},{opacity:1,transform:'none'}],{duration:350,delay:120*i}));
+  $('#toSign').onclick=()=>signingDayScreen();
+}
+// Signing Day: your class in one row, best recruit already in each spot. Tap a card to see the next option.
+function recruitCard(sp,j,colors){
+  const p=sp.prospects[j];
+  return`<span class="spotLab">${esc(ROLE_NAME[sp.role]||sp.role)}</span><canvas data-pid="${esc(p.id)}" width="56" height="56"></canvas><span class="rs">${starStr(p.stars)}</span><span class="rn">${esc(p.name)}</span><span class="mini">${esc(p.archetype)}</span><span class="rimp">${esc(gameImpact(p))}</span><span class="rcycle">${j+1} of ${sp.prospects.length} ↻</span>`;
+}
+function signingDayScreen(){
+  const o=save.world.offseason,me=specOf(save.team),m=$('#modal');
+  if(!o||o.stage!=='signing'){seasonEndScreen();return}
+  const picks=o.spots.map(()=>0);
+  m.innerHTML=`<div class="mwrap"><p class="big gold" style="font-size:clamp(40px,8vw,96px)">SIGNING DAY</p>
+    <p class="statline">Your class is ready. Tap a recruit to see another option.</p>
+    <div class="classRow" id="spots"></div><button class="btn go" id="signAll">SIGN THIS CLASS</button></div>`;
+  m.classList.add('on');m.scrollTop=0;
+  const box=$('#spots');
+  o.spots.forEach((sp,i)=>{
+    const el=document.createElement('button');el.className='recruit on';el.innerHTML=recruitCard(sp,0,me.colors);box.appendChild(el);paintTiles(el,sp.prospects,me.colors);
+    FX.anim(el,[{opacity:0,transform:'translateY(40px) rotate(-4deg)'},{opacity:1,transform:'none'}],{duration:380,delay:110*i,easing:'cubic-bezier(.2,1.4,.4,1)'});
+    el.onclick=async()=>{
+      if(el.dataset.locked)return;picks[i]=(picks[i]+1)%sp.prospects.length;S.whoosh();
+      await FX.anim(el,[{transform:'scaleX(1)'},{transform:'scaleX(0)'}],{duration:120,easing:'ease-in'});
+      el.innerHTML=recruitCard(sp,picks[i],me.colors);paintTiles(el,sp.prospects,me.colors);
+      FX.anim(el,[{transform:'scaleX(0)'},{transform:'none'}],{duration:180,easing:'cubic-bezier(.2,1.6,.4,1)'});
+    };
+  });
+  $('#signAll').onclick=async()=>{
+    $('#signAll').disabled=true;
+    for(const el of box.querySelectorAll('.recruit')){el.dataset.locked='1';el.insertAdjacentHTML('beforeend','<span class="signed">SIGNED</span>');S.clash();FX.shake(m,.5);const r=el.getBoundingClientRect();PT.burst(r.left+r.width/2,r.top+r.height/2,{n:30,colors:[me.colors[0],'#fff','#ffd84d']});await FX.wait(220)}
+    const res=W.finishOffseason(save.world,picks);writeSave();
+    S.fanfare();PT.confetti(160);
+    $('#signAll').remove();
+    m.querySelector('.mwrap').insertAdjacentHTML('beforeend',`<p class="statline" style="margin-top:12px">CLASS RATING <b class="gold">${starStr(Math.round(res.rating))}</b></p><button class="btn go" id="toS2">ON TO SEASON ${save.world.season} →</button>`);
+    $('#toS2').onclick=()=>scoutingReport();
+  };
+}
+function rosterView(){
+  const me=specOf(save.team),lu=save.world.userLineup,m=$('#modal');
+  const group=(lab,side)=>`<p class="statline" style="margin-top:14px">${lab}</p><div class="ptiles">${Object.values(lu[side]).map(p=>playerTile(p,me.colors,` · ${p.ovr}${p.year===4?' · <span class="roh">final year</span>':''}`)).join('')}</div>`;
+  m.innerHTML=`<div class="mwrap"><p class="big gold" style="font-size:clamp(36px,6vw,72px)">ROSTER</p><p class="statline">${CL.allPlayers(lu).filter(p=>p.year===4).length} seniors leave after this season.</p>
+    ${group('OFFENSE','off')}${group('DEFENSE','def')}<button class="btn go" id="back">BACK</button></div>`;
+  m.classList.add('on');m.scrollTop=0;paintTiles(m,CL.allPlayers(lu),me.colors);$('#back').onclick=title;
+}
+// Three steps, shown once (and from the side panel any time).
+function howToPlay(then){
+  const m=$('#modal');
+  m.innerHTML=`<div class="mwrap"><p class="big gold" style="font-size:clamp(40px,7vw,80px)">HOW TO PLAY</p>
+    <div class="howto"><div><b>1</b><span class="hi">🃏</span>Pick a play card</div><div><b>2</b><span class="hi">🪙</span>Add tactics with your coins</div><div><b>3</b><span class="hi">⚔️</span>Win the duels, gain yards</div></div>
+    <p class="statline">Green chips = good odds. Red = risky. A new first down refills your hand.</p>
+    <button class="btn go" id="gotIt">GOT IT</button></div>`;
+  m.classList.add('on');
+  $('#gotIt').onclick=()=>{save.seenHelp=true;writeSave();m.classList.remove('on');if(then)then()};
+}
+
 // ================================================================ title, league and playbooks
 const identity=s=>{const pr=s.passRate??.5;return`${pr<=.42?'Run-heavy':pr>=.56?'Air raid':'Balanced'} · ${(s.discipline??4)<=3?'aggressive':(s.discipline??4)>=5?'disciplined':'steady'} defense`};
-function standingsHTML(){
+function standingsHTML(compact){
   if(!save.world)return'';
-  const rows=W.standings(save.world,save.playbook,specOf(save.team).name);
-  return`<table class="stand"><tr><th></th><th>Program</th><th>W-L</th><th>Notable</th></tr>${rows.map((r,i)=>`<tr class="${r.you?'you':''}" ${r.you?'':`data-prog="${r.id}"`}><td>${i+1}</td><td><b>${esc(r.name)}</b>${r.you?' <span class="mini">(you)</span>':''}</td><td>${r.w}-${r.l}</td><td class="mini">${r.legendaries.map(id=>`<span class="leg">★ ${esc(P.cardDef(id).name)}</span>`).join(' ')} ${r.evolved.length?`${r.evolved.length} evolved`:''}</td></tr>`).join('')}</table>`;
+  const all=W.standings(save.world,save.playbook,specOf(save.team).name);
+  const rows=compact?all.filter((r,i)=>i<4||r.you):all;
+  return`<table class="stand"><tr><th></th><th>Program</th><th>W-L</th><th>Notable</th></tr>${rows.map(r=>`<tr class="${r.you?'you':''}" ${r.you?'':`data-prog="${r.id}"`}><td>${all.indexOf(r)+1}</td><td><b>${esc(r.name)}</b>${r.you?' <span class="mini">(you)</span>':''}</td><td>${r.w}-${r.l}</td><td class="mini">${r.legendaries.map(id=>`<span class="leg">★ ${esc(P.cardDef(id).name)}</span>`).join(' ')} ${r.evolved.length?`${r.evolved.length} evolved`:''}</td></tr>`).join('')}</table>`;
 }
 function title(){
   const m=$('#modal'),pb=save.playbook,st=save.settings;
@@ -583,13 +679,14 @@ function title(){
       :`<div class="box" style="text-align:left;margin:14px auto;max-width:720px"><h3>The league</h3>${standingsHTML()}<div class="mini" style="margin-top:6px">Tap a program to scout its playbook. AI programs open packs, cut cards and evolve plays every week too.</div></div>`}
     <div class="opts">${opt('mode','key','Key moments')}${opt('mode','snap','Every snap')}</div>
     <div class="opts">${opt('control','offense','Coach offense')}${opt('control','both','Coach both sides')}</div>
-    <div>${save.team?`<button class="btn go" id="play">PLAY · vs ${esc(specOf(oppId()).name)}</button><button class="btn" id="pbv">YOUR PLAYBOOK</button><button class="btn" id="reset">NEW DYNASTY</button>`:''}</div>
+    <div>${save.team?`<button class="btn go" id="play">${save.world?.offseason?'SEASON FINALE →':`PLAY · vs ${esc(specOf(oppId()).name)}`}</button><button class="btn" id="rost">ROSTER</button><button class="btn" id="pbv">PLAYBOOK</button><button class="btn" id="reset">NEW DYNASTY</button>`:''}</div>
     <p class="mini" style="margin-top:14px">Progress stays in this browser only.</p></div>`;
   m.classList.add('on');
   m.querySelectorAll('[data-team]').forEach(el=>el.onclick=()=>{S.init();save.team=el.dataset.team;save.playbook=P.newPlaybook();save.combos=[];save.games=0;save.world=W.newWorld(save.team,`w${Date.now()%1e6}`);writeSave();S.chime();title()});
   m.querySelectorAll('[data-prog]').forEach(el=>el.onclick=()=>{S.tick(6);playbookView(save.world.programs[el.dataset.prog].playbook,specOf(el.dataset.prog).name,el.dataset.prog)});
   m.querySelectorAll('[data-k]').forEach(el=>el.onclick=()=>{st[el.dataset.k]=el.dataset.v;writeSave();S.tick(5);title()});
-  const p=$('#play');if(p)p.onclick=()=>{S.init();scoutingReport()};
+  const p=$('#play');if(p)p.onclick=()=>{S.init();if(save.world.offseason?.stage==='signing')signingDayScreen();else if(save.world.offseason)seasonEndScreen();else scoutingReport()};
+  const ro=$('#rost');if(ro)ro.onclick=rosterView;
   const v=$('#pbv');if(v)v.onclick=()=>playbookView(save.playbook,'Your playbook',null);
   const r=$('#reset');if(r)r.onclick=()=>{if(r.dataset.armed!=='1'){r.dataset.armed='1';r.textContent='TAP AGAIN: ERASE THIS DYNASTY';r.style.borderColor='var(--lose)';S.error();return}save={team:null,playbook:P.newPlaybook(),settings:st,combos:[],games:0};writeSave();title()};
 }
@@ -601,6 +698,7 @@ function playbookView(pb,name,progId){
     ${spec?`<p class="statline">${esc(identity(spec))} · coordinator ${esc(spec.coach)} · record <b>${save.world.programs[progId].record.w}-${save.world.programs[progId].record.l}</b></p>`:''}
     ${group('OFFENSE · CALL SHEET',pb.off.base)}${group(`OFFENSE · PLAY PILE (max ${pb.capacity.wrinkles})`,pb.off.wrinkles)}${group(`OFFENSE · TACTICS (max ${pb.capacity.tactics})`,pb.off.tactics)}
     ${(pb.signatures||[]).length?group(`SIGNATURE CARDS (max ${SG.SLOTS})`,pb.signatures.map(s=>s.id)):''}
+    ${(pb.ringOfHonor||[]).length?group('RING OF HONOR · retired with their players',pb.ringOfHonor.map(s=>s.id)):''}
     ${group('DEFENSE · CALL SHEET',pb.def.base)}${group(`DEFENSE · CALL PILE (max ${pb.capacity.wrinkles})`,pb.def.wrinkles)}${group(`DEFENSE · TACTICS (max ${pb.capacity.tactics})`,pb.def.tactics)}
     <button class="btn go" id="back">BACK</button></div>`;
   m.querySelectorAll('[data-c]').forEach(w=>w.appendChild(card(w.dataset.c,{small:true,mastery:progId?null:EV.progress(pb,w.dataset.c)})));
@@ -623,7 +721,7 @@ function scoutingReport(){
   const g=$('#watch');
   for(const id of uniq){const w=document.createElement('div');w.appendChild(card(id,{small:true}));g.appendChild(w);FX.anim(w,[{opacity:0,transform:'translateY(30px) scale(.8)'},{opacity:1,transform:'none'}],{duration:350,delay:120*g.children.length,easing:'cubic-bezier(.2,1.4,.4,1)'})}
   m.classList.add('on');
-  $('#kick').onclick=()=>{m.classList.remove('on');S.whistle();startGame()};
+  $('#kick').onclick=()=>{m.classList.remove('on');S.whistle();if(!save.seenHelp)howToPlay(startGame);else startGame()};
   $('#back').onclick=title;
 }
 // A card has enough reps: pick its future.
@@ -663,25 +761,25 @@ function leagueScreen(){
     ${news.some(n=>n.type==='trophy')?`<p class="statline" style="color:var(--gold)">${esc(trophyName())} CHANGES HANDS</p>`:''}
     ${news.some(n=>n.type==='season')?`<p class="statline" style="color:var(--gold)">A NEW SEASON BEGINS · SEASON ${save.world.season}</p>`:''}
     <div class="news" id="news"></div>
-    <div class="box" style="text-align:left;margin:14px auto;max-width:720px"><h3>Standings</h3>${standingsHTML()}</div>
-    <button class="btn go" id="nextG">NEXT · vs ${esc(specOf(oppId()).name)}</button><button class="btn" id="toTitle">PROGRAM</button></div>`;
+    <div>${save.world.offseason?`<button class="btn go" id="nextG">SEASON FINALE →</button>`:nextStrip()}<button class="btn" id="toTitle">PROGRAM</button></div>
+    <div class="box" style="text-align:left;margin:14px auto;max-width:720px"><h3>Standings</h3>${standingsHTML(true)}</div></div>`;
   m.classList.add('on');
   const g=$('#news');
   const items=[...pulls.sort((a,c)=>({legendary:0,rare:1,common:2}[a.rarity]-{legendary:0,rare:1,common:2}[c.rarity])).map(n=>({id:n.card,txt:`${name(n.program)} pulled`,leg:n.rarity==='legendary'})),...evos.map(n=>({id:n.to,txt:`${name(n.program)} evolved ${P.cardDef(n.from).name} into`})),...news.filter(n=>n.type==='signature').map(n=>({id:n.card,txt:`${name(n.program)}: ${n.player} broke out`,leg:true}))];
-  items.slice(0,8).forEach((it,i)=>{
+  items.slice(0,5).forEach((it,i)=>{
     const w=document.createElement('div');w.className=`nitem ${it.leg?'legpull':''}`;w.innerHTML=`<div class="ntxt">${esc(it.txt)}</div>`;w.appendChild(card(it.id,{small:true}));g.appendChild(w);
     FX.anim(w,[{opacity:0,transform:'translateY(40px) rotate(-6deg)'},{opacity:1,transform:'none'}],{duration:380,delay:140*i,easing:'cubic-bezier(.2,1.4,.4,1)'});
     if(it.leg)setTimeout(()=>{S.groan();FX.shake(m,1)},140*i+300);
   });
   if(!items.length)g.innerHTML='<p class="mini">A quiet week around the league.</p>';
-  $('#nextG').onclick=()=>scoutingReport();
+  $('#nextG').onclick=()=>{if(save.world.offseason)seasonEndScreen();else{$('#modal').classList.remove('on');S.whistle();startGame()}};
   $('#toTitle').onclick=title;
   m.querySelectorAll('[data-prog]').forEach(el=>el.onclick=()=>playbookView(save.world.programs[el.dataset.prog].playbook,specOf(el.dataset.prog).name,el.dataset.prog));
 }
 
 // ================================================================ start
 function startGame(){
-  const oid=oppId(),me=W.teamFor(save.team,save.playbook),opp=W.teamFor(oid,save.world.programs[oid].playbook);
+  const oid=oppId(),me=W.teamFor(save.team,save.playbook,save.world.userLineup),opp=W.teamFor(oid,save.world.programs[oid].playbook,save.world.programs[oid].lineup);
   b=B.create({home:me,away:opp,user:'home',mode:save.settings.mode,control:save.settings.control,seed:`slice:${save.team}:${save.games}`,weather:weatherFor(),rivalry:W.isRivalry(save.world)});
   setWeather(b.weather);
   seen=0;sel={play:null,tac:[]};err='';lastLook={};b._lastScore={home:0,away:0};
@@ -694,6 +792,6 @@ $('#stage').addEventListener('click',()=>{if(busy&&$('#skip').classList.contains
 FX.speed=save.settings.fast?.45:1;S.on=save.settings.sound!==false;
 PT.mount($('#fx'));
 // Test hook: lets automated checks drive the slice without pixel hunting.
-window.__slice={get b(){return b},get req(){return req},get busy(){return busy},save:()=>save,go,startGame,title,evolutionScreen,leagueScreen,breakoutScreen,setWeather,scoutingReport};
+window.__slice={seasonEndScreen,signingDayScreen,rosterView,howToPlay,get b(){return b},get req(){return req},get busy(){return busy},save:()=>save,go,startGame,title,evolutionScreen,leagueScreen,breakoutScreen,setWeather,scoutingReport};
 title();
 })();
