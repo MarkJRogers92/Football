@@ -21,7 +21,7 @@ globalThis.DynastyCeremonySnapshot=Object.freeze({
     out.push({key:`${year}:signing`,kind:'signing',year,team,count:signed.length,stars:[5,4,3].map(n=>signed.filter(r=>(r.stars||0)===n).length),top:signed.slice(0,5).map(r=>({id:r.id,name:r.name,pos:r.pos,stars:r.stars||0,rank:r.rank||null}))});
    }
    const picks=(universe.draftHistory?.[year]||[]).filter(d=>d.school===u.name&&d.status==='Drafted').sort((a,b)=>(a.round-b.round)||(a.pick-b.pick));
-   if(picks.length)out.push({key:`${year}:draft`,kind:'draft',year,team,picks:picks.slice(0,8).map(d=>({playerId:d.playerId,name:d.playerName,pos:d.pos,round:d.round,pick:d.pick,label:d.label}))});
+   if(picks.length)out.push({key:`${year}:draft`,kind:'draft',year,team,picks:picks.slice(0,8).map(d=>({playerId:d.playerId,name:d.playerName,pos:d.pos,round:d.round,pick:d.pick,label:d.potw>=2&&globalThis.DynastyPlayersOfWeek?`${d.label} · ${globalThis.DynastyPlayersOfWeek.honourLabel(d.potw)}`:d.label}))});
    const nfl=globalThis.DynastyNfl;
    if(nfl&&universe.phase==='complete'){
     const seen=new Set(),alumni=[];

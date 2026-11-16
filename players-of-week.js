@@ -4,6 +4,10 @@
 //
 // The score reads only the game's own statistics (a small bonus for winning), never ratings. State:
 // universe.weeklyHonors {year, rows:[{week, off, def}]}, this season only (about 2 KB), cleared when a new season starts.
+//
+// v0.37 — the honour counts for more than a week. This season's honours lift a player in the award race (seasonScore),
+// his career count (p.potw, one small integer, carried into the archive and onto his draft record) lifts his draft
+// stock a little, and a player honoured twice or more is introduced that way on Draft Night and in the Hall of Fame.
 function makePlayersOfWeek(env){
  'use strict';
  const universe=()=>env.getUniverse();
@@ -50,8 +54,23 @@ function makePlayersOfWeek(env){
   const row={week,off,def};s.rows.push(row);return row;
  }
  function last(){return state().rows.at(-1)||null}
- function countFor(playerId){return state().rows.reduce((k,r)=>k+(r.off?.playerId===playerId?1:0)+(r.def?.playerId===playerId?1:0),0)}
- return{score,line,pick,award,last,countFor,state};
+ // This season's honours by player, rebuilt only when a week is added (seasonScore reads it for every player).
+ let counts={key:null,map:new Map()};
+ function seasonCounts(){
+  const s=state(),key=`${s.year}:${s.rows.length}`;
+  if(counts.key!==key){const map=new Map();for(const r of s.rows)for(const w of [r.off,r.def])if(w)map.set(String(w.playerId),(map.get(String(w.playerId))||0)+1);counts={key,map}}
+  return counts.map;
+ }
+ function countFor(playerId){return seasonCounts().get(String(playerId))||0}
+ // Award race: each honour this season is worth about one strong game in seasonScore, up to four of them.
+ const AWARD_BONUS=2.5,AWARD_MAX=4;
+ function awardBonus(playerId){return Math.min(AWARD_MAX,countFor(playerId))*AWARD_BONUS}
+ // Draft: scouts notice a player the country kept naming. Worth well under a round (a round is 3-4 board points).
+ const DRAFT_STEP=.6,DRAFT_MAX=2;
+ function draftBump(career){return Math.round(Math.min(DRAFT_MAX,Math.max(0,Number(career)||0)*DRAFT_STEP)*10)/10}
+ const WORDS=['','','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten'];
+ function honourLabel(k){k=Number(k)||0;if(k<1)return'';if(k===1)return'Player of the Week';return`${WORDS[k]||k}-time Player of the Week`}
+ return{score,line,pick,award,last,countFor,seasonCounts,awardBonus,draftBump,honourLabel,AWARD_BONUS,AWARD_MAX,DRAFT_STEP,DRAFT_MAX,state};
 }
 
 if(typeof module==='object'&&module.exports){
@@ -70,12 +89,35 @@ if(typeof module==='object'&&module.exports){
   }
  }
  potw.announce=announcePlayersOfWeek;
+ // A player's career count lives on the player, so it survives the season, the archive and the draft.
+ function creditCareer(row){for(const w of [row?.off,row?.def]){if(!w)continue;const f=findPlayer(w.playerId);if(f?.p)f.p.potw=(f.p.potw||0)+1}}
+ potw.creditCareer=creditCareer;
  const simWeekBeforePotw=simWeek;
  simWeek=function simWeekWithPlayersOfWeek(){
   const week=universe?.week,out=simWeekBeforePotw.apply(this,arguments);
-  try{if(universe&&week!=null&&universe.week===week+1)announcePlayersOfWeek(potw.award(week+1))}catch(err){console.error(err)}
+  try{if(universe&&week!=null&&universe.week===week+1){const row=potw.award(week+1);if(row){creditCareer(row);announcePlayersOfWeek(row)}}}catch(err){console.error(err)}
   return out;
  };
+ // The award race and the season's awards read seasonScore.
+ const seasonScoreBeforePotw=seasonScore;
+ seasonScore=function seasonScoreWithPlayersOfWeek(p,t){const base=seasonScoreBeforePotw.apply(this,arguments);return p?.id!=null?base+potw.awardBonus(p.id):base};
+ // The draft board: a small lift for a career of weekly honours, recomputing the round on the same thresholds.
+ const draftProjectionBeforePotw=draftProjection;
+ draftProjection=function draftProjectionWithPlayersOfWeek(p,t){
+  const d=draftProjectionBeforePotw.apply(this,arguments),bump=potw.draftBump(p?.potw);
+  if(!d||!bump)return d;
+  const nfl=globalThis.DynastyNfl,raw=d.grade!=null&&d.positionValue!=null&&nfl?d.grade+d.positionValue*.8:d.score;
+  const score=raw+bump,round=nfl?nfl.roundFor(score):d.round;
+  const pick=round?(d.pick??(nfl?1+nfl.hash(p.id,'pick')%32:16)):null;
+  return{...d,score:Math.round(score),round,pick,label:round?`Projected round ${round}`:d.label,potwBump:bump};
+ };
+ const draftPlayerBeforePotw=draftPlayer;
+ draftPlayer=function draftPlayerWithPlayersOfWeek(p){const r=draftPlayerBeforePotw.apply(this,arguments);if(r&&p?.potw)r.potw=p.potw;return r};
+ const archiveRecordBeforePotw=archiveRecord;
+ archiveRecord=function archiveRecordWithPlayersOfWeek(p){const out=archiveRecordBeforePotw.apply(this,arguments);if(out&&p?.potw)out.potw=p.potw;return out};
+ // Hall of Fame: twice honoured or more is part of the case.
+ const hofReasonsBeforePotw=hofPlayerReasons;
+ hofPlayerReasons=function hofReasonsWithPlayersOfWeek(p){const reasons=hofReasonsBeforePotw.apply(this,arguments);if((p?.potw||0)>=2){const at=Math.min(reasons.length,2);reasons.splice(at,0,potw.honourLabel(p.potw))}return reasons.slice(0,4)};
  function renderPlayersOfWeek(){
   const host=$('#weeklyDecisions');if(!host?.insertAdjacentElement)return;
   let card=$('#playersOfWeek');const row=universe?.teams&&universe.phase==='regular'?potw.last():null,me=row?selected():null;
