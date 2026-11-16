@@ -1,6 +1,6 @@
 # Dynasty Lab: Call Sheet (experimental fork)
 
-**Status:** design only. Nothing in this folder is loaded by the build, the tests or the shipped game.
+**Status:** rules engine and playable sandbox (rules v0.2). Nothing in this folder is loaded by the build, the tests or the shipped game.
 `tools/build.js` injects modules from a fixed list, so files here can't leak into Dynasty Lab.
 
 **Working title:** *Call Sheet*. It's named after the laminated play sheet a coordinator holds on the sideline,
@@ -27,13 +27,29 @@ When a prototype is authorized, the recommended order is:
 | File | Contents |
 | --- | --- |
 | `DESIGN.md` | The review of the 2026-11-15 handoff, in the order its Section 18 requested, plus the unified game concept |
-| `README.md` | This file: fork strategy and the reuse map |
+| `README.md` | This file: fork strategy, how to run, and the reuse map |
+| `core/` | Rules engine (data, resolver, battle, rosters), plain JS, runs in Node and the browser |
+| `sandbox/index.html` | Playable battle page. Open it straight from disk; it loads `rng.js` and `game-engine-v2.js` from the repo root |
+| `tests/battle.test.js` | Rules tests |
+| `tools/sim-report.js` | Calibration, play variety and pacing report; `tools/latest-report.txt` is the last run |
+
+## Run it
+
+```bash
+node forks/call-sheet/tests/battle.test.js
+```
+
+```bash
+node forks/call-sheet/tools/sim-report.js 200
+```
+
+Then open `forks/call-sheet/sandbox/index.html` in a browser. No build step and no server needed.
 
 ## Reuse map (verified by reading source on 2026-11-16, v0.36.0)
 
 | Existing system | File(s) | Use in Call Sheet | Verified? |
 | --- | --- | --- | --- |
-| Game state machine: downs, clock, scoring, kicks, punts with returns, penalties, OT, two-point shootout | `game-engine-v2.js` | Keep as the referee. The card resolver produces an `outcome` object and hands it to `applyScrimmage` | Yes. `step()` already separates `generateOutcome()` from `applyScrimmage()` (`game-engine-v2.js:350-355`) |
+| Game state machine: downs, clock, scoring, kicks, punts with returns, penalties, OT, two-point shootout | `game-engine-v2.js` | **In use.** The card resolver produces an `outcome` and calls the exported `applyScrimmage`, `punt`, `attemptFieldGoal` and `step` (overtime) | Yes. It runs in the sandbox with `validateGame` passing in every simulated game |
 | Snap outcome generation | `generateOutcome()` in `game-engine-v2.js` | **Replace for user-played games.** It uses one team rating, a random pass/run flip (53%) and a Gaussian. No plays, players or assignments exist in it | Yes, read directly |
 | Deterministic RNG with snapshots | `rng.js`, `state.rng` | Pile order, draws and duel rolls stored the same way, so save/resume can't reroll a hand | Pattern verified; card use is new |
 | Weather and stadium effects | `game-conditions.js` | Feed duel modifiers (wind → deep duels, rain → ball security) | Yes |
@@ -46,6 +62,5 @@ When a prototype is authorized, the recommended order is:
 | Portrait renderer | `portraits/renderer-v1.js` | Card face art, already deterministic per player | Exists |
 | Game Day transaction/record back into the season | `game-engine-v2-transaction.js`, `-record-*.js` | Write the battle result back exactly as a coached game does today | Exists; the fit needs verifying when building |
 
-**Must verify before building:** whether `applyScrimmage` and the kick functions can be exported without changing
-base-game behavior; how live-game save/resume serializes a session (`game-engine-v2-gameday.js`); and whether the
+**Must verify before the dynasty adapter:** (`applyScrimmage` and the kick functions turned out to be exported already, so nothing in the base game changed): how live-game save/resume serializes a session (`game-engine-v2-gameday.js`); and whether the
 record path assumes `generateOutcome`'s pass/run split anywhere.

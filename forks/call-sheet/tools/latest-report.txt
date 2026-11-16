@@ -1,0 +1,48 @@
+Call Sheet sim report — 160 games (engine errors: 0, OT rate 1.3%)
+
+Realism (per team per game)      value    band
+  points                            28.1   24–33  ok
+  plays                             71.8   63–76  ok
+  yardsPerPlay                       6.2   5.2–6.4  ok
+  rushAtt                           31.7   28–40  ok
+  rushAttNcaa                       33.7   30–42  ok
+  yardsPerCarry                      4.7   3.9–5  ok
+  passAtt                           38.1   27–38  HIGH
+  compPct                          0.645   0.58–0.67  ok
+  yardsPerAtt                        8.2   6.6–8.2  HIGH
+  sacks                              2.0   1.6–3  ok
+  ints                             0.800   0.6–1.1  ok
+  fumblesLost                      0.487   0.3–0.8  ok
+  thirdPct                         0.372   0.36–0.45  ok
+  punts                              5.8   3.5–5.5  HIGH
+  penalties                          5.5   5–7.5  ok
+  explosives                         6.0   4–8  ok
+  sack rate per dropback          5.1%
+
+Play share
+  outside_zone     13.9%
+  pa_boot          13.3%
+  screen           11.0%
+  power            10.3%
+  inside_zone      10.0%
+  quick_slant      9.8%
+  deep_cross       9.7%
+  stick            8.2%
+  read_option      7.6%
+  vertical_shot    6.2%
+
+Top lines (play + tactics)
+  screen                                   9.0%
+  inside_zone                              8.2%
+  outside_zone                             7.7%
+  power                                    7.0%
+  quick_slant                              6.9%
+  outside_zone+seal_block                  6.2%
+  stick                                    5.9%
+  pa_boot                                  5.4%
+
+Pacing (person on one side; coordinator answers)   stops  live  plans  4th  ~minutes
+  snap                                         162   152      0   10       59
+  series                                       116    53     55    8       32
+  key                                           62    54      0    8       21
+  sim                                            0     0      0    0        0

@@ -528,3 +528,74 @@ attended.
 The central test from the handoff still holds: **does building the program give you interesting things to do on
 Saturday, and does Saturday make you care about the next recruiting decision?** The duel system, archetype
 signatures and the Lean cycle are this design's answer. The sandbox in §7 is how we find out whether it's right.
+
+---
+
+## 11. Rules v0.2: what's built (2026-11-16)
+
+Mark's answers to §8 changed three things:
+
+1. **Synergy *and* luck.** Plays now come from two sources. The **base sheet** has 4 always-available
+   identity plays, so you're never stuck without a basic call. The **wrinkle row** holds 3 plays drawn from a
+   12-card play pile: Deep Cross, PA Boot, Screen, Power, Vertical Shot, Read Option. The luck is whether you're
+   holding PA Boot when their linebackers start cheating. The tactic hand (4 drawn) works as before.
+2. **A hand is a series.** At every new set of downs you get a fresh hand and **5 Command for the whole series**.
+   Moving the chains refills the hand, which makes it the reward. The real sequencing decision is *spend on early
+   downs to stay ahead of the sticks, or save Command for 3rd down*. Retention across snaps is gone; the series
+   is the unit.
+3. **Draft mode is a test tool only.** `roster.dealDraft()` exists, but there's no screen for it yet.
+
+### The control dial (all modes play identical rules, so stats agree)
+
+| Mode | What you do | Stops per game* | Est. time* |
+| --- | --- | --- | --- |
+| Every snap | Call every snap, offense and defense | ~160 | ~59 min |
+| **Series** | Script 1st and 2nd down at each new set of downs (or hand them to the coordinator); call 3rd/4th down, the red zone and the last 2:00 live | ~115 | ~32 min |
+| **Key moments** | The coordinator plays routine downs *with your cards*; you take 3rd/4th down, red zone, last 2:00 | ~62 | ~21 min |
+| Sim | Watch or skip | 0 | instant |
+
+\*Measured by `tools/sim-report.js` with the person coaching both sides; times assume about 20 s per live call,
+12 s per series plan and 3 s of animation. **Coaching offense only cuts stops by about 40%** (key moments: 61 →
+37 stops), and defense only by about 58% (→ 26). The middle ground Mark asked for probably isn't one mode. It's
+*Key moments + offense only* (around 15 minutes) for routine weeks, and *Series, both sides* for rivalry games.
+The playtest needs to confirm this.
+
+**Honest finding:** Series mode doesn't save as much time as hoped, because it asks for a plan at every new set
+of downs on *both* sides. A quick fix to test: offer the series plan only on offense, and let the defensive
+coordinator plan early downs unless you open the defense card.
+
+### Implemented and verified
+
+- `core/data.js`: 10 offensive plays, 10 defensive calls, 12 tactics, 31 archetype signatures, plus the
+  archetype tables copied from Dynasty Lab.
+- `core/resolver.js`: three duels per play. Every modifier carries a visible source; the same function drives the
+  AI, the pre-snap chips and the real roll.
+- `core/battle.js`: series hands and Command, the Look (Confirmed is never false), Tendency → Lean → punish →
+  reset, coordinator AI for both sides, fourth downs, penalties, overtime, a box score, deterministic save/resume.
+  **Game Engine 2 is the referee, called through its exported API. The base game is unmodified.**
+- `core/roster.js`: four contrasting presets built from real archetypes.
+- `sandbox/index.html`: a playable page with scoreboard, field strip, Look tiles, a call sheet with chalk diagrams,
+  a tactic hand, Command pips, a duel projection with modifier sources, a series planner, fourth-down choices, the
+  three-duel result cascade, a game log and a final box score with standouts. Works at phone width; honors
+  reduced motion.
+- `tests/battle.test.js`: 11 tests (determinism, save/resume, Command limits, honest Looks, the Lean cycle,
+  *a QB swap changes the best line*, signatures, series scripting, hand refill, card conservation).
+
+### Calibration (160 coordinator-vs-coordinator games, `tools/latest-report.txt`)
+
+Per team per game: 28.1 points · 71.8 plays · 6.2 yds/play · 31.7 rushes at 4.7 · 38.1 passes, 64.5% complete,
+8.2 yds/att · 2.0 sacks · 0.8 INT · 0.49 fumbles lost · 37% on 3rd down · 6.0 explosive plays · 5.5 penalties.
+Every value is inside or at the edge of FBS-style bands. Punts run slightly high (5.8). No single play exceeds 14%
+of calls, and no play-plus-tactic line exceeds 9%. Engine validation passed in every game.
+
+### Next steps, in order
+
+1. **Play it.** Mark plays 3–5 games in each dial setting and notes where he gets bored or confused. That's the
+   real test from §7.
+2. Offense-only series plans (above); a **"why" overlay** on the result cascade (tap a duel to see its modifiers).
+3. **Solver bot:** list every legal line in seeded situations per preset to measure "roster changes best line"
+   (target ≥ 40%).
+4. Clock management (hurry-up / bleed as persistent controls), and user two-point decisions (Engine 2 currently
+   auto-kicks).
+5. A Dynasty Lab adapter: read real rosters (`ROLE_DEFS` depth → lineup roles, real traits and archetypes) and
+   write the box score back through the Game Day record path. This is the step that becomes the real fork.

@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Call Sheet Sandbox</title>
+<style>
+@font-face{font-family:'Barlow Condensed';font-weight:600;src:url('../../../assets/fonts/barlow-condensed-600.woff2') format('woff2')}
+@font-face{font-family:'Barlow Condensed';font-weight:800;src:url('../../../assets/fonts/barlow-condensed-800.woff2') format('woff2')}
+:root{--bg:#0d1118;--panel:#161c27;--panel2:#1d2533;--ink:#efe6d2;--muted:#9a9384;--brass:#c9a227;--brass2:#e5c766;--line:#2b3446;
+  --run:#6fae5a;--quick:#4fa3c7;--deep:#b07ad6;--constraint:#e08a3c;--zone:#4fa3c7;--man:#d9564c;--pressure:#e08a3c;
+  --win:#7fc46a;--lose:#e0645a;--even:#c9a227;--chalk:rgba(239,230,210,.82);--field:#122016}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,Segoe UI,sans-serif}
+h1,h2,h3,.cond{font-family:'Barlow Condensed',system-ui,sans-serif;letter-spacing:.02em}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:1180px;margin:0 auto;padding:12px 16px 40px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{font-family:'Barlow Condensed';font-weight:800;font-size:22px;color:var(--brass2);letter-spacing:.06em;text-transform:uppercase}
+.brand small{color:var(--muted);font-weight:600;font-size:13px;letter-spacing:.04em;margin-left:8px}
+.btn{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 14px;min-height:40px}
+.btn:hover{border-color:var(--brass)}
+.btn.primary{background:linear-gradient(180deg,#d8b440,#a8841c);color:#17120a;border-color:#e5c766;font-weight:700}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+.muted{color:var(--muted)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+/* Scoreboard */
+.board{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin:10px 0}
+.team{display:flex;align-items:center;gap:10px}
+.team.right{justify-content:flex-end;text-align:right}
+.swatch{width:12px;height:38px;border-radius:3px}
+.tname{font-family:'Barlow Condensed';font-weight:800;font-size:20px;line-height:1.1}
+.score{font-family:'Barlow Condensed';font-weight:800;font-size:40px;color:var(--brass2);min-width:48px;text-align:center}
+.ball{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--brass2);margin:0 6px;vertical-align:middle}
+.mid{text-align:center}
+.clock{font-family:'Barlow Condensed';font-weight:800;font-size:22px}
+.dd{font-family:'Barlow Condensed';font-weight:600;font-size:17px;color:var(--brass2)}
+/* Field strip */
+.field{position:relative;height:44px;border-radius:8px;background:repeating-linear-gradient(90deg,var(--field) 0 9.9%,rgba(239,230,210,.18) 9.9% 10%);border:1px solid var(--line);margin-bottom:10px;overflow:hidden}
+.ez{position:absolute;top:0;bottom:0;width:6%;background:rgba(201,162,39,.12)}
+.marker{position:absolute;top:6px;bottom:6px;width:4px;margin-left:-2px;background:var(--brass2);border-radius:2px;transition:left .5s}
+.togain{position:absolute;top:0;bottom:0;width:2px;background:#f2d34c;opacity:.8;transition:left .5s}
+/* Layout */
+.grid{display:grid;grid-template-columns:1.55fr 1fr;gap:12px}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+.label{font-family:'Barlow Condensed';font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:13px;color:var(--muted);margin:8px 0 6px}
+/* Look tiles */
+.look{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media (max-width:560px){.look{grid-template-columns:repeat(2,1fr)}}
+.fact{border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--panel2);min-height:58px}
+.fact .k{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.fact .v{font-family:'Barlow Condensed';font-weight:800;font-size:19px}
+.fact .c{font-size:11px}
+.fact.unc{background:repeating-linear-gradient(135deg,var(--panel2) 0 7px,#202a3a 7px 14px)}
+.fact.conf .c{color:var(--win)}.fact.unc .c{color:var(--muted)}
+.fact.lean{border-color:#e08a3c;box-shadow:0 0 0 1px #e08a3c inset}
+/* Cards */
+.cards{display:flex;gap:8px;flex-wrap:wrap}
+.card{position:relative;width:132px;min-height:168px;border-radius:10px;background:linear-gradient(180deg,#1f2838,#151b26);border:1.5px solid #3a4558;padding:8px;text-align:left;display:flex;flex-direction:column;gap:4px;transition:transform .12s,border-color .12s}
+.card:hover{transform:translateY(-2px)}
+.card.sel{border-color:var(--brass2);box-shadow:0 0 0 2px rgba(229,199,102,.35)}
+.card.blocked{opacity:.5}
+.card .fam{position:absolute;left:0;top:10px;bottom:10px;width:4px;border-radius:0 3px 3px 0}
+.card .nm{font-family:'Barlow Condensed';font-weight:800;font-size:16px;line-height:1.05;padding-right:22px}
+.card .cost{position:absolute;right:7px;top:7px;width:22px;height:22px;border-radius:50%;background:var(--brass);color:#17120a;font-weight:800;display:grid;place-items:center;font-size:13px}
+.card .tag{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.card .tx{font-size:11.5px;color:#cfc6b2}
+.card .why{font-size:11px;color:var(--lose)}
+.card svg{width:100%;height:46px;background:var(--field);border-radius:5px}
+.card.notch::after{content:'PUNISHES LEAN';position:absolute;bottom:6px;right:6px;font-size:9px;font-weight:800;letter-spacing:.06em;color:#17120a;background:#e08a3c;border-radius:3px;padding:1px 4px}
+.tcard{width:118px;min-height:118px}
+.tcard .ic{font-size:22px;color:var(--brass2)}
+.tcard.info{border-style:dashed}
+.pips{display:flex;gap:5px;align-items:center}
+.pip{width:14px;height:14px;border-radius:50%;border:2px solid var(--brass);background:transparent}
+.pip.on{background:var(--brass2)}
+/* Projection */
+.duel{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;border-bottom:1px solid var(--line);padding:7px 0}
+.duel:last-child{border-bottom:0}
+.dk{font-family:'Barlow Condensed';font-weight:800;font-size:18px;color:var(--brass2)}
+.dn{font-size:13px}.dn b{font-weight:700}
+.dm{font-size:11px;color:var(--muted)}
+.chip{font-family:'Barlow Condensed';font-weight:800;font-size:13px;padding:3px 8px;border-radius:12px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.chip.Strong{background:#2e5a2a;color:#cfeec5}.chip.Edge{background:#2a4a2a;color:#bfe6b0}.chip.Even{background:#4a3f1c;color:#f2dc8f}.chip.Tough{background:#5a3324;color:#f7c4a8}.chip.Danger{background:#5c2422;color:#f6b4ae}
+.ev{display:flex;gap:16px;margin-top:8px;font-family:'Barlow Condensed';font-weight:600;font-size:16px}
+.ev b{color:var(--brass2);font-weight:800}
+/* Result cascade */
+.cascade{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
+.face{flex:1 1 140px;border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--panel2);opacity:0;transform:rotateX(70deg);animation:flip .38s ease forwards}
+.face:nth-child(2){animation-delay:.38s}.face:nth-child(3){animation-delay:.76s}
+@keyframes flip{to{opacity:1;transform:none}}
+.face .st{font-family:'Barlow Condensed';font-weight:800;font-size:15px}
+.face.won .st{color:var(--win)}.face.lost .st{color:var(--lose)}
+.yd{font-family:'Barlow Condensed';font-weight:800;font-size:26px;color:var(--brass2);opacity:0;animation:fade .3s ease 1.14s forwards}
+@keyframes fade{to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.face,.yd{animation:none;opacity:1;transform:none}}
+.feed{max-height:260px;overflow:auto;font-size:13px}
+.feed div{padding:4px 0;border-bottom:1px solid #222a38}
+.feed .me{color:var(--ink)}.feed .them{color:#b9b2a2}
+.slots{display:flex;gap:8px;flex-wrap:wrap}
+.slot{flex:1 1 200px;border:1px dashed var(--brass);border-radius:8px;padding:8px;min-height:52px}
+.slot.active{background:rgba(201,162,39,.08)}
+.err{color:var(--lose);min-height:18px;font-size:13px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:right}
+td:first-child,th:first-child{text-align:left}
+.setup{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+select{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px;min-height:40px;width:100%}
+.lineup{font-size:12.5px;columns:2;column-gap:14px}
+.lineup div{break-inside:avoid;padding:2px 0}
+.hint{font-size:12.5px;color:var(--muted)}
+@media (max-width:560px){.swatch{display:none}.tname{font-size:16px}.score{font-size:30px;min-width:28px}.board{gap:6px}.team{gap:6px}.card{width:calc(50% - 4px)}.tcard{width:calc(50% - 4px)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">Call Sheet<small>battle sandbox · rules v0.2</small></div>
+    <div class="row" id="topControls"></div>
+  </div>
+  <div id="app"></div>
+</div>
+
+<script src="../../../rng.js"></script>
+<script src="../../../game-engine-v2.js"></script>
+<script src="../core/data.js"></script>
+<script src="../core/resolver.js"></script>
+<script src="../core/roster.js"></script>
+<script src="../core/battle.js"></script>
+<script>
+'use strict';
+const {data:D,resolver:R,roster:Ro,battle:B}=window.CallSheet;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const FAMC={run:'var(--run)',quick:'var(--quick)',deep:'var(--deep)',constraint:'var(--constraint)',zone:'var(--zone)',man:'var(--man)',pressure:'var(--pressure)'};
+let b=null,req=null,sel={play:null,tactics:[]},plan={slot:0,calls:[null,null]},logSeen=0,err='',lastShown=null;
+
+// ---------- chalk diagrams: simple X/O sketches generated from each play's job
+const DIAG={
+  inside_zone:'M50 40 L50 22',outside_zone:'M50 42 Q70 42 80 26',power:'M44 36 L56 36 M50 42 L54 22',read_option:'M50 38 Q36 36 28 22 M50 38 L56 24',
+  quick_slant:'M78 34 L78 30 L62 20',stick:'M66 34 L66 22 L62 22',deep_cross:'M80 34 L80 24 L24 10',vertical_shot:'M18 34 L18 4',
+  pa_boot:'M50 40 L62 40 M50 38 L32 40 M80 34 L80 22 L36 14',screen:'M50 40 L30 40 M44 34 L30 30',
+  two_high:'M30 6 L30 6 M70 6 L70 6',cover1:'M50 4 L50 4',cover3:'M20 8 L20 8 M50 6 L50 6 M80 8 L80 8',run_fit:'M50 18 L50 18',
+  zone_pressure:'M36 26 L44 38 M64 26 L56 38',cover0:'M30 24 L42 38 M50 22 L50 38 M70 24 L58 38',sim_pressure:'M40 24 L46 38',
+  two_man:'M28 6 L28 6 M72 6 L72 6',robber:'M50 16 L50 16 M50 4 L50 4',bear:'M44 26 L46 36 M56 26 L54 36'
+};
+function diagram(id,side){
+  const o=side==='off';let s=`<svg viewBox="0 0 100 48" aria-hidden="true">`;
+  s+=`<line x1="0" y1="34" x2="100" y2="34" stroke="rgba(239,230,210,.25)" stroke-dasharray="2 3"/>`;
+  for(const x of [38,44,50,56,62])s+=`<circle cx="${x}" cy="37" r="2.6" fill="none" stroke="var(--chalk)" stroke-width="1.2"/>`;
+  for(const [x,y] of [[50,42],[18,36],[80,36],[68,36]])s+=`<circle cx="${x}" cy="${y}" r="2.4" fill="none" stroke="var(--chalk)" stroke-width="1.2"/>`;
+  if(!o){for(const x of [40,47,53,60])s+=`<text x="${x-2}" y="31" font-size="6" fill="#e0645a">X</text>`}
+  const d=DIAG[id]||'';
+  if(o)s+=`<path d="${d}" fill="none" stroke="#f2d34c" stroke-width="1.6" marker-end="url(#a)"/>`;
+  else{for(const m of d.matchAll(/M(\d+) (\d+) L(\d+) (\d+)/g)){const [_,x1,y1,x2,y2]=m.map(Number);s+=x1===x2&&y1===y2?`<circle cx="${x1}" cy="${y1}" r="4" fill="none" stroke="#e0645a" stroke-width="1.4"/>`:`<path d="M${x1} ${y1} L${x2} ${y2}" stroke="#e0645a" stroke-width="1.6" fill="none"/>`}}
+  return s+`<defs><marker id="a" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L6 3L0 6z" fill="#f2d34c"/></marker></defs></svg>`;
+}
+
+// ---------- setup
+function setup(){
+  $('#topControls').innerHTML='';
+  const opts=Object.entries(Ro.PRESETS).map(([k,p])=>`<option value="${k}">${esc(p.name)}</option>`).join('');
+  $('#app').innerHTML=`<div class="panel" style="margin-top:12px">
+    <h2 style="margin:4px 0 4px">Set up a test game</h2>
+    <p class="muted" style="margin:0 0 10px">A sandbox for the battle rules only: no dynasty, no saves. Rosters are presets built from Dynasty Lab archetypes.</p>
+    <div class="setup">
+      <label>Your team<select id="sUser">${opts}</select></label>
+      <label>Opponent<select id="sOpp">${opts}</select></label>
+      <label>Control dial<select id="sMode">
+        <option value="key">Key moments (≈20 min)</option><option value="series">Series (≈30 min)</option>
+        <option value="snap">Every snap (≈55 min)</option><option value="sim">Sim (watch the result)</option></select></label>
+      <label>You coach<select id="sControl"><option value="both">Offense and defense</option><option value="offense">Offense only</option><option value="defense">Defense only</option></select></label>
+    </div>
+    <div class="row" style="margin-top:12px"><button class="btn primary" id="go">Kick off</button><span class="hint">Seed: <input id="sSeed" value="${Date.now()%100000}" style="width:90px;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:4px"></span></div>
+  </div>
+  <div class="grid" style="margin-top:12px"><div class="panel" id="preview"></div><div class="panel"><div class="label">How a snap works</div>
+  <div class="hint">1. The opponent commits first. 2. You read the Look: <b>solid</b> facts are confirmed and always true, <b>hatched</b> ones may be a bluff. 3. Information cards (dashed) are spent immediately and reveal more. 4. Call a play plus tactics within your Command. A new set of downs deals a fresh hand and refills Command, so moving the chains is the reward. 5. Three duels decide the snap: Gate, then Key and Finish. Lose the Gate and the play fails; win the Gate and each other duel won makes it better.</div></div></div>`;
+  $('#sUser').value='aerial';$('#sOpp').value='ground';
+  const showRoster=()=>{const t=Ro.preset($('#sUser').value);$('#preview').innerHTML=`<div class="label">${esc(t.name)} · coordinator ${esc(t.coach.name)}</div><div class="lineup">${[...Object.entries(t.lineup.off),...Object.entries(t.lineup.def)].map(([r,p])=>`<div><b>${r}</b> ${esc(p.name)} · <span class="muted">${esc(p.archetype)}</span>${D.SIGNATURES[p.archetype]?` · <i class="muted">${esc(D.SIGNATURES[p.archetype].text)}</i>`:''}</div>`).join('')}</div>`};
+  $('#sUser').onchange=showRoster;showRoster();
+  $('#go').onclick=()=>{
+    const mode=$('#sMode').value,user=mode==='sim'?null:'home';
+    b=B.create({home:Ro.preset($('#sUser').value),away:Ro.preset($('#sOpp').value),user,mode,control:$('#sControl').value,seed:$('#sSeed').value});
+    logSeen=0;resetSel();req=B.advance(b);render();
+  };
+}
+function resetSel(){sel={play:null,tactics:[]};plan={slot:0,calls:[null,null]};err=''}
+
+// ---------- rendering
+function teamSide(s){return b.teams[s]}
+function yard(f){return f>50?`OPP ${100-f}`:f===50?'50':`OWN ${f}`}
+function scoreboard(){
+  const g=b.game,q=g.status==='final'?'FINAL':g.period>4?'OT':`Q${g.period}`,m=Math.floor(g.clock/60),s=String(g.clock%60).padStart(2,'0');
+  const dd=g.status==='live'&&g.down?`${['','1st','2nd','3rd','4th'][g.down]} & ${g.fieldPosition+g.distance>=100?'Goal':g.distance} · ${yard(g.fieldPosition)}`:'';
+  const T=s=>teamSide(s),ball=s=>g.possession===s?'<span class="ball" title="Possession"></span>':'';
+  const off=g.possession,abs=f=>off==='home'?f:100-f;
+  return`<div class="board">
+    <div class="team"><div class="swatch" style="background:${T('home').colors[0]}"></div><div><div class="tname">${esc(T('home').name)}${b.user==='home'?' <span class="muted cond">(you)</span>':''}</div><div class="muted" style="font-size:12px">${esc(T('home').coach.name)}</div></div><div class="score">${g.score.home}</div>${ball('home')}</div>
+    <div class="mid"><div class="clock">${q} ${g.period>4?'':`${m}:${s}`}</div><div class="dd">${dd}</div></div>
+    <div class="team right">${ball('away')}<div class="score">${g.score.away}</div><div><div class="tname">${esc(T('away').name)}</div><div class="muted" style="font-size:12px">${esc(T('away').coach.name)}</div></div><div class="swatch" style="background:${T('away').colors[0]}"></div></div>
+  </div>
+  ${g.status==='live'&&g.fieldPosition!=null?`<div class="field" aria-label="Field position"><div class="ez" style="left:0"></div><div class="ez" style="right:0"></div>
+    <div class="togain" style="left:${6+Math.min(100,abs(g.fieldPosition+g.distance))*.88}%"></div><div class="marker" style="left:${6+abs(g.fieldPosition)*.88}%"></div></div>`:''}`;
+}
+function topControls(){
+  $('#topControls').innerHTML=`<label class="hint">Dial <select id="tMode" style="width:auto;display:inline-block;min-height:34px;padding:4px">${['key','series','snap','sim'].map(m=>`<option ${b.mode===m?'selected':''}>${m}</option>`).join('')}</select></label>
+  <button class="btn ghost" id="tSim">Sim to end</button><button class="btn ghost" id="tNew">New game</button>`;
+  $('#tMode').onchange=e=>{b.mode=e.target.value;if(b.mode==='sim'){b.pending=null}req=b.pending||B.advance(b);resetSel();render()};
+  $('#tSim').onclick=()=>{b.mode='sim';b.pending=null;req=B.advance(b);render()};
+  $('#tNew').onclick=setup;
+}
+function newFeed(){
+  const out=b.log.slice(logSeen);logSeen=b.log.length;return out;
+}
+function cascade(entry){
+  if(!entry||!entry.duelResults)return entry?`<div class="hint">${esc(entry.text||'')}</div>`:'';
+  const you=b.user===entry.offSide?'Your offense':b.user===entry.defSide?'Your defense':teamSide(entry.offSide).short;
+  return`<div class="label">Last snap · ${esc(you)} · ${esc(D.PLAYS[entry.play].name)} vs ${esc(D.CALLS[entry.call].name)}${entry.offTactics.length?' · +'+entry.offTactics.map(t=>D.TACTICS[t].name).join(', '):''}${entry.defTactics.length?' · D: '+entry.defTactics.map(t=>D.TACTICS[t].name).join(', '):''}</div>
+  <div class="cascade">${entry.duelResults.map(d=>`<div class="face ${d.won?'won':'lost'}"><div class="st">${d.key} · ${esc(d.label)} ${d.won?'WON':'LOST'}</div><div class="dm">${esc(d.offNames.join(' & '))} vs ${esc(d.defNames.join(' & '))} · margin ${d.margin>0?'+':''}${d.margin}</div></div>`).join('')}</div>
+  <div class="yd">${entry.turnover?entry.turnover.toUpperCase():entry.kind==='inc'?'Incomplete':`${entry.yards>0?'+':''}${entry.yards} yards`}${entry.reset?` · Lean broken (${entry.reset})`:''}</div>
+  <div class="hint">${esc(entry.text)}</div>`;
+}
+function feedHTML(){
+  const items=b.log.slice(-40).reverse();
+  return`<div class="label">Game log</div><div class="feed">${items.map(l=>`<div class="${l.offSide===b.user?'me':'them'}">${l.sit?`<span class="muted">${['','1st','2nd','3rd','4th'][l.sit.down]}&${l.sit.distance} ${yard(l.sit.field)} · ${teamSide(l.offSide).short}</span> `:''}${esc(l.text)}</div>`).join('')}</div>`;
+}
+function lookHTML(look,lean){
+  const f=(k,v,c,extra='')=>`<div class="fact ${c?'conf':'unc'} ${extra}"><div class="k">${k}</div><div class="v">${v}</div><div class="c">${c?'Confirmed':'Uncertain'}</div></div>`;
+  const shell=v=>v===0?'No safety':v===1?'One-high':'Two-high';
+  return`<div class="label">The Look</div><div class="look">
+    ${f('Box',look.box.value,look.box.confirmed)}
+    ${f('Shell',shell(look.shell.value),look.shell.confirmed)}
+    ${f('Pressure',look.pressure.value?'Shown':'Not shown',look.pressure.confirmed)}
+    ${look.coverage.confirmed?f('Coverage',look.coverage.value,true):look.lean.value?f('Lean',`Cheating: ${look.lean.value}`,look.lean.confirmed,'lean'):f('Coverage','?',false)}
+  </div>${look.heat?'<div class="hint" style="margin-top:6px">🔥 Blitz-happy: they keep sending pressure. Screens get +1.</div>':''}`;
+}
+function offLookHTML(r){
+  const t=r.offTendency,fam=r.offLook.family;
+  return`<div class="label">Their offense</div><div class="look">
+    <div class="fact ${fam.confirmed?'conf':'unc'}"><div class="k">Play family</div><div class="v">${fam.confirmed?fam.value:'?'}</div><div class="c">${fam.confirmed?'Confirmed':'Use Film Tell'}</div></div>
+    ${['run','quick','deep','constraint'].map(k=>`<div class="fact conf"><div class="k">Tendency · ${k}</div><div class="v">${t[k]}</div><div class="c">calls this half</div></div>`).slice(0,3).join('')}
+  </div>${r.lean?`<div class="hint" style="margin-top:6px">Your defense is leaning on <b>${r.lean}</b>: counters get +1, but their constraint plays get +2.</div>`:''}`;
+}
+function playCard(p,role,lean,selected,onclick){
+  const c=p.card,fam=c.family,notch=role==='off'&&lean&&(c.punishes===lean||(c.id==='vertical_shot'&&lean==='quick'));
+  const tag=role==='off'?`${fam}${p.base?' · base':' · wrinkle'}`:`${c.coverage} · ${c.box} box${c.pressure?` · ${c.pressure===2?'all-out':'5-man'}`:''}${p.base?' · base':' · wrinkle'}`;
+  return`<button class="card ${selected?'sel':''} ${p.blocked?'blocked':''} ${notch?'notch':''}" data-play="${p.id}" ${p.blocked?'aria-disabled="true"':''}>
+    <span class="fam" style="background:${FAMC[fam]||'var(--brass)'}"></span><span class="cost">${p.cost}</span>
+    <span class="nm">${esc(c.name)}</span><span class="tag">${esc(tag)}</span>${diagram(c.id,role)}
+    <span class="tx">${esc(c.text)}</span>${p.blocked?`<span class="why">${esc(p.blocked)}</span>`:''}</button>`;
+}
+function tacticCard(t,selected,why){
+  return`<button class="card tcard ${t.card.info?'info':''} ${selected?'sel':''} ${why?'blocked':''}" data-tac="${t.slot}">
+    <span class="cost">${t.cost}</span><span class="ic">${t.card.icon}</span><span class="nm">${esc(t.card.name)}</span>
+    <span class="tag">${t.card.info?'information · plays now':'tactic'}</span><span class="tx">${esc(t.card.text)}</span>${why?`<span class="why">${esc(why)}</span>`:''}</button>`;
+}
+function pips(n,used){return`<div class="pips" title="Command">${Array.from({length:D.RULES.seriesCommand},(_,i)=>`<span class="pip ${i<n-used?'on':''}"></span>`).join('')}<span class="cond" style="margin-left:6px">${n-used} Command left this series</span></div>`}
+function selCost(opts){
+  const p=opts.plays.find(x=>x.id===sel.play);return(p?p.cost:0)+sel.tactics.reduce((s,slot)=>s+(opts.tactics.find(t=>t.slot===slot)?.cost||0),0);
+}
+function projectionHTML(r){
+  if(!sel.play)return`<div class="label">Projection</div><div class="hint">Pick a play to see its three duels against what you can see.</div>`;
+  const tactics=sel.tactics.map(s=>r.options.tactics.find(t=>t.slot===s)?.id).filter(Boolean);
+  const pv=B.preview(b,r.side,{play:sel.play,tactics});if(!pv)return'';
+  if(r.role==='off'){
+    const snap=pv.snap,ev=pv.ev;
+    return`<div class="label">Projection vs the Look</div>${snap.duels.map(d=>`<div class="duel"><div class="dk">${d.key}</div><div><div class="dn"><b>${esc(d.label)}</b>: ${esc(d.offNames.join(' & '))} (${d.offGrade}) vs ${esc(d.defNames.join(' & '))} (${d.defGrade})</div><div class="dm">${d.mods.map(m=>`${m.v>0?'+':''}${m.v} ${esc(m.src)}`).join(' · ')||'no modifiers'}</div></div><span class="chip ${d.chip}" title="${Math.round(d.p*100)}%">${d.chip}</span></div>`).join('')}
+    <div class="ev"><span>Expected <b>${ev.yards.toFixed(1)}</b> yds</span><span>First down <b>${Math.round(ev.first*100)}%</b></span><span>Turnover <b>${(ev.turnover*100).toFixed(1)}%</b></span></div>
+    <div class="hint">Projected against what the Look shows. Uncertain facts may be wrong.</div>`;
+  }
+  return`<div class="label">Projection vs their likely calls</div>${pv.vs.sort((a,b)=>b.weight-a.weight).map(v=>`<div class="duel"><div class="dk">${Math.round(v.weight*100)}%</div><div><div class="dn"><b>If ${esc(v.family)}</b> (${esc(D.PLAYS[v.play].name)}): ${v.snap.duels.map(d=>`${d.key} <span class="chip ${chipFor(-d.margin)}">${chipFor(-d.margin)}</span>`).join(' ')}</div></div><span class="cond">${v.ev.yards.toFixed(1)} yds</span></div>`).join('')}<div class="hint">Chips show your defense's side of each duel.</div>`;
+}
+const chipFor=m=>D.chip(Math.max(-3,Math.min(3,m)));
+
+function render(){
+  topControls();
+  const fresh=newFeed();const lastSnap=[...b.log].reverse().find(l=>l.type==='snap');
+  if(!req||b.game.status==='final'){renderFinal(lastSnap);return}
+  let body='';
+  if(req.kind==='fourth')body=fourthHTML(req);
+  else if(req.kind==='plan')body=planHTML(req);
+  else body=snapHTML(req);
+  $('#app').innerHTML=scoreboard()+`<div class="grid"><div>${body}</div><div>${lastSnap?`<div class="panel">${cascade(lastSnap)}</div>`:''}<div class="panel" style="margin-top:12px">${feedHTML()}</div></div></div>`;
+  wire();
+}
+function fourthHTML(r){
+  const opts=r.options.map(o=>`<button class="btn ${o===r.recommended?'primary':''}" data-fourth="${o}">${o==='go'?'Go for it':o==='punt'?'Punt':`Field goal (${Math.round(r.fgChance*100)}%)`}</button>`).join('');
+  return`<div class="panel"><h2 style="margin:0 0 6px">Fourth down</h2><p class="muted">Staff recommendation is highlighted.</p><div class="row">${opts}</div></div>`;
+}
+function snapHTML(r){
+  const o=r.options,used=selCost(o),role=r.role;
+  const play=o.plays.find(p=>p.id===sel.play);
+  const tWhy=t=>{if(t.card.info)return null;if(role==='off'&&play)return R.tacticBlocked(t.card,play.card,b.teams[r.side].lineup.off);return null};
+  return`<div class="panel">
+    ${role==='off'?lookHTML(r.look,r.lean):offLookHTML(r)}
+    <div class="row" style="justify-content:space-between;margin-top:10px">${pips(o.command,used)}<span class="hint">${role==='off'?'Offense':'Defense'} · ${b.mode} mode</span></div>
+    <div class="label">Call sheet</div><div class="cards" id="plays">${o.plays.map(p=>playCard(p,role,role==='off'?(r.look.lean.confirmed?r.look.lean.value:null):null,sel.play===p.id)).join('')}</div>
+    <div class="label">Tactic hand</div><div class="cards" id="tacs">${o.tactics.length?o.tactics.map(t=>tacticCard(t,sel.tactics.includes(t.slot),tWhy(t))).join(''):'<span class="hint">Hand empty: no tactics left this series.</span>'}</div>
+    <div class="err">${esc(err)}</div>
+    <div class="row"><button class="btn primary" id="snapBtn" ${sel.play?'':'disabled'}>Snap it (${used} Command)</button><button class="btn" id="autoBtn">Coordinator calls it</button></div>
+  </div><div class="panel" style="margin-top:12px">${projectionHTML(r)}</div>`;
+}
+function planHTML(r){
+  const o=r.options,role=r.role;
+  const cost=c=>c?(o.plays.find(p=>p.id===c.play)?.cost||0)+c.tactics.reduce((s,id)=>s+(o.tactics.find(t=>t.id===id)?.cost||0),0):0;
+  const used=cost(plan.calls[0])+cost(plan.calls[1]);
+  const play=o.plays.find(p=>p.id===sel.play);
+  const slot=(i)=>{const c=plan.calls[i];return`<div class="slot ${plan.slot===i?'active':''}" data-slot="${i}"><div class="label" style="margin:0">${i?'2nd':'1st'} down</div>${c?`<b>${esc((role==='off'?D.PLAYS:D.CALLS)[c.play].name)}</b>${c.tactics.length?' + '+c.tactics.map(t=>D.TACTICS[t].name).join(', '):''}`:'<span class="hint">Coordinator decides</span>'}</div>`};
+  return`<div class="panel"><h2 style="margin:0 0 4px">Plan the series · ${role==='off'?'offense':'defense'}</h2>
+    <p class="hint" style="margin:0 0 8px">Script 1st and 2nd down, or leave them to your coordinator. You'll call 3rd down, the red zone and the last two minutes live. Command you spend now isn't there on 3rd down. Information cards can't be scripted.</p>
+    ${pips(o.command,used)}
+    <div class="slots" style="margin:8px 0">${slot(0)}${slot(1)}</div>
+    <div class="label">Call sheet</div><div class="cards" id="plays">${o.plays.map(p=>playCard(p,role,null,sel.play===p.id)).join('')}</div>
+    <div class="label">Tactic hand</div><div class="cards" id="tacs">${o.tactics.map(t=>tacticCard(t,sel.tactics.includes(t.slot),t.card.info?'Live only':(role==='off'&&play?R.tacticBlocked(t.card,play.card,b.teams[r.side].lineup.off):null))).join('')}</div>
+    <div class="err">${esc(err)}</div>
+    <div class="row"><button class="btn" id="addSlot" ${sel.play?'':'disabled'}>Put on ${plan.slot?'2nd':'1st'} down</button><button class="btn primary" id="planGo">Run the series</button><button class="btn ghost" id="planAuto">Coordinator takes both</button></div>
+  </div>`;
+}
+function renderFinal(last){
+  const g=b.game,box=b.box;
+  const rows=[['Points',s=>g.score[s]],['Plays',s=>box[s].plays],['Total yards',s=>box[s].yards],['Rushing',s=>`${box[s].rushAtt}-${box[s].rushYds}`],['Passing',s=>`${box[s].comp}/${box[s].passAtt}, ${box[s].passYds}`],['Sacks taken',s=>box[s].sacks],['Turnovers',s=>box[s].ints+box[s].fumbles],['3rd down',s=>`${box[s].thirdConv}/${box[s].thirdAtt}`],['Penalties',s=>box[s].penalties],['Explosive plays',s=>box[s].explosives],['Cards played',s=>box[s].cardsPlayed]];
+  const top=Object.values(b.players).sort((a,c)=>(c.passYds+c.rushYds*1.5+c.recYds*1.5+c.sacks*25+c.intDef*30)-(a.passYds+a.rushYds*1.5+a.recYds*1.5+a.sacks*25+a.intDef*30)).slice(0,6);
+  $('#app').innerHTML=scoreboard()+`<div class="grid"><div class="panel"><h2 style="margin:0 0 8px">Final${b.final?.engineError?' (engine warning)':''}</h2>
+    <table><tr><th></th><th>${esc(teamSide('home').short)}</th><th>${esc(teamSide('away').short)}</th></tr>${rows.map(([k,f])=>`<tr><td>${k}</td><td>${f('home')}</td><td>${f('away')}</td></tr>`).join('')}</table>
+    <div class="label">Standouts</div>${top.map(p=>`<div class="hint"><b style="color:var(--ink)">${esc(p.name)}</b> (${esc(teamSide(p.side).short)} ${p.role}, ${esc(p.archetype)}): ${[p.passAtt?`${p.comp}/${p.passAtt} ${p.passYds} yds ${p.passTD} TD`:'',p.rushAtt?`${p.rushAtt}-${p.rushYds} rush`:'',p.rec?`${p.rec} rec ${p.recYds}`:'',p.sacks?`${p.sacks} sacks`:'',p.intDef?`${p.intDef} INT`:''].filter(Boolean).join(', ')}</div>`).join('')}
+    <div class="row" style="margin-top:12px"><button class="btn primary" id="again">New game</button></div></div>
+    <div><div class="panel">${cascade(last)}</div><div class="panel" style="margin-top:12px">${feedHTML()}</div></div></div>`;
+  $('#again').onclick=setup;
+}
+function wire(){
+  document.querySelectorAll('[data-fourth]').forEach(el=>el.onclick=()=>act({choice:el.dataset.fourth}));
+  document.querySelectorAll('#plays .card').forEach(el=>el.onclick=()=>{if(el.getAttribute('aria-disabled'))return;sel.play=sel.play===el.dataset.play?null:el.dataset.play;err='';render()});
+  document.querySelectorAll('#tacs .card').forEach(el=>el.onclick=()=>{
+    const slot=Number(el.dataset.tac),t=req.options.tactics.find(x=>x.slot===slot);
+    if(t.card.info){if(req.kind==='plan'){err='Information cards are played live, not scripted.';render();return}
+      if(t.cost>req.options.command-selCost(req.options)+0&&t.cost>req.options.command){err='Not enough Command.';render();return}
+      try{const keep=sel.play;req=B.submit(b,{type:'info',tactic:t.id});sel={play:keep,tactics:[]};err=''}catch(e){err=e.message}render();return}
+    const i=sel.tactics.indexOf(slot);if(i>=0)sel.tactics.splice(i,1);else sel.tactics.push(slot);err='';render();
+  });
+  const snapBtn=$('#snapBtn');if(snapBtn)snapBtn.onclick=()=>{const tactics=sel.tactics.map(s=>req.options.tactics.find(t=>t.slot===s).id);act({type:'call',play:sel.play,tactics})};
+  const autoBtn=$('#autoBtn');if(autoBtn)autoBtn.onclick=()=>act({type:'auto'});
+  document.querySelectorAll('[data-slot]').forEach(el=>el.onclick=()=>{plan.slot=Number(el.dataset.slot);render()});
+  const add=$('#addSlot');if(add)add.onclick=()=>{plan.calls[plan.slot]={play:sel.play,tactics:sel.tactics.map(s=>req.options.tactics.find(t=>t.slot===s).id)};plan.slot=plan.slot?1:1;sel={play:null,tactics:[]};render()};
+  const go=$('#planGo');if(go)go.onclick=()=>act({type:'plan',calls:plan.calls});
+  const pa=$('#planAuto');if(pa)pa.onclick=()=>act({type:'plan',calls:[]});
+}
+function act(action){
+  try{req=B.submit(b,action);resetSel()}catch(e){err=e.message}
+  render();
+}
+setup();
+</script>
+</body>
+</html>
