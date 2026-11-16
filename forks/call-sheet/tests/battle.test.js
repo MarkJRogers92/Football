@@ -7,6 +7,7 @@ const B=require(path.join(__dirname,'../core/battle.js'));
 const R=require(path.join(__dirname,'../core/resolver.js'));
 const Ro=require(path.join(__dirname,'../core/roster.js'));
 const D=require(path.join(__dirname,'../core/data.js'));
+const P=require(path.join(__dirname,'../core/packs.js'));
 
 let passed=0;const failures=[];
 function test(name,fn){try{fn();passed++;console.log(`  ok  ${name}`)}catch(e){failures.push(name);console.log(`  FAIL ${name}\n       ${e.stack.split('\n').slice(0,3).join('\n       ')}`)}}
@@ -127,7 +128,7 @@ test('a new set of downs deals a fresh hand and Command',()=>{
   let req=B.advance(b),seen=0;
   for(let i=0;i<300&&req;i++){
     if(req.kind==='snap'&&req.situation.down===1&&b.seriesSnap===0){
-      assert.equal(req.options.command,D.RULES.seriesCommand);
+      assert.ok([D.RULES.seriesCommand,D.RULES.seriesCommand+1].includes(req.options.command),'5 Command, or 6 after a Chain Gang combo');
       assert.equal(b.hands.home.wrinkles.length,D.RULES.wrinkleRow);assert.equal(b.hands.home.tactics.length,D.RULES.tacticHand);seen++;
     }
     req=auto(b,req);
@@ -139,9 +140,48 @@ test('card piles conserve every card',()=>{
   const b=B.simulate({home:Ro.preset('tempo'),away:Ro.preset('aerial'),seed:'conserve'});
   for(const side of ['home','away'])for(const role of ['off','def']){
     const deck=b.decks[side][role],p=b.piles[side][role],h=b.hands[side]&&b.hands[side].role===role?b.hands[side]:{wrinkles:[],tactics:[]};
-    assert.equal(p.wrinkle.draw.length+p.wrinkle.discard.length+h.wrinkles.length,deck.wrinkles.length,`${side} ${role} wrinkles`);
+    const ex=role==='off'||role==='def'?(b.exhausted[side]||[]).filter(id=>deck.wrinkles.includes(id)).length:0;
+    assert.equal(p.wrinkle.draw.length+p.wrinkle.discard.length+h.wrinkles.length+ex,deck.wrinkles.length,`${side} ${role} wrinkles`);
     assert.equal(p.tactic.draw.length+p.tactic.discard.length+h.tactics.length,deck.tactics.length,`${side} ${role} tactics`);
   }
+});
+
+test('combos, hot streaks and trick plays fire in real games',()=>{
+  let combos=0,fires=0,cools=0;
+  for(let i=0;i<10;i++){const b=B.simulate({home:Ro.preset('ground'),away:Ro.preset('aerial'),seed:`events-${i}`});
+    for(const l of b.log)for(const e of l.events||[]){if(e.type==='combo')combos++;if(e.type==='fire')fires++;if(e.type==='cooled')cools++}}
+  assert.ok(combos>0,'expected combos');assert.ok(fires>0,'expected hot streaks');assert.ok(cools>0,'expected players cooling off');
+  const b=B.create({home:Ro.preset('aerial'),away:Ro.preset('ground'),user:'home',mode:'snap',control:'offense',seed:'trick'});
+  b.decks.home.off.wrinkles.push('statue_left');
+  let req=B.advance(b);
+  while(req&&!(req.kind==='snap'&&req.role==='off'))req=auto(b,req);
+  b.hands.home.wrinkles.push('statue_left');b.hands.home.command=5;
+  B.submit(b,{type:'call',play:'statue_left',tactics:[]});
+  assert.deepEqual(b.exhausted.home,['statue_left']);
+  const p=b.piles.home.off.wrinkle;assert.ok(!p.discard.includes('statue_left')&&!p.draw.includes('statue_left'),'trick play must not return to the piles');
+});
+
+test('packs: film study counters, pick-one, capacity cuts, one legendary per world',()=>{
+  const pb=P.newPlaybook();
+  const film=P.openPack(pb,{won:false,seed:'f',oppTendency:{run:9,quick:1,deep:1,constraint:0}});
+  assert.equal(film.cards.length,3);
+  assert.ok(film.cards.filter(c=>P.COUNTERS.run.includes(c.id)).length>=2,'film study should lead with run counters');
+  const win=P.openPack(pb,{won:true,seed:'w'});assert.equal(win.cards.length,4);
+  assert.equal(new Set(win.cards.map(c=>c.id)).size,4,'no duplicate cards in one pack');
+  // Fill the play pile to capacity, then a pick must force a cut.
+  while(pb.off.wrinkles.length<pb.capacity.wrinkles)pb.off.wrinkles.push('power');
+  const res=P.applyPick(pb,{id:'draw',kind:'play',side:'off',rarity:'common'});
+  assert.deepEqual(res.over,{side:'off',pile:'wrinkles'});
+  P.cut(pb,'off','wrinkles',0);assert.equal(P.overCapacity(pb),null);
+  // Upgrades replace the base play on the sheet.
+  P.applyPick(pb,{id:'inside_zone_plus',kind:'upgrade',side:'off',replaces:'inside_zone',rarity:'rare'});
+  assert.ok(pb.off.base.includes('inside_zone_plus')&&!pb.off.base.includes('inside_zone'));
+  // A legendary you own, or another program owns, never appears again.
+  P.applyPick(pb,{id:'statue_left',kind:'play',side:'off',rarity:'legendary'});
+  for(let i=0;i<60;i++){const pk=P.openPack(pb,{won:true,seed:'leg'+i,worldTaken:['midnight_mirage']});assert.ok(!pk.cards.some(c=>c.id==='statue_left'||c.id==='midnight_mirage'))}
+  // Picked cards play in a real battle.
+  const team=Ro.preset('aerial');team.decks=P.decksOf(pb);
+  const b=B.simulate({home:team,away:Ro.preset('ground'),seed:'pb-game'});assert.equal(b.game.status,'final');
 });
 
 console.log(`\n${passed} passed, ${failures.length} failed`);

@@ -29,6 +29,8 @@ When a prototype is authorized, the recommended order is:
 | `DESIGN.md` | The review of the 2026-11-15 handoff, in the order its Section 18 requested, plus the unified game concept |
 | `README.md` | This file: fork strategy, how to run, and the reuse map |
 | `core/` | Rules engine (data, resolver, battle, rosters), plain JS, runs in Node and the browser |
+| `slice/index.html` | **The vertical slice.** The arcade battle screen plus the post-game pack. Open it straight from disk. Your program, playbook and record stay in that browser |
+| `core/packs.js` | Packs, rarity, Film Study counters, playbook capacity and cuts, one-per-world legendaries |
 | `sandbox/index.html` | Playable battle page. Open it straight from disk; it loads `rng.js` and `game-engine-v2.js` from the repo root |
 | `tests/battle.test.js` | Rules tests |
 | `tools/sim-report.js` | Calibration, play variety and pacing report; `tools/latest-report.txt` is the last run |

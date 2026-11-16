@@ -34,6 +34,7 @@ function create(opts){
     tend:{home:blankTend(),away:blankTend()},
     seriesKey:null,seriesSnap:0,plan:null,period:1,
     snap:null,pending:null,log:[],lastResult:null,
+    streaks:{},fire:{},drive:{key:null,fams:[],firsts:0},bonusCommand:{home:0,away:0},exhausted:{home:[],away:[]},
     box:{home:blankBox(),away:blankBox()},players:{},
     telemetry:{decisions:{plan:0,snap:0,info:0,fourth:0},snaps:0,series:0,userSnaps:0,lineCounts:{},cardsPlayed:0},
     rng:DynastyRng.create(`${seed}:cards`).snapshot()};
@@ -107,7 +108,8 @@ function dealHand(b,side,role){
   const old=b.hands[side];
   if(old){const p=b.piles[side][old.role];p.wrinkle.discard.push(...old.wrinkles);p.tactic.discard.push(...old.tactics)}
   const p=b.piles[side][role];
-  b.hands[side]={role,wrinkles:drawFrom(b,p.wrinkle,D.RULES.wrinkleRow),tactics:drawFrom(b,p.tactic,D.RULES.tacticHand),command:D.RULES.seriesCommand,onceUsed:[]};
+  const bonus=role==='off'?(b.bonusCommand?.[side]||0):0;if(bonus)b.bonusCommand[side]=0;
+  b.hands[side]={role,wrinkles:drawFrom(b,p.wrinkle,D.RULES.wrinkleRow),tactics:drawFrom(b,p.tactic,D.RULES.tacticHand),command:D.RULES.seriesCommand+bonus,onceUsed:[]};
 }
 function halftime(b){
   for(const side of ['home','away']){
@@ -252,7 +254,9 @@ function payAndRemove(b,side,kind,id){
   if(kind==='tactic'){const i=hand.tactics.indexOf(id);if(i<0)throw new Error(`${card.name} is not in hand.`);hand.tactics.splice(i,1);b.piles[side][hand.role].tactic.discard.push(id)}
   else{
     const base=b.decks[side][hand.role].base.includes(id);
-    if(!base){const i=hand.wrinkles.indexOf(id);if(i<0)throw new Error(`${card.name} is not on your call sheet.`);hand.wrinkles.splice(i,1);b.piles[side][hand.role].wrinkle.discard.push(id)}
+    if(!base){const i=hand.wrinkles.indexOf(id);if(i<0)throw new Error(`${card.name} is not on your call sheet.`);hand.wrinkles.splice(i,1);
+      // Trick plays are exhausted: once per game.
+      if(card.trick)(b.exhausted[side]??=[]).push(id);else b.piles[side][hand.role].wrinkle.discard.push(id)}
   }
   markCostUse(b,side,card);hand.command-=cost;
   if(kind==='tactic'||!b.decks[side][hand.role].base.includes(id))b.box[side].cardsPlayed++;
@@ -399,8 +403,9 @@ function fourthRequest(b){
 function kick(b,choice){
   const g=b.game,off=offSide(b),before=g.fieldPosition;
   if(choice==='ot_fg'){Engine.step(g);b.log.push({type:'kick',text:'Overtime field goal attempt.'});return}
-  if(choice==='punt'){Engine.punt(g);b.box[off].punts++;b.log.push({type:'kick',side:off,text:`${b.teams[off].short} punts from the ${yardLine(before)}.`})}
-  else{const made=Engine.attemptFieldGoal(g);b.log.push({type:'kick',side:off,text:`${b.teams[off].short} ${made?'makes':'misses'} a ${100-before+17}-yard field goal.`})}
+  const sit=situation(b);
+  if(choice==='punt'){Engine.punt(g);b.box[off].punts++;b.log.push({type:'kick',kick:'punt',side:off,sit,after:situation(b),score:{...g.score},text:`${b.teams[off].short} punts from the ${yardLine(before)}.`})}
+  else{const made=Engine.attemptFieldGoal(g);b.log.push({type:'kick',kick:'field_goal',made,side:off,sit,after:situation(b),score:{...g.score},text:`${b.teams[off].short} ${made?'makes':'misses'} a ${100-before+17}-yard field goal.`})}
 }
 
 // ---------------------------------------------------------------- submit
@@ -428,7 +433,7 @@ function submit(b,action){
     if(action.type==='call'){
       const res=commit(b,side,action);
       if(role==='off')b.snap.off=res;else{b.snap.def=res;b.snap.look=lookFor(b,res)}
-      b.pending=null;b.telemetry.userSnaps++;
+      b.pending=null;b.telemetry.userSnaps++;b.snap.userCalled=true;
       if(role==='def'&&!b.snap.off)b.snap.off=decideAI(b,offSide(b),'off');
       resolveSnap(b);return advance(b);
     }
@@ -460,13 +465,17 @@ function resolveSnap(b){
   if(!s.off)s.off=decideAI(b,off,'off');
   const play=D.PLAYS[s.off.play],call=D.CALLS[s.def.play],sit=situation(b);
   const lean=leanFor(b),heat=heatFor(b);
-  const snap=R.buildSnap({off:b.teams[off].lineup.off,def:b.teams[def].lineup.def,play,call,offTactics:s.off.tactics,defTactics:s.def.tactics,situation:sit,lean,heat,motionConfirmed:s.motionConfirmed});
+  // Drive memory for combos.
+  const dkey=`${g.drive}:${off}`;if(b.drive.key!==dkey)b.drive={key:dkey,fams:[],firsts:0};
+  const fams=b.drive.fams,isPA=play.id==='pa_boot'||play.upgradeOf==='pa_boot';
+  const combo=isPA&&fams.length>=2&&fams[fams.length-1]==='run'&&fams[fams.length-2]==='run'?{id:'establish',name:'Establish the Run',duel:'K',v:1,reward:'+1 Command'}:null;
+  const snap=R.buildSnap({off:b.teams[off].lineup.off,def:b.teams[def].lineup.def,play,call,offTactics:s.off.tactics,defTactics:s.def.tactics,situation:sit,lean,heat,motionConfirmed:s.motionConfirmed,combo,fire:b.fire});
   b.telemetry.snaps++;b.seriesSnap++;
   const lineKey=`${play.id}${s.off.tactics.length?'+'+[...s.off.tactics].sort().join('+'):''}`;b.telemetry.lineCounts[lineKey]=(b.telemetry.lineCounts[lineKey]||0)+1;
   // Tendencies move whether or not a flag flies.
   b.tend[off][play.family]++;b.tend[def][call.family==='pressure'?'pressure':call.coverage]++;
   const pen=g.period>4?null:rollPenalty(b,play);
-  const result={sit,offSide:off,defSide:def,play:play.id,call:call.id,offTactics:[...s.off.tactics],defTactics:[...s.def.tactics],offInfo:[...s.offInfo],defInfo:[...s.defInfo],lean,heat,duels:snap.duels,look:s.look};
+  const result={userCalled:!!s.userCalled,sit,offSide:off,defSide:def,play:play.id,call:call.id,offTactics:[...s.off.tactics],defTactics:[...s.def.tactics],offInfo:[...s.offInfo],defInfo:[...s.defInfo],lean,heat,duels:snap.duels,look:s.look};
   if(pen){
     const against=pen.spec.against==='offense'?off:def;
     Engine.applyScrimmage(g,{penalty:{kind:pen.kind},clock:pen.spec.dead?4:8});
@@ -479,6 +488,14 @@ function resolveSnap(b){
     Engine.applyScrimmage(g,{yards:out.yards,clock:out.clock,kind:out.engineKind,completed:out.completed,turnover:out.turnover});
     recordStats(b,off,def,out,before,play);
     result.text=storyLine(b,off,def,play,out,before);
+    result.events=[];
+    fams.push(play.family);
+    if(combo){result.events.push({type:'combo',...combo,side:off});if(b.hands[off])b.hands[off].command=Math.min(D.RULES.seriesCommand,b.hands[off].command+1)}
+    if(g.possession===off&&g.down===1&&g.score[off]===before.score[off]&&!out.turnover){
+      b.drive.firsts++;
+      if(b.drive.firsts===3){b.bonusCommand[off]=1;result.events.push({type:'combo',id:'chain_gang',name:'Chain Gang',reward:'+1 Command next series',side:off})}
+    }
+    updateFire(b,off,def,snap,out.wins,result.events);
     // A constraint play that works resets the tendency it punished.
     if(['success','explosive'].includes(out.category)){
       if(play.punishes==='run'&&lean==='run'){b.tend[off].run=0;result.reset='run'}
@@ -490,6 +507,19 @@ function resolveSnap(b){
   b.lastResult=result;b.log.push({type:'snap',...result});
   b.snap=null;b.fourthGo=false;
   return result;
+}
+// On Fire: a playmaker who wins every duel he's in for three straight snaps gets +1 until he loses one.
+const OFF_SKILL=['QB','RB','X','Z','SLOT','TE'],DEF_SKILL=['RUSH','SET','MIKE','WILL','FCB','BCB','NICKEL','FS','BOXS'];
+function updateFire(b,off,def,snap,wins,events){
+  const tally=new Map();
+  snap.duels.forEach((d,i)=>{
+    for(const r of d.offRoles)if(OFF_SKILL.includes(r)){const p=b.teams[off].lineup.off[r];if(p){const t=tally.get(p.id)||{p,side:off,ok:true};t.ok=t.ok&&wins[i];tally.set(p.id,t)}}
+    for(const r of d.defRoles)if(DEF_SKILL.includes(r)){const p=b.teams[def].lineup.def[r];if(p){const t=tally.get(p.id)||{p,side:def,ok:true};t.ok=t.ok&&!wins[i];tally.set(p.id,t)}}
+  });
+  for(const [id,t] of tally){
+    if(t.ok){b.streaks[id]=(b.streaks[id]||0)+1;if(b.streaks[id]>=D.RULES.fireStreak&&!b.fire[id]){b.fire[id]=true;events.push({type:'fire',name:t.p.name,role:t.p.role,side:t.side,id})}}
+    else{b.streaks[id]=0;if(b.fire[id]){delete b.fire[id];events.push({type:'cooled',name:t.p.name,role:t.p.role,side:t.side,id})}}
+  }
 }
 function yardLine(f){return f>50?`opp ${100-f}`:f===50?'50':`own ${f}`}
 function storyLine(b,off,def,play,out,before){

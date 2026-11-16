@@ -103,6 +103,18 @@ function buildSnap(ctx){
     if(dt.has('spy')){if(d.qbRun)add(-2,'QB spy');if(d.protect)add(1,'One fewer rusher')}
     if(dt.has('press')&&d.release){add(-1,'Press');flags.press=true}
     if(dt.has('identify_protection')&&d.protect&&call.pressure>0)add(-1,'Aimed pressure');
+    // Data-driven matchups on newer cards.
+    for(const m of play.matchups||[]){
+      if(m.duel!==key)continue;
+      const hit={pressure:call.pressure>0,shell1:call.shell===1,shell2:call.shell===2,man:call.coverage==='man',zone:call.coverage==='zone',loaded:call.box==='loaded',light:call.box==='light'}[m.when];
+      if(hit)add(m.v,m.src);
+    }
+    // Combos and hot players.
+    if(ctx.combo&&ctx.combo.duel===key)add(ctx.combo.v,`COMBO: ${ctx.combo.name}`);
+    if(ctx.fire){
+      const hotO=d.off.map(r=>off[r]).find(p=>p&&ctx.fire[p.id]),hotD=d.def.map(r=>def[r]).find(p=>p&&ctx.fire[p.id]);
+      if(hotO)add(1,`${hotO.name} ON FIRE`);if(hotD)add(-1,`${hotD.name} ON FIRE`);
+    }
     // Signatures (offense positive, defense negative).
     for(const [roles,lineup] of [[d.off,off],[d.def,def]]){
       for(const r of roles){const s=D.SIGNATURES[lineup[r]?.archetype];if(s?.duel&&s.scope!=='field')add(s.duel({play,call},key,d),`${lineup[r].name} (${lineup[r].archetype})`)}

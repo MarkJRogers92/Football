@@ -677,3 +677,37 @@ strategy and identity come from. No currency, no paid packs.
 One snap in the arcade style (fanned hand, drag to call, the play running on the field, duel clashes, counted
 yards, callout), plus **On Fire**, one named combo, and a **post-game pack pick with the full rip**. This tests
 the feel of both halves of the loop: Saturday and the playbook.
+
+---
+
+## 13. Vertical slice (rules v0.3, built 2026-11-16)
+
+Open `slice/index.html`. One program, one game at a time, one pack after every game, with the playbook persisting
+in the browser.
+
+**New rules in the engine (all tested):**
+- **On Fire:** a playmaker who wins every duel he's in for 3 straight snaps gets +1 (−1 against him on
+  defense) until he loses one. You can cool off a hot receiver with Bracket.
+- **Combos:** *Establish the Run* (run, run, then PA Boot in one drive: Key +1 and +1 Command) and *Chain Gang*
+  (3 first downs in one drive: +1 Command next series). The combo book fills in as you discover them.
+- **Trick plays:** used once per game, then exhausted (*Statue Left*, *Midnight Mirage*).
+- **Upgrades:** *Inside Zone+*, *Quick Slant+*, *PA Boot+* replace the base card.
+- **New cards:** Draw, Four Verts, Corner Blitz, Cover 2 Trap. Card text uses data-driven matchups
+  ("Rushers ran right past it").
+- **Packs (`core/packs.js`):** after a win, pick 1 of 4; after a loss, a Film Study pack (1 of 3) leads with
+  counters to the opponent's most-used family. Rarity is common, rare or legendary, and reveals escalate in that
+  order. **The play pile and tactic deck hold 14 each, so picks start forcing cuts after the second pack.**
+  Legendaries exist once per world (`worldTaken` excludes ones AI programs own).
+
+**Presentation:** a broadcast-style scoreboard, a tilted stadium field with all 22 players, Look tags (solid
+for confirmed, hatched for uncertain, glowing for a lean), and a fanned hand with 3D tilt, rarity frames
+(gold sweep for rare, holographic for legendary) and drag-to-field calling. Command shows as coins. The
+three-duel clash shows player cards slamming together, modifier chips, WIN/LOSE stamps, sparks and screen shake.
+The play animates on the field, the yardage counts up, and giant callouts follow (TOUCHDOWN with light rays and
+confetti; SACK, PICKED OFF, FIRST DOWN, BIG PLAY), plus ON FIRE, COMBO and LEAN BROKEN banners. The pack shakes,
+rips, deals its cards and reveals them in rarity order. You pick one and the rest burn; a full playbook forces a
+cut. All sound is synthesized (crowd, whistle, clash, chimes, rip, burn). There's a skip button, a fast speed and
+reduced-motion support.
+
+**Not in the slice yet:** series planning mode (the slice offers key moments or every snap), saving a game in
+progress, AI programs opening packs, card mastery and branching evolution, signature player cards, and real art.

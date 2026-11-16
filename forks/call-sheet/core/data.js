@@ -208,6 +208,61 @@ const SIGNATURES={
   'Centerfielder':{text:'Deep passes: +1 against single-high shots.',duel:(c,k)=>c.play.family==='deep'&&k==='K'&&c.call.shell===1?-1:0}
 };
 
+// --- Pack-only cards (rules v0.3) --------------------------------------------------------------------
+// matchups: data-driven call-vs-play bonuses. when: pressure | shell1 | shell2 | man | zone | loaded | light.
+Object.assign(PLAYS,{
+  draw:{id:'draw',side:'off',name:'Draw',family:'run',cost:1,carrier:'RB',
+    matchups:[{when:'pressure',duel:'K',v:2,src:'Rushers ran right past it'}],
+    text:'Show pass, hand it off. Rushers who fly upfield open the lane.',
+    duels:{
+      G:{label:'Invite the rush',off:['LG','C','RG'],ot:['technique','iq'],def:['NT','DT3'],dt:['speed','technique'],bias:1},
+      K:{label:'Find the lane',off:['RB'],ot:['iq','speed'],def:['MIKE'],dt:['iq','speed'],bias:0},
+      F:{label:'Daylight',off:['RB'],ot:['speed','power'],def:['BOXS'],dt:['speed','technique'],bias:0}},
+    results:{fail:[R(1,'run',[-1,1.5])],short:[R(1,'run',[2.5,1.2])],success:[R(1,'run',[7,2])],explosive:[R(1,'run',[15,6],{tail:.18})]}},
+  four_verts:{id:'four_verts',side:'off',name:'Four Verts',family:'deep',cost:1,target:'SLOT',pass:true,protection:true,
+    matchups:[{when:'shell1',duel:'K',v:1,src:'Four routes, one safety'}],
+    text:'Everybody goes. The slot splits the lone deep safety.',
+    duels:{
+      G:{label:'Protection',off:['LT','RT'],ot:['technique','power'],def:['RUSH','SET'],dt:['speed','technique'],bias:1,protect:true},
+      K:{label:'Seam',off:['SLOT'],ot:['speed','technique'],def:['FS'],dt:['speed','iq'],bias:0,separation:true},
+      F:{label:'Throw the seam',off:['QB'],ot:['iq','composure'],def:['NICKEL'],dt:['iq','technique'],bias:0,qbRead:true}},
+    results:{fail:[R(.34,'sack',[-7,2]),R(.46,'inc',[0,0],{int:.06}),R(.2,'catch',[4,2])],short:[R(.6,'inc',[0,0],{int:.06}),R(.4,'catch',[8,3])],success:[R(.65,'catch',[18,4]),R(.35,'inc',[0,0],{int:.04})],explosive:[R(1,'catch',[30,10],{tail:.25})]}},
+  statue_left:{id:'statue_left',side:'off',name:'Statue Left',family:'constraint',punishes:'pressure',cost:2,carrier:'RB',trick:true,
+    matchups:[{when:'pressure',duel:'G',v:2,src:'The rush bit on the fake throw'}],
+    text:'TRICK · The quarterback cocks to throw; the back takes it from behind his hip. Once per game.',
+    duels:{
+      G:{label:'Sell the throw',off:['QB'],ot:['composure','technique'],def:['RUSH'],dt:['iq','composure'],bias:1,qbRead:true},
+      K:{label:'The handoff',off:['RB'],ot:['speed','versatility'],def:['WILL'],dt:['speed','iq'],bias:1},
+      F:{label:'Gone',off:['RB'],ot:['speed','composure'],def:['FS'],dt:['speed','iq'],bias:0}},
+    results:{fail:[R(1,'run',[-4,2])],short:[R(1,'run',[3,2])],success:[R(1,'run',[15,4])],explosive:[R(1,'run',[34,12],{tail:.45})]}}
+});
+// Upgrades: practiced versions of existing plays. Upgrading a base play replaces it on the sheet.
+function upgrade(baseId,id,name,boost,note){
+  const c=JSON.parse(JSON.stringify(PLAYS[baseId]));c.id=id;c.name=name;c.upgradeOf=baseId;c.base=PLAYS[baseId].base;
+  for(const [k,v] of Object.entries(boost))c.duels[k].bias+=v;c.text=`${note} ${c.text}`;PLAYS[id]=c;
+}
+upgrade('inside_zone','inside_zone_plus','Inside Zone+',{G:1},'PRACTICED · Gate +1.');
+upgrade('quick_slant','quick_slant_plus','Quick Slant+',{K:1},'PRACTICED · Key +1.');
+upgrade('pa_boot','pa_boot_plus','PA Boot+',{K:1},'PRACTICED · Key +1.');
+Object.assign(CALLS,{
+  corner_blitz:{id:'corner_blitz',side:'def',name:'Corner Blitz',family:'pressure',cost:1,box:'normal',shell:1,coverage:'man',pressure:1,counters:['quick'],look:{pressureShown:false},
+    text:'The boundary corner comes off the edge. Nobody sees it coming.'},
+  cover2_trap:{id:'cover2_trap',side:'def',name:'Cover 2 Trap',family:'zone',cost:1,box:'light',shell:2,coverage:'zone',pressure:0,counters:['quick','constraint'],look:{pressureShown:true},
+    text:'Show blitz, bail out, and sit on the quick throw.'},
+  midnight_mirage:{id:'midnight_mirage',side:'def',name:'Midnight Mirage',family:'pressure',cost:2,box:'normal',shell:2,coverage:'zone',pressure:1,counters:['deep','quick'],look:{pressureShown:false},trick:true,
+    text:'TRICK · Two deep, five rushing, nobody where they look. Once per game.'}
+});
+
+// Rarity drives pack odds and card frames. Legendaries exist once per world.
+const RARITY={
+  deep_cross:'common',pa_boot:'common',screen:'common',power:'common',read_option:'common',draw:'common',four_verts:'common',vertical_shot:'rare',
+  motion:'common',max_protect:'common',route_adjust:'common',seal_block:'common',hard_count:'common',check_with_me:'rare',
+  inside_zone_plus:'rare',quick_slant_plus:'rare',pa_boot_plus:'rare',statue_left:'legendary',
+  zone_pressure:'common',two_man:'common',robber:'common',sim_pressure:'common',bear:'common',corner_blitz:'common',cover2_trap:'common',cover0:'rare',
+  film_tell:'common',identify_protection:'common',disguise:'common',bracket:'common',spy:'common',press:'common',midnight_mirage:'legendary'
+};
+const rarityOf=id=>RARITY[id]||'common';
+
 // Game-day decks for the sandbox: base plays are always on the sheet; wrinkles and tactics are drawn.
 const DEFAULT_DECKS={
   off:{base:['inside_zone','outside_zone','quick_slant','stick'],
@@ -218,7 +273,7 @@ const DEFAULT_DECKS={
     tactics:['film_tell','film_tell','identify_protection','identify_protection','disguise','disguise','bracket','bracket','spy','spy','press','press']}
 };
 
-const RULES={seriesCommand:5,wrinkleRow:3,tacticHand:4,leanBase:4,redZone:80,twoMinute:120};
+const RULES={seriesCommand:5,wrinkleRow:3,tacticHand:4,leanBase:4,redZone:80,twoMinute:120,fireStreak:3};
 
-return{STYLES,STYLE_TRAITS,TRAITS,OFF_ROLES,DEF_ROLES,WIN_CHANCE,chip,PLAYS,CALLS,TACTICS,SIGNATURES,DEFAULT_DECKS,RULES};
+return{STYLES,STYLE_TRAITS,TRAITS,OFF_ROLES,DEF_ROLES,WIN_CHANCE,chip,PLAYS,CALLS,TACTICS,SIGNATURES,DEFAULT_DECKS,RULES,RARITY,rarityOf};
 });
