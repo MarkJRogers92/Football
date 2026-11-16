@@ -71,6 +71,9 @@ function v2RecordDriveArchive(preview){
     if(e.type==='kickoff'&&valid(e.receiver)){finish();start(e.receiver);continue}
     if(e.type==='overtime_possession'&&valid(e.possession)){finish();start(e.possession,true);continue}
     if(e.type==='possession_change'&&valid(e.to)){if(drive&&drive.side!==e.to){if(e.reason==='turnover_on_downs'&&!drive.result)drive.result='DOWNS';finish()}if(!drive)start(e.to);continue}
+    // A safety belongs to the defense (e.team), but it is how the offense's drive ended: say so on that drive. The two
+    // points stay on the defense's zero-play entry, so quarter scores are unchanged.
+    if(e.type==='safety'&&drive&&valid(e.team)&&drive.side!==e.team)drive.result='SAFETY';
     const side=valid(e.team)?e.team:null;if(side&&(!drive||drive.side!==side)){finish();start(side,(e.state?.period||0)>4)}if(!drive)continue;
     if(['scrimmage','interception','fumble'].includes(e.type)){drive.plays++;drive.playByPlay.push(v2RecordArchiveText(e,names));if(e.type==='interception')drive.result='INT';if(e.type==='fumble')drive.result='FUMBLE'}
     else if(e.type==='coaching_decision'||e.type==='penalty'||e.type==='timeout'){drive.playByPlay.push(v2RecordArchiveText(e,names))}

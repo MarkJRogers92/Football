@@ -201,9 +201,9 @@ function archiveMemory(memory){
 // v0.37 cold tier. A player who used up his eligibility without ever starting, with no award, no draft round and no
 // Player of the Week honour, is most of a long dynasty's archive (57% of records at twelve seasons). His record keeps
 // identity, school, years, career totals, every season line (team, position, rating, games and statistics) and his
-// draft result; it drops the camp and scouting histories and per-season style and class labels, which only his
-// profile's development panels read. Marked cold:1. compactHistoryArchive applies it to older records once a season.
-const ARCHIVE_COLD_DROP=['campHistory','scoutingHistory','scoutingDomains','positionFamiliarity','trainingFocus','requestedPositionChange'];
+// draft result and camp history (camp attendance is real off-field history); it drops the scouting history and
+// per-season style and class labels, which only his profile panels read. Marked cold:1. compactHistoryArchive applies it to older records once a season.
+const ARCHIVE_COLD_DROP=['scoutingHistory','scoutingDomains','positionFamiliarity','trainingFocus','requestedPositionChange'];
 function archiveColdEligible(rec,source=rec){
  return !!rec&&!rec.cold&&rec.exitReason==='Eligibility exhausted'&&!((rec.career?.starts||0)>0)&&!((source?.career?.starts||0)>0)
   &&!(rec.awards?.length)&&!rec.draftResult?.round&&!rec.potw&&!source?.potw;
