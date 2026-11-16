@@ -49,10 +49,13 @@ if(typeof module==='object'&&module.exports){
  const gameProfilesBeforeFatigue=gameProfiles;
  gameProfiles=function gameProfilesWithFatigue(t){
   const base=gameProfilesBeforeFatigue.apply(this,arguments);if(!base||!t)return base;
-  const f=fatigue.forTeam(t);
-  if(quickSims>0)return fatigue.blend(base,f);
-  return{...base,fatigueOff:f.off,fatigueDef:f.def};
+  if(quickSims>0)return fatigue.blend(base,fatigue.forTeam(t));
+  return decorate(t,base);
  };
+ // The late-game penalty as two extra fields; the weekly-coaching test hook applies it to its baseline too, so a
+ // zero-point preparation still compares like with like.
+ function decorate(t,profile){if(!profile||!t)return profile;const f=fatigue.forTeam(t);return{...profile,fatigueOff:f.off,fatigueDef:f.def}}
+ fatigue.decorate=decorate;
  const gameSimBeforeFatigue=gameSim;
  gameSim=function gameSimWithFatigue(){quickSims++;try{return gameSimBeforeFatigue.apply(this,arguments)}finally{quickSims--}};
 }
