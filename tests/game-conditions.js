@@ -114,3 +114,19 @@ test('conditions read in plain words and a bad value is rejected', () => {
   const clamped = GC.sanitize({roof: 'open', sky: 'lava', temp: 900, wind: -4, precip: 9, altitude: 'moon'});
   assert.deepEqual([clamped.sky, clamped.temp, clamped.wind, clamped.precip, clamped.altitude], ['clear', 115, 0, 3, 'low']);
 });
+
+test('in the game, the staff report reads the forecast for this week\'s game', async () => {
+  const {loadEngine}=require('../tools/harness.js');
+  const e=loadEngine({seed:8181,fullRuntime:true});await e.loadSchools();e.setUserTeam('Chicago Metropolitan');e.initUniverse();
+  const u=e.universe,t=e.T('Chicago Metropolitan');if(u.phase==='preseason')e.beginSeason();
+  const g=u.schedule[u.week].find(x=>x.home===t.name||x.away===t.name);const opp=e.T(g.home===t.name?g.away:g.home);
+  const home=e.T(g.home);const f=e.forecastFor(g);assert.ok(f);
+  // If this week is calm, move the game to a week whose forecast is rough and check the advice follows.
+  const r=e.weeklyOpponentReport(t,opp);
+  const advice=require('../weekly-coaching-engine.js').weatherAdvice(f);
+  assert.deepEqual(r.weather,advice?{kind:advice.kind,text:advice.text}:null,'the report carries exactly the forecast\'s advice');
+  if(!advice){
+    for(const w of [2,3,4,5,6,7,8,9,10,11]){const c=GC.forGame({home,year:u.year,week:w});if(require('../weekly-coaching-engine.js').weatherAdvice(c)){g.week=w;break}}
+    const r2=e.weeklyOpponentReport(t,opp);if(r2.weather)assert.deepEqual(r2.recommendedFocuses,['run_blocking','run_fits']);
+  }
+});

@@ -18,7 +18,7 @@ function makeFacilitySystem(env){
  const universe=()=>env.getUniverse(),clamp=env.clamp;
  const TRACKS={
   stadium:{label:'Stadium & Game Day',short:'Stadium',blurb:'Seats, sightlines and a louder crowd.',perLevel:'+2 fan support (a bigger home-field edge), gifts grow'},
-  training:{label:'Training & Performance Center',short:'Training',blurb:'Weight room, recovery and sports science.',perLevel:'+1 development at levels 2 and 4'},
+  training:{label:'Training & Performance Center',short:'Training',blurb:'Weight room, recovery and sports science.',perLevel:'+1 development at levels 2 and 4; injured players heal faster and featured plans get extra work at every level'},
   football_ops:{label:'Football Operations Building',short:'Football Ops',blurb:'Film rooms, a recruiting lounge and staff space.',perLevel:'+2 recruiting hours a week'}
  };
  const TRACK_IDS=Object.keys(TRACKS);
@@ -247,7 +247,7 @@ function makeFacilitySystem(env){
  function effectsText(t){
   const s=level(t,'stadium'),tr=level(t,'training'),o=level(t,'football_ops'),out=[];
   if(s)out.push(`Stadium level ${s}: +${s*STADIUM_FAN} fan support, bigger gifts`);
-  if(tr)out.push(`Training level ${tr}: +${TRAINING_DEV_LEVELS.filter(x=>x<=tr).length} development`);
+  if(tr)out.push(`Training level ${tr}: +${TRAINING_DEV_LEVELS.filter(x=>x<=tr).length} development, ${tr*5}% weekly chance an injured player heals a week early`);
   if(o)out.push(`Football Ops level ${o}: +${o*OPS_HOURS} recruiting hours a week`);
   return out;
  }

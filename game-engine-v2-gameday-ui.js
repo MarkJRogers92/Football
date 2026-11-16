@@ -104,13 +104,14 @@ const V2_GAMEDAY_CALL_HINTS={
   balanced:'No tilt either way.',ground:'Safer and slower. Fewer big plays.',quick:'High percentage, short gains, fewer sacks.',shots:'Bigger gains. More sacks and interceptions.',
   base:'No tilt either way.',pressure:'More sacks. A completion goes further.',coverage:'Takes away the deep ball. Gives up the run.',run_stop:'Stops the run. Thin behind it.'
 };
+const V2_GAMEDAY_HALFTIME_HINTS={aggressive:'Throw more in the second half. Faster snaps, bigger gains, more risk.',balanced:'Keep the first-half mix.',ball_control:'Run more and shorten the game. Protects a lead.'};
 const V2_GAMEDAY_DECISION_TITLES={timeout_call:'CLOCK RUNNING',drive_call:'YOUR DRIVE',defense_call:'DEFENSIVE CALL',fourth_down:'FOURTH DOWN',two_point_decision:'AFTER THE TOUCHDOWN',halftime_adjustment:'HALFTIME',late_game_tempo:'CLOCK MANAGEMENT'};
 function v2GameDayUIOptionLabel(d,id){return d.options.find(o=>o.id===id)?.label||String(id||'').replaceAll('_',' ')}
 function v2GameDayUIDecision(session){
   const d=globalThis.DynastyGameEngineV2GameDay?.pendingDecision(session);if(!d)return'';
   const calls=d.type==='drive_call'||d.type==='defense_call',win=v2GameDayUIWinChance(session),staff=v2GameDayUIOptionLabel(d,d.staffRecommendation);
   const option=o=>{
-    const hint=calls?V2_GAMEDAY_CALL_HINTS[o.id]:'',current=d.type==='drive_call'&&o.id===d.lastCall,cls=[o.id===d.staffRecommendation?'recommended':'',calls&&o.id!=='delegate'?'v2-gameday-call':''].filter(Boolean).join(' ');
+    const hint=calls?V2_GAMEDAY_CALL_HINTS[o.id]:d.type==='halftime_adjustment'?V2_GAMEDAY_HALFTIME_HINTS[o.id]||'':'',current=d.type==='drive_call'&&o.id===d.lastCall,cls=[o.id===d.staffRecommendation?'recommended':'',calls&&o.id!=='delegate'?'v2-gameday-call':''].filter(Boolean).join(' ');
     return`<button type="button" data-v2-gameday-choice="${gameEscape(o.id)}"${cls?` class="${cls}"`:''}><span>${gameEscape(o.label)}</span>${hint?`<small>${gameEscape(hint)}</small>`:''}${current?'<em>Last drive</em>':''}</button>`
   };
   return`<div class="v2-gameday-decision" data-decision-type="${gameEscape(d.type)}">${d.type==='fourth_down'?(globalThis.DynastyArt?.img('goalposts','dl-art dl-art-decision')||''):''}<div class="eyebrow">${gameEscape(V2_GAMEDAY_DECISION_TITLES[d.type]||'HEAD COACH DECISION')}</div><h3>${gameEscape(d.situation)}</h3><div class="muted">Staff recommendation: <strong>${gameEscape(staff)}</strong>${d.reason?` (${gameEscape(d.reason)})`:''}${win!=null?` · Win chance now <strong>${win}%</strong>`:''}</div><div class="button-row${calls?' v2-gameday-calls':''}">${d.options.map(option).join('')}</div></div>`

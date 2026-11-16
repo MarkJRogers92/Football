@@ -38,8 +38,12 @@
     else if(est.teamPass>=3)observations.push('Your passing matchup looks favorable enough to justify an explosive-pass emphasis.');
     else if(est.teamRun>=3)observations.push('Your run-game matchup looks favorable enough to lean into blocking detail.');
     else observations.push('Your offense projects relatively even; preparation can be used to shape identity rather than patch a clear weakness.');
+    const weather=weatherAdvice(input.weather);
+    if(weather)observations.unshift(weather.text);
     const oppInjuries=Number(input.opponentInjuries||0);if(oppInjuries>0)observations.push(`${oppInjuries} opponent availability issue${oppInjuries===1?' is':'s are'} on the staff report.`);
     const candidates=[];const add=id=>{if(FOCUSES[id]&&!candidates.includes(id))candidates.push(id)};
+    // Weather bad enough to cut the passing game sends both offenses to the ground: the staff want the run package.
+    if(weather)weather.focuses.forEach(add);
     if(est.teamProtect<=-2)add('pass_protection');
     if(est.oppPass>=2||passEstimate>=56)add('coverage');
     if(est.oppProtect<=-2)add('pressure');
@@ -47,7 +51,22 @@
     if(est.teamPass>=2)add('explosive_pass');
     if(est.teamRun>=2)add('run_blocking');
     add('pass_protection');add('coverage');
-    return{version:VERSION,confidence,confidenceLabel:confidenceLabel(confidence),passEstimate,estimatedEdges:est,observations:observations.slice(0,4),recommendedFocuses:candidates.slice(0,MAX_POINTS)}
+    return{version:VERSION,confidence,confidenceLabel:confidenceLabel(confidence),passEstimate,estimatedEdges:est,observations:observations.slice(0,4),recommendedFocuses:candidates.slice(0,MAX_POINTS),weather:weather?{kind:weather.kind,text:weather.text}:null}
+  }
+  // v0.37 — staff read the forecast. input.weather is a game-conditions record (roof, wind, precip, sky, temp). Only
+  // weather that really changes the passing game (the thresholds where game-conditions starts cutting pass yards and
+  // pass rate) earns advice; a calm or indoor game returns null and the report is unchanged.
+  const WEATHER_WIND=18;
+  function weatherAdvice(c){
+    if(!c||typeof c!=='object'||c.roof==='dome')return null;
+    const wind=Math.round(Number(c.wind)||0),precip=Number(c.precip)||0,snow=c.sky==='snow',temp=Math.round(Number(c.temp));
+    const why=[];
+    if(wind>=WEATHER_WIND)why.push(`Wind ${wind} mph`);
+    if(snow&&precip>=1)why.push(precip>=2?'Heavy snow':'Snow');
+    else if(precip>=2)why.push(precip>=3?'Heavy rain':'Rain');
+    if(!why.length)return null;
+    const cold=Number.isFinite(temp)&&temp<=25?` and ${temp}°F`:'';
+    return{kind:wind>=WEATHER_WIND?'wind':snow?'snow':'rain',focuses:['run_blocking','run_fits'],text:`${why.join(' and ')}${cold} Saturday: staff suggest the run package (Run Blocking + Run Fits). Both offenses will lean on the ground.`};
   }
   function applyPrepProfile(profile,focuses){
     const ids=normalizeFocuses(focuses);if(!profile||!ids.length)return profile&&JSON.parse(JSON.stringify(profile));
@@ -89,5 +108,5 @@
     const splitPlan=normalizeFocuses([ocPlan[0],dcPlan[0]]);
     return{version:VERSION,oc:{name:oc.name||'Offensive Coordinator',confidence:advisorConfidence(oc,ocMatch),schemeMatch:ocMatch,plan:ocPlan,reason:ocReason},dc:{name:dc.name||'Defensive Coordinator',confidence:advisorConfidence(dc,dcMatch),schemeMatch:dcMatch,plan:dcPlan,reason:dcReason},split:{plan:splitPlan,reason:'Use one preparation point on each coordinator’s top concern instead of giving either side the entire week.'}}
   }
-  return{VERSION,MAX_POINTS,FOCUSES,normalizeFocuses,buildReport,applyPrepProfile,focusSummary,confidenceLabel,struggleSignal,selectStarterChallenge,advisorConfidence,buildStaffRoom}
+  return{weatherAdvice,VERSION,MAX_POINTS,FOCUSES,normalizeFocuses,buildReport,applyPrepProfile,focusSummary,confidenceLabel,struggleSignal,selectStarterChallenge,advisorConfidence,buildStaffRoom}
 });

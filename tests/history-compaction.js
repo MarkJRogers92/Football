@@ -59,7 +59,7 @@ test('compaction is idempotent, and a story recorded before it is never recorded
  const e=await rolledDynasty(),u=e.universe;
  e.compactHistoryArchive();
  const n=u.events.length;
- assert.deepEqual(e.compactHistoryArchive(),{events:0,dropped:0,camps:0});
+ assert.deepEqual(e.compactHistoryArchive(),{events:0,dropped:0,camps:0,cold:0});
  assert.equal(u.events.length,n);
  const kept=u.events.find(x=>x.slim&&x.storyId);
  assert.equal(globalThis.__DL_TEST__.playerEvidenceStoryRecorded(kept.storyId),true,'the story index still sees slimmed stories');

@@ -33,10 +33,16 @@ test('never-played careers retain recruitment, transfers and injuries through re
   recruitingMemory:{schoolId:t.id,season:2028,stars:3},
   transferHistory:[{year:2029,from:'Prior School',to:t.name,fromSchoolId:2,toSchoolId:t.id}],
   injuryHistory:[{year:2030,type:'Knee injury',weeks:8}],scoutingHistory:[{year:2029,reason:'SIGNING_DAY'}]};
- e.addToArchive(p,t,'Eligibility exhausted');
+ // A roster cut keeps everything; an eligibility-exhausted career that never started goes to the v0.37 cold tier,
+ // which keeps recruitment, transfers and injuries but trims the scouting history (tests/archive-cold.js).
+ e.addToArchive(p,t,'Roster cut');
+ const q={...p,id:'off-field-cold'};e.addToArchive(q,t,'Eligibility exhausted');
  const save=JSON.parse(JSON.stringify({userTeam:t.name,universe:e.packUniverse(u)}));e.installSave(save);
  const row=e.universe.playerArchive.find(x=>x.id===p.id);
  for(const key of ['recruitingMemory','transferHistory','injuryHistory','scoutingHistory'])assert.deepEqual(row[key],p[key],key);
+ const cold=e.universe.playerArchive.find(x=>x.id===q.id);
+ for(const key of ['recruitingMemory','transferHistory','injuryHistory'])assert.deepEqual(cold[key],q[key],key);
+ assert.equal(cold.scoutingHistory,undefined);assert.equal(cold.cold,1);
 });
 
 test('a career with games keeps the full record', async()=>{

@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.36.0</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d12"><title>Dynasty Lab v0.37.0</title><style>
 :root{
   --bg:#0e1116;--panel:#151a22;--panel2:#1b2230;--line:#2a3444;--text:#edf1f7;--muted:#96a3b7;
   --accent:#d6e2ff;--accent2:#8fb1ff;--good:#77d6a3;--warn:#f3ca78;--bad:#ef8f92;
@@ -1068,6 +1068,9 @@ tr[hidden]{display:none!important}
 .facilities-boosters .fb-log ul{margin:6px 0 0;padding-left:18px}
 @media (max-width:560px){.facilities-boosters .fb-tracks{grid-template-columns:1fr}.facilities-boosters .fb-money{flex-direction:column;align-items:flex-start}}
 .facilities-boosters .fb-risky{border-color:#d9a441;color:#e8c27a}
+.fb-helped{margin-top:10px;padding-top:8px;border-top:1px solid var(--line,rgba(255,255,255,.14))}
+.fb-helped ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:4px}
+.fb-helped .player-button{padding:0;min-height:0}
 
 /* v0.32: conference realignment (Program page and This Week), the locker room (Roster page and This Week) and the
    nonconference schedule (Season page). Shares the summary tiles with Facilities & Boosters. */
@@ -1150,6 +1153,12 @@ tr[hidden]{display:none!important}
 .rn-number{display:inline-block;align-self:flex-start;width:auto;min-width:2.2em;text-align:center;padding:1px 6px;border:1px solid var(--accent,#d9a441);border-radius:5px;margin-right:6px}
 .rn-candidates li{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .retired-numbers-card p.small{text-transform:none;letter-spacing:normal}
+.long-memory{margin:8px 0;padding:9px 12px;border-radius:6px;border:1px solid var(--line,rgba(255,255,255,.14));border-left:4px solid var(--accent,#d9a441)}
+.long-memory p{margin:4px 0 8px}
+.lm-list{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:4px}
+.long-memory .player-button{padding:0;min-height:0}
+.conversion-review{margin:10px 0;padding:8px 12px;border-radius:6px;border:1px solid var(--line,rgba(255,255,255,.14));border-left:4px solid var(--accent,#d9a441)}
+.conversion-review ul{margin:4px 0 0;padding-left:18px}
 
 .situational-playbook{display:grid;gap:8px}
 .situational-playbook>p{margin:0}
@@ -3666,7 +3675,7 @@ select{min-width:44px}
       </section>
     </div>
 
-    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.36.0</b></span></footer>
+    <footer class="title-footer"><span id="titleStatus" role="status" aria-live="polite">Preparing the main menu…</span><span>Dynasty Lab <b data-title-version>v0.37.0</b></span></footer>
   </div>
 </section>
 
@@ -3693,7 +3702,7 @@ select{min-width:44px}
   <header class="topbar">
     <div>
       <div class="eyebrow">COLLEGE FOOTBALL UNIVERSE</div>
-      <h1>Dynasty Lab <span data-app-version>v0.36.0</span></h1>
+      <h1>Dynasty Lab <span data-app-version>v0.37.0</span></h1>
     </div>
     <div class="header-actions">
       <select id="userTeam" aria-label="Controlled program"></select>
@@ -5938,7 +5947,16 @@ function profileTeam(team,profile={}){
   const offense=clamp(finite(profile.offense,finite(profile.overall,70)),1,100);
   const defense=clamp(finite(profile.defense,finite(profile.overall,70)),1,100);
   const rating=clamp(finite(profile.overall,(offense+defense)/2),1,100);
-  return{id:team?.id??null,name:String(team?.name??'Team'),rating,offense,defense};
+  const out={id:team?.id??null,name:String(team?.name??'Team'),rating,offense,defense};
+  // v0.37 late-game fatigue: carried only when the profile has it, so older games keep identical inputs.
+  if(finite(profile.fatigueOff,0)>0)out.fatigueOff=clamp(finite(profile.fatigueOff,0),0,3);
+  if(finite(profile.fatigueDef,0)>0)out.fatigueDef=clamp(finite(profile.fatigueDef,0),0,3);
+  return out;
+}
+// Fourth quarter and overtime: each side plays a little below its rating, less with good depth.
+function lateGameRatings(state,offense,defense){
+  if(!(state.period>=4))return{off:offense.offense,def:defense.defense};
+  return{off:offense.offense-finite(offense.fatigueOff,0),def:defense.defense-finite(defense.fatigueDef,0)};
 }
 function eventSummary(state){
   const side=()=>({points:0,plays:0,yards:0,turnovers:0,punts:0,fieldGoals:{made:0,attempted:0},touchdowns:0,possessions:0,penalties:0,penaltyYards:0});
@@ -6036,7 +6054,7 @@ function profileOutcomeRules(state,homeInput,awayInput,homeFieldRating=0,call=nu
   const c=call||{},cPass=finite(c.passRate,0),cPassYards=finite(c.passYards,1),cRushYards=finite(c.rushYards,0),cInt=finite(c.intMult,1),cSack=finite(c.sackMult,1),cComp=finite(c.comp,0),cHurry=finite(c.hurry,0);
   const rng=DynastyRng.create(state.rng),isHome=state.possession==='home',offense=isHome?homeInput:awayInput,defense=isHome?awayInput:homeInput;
   const rules=state.rules,e=GameEngineV2.effectsOf(state),pressureOn=rules.pressure!==false;
-  const venueEdge=isHome?homeFieldRating:-homeFieldRating,matchup=offense.offense-defense.defense+venueEdge,edge=matchup/18;
+  const late=lateGameRatings(state,offense,defense),venueEdge=isHome?homeFieldRating:-homeFieldRating,matchup=late.off-late.def+venueEdge,edge=matchup/18;
   const roll=rng.next(),pass=rng.next()<clamp(.53+e.passRate+cPass,call?.2:.35,call?.8:.62);
   let outcome;
   if(pass){
@@ -6132,7 +6150,7 @@ function aggregate(samples){
   for(const k of ['points','plays','yards','turnovers','overtime','homeWins'])result[k]/=result.games;
   return result;
 }
-return{attachPlaybook,profileTeam,eventSummary,createShadowGame,profileOutcome,annotateOutcomeEvent,shadowDecision,simulateShadow,aggregate};
+return{attachPlaybook,profileTeam,lateGameRatings,eventSummary,createShadowGame,profileOutcome,annotateOutcomeEvent,shadowDecision,simulateShadow,aggregate};
 });
 
 (function(root,factory){
@@ -6209,7 +6227,7 @@ function createSession(options={}){
     tempo:{home:'normal',away:'normal'},tempoDecisionMade:{home:false,away:false},
     // Drive and defensive calls are on only for a fully coached game (options.calls); null means the session never asks.
     driveCall:options.calls===true&&controlledSide?{home:'balanced',away:'balanced'}:null,driveAsked:null,defenseCall:null,defenseAsked:null,
-    halftimeApproach:{home:'balanced',away:'balanced'},halftimeDecisionMade:false,pendingConversion:null,pendingStrategyDecision:null,
+    halftimeApproach:{home:'balanced',away:'balanced'},halftimeDecisionMade:false,halftimePolicy:HALFTIME_V2,pendingConversion:null,pendingStrategyDecision:null,
     names:{home:String(options.home?.name??made.homeInput.name??'Home'),away:String(options.away?.name??made.awayInput.name??'Away')},
     skipRoutine:options.skipRoutine===true
   };
@@ -6261,6 +6279,14 @@ function resolvePendingConversion(session,choice='extra_point'){
   if(state.period<=4&&state.clock===0)state.pendingKickoff={receiver:other(side),reason:'post_touchdown'};else kickoffGame(state,other(side),'post_touchdown');
   endRegulationAfterConversion(state);engine.validateState(state);return state
 }
+// v0.37 (halftime-v2): the coach's halftime approach also sets the second-half play mix (open it up throws about 7%
+// more often, ball control 7% less). Staying balanced or delegating changes nothing, so a delegated coached game still
+// plays exactly like a simulated one. Sessions created before v0.37 carry no halftimePolicy and play as they did.
+const HALFTIME_V2='halftime-v2',HALFTIME_MIX={aggressive:{passRate:.07},ball_control:{passRate:-.07}};
+function halftimeCall(session,state){
+  if(session.halftimePolicy!==HALFTIME_V2||state.period<3)return null;
+  return HALFTIME_MIX[session.halftimeApproach?.[state.possession]]||null;
+}
 function halftimeAdjustedOutcome(session,state,outcome){
   if(state.period<3)return outcome;const approach=session.halftimeApproach?.[state.possession]||'balanced';
   if(approach==='aggressive'){
@@ -6287,9 +6313,10 @@ function deferredTouchdown(session,state,outcome){
 function snapCall(session,state){
   const side=state.possession,offense=DRIVE_CALLS[session.driveCall?.[side]]||null,d=session.defenseCall;
   const defense=d&&d.side===other(side)&&d.at===state.events.length?DEFENSE_CALLS[d.call]||null:null;
-  if(!offense&&!defense)return null;
+  const half=halftimeCall(session,state);
+  if(!offense&&!defense&&!half)return null;
   const out={passRate:0,passYards:1,rushYards:0,intMult:1,sackMult:1,comp:0,hurry:0,clock:1};
-  for(const c of [offense,defense])if(c){out.passRate+=c.passRate||0;out.rushYards+=c.rushYards||0;out.comp+=c.comp||0;out.hurry+=c.hurry||0;out.passYards*=c.passYards??1;out.intMult*=c.intMult??1;out.sackMult*=c.sackMult??1;out.clock*=c.clock??1}
+  for(const c of [offense,defense,half])if(c){out.passRate+=c.passRate||0;out.rushYards+=c.rushYards||0;out.comp+=c.comp||0;out.hurry+=c.hurry||0;out.passYards*=c.passYards??1;out.intMult*=c.intMult??1;out.sackMult*=c.sackMult??1;out.clock*=c.clock??1}
   return out
 }
 function playOutcome(session,state){
@@ -6474,7 +6501,7 @@ function snapshot(session){validateSession(session);return clone(session)}
 function restore(value){const session=clone(value);validateSession(session);const pending=session.pendingStrategyDecision||decisions.pendingDecision(session.state);session.status=session.state.status==='final'?'final':(pending?'decision':session.state.status);return session}
 function pendingDecision(session){validateSession(session);return session.pendingStrategyDecision?clone(session.pendingStrategyDecision):decisions.pendingDecision(session.state)}
 
-return{VERSION,POLICY_ID,TEMPO_POLICY_ID,HALFTIME_POLICY_ID,CONVERSION_POLICY_ID,DRIVE_POLICY_ID,DEFENSE_POLICY_ID,DRIVE_CALLS,DEFENSE_CALLS,DRIVE_LABELS,DEFENSE_LABELS,createSession,advanceOne,advance,resolve,simulate,snapshot,restore,pendingDecision,validateSession};
+return{VERSION,POLICY_ID,TEMPO_POLICY_ID,HALFTIME_POLICY_ID,HALFTIME_V2,HALFTIME_MIX,CONVERSION_POLICY_ID,DRIVE_POLICY_ID,DEFENSE_POLICY_ID,DRIVE_CALLS,DEFENSE_CALLS,DRIVE_LABELS,DEFENSE_LABELS,createSession,advanceOne,advance,resolve,simulate,snapshot,restore,pendingDecision,validateSession};
 });
 
 (function(root,factory){
@@ -7478,8 +7505,12 @@ return{guidanceMode,classifyAgenda,buildCarryForward,buildBriefing,buildPrepPath
     else if(est.teamPass>=3)observations.push('Your passing matchup looks favorable enough to justify an explosive-pass emphasis.');
     else if(est.teamRun>=3)observations.push('Your run-game matchup looks favorable enough to lean into blocking detail.');
     else observations.push('Your offense projects relatively even; preparation can be used to shape identity rather than patch a clear weakness.');
+    const weather=weatherAdvice(input.weather);
+    if(weather)observations.unshift(weather.text);
     const oppInjuries=Number(input.opponentInjuries||0);if(oppInjuries>0)observations.push(`${oppInjuries} opponent availability issue${oppInjuries===1?' is':'s are'} on the staff report.`);
     const candidates=[];const add=id=>{if(FOCUSES[id]&&!candidates.includes(id))candidates.push(id)};
+    // Weather bad enough to cut the passing game sends both offenses to the ground: the staff want the run package.
+    if(weather)weather.focuses.forEach(add);
     if(est.teamProtect<=-2)add('pass_protection');
     if(est.oppPass>=2||passEstimate>=56)add('coverage');
     if(est.oppProtect<=-2)add('pressure');
@@ -7487,7 +7518,22 @@ return{guidanceMode,classifyAgenda,buildCarryForward,buildBriefing,buildPrepPath
     if(est.teamPass>=2)add('explosive_pass');
     if(est.teamRun>=2)add('run_blocking');
     add('pass_protection');add('coverage');
-    return{version:VERSION,confidence,confidenceLabel:confidenceLabel(confidence),passEstimate,estimatedEdges:est,observations:observations.slice(0,4),recommendedFocuses:candidates.slice(0,MAX_POINTS)}
+    return{version:VERSION,confidence,confidenceLabel:confidenceLabel(confidence),passEstimate,estimatedEdges:est,observations:observations.slice(0,4),recommendedFocuses:candidates.slice(0,MAX_POINTS),weather:weather?{kind:weather.kind,text:weather.text}:null}
+  }
+  // v0.37 — staff read the forecast. input.weather is a game-conditions record (roof, wind, precip, sky, temp). Only
+  // weather that really changes the passing game (the thresholds where game-conditions starts cutting pass yards and
+  // pass rate) earns advice; a calm or indoor game returns null and the report is unchanged.
+  const WEATHER_WIND=18;
+  function weatherAdvice(c){
+    if(!c||typeof c!=='object'||c.roof==='dome')return null;
+    const wind=Math.round(Number(c.wind)||0),precip=Number(c.precip)||0,snow=c.sky==='snow',temp=Math.round(Number(c.temp));
+    const why=[];
+    if(wind>=WEATHER_WIND)why.push(`Wind ${wind} mph`);
+    if(snow&&precip>=1)why.push(precip>=2?'Heavy snow':'Snow');
+    else if(precip>=2)why.push(precip>=3?'Heavy rain':'Rain');
+    if(!why.length)return null;
+    const cold=Number.isFinite(temp)&&temp<=25?` and ${temp}°F`:'';
+    return{kind:wind>=WEATHER_WIND?'wind':snow?'snow':'rain',focuses:['run_blocking','run_fits'],text:`${why.join(' and ')}${cold} Saturday: staff suggest the run package (Run Blocking + Run Fits). Both offenses will lean on the ground.`};
   }
   function applyPrepProfile(profile,focuses){
     const ids=normalizeFocuses(focuses);if(!profile||!ids.length)return profile&&JSON.parse(JSON.stringify(profile));
@@ -7529,7 +7575,7 @@ return{guidanceMode,classifyAgenda,buildCarryForward,buildBriefing,buildPrepPath
     const splitPlan=normalizeFocuses([ocPlan[0],dcPlan[0]]);
     return{version:VERSION,oc:{name:oc.name||'Offensive Coordinator',confidence:advisorConfidence(oc,ocMatch),schemeMatch:ocMatch,plan:ocPlan,reason:ocReason},dc:{name:dc.name||'Defensive Coordinator',confidence:advisorConfidence(dc,dcMatch),schemeMatch:dcMatch,plan:dcPlan,reason:dcReason},split:{plan:splitPlan,reason:'Use one preparation point on each coordinator’s top concern instead of giving either side the entire week.'}}
   }
-  return{VERSION,MAX_POINTS,FOCUSES,normalizeFocuses,buildReport,applyPrepProfile,focusSummary,confidenceLabel,struggleSignal,selectStarterChallenge,advisorConfidence,buildStaffRoom}
+  return{weatherAdvice,VERSION,MAX_POINTS,FOCUSES,normalizeFocuses,buildReport,applyPrepProfile,focusSummary,confidenceLabel,struggleSignal,selectStarterChallenge,advisorConfidence,buildStaffRoom}
 });
 
 (function(root,factory){
@@ -7642,7 +7688,7 @@ var esc=(typeof globalThis!=='undefined'&&globalThis.DynastyEscape)||function(x)
 'use strict';
 const EMBEDDED_SCHOOLS=globalThis.DynastySchools;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='0.36.0';
+const APP_VERSION='0.37.0';
 const POS=['QB','RB','WR','TE','OT','OG','C','EDGE','DT','LB','CB','S','K','P'];
 const POS_COUNTS={QB:4,RB:5,WR:10,TE:5,OT:7,OG:6,C:3,EDGE:7,DT:7,LB:8,CB:8,S:7,K:2,P:2};
 const FIRST=['Marcus','Darius','Eli','Jordan','Devin','Trevor','Mason','Jamal','Evan','Aaron','Tyler','Carter','Malik','Isaiah','Noah','Caleb','Andre','Micah','Dante','Logan','Xavier','Bryce','Miles','Cole','Jaylen','Cam','Roman','Nico','Zion','Trey','Dominic','Rashad','Gavin','Khalil','Luke','Jalen','Emmett','Malachi','Aiden','Alex','Amari','Andrew','Anthony','Antonio','Armani','Ashton','Austin','Avery','Bennett','Blake','Brady','Brandon','Brayden','Brennan','Brock','Bryson','Cade','Caden','Calvin','Cameron','Carson','Cedric','Chase','Christian','Cody','Colby','Collin','Connor','Corey','Damian','Damon','Daniel','Davion','Dawson','Deandre','Demarcus','Derek','Desmond','Dillon','Drew','Dylan','Elijah','Ethan','Ezra','Garrett','Grady','Graham','Grant','Hayden','Hunter','Ian','Isaac','Jabari','Jace','Jackson','Jacob','Jaden','Jake','Jamar','Jameson','Jared','Jarrett','Javon','Jaxon','Jay','Jermaine','Jesse','Joel','Jonah','Josiah','Julian','Justin','Kaden','Kai','Kamari','Keegan','Keenan','Kendall','Kendrick','Kevin','Kobe','Kyle','Kyler','Lamar','Landon','Lane','Lawrence','Leon','Levi','Lincoln','Lucas','Marco','Mario','Mateo','Matthew','Maurice','Max','Myles','Nate','Nathan','Nolan','Omar','Owen','Parker','Patrick','Preston','Quentin','Quincy','Reggie','Riley','Ryan','Sam','Sean','Seth','Shane','Silas','Solomon','Spencer','Sterling','Terrell','Theo','Tobias','Travis','Tristan','Troy','Tucker','Tyrese','Victor','Wade','Walker','Wes','Wyatt','Zach','Zane','Andres','Diego','Rafael','Tevita','Sione','Manu','Keoni','Kenji','Darnell'];
@@ -7945,7 +7991,12 @@ function gameAvailable(p){return !!p&&(p.injuryWeeks||0)===0&&!p.redshirtActive&
 function roleFit(p,t,role,useScout=false){if(!p||!role.eligible.includes(p.pos))return 0;ensurePlayerDevelopment(p,t);let base=useScout?p.perceived:conditionRating(p),w=0,total=0;for(const [k,x] of Object.entries(role.weights||{})){w+=(p[k]??p.trueNow)*x;total+=x}let attr=total?w/total:base,scheme=playerSchemeFit(p,t),fam=familiarity(p,p.pos),pen=(100-fam)*.12;return clamp(Math.round(base*.43+attr*.40+scheme*.17-pen),20,99)}
 function makeRoleDepth(t,useScout=false){let out={},used=new Set();for(const role of ROLE_DEFS){let a=t.roster.filter(p=>role.eligible.includes(p.pos)).map(p=>({p,f:roleFit(p,t,role,useScout)})).sort((x,y)=>y.f-x.f).map(x=>x.p);if(role.base){let fresh=a.filter(p=>!used.has(p.id)),rest=a.filter(p=>used.has(p.id));a=[...fresh,...rest];if(a[0])used.add(a[0].id)}out[role.id]=a.map(p=>p.id)}return out}
 function ensureRoleDepth(t){t.roleDepth??=makeRoleDepth(t,false);for(const role of ROLE_DEFS){let valid=new Set(t.roster.filter(p=>role.eligible.includes(p.pos)).map(p=>p.id)),arr=(t.roleDepth[role.id]||[]).filter(id=>valid.has(id));for(const p of t.roster.filter(p=>role.eligible.includes(p.pos)))if(!arr.includes(p.id))arr.push(p.id);t.roleDepth[role.id]=arr}}
-function rolePlayers(t,id){if(!t.roleDepth||!t.roleDepth[id])ensureRoleDepth(t);let role=ROLE_BY_ID[id],by=new Map(t.roster.filter(p=>role?.eligible.includes(p.pos)).map(p=>[p.id,p]));return (t.roleDepth[id]||[]).map(x=>by.get(x)).filter(Boolean)}
+// Hot path (v0.37): roleStarter runs ~50 times per team profile. Instead of mapping the whole roster on every call,
+// look players up in a per-team id -> index map that is checked on every hit and rebuilt when the roster changes.
+const ROSTER_INDEX=new WeakMap();
+function rosterIndex(t,force=false){const r=t.roster;let ix=ROSTER_INDEX.get(t);if(force||!ix||ix.roster!==r||ix.length!==r.length){ix={roster:r,length:r.length,map:new Map()};for(let i=0;i<r.length;i++)ix.map.set(r[i].id,i);ROSTER_INDEX.set(t,ix)}return ix}
+function rosterPlayer(t,id){let i=rosterIndex(t).map.get(id),p=i===undefined?undefined:t.roster[i];if(p&&p.id===id)return p;i=rosterIndex(t,true).map.get(id);return i===undefined?undefined:t.roster[i]}
+function rolePlayers(t,id){if(!t.roleDepth||!t.roleDepth[id])ensureRoleDepth(t);const role=ROLE_BY_ID[id],out=[];if(!role)return out;for(const x of t.roleDepth[id]||[]){const p=rosterPlayer(t,x);if(p&&role.eligible.includes(p.pos))out.push(p)}return out}
 function roleStarter(t,id){let a=rolePlayers(t,id),ready=a.filter(gameAvailable);return ready.find(p=>weeklyPlayerPlan(p)?.role!=='limited')||ready[0]||a[0]||null}
 // One definition of a player's roles for every screen. The listed starter keeps the role with a
 // designation when he won't play (redshirt protected, or out), and whoever actually starts in
@@ -8277,7 +8328,23 @@ function archiveMemory(memory){
  const round=v=>Number.isFinite(v)?Math.round(v*ARCHIVE_COORD)/ARCHIVE_COORD:v;
  return Number.isFinite(memory.lat)||Number.isFinite(memory.lon)?{...memory,lat:round(memory.lat),lon:round(memory.lon)}:memory;
 }
-function archiveRecord(p,team,reason){
+// v0.37 cold tier. A player who used up his eligibility without ever starting, with no award, no draft round and no
+// Player of the Week honour, is most of a long dynasty's archive (57% of records at twelve seasons). His record keeps
+// identity, school, years, career totals, every season line (team, position, rating, games and statistics) and his
+// draft result and camp history (camp attendance is real off-field history); it drops the scouting history and
+// per-season style and class labels, which only his profile panels read. Marked cold:1. compactHistoryArchive applies it to older records once a season.
+const ARCHIVE_COLD_DROP=['scoutingHistory','scoutingDomains','positionFamiliarity','trainingFocus','requestedPositionChange'];
+function archiveColdEligible(rec,source=rec){
+ return !!rec&&!rec.cold&&rec.exitReason==='Eligibility exhausted'&&!((rec.career?.starts||0)>0)&&!((source?.career?.starts||0)>0)
+  &&!(rec.awards?.length)&&!rec.draftResult?.round&&!rec.potw&&!source?.potw;
+}
+function coldArchiveRecord(rec){
+ for(const k of ARCHIVE_COLD_DROP)delete rec[k];
+ for(const s of rec.seasonHistory||[]){if(s&&typeof s==='object'){delete s.style;delete s.eligibility}}
+ rec.cold=1;return rec;
+}
+function archiveRecord(p,team,reason){const out=archiveRecordTiered(p,team,reason);if(archiveColdEligible(out,p))coldArchiveRecord(out);return out}
+function archiveRecordTiered(p,team,reason){
  const played=(p.career?.games||0)>0||(p.stats?.games||0)>0;
  if(!played){
   // Keep the keys normalizeUniverse fills in, so a summary record survives a
@@ -10941,7 +11008,10 @@ function compactHistoryArchive({horizon=EVENT_DETAIL_HORIZON}={}){
   if(Number(year)>cutoff||!ds||ds.slim)continue;
   slimCampReport(ds.springReport);slimCampReport(ds.fallReport);ds.slim=true;camps++;
  }
- return {events,dropped,camps};
+ // Older archive records move to the cold tier (v0.37), only when the archive is in memory.
+ let cold=0;
+ if(!(typeof archiveIsDeferred==='function'&&archiveIsDeferred()))for(const p of universe.playerArchive||[])if(archiveColdEligible(p)){coldArchiveRecord(p);cold++}
+ return {events,dropped,camps,cold};
 }
 function offseasonPreseason(){
  const os=normalizeOffseasonState(),ds=ensureDevelopmentState();
@@ -11334,7 +11404,8 @@ function careerChronologyHTML(p){
   rows.push({year:p.retiredYear,rank:6,kicker:'COLLEGE CAREER ENDED',main:gameEscape(`${p.name} completed his college eligibility at ${p.lastTeam||'his school'}.`),sub:''});
  if(!rows.length)return '<div class="muted">No career history recorded yet.</div>';
  return rows.sort((a,b)=>{const yearDiff=(Number(b.year)||0)-(Number(a.year)||0);if(yearDiff)return yearDiff;if(a.eventWeek!=null&&b.eventWeek!=null){const weekDiff=b.eventWeek-a.eventWeek;if(weekDiff)return weekDiff;if(a.eventOrder!=null&&b.eventOrder!=null&&a.eventOrder!==b.eventOrder)return b.eventOrder-a.eventOrder;return b.eventIndex-a.eventIndex}return a.rank-b.rank}).map(r=>
-  `<div class="timeline-row"><div class="small muted">${r.year} · ${r.kicker}</div><strong>${r.main}</strong>${r.sub?`<div class="muted">${r.sub}</div>`:''}</div>`).join('');
+  `<div class="timeline-row"><div class="small muted">${r.year} · ${r.kicker}</div><strong>${r.main}</strong>${r.sub?`<div class="muted">${r.sub}</div>`:''}</div>`).join('')+
+  (p.cold?'<p class="small muted">This archived record keeps every season line, career total and camp result; its scouting history was trimmed to keep long dynasties small.</p>':'');
 }
 function orderPlayerStoryEvents(events=universe?.events||[]){return(Array.isArray(events)?events:[]).map((event,index)=>({event,index})).filter(({event})=>['BREAKOUT','ROLE_BATTLE','COLLEGE_CAREER_ENDED','FIRST_COLLEGE_START'].includes(event?.metadata?.storyType)).sort((a,b)=>{const year=(Number(b.event.season)||0)-(Number(a.event.season)||0);if(year)return year;const aw=Number.isFinite(a.event.week)?a.event.week:null,bw=Number.isFinite(b.event.week)?b.event.week:null;if(aw!=null&&bw!=null&&aw!==bw)return bw-aw;if(a.event.timestampOrder!=null&&b.event.timestampOrder!=null&&a.event.timestampOrder!==b.event.timestampOrder)return b.event.timestampOrder-a.event.timestampOrder;return b.index-a.index}).map(x=>x.event)}
 function transferHistoryHTML(p){const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));return '<h3 style="margin-top:14px">Transfer History</h3>'+((p.transferHistory||[]).map(h=>`<div class="timeline-row"><strong>${esc(h.season)} · ${esc(h.fromSchool)} → ${esc(h.toSchool)}</strong><div>${esc(transferReasonLabel(h.reason))}</div></div>`).join('')||'<div class="muted">No transfers recorded.</div>')}
@@ -15312,7 +15383,7 @@ function makeFacilitySystem(env){
  const universe=()=>env.getUniverse(),clamp=env.clamp;
  const TRACKS={
   stadium:{label:'Stadium & Game Day',short:'Stadium',blurb:'Seats, sightlines and a louder crowd.',perLevel:'+2 fan support (a bigger home-field edge), gifts grow'},
-  training:{label:'Training & Performance Center',short:'Training',blurb:'Weight room, recovery and sports science.',perLevel:'+1 development at levels 2 and 4'},
+  training:{label:'Training & Performance Center',short:'Training',blurb:'Weight room, recovery and sports science.',perLevel:'+1 development at levels 2 and 4; injured players heal faster and featured plans get extra work at every level'},
   football_ops:{label:'Football Operations Building',short:'Football Ops',blurb:'Film rooms, a recruiting lounge and staff space.',perLevel:'+2 recruiting hours a week'}
  };
  const TRACK_IDS=Object.keys(TRACKS);
@@ -15541,7 +15612,7 @@ function makeFacilitySystem(env){
  function effectsText(t){
   const s=level(t,'stadium'),tr=level(t,'training'),o=level(t,'football_ops'),out=[];
   if(s)out.push(`Stadium level ${s}: +${s*STADIUM_FAN} fan support, bigger gifts`);
-  if(tr)out.push(`Training level ${tr}: +${TRAINING_DEV_LEVELS.filter(x=>x<=tr).length} development`);
+  if(tr)out.push(`Training level ${tr}: +${TRAINING_DEV_LEVELS.filter(x=>x<=tr).length} development, ${tr*5}% weekly chance an injured player heals a week early`);
   if(o)out.push(`Football Ops level ${o}: +${o*OPS_HOURS} recruiting hours a week`);
   return out;
  }
@@ -15950,7 +16021,7 @@ else{
  }
  function augmentTrainingPlanControls(){const t=selected(),ds=ensureDevelopmentState();for(const s of $$('[data-training]')){const p=t.roster.find(x=>String(x.id)===String(s.dataset.training)),cell=s.closest('td');if(!p||!cell||cell.querySelector('[data-feature-development]'))continue;const plan=developmentPlanSystem.activePlan(p,universe),used=developmentPlanSystem.count(t.roster,universe),disabled=ds.springRun||(!plan&&used>=developmentPlanSystem.LIMIT)||universe.phase!=='complete';cell.insertAdjacentHTML('beforeend',`<button type="button" class="development-feature-btn${plan?' active':''}" data-feature-development="${devPlanEscape(p.id)}" ${disabled?'disabled':''}>${plan?'Featured Plan':'Feature Plan'}</button>${plan?`<div class="small muted">${devPlanEscape(planResultText(plan))}</div>`:''}`);if(plan)s.onchange=()=>{s.value=plan.focus;setStatus(`${p.name}'s featured plan is locked to ${plan.focus} for this training cycle.`)}}bindDevelopmentPlanButtons()}
  extendRender('development',()=>{renderDevelopmentPlanBoard();augmentTrainingPlanControls()});
- globalThis.DynastyLabDevelopmentPlans={active:p=>developmentPlanSystem.activePlan(p,universe),count:()=>developmentPlanSystem.count(selected()?.roster||[],universe),countFor:roster=>developmentPlanSystem.count(roster||[],universe),limit:developmentPlanSystem.LIMIT,recordResults};
+ globalThis.DynastyLabDevelopmentPlans={bonus:developmentPlanSystem.BONUS,active:p=>developmentPlanSystem.activePlan(p,universe),count:()=>developmentPlanSystem.count(selected()?.roster||[],universe),countFor:roster=>developmentPlanSystem.count(roster||[],universe),limit:developmentPlanSystem.LIMIT,recordResults};
 }
 
 function makeDevelopmentVisualizationModel(){
@@ -16407,6 +16478,9 @@ function v2RecordDriveArchive(preview){
     if(e.type==='kickoff'&&valid(e.receiver)){finish();start(e.receiver);continue}
     if(e.type==='overtime_possession'&&valid(e.possession)){finish();start(e.possession,true);continue}
     if(e.type==='possession_change'&&valid(e.to)){if(drive&&drive.side!==e.to){if(e.reason==='turnover_on_downs'&&!drive.result)drive.result='DOWNS';finish()}if(!drive)start(e.to);continue}
+    // A safety belongs to the defense (e.team), but it is how the offense's drive ended: say so on that drive. The two
+    // points stay on the defense's zero-play entry, so quarter scores are unchanged.
+    if(e.type==='safety'&&drive&&valid(e.team)&&drive.side!==e.team)drive.result='SAFETY';
     const side=valid(e.team)?e.team:null;if(side&&(!drive||drive.side!==side)){finish();start(side,(e.state?.period||0)>4)}if(!drive)continue;
     if(['scrimmage','interception','fumble'].includes(e.type)){drive.plays++;drive.playByPlay.push(v2RecordArchiveText(e,names));if(e.type==='interception')drive.result='INT';if(e.type==='fumble')drive.result='FUMBLE'}
     else if(e.type==='coaching_decision'||e.type==='penalty'||e.type==='timeout'){drive.playByPlay.push(v2RecordArchiveText(e,names))}
@@ -16602,10 +16676,12 @@ function v2PostseasonStageCapture(){
   for(const [key,value] of Object.entries(universe)){
     if(V2_STAGE_APPEND_ONLY.includes(key)&&Array.isArray(value))kept[key]={rows:value,length:value.length};else core[key]=value;
   }
-  return{core:v2RecordClone(core),kept,order:Object.keys(universe)};
+  // v0.37: the rollback copy is read only when a stage fails, so it is kept as JSON text and parsed on restore. The
+  // restored universe is the same JSON round trip as before; a stage that succeeds no longer pays for the parse.
+  return{coreJson:JSON.stringify(core),kept,order:Object.keys(universe)};
 }
 function v2PostseasonStageRestore(snapshot){
-  const core=v2RecordClone(snapshot.core),next={};
+  const core=snapshot.coreJson!=null?JSON.parse(snapshot.coreJson):v2RecordClone(snapshot.core),next={};
   for(const key of snapshot.order){
     const kept=snapshot.kept[key];
     if(kept){kept.rows.length=Math.min(kept.rows.length,kept.length);next[key]=kept.rows}else if(key in core)next[key]=core[key];
@@ -16979,13 +17055,14 @@ const V2_GAMEDAY_CALL_HINTS={
   balanced:'No tilt either way.',ground:'Safer and slower. Fewer big plays.',quick:'High percentage, short gains, fewer sacks.',shots:'Bigger gains. More sacks and interceptions.',
   base:'No tilt either way.',pressure:'More sacks. A completion goes further.',coverage:'Takes away the deep ball. Gives up the run.',run_stop:'Stops the run. Thin behind it.'
 };
+const V2_GAMEDAY_HALFTIME_HINTS={aggressive:'Throw more in the second half. Faster snaps, bigger gains, more risk.',balanced:'Keep the first-half mix.',ball_control:'Run more and shorten the game. Protects a lead.'};
 const V2_GAMEDAY_DECISION_TITLES={timeout_call:'CLOCK RUNNING',drive_call:'YOUR DRIVE',defense_call:'DEFENSIVE CALL',fourth_down:'FOURTH DOWN',two_point_decision:'AFTER THE TOUCHDOWN',halftime_adjustment:'HALFTIME',late_game_tempo:'CLOCK MANAGEMENT'};
 function v2GameDayUIOptionLabel(d,id){return d.options.find(o=>o.id===id)?.label||String(id||'').replaceAll('_',' ')}
 function v2GameDayUIDecision(session){
   const d=globalThis.DynastyGameEngineV2GameDay?.pendingDecision(session);if(!d)return'';
   const calls=d.type==='drive_call'||d.type==='defense_call',win=v2GameDayUIWinChance(session),staff=v2GameDayUIOptionLabel(d,d.staffRecommendation);
   const option=o=>{
-    const hint=calls?V2_GAMEDAY_CALL_HINTS[o.id]:'',current=d.type==='drive_call'&&o.id===d.lastCall,cls=[o.id===d.staffRecommendation?'recommended':'',calls&&o.id!=='delegate'?'v2-gameday-call':''].filter(Boolean).join(' ');
+    const hint=calls?V2_GAMEDAY_CALL_HINTS[o.id]:d.type==='halftime_adjustment'?V2_GAMEDAY_HALFTIME_HINTS[o.id]||'':'',current=d.type==='drive_call'&&o.id===d.lastCall,cls=[o.id===d.staffRecommendation?'recommended':'',calls&&o.id!=='delegate'?'v2-gameday-call':''].filter(Boolean).join(' ');
     return`<button type="button" data-v2-gameday-choice="${gameEscape(o.id)}"${cls?` class="${cls}"`:''}><span>${gameEscape(o.label)}</span>${hint?`<small>${gameEscape(hint)}</small>`:''}${current?'<em>Last drive</em>':''}</button>`
   };
   return`<div class="v2-gameday-decision" data-decision-type="${gameEscape(d.type)}">${d.type==='fourth_down'?(globalThis.DynastyArt?.img('goalposts','dl-art dl-art-decision')||''):''}<div class="eyebrow">${gameEscape(V2_GAMEDAY_DECISION_TITLES[d.type]||'HEAD COACH DECISION')}</div><h3>${gameEscape(d.situation)}</h3><div class="muted">Staff recommendation: <strong>${gameEscape(staff)}</strong>${d.reason?` (${gameEscape(d.reason)})`:''}${win!=null?` · Win chance now <strong>${win}%</strong>`:''}</div><div class="button-row${calls?' v2-gameday-calls':''}">${d.options.map(option).join('')}</div></div>`
@@ -17204,10 +17281,17 @@ function v0102WeeklyBaselineMatchup(t,opp){
   const P=gameProfilesBeforeWeeklyPrep(t,opp.name),O=gameProfilesBeforeWeeklyPrep(opp,t.name);
   return{teamProfile:P,opponentProfile:O,teamEdges:matchupEdges(t,opp,P,O),opponentEdges:matchupEdges(opp,t,O,P)}
 }
+// The forecast for this week's game between the two programs (the same weather the game will be played in).
+function v0102WeeklyForecast(t,opp){
+  try{
+    const g=universe.phase==='regular'?(universe.schedule?.[universe.week]||[]).find(x=>!x.played&&((x.home===t.name&&x.away===opp.name)||(x.away===t.name&&x.home===opp.name))):null;
+    return g&&typeof v2ForecastFor==='function'?v2ForecastFor(g):null;
+  }catch{return null}
+}
 function v0102WeeklyOpponentReport(t,opp){
   if(!v0102WeeklyApi||!t||!opp)return null;
   const m=v0102WeeklyBaselineMatchup(t,opp),passShare=OFF_SCHEMES[opp.offScheme]?.pass??.5;
-  return v0102WeeklyApi.buildReport({season:universe.year,week:universe.week,teamName:t.name,opponentName:opp.name,passShare,confidence:v0102WeeklyStaffConfidence(t),teamEdges:m.teamEdges,opponentEdges:m.opponentEdges,opponentInjuries:(opp.roster||[]).filter(p=>p.injury||(p.injuryWeeks||0)>0).length})
+  return v0102WeeklyApi.buildReport({season:universe.year,week:universe.week,teamName:t.name,opponentName:opp.name,passShare,weather:v0102WeeklyForecast(t,opp),confidence:v0102WeeklyStaffConfidence(t),teamEdges:m.teamEdges,opponentEdges:m.opponentEdges,opponentInjuries:(opp.roster||[]).filter(p=>p.injury||(p.injuryWeeks||0)>0).length})
 }
 function v0102WeeklyStaffRoom(t,opp,report=v0102WeeklyOpponentReport(t,opp)){
   if(!v0102WeeklyApi||!t||!opp||!report)return null;const oc=t.staff?.OC||{},dc=t.staff?.DC||{};
@@ -17260,7 +17344,7 @@ recordInteractiveV2GameDay=function recordInteractiveV2GameDayWithWeeklyPrep(ses
 };
 if(globalThis.DynastyGameEngineV2LabBridge)globalThis.DynastyGameEngineV2LabBridge.recordInteractive=recordInteractiveV2GameDay;
 if(globalThis.__DL_TEST__){
-  globalThis.__DL_TEST__.weeklyCoachingDebug=()=>{const t=selected(),g=findUserGame(),opp=t&&g?T(g.home===t.name?g.away:g.home):null;if(!t||!opp)return null;const report=v0102WeeklyOpponentReport(t,opp),prep=v0102WeeklyPrepSnapshot(t,opp.name),base=gameProfilesBeforeWeeklyPrep(t,opp.name),active=gameProfiles(t,opp.name),staffRoom=v0102WeeklyStaffRoom(t,opp,report);return{opponent:opp.name,report,staffRoom,prep,profile:{base,active}}};
+  globalThis.__DL_TEST__.weeklyCoachingDebug=()=>{const t=selected(),g=findUserGame(),opp=t&&g?T(g.home===t.name?g.away:g.home):null;if(!t||!opp)return null;const report=v0102WeeklyOpponentReport(t,opp),prep=v0102WeeklyPrepSnapshot(t,opp.name),base=(globalThis.DynastyFatigue?.decorate||((x,p)=>p))(t,gameProfilesBeforeWeeklyPrep(t,opp.name)),active=gameProfiles(t,opp.name),staffRoom=v0102WeeklyStaffRoom(t,opp,report);return{opponent:opp.name,report,staffRoom,prep,profile:{base,active}}};
   globalThis.__DL_TEST__.weeklyCoachingSet=(focuses=[])=>{const t=selected(),g=findUserGame(),opp=t&&g?T(g.home===t.name?g.away:g.home):null;return!!(t&&opp&&v0102SetWeeklyPrep(t,opp,focuses,{source:'manual'}))};
   globalThis.__DL_TEST__.resolvePendingWeeklyDecisions=()=>{const t=selected();if(!t)return 0;const pending=(universe.weeklyDecisions||[]).filter(d=>d.season===universe.year&&d.week===universe.week&&d.teamId===t.id&&!d.resolved&&d.type!=='WEEKLY_GAMEPLAN');for(const d of pending){const o=delegatedWeeklyOption(d,t);if(o)applyWeeklyDecision(d.id,o.id,{selectedBy:'staff',coachId:t.staff.HC.id})}if(pending.length)render();return pending.length};
   globalThis.__DL_TEST__.weeklyCoachingDelegate=()=>{const t=selected(),g=findUserGame(),opp=t&&g?T(g.home===t.name?g.away:g.home):null;return!!(t&&opp&&v0102DelegateWeeklyPrep(t,opp))};
@@ -19084,7 +19168,7 @@ globalThis.DynastyCeremonySnapshot=Object.freeze({
     out.push({key:`${year}:signing`,kind:'signing',year,team,count:signed.length,stars:[5,4,3].map(n=>signed.filter(r=>(r.stars||0)===n).length),top:signed.slice(0,5).map(r=>({id:r.id,name:r.name,pos:r.pos,stars:r.stars||0,rank:r.rank||null}))});
    }
    const picks=(universe.draftHistory?.[year]||[]).filter(d=>d.school===u.name&&d.status==='Drafted').sort((a,b)=>(a.round-b.round)||(a.pick-b.pick));
-   if(picks.length)out.push({key:`${year}:draft`,kind:'draft',year,team,picks:picks.slice(0,8).map(d=>({playerId:d.playerId,name:d.playerName,pos:d.pos,round:d.round,pick:d.pick,label:d.label}))});
+   if(picks.length)out.push({key:`${year}:draft`,kind:'draft',year,team,picks:picks.slice(0,8).map(d=>({playerId:d.playerId,name:d.playerName,pos:d.pos,round:d.round,pick:d.pick,label:d.potw>=2&&globalThis.DynastyPlayersOfWeek?`${d.label} · ${globalThis.DynastyPlayersOfWeek.honourLabel(d.potw)}`:d.label}))});
    const nfl=globalThis.DynastyNfl;
    if(nfl&&universe.phase==='complete'){
     const seen=new Set(),alumni=[];
@@ -20743,7 +20827,7 @@ if(typeof module==='object'&&module.exports){
 // Optional, current facts shared by the Wire and the short weekly briefing.
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.DynastyWorldNews=api})(typeof globalThis!=='undefined'?globalThis:this,function(){
  'use strict';
- const TYPES={PRO_MILESTONE:{kicker:'PRO ALUMNI',tab:'program'},LOCKER_ROOM_MEETING:{kicker:'LOCKER ROOM',tab:'roster'},LOCKER_ROOM_FLASHPOINT:{kicker:'LOCKER ROOM',tab:'roster'},LOCKER_ROOM_RESOLVED:{kicker:'LOCKER ROOM',tab:'roster'},SCOUTING_VINDICATED:{kicker:'YOU SAW HIM FIRST',tab:'recruiting'},STATEMENT_WIN:{kicker:'STATEMENT WIN',tab:'season'},ADMIN_WAGER:{kicker:'THE BOARD',tab:'program'},HOME_STREAK:{kicker:'HOME STREAK',tab:'season'},TRADITION:{kicker:'TRADITION',tab:'program'},PLAYER_OF_WEEK:{kicker:'PLAYER OF THE WEEK',tab:'roster'},NUMBER_RETIRED:{kicker:'RETIRED NUMBER',tab:'program'}};
+ const TYPES={PRO_MILESTONE:{kicker:'PRO ALUMNI',tab:'program'},LOCKER_ROOM_MEETING:{kicker:'LOCKER ROOM',tab:'roster'},LOCKER_ROOM_FLASHPOINT:{kicker:'LOCKER ROOM',tab:'roster'},LOCKER_ROOM_RESOLVED:{kicker:'LOCKER ROOM',tab:'roster'},SCOUTING_VINDICATED:{kicker:'YOU SAW HIM FIRST',tab:'recruiting'},STATEMENT_WIN:{kicker:'STATEMENT WIN',tab:'season'},ADMIN_WAGER:{kicker:'THE BOARD',tab:'program'},HOME_STREAK:{kicker:'HOME STREAK',tab:'season'},TRADITION:{kicker:'TRADITION',tab:'program'},PLAYER_OF_WEEK:{kicker:'PLAYER OF THE WEEK',tab:'roster'},WHERE_NOW:{kicker:'WHERE ARE THEY NOW',tab:'program'},FACILITY_HELP:{kicker:'TRAINING CENTER',tab:'program'},NUMBER_RETIRED:{kicker:'RETIRED NUMBER',tab:'program'}};
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function items(u,t){
   if(!u||!t)return[];
@@ -21708,6 +21792,10 @@ if(typeof module==='object'&&module.exports){
 //
 // The score reads only the game's own statistics (a small bonus for winning), never ratings. State:
 // universe.weeklyHonors {year, rows:[{week, off, def}]}, this season only (about 2 KB), cleared when a new season starts.
+//
+// v0.37 — the honour counts for more than a week. This season's honours lift a player in the award race (seasonScore),
+// his career count (p.potw, one small integer, carried into the archive and onto his draft record) lifts his draft
+// stock a little, and a player honoured twice or more is introduced that way on Draft Night and in the Hall of Fame.
 function makePlayersOfWeek(env){
  'use strict';
  const universe=()=>env.getUniverse();
@@ -21754,8 +21842,23 @@ function makePlayersOfWeek(env){
   const row={week,off,def};s.rows.push(row);return row;
  }
  function last(){return state().rows.at(-1)||null}
- function countFor(playerId){return state().rows.reduce((k,r)=>k+(r.off?.playerId===playerId?1:0)+(r.def?.playerId===playerId?1:0),0)}
- return{score,line,pick,award,last,countFor,state};
+ // This season's honours by player, rebuilt only when a week is added (seasonScore reads it for every player).
+ let counts={key:null,map:new Map()};
+ function seasonCounts(){
+  const s=state(),key=`${s.year}:${s.rows.length}`;
+  if(counts.key!==key){const map=new Map();for(const r of s.rows)for(const w of [r.off,r.def])if(w)map.set(String(w.playerId),(map.get(String(w.playerId))||0)+1);counts={key,map}}
+  return counts.map;
+ }
+ function countFor(playerId){return seasonCounts().get(String(playerId))||0}
+ // Award race: each honour this season is worth about one strong game in seasonScore, up to four of them.
+ const AWARD_BONUS=2.5,AWARD_MAX=4;
+ function awardBonus(playerId){return Math.min(AWARD_MAX,countFor(playerId))*AWARD_BONUS}
+ // Draft: scouts notice a player the country kept naming. Worth well under a round (a round is 3-4 board points).
+ const DRAFT_STEP=.6,DRAFT_MAX=2;
+ function draftBump(career){return Math.round(Math.min(DRAFT_MAX,Math.max(0,Number(career)||0)*DRAFT_STEP)*10)/10}
+ const WORDS=['','','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten'];
+ function honourLabel(k){k=Number(k)||0;if(k<1)return'';if(k===1)return'Player of the Week';return`${WORDS[k]||k}-time Player of the Week`}
+ return{score,line,pick,award,last,countFor,seasonCounts,awardBonus,draftBump,honourLabel,AWARD_BONUS,AWARD_MAX,DRAFT_STEP,DRAFT_MAX,state};
 }
 
 if(typeof module==='object'&&module.exports){
@@ -21774,12 +21877,35 @@ if(typeof module==='object'&&module.exports){
   }
  }
  potw.announce=announcePlayersOfWeek;
+ // A player's career count lives on the player, so it survives the season, the archive and the draft.
+ function creditCareer(row){for(const w of [row?.off,row?.def]){if(!w)continue;const f=findPlayer(w.playerId);if(f?.p)f.p.potw=(f.p.potw||0)+1}}
+ potw.creditCareer=creditCareer;
  const simWeekBeforePotw=simWeek;
  simWeek=function simWeekWithPlayersOfWeek(){
   const week=universe?.week,out=simWeekBeforePotw.apply(this,arguments);
-  try{if(universe&&week!=null&&universe.week===week+1)announcePlayersOfWeek(potw.award(week+1))}catch(err){console.error(err)}
+  try{if(universe&&week!=null&&universe.week===week+1){const row=potw.award(week+1);if(row){creditCareer(row);announcePlayersOfWeek(row)}}}catch(err){console.error(err)}
   return out;
  };
+ // The award race and the season's awards read seasonScore.
+ const seasonScoreBeforePotw=seasonScore;
+ seasonScore=function seasonScoreWithPlayersOfWeek(p,t){const base=seasonScoreBeforePotw.apply(this,arguments);return p?.id!=null?base+potw.awardBonus(p.id):base};
+ // The draft board: a small lift for a career of weekly honours, recomputing the round on the same thresholds.
+ const draftProjectionBeforePotw=draftProjection;
+ draftProjection=function draftProjectionWithPlayersOfWeek(p,t){
+  const d=draftProjectionBeforePotw.apply(this,arguments),bump=potw.draftBump(p?.potw);
+  if(!d||!bump)return d;
+  const nfl=globalThis.DynastyNfl,raw=d.grade!=null&&d.positionValue!=null&&nfl?d.grade+d.positionValue*.8:d.score;
+  const score=raw+bump,round=nfl?nfl.roundFor(score):d.round;
+  const pick=round?(d.pick??(nfl?1+nfl.hash(p.id,'pick')%32:16)):null;
+  return{...d,score:Math.round(score),round,pick,label:round?`Projected round ${round}`:d.label,potwBump:bump};
+ };
+ const draftPlayerBeforePotw=draftPlayer;
+ draftPlayer=function draftPlayerWithPlayersOfWeek(p){const r=draftPlayerBeforePotw.apply(this,arguments);if(r&&p?.potw)r.potw=p.potw;return r};
+ const archiveRecordBeforePotw=archiveRecord;
+ archiveRecord=function archiveRecordWithPlayersOfWeek(p){const out=archiveRecordBeforePotw.apply(this,arguments);if(out&&p?.potw)out.potw=p.potw;return out};
+ // Hall of Fame: twice honoured or more is part of the case.
+ const hofReasonsBeforePotw=hofPlayerReasons;
+ hofPlayerReasons=function hofReasonsWithPlayersOfWeek(p){const reasons=hofReasonsBeforePotw.apply(this,arguments);if((p?.potw||0)>=2){const at=Math.min(reasons.length,2);reasons.splice(at,0,potw.honourLabel(p.potw))}return reasons.slice(0,4)};
  function renderPlayersOfWeek(){
   const host=$('#weeklyDecisions');if(!host?.insertAdjacentElement)return;
   let card=$('#playersOfWeek');const row=universe?.teams&&universe.phase==='regular'?potw.last():null,me=row?selected():null;
@@ -21869,6 +21995,464 @@ if(typeof module==='object'&&module.exports){
  TAB_RENDERERS.program=()=>{renderProgramBeforeRetired();renderRetiredNumbers()};
  // Test pages only: a decorated former player in the archive.
  if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.retiredNumberFixture=()=>{const t=selected();(universe.playerArchive??=[]).push({id:'RNFIX',name:'Legend Fixture',pos:'QB',lastTeam:t.name,retiredYear:universe.year-2,jerseyNumber:12,awards:[{year:universe.year-2,name:'National Player of the Year'}],draftResult:{round:1,pick:3},seasonHistory:[],career:{},stats:{}});renderRetiredNumbers();return 12};
+}
+
+// v0.37 — the long memory. Three things a long dynasty has earned the right to remember:
+//
+// * Where are they now? Every fifth archived season The Wire checks in on three notable former players of your program:
+//   still playing pro football, retired from it, coaching somewhere, or out of the game with his college line standing.
+//   Nothing is invented: a pro career is read from the pro pipeline, a coaching job from the staff lists.
+// * This week in history. When the coming week's anniversary (5, 10, 15... years) holds a memorable game of yours, an
+//   upset, a win over a top-five team or a rivalry win, This Week says so. Derived from the game archive; no save field.
+// * Milestone watch. A player of yours within about two games of a school season record, a school career record or a
+//   national career record is named on This Week, with what he needs and the holder he would pass. Derived; no save field.
+//
+// State: universe.longMemory {checkins:[year], seen:[playerId]} (seen capped at 60) for the check-ins only.
+function makeLongMemory(env){
+ 'use strict';
+ const universe=()=>env.getUniverse();
+ const n=v=>Number(v)||0;
+ const CHECKIN_EVERY=5,CHECKIN_SIZE=3,CHECKIN_MIN_GONE=3,SEEN_CAP=60;
+ const ANNIVERSARY_STEP=5,MILESTONE_GAMES=2,MILESTONE_MAX=3;
+ function state(){const u=universe();u.longMemory??={checkins:[],seen:[]};u.longMemory.checkins??=[];u.longMemory.seen??=[];return u.longMemory}
+
+ // ---- Where are they now ----
+ function archivedSeasons(){return (universe().history||[]).filter(h=>h?.type==='season').length}
+ function checkinDue(){const s=archivedSeasons();return s>0&&s%CHECKIN_EVERY===0&&!state().checkins.includes(universe().year)}
+ const ROUND_POINTS={1:25,2:15,3:8};
+ function notability(p){
+  const awards=(p.awards||[]).length,round=p.draftResult?.round||0,pro=env.proCareer?.(p);
+  return awards*30+(round?ROUND_POINTS[round]||4:0)+n(p.potw)*3+Math.max(0,n(env.production?.(p))-55)+(pro?n(pro.legacy):0);
+ }
+ function alumniOf(t){
+  const u=universe(),out=[];
+  for(const p of u.playerArchive||[]){
+   if(p.lastTeam!==t.name&&String(p.currentSchoolId)!==String(t.id))continue;
+   if(n(p.retiredYear)>u.year-CHECKIN_MIN_GONE)continue;
+   if(!(n(p.career?.games)>0))continue;
+   out.push(p);
+  }
+  return out;
+ }
+ function pickCheckins(t){
+  const seen=new Set(state().seen.map(String));
+  return alumniOf(t).filter(p=>!seen.has(String(p.id))).map(p=>({p,score:notability(p)})).filter(x=>x.score>=10)
+   .sort((a,b)=>b.score-a.score||String(a.p.id).localeCompare(String(b.p.id))).slice(0,CHECKIN_SIZE).map(x=>x.p);
+ }
+ const BEST={QB:['passYds','passing yards'],RB:['rushYds','rushing yards'],WR:['recYds','receiving yards'],TE:['recYds','receiving yards'],EDGE:['sacks','sacks'],DT:['sacks','sacks'],LB:['tackles','tackles'],CB:['intDef','interceptions'],S:['intDef','interceptions']};
+ function collegeLine(p){const d=BEST[p.pos];if(!d)return null;const v=n(p.career?.[d[0]]);return v?`${d[0]==='sacks'?v.toFixed(1).replace(/\.0$/,''):Math.round(v).toLocaleString('en-US')} career ${d[1]}`:null}
+ const plural=(k,w)=>`${k} ${w}${k===1?'':'s'}`;
+ function proHonours(c){return[c.proBowls?plural(c.proBowls,'Pro Bowl'):'',c.allPros?`${c.allPros}× All-Pro`:'',c.rings?plural(c.rings,'ring'):''].filter(Boolean).join(', ')}
+ // One clause per former player, from facts the game holds.
+ function whereNow(p){
+  const c=env.proCareer?.(p),coach=env.coachFor?.(p.id),h=c?proHonours(c):'';
+  const job=coach?`coaching ${coach.role||'on staff'} at ${coach.school}`:'';
+  if(c&&c.hof)return`in the Pro Football Hall of Fame${h?` (${h})`:''}${job?`, now ${job}`:''}`;
+  if(c&&c.active)return`in his ${ordinal(c.done+1)} pro season${h?` (${h})`:''}`;
+  if(c&&c.retired&&c.length)return`retired after ${plural(c.length,'pro season')}${h?` (${h})`:''}${job?`, now ${job}`:''}`;
+  if(job)return job;
+  const line=collegeLine(p);return line?`out of football; his ${line} still stand`:`out of football after ${plural(n(p.career?.games),'college game')}`;
+ }
+ function ordinal(k){const s=['th','st','nd','rd'],v=k%100;return k+(s[(v-20)%10]||s[v]||s[0])}
+ function checkin(t){
+  if(!t||!checkinDue())return null;
+  const s=state(),list=pickCheckins(t);s.checkins.push(universe().year);s.checkins=s.checkins.slice(-12);
+  if(!list.length)return null;
+  s.seen.push(...list.map(p=>String(p.id)));s.seen=s.seen.slice(-SEEN_CAP);
+  return{year:universe().year,rows:list.map(p=>({playerId:p.id,name:p.name,pos:p.pos,left:p.retiredYear,text:whereNow(p)}))};
+ }
+
+ // ---- This week in history ----
+ const ranked=r=>Number.isFinite(Number(r))&&Number(r)>0&&Number(r)<=25?Number(r):null;
+ function memorable(g,t){
+  if(!g?.score||g.season==null)return null;
+  const side=String(g.home?.id)===String(t.id)?'home':String(g.away?.id)===String(t.id)?'away':null;if(!side)return null;
+  const other=side==='home'?'away':'home',us=n(g.score[side]),them=n(g.score[other]);if(us<=them)return null;
+  const mine=ranked(g[side]?.rank),opp=ranked(g[other]?.rank),oppName=g[other]?.name||'';
+  const score=`${us}-${them}`;
+  if(opp&&opp<=10&&(mine==null||mine-opp>=12))return{kind:'upset',weight:3,text:`${mine?`#${mine} `:'unranked '}${t.name} upset #${opp} ${oppName}, ${score}`};
+  if(opp&&opp<=5)return{kind:'top5',weight:2,text:`${t.name} beat #${opp} ${oppName}, ${score}`};
+  if(env.isRivalry?.(g,t))return{kind:'rivalry',weight:1,text:`${t.name} beat ${oppName}${g.trophy?` for the ${g.trophy}`:''}, ${score}`};
+  return null;
+ }
+ // The coming week's games from 5, 10, 15... years ago; the best one wins, the older one breaking a tie.
+ function anniversary(t,{week=universe().week+1,year=universe().year}={}){
+  if(!t||env.gamesDeferred?.())return null;
+  let best=null;
+  for(const g of universe().gameArchive||[]){
+   const ago=year-n(g.season);if(ago<ANNIVERSARY_STEP||ago%ANNIVERSARY_STEP)continue;
+   if(g.week!==week||(g.label&&g.label!=='Regular season'))continue;
+   const m=memorable(g,t);if(!m)continue;
+   if(!best||m.weight>best.weight||(m.weight===best.weight&&ago>best.ago))best={...m,ago,season:g.season,gameId:g.id};
+  }
+  return best;
+ }
+
+ // ---- Milestone watch ----
+ function pace(p,k){const g=n(p.stats?.games);if(g>=2)return n(p.stats?.[k])/g;const cg=n(p.career?.games);return cg?n(p.career?.[k])/cg:0}
+ // records: {season:t.records, schoolCareer:(playerId,k)=>{total, holder}|null, nationalCareer:universe.records.nationalCareer}
+ function milestones(t,records){
+  if(!t)return[];
+  const out=[];
+  for(const p of t.roster||[]){
+   const d=BEST[p.pos];if(!d||!(n(p.stats?.games)>=1)||n(p.injuryWeeks)>MILESTONE_GAMES)continue;
+   const [k,label]=d,per=pace(p,k);if(per<=0)continue;
+   const consider=(kind,mine,rec,holder,rank)=>{
+    if(!(rec>0)||holder?.id===p.id)return;const need=rec-mine;if(need<=0)return;const games=Math.ceil(need/per);if(games>MILESTONE_GAMES)return;
+    out.push({playerId:p.id,name:p.name,pos:p.pos,kind,stat:k,label,need:Math.ceil(need*10)/10,games,holder:holder?.name||'',holderYear:holder?.year??null,rank});
+   };
+   const nat=records?.nationalCareer?.[k];consider('national career',n(p.career?.[k])+n(p.stats?.[k]),n(nat?.value),nat&&{id:nat.playerId,name:nat.playerName,year:nat.year},3);
+   const sc=records?.schoolCareer?.(p.id,k);if(sc)consider('school career',sc.total,sc.value,{id:sc.id,name:sc.holder},2);
+   const ss=records?.season?.[k];consider('school season',n(p.stats?.[k]),n(ss?.value),ss&&{id:ss.playerId,name:ss.playerName,year:ss.year},1);
+  }
+  // One line per player, his biggest record first.
+  const byPlayer=new Map();for(const m of out.sort((a,b)=>b.rank-a.rank||a.games-b.games||a.need-b.need))if(!byPlayer.has(m.playerId))byPlayer.set(m.playerId,m);
+  return[...byPlayer.values()].slice(0,MILESTONE_MAX);
+ }
+ function fmt(v,k){return k==='sacks'?String(Math.round(v*10)/10):Math.ceil(v).toLocaleString('en-US')}
+ function milestoneText(m){return`${m.pos} ${m.name} needs ${fmt(m.need,m.stat)} ${m.label} for the ${m.kind} record${m.holder?` (${m.holder}${m.holderYear&&m.kind==='school season'?`, ${m.holderYear}`:''})`:''}: ${m.games===1?'one good game':'about two games'} at his pace.`}
+
+ return{CHECKIN_EVERY,CHECKIN_SIZE,ANNIVERSARY_STEP,MILESTONE_GAMES,state,checkinDue,notability,alumniOf,pickCheckins,whereNow,checkin,memorable,anniversary,milestones,milestoneText,ordinal};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeLongMemory};
+}else{
+ const lmEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function lmCoachFor(playerId){
+  for(const t of universe.teams||[])for(const c of Object.values(t.staff||{}))if(c?.formerPlayer?.id!=null&&String(c.formerPlayer.id)===String(playerId))return{role:String(c.role||'').toLowerCase()||null,school:t.name};
+  return null;
+ }
+ function lmProCareer(p){
+  const nfl=globalThis.DynastyNfl;if(!nfl||!p?.draftResult)return null;
+  const r=nfl.recordFor(p.id)||p.draftResult;if(!(r.round||r.status==='UDFA'))return null;
+  try{return nfl.careerAt(r,universe.year,universe.phase==='complete')}catch{return null}
+ }
+ const memory=makeLongMemory({getUniverse:()=>universe,production:p=>productionRating(p),proCareer:lmProCareer,coachFor:lmCoachFor,
+  gamesDeferred:()=>typeof gamesAreDeferred==='function'&&gamesAreDeferred(),
+  isRivalry:(g,t)=>{if(g.rivalry)return true;const r=typeof rivalOf==='function'?rivalOf(t):null;const other=String(g.home?.id)===String(t.id)?g.away:g.home;return!!r&&String(r.id??r)===String(other?.id)}});
+ globalThis.DynastyLongMemory=memory;
+
+ // The check-in runs once the season is archived.
+ const offseasonReviewBeforeMemory=offseasonReview;
+ offseasonReview=function offseasonReviewWithLongMemory(){
+  const out=offseasonReviewBeforeMemory.apply(this,arguments);
+  try{
+   const me=selected(),c=me&&memory.checkin(me);
+   if(c){universe.events??=[];universe.events.push({id:`EVT_WHERE_NOW_${c.year}`,type:'WHERE_NOW',season:universe.year,week:universe.week,schoolIds:[me.id],playerIds:c.rows.map(r=>r.playerId),coachIds:[],gameIds:[],importance:58,
+    summary:`Where are they now? ${c.rows.map(r=>`${r.pos} ${r.name} (${r.left}): ${r.text}`).join('; ')}.`,metadata:{rows:c.rows}})}
+  }catch(err){console.error(err)}
+  return out;
+ };
+
+ // School career records, worked out with the storylines tally and kept for the week.
+ let lmRecords={key:null,value:null};
+ function lmSchoolCareer(t){
+  const key=`${universe.year}:${universe.week}:${t.id}:${(universe.playerArchive||[]).length}`;
+  if(lmRecords.key!==key){
+   let value=null;
+   try{if(typeof storylineSchoolRecords==='function'&&!(typeof archiveIsDeferred==='function'&&archiveIsDeferred()))value=storylineSchoolRecords()}catch(err){console.error(err)}
+   lmRecords={key,value};
+  }
+  const r=lmRecords.value;if(!r)return null;
+  return(playerId,k)=>{
+   if(r.incomplete?.has(k))return null;
+   const list=r.bySchool[`${t.name}|${k}`]||[],top=list.find(x=>String(x.id)!==String(playerId));if(!top)return null;
+   return{total:r.totals.get(`${playerId}|${t.name}|${k}`)||0,value:top.value,holder:top.holder,id:top.id};
+  };
+ }
+ function cardData(me){
+  if(!me)return{ann:null,ms:[]};
+  return{ann:memory.anniversary(me),ms:memory.milestones(me,{season:me.records,schoolCareer:lmSchoolCareer(me),nationalCareer:universe.records?.nationalCareer})};
+ }
+ memory.cardData=cardData;
+ function renderLongMemory(){
+  const host=$('#weeklyDecisions');if(!host?.insertAdjacentElement)return;
+  let card=$('#longMemory');const me=universe?.teams&&universe.phase==='regular'?selected():null;
+  const {ann,ms}=cardData(me);
+  if(!ann&&!ms.length){if(card?.isConnected)card.remove();return}
+  if(!card||!card.isConnected){card=document.createElement('section');card.id='longMemory';card.className='long-memory';card.setAttribute('role','region');card.setAttribute('aria-label','History this week');host.insertAdjacentElement('beforebegin',card)}
+  card.innerHTML=(ann?`<div class="eyebrow">THIS WEEK IN HISTORY</div><p><strong>${ann.ago} years ago</strong> this week, ${lmEsc(ann.text)}.</p>`:'')+
+   (ms.length?`<div class="eyebrow">MILESTONE WATCH</div><ul class="lm-list">${ms.map(m=>`<li><button type="button" class="player-button" data-player="${lmEsc(m.playerId)}">${lmEsc(m.pos)} ${lmEsc(m.name)}</button> ${lmEsc(memory.milestoneText(m).replace(`${m.pos} ${m.name} `,''))}</li>`).join('')}</ul>`:'');
+  card.querySelectorAll('[data-player]').forEach(b=>b.onclick=()=>showPlayerProfile(b.dataset.player));
+ }
+ extendRender('dashboard',renderLongMemory);
+ // Test pages only: an anniversary and a milestone for the card.
+ if(typeof window!=='undefined'&&window.__DL_TEST__)window.__DL_TEST__.longMemoryFixture=()=>{
+  const t=selected(),rb=t.roster.find(p=>p.pos==='RB');const opp=universe.teams.find(x=>x.id!==t.id);
+  universe.gameArchive.push({id:'G_LM_FIXTURE',season:universe.year-10,week:universe.week+1,label:'Regular season',final:true,home:{id:t.id,name:t.name,rank:null},away:{id:opp.id,name:opp.name,rank:2},score:{home:24,away:21}});
+  rb.stats.games=Math.max(rb.stats.games||0,4);rb.stats.rushYds=Math.max(rb.stats.rushYds||0,520);t.records??={};t.records.rushYds={label:'Rushing Yards',value:rb.stats.rushYds+90,playerId:'old',playerName:'Old Legend',year:universe.year-6};
+  render();return rb.name;
+ };
+}
+
+// v0.37 — facilities that help players by name. The Training & Performance Center (the training track in
+// facilities-boosters.js) now does two things a player can feel:
+//
+// * Recovery. After each regular-season week, every injured player at a program with a training level L has an L×5%
+//   chance (25% at level 5) to heal a week early. Every program gets this, on its own level. The roll is a hash of the
+//   player, season and week, so it never touches the gameplay random stream and a reload never changes it. It runs
+//   after the week is played, so a Game Day prepared before kickoff sees the same roster the game is played with.
+// * Development. A player on a featured development plan gets extra work in his plan's focus at spring and fall camp:
+//   +0.08×L to each focus trait at spring, scaled like the rest of camp in the fall (about a tenth of a plan's own bonus
+//   per level).
+//
+// The coach's program keeps a short list of who was helped (t.facilityHelp {rows}, last two seasons, at most 16 rows),
+// shown under the facilities card on the Program page and reported in The Wire when a starter returns early.
+function makeFacilityEffects(env){
+ 'use strict';
+ const universe=()=>env.getUniverse();
+ const RECOVERY_STEP=.05,DEV_STEP=.08,LOG_MAX=16;
+ function hash(...parts){let h=2166136261;for(const ch of parts.join('|')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+ const unit=(...parts)=>hash(...parts)/4294967296;
+ const recoveryChance=level=>Math.max(0,Math.min(5,Number(level)||0))*RECOVERY_STEP;
+ // Players who heal a week early this week. Mutates injuryWeeks/injury; returns what happened.
+ function recover(team,level,{year=universe().year,week=universe().week}={}){
+  const chance=recoveryChance(level),out=[];if(!chance)return out;
+  for(const p of team?.roster||[]){
+   if(!(Number(p.injuryWeeks)>0))continue;
+   if(unit(p.id,year,week,'training-rehab')>=chance)continue;
+   p.injuryWeeks=Math.max(0,p.injuryWeeks-1);
+   const back=p.injuryWeeks===0,injury=p.injury;
+   if(back)p.injury=null;
+   out.push({playerId:p.id,name:p.name,pos:p.pos,injury:typeof injury==='string'?injury:injury?.name||injury?.type||null,back,weeksLeft:p.injuryWeeks});
+  }
+  return out;
+ }
+ // Extra camp work for a featured plan's focus traits.
+ function devBoost(level,focus,bonusTable,phase){
+  const L=Math.max(0,Math.min(5,Number(level)||0));if(!L)return null;
+  const targets=Object.keys(bonusTable?.[focus]||bonusTable?.Balanced||{});if(!targets.length)return null;
+  const scale=phase==='spring'?1:.55,out={};for(const k of targets)out[k]=Math.round(DEV_STEP*L*scale*1000)/1000;return out;
+ }
+ function log(team){const u=universe();team.facilityHelp??={rows:[]};team.facilityHelp.rows=(team.facilityHelp.rows||[]).filter(r=>r.year>=u.year-1).slice(-LOG_MAX);return team.facilityHelp}
+ function note(team,row){const h=log(team),key=`${row.kind}:${row.playerId}:${row.year}:${row.phase||row.week}`;if(h.rows.some(r=>r.key===key))return false;h.rows.push({...row,key});h.rows=h.rows.slice(-LOG_MAX);return true}
+ function rowText(r){
+  if(r.kind==='recovery')return`${r.pos} ${r.name} ${r.back?`returned a week early${r.injury?` from ${r.injury}`:''}`:`is a week ahead in rehab${r.injury?` (${r.injury})`:''}`} (week ${r.week}, ${r.year})`;
+  return`${r.pos} ${r.name}: extra ${r.focus} work at ${r.phase==='spring'?'spring':'fall'} camp (${r.year})`;
+ }
+ return{RECOVERY_STEP,DEV_STEP,LOG_MAX,hash,unit,recoveryChance,recover,devBoost,log,note,rowText};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeFacilityEffects};
+}else{
+ const fx=makeFacilityEffects({getUniverse:()=>universe});
+ globalThis.DynastyFacilityEffects=fx;
+ const feEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const trainingLevel=t=>globalThis.DynastyFacilities?.level(t,'training')||0;
+ const mine=t=>t&&t.name===$('#userTeam')?.value;
+
+ const simWeekBeforeFacilityFx=simWeek;
+ simWeek=function simWeekWithFacilityRecovery(){
+  const week=universe?.week,phase=universe?.phase,out=simWeekBeforeFacilityFx.apply(this,arguments);
+  try{
+   if(universe&&phase==='regular'&&week!=null&&universe.week===week+1){
+    for(const t of universe.teams){
+     const L=trainingLevel(t);if(!L)continue;
+     const healed=fx.recover(t,L,{year:universe.year,week:week+1});
+     if(!healed.length||!mine(t))continue;
+     for(const h of healed){
+      fx.note(t,{kind:'recovery',year:universe.year,week:week+1,...h});
+      const p=t.roster.find(x=>x.id===h.playerId),starter=(p?.stats?.starts||0)>0;
+      if(h.back){
+       universe.events??=[];universe.events.push({id:`EVT_REHAB_${universe.year}_${week+1}_${h.playerId}`,type:'FACILITY_HELP',season:universe.year,week:universe.week,schoolIds:[t.id],playerIds:[h.playerId],coachIds:[],gameIds:[],importance:52+(starter?6:0),
+        summary:`${h.pos} ${h.name} is back a week early${h.injury?` from ${h.injury}`:''}: credit the Training Center (level ${L}).`,metadata:{level:L}});
+      }
+     }
+    }
+   }
+  }catch(err){console.error(err)}
+  return out;
+ };
+
+ // Featured plans: extra work in the plan's focus, logged once per player per camp.
+ const trainingAttrBoostBeforeFacilityFx=trainingAttrBoost;
+ trainingAttrBoost=function trainingAttrBoostWithFacilities(p,teamFocus,individual,phase){
+  const out=trainingAttrBoostBeforeFacilityFx.apply(this,arguments);
+  try{
+   const plans=globalThis.DynastyLabDevelopmentPlans,plan=plans?.active(p);if(!plan)return out;
+   const t=findPlayer(p.id)?.team;const L=t?trainingLevel(t):0;
+   const add=fx.devBoost(L,plan.focus,plans.bonus,phase);if(!add)return out;
+   for(const [k,v] of Object.entries(add))out[k]=(out[k]||0)+v;
+   if(mine(t))fx.note(t,{kind:'development',year:universe.year,phase:phase==='spring'?'spring':'fall',playerId:p.id,name:p.name,pos:p.pos,focus:plan.focus,level:L});
+  }catch(err){console.error(err)}
+  return out;
+ };
+
+ // Under the facilities card: who the Training Center helped.
+ function renderFacilityHelp(){
+  const host=$('#facilitiesBoosters'),t=selected();if(!host?.insertAdjacentHTML||!t)return;
+  host.querySelector('.fb-helped')?.remove();
+  const rows=(t.facilityHelp?.rows||[]).filter(r=>r.year>=universe.year-1).slice().reverse().slice(0,8);
+  const L=trainingLevel(t);
+  if(!rows.length&&!L)return;
+  host.insertAdjacentHTML('beforeend',`<div class="fb-helped"><strong>Who the Training Center helped</strong>${rows.length?`<ul>${rows.map(r=>`<li><button type="button" class="player-button" data-player="${feEsc(r.playerId)}">${feEsc(r.pos)} ${feEsc(r.name)}</button> ${feEsc(fx.rowText(r).replace(`${r.pos} ${r.name}`,'').replace(/^:\s*/,''))}</li>`).join('')}</ul>`:'<p class="small muted">Nobody yet. At level '+L+', each injured player has a '+Math.round(fx.recoveryChance(L)*100)+'% chance a week to heal early, and featured development plans get extra work at camp.</p>'}</div>`);
+  host.querySelectorAll('.fb-helped [data-player]').forEach(b=>b.onclick=()=>showPlayerProfile(b.dataset.player));
+ }
+ const renderProgramBeforeFacilityFx=TAB_RENDERERS.program;
+ TAB_RENDERERS.program=()=>{renderProgramBeforeFacilityFx();renderFacilityHelp()};
+}
+
+// v0.37 — a light fourth-quarter fatigue, so depth matters late. Each side of the ball loses a little in the fourth
+// quarter and overtime: a base amount everyone pays, plus more when the players who rotate in late (RB2, WR4-5, TE2,
+// the sixth and seventh linemen, the second wave of the front and the nickel and dime backs) are far below the
+// starters. Measured on new universes the starter-to-backup gap is 4-9 rating points, which makes the penalty about
+// 0.6-2.2 offense or defense rating points; it is capped at 3.
+//
+// Coached and simulated detailed games (Game Engine 2) apply it in the fourth quarter and overtime through the team
+// inputs (fatigueOff / fatigueDef; a game started before v0.37 carries neither and plays as it did). Quick simulation
+// has no quarters, so it applies a quarter of it across the whole game. Ratings and availability only: no randomness.
+function makeFatigue(env){
+ 'use strict';
+ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+ // [starters, players who rotate in late]
+ const GROUPS={off:{RB:[1,1],WR:[3,2],TE:[1,1],OT:[2,1],OG:[2,1],C:[1,1]},def:{EDGE:[2,2],DT:[2,2],LB:[3,1],CB:[2,2],S:[2,1]}};
+ const BASE=.5,PER_POINT=.35,GAP_FLOOR=4,MAX=3,EMPTY=45,QUICK_SHARE=.25;
+ const ability=p=>Number(p?.trueNow)||EMPTY;
+ function gap(team,side){
+  const ok=env.available||(()=>true);let num=0,den=0;
+  for(const [pos,[s,b]] of Object.entries(GROUPS[side])){
+   const list=(team?.roster||[]).filter(p=>p.pos===pos&&ok(p)).sort((x,y)=>ability(y)-ability(x)||String(x.id).localeCompare(String(y.id)));
+   const st=list.slice(0,s),bk=list.slice(s,s+b);
+   const sa=st.length?st.reduce((n,p)=>n+ability(p),0)/st.length:EMPTY;
+   let bsum=0;for(let i=0;i<b;i++)bsum+=bk[i]?ability(bk[i]):EMPTY;
+   num+=(sa-bsum/b)*b;den+=b;
+  }
+  return den?num/den:0;
+ }
+ const penaltyFor=g=>Math.round(clamp(BASE+(g-GAP_FLOOR)*PER_POINT,0,MAX)*100)/100;
+ function forTeam(team){return{off:penaltyFor(gap(team,'off')),def:penaltyFor(gap(team,'def'))}}
+ // The quick-sim blend: a quarter of the late-game penalty on the units that rotate.
+ function blend(profile,f){
+  if(!profile||!f)return profile;
+  const o=f.off*QUICK_SHARE,d=f.def*QUICK_SHARE,out={...profile};
+  for(const k of ['skill','ol','offense'])if(Number.isFinite(out[k]))out[k]-=o;
+  for(const k of ['front','coverage','defense'])if(Number.isFinite(out[k]))out[k]-=d;
+  if(Number.isFinite(out.overall))out.overall-=(o+d)/2;
+  return out;
+ }
+ return{GROUPS,BASE,PER_POINT,MAX,QUICK_SHARE,gap,penaltyFor,forTeam,blend};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeFatigue};
+}else{
+ const fatigue=makeFatigue({available:p=>gameAvailable(p)});
+ globalThis.DynastyFatigue=fatigue;
+ let quickSims=0;
+ // Every profile a game reads carries the late-game penalty; quick simulation folds a quarter of it in.
+ const gameProfilesBeforeFatigue=gameProfiles;
+ gameProfiles=function gameProfilesWithFatigue(t){
+  const base=gameProfilesBeforeFatigue.apply(this,arguments);if(!base||!t)return base;
+  if(quickSims>0)return fatigue.blend(base,fatigue.forTeam(t));
+  return decorate(t,base);
+ };
+ // The late-game penalty as two extra fields; the weekly-coaching test hook applies it to its baseline too, so a
+ // zero-point preparation still compares like with like.
+ function decorate(t,profile){if(!profile||!t)return profile;const f=fatigue.forTeam(t);return{...profile,fatigueOff:f.off,fatigueDef:f.def}}
+ fatigue.decorate=decorate;
+ const gameSimBeforeFatigue=gameSim;
+ gameSim=function gameSimWithFatigue(){quickSims++;try{return gameSimBeforeFatigue.apply(this,arguments)}finally{quickSims--}};
+}
+
+// v0.37 — the staff's conversion calls, reviewed. After a detailed game (coached or simulated) each extra point or
+// two-point try the coach's staff chose in the second half is checked against a late-game chart; when the other
+// choice was worth 5+ points of win chance, the box score says so ("Down 2 after the touchdown with 2:31 left, the
+// staff kicked. Going for two was worth 15 points of win chance by the chart."). A call the coach made himself is
+// never second-guessed.
+//
+// The chart. The live win-chance graph is a smooth curve and cannot tell a kick from a two-point try (they differ by
+// at most 3 points anywhere in a game), so the review uses a small possession model: the other team receives, then
+// the drives left (one per 145 seconds, the engine's pace) alternate, each a touchdown (22%), a field goal (13%) or
+// nothing; a tie at the end is a coin flip (overtime). The kick and two-point rates are the engine's (96.5% and 47%).
+// It reproduces the familiar chart: down 2, go for two; tied, kick; up 5, go for two late.
+//
+// Saved on the game record as conversionReview [{period, clock, margin, choice, better, gain, made}] (at most two),
+// only when there is something to say. No randomness.
+function makeConversionReview(){
+ 'use strict';
+ const TD=.22,FG=.13,SECONDS_PER_DRIVE=145,KICK=.965,TWO=.47,FLAG=.05,MAX_ROWS=2,QUARTER=900;
+ function drivesLeft(period,clock){if(!(period>=1&&period<=4))return 0;return Math.max(0,Math.round(((4-period)*QUARTER+(Number(clock)||0))/SECONDS_PER_DRIVE))}
+ // Chance to win with `margin` (for us) and `drives` drives left, the other team going first.
+ function winChance(margin,drives){
+  const memo=new Map();
+  const f=(m,p,ours)=>{if(p<=0)return m>0?1:m<0?0:.5;const k=`${m}|${p}|${ours}`;if(memo.has(k))return memo.get(k);const s=ours?1:-1;
+   const v=TD*f(m+7*s,p-1,!ours)+FG*f(m+3*s,p-1,!ours)+(1-TD-FG)*f(m,p-1,!ours);memo.set(k,v);return v};
+  return f(margin,drives,false);
+ }
+ // Margin is ours after the six points.
+ function options(margin,drives){
+  const w=x=>winChance(x,drives);
+  return{kick:KICK*w(margin+1)+(1-KICK)*w(margin),two:TWO*w(margin+2)+(1-TWO)*w(margin)};
+ }
+ function judge(margin,period,clock,choice){
+  const o=options(margin,drivesLeft(period,clock)),mine=o[choice],otherChoice=choice==='kick'?'two':'kick',gain=o[otherChoice]-mine;
+  return gain>=FLAG?{better:otherChoice,gain:Math.round(gain*100)}:null;
+ }
+ // events: a Game Engine 2 event list. side: 'home' or 'away' (the coach's program).
+ function review(events,side){
+  const out=[];const list=Array.isArray(events)?events:[];
+  for(let i=0;i<list.length;i++){
+   const e=list[i];if(!e||e.team!==side||!['extra_point','two_point'].includes(e.type)||e.ot||e.shootout)continue;
+   // The touchdown just before it gives the score after the six points and the clock.
+   let td=null;for(let j=i-1;j>=0&&j>=i-6;j--){if(list[j]?.type==='touchdown'&&list[j].team===side){td=list[j];break}}
+   const st=td?.state;if(!st||!(st.period>=3&&st.period<=4))continue;
+   // Was it the coach's own call? A two-point decision he answered himself sits between the touchdown and the try.
+   const own=list.slice(list.indexOf(td),i).some(x=>x?.type==='coaching_decision'&&x.decisionType==='two_point_decision'&&x.team===side&&x.selectedOption&&x.selectedOption!=='delegate');
+   if(own)continue;
+   const other=side==='home'?'away':'home',margin=(Number(st.score?.[side])||0)-(Number(st.score?.[other])||0),choice=e.type==='extra_point'?'kick':'two';
+   const verdict=judge(margin,st.period,st.clock,choice);if(!verdict)continue;
+   out.push({period:st.period,clock:Number(st.clock)||0,margin,choice,better:verdict.better,gain:verdict.gain,made:e.made!==false&&(Number(e.points)||0)>0});
+  }
+  return out.sort((a,b)=>b.gain-a.gain).slice(0,MAX_ROWS).sort((a,b)=>a.period-b.period||b.clock-a.clock);
+ }
+ const clockText=(period,clock)=>`${period===4?'Q4':'Q3'} ${Math.floor(clock/60)}:${String(clock%60).padStart(2,'0')}`;
+ const marginText=m=>m===0?'Tied':m>0?`Up ${m}`:`Down ${-m}`;
+ function text(r){
+  const did=r.choice==='kick'?'kicked the extra point':'went for two',should=r.better==='two'?'Going for two':'Kicking';
+  return`${clockText(r.period,r.clock)}: ${marginText(r.margin)} after the touchdown, the staff ${did}${r.choice==='two'?(r.made?' (good)':' (no good)'):''}. ${should} was worth ${r.gain} points of win chance by the chart.`;
+ }
+ return{TD,FG,SECONDS_PER_DRIVE,KICK,TWO,FLAG,drivesLeft,winChance,options,judge,review,text};
+}
+
+if(typeof module==='object'&&module.exports){
+ module.exports={makeConversionReview};
+}else{
+ const conv=makeConversionReview();
+ globalThis.DynastyConversionReview=conv;
+ const crEsc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ // The two ways a detailed game is recorded each hand over their play-by-play state; finishGame writes the record.
+ let pending=null;
+ const preparedBeforeReview=v2RecordPrepared;
+ v2RecordPrepared=function v2RecordPreparedWithReview(g,home,away){const out=preparedBeforeReview.apply(this,arguments);pending={home:home?.name,away:away?.name,events:out?.preview?.state?.events||null};return out};
+ const interactiveBeforeReview=recordInteractiveV2GameDay;
+ recordInteractiveV2GameDay=function recordInteractiveV2GameDayWithReview(session){
+  const g=findUserGame();pending={home:g?.home,away:g?.away,events:session?.state?.events||null};
+  try{return interactiveBeforeReview.apply(this,arguments)}finally{pending=null}
+ };
+ if(globalThis.DynastyGameEngineV2LabBridge)globalThis.DynastyGameEngineV2LabBridge.recordInteractive=recordInteractiveV2GameDay;
+ const finishGameBeforeReview=finishGame;
+ finishGame=function finishGameWithReview(before,home,away){
+  const out=finishGameBeforeReview.apply(this,arguments);
+  try{
+   const p=pending;pending=null;
+   const me=selected();
+   if(p&&p.events&&me&&p.home===home?.name&&p.away===away?.name&&(home.id===me.id||away.id===me.id)){
+    const rows=conv.review(p.events,home.id===me.id?'home':'away');
+    const record=rows.length&&out?.gameId?(universe.gameArchive||[]).find(x=>x.id===out.gameId):null;
+    if(record)record.conversionReview=rows;
+   }
+  }catch(err){console.error(err)}
+  return out;
+ };
+ // The box score says it under the team statistics.
+ const gameBoxBeforeReview=gameBoxHTML;
+ gameBoxHTML=function gameBoxWithReview(g){
+  const html=gameBoxBeforeReview.apply(this,arguments);
+  const rows=Array.isArray(g?.conversionReview)?g.conversionReview:[];if(!rows.length)return html;
+  return html+`<div class="conversion-review"><div class="eyebrow">STAFF CALLS, REVIEWED</div><ul>${rows.map(r=>`<li>${crEsc(conv.text(r))}</li>`).join('')}</ul></div>`;
+ };
 }
 
 loadSchools().then(()=>{populateTitleTeams();POS.forEach(p=>{let o=document.createElement('option');o.value=p;o.textContent=p;$('#positionFilter').appendChild(o)});[...new Set(schools.map(t=>t.conference))].forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;$('#editConference').appendChild(o)});bind();bindNewDynastySetup();applyTitlePreferences();showTitleScreen();refreshTitleSave().then(restoreNewDynastySetupDraft);}).catch(e=>{$('#titleStatus').textContent='Could not initialize Dynasty Lab. '+e.message});

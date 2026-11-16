@@ -10,10 +10,12 @@ function v2PostseasonStageCapture(){
   for(const [key,value] of Object.entries(universe)){
     if(V2_STAGE_APPEND_ONLY.includes(key)&&Array.isArray(value))kept[key]={rows:value,length:value.length};else core[key]=value;
   }
-  return{core:v2RecordClone(core),kept,order:Object.keys(universe)};
+  // v0.37: the rollback copy is read only when a stage fails, so it is kept as JSON text and parsed on restore. The
+  // restored universe is the same JSON round trip as before; a stage that succeeds no longer pays for the parse.
+  return{coreJson:JSON.stringify(core),kept,order:Object.keys(universe)};
 }
 function v2PostseasonStageRestore(snapshot){
-  const core=v2RecordClone(snapshot.core),next={};
+  const core=snapshot.coreJson!=null?JSON.parse(snapshot.coreJson):v2RecordClone(snapshot.core),next={};
   for(const key of snapshot.order){
     const kept=snapshot.kept[key];
     if(kept){kept.rows.length=Math.min(kept.rows.length,kept.length);next[key]=kept.rows}else if(key in core)next[key]=core[key];

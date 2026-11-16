@@ -72,7 +72,7 @@ function createSession(options={}){
     tempo:{home:'normal',away:'normal'},tempoDecisionMade:{home:false,away:false},
     // Drive and defensive calls are on only for a fully coached game (options.calls); null means the session never asks.
     driveCall:options.calls===true&&controlledSide?{home:'balanced',away:'balanced'}:null,driveAsked:null,defenseCall:null,defenseAsked:null,
-    halftimeApproach:{home:'balanced',away:'balanced'},halftimeDecisionMade:false,pendingConversion:null,pendingStrategyDecision:null,
+    halftimeApproach:{home:'balanced',away:'balanced'},halftimeDecisionMade:false,halftimePolicy:HALFTIME_V2,pendingConversion:null,pendingStrategyDecision:null,
     names:{home:String(options.home?.name??made.homeInput.name??'Home'),away:String(options.away?.name??made.awayInput.name??'Away')},
     skipRoutine:options.skipRoutine===true
   };
@@ -124,6 +124,14 @@ function resolvePendingConversion(session,choice='extra_point'){
   if(state.period<=4&&state.clock===0)state.pendingKickoff={receiver:other(side),reason:'post_touchdown'};else kickoffGame(state,other(side),'post_touchdown');
   endRegulationAfterConversion(state);engine.validateState(state);return state
 }
+// v0.37 (halftime-v2): the coach's halftime approach also sets the second-half play mix (open it up throws about 7%
+// more often, ball control 7% less). Staying balanced or delegating changes nothing, so a delegated coached game still
+// plays exactly like a simulated one. Sessions created before v0.37 carry no halftimePolicy and play as they did.
+const HALFTIME_V2='halftime-v2',HALFTIME_MIX={aggressive:{passRate:.07},ball_control:{passRate:-.07}};
+function halftimeCall(session,state){
+  if(session.halftimePolicy!==HALFTIME_V2||state.period<3)return null;
+  return HALFTIME_MIX[session.halftimeApproach?.[state.possession]]||null;
+}
 function halftimeAdjustedOutcome(session,state,outcome){
   if(state.period<3)return outcome;const approach=session.halftimeApproach?.[state.possession]||'balanced';
   if(approach==='aggressive'){
@@ -150,9 +158,10 @@ function deferredTouchdown(session,state,outcome){
 function snapCall(session,state){
   const side=state.possession,offense=DRIVE_CALLS[session.driveCall?.[side]]||null,d=session.defenseCall;
   const defense=d&&d.side===other(side)&&d.at===state.events.length?DEFENSE_CALLS[d.call]||null:null;
-  if(!offense&&!defense)return null;
+  const half=halftimeCall(session,state);
+  if(!offense&&!defense&&!half)return null;
   const out={passRate:0,passYards:1,rushYards:0,intMult:1,sackMult:1,comp:0,hurry:0,clock:1};
-  for(const c of [offense,defense])if(c){out.passRate+=c.passRate||0;out.rushYards+=c.rushYards||0;out.comp+=c.comp||0;out.hurry+=c.hurry||0;out.passYards*=c.passYards??1;out.intMult*=c.intMult??1;out.sackMult*=c.sackMult??1;out.clock*=c.clock??1}
+  for(const c of [offense,defense,half])if(c){out.passRate+=c.passRate||0;out.rushYards+=c.rushYards||0;out.comp+=c.comp||0;out.hurry+=c.hurry||0;out.passYards*=c.passYards??1;out.intMult*=c.intMult??1;out.sackMult*=c.sackMult??1;out.clock*=c.clock??1}
   return out
 }
 function playOutcome(session,state){
@@ -337,5 +346,5 @@ function snapshot(session){validateSession(session);return clone(session)}
 function restore(value){const session=clone(value);validateSession(session);const pending=session.pendingStrategyDecision||decisions.pendingDecision(session.state);session.status=session.state.status==='final'?'final':(pending?'decision':session.state.status);return session}
 function pendingDecision(session){validateSession(session);return session.pendingStrategyDecision?clone(session.pendingStrategyDecision):decisions.pendingDecision(session.state)}
 
-return{VERSION,POLICY_ID,TEMPO_POLICY_ID,HALFTIME_POLICY_ID,CONVERSION_POLICY_ID,DRIVE_POLICY_ID,DEFENSE_POLICY_ID,DRIVE_CALLS,DEFENSE_CALLS,DRIVE_LABELS,DEFENSE_LABELS,createSession,advanceOne,advance,resolve,simulate,snapshot,restore,pendingDecision,validateSession};
+return{VERSION,POLICY_ID,TEMPO_POLICY_ID,HALFTIME_POLICY_ID,HALFTIME_V2,HALFTIME_MIX,CONVERSION_POLICY_ID,DRIVE_POLICY_ID,DEFENSE_POLICY_ID,DRIVE_CALLS,DEFENSE_CALLS,DRIVE_LABELS,DEFENSE_LABELS,createSession,advanceOne,advance,resolve,simulate,snapshot,restore,pendingDecision,validateSession};
 });
