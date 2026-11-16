@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-11-11T10:35:16.904Z",
+  "generatedAt": "2026-11-16T05:02:35.017Z",
   "branch": "codex/v0100-game-engine-2",
-  "baselineVersion": "0.19.0",
+  "baselineVersion": "0.36.0",
   "mode": "development-only shadow comparison",
   "matchups": 480,
   "sample": "weeks 1-8, all 480 scheduled games (120 was too few: the mean-points delta moved by 2 between runs of the same rules)",
@@ -70,7 +70,7 @@
     "These are calibration observations, not release thresholds."
   ],
   "calibrationContract": 1,
-  "sourceSha256": "f43e421e4e5164c067a953d5aab7812394d59acafbeb394b0ad343b71ae42dcb",
+  "sourceSha256": "4a709b421a7f71d374e4e2916ddd19dd30a22eebbba54b33ce7f4cb7de4b2df9",
   "sourceFiles": [
     "game-engine-v2.js",
     "game-engine-v2-adapter.js",

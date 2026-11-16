@@ -14,7 +14,16 @@ function profileTeam(team,profile={}){
   const offense=clamp(finite(profile.offense,finite(profile.overall,70)),1,100);
   const defense=clamp(finite(profile.defense,finite(profile.overall,70)),1,100);
   const rating=clamp(finite(profile.overall,(offense+defense)/2),1,100);
-  return{id:team?.id??null,name:String(team?.name??'Team'),rating,offense,defense};
+  const out={id:team?.id??null,name:String(team?.name??'Team'),rating,offense,defense};
+  // v0.37 late-game fatigue: carried only when the profile has it, so older games keep identical inputs.
+  if(finite(profile.fatigueOff,0)>0)out.fatigueOff=clamp(finite(profile.fatigueOff,0),0,3);
+  if(finite(profile.fatigueDef,0)>0)out.fatigueDef=clamp(finite(profile.fatigueDef,0),0,3);
+  return out;
+}
+// Fourth quarter and overtime: each side plays a little below its rating, less with good depth.
+function lateGameRatings(state,offense,defense){
+  if(!(state.period>=4))return{off:offense.offense,def:defense.defense};
+  return{off:offense.offense-finite(offense.fatigueOff,0),def:defense.defense-finite(defense.fatigueDef,0)};
 }
 function eventSummary(state){
   const side=()=>({points:0,plays:0,yards:0,turnovers:0,punts:0,fieldGoals:{made:0,attempted:0},touchdowns:0,possessions:0,penalties:0,penaltyYards:0});
@@ -112,7 +121,7 @@ function profileOutcomeRules(state,homeInput,awayInput,homeFieldRating=0,call=nu
   const c=call||{},cPass=finite(c.passRate,0),cPassYards=finite(c.passYards,1),cRushYards=finite(c.rushYards,0),cInt=finite(c.intMult,1),cSack=finite(c.sackMult,1),cComp=finite(c.comp,0),cHurry=finite(c.hurry,0);
   const rng=DynastyRng.create(state.rng),isHome=state.possession==='home',offense=isHome?homeInput:awayInput,defense=isHome?awayInput:homeInput;
   const rules=state.rules,e=GameEngineV2.effectsOf(state),pressureOn=rules.pressure!==false;
-  const venueEdge=isHome?homeFieldRating:-homeFieldRating,matchup=offense.offense-defense.defense+venueEdge,edge=matchup/18;
+  const late=lateGameRatings(state,offense,defense),venueEdge=isHome?homeFieldRating:-homeFieldRating,matchup=late.off-late.def+venueEdge,edge=matchup/18;
   const roll=rng.next(),pass=rng.next()<clamp(.53+e.passRate+cPass,call?.2:.35,call?.8:.62);
   let outcome;
   if(pass){
@@ -208,5 +217,5 @@ function aggregate(samples){
   for(const k of ['points','plays','yards','turnovers','overtime','homeWins'])result[k]/=result.games;
   return result;
 }
-return{attachPlaybook,profileTeam,eventSummary,createShadowGame,profileOutcome,annotateOutcomeEvent,shadowDecision,simulateShadow,aggregate};
+return{attachPlaybook,profileTeam,lateGameRatings,eventSummary,createShadowGame,profileOutcome,annotateOutcomeEvent,shadowDecision,simulateShadow,aggregate};
 });
