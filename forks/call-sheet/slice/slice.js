@@ -7,8 +7,18 @@ const $=s=>document.querySelector(s);
 const STORE='callsheet.slice.v1';
 
 // ================================================================ persistence (per-viewer, optional)
-function loadSave(){try{const t=localStorage.getItem(STORE);if(t)return JSON.parse(t)}catch(e){}return null}
-function writeSave(){try{localStorage.setItem(STORE,JSON.stringify(save))}catch(e){}}
+// Dynasty mode: when Dynasty Lab opens the battle (an iframe on the same origin), the host supplies the real teams,
+// the program's playbook and settings, records the result into the season, and stores the playbook in the save.
+const HOST=(()=>{try{return window.parent!==window&&window.parent.__callSheetDynasty||null}catch(e){return null}})();
+const DYN=HOST?HOST.launch():null;
+function loadSave(){
+  if(DYN)return{team:null,world:null,playbook:DYN.playbook?JSON.parse(JSON.stringify(DYN.playbook)):P.newPlaybook(),settings:DYN.settings||null,combos:[...(DYN.combos||[])],games:DYN.games||0,seenHelp:!!DYN.seenHelp};
+  try{const t=localStorage.getItem(STORE);if(t)return JSON.parse(t)}catch(e){}return null;
+}
+function writeSave(){
+  if(DYN){HOST.save({playbook:save.playbook,combos:save.combos,settings:save.settings,games:save.games,seenHelp:!!save.seenHelp});return}
+  try{localStorage.setItem(STORE,JSON.stringify(save))}catch(e){}
+}
 let save=loadSave()||{team:null,playbook:P.newPlaybook(),settings:{mode:'key',control:'offense',fast:false,sound:true},combos:[],games:0};
 save.settings??={mode:'key',control:'offense',fast:false,sound:true};save.combos??=[];
 // Saves from before the league existed get one.
@@ -38,6 +48,7 @@ function drawField(){
   svg.innerHTML='';
   const defs=mk('defs',{},svg);
   const g=mk('linearGradient',{id:'turf',x1:0,y1:0,x2:0,y2:1},defs);mk('stop',{offset:0,'stop-color':'#1f6b33'},g);mk('stop',{offset:1,'stop-color':'#124a22'},g);
+  {const f=mk('filter',{id:'plglow',x:'-60%',y:'-60%',width:'220%',height:'220%'},defs);mk('feGaussianBlur',{stdDeviation:2.6},f)}
   mk('rect',{x:0,y:0,width:1200,height:533,fill:'url(#turf)',rx:6},svg);
   for(let i=0;i<10;i++)mk('rect',{x:100+i*100,y:0,width:50,height:533,fill:'rgba(255,255,255,.035)'},svg);
   const hc=teamOf('home').colors[0],ac=teamOf('away').colors[0];
@@ -54,8 +65,8 @@ function drawField(){
   layer.ball=mk('ellipse',{cx:0,cy:0,rx:8,ry:5,fill:'#8a4b1c',stroke:'#fff','stroke-width':1.5},svg);
   pos={};layer.dots={};
 }
-const OFF_SPOTS={LT:[-1,206],LG:[-1,236],C:[-1,266],RG:[-1,296],RT:[-1,326],TE:[-1.3,362],X:[-1,70],Z:[-1,462],SLOT:[-2,412],QB:[-5,266],RB:[-7.5,266]};
-const DEF_SPOTS={RUSH:[1.3,190],NT:[1.3,250],DT3:[1.3,284],SET:[1.3,346],WILL:[5,212],MIKE:[5,268],BOXS:[6,352],NICKEL:[5.5,412],BCB:[7,70],FCB:[7,462],FS:[13,266]};
+const OFF_SPOTS={LT:[-1,194],LG:[-1,230],C:[-1,266],RG:[-1,302],RT:[-1,338],TE:[-1.3,376],X:[-1,70],Z:[-1,462],SLOT:[-2,412],QB:[-5,266],RB:[-7.5,266]};
+const DEF_SPOTS={RUSH:[1.3,176],NT:[1.3,246],DT3:[1.3,290],SET:[1.3,358],WILL:[5,212],MIKE:[5,268],BOXS:[6,352],NICKEL:[5.5,412],BCB:[7,70],FCB:[7,462],FS:[13,266]};
 function formation(st){
   if(!st||!st.possession||st.field==null)return null;
   const off=st.possession,def=off==='home'?'away':'home',dir=off==='home'?1:-1,los=X(absOf(st.field,off)),out={};
@@ -63,16 +74,119 @@ function formation(st){
   for(const[r,[dx,y]]of Object.entries(DEF_SPOTS))out[`d:${r}`]={x:los+dx*YD*dir,y,side:def,role:r,lineup:'def'};
   return{los,dir,dots:out,off,def};
 }
+// ---------------------------------------------------------------- player cards on the field
+// Every player on the field is a small card: team color, real face, jersey number. Hover (or tap) for the player's
+// grades and this game's line. Cards light up: green where you hold the edge in the coming duels, red where you
+// don't, gold when a player wins his duel, and a big pop for the player who made the play.
+const CW=26,CH=34,faceCache=new Map();
+function faceURL(p,colors){
+  const key=`${p.id}|${colors?.[0]}`;if(faceCache.has(key))return faceCache.get(key);
+  let url='';try{const cv=document.createElement('canvas');cv.width=cv.height=48;if(paintPortrait(cv,p,colors,48))url=cv.toDataURL()}catch(e){}
+  faceCache.set(key,url);return url;
+}
+function signatureIds(){
+  const ids=new Set();for(const pb of [save.playbook,DYN?.oppPlaybook])for(const s of pb?.signatures||[])ids.add(String(s.playerId));
+  return ids;
+}
 function ensureDots(f){
+  const sigs=signatureIds();
   for(const[k,d]of Object.entries(f.dots)){
     let el=layer.dots[k];
-    if(!el){el=mk('g',{class:'pl'},layer.players);mk('circle',{r:12,'stroke-width':3},el);const t=mk('text',{'text-anchor':'middle','dominant-baseline':'central','font-size':11,'font-weight':800,fill:'#fff','font-family':'system-ui'},el);layer.dots[k]=el}
-    const p=teamOf(d.side).lineup[d.lineup][d.role],c=el.firstChild;
-    c.setAttribute('fill',teamOf(d.side).colors[0]);c.setAttribute('stroke',d.lineup==='off'?'#fff':'#ffd2ce');
-    c.classList.toggle('hotp',!!(p&&b.fire[p.id]));
-    el.lastChild.textContent=p?p.number:'';
+    if(!el){
+      el=mk('g',{class:'pl',role:'img'},layer.players);el.dataset.key=k;
+      const c=mk('g',{class:'pc'},el);
+      mk('rect',{class:'glow',x:-CW/2-2,y:-CH/2-2,width:CW+4,height:CH+4,rx:5,filter:'url(#plglow)'},c);
+      mk('rect',{class:'cbody',x:-CW/2,y:-CH/2,width:CW,height:CH,rx:3,'stroke-width':1.5},c);
+      mk('image',{class:'pface',x:-CW/2+1.5,y:-CH/2+1.5,width:CW-3,height:CH-12,preserveAspectRatio:'xMidYMin slice'},c);
+      mk('rect',{class:'nband',x:-CW/2,y:CH/2-11,width:CW,height:11,rx:2},c);
+      mk('text',{class:'num',x:0,y:CH/2-5.2,'text-anchor':'middle','dominant-baseline':'central'},c);
+      el.addEventListener('pointerenter',ev=>showTip(el,ev));el.addEventListener('pointermove',ev=>moveTip(ev));
+      el.addEventListener('pointerleave',hideTip);el.addEventListener('pointerdown',ev=>{if(ev.pointerType!=='mouse'){ev.stopPropagation();tipFor===el?hideTip():showTip(el,ev)}});
+      layer.dots[k]=el;
+    }
+    const team=teamOf(d.side),p=team.lineup[d.lineup][d.role],c=el.firstChild;
+    el.dataset.side=d.side;el.dataset.lineup=d.lineup;el.dataset.role=d.role;el.dataset.pid=p?p.id:'';
+    c.querySelector('.cbody').setAttribute('fill',team.colors[0]);c.querySelector('.nband').setAttribute('fill',team.colors[0]);
+    c.querySelector('.cbody').setAttribute('stroke',team.colors[1]||'#fff');
+    const face=c.querySelector('.pface'),url=p?faceURL(p,team.colors):'';
+    if(face.getAttribute('href')!==url){if(url)face.setAttribute('href',url);else face.removeAttribute('href')}
+    c.querySelector('.num').textContent=p?p.number:'';
+    el.classList.toggle('hot',!!(p&&b.fire[p.id]));el.classList.toggle('sig',!!(p&&sigs.has(String(p.id))));
+    el.classList.toggle('opp',d.side!==b.user);
+    el.setAttribute('aria-label',p?`${p.name}, #${p.number} ${p.role}`:d.role);
   }
 }
+// Matchup glow for the coming snap. duels come from the read (preview), margin > 0 favors the offense.
+let glowNotes={};
+function clearGlow(){glowNotes={};for(const el of Object.values(layer.dots||{}))el.classList.remove('edge','risk','threat','won','dim')}
+function fieldGlow(duels,userOff){
+  clearGlow();if(!duels)return;
+  for(const d of duels){
+    const adv=userOff?d.margin:-d.margin;if(Math.abs(adv)<1)continue;
+    const mine=(userOff?d.offRoles:d.defRoles).map(r=>(userOff?'o:':'d:')+r),theirs=(userOff?d.defRoles:d.offRoles).map(r=>(userOff?'d:':'o:')+r);
+    for(const k of mine){layer.dots[k]?.classList.add(adv>0?'edge':'risk');(glowNotes[k]??=[]).push(`${d.label}: ${D.chip(Math.max(-3,Math.min(3,adv)))}`)}
+    if(adv<0)for(const k of theirs){layer.dots[k]?.classList.add('threat');(glowNotes[k]??=[]).push(`${d.label}: a threat to you`)}
+  }
+}
+// After the play: duel winners flash gold, the playmaker pops.
+function celebrateCards(e){
+  clearGlow();const lit=[];
+  for(let i=0;i<(e.duelResults||[]).length;i++){
+    const d=e.duels[i],won=e.duelResults[i].won;
+    for(const r of won?d.offRoles:d.defRoles){const k=(won?'o:':'d:')+r;if(layer.dots[k])lit.push(k)}
+    if(i===0&&!won)break;
+  }
+  const P=e.participants||{},big=Math.abs(e.yards||0)>=15||e.turnover||e.kind==='sack';
+  const star=e.turnover==='interception'&&P.defender?`d:${P.defender}`:e.kind==='sack'&&P.sacker?`d:${P.sacker}`:P.carrier&&(e.kind==='run'||e.kind==='scramble')?`o:${P.carrier}`:P.target&&e.completed?`o:${P.target}`:null;
+  for(const k of new Set(lit)){const el=layer.dots[k];el.classList.add('won');layer.players.appendChild(el);
+    FX.anim(el.firstChild,[{transform:'scale(1)'},{transform:'scale(1.35)'},{transform:'scale(1.1)'}],{duration:320,easing:'cubic-bezier(.2,1.6,.4,1)'})}
+  if(star&&layer.dots[star]&&big){
+    const el=layer.dots[star];el.classList.add('won');layer.players.appendChild(el);
+    FX.anim(el.firstChild,[{transform:'scale(1)'},{transform:'scale(2.1)'},{transform:'scale(1.3)'}],{duration:520,easing:'cubic-bezier(.2,1.6,.4,1)'});
+    const r=el.getBoundingClientRect();PT.burst(r.left+r.width/2,r.top+r.height/2,{n:28,speed:7,colors:['#fff','#ffe066','#ffb03c']});
+  }
+  setTimeout(()=>{for(const el of Object.values(layer.dots))el.classList.remove('won')},1700);
+}
+// Hover card: who he is, his grades, this game.
+let tipFor=null;
+const CLASS_YR=['','FR','SO','JR','SR'];
+function gameLine(st){
+  if(!st)return'No stats yet';
+  const out=[];
+  if(st.passAtt)out.push(`${st.comp}/${st.passAtt} · ${st.passYds} yds${st.passTD?` · ${st.passTD} TD`:''}${st.ints?` · ${st.ints} INT`:''}`);
+  if(st.rushAtt)out.push(`${st.rushAtt} car · ${st.rushYds} yds${st.rushTD?` · ${st.rushTD} TD`:''}`);
+  if(st.rec||st.targets)out.push(`${st.rec} rec · ${st.recYds} yds${st.recTD?` · ${st.recTD} TD`:''}`);
+  const dfn=[st.tackles&&`${st.tackles} tkl`,st.sacks&&`${st.sacks} sack${st.sacks>1?'s':''}`,st.intDef&&`${st.intDef} INT`].filter(Boolean);
+  if(dfn.length)out.push(dfn.join(' · '));
+  return out.join('<br>')||'No stats yet';
+}
+function showTip(el,ev){
+  const team=teamOf(el.dataset.side),p=team.lineup[el.dataset.lineup]?.[el.dataset.role];if(!p)return;
+  tipFor=el;let tip=$('#ptip');
+  if(!tip){tip=document.createElement('div');tip.id='ptip';tip.setAttribute('role','tooltip');document.body.appendChild(tip)}
+  const strong=new Set(D.STYLE_TRAITS[p.archetype]||[]);
+  const traits=D.TRAITS.map(t=>[t,p.traits?.[t]??50]).sort((a,c)=>(strong.has(c[0])-strong.has(a[0]))||c[1]-a[1]).slice(0,4);
+  const opp=el.dataset.side!==b.user,fog=opp?fogSpread():0;
+  const g=v=>{if(!fog)return String(v);const lo=v-(v%(fog*5+1));return`${lo}–${lo+fog*5}`};
+  const notes=glowNotes[el.dataset.key]||[];
+  tip.className=`${el.classList.contains('sig')?'sig':''} ${opp?'opp':''}`;
+  tip.style.setProperty('--tc',team.colors[0]);
+  tip.innerHTML=`<div class="tt-head"><canvas width="56" height="56"></canvas><div><b>${esc(p.name)}</b><span>#${esc(p.number)} · ${esc(p.pos||p.role)} · ${esc(CLASS_YR[p.year]||'')}</span><span>${esc(team.short)} ${esc(p.role)} · ${esc(p.archetype||'')}${p.ovr?` · <b>${g(p.ovr)}</b> OVR`:''}</span></div></div>
+    <div class="tt-traits">${traits.map(([t,v])=>`<div class="${strong.has(t)?'key':''}"><span>${t==='iq'?'IQ':esc(t)}</span><i style="--v:${Math.max(0,Math.min(100,v))}%"></i><b>${g(v)}</b></div>`).join('')}</div>
+    ${(p.cond||[]).length?`<div class="tt-cond">${p.cond.map(c=>`<span class="${c.v>0?'up':'down'}">${c.v>0?'+1':'−1'} ${esc(c.src)}<small>${c.when==='late'?'4th quarter':c.when==='money'?'3rd & 4th down':'every snap'}</small></span>`).join('')}</div>`:''}
+    ${notes.length?`<div class="tt-notes">${notes.map(n=>`<div>${esc(n)}</div>`).join('')}</div>`:''}
+    ${b.fire[p.id]?'<div class="tt-fire">ON FIRE</div>':''}${el.classList.contains('sig')?'<div class="tt-sig">SIGNATURE CARD</div>':''}
+    <div class="tt-line"><span>This game</span>${gameLine(b.players?.[p.id])}</div>${fog?`<div class="tt-fog">Film confidence ${DYN.scouting.confidence}%: grades are ranges</div>`:''}`;
+  paintPortrait(tip.querySelector('canvas'),p,team.colors,56);
+  tip.classList.add('on');moveTip(ev);
+}
+function moveTip(ev){
+  const tip=$('#ptip');if(!tip||!tipFor)return;
+  const w=tip.offsetWidth,h=tip.offsetHeight,x=ev.clientX+16+w>innerWidth?ev.clientX-16-w:ev.clientX+16,y=Math.min(innerHeight-h-8,Math.max(8,ev.clientY-h/2));
+  tip.style.left=`${Math.max(8,x)}px`;tip.style.top=`${y}px`;
+}
+function hideTip(){tipFor=null;$('#ptip')?.classList.remove('on')}
+document.addEventListener('pointerdown',e=>{if(tipFor&&!e.target.closest?.('.pl'))hideTip()});
 function placeDot(k,x,y){const el=layer.dots[k];if(el)el.setAttribute('transform',`translate(${x.toFixed(1)},${y.toFixed(1)})`);pos[k]={x,y}}
 function placeBall(x,y,h=0){layer.ball.setAttribute('cx',x);layer.ball.setAttribute('cy',y-h);layer.ball.setAttribute('rx',8*(1+h/120));layer.ball.setAttribute('ry',5*(1+h/120));layer.shadow.setAttribute('cx',x);layer.shadow.setAttribute('cy',y+6)}
 function setMarkers(st,instant){
@@ -140,26 +254,27 @@ function hotHTML(){
 const COMBOS=[{id:'establish',name:'Establish the Run',how:'Run, run, then PA Boot in one drive',reward:'Key +1 and +1 Command'},{id:'chain_gang',name:'Chain Gang',how:'Three first downs in one drive',reward:'+1 Command next series'}];
 function comboHTML(){if(!save.combos.length)return'';return`<div class="box"><h3>Combo book</h3>${COMBOS.map(c=>{const f=save.combos.includes(c.id);return`<div class="combo ${f?'found':''}"><b>${f?esc(c.name):'? ? ?'}</b><br>${f?esc(c.how)+' · '+esc(c.reward):'Undiscovered'}</div>`}).join('')}</div>`}
 function readHTML(){
-  if(!req||req.kind!=='snap')return'';
-  if(!sel.play)return`<div class="box"><h3>The read</h3><div class="mini">Pick a play card. Drag it onto the field, or tap it and hit SNAP.</div></div>`;
+  if(!req||req.kind!=='snap'){clearGlow();return''}
+  if(!sel.play){clearGlow();return`<div class="box"><h3>The read</h3><div class="mini">Pick a play card. Drag it onto the field, or tap it and hit SNAP.</div></div>`}
   const tactics=sel.tac.map(i=>req.options.tactics.find(t=>t.slot===i)?.id).filter(Boolean);
   const pv=B.preview(b,req.side,{play:sel.play,tactics});if(!pv)return'';
   if(req.role==='off'){
+    fieldGlow(pv.snap.duels,true);
     const bonus=pv.snap.duels.flatMap(d=>d.mods.filter(m=>m.src!=='Play design').map(m=>({...m,k:d.key})));
-    return`<div class="box"><h3>The read</h3><div class="exp">${pv.ev.yards.toFixed(1)}<small>yds expected</small></div>
+    return`<div class="box"><h3>The read</h3>${DYN&&fogSpread()?`<div class="mini" style="color:#9fe3ff">Film confidence ${DYN.scouting.confidence}%: their ratings are ranges. Scout them to sharpen.</div>`:''}<div class="exp">${pv.ev.yards.toFixed(1)}<small>yds expected</small></div>
       <div class="kpis"><span>1ST DOWN <b>${Math.round(pv.ev.first*100)}%</b></span><span>TURNOVER <b>${(pv.ev.turnover*100).toFixed(0)}%</b></span></div>
-      ${pv.snap.duels.map(d=>`<div class="drow"><span class="k">${d.key}</span><span class="n"><b>${esc(d.label)}</b><br>${esc(d.offNames.join(' & '))} <span class="muted">vs</span> ${esc(d.defNames.join(' & '))}</span><span class="chip ${d.chip}">${d.chip}</span></div>`).join('')}
+      ${pv.snap.duels.map(d=>`<div class="drow"><span class="k">${d.key}</span><span class="n"><b>${esc(d.label)}</b><br>${esc(d.offNames.join(' & '))} <span class="muted">vs</span> ${esc(d.defNames.join(' & '))}${(()=>{const dside=req.side===b.user?(b.user==='home'?'away':'home'):b.user,fg=fogGrade(d.defGrade,d.defNames[0],dside);return fg.fog?` <span class="muted">(${fg.text})</span>`:''})()}</span><span class="chip ${d.chip}${fogSpread()&&DYN?' fogchip':''}">${d.chip}${fogSpread()&&DYN?'?':''}</span></div>`).join('')}
       ${bonus.length?`<div class="bonus">${bonus.map(m=>`<span class="${m.v<0?'neg':''}">${m.k} ${m.v>0?'+':''}${m.v} ${esc(m.src)}</span>`).join('')}</div>`:''}</div>`;
   }
-  const rows=pv.vs.sort((a,c)=>c.weight-a.weight);
+  const rows=pv.vs.sort((a,c)=>c.weight-a.weight);fieldGlow(rows[0]?.snap.duels,false);
   const avg=rows.reduce((s,v)=>s+v.weight*v.ev.yards,0);
   return`<div class="box"><h3>The read</h3><div class="exp">${avg.toFixed(1)}<small>yds allowed</small></div>
     ${rows.map(v=>`<div class="drow"><span class="k">${Math.round(v.weight*100)}</span><span class="n"><b>If ${esc(v.family)}</b><br>${v.snap.duels.map(d=>`${d.key} <span class="chip ${D.chip(Math.max(-3,Math.min(3,-d.margin)))}" style="font-size:10px;padding:1px 5px">${D.chip(Math.max(-3,Math.min(3,-d.margin)))}</span>`).join(' ')}</span><span class="cond">${v.ev.yards.toFixed(1)}</span></div>`).join('')}</div>`;
 }
 function renderSide(){
   const pb=save.playbook;
-  const ur=save.world.userRecord||pb.record;
-  $('#side').innerHTML=readHTML()+hotHTML()+comboHTML()+`<div class="box"><h3>Season ${save.world.season}</h3><div class="statline">RECORD <b>${ur.w}-${ur.l}</b> · WEEK <b>${save.world.week%save.world.order.length+1}</b> of ${save.world.order.length}</div>
+  const ur=DYN?DYN.record:(save.world.userRecord||pb.record);
+  $('#side').innerHTML=readHTML()+hotHTML()+comboHTML()+`<div class="box"><h3>${DYN?esc(DYN.label):`Season ${save.world.season}`}</h3><div class="statline">RECORD <b>${ur.w}-${ur.l}</b>${DYN?'':` · WEEK <b>${save.world.week%save.world.order.length+1}</b> of ${save.world.order.length}`}</div>
    <div class="mini">vs ${esc(teamOf('away').name)} · ${esc(teamOf('away').coach.name)}</div>
    <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><button class="tbtn" id="bHelp">How to play</button><button class="tbtn" id="bFast">${save.settings.fast?'Speed: fast':'Speed: normal'}</button><button class="tbtn" id="bSound">${save.settings.sound?'Sound: on':'Sound: off'}</button><button class="tbtn" id="bSim">Sim to end</button></div></div>`;
   $('#bHelp').onclick=()=>howToPlay();
@@ -318,7 +433,17 @@ async function quickKick(e){
   await FX.wait(200);
 }
 function initials(n){return n.split(' ').map(x=>x[0]).join('')}
+// Scouting fog (Dynasty Lab film confidence): below 82, opponent grades show as a range that always contains the
+// true grade; below 64 the range is wider. Your own players are always exact. The duel math never changes.
+function fogSpread(){const c=DYN?.scouting?.confidence;return c==null||c>=82?0:c>=64?1:2}
+function isOpponentSide(side){return!!DYN&&side!==b.user}
+function fogGrade(grade,pid,side){
+  const sp=isOpponentSide(side)?fogSpread():0;if(!sp)return{text:String(grade),fog:false};
+  let h=0;for(const ch of String(pid))h=(h*31+ch.charCodeAt(0))>>>0;const lo=grade-(h%(sp+1));
+  return{text:`${lo}–${lo+sp}`,fog:true};
+}
 function fighterHTML(cls,names,roles,lineup,grade,color){
+  {const pl=lineup[roles[0]],side=cls==='o'?b.game.possession:(b.game.possession==='home'?'away':'home'),fg=fogGrade(grade,names[0],side);grade=fg.text}
   const p=lineup[roles[0]];const hot=p&&b.fire[p.id];
   return`<div class="fighter ${cls} ${hot?'burn':''}" style="--${cls==='o'?'oc':'dc'}:${color}"><canvas class="face" data-pid="${esc(p?p.id:'')}" data-side="${cls}" width="64" height="64" aria-label="${esc(names[0]||'')}"></canvas><div><div class="nm">${esc(names.join(' & '))}</div><div class="ar">${esc(p?p.archetype:'')}${hot?' · 🔥 ON FIRE':''}</div></div><div class="gr">${grade}</div></div>`;
 }
@@ -356,7 +481,9 @@ async function cinematic(e){
   }
   clash.classList.remove('on');clash.innerHTML='';
   // Phase 2: the play runs.
+  hideTip();clearGlow();
   await animatePlay(e);
+  celebrateCards(e);
   // Phase 3: count the yards, then the callout.
   const before=b._lastScore||e.score,td=e.score[e.offSide]-before[e.offSide]>=6;
   b._lastScore={...e.score};
@@ -430,14 +557,17 @@ function finalScreen(){
   $('#hand').classList.add('away');$('#look').innerHTML='';renderBug();
   const won=b.game.score[b.user]>b.game.score[b.user==='home'?'away':'home'];
   if(!b._recorded){b._recorded=true;b._breakout=SG.candidate(b,b.user,save.playbook);save.playbook.record[won?'w':'l']++;save.games++;save.playbook.gamesPlayed=(save.playbook.gamesPlayed||0)+1;
-    CL.recordCareers(save.world.userLineup,b.players);const op=save.world.programs[oppId()];if(op?.lineup)CL.recordCareers(op.lineup,b.players);b._gained=EV.recordReps(save.playbook,b.log,b.user);save.pending={won,userTendency:b.tend[b.user]};writeSave()}
+    if(DYN){b._saved=HOST.record(JSON.parse(JSON.stringify(b.game)),B.duelTally(b));for(const [root,n] of Object.entries(DYN.practiceReps||{}))EV.addReps(save.playbook,root,n)}
+    else{CL.recordCareers(save.world.userLineup,b.players);const op=save.world.programs[oppId()];if(op?.lineup)CL.recordCareers(op.lineup,b.players);save.pending={won,userTendency:b.tend[b.user]}}
+    b._gained=EV.recordReps(save.playbook,b.log,b.user);writeSave()}
   const top=Object.values(b.players).filter(p=>p.side===b.user).sort((a,c)=>(c.passYds+c.rushYds*1.6+c.recYds*1.6+c.sacks*30+c.intDef*35)-(a.passYds+a.rushYds*1.6+a.recYds*1.6+a.sacks*30+a.intDef*35)).slice(0,3);
   const line=p=>[p.passAtt?`${p.comp}/${p.passAtt} · ${p.passYds} yds · ${p.passTD} TD`:'',p.rushAtt?`${p.rushAtt} car · ${p.rushYds} yds`:'',p.rec?`${p.rec} rec · ${p.recYds} yds`:'',p.sacks?`${p.sacks} sacks`:'',p.intDef?`${p.intDef} INT`:''].filter(Boolean).join(' · ');
   const m=$('#modal');
   m.innerHTML=`<div class="mwrap"><p class="big ${won?'gold':'red'}">${won?'VICTORY':'DEFEAT'}</p>
-    <p class="statline">${esc(teamOf('home').short)} <b>${b.game.score.home}</b> — <b>${b.game.score.away}</b> ${esc(teamOf('away').short)} · record <b>${save.playbook.record.w}-${save.playbook.record.l}</b></p>
+    <p class="statline">${esc(teamOf('home').short)} <b>${b.game.score.home}</b> — <b>${b.game.score.away}</b> ${esc(teamOf('away').short)}${DYN?'':` · record <b>${save.playbook.record.w}-${save.playbook.record.l}</b>`}</p>
+    ${DYN?(b._saved?.ok?'<p class="statline" style="color:var(--win)">✓ SAVED TO YOUR SEASON</p>':`<p class="statline" style="color:var(--lose)">NOT SAVED: ${esc(b._saved?.error||'unknown error')}. Your season is unchanged.</p>`):''}
     <div style="margin:14px 0">${top.map(p=>`<div class="statline" style="font-size:16px"><b>${esc(p.name)}</b> ${p.role} · ${esc(line(p))}</div>`).join('')}</div>
-    ${b.rivalry?`<div class="trophyWrap ${won?'won':''}">${trophyImg()}<p class="statline">${won?`<b>${esc(trophyName())}</b> ${save.world.trophy.holder==='user'?'stays':'comes'} home`:`${esc(specOf(oppId()).short)} keeps <b>${esc(trophyName())}</b>`}</p></div>`:''}
+    ${b.rivalry?(DYN?`<p class="statline">RIVALRY ${won?'WON':'LOST'}</p>`:`<div class="trophyWrap ${won?'won':''}">${trophyImg()}<p class="statline">${won?`<b>${esc(trophyName())}</b> ${save.world.trophy.holder==='user'?'stays':'comes'} home`:`${esc(specOf(oppId()).short)} keeps <b>${esc(trophyName())}</b>`}</p></div>`):''}
     <button class="btn go" id="openPack">${b._breakout?'⭐ SEE THE BREAKOUT':won?(b.rivalry?'OPEN RIVALRY PACK':'OPEN VICTORY PACK'):'OPEN FILM STUDY PACK'}</button></div>`;
   m.classList.add('on');
   if(won){PT.confetti(220);S.fanfare()}else S.groan();
@@ -446,7 +576,7 @@ function finalScreen(){
 async function packScreen(won){
   S.init();
   const opp=b.user==='home'?'away':'home';
-  const pack=P.openPack(save.playbook,{won,rivalry:b.rivalry,seed:`${save.team}:${save.games}`,oppTendency:b.tend[opp],worldTaken:W.takenLegendaries(save.world,save.playbook,'user')});
+  const pack=P.openPack(save.playbook,{won,rivalry:b.rivalry,seed:`${save.team}:${save.games}`,oppTendency:b.tend[opp],worldTaken:DYN?[]:W.takenLegendaries(save.world,save.playbook,'user')});
   const pc=pack.type==='rivalry'?['#e0322a','#3a0705']:won?['#ffcc33','#7a4a00']:['#3f8fe0','#0d2a55'];
   const m=$('#modal');
   m.innerHTML=`<div class="mwrap"><p class="big ${won?'gold':''}" style="font-size:clamp(40px,7vw,80px)">${esc(pack.title.toUpperCase())}</p><p class="statline">${esc(pack.subtitle)}</p>
@@ -516,12 +646,12 @@ async function afterPack(){
   await FX.wait(900);
   const r=EV.ready(save.playbook);
   if(r.length){evolutionScreen(r[0]);return}
-  leagueScreen();
+  afterWeek();
 }
 
 // ================================================================ weather, rivalry, breakouts
 const WX={clear:{label:'Clear',icon:'☀',note:'No effect on the duels'},rain:{label:'Rain',icon:'🌧',note:'Wet ball: every pass Finish −1'},wind:{label:'Wind',icon:'🌬',note:'Swirling wind: deep passes Key −1'},snow:{label:'Snow',icon:'❄',note:'Every Finish −1; run Gates +1'}};
-function weatherFor(){const r=window.DynastyRng.create(`wx:${save.world.seed}:${save.games}`).next();return r<.55?'clear':r<.72?'rain':r<.88?'wind':'snow'}
+function weatherFor(){if(DYN)return DYN.weather||'clear';const r=window.DynastyRng.create(`wx:${save.world.seed}:${save.games}`).next();return r<.55?'clear':r<.72?'rain':r<.88?'wind':'snow'}
 let wxLoop=null;
 function setWeather(kind){
   let cv=$('#wx');if(!cv){cv=document.createElement('canvas');cv.id='wx';$('#stage').prepend(cv)}
@@ -548,7 +678,7 @@ function trophyImg(cls='trophy'){const src=$('#trophySrc')?.src;return src?`<div
 // A player had a breakout game: he earns his own card.
 async function breakoutScreen(won){
   const c=b._breakout,p=c.p,me=teamOf(b.user),pb=save.playbook,m=$('#modal');
-  const spec=SG.specFor(p,{season:save.world.season,colors:me.colors,earned:`${c.wins} of ${c.duels} duels won${c.fire?`, caught fire ${c.fire}×`:''} vs ${teamOf(b.user==='home'?'away':'home').short}`});
+  const spec=SG.specFor(p,{season:DYN?DYN.season:save.world.season,colors:me.colors,earned:`${c.wins} of ${c.duels} duels won${c.fire?`, caught fire ${c.fire}×`:''} vs ${teamOf(b.user==='home'?'away':'home').short}`});
   m.innerHTML=`<div class="mwrap"><div class="spot"></div><p class="statline">BREAKOUT PERFORMANCE</p>
     <div class="bo"><canvas id="boFace" width="180" height="180"></canvas><div class="boText"><div class="boNum" style="color:${me.colors[0]}">#${p.number}</div><p class="big gold" id="boName" style="font-size:clamp(40px,8vw,96px)">${esc(p.name.toUpperCase())}</p>
     <p class="statline">${esc(p.role)} · ${esc(p.archetype)} · <b>${c.wins}</b> of ${c.duels} duels won${c.fire?` · caught fire <b>${c.fire}×</b>`:''}</p></div></div>
@@ -746,11 +876,46 @@ function evolutionScreen(r){
       EV.evolve(pb,from,w.dataset.b);writeSave();
       w.insertAdjacentHTML('beforeend','<div class="evostamp">EVOLVED</div>');
       await FX.wait(1300);$('#rays').classList.remove('on');
-      const more=EV.ready(pb);if(more.length)evolutionScreen(more[0]);else leagueScreen();
+      const more=EV.ready(pb);if(more.length)evolutionScreen(more[0]);else afterWeek();
     };
   });
 }
 // Close out the week: the AI programs play, open packs, cut and evolve.
+// After the pack and evolutions: back to the sandbox league, or home to the dynasty.
+function afterWeek(){if(DYN){dynastyDone();return}leagueScreen()}
+function dynastyDone(){
+  const m=$('#modal');writeSave();
+  m.innerHTML=`<div class="mwrap"><p class="big gold" style="font-size:clamp(40px,7vw,80px)">BACK TO THE WEEK</p><p class="statline">${b._saved?.ok?'The game, your playbook and your cards are saved.':'Your playbook and cards are saved. The game was not recorded.'}</p><button class="btn go" id="home">RETURN TO DYNASTY</button></div>`;
+  m.classList.add('on');$('#home').onclick=()=>HOST.close();
+}
+// Dynasty game day: the battle starts at once with the real teams.
+// A playbook from the save only plays cards this build knows; anything else is dropped (base calls fall back).
+function sanitizePlaybook(pb){
+  const known=id=>!!(D.PLAYS[id]||D.CALLS[id]||D.TACTICS[id]);
+  for(const side of ['off','def']){const d=pb[side];if(!d)continue;
+    if(!(d.base||[]).every(known)||(d.base||[]).length!==4)d.base=[...D.DEFAULT_DECKS[side].base];
+    d.wrinkles=(d.wrinkles||[]).filter(known);d.tactics=(d.tactics||[]).filter(known);}
+  pb.signatures=(pb.signatures||[]).filter(sg=>known(sg.id));
+  return pb;
+}
+function dynastyStart(){
+  registerSignatures();sanitizePlaybook(save.playbook);
+  const AD=window.CallSheet.adapter;
+  const opp=DYN.oppPlaybook?sanitizePlaybook(DYN.oppPlaybook):null;if(opp)SG.registerAll(opp);
+  const deckFor=side=>DYN.userSide===side?P.decksOf(save.playbook):(opp?P.decksOf(opp):null);
+  b=B.create({home:AD.battleTeam(DYN.home,deckFor('home'),DYN.program?.home),away:AD.battleTeam(DYN.away,deckFor('away'),DYN.program?.away),
+    user:DYN.userSide,mode:save.settings.mode,control:save.settings.control,seed:DYN.seed,weather:DYN.weather||'clear',rivalry:!!DYN.rivalry,conditions:DYN.conditions||null});
+  setWeather(b.weather);seen=0;sel={play:null,tac:[]};err='';lastLook={};b._lastScore={home:0,away:0};
+  drawField();renderBug();setMarkers(null);$('#ticker').innerHTML='';
+  const begin=async()=>{
+    for(const mv of DYN.moves||[]){
+      if(mv.how==='ring'){$('#rays').classList.add('on');S.fanfare();await callout('RING OF HONOR','',1600,`${mv.name} · ${mv.exit||'graduated'} · his card retires`);$('#rays').classList.remove('on')}
+      else await callout(mv.how==='transfer'?'TRANSFERRED':'MOVED ON','cool small',1200,`${mv.name}${mv.to?` · now at ${mv.to}`:''} · his card leaves with him`);
+    }
+    await callout(DYN.rivalry?'RIVALRY WEEK':'KICKOFF','small',800,`${teamOf('away').name} at ${teamOf('home').name}`);go(null);
+  };
+  if(!save.seenHelp)howToPlay(begin);else begin();
+}
 function leagueScreen(){
   if(save.pending){W.advanceWeek(save.world,save.playbook,save.pending);save.pending=null;writeSave()}
   const news=save.world.news||[],name=id=>id==='user'?specOf(save.team).name:specOf(id).name;
@@ -793,5 +958,5 @@ FX.speed=save.settings.fast?.45:1;S.on=save.settings.sound!==false;
 PT.mount($('#fx'));
 // Test hook: lets automated checks drive the slice without pixel hunting.
 window.__slice={seasonEndScreen,signingDayScreen,rosterView,howToPlay,get b(){return b},get req(){return req},get busy(){return busy},save:()=>save,go,startGame,title,evolutionScreen,leagueScreen,breakoutScreen,setWeather,scoutingReport};
-title();
+if(DYN)dynastyStart();else title();
 })();

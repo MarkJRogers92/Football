@@ -107,6 +107,10 @@ function buildSnap(ctx){
     const hits=e=>(e.duel==null||e.duel===key)&&(!e.flag||(e.flag==='run'?play.family==='run':e.flag==='pass'?!!play.pass:!!d[e.flag]))&&(!e.role||d.off.includes(e.role)||d.def.includes(e.role));
     for(const id of ot){const T=D.TACTICS[id]||{};for(const e of T.effects||[])if(hits(e))add(e.v,T.name)}
     for(const id of dt){const T=D.TACTICS[id]||{};for(const e of T.effects||[])if(hits(e))add(-e.v,T.name)}
+    // Program edges from the dynasty: scheme fit, weekly prep, crowd. Extra conditions: family, pressureCall, thirdDown.
+    const edgeHits=e=>hits(e)&&(!e.family||play.family===e.family)&&(!e.pressureCall||call.pressure>0)&&(!e.thirdDown||sit.down===3);
+    for(const e of ctx.offEdges||[])if(edgeHits(e))add(e.v,e.src);
+    for(const e of ctx.defEdges||[])if(edgeHits(e))add(-e.v,e.src);
     for(const e of play.effects||[])if(hits(e))add(e.v,e.src||play.name);
     for(const e of call.effects||[])if(hits(e))add(-e.v,e.src||call.name);
     // Weather.
@@ -130,6 +134,9 @@ function buildSnap(ctx){
     for(const [roles,lineup] of [[d.off,off],[d.def,def]]){
       for(const r of roles){const s=D.SIGNATURES[lineup[r]?.archetype];if(s?.duel&&s.scope!=='field')add(s.duel({play,call},key,d),`${lineup[r].name} (${lineup[r].archetype})`)}
     }
+    // Player conditions from the dynasty (fatigue, composure, morale, playing out of position). Labeled, ±1 each.
+    const condOn=c=>c.when==='any'||c.when==='late'&&(sit.period||1)>=4||c.when==='money'&&sit.down>=3;
+    for(const [roles,lineup,sign] of [[d.off,off,1],[d.def,def,-1]])for(const r of roles){const pl=lineup[r];for(const c of pl?.cond||[])if(condOn(c))add(sign*c.v,`${pl.name}: ${c.src}`)}
     for(const r of Object.keys(D.DEF_ROLES)){const p=def[r],s=D.SIGNATURES[p?.archetype];if(s?.duel&&s.scope==='field')add(s.duel({play,call},key,d),`${p.name} (${p.archetype})`)}
     const offGrade=grade(off,d.off,d.ot),defGrade=grade(def,d.def,d.dt);
     const raw=offGrade-defGrade+mods.reduce((s,m)=>s+m.v,0),margin=clamp(raw,-3,3);

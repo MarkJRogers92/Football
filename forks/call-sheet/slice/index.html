@@ -43,6 +43,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .drow .k{font-family:var(--cond);font-weight:800;font-size:20px;color:var(--gold)}
 .drow .n{font-size:12px;line-height:1.2}.drow .n b{font-size:12.5px}
 .chip{font-family:var(--cond);font-weight:800;font-size:13px;letter-spacing:.06em;padding:3px 9px;border-radius:12px;text-transform:uppercase}
+.chip.fogchip{outline:2px dashed rgba(159,227,255,.7);outline-offset:1px}
 .chip.Strong{background:#1e7a37;color:#eaffea;box-shadow:0 0 12px rgba(114,240,138,.5)}.chip.Edge{background:#265c32;color:#d6ffd9}.chip.Even{background:#6a5714;color:#fff1b8}.chip.Tough{background:#7a3a1d;color:#ffd9c4}.chip.Danger{background:#8a1e1b;color:#ffd2ce;box-shadow:0 0 12px rgba(255,90,79,.45)}
 .bonus{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .bonus span{font-family:var(--cond);font-weight:800;font-size:12px;padding:2px 7px;border-radius:9px;background:rgba(255,154,60,.18);color:#ffcf9e;border:1px solid rgba(255,154,60,.4)}
@@ -59,9 +60,44 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 #stage{position:relative;overflow:hidden;min-height:0;min-width:0}
 #fieldWrap{position:absolute;inset:0;perspective:1100px;display:flex;align-items:center;justify-content:center}
 #field{width:min(100%,1150px);transform:rotateX(34deg) translateY(-2%);transform-origin:50% 60%;filter:drop-shadow(0 30px 40px rgba(0,0,0,.7))}
-#field .pl{transition:none}
-#field .hotp{animation:hotp .5s infinite alternate}
-@keyframes hotp{to{stroke:#ffe066;stroke-width:5}}
+#field .pl{transition:none;cursor:pointer}
+#field .pl .pc{transform-box:fill-box;transform-origin:center}
+#field .pl .cbody{filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))}
+#field .pl .nband{stroke:rgba(0,0,0,.35);stroke-width:.8}
+#field .pl .num{fill:#fff;paint-order:stroke;stroke:rgba(0,0,0,.7);stroke-width:2px;font:800 10.5px 'Barlow Condensed',Impact,system-ui;letter-spacing:.3px}
+#field .pl .glow{fill:none;stroke:transparent;stroke-width:6;opacity:0;transition:opacity .18s}
+#field .pl:hover .glow{stroke:#fff;opacity:.8}
+#field .pl.sig .cbody{stroke:#ffd34d;stroke-width:2.6}
+#field .pl.sig .nband{fill:#c99a12!important}
+#field .pl.hot .cbody{animation:hotp .5s infinite alternate}
+@keyframes hotp{to{stroke:#ff7a1a;stroke-width:3.4}}
+#field .pl.edge .glow{stroke:#3dff86;opacity:1;animation:plpulse .9s ease-in-out infinite alternate}
+#field .pl.risk .glow{stroke:#ff3b4f;opacity:1;animation:plpulse .9s ease-in-out infinite alternate}
+#field .pl.threat .glow{stroke:#ffb03c;opacity:.85;stroke-dasharray:5 3}
+#field .pl.won .glow{stroke:#ffe066;opacity:1;stroke-width:9;animation:none}
+@keyframes plpulse{from{opacity:.55}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){#field .pl .glow,#field .pl.hot .cbody{animation:none!important}}
+#ptip{position:fixed;z-index:60;pointer-events:none;width:230px;padding:10px 12px;border-radius:12px;background:linear-gradient(160deg,#141b30,#0b0f1c);border:2px solid var(--tc,#3a4677);color:#eef2ff;font:13px/1.35 system-ui;box-shadow:0 14px 34px rgba(0,0,0,.6);opacity:0;transform:translateY(4px) scale(.97);transition:opacity .12s,transform .12s}
+#ptip.on{opacity:1;transform:none}
+#ptip.sig{border-color:#ffd34d;box-shadow:0 0 0 1px #ffd34d,0 0 22px rgba(255,211,77,.35),0 14px 34px rgba(0,0,0,.6)}
+#ptip .tt-head{display:flex;gap:10px;align-items:center}
+#ptip canvas{width:56px;height:56px;border-radius:8px;background:var(--tc);flex:none}
+#ptip .tt-head>div>b{font:800 17px 'Barlow Condensed',Impact,system-ui;letter-spacing:.3px;display:block}
+#ptip .tt-head span{display:block;font-size:11.5px;color:#aab6e8}#ptip .tt-head span b{color:#fff}
+#ptip .tt-traits{margin-top:8px;display:grid;gap:3px}
+#ptip .tt-traits div{display:grid;grid-template-columns:80px 1fr 38px;gap:6px;align-items:center;font-size:11.5px;text-transform:capitalize;color:#c9d2f5}
+#ptip .tt-traits div.key span{color:#ffe066;font-weight:700}
+#ptip .tt-traits i{height:5px;border-radius:3px;background:rgba(255,255,255,.12);position:relative;overflow:hidden}
+#ptip .tt-traits i::after{content:'';position:absolute;inset:0;width:var(--v);background:linear-gradient(90deg,#3fc1ff,#7dffb0)}
+#ptip .tt-traits b{text-align:right}
+#ptip .tt-cond{margin-top:7px;display:grid;gap:3px}#ptip .tt-cond span{font-size:11.5px;padding:2px 6px;border-radius:5px;background:rgba(255,90,90,.14);color:#ffc4c4}#ptip .tt-cond span.up{background:rgba(61,255,134,.12);color:#b6ffd2}#ptip .tt-cond small{display:block;font-size:10px;opacity:.75}
+#ptip .tt-notes{margin-top:7px;font-size:11.5px;display:grid;gap:2px}
+#ptip .tt-notes div{padding:2px 6px;border-radius:5px;background:rgba(61,255,134,.12);color:#b6ffd2}
+#ptip .tt-fire,#ptip .tt-sig{margin-top:6px;font:800 11px system-ui;letter-spacing:.12em;color:#ff9a3c}
+#ptip .tt-sig{color:#ffd34d}
+#ptip .tt-line{margin-top:8px;padding-top:7px;border-top:1px solid rgba(255,255,255,.12);font-size:12.5px}
+#ptip .tt-line span{display:block;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8c98c9;margin-bottom:2px}
+#ptip .tt-fog{margin-top:6px;font-size:11px;color:#9fe3ff}
 #look{position:absolute;top:8px;left:0;right:0;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;z-index:3;padding:0 10px}
 .tag{font-family:var(--cond);font-weight:800;font-size:15px;letter-spacing:.07em;text-transform:uppercase;padding:5px 12px;border-radius:8px;border:2px solid;background:rgba(6,10,16,.78);backdrop-filter:blur(3px)}
 .tag.conf{border-color:#72f08a;color:#d8ffe0;box-shadow:0 0 14px rgba(114,240,138,.35)}
@@ -321,6 +357,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 <div class="sr" id="sr" aria-live="assertive"></div>
 
 <script src="../../../rng.js"></script>
+<script src="../../../game-conditions.js"></script>
 <script src="../../../game-engine-v2.js"></script>
 <script src="../core/data.js"></script>
 <script src="../core/resolver.js"></script>
@@ -330,6 +367,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 <script src="../core/evolution.js"></script>
 <script src="../core/signatures.js"></script>
 <script src="../core/classes.js"></script>
+<script src="../core/adapter.js"></script>
 <script src="../core/world.js"></script>
 <script src="../../../portraits/renderer-v1.js"></script>
 <script src="fx.js"></script>

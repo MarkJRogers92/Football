@@ -67,7 +67,7 @@ function register(spec){
 function registerAll(pb){for(const s of pb?.signatures||[])register(s)}
 function specFor(player,info={}){
   const template=templateFor(player),b=build({template,role:player.role,last:lastName(player.name),name:player.name,id:'x'});
-  return{id:`sig_${player.id}`,template,playerId:player.id,name:player.name,last:lastName(player.name),role:player.role,pos:player.pos,archetype:player.archetype,number:player.number,
+  return{id:`sig_${player.id}`,template,playerId:player.id,name:player.name,last:lastName(player.name),role:player.role,pos:player.pos,archetype:player.archetype,number:player.number,portraitSeed:player.portraitSeed,
     side:b.side,pile:b.kind==='tactic'?'tactics':'wrinkles',earned:info.earned||'',season:info.season||1,colors:info.colors||null};
 }
 // Who broke out in this game? A dominant share of his duels, or catching fire again and again.

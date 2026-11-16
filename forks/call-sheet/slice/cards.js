@@ -34,7 +34,7 @@ function def(id){return D.PLAYS[id]||D.CALLS[id]||D.TACTICS[id]}
 // Real faces from Dynasty Lab's deterministic portrait renderer, when it's loaded.
 function paintPortrait(cv,p,colors,size=96){
   try{const DP=window.DynastyPortraits;if(!DP)return false;
-    DP.renderPlayerPortrait({portraitSeed:`cs-${p.playerId||p.id}-${p.name}`,pos:p.pos,jerseyNumber:p.number},{primary:colors?.[0]||'#2a3550',secondary:colors?.[1]||'#e8e2d0'},cv,{size,frame:'card',pixelRatio:Math.min(2,window.devicePixelRatio||1)});
+    DP.renderPlayerPortrait({portraitSeed:p.portraitSeed||`cs-${p.playerId||p.id}-${p.name}`,pos:p.pos,jerseyNumber:p.number,height:p.height,weight:p.weight},{primary:colors?.[0]||'#2a3550',secondary:colors?.[1]||'#e8e2d0'},cv,{size,frame:'card',pixelRatio:Math.min(2,window.devicePixelRatio||1)});
     cv.style.width=cv.style.height=`${size}px`;return true}catch(e){return false}
 }
 function kindOf(id){return D.PLAYS[id]?'play':D.CALLS[id]?'call':'tactic'}

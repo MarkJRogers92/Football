@@ -26,7 +26,7 @@ const OFF_FAMILIES=['run','quick','deep','constraint'];
 // ---------------------------------------------------------------- setup
 function create(opts){
   const seed=String(opts.seed??'call-sheet');
-  const game=Engine.createGame({home:{id:'home',name:opts.home.name,rating:70},away:{id:'away',name:opts.away.name,rating:70},seed,rules:{penalties:true,returns:true,pressure:true}});
+  const game=Engine.createGame({home:{id:'home',name:opts.home.name,rating:70},away:{id:'away',name:opts.away.name,rating:70},seed,rules:{penalties:true,returns:true,pressure:true,...(opts.conditions?{conditions:opts.conditions}:{})}});
   const b={version:VERSION,seed,mode:opts.mode||'series',user:opts.user||null,control:opts.control||'both',weather:opts.weather||'clear',rivalry:!!opts.rivalry,game,
     teams:{home:clone(opts.home),away:clone(opts.away)},
     decks:{home:clone(opts.home.decks||D.DEFAULT_DECKS),away:clone(opts.away.decks||D.DEFAULT_DECKS)},
@@ -62,6 +62,9 @@ function lineupOf(b,side,role){return b.teams[side].lineup[role]}
 function situation(b){const g=b.game;return{down:g.down,distance:g.distance,field:g.fieldPosition,period:g.period,clock:g.clock,score:{...g.score},possession:g.possession}}
 function seriesKeyOf(g){return`${g.drive}:${g.possession}:${g.fieldPosition+g.distance}:${g.ot?g.ot.period+'.'+g.ot.possessions:''}`}
 // The person controls a side's snaps when it is their team and the control setting covers that unit.
+// Program edges (scheme fit, weekly prep, home crowd): each team's offensive edges help its offense, its
+// defensive edges help its defense. They come from the Dynasty Lab program via the adapter.
+function edgesFor(b,offSide){return{offEdges:b.teams[offSide]?.edges?.off||[],defEdges:b.teams[other(offSide)]?.edges?.def||[]}}
 function isUser(b,side){
   if(b.user!==side||!b.game.possession)return false;
   if(b.control==='both')return true;
@@ -109,7 +112,8 @@ function dealHand(b,side,role){
   if(old){const p=b.piles[side][old.role];p.wrinkle.discard.push(...old.wrinkles);p.tactic.discard.push(...old.tactics)}
   const p=b.piles[side][role];
   const bonus=role==='off'?(b.bonusCommand?.[side]||0):0;if(bonus)b.bonusCommand[side]=0;
-  b.hands[side]={role,wrinkles:drawFrom(b,p.wrinkle,D.RULES.wrinkleRow),tactics:drawFrom(b,p.tactic,D.RULES.tacticHand),command:D.RULES.seriesCommand+bonus,onceUsed:[]};
+  const staffBonus=b.teams[side]?.coach?.commandBonus?.[role]||0;
+  b.hands[side]={role,wrinkles:drawFrom(b,p.wrinkle,D.RULES.wrinkleRow),tactics:drawFrom(b,p.tactic,D.RULES.tacticHand),command:D.RULES.seriesCommand+bonus+staffBonus,onceUsed:[]};
 }
 function halftime(b){
   for(const side of ['home','away']){
@@ -199,7 +203,7 @@ function aiOffense(b,side,look,opts={}){
     for(const ts of subsets(tacs,2)){
       const cost=p.cost+ts.reduce((s,t)=>s+t.cost,0);if(cost>cap)continue;
       if(ts.some(t=>R.tacticBlocked(t.card,p.card,team.lineup.off)))continue;
-      const snap=R.buildSnap({weather:b.weather,off:team.lineup.off,def,play:p.card,call,offTactics:ts.map(t=>t.id),situation:sit,lean:look.lean.confirmed?look.lean.value:null,heat:look.heat,motionConfirmed:!!b.snap?.motionConfirmed});
+      const snap=R.buildSnap({weather:b.weather,...edgesFor(b,side),off:team.lineup.off,def,play:p.card,call,offTactics:ts.map(t=>t.id),situation:sit,lean:look.lean.confirmed?look.lean.value:null,heat:look.heat,motionConfirmed:!!b.snap?.motionConfirmed});
       const ev=R.evaluate(snap,sit);
       const isRun=!p.card.pass;
       lines.push({play:p.id,tactics:ts.map(t=>t.id),u:utility(ev,sit)-cost*(sit.down>=3?.2:.55)-(p.base?0:.15)+(isRun?balance:-balance)});
@@ -222,7 +226,7 @@ function aiDefense(b,side,opts={}){
       for(const f of OFF_FAMILIES){
         if(weights[f]<.02)continue;const reps=REP_PLAYS[f].filter(id=>!R.playBlocked(D.PLAYS[id],offTeam.lineup.off));let best=-99;
         for(const id of reps){
-          const snap=R.buildSnap({weather:b.weather,off:offTeam.lineup.off,def:team.lineup.def,play:D.PLAYS[id],call:p.card,defTactics:ts.map(t=>t.id),situation:sit,lean,heat});
+          const snap=R.buildSnap({weather:b.weather,...edgesFor(b,other(side)),off:offTeam.lineup.off,def:team.lineup.def,play:D.PLAYS[id],call:p.card,defTactics:ts.map(t=>t.id),situation:sit,lean,heat});
           best=Math.max(best,utility(R.evaluate(snap,sit),sit));
         }
         u+=weights[f]*(best===-99?0:best);
@@ -474,7 +478,7 @@ function resolveSnap(b){
   const fams=b.drive.fams,isPA=play.id==='pa_boot'||play.upgradeOf==='pa_boot';
   const combo=isPA&&fams.length>=2&&fams[fams.length-1]==='run'&&fams[fams.length-2]==='run'?{id:'establish',name:'Establish the Run',duel:'K',v:1,reward:'+1 Command'}:null;
   const hurried=s.off.tactics.includes('hurry_up')&&s.def.tactics.length>0;
-  const snap=R.buildSnap({weather:b.weather,off:b.teams[off].lineup.off,def:b.teams[def].lineup.def,play,call,offTactics:s.off.tactics,defTactics:hurried?[]:s.def.tactics,situation:sit,lean,heat,motionConfirmed:s.motionConfirmed,combo,fire:b.fire});
+  const snap=R.buildSnap({weather:b.weather,...edgesFor(b,off),off:b.teams[off].lineup.off,def:b.teams[def].lineup.def,play,call,offTactics:s.off.tactics,defTactics:hurried?[]:s.def.tactics,situation:sit,lean,heat,motionConfirmed:s.motionConfirmed,combo,fire:b.fire});
   b.telemetry.snaps++;b.seriesSnap++;
   const lineKey=`${play.id}${s.off.tactics.length?'+'+[...s.off.tactics].sort().join('+'):''}`;b.telemetry.lineCounts[lineKey]=(b.telemetry.lineCounts[lineKey]||0)+1;
   // Tendencies move whether or not a flag flies.
@@ -490,7 +494,14 @@ function resolveSnap(b){
     const out=withRng(b,rng=>R.resolve(snap,rng,sit));
     Object.assign(result,{category:out.category,kind:out.kind,yards:out.yards,turnover:out.turnover||null,completed:out.completed,duelResults:out.duels,participants:out.participants});
     const before={down:g.down,distance:g.distance,field:g.fieldPosition,score:{...g.score}};
+    const evStart=g.events.length;
     Engine.applyScrimmage(g,{yards:out.yards,clock:out.clock,kind:out.engineKind,completed:out.completed,turnover:out.turnover});
+    // Tag the play the way Dynasty Lab's attribution expects (run/pass, completion, sack), plus who actually played it.
+    for(let i=g.events.length-1;i>=evStart;i--){const ev=g.events[i];if(!['scrimmage','interception','fumble'].includes(ev.type))continue;
+      ev.kind=out.engineKind;if(typeof out.completed==='boolean')ev.completed=out.completed;if(out.kind==='sack')ev.sack=true;
+      const P=out.participants,O=b.teams[off].lineup.off,Df=b.teams[def].lineup.def,id=(lu,r)=>r&&lu[r]?String(lu[r].id):null;
+      ev.card={play:play.id,call:call.id,category:out.category,actors:{qb:play.pass?id(O,'QB'):null,carrier:id(O,P.carrier),target:id(O,P.target),
+        sacker:id(Df,P.sacker),tackler:out.kind==='sack'||out.turnover==='interception'?null:id(Df,P.defender),interceptor:out.turnover==='interception'?id(Df,P.defender):null}};break}
     recordStats(b,off,def,out,before,play);
     result.text=storyLine(b,off,def,play,out,before);
     result.events=[];
@@ -547,6 +558,8 @@ function pstat(b,side,role,lineupKey){
 function recordStats(b,off,def,out,before,play){
   const bo=b.box[off],P=out.participants,g=b.game;
   const td=g.score[off]-before.score[off]>=6&&!out.turnover;
+  // Gains stop at the goal line (and losses at your own end line), the way the engine and the box score count them.
+  out={...out,yards:out.turnover?out.yards:Math.max(-before.field,Math.min(out.yards,100-before.field))};
   bo.plays++;
   if(before.down===3){bo.thirdAtt++}if(before.down===4){bo.fourthAtt++}
   const gained=!out.turnover&&out.yards>=before.distance;
@@ -575,13 +588,13 @@ function preview(b,side,choice){
   if(role==='off'){
     const play=D.PLAYS[choice.play];if(!play)return null;
     const call=presumedCall(b.snap.look);
-    const snap=R.buildSnap({weather:b.weather,off:b.teams[side].lineup.off,def:b.teams[other(side)].lineup.def,play,call,offTactics:choice.tactics||[],situation:sit,lean:leanFor(b),heat:heatFor(b),motionConfirmed:b.snap.motionConfirmed});
+    const snap=R.buildSnap({weather:b.weather,...edgesFor(b,side),off:b.teams[side].lineup.off,def:b.teams[other(side)].lineup.def,play,call,offTactics:choice.tactics||[],situation:sit,lean:leanFor(b),heat:heatFor(b),motionConfirmed:b.snap.motionConfirmed});
     return{snap,ev:R.evaluate(snap,sit),against:call};
   }
   const call=D.CALLS[choice.play];if(!call)return null;
   const fam=b.snap.offLook.family.confirmed?b.snap.offLook.family.value:null,w=offFamilyWeights(b,fam),out=[];
   for(const f of OFF_FAMILIES){if(w[f]<.02)continue;const id=REP_PLAYS[f].find(x=>!R.playBlocked(D.PLAYS[x],b.teams[other(side)].lineup.off));if(!id)continue;
-    const snap=R.buildSnap({weather:b.weather,off:b.teams[other(side)].lineup.off,def:b.teams[side].lineup.def,play:D.PLAYS[id],call,defTactics:choice.tactics||[],situation:sit,lean:leanFor(b),heat:heatFor(b)});
+    const snap=R.buildSnap({weather:b.weather,...edgesFor(b,other(side)),off:b.teams[other(side)].lineup.off,def:b.teams[side].lineup.def,play:D.PLAYS[id],call,defTactics:choice.tactics||[],situation:sit,lean:leanFor(b),heat:heatFor(b)});
     out.push({family:f,weight:w[f],play:id,snap,ev:R.evaluate(snap,sit)})}
   return{vs:out};
 }
@@ -592,5 +605,27 @@ function load(text){const b=JSON.parse(text);if(b.version!==VERSION)throw new Er
 
 function simulate(opts){const b=create({...opts,user:null,mode:'sim'});advance(b);return b}
 
-return{VERSION,create,advance,submit,preview,save,load,simulate,offOptions,defOptions,leanFor,presumedCall,lookFor};
+// Who won and lost each duel this game, per player, plus the plays that made highlights.
+// A lost Gate decides the play, so the duels after it never happened. Returns {playerId:{name,side,w,l,big}}.
+function duelTally(b){
+  const out={},rec=(p,side)=>p?(out[p.id]??={name:p.name,side,w:0,l:0,big:0}):null;
+  for(const e of b.log||[]){
+    if(e.type!=='snap'||!e.duelResults||!e.duels)continue;
+    const O=b.teams[e.offSide].lineup.off,Df=b.teams[e.defSide].lineup.def;
+    for(let i=0;i<e.duelResults.length;i++){
+      const d=e.duels[i],won=e.duelResults[i].won;if(!d)continue;
+      for(const r of d.offRoles||[]){const t=rec(O[r],e.offSide);if(t)won?t.w++:t.l++}
+      for(const r of d.defRoles||[]){const t=rec(Df[r],e.defSide);if(t)won?t.l++:t.w++}
+      if(i===0&&!won)break;
+    }
+    const P=e.participants||{},td=/touchdown/i.test(e.text||'');
+    if(Math.abs(e.yards||0)>=20||td||e.turnover||e.kind==='sack'){
+      const defStar=e.kind==='sack'?Df[P.sacker]:e.turnover?Df[P.defender]:null;
+      const offStar=defStar?null:(e.kind==='run'||e.kind==='scramble')?O[P.carrier]:e.completed?O[P.target]:null;
+      const t=defStar?rec(defStar,e.defSide):rec(offStar,e.offSide);if(t)t.big++;
+    }
+  }
+  return out;
+}
+return{VERSION,create,advance,submit,preview,save,load,simulate,offOptions,defOptions,leanFor,presumedCall,lookFor,duelTally};
 });
