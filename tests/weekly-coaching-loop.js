@@ -27,4 +27,14 @@ const noChallenge=weekly.selectStarterChallenge([{pos:'RB',starter:{id:'S',name:
 assert.equal(noChallenge,null,'healthy separation and solid production should not manufacture a personnel decision');
 const room=weekly.buildStaffRoom({report:a,offPass:.61,defPressure:70,oc:{name:'O. Coach',playCall:82,adaptability:76},dc:{name:'D. Coach',playCall:74,adaptability:69},ocSchemeMatch:true,dcSchemeMatch:false});
 assert.equal(room.oc.name,'O. Coach');assert.equal(room.dc.name,'D. Coach');assert.equal(room.oc.plan.length,2);assert.equal(room.dc.plan.length,2);assert.ok(room.oc.plan.every(id=>weekly.FOCUSES[id].side==='offense'),'OC should spend a backed plan on offense');assert.ok(room.dc.plan.every(id=>weekly.FOCUSES[id].side==='defense'),'DC should spend a backed plan on defense');assert.equal(room.split.plan.length,2);assert.equal(weekly.FOCUSES[room.split.plan[0]].side,'offense');assert.equal(weekly.FOCUSES[room.split.plan[1]].side,'defense');assert.ok(room.oc.confidence>room.dc.confidence,'stronger aligned OC should carry more confidence than mismatched DC');assert.deepEqual(room,weekly.buildStaffRoom({report:a,offPass:.61,defPressure:70,oc:{name:'O. Coach',playCall:82,adaptability:76},dc:{name:'D. Coach',playCall:74,adaptability:69},ocSchemeMatch:true,dcSchemeMatch:false}),'Staff Room advice must be deterministic');
+// v0.37: staff read the forecast. Calm or indoor weather leaves the report as it was.
+assert.equal(weekly.weatherAdvice({roof:'dome',wind:30,precip:3}),null);
+assert.equal(weekly.weatherAdvice({roof:'open',wind:14,precip:1,sky:'rain',temp:60}),null,'a breeze and drizzle are not worth a plan');
+assert.deepEqual(weekly.buildReport({...input,weather:{roof:'open',wind:9,precip:0,sky:'clear',temp:70}}),{...a,weather:null});
+const windy=weekly.buildReport({...input,weather:{roof:'open',wind:22,precip:0,sky:'clear',temp:48}});
+assert.deepEqual(windy.recommendedFocuses,['run_blocking','run_fits'],'wind sends the staff to the run package');
+assert.match(windy.observations[0],/^Wind 22 mph Saturday: staff suggest the run package/);assert.equal(windy.weather.kind,'wind');
+assert.equal(windy.observations.length,4);
+assert.match(weekly.buildReport({...input,weather:{roof:'open',wind:6,precip:2,sky:'snow',temp:21}}).observations[0],/^Heavy snow and 21°F Saturday/);
+assert.match(weekly.weatherAdvice({roof:'open',wind:20,precip:3,sky:'rain',temp:50}).text,/^Wind 20 mph and Heavy rain Saturday/);
 console.log('PASS v0.10.2 weekly coaching engine: scouting, prep, starter pressure and deterministic Staff Room plans');

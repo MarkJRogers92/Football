@@ -17,10 +17,17 @@ function v0102WeeklyBaselineMatchup(t,opp){
   const P=gameProfilesBeforeWeeklyPrep(t,opp.name),O=gameProfilesBeforeWeeklyPrep(opp,t.name);
   return{teamProfile:P,opponentProfile:O,teamEdges:matchupEdges(t,opp,P,O),opponentEdges:matchupEdges(opp,t,O,P)}
 }
+// The forecast for this week's game between the two programs (the same weather the game will be played in).
+function v0102WeeklyForecast(t,opp){
+  try{
+    const g=universe.phase==='regular'?(universe.schedule?.[universe.week]||[]).find(x=>!x.played&&((x.home===t.name&&x.away===opp.name)||(x.away===t.name&&x.home===opp.name))):null;
+    return g&&typeof v2ForecastFor==='function'?v2ForecastFor(g):null;
+  }catch{return null}
+}
 function v0102WeeklyOpponentReport(t,opp){
   if(!v0102WeeklyApi||!t||!opp)return null;
   const m=v0102WeeklyBaselineMatchup(t,opp),passShare=OFF_SCHEMES[opp.offScheme]?.pass??.5;
-  return v0102WeeklyApi.buildReport({season:universe.year,week:universe.week,teamName:t.name,opponentName:opp.name,passShare,confidence:v0102WeeklyStaffConfidence(t),teamEdges:m.teamEdges,opponentEdges:m.opponentEdges,opponentInjuries:(opp.roster||[]).filter(p=>p.injury||(p.injuryWeeks||0)>0).length})
+  return v0102WeeklyApi.buildReport({season:universe.year,week:universe.week,teamName:t.name,opponentName:opp.name,passShare,weather:v0102WeeklyForecast(t,opp),confidence:v0102WeeklyStaffConfidence(t),teamEdges:m.teamEdges,opponentEdges:m.opponentEdges,opponentInjuries:(opp.roster||[]).filter(p=>p.injury||(p.injuryWeeks||0)>0).length})
 }
 function v0102WeeklyStaffRoom(t,opp,report=v0102WeeklyOpponentReport(t,opp)){
   if(!v0102WeeklyApi||!t||!opp||!report)return null;const oc=t.staff?.OC||{},dc=t.staff?.DC||{};
