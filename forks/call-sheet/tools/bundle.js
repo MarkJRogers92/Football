@@ -16,6 +16,8 @@ body=body.replace(/<script src="([^"]+)"><\/script>/g,(m,rel)=>{
   const src=fs.readFileSync(path.resolve(sliceDir,rel),'utf8').replace(/<\/script/gi,'<\\/script');
   return`<script>/* ${path.basename(rel)} */\n${src}\n</script>`;
 });
+// Images → data URIs.
+body=body.replace(/src="([^"]+\.(webp|png|jpg))"/g,(m,rel,ext)=>`src="data:image/${ext==='jpg'?'jpeg':ext};base64,${fs.readFileSync(path.resolve(sliceDir,rel)).toString('base64')}"`);
 const page=`<title>Call Sheet</title>\n<meta name="description" content="A college football card battler: call plays, win duels, open packs, evolve your playbook.">\n<style>${style}</style>\n${body}`;
 fs.writeFileSync(out,page);
 console.log(`Wrote ${out} (${(page.length/1024).toFixed(0)} KB)`);

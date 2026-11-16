@@ -4,11 +4,11 @@
 // the card you wanted — and you'll see it used against you.
 (function(root,factory){
   const node=typeof module==='object'&&module.exports;
-  const deps=node?[require('./data.js'),require('./roster.js'),require('./packs.js'),require('./evolution.js'),require('../../../rng.js')]
-    :[root.CallSheet.data,root.CallSheet.roster,root.CallSheet.packs,root.CallSheet.evolution,root.DynastyRng];
+  const deps=node?[require('./data.js'),require('./roster.js'),require('./packs.js'),require('./evolution.js'),require('../../../rng.js'),require('./signatures.js')]
+    :[root.CallSheet.data,root.CallSheet.roster,root.CallSheet.packs,root.CallSheet.evolution,root.DynastyRng,root.CallSheet.signatures];
   const api=factory(...deps);
   if(node)module.exports=api;else root.CallSheet.world=api;
-})(typeof window==='object'?window:globalThis,function(D,Ro,P,EV,DynastyRng){
+})(typeof window==='object'?window:globalThis,function(D,Ro,P,EV,DynastyRng,SG){
 'use strict';
 
 // Four generated programs join the presets so the league has eight teams.
@@ -21,7 +21,7 @@ const GENERATED=[
 const SPECS=Object.fromEntries([...Object.entries(Ro.PRESETS).map(([id,s])=>[id,{...s,id}]),...GENERATED.map(s=>[s.id,s])]);
 function teamFor(id,playbook){
   const s=SPECS[id];if(!s)throw new Error(`Unknown program ${id}`);
-  const t=Ro.makeTeam(s,`program:${id}`);t.id=id;if(playbook)t.decks=P.decksOf(playbook);return t;
+  const t=Ro.makeTeam(s,`program:${id}`);t.id=id;if(playbook){SG.registerAll(playbook);t.decks=P.decksOf(playbook)}return t;
 }
 
 function newWorld(userId,seed='world'){
@@ -31,9 +31,12 @@ function newWorld(userId,seed='world'){
   // Schedule: you play each AI program once per season, in a seeded order.
   const rng=DynastyRng.create(`schedule:${seed}`),order=Object.keys(programs);
   for(let i=order.length-1;i>0;i--){const j=rng.int(0,i);[order[i],order[j]]=[order[j],order[i]]}
-  return{version:1,seed,user:userId,week:0,season:1,order,programs,news:[]};
+  // A rival: the program you'll circle on the calendar. Rivalry games use a bigger pack.
+  const rival=order[rng.int(0,order.length-1)];
+  return{version:1,seed,user:userId,week:0,season:1,order,programs,news:[],rival,trophy:{holder:rival,history:[]}};
 }
 function opponentOf(world){return world.order[world.week%world.order.length]}
+function isRivalry(world){return!!world.rival&&opponentOf(world)===world.rival}
 // Every legendary owned by anyone other than `exceptId` (a program id, or 'user').
 function takenLegendaries(world,userPb,exceptId){
   const out=[];
@@ -97,12 +100,19 @@ function aiWeek(world,userPb,id,won,oppTendency){
     news.push({type:'pick',program:id,card:pick.id,rarity:pick.rarity});
   }
   const evo=aiReps(spec,prog.playbook,rng);if(evo)news.push({...evo,program:id});
+  // AI breakouts: now and then a player on their roster earns a signature card.
+  if((prog.playbook.signatures||[]).length<2&&rng.next()<.16){
+    const lu=teamFor(id).lineup,pool=[...Object.values(lu.off).filter(p=>['QB','RB','X','Z','SLOT','TE'].includes(p.role)),...Object.values(lu.def).filter(p=>['RUSH','MIKE','FCB','FS'].includes(p.role))];
+    const have=new Set((prog.playbook.signatures||[]).map(s=>s.playerId)),p=pool.filter(x=>!have.has(x.id)).sort((a,c)=>c.ovr-a.ovr)[rng.int(0,2)];
+    if(p){const sp=SG.specFor(p,{season:world.season,earned:'breakout',colors:spec.colors});SG.add(prog.playbook,sp);news.push({type:'signature',program:id,card:sp.id,player:p.name})}
+  }
   return news;
 }
 
 // Close out a week after the person's game. userResult: {won, opponentTendency, userTendency}
 function advanceWeek(world,userPb,userResult){
   const opp=opponentOf(world),news=[];
+  if(world.rival&&opp===world.rival){const holder=userResult.won?'user':opp;world.trophy.history.push({season:world.season,holder});if(holder!==world.trophy.holder)news.push({type:'trophy',holder});world.trophy.holder=holder}
   news.push(...aiWeek(world,userPb,opp,!userResult.won,userResult.userTendency));
   // The other six play each other: a quick strength-weighted result (full battles stay reserved for your games).
   const others=Object.keys(world.programs).filter(id=>id!==opp);
@@ -125,5 +135,5 @@ function standings(world,userPb,userName){
   return rows.sort((a,b)=>(b.w-b.l)-(a.w-a.l)||b.w-a.w);
 }
 
-return{SPECS,GENERATED,teamFor,newWorld,opponentOf,takenLegendaries,fit,aiPick,aiCut,advanceWeek,standings,strength};
+return{SPECS,GENERATED,teamFor,newWorld,opponentOf,isRivalry,takenLegendaries,fit,aiPick,aiCut,advanceWeek,standings,strength};
 });

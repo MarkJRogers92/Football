@@ -10,6 +10,7 @@ const D=require(path.join(__dirname,'../core/data.js'));
 const P=require(path.join(__dirname,'../core/packs.js'));
 const EV=require(path.join(__dirname,'../core/evolution.js'));
 const W=require(path.join(__dirname,'../core/world.js'));
+const SG=require(path.join(__dirname,'../core/signatures.js'));
 
 let passed=0;const failures=[];
 function test(name,fn){try{fn();passed++;console.log(`  ok  ${name}`)}catch(e){failures.push(name);console.log(`  FAIL ${name}\n       ${e.stack.split('\n').slice(0,3).join('\n       ')}`)}}
@@ -230,6 +231,37 @@ test('league: AI programs open packs, cut to capacity, evolve, and never share a
   // An AI team plays with its built playbook.
   const id=W.opponentOf(w),g=B.simulate({home:W.teamFor('aerial',pb),away:W.teamFor(id,w.programs[id].playbook),seed:'ai-deck'});
   assert.equal(g.game.status,'final');
+});
+
+test('signature cards: one per player, built from his role, three slots, cooldown, and they get played',()=>{
+  const team=Ro.preset('aerial'),lu=team.lineup;
+  const kinds={};for(const p of [...Object.values(lu.off),...Object.values(lu.def)]){const sp=SG.specFor(p);kinds[p.role]=SG.build(sp).kind;assert.equal(sp.id,`sig_${p.id}`)}
+  assert.equal(kinds.Z,'play');assert.equal(kinds.LT,'tactic');assert.equal(kinds.RUSH,'call');assert.equal(kinds.FCB,'tactic');
+  const pb=P.newPlaybook();
+  for(const r of ['Z','RB','RUSH'])assert.equal(SG.add(pb,SG.specFor(lu.off[r]||lu.def[r])).full,false);
+  assert.equal(SG.add(pb,SG.specFor(lu.off.TE)).full,true,'a fourth needs a replacement');
+  SG.add(pb,SG.specFor(lu.off.TE),0);assert.equal(pb.signatures.length,3);assert.ok(!pb.signatures.some(s=>s.playerId===lu.off.Z.id));
+  const d=P.decksOf(pb);assert.ok(d.off.wrinkles.includes(`sig_${lu.off.TE.id}`)&&d.def.wrinkles.includes(`sig_${lu.def.RUSH.id}`));
+  assert.equal(P.overCapacity(pb),null,'signatures sit outside the capacity limits');
+  team.decks=d;const g=B.simulate({home:team,away:Ro.preset('ground'),seed:'sig-play'});
+  assert.ok(g.log.some(l=>String(l.play).startsWith('sig_')||String(l.call).startsWith('sig_')),'signature plays should be called');
+  // Cooldown: right after earning one, no candidate.
+  const b2=B.simulate({home:Ro.preset('tempo'),away:Ro.preset('control'),seed:'cool'});assert.equal(SG.candidate(b2,'home',pb),null);
+});
+
+test('weather changes duels; rivalry week, trophy and the rivalry pack',()=>{
+  const off=Ro.preset('aerial').lineup.off,def=Ro.preset('ground').lineup.def,sit={down:1,distance:10};
+  const k=w=>R.buildSnap({off,def,play:D.PLAYS.vertical_shot,call:D.CALLS.cover3,situation:sit,weather:w}).duels[1].raw;
+  assert.equal(k('wind'),k('clear')-1);
+  const f=w=>R.buildSnap({off,def,play:D.PLAYS.quick_slant,call:D.CALLS.cover3,situation:sit,weather:w}).duels[2].raw;
+  assert.equal(f('rain'),f('clear')-1);
+  const g=B.simulate({home:Ro.preset('aerial'),away:Ro.preset('ground'),seed:'snowgame',weather:'snow'});assert.equal(g.game.status,'final');
+  const w=W.newWorld('aerial','rivals');assert.ok(w.programs[w.rival]);
+  while(!W.isRivalry(w))W.advanceWeek(w,P.newPlaybook(),{won:false});
+  W.advanceWeek(w,P.newPlaybook(),{won:true});assert.equal(w.trophy.holder,'user');
+  const pk=P.openPack(P.newPlaybook(),{won:true,rivalry:true,seed:'rp'});assert.equal(pk.cards.length,5);assert.equal(pk.type,'rivalry');
+  // New effect cards: Stunt and Hurry-Up.
+  const st=R.buildSnap({off,def,play:D.PLAYS.deep_cross,call:D.CALLS.cover3,defTactics:['stunt'],situation:sit});assert.ok(st.duels[0].mods.some(m=>m.src==='Stunt'&&m.v===-1));
 });
 
 console.log(`\n${passed} passed, ${failures.length} failed`);

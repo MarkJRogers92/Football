@@ -263,6 +263,56 @@ const RARITY={
 };
 const rarityOf=id=>RARITY[id]||'common';
 
+// --- Pack cards (rules v0.5) ---------------------------------------------------------------------------
+Object.assign(PLAYS,{
+  rpo_bubble:{id:'rpo_bubble',side:'off',name:'RPO Bubble',family:'constraint',punishes:'run',cost:0,target:'SLOT',pass:true,
+    matchups:[{when:'loaded',duel:'G',v:2,src:'Box overloaded, bubble wide open'}],
+    text:'Read the overhang: hand it off or flip it to the slot on the bubble.',
+    duels:{
+      G:{label:'Read the overhang',off:['QB'],ot:['iq','composure'],def:['NICKEL'],dt:['iq','speed'],bias:1,qbRead:true},
+      K:{label:'Perimeter block',off:['X'],ot:['power','technique'],def:['FCB'],dt:['power','technique'],bias:0},
+      F:{label:'Make him miss',off:['SLOT'],ot:['speed','versatility'],def:['FS'],dt:['speed','technique'],bias:0}},
+    results:{fail:[R(.6,'catch',[-1,1.5]),R(.4,'inc',[0,0],{int:.02})],short:[R(1,'catch',[3,1.5])],success:[R(1,'catch',[7,2])],explosive:[R(1,'catch',[16,6],{tail:.15})]}},
+  hb_wheel:{id:'hb_wheel',side:'off',name:'HB Wheel',family:'deep',cost:1,target:'RB',pass:true,protection:true,
+    matchups:[{when:'man',duel:'K',v:2,src:'Linebacker trailing the wheel'}],
+    text:'The back runs the wheel up the sideline. Linebackers in man can\'t keep up.',
+    duels:{
+      G:{label:'Protection',off:['LT','RT'],ot:['technique','power'],def:['RUSH','SET'],dt:['speed','technique'],bias:1,protect:true},
+      K:{label:'Wheel route',off:['RB'],ot:['speed','versatility'],def:['WILL'],dt:['speed','iq'],bias:0,separation:true},
+      F:{label:'Over the shoulder',off:['RB'],ot:['technique','composure'],def:['FS'],dt:['speed','iq'],bias:0}},
+    results:{fail:[R(.3,'sack',[-7,2]),R(.5,'inc',[0,0],{int:.05}),R(.2,'catch',[2,1.5])],short:[R(.6,'inc',[0,0],{int:.04}),R(.4,'catch',[6,2])],success:[R(.75,'catch',[17,4]),R(.25,'inc',[0,0],{int:.03})],explosive:[R(1,'catch',[30,10],{tail:.25})]}},
+  qb_draw:{id:'qb_draw',side:'off',name:'QB Draw',family:'run',cost:1,carrier:'QB',
+    matchups:[{when:'pressure',duel:'K',v:2,src:'Rushers vacated the middle'},{when:'shell2',duel:'G',v:1,src:'Light box behind two deep'}],
+    text:'Drop like it\'s a pass, then the quarterback runs up the vacated middle.',
+    duels:{
+      G:{label:'Sell the drop',off:['QB'],ot:['composure','iq'],def:['MIKE'],dt:['iq','composure'],bias:1,qbRead:true},
+      K:{label:'Find the hole',off:['QB'],ot:['speed','iq'],def:['NT','DT3'],dt:['speed','technique'],bias:0,qbRun:true},
+      F:{label:'Slide or score',off:['QB'],ot:['speed','power'],def:['BOXS'],dt:['speed','power'],bias:0,qbRun:true}},
+    results:{fail:[R(1,'run',[-1,1.5])],short:[R(1,'run',[3,1.5])],success:[R(1,'run',[8,2])],explosive:[R(1,'run',[16,6],{tail:.2})]}},
+  hook_ladder:{id:'hook_ladder',side:'off',name:'Hook & Ladder',family:'constraint',punishes:'quick',cost:2,target:'Z',pass:true,trick:true,
+    matchups:[{when:'zone',duel:'F',v:2,src:'Zone defenders converged on the hook'}],
+    text:'TRICK · Hook route, then a pitch to the trailer at full speed. Once per game.',
+    duels:{
+      G:{label:'The hook',off:['Z'],ot:['technique','power'],def:['FCB'],dt:['technique','iq'],bias:1,release:true},
+      K:{label:'The pitch',off:['Z'],ot:['composure','iq'],def:['WILL'],dt:['speed','iq'],bias:1},
+      F:{label:'The trailer',off:['SLOT'],ot:['speed','versatility'],def:['FS'],dt:['speed','iq'],bias:0}},
+    results:{fail:[R(.5,'inc',[0,0],{int:.05}),R(.5,'catch',[4,2])],short:[R(1,'catch',[9,2])],success:[R(1,'catch',[22,5])],explosive:[R(1,'catch',[42,12],{tail:.5})]}}
+});
+Object.assign(CALLS,{
+  tampa2:{id:'tampa2',side:'def',name:'Tampa 2',family:'zone',cost:1,box:'normal',shell:2,coverage:'zone',pressure:0,counters:['quick','deep'],look:{pressureShown:false},
+    text:'The middle linebacker runs the deep middle. Two deep, nothing easy anywhere.'},
+  ghost_blitz:{id:'ghost_blitz',side:'def',name:'Ghost Blitz',family:'pressure',cost:2,box:'normal',shell:2,coverage:'man',pressure:2,counters:['run','quick','deep'],look:{pressureShown:false},trick:true,
+    effects:[{flag:'protect',v:1,src:'Nobody blocked the ghost'}],
+    text:'TRICK · Two deep at the snap, then everybody comes. Once per game.'}
+});
+Object.assign(TACTICS,{
+  hurry_up:{id:'hurry_up',side:'off',name:'Hurry-Up',cost:1,icon:'⏩',text:'Snap it before they adjust: their tactics this snap are wasted.'},
+  audible:{id:'audible',side:'off',name:'Audible',cost:1,info:true,icon:'📣',reveal:['shell','pressure'],text:'Confirms the shell and the pressure. Cheaper than Check-With-Me; no coverage read.'},
+  stunt:{id:'stunt',side:'def',name:'Stunt',cost:1,icon:'⤨',effects:[{flag:'protect',v:1},{flag:'run',duel:'G',v:-1}],text:'Twist the rushers: +1 on pressure, but −1 at the point of attack against the run.'},
+  lock:{id:'lock',side:'def',name:'Lockdown',cost:1,icon:'🔒',effects:[{flag:'separation',v:1},{flag:'release',v:1}],text:'Every corner plays tight: +1 against separation and release.'}
+});
+Object.assign(RARITY,{rpo_bubble:'common',hb_wheel:'common',qb_draw:'common',hook_ladder:'legendary',tampa2:'common',ghost_blitz:'legendary',hurry_up:'rare',audible:'common',stunt:'common',lock:'rare'});
+
 // Game-day decks for the sandbox: base plays are always on the sheet; wrinkles and tactics are drawn.
 const DEFAULT_DECKS={
   off:{base:['inside_zone','outside_zone','quick_slant','stick'],

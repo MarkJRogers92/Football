@@ -31,6 +31,12 @@ function diagram(id,side){
   <marker id="ah2" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="4.5" markerHeight="4.5" orient="auto"><path d="M0 0L6 3L0 6z" fill="#ffb03c"/></marker></defs></svg>`;
 }
 function def(id){return D.PLAYS[id]||D.CALLS[id]||D.TACTICS[id]}
+// Real faces from Dynasty Lab's deterministic portrait renderer, when it's loaded.
+function paintPortrait(cv,p,colors,size=96){
+  try{const DP=window.DynastyPortraits;if(!DP)return false;
+    DP.renderPlayerPortrait({portraitSeed:`cs-${p.playerId||p.id}-${p.name}`,pos:p.pos,jerseyNumber:p.number},{primary:colors?.[0]||'#2a3550',secondary:colors?.[1]||'#e8e2d0'},cv,{size,frame:'card',pixelRatio:Math.min(2,window.devicePixelRatio||1)});
+    cv.style.width=cv.style.height=`${size}px`;return true}catch(e){return false}
+}
 function kindOf(id){return D.PLAYS[id]?'play':D.CALLS[id]?'call':'tactic'}
 // opts: {cost, base, blocked, selected, notch, why, small, compact}
 function card(id,opts={}){
@@ -42,16 +48,18 @@ function card(id,opts={}){
   if(kind==='play')type=`${fam}${c.trick?' · trick':''}${opts.base?' · base':''}`;
   else if(kind==='call')type=`${c.coverage} · ${c.box} box${c.pressure?` · ${c.pressure===2?'all-out':'blitz'}`:''}${c.trick?' · trick':''}`;
   else type=c.info?'info · plays now':'tactic';
-  const art=kind==='tactic'?`<div class="ticon">${esc(c.icon)}</div>`:diagram(c.evolvedFrom||c.upgradeOf||id,side);
+  const sg=c.signature;
+  const art=sg?`<div class="sigart"><canvas class="sigface" width="58" height="58"></canvas><div class="signum">#${esc(sg.number)}<small>${esc(sg.role)}</small></div></div>`:kind==='tactic'?`<div class="ticon">${esc(c.icon)}</div>`:diagram(c.evolvedFrom||c.upgradeOf||id,side);
   el.innerHTML=`<span class="frame"></span><span class="cost">${opts.cost??c.cost}</span>
     <span class="cname">${esc(c.name)}</span><span class="art">${art}</span><span class="ctype">${esc(type)}</span>
     <span class="ctext">${esc(String(c.text).replace(/^EVOLVED · /,''))}</span>${opts.why?`<span class="cwhy">${esc(opts.why)}</span>`:''}${opts.notch?'<span class="notch">PUNISHES LEAN</span>':''}
-    ${rarity!=='common'?`<span class="rar">${rarity==='evolved'?'evolved · '+esc(c.branch||''):rarity}</span>`:''}${opts.mastery?`<span class="mbar ${opts.mastery.reps>=opts.mastery.need?'full':''}" title="Reps toward evolution"><i style="width:${Math.min(100,opts.mastery.reps/opts.mastery.need*100)}%"></i></span>`:''}<span class="shine"></span>`;
+    ${rarity!=='common'?`<span class="rar">${rarity==='evolved'?'evolved · '+esc(c.branch||''):rarity==='signature'?'signature · '+esc(sg.archetype):rarity}</span>`:''}${opts.mastery?`<span class="mbar ${opts.mastery.reps>=opts.mastery.need?'full':''}" title="Reps toward evolution"><i style="width:${Math.min(100,opts.mastery.reps/opts.mastery.need*100)}%"></i></span>`:''}<span class="shine"></span>`;
   el.setAttribute('aria-label',`${c.name}, costs ${opts.cost??c.cost}. ${c.text}${opts.why?' '+opts.why:''}`);
+  if(sg){const cv=el.querySelector('.sigface');paintPortrait(cv,sg,sg.colors,58)}
   // 3D tilt and moving shine.
   el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;el.style.setProperty('--rx',`${(.5-y)*14}deg`);el.style.setProperty('--ry',`${(x-.5)*16}deg`);el.style.setProperty('--sx',`${x*100}%`);el.style.setProperty('--sy',`${y*100}%`)});
   el.addEventListener('pointerleave',()=>{el.style.setProperty('--rx','0deg');el.style.setProperty('--ry','0deg')});
   return el;
 }
-root.SliceCards={card,diagram,def,kindOf,FAM,esc};
+root.SliceCards={card,diagram,def,kindOf,FAM,esc,paintPortrait};
 })(window);

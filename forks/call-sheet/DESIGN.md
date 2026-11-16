@@ -739,3 +739,41 @@ before kickoff ("Watch for" its legendaries, evolved cards and newest pulls); an
 card glows and two branches fly out; you pick one, the rest flashes away, EVOLVED); and *Around the League* after
 your pack (every program's pull dealt out as cards, legendaries first, then the standings). Cards in your hand
 show a mastery bar that glows when ready. Evolved cards get a teal frame.
+
+---
+
+## 15. Signature cards, weather, rivalry and new cards (rules v0.5, 2026-11-16)
+
+**Signature player cards (`core/signatures.js`):** a player who dominates a game earns a card of his own. The bar
+is winning 80%+ of 15+ duels, or catching fire 5+ times. A breakout can happen at most once every 3 games, which
+in testing worked out to about one card every 4–5 games. The card is built from his role and archetype:
+- **QB:** a pocket passer gets *Audible* (QB reads +2); a runner gets *Keeper*, a QB run.
+- **Backs and receivers:** a back gets *Express* (a run), a third-down back *Wheel*, receivers *Special*, tight
+  ends *Seam*. These are routes or runs drawn up for him.
+- **Front seven:** linemen get *Wall* (Protection +2, run Gate +1), rushers *Unleashed* (a pressure call,
+  +2), linebackers *Hunt* (run Key +2).
+- **Secondary:** corners get *Island* (+2 against separation), safeties *Robber* (QB reads −2).
+
+The card shows his real face from Dynasty Lab's portrait renderer, plus his number and archetype, in a gold
+frame. You hold up to 3 outside your playbook limits, so a fourth means retiring one (or letting it go). The
+breakout screen has a spotlight, portrait, name slam and the card's reveal. AI programs earn signatures too, and
+they show up in league news and scouting reports. Portraits now also appear in the duel clashes.
+
+**Weather:** each game rolls clear (55%), rain, wind or snow, shown in the scouting forecast, the scoreboard and
+as falling particles on the field.
+- **Rain:** every pass Finish −1.
+- **Wind:** deep passes Key −1.
+- **Snow:** every Finish −1, run Gate +1.
+
+**Rivalry:** each dynasty has a rival and a trophy, *The Iron Lantern* (a 36-frame spinning turntable from
+Dynasty Lab's assets). Rivalry week gets a banner in the scouting report. Winning it opens a 5-card Rivalry
+Pack with a 35% chance at a legendary in the last slot. The trophy changes hands in league news.
+
+**Generic card effects:** tactics, calls and plays can carry `effects` (which duels, how much) and `reveal` (which
+Look facts they confirm). Signature cards and these new cards are built on that:
+- **Plays:** RPO Bubble, HB Wheel, QB Draw, *Hook & Ladder* (legendary trick).
+- **Calls:** Tampa 2, *Ghost Blitz* (legendary trick).
+- **Tactics:** Hurry-Up (their tactics are wasted this snap), Audible, Stunt, Lockdown.
+
+**Known issue:** a run-heavy team with a hot back can pile 40–50 carries onto one player, because the sandbox has a
+single RB. A rotation or backup back is the fix.

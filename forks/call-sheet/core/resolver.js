@@ -103,6 +103,17 @@ function buildSnap(ctx){
     if(dt.has('spy')){if(d.qbRun)add(-2,'QB spy');if(d.protect)add(1,'One fewer rusher')}
     if(dt.has('press')&&d.release){add(-1,'Press');flags.press=true}
     if(dt.has('identify_protection')&&d.protect&&call.pressure>0)add(-1,'Aimed pressure');
+    // Generic card effects (new tactics, signature cards, calls with duel mods). Each names which duels it touches.
+    const hits=e=>(e.duel==null||e.duel===key)&&(!e.flag||(e.flag==='run'?play.family==='run':e.flag==='pass'?!!play.pass:!!d[e.flag]))&&(!e.role||d.off.includes(e.role)||d.def.includes(e.role));
+    for(const id of ot){const T=D.TACTICS[id]||{};for(const e of T.effects||[])if(hits(e))add(e.v,T.name)}
+    for(const id of dt){const T=D.TACTICS[id]||{};for(const e of T.effects||[])if(hits(e))add(-e.v,T.name)}
+    for(const e of play.effects||[])if(hits(e))add(e.v,e.src||play.name);
+    for(const e of call.effects||[])if(hits(e))add(-e.v,e.src||call.name);
+    // Weather.
+    const wx=ctx.weather;
+    if(wx==='rain'){if(play.pass&&key==='F')add(-1,'Wet ball');}
+    if(wx==='wind'){if(play.family==='deep'&&key==='K')add(-1,'Swirling wind');}
+    if(wx==='snow'){if(key==='F')add(-1,'Footing in the snow');if(play.family==='run'&&key==='G')add(1,'Snow slows the rush');}
     // Data-driven matchups on newer cards.
     for(const m of play.matchups||[]){
       if(m.duel!==key)continue;
