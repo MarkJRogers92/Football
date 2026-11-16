@@ -711,3 +711,31 @@ reduced-motion support.
 
 **Not in the slice yet:** series planning mode (the slice offers key moments or every snap), saving a game in
 progress, AI programs opening packs, card mastery and branching evolution, signature player cards, and real art.
+
+---
+
+## 14. The league and card evolution (rules v0.4, 2026-11-16)
+
+**The league (`core/world.js`):** eight programs, the four presets plus four generated ones (Lakeshore A&M, Granite
+Falls, Sunbelt Tech, Prairie State). You play each AI program once per season in a seeded order. Every week:
+- **Your opponent** opens a pack based on your game's result (a Film Study pack aimed at *your* tendencies if you
+  beat them).
+- **The other six** play each other (a quick result weighted by roster strength; full battles are reserved for
+  your games) and open their own packs.
+- **AI picks follow identity:** run-heavy programs take run plays, aggressive defenses take pressure, plus a
+  random element. They prefer cards they don't already have several copies of, cut the worst-fitting card when
+  full, earn reps, and evolve. In a 14-week test the seven AI playbooks all ended up different.
+- **Legendaries are unique across the world.** If Lakeshore pulls *Statue Left*, it's gone from your packs, and
+  you'll see it used against you.
+
+**Card evolution (`core/evolution.js`):** 12 cards (all 8 base plays and calls, plus PA Boot, Deep Cross, Screen,
+Power and Zone Pressure) each branch two ways, giving 24 evolved cards. Each branch is tagged with the identity it
+pushes toward (Power, Misdirection, Speed, Timing, Option, Shot, Coverage, Run fits, Aggression). Reps come
+from the plays your program actually runs. The threshold is 40 for base cards and 24 for drawn cards, about 3
+games of real use. The choice is permanent and replaces every copy, including a "+" upgrade.
+
+**New screens:** a league table on the title screen (tap a program to scout its whole playbook); a scouting report
+before kickoff ("Watch for" its legendaries, evolved cards and newest pulls); an evolution screen (the original
+card glows and two branches fly out; you pick one, the rest flashes away, EVOLVED); and *Around the League* after
+your pack (every program's pull dealt out as cards, legendaries first, then the standings). Cards in your hand
+show a mastery bar that glows when ready. Evolved cards get a teal frame.

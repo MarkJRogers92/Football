@@ -42,11 +42,11 @@ function card(id,opts={}){
   if(kind==='play')type=`${fam}${c.trick?' · trick':''}${opts.base?' · base':''}`;
   else if(kind==='call')type=`${c.coverage} · ${c.box} box${c.pressure?` · ${c.pressure===2?'all-out':'blitz'}`:''}${c.trick?' · trick':''}`;
   else type=c.info?'info · plays now':'tactic';
-  const art=kind==='tactic'?`<div class="ticon">${esc(c.icon)}</div>`:diagram(id,side);
+  const art=kind==='tactic'?`<div class="ticon">${esc(c.icon)}</div>`:diagram(c.evolvedFrom||c.upgradeOf||id,side);
   el.innerHTML=`<span class="frame"></span><span class="cost">${opts.cost??c.cost}</span>
     <span class="cname">${esc(c.name)}</span><span class="art">${art}</span><span class="ctype">${esc(type)}</span>
-    <span class="ctext">${esc(c.text)}</span>${opts.why?`<span class="cwhy">${esc(opts.why)}</span>`:''}${opts.notch?'<span class="notch">PUNISHES LEAN</span>':''}
-    ${rarity!=='common'?`<span class="rar">${rarity}</span>`:''}<span class="shine"></span>`;
+    <span class="ctext">${esc(String(c.text).replace(/^EVOLVED · /,''))}</span>${opts.why?`<span class="cwhy">${esc(opts.why)}</span>`:''}${opts.notch?'<span class="notch">PUNISHES LEAN</span>':''}
+    ${rarity!=='common'?`<span class="rar">${rarity==='evolved'?'evolved · '+esc(c.branch||''):rarity}</span>`:''}${opts.mastery?`<span class="mbar ${opts.mastery.reps>=opts.mastery.need?'full':''}" title="Reps toward evolution"><i style="width:${Math.min(100,opts.mastery.reps/opts.mastery.need*100)}%"></i></span>`:''}<span class="shine"></span>`;
   el.setAttribute('aria-label',`${c.name}, costs ${opts.cost??c.cost}. ${c.text}${opts.why?' '+opts.why:''}`);
   // 3D tilt and moving shine.
   el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;el.style.setProperty('--rx',`${(.5-y)*14}deg`);el.style.setProperty('--ry',`${(x-.5)*16}deg`);el.style.setProperty('--sx',`${x*100}%`);el.style.setProperty('--sy',`${y*100}%`)});

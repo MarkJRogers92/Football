@@ -1,7 +1,7 @@
 // Call Sheet vertical slice: one arcade battle screen + the post-game pack.
 (function(){
 'use strict';
-const {data:D,resolver:R,roster:Ro,battle:B,packs:P}=window.CallSheet;
+const {data:D,resolver:R,roster:Ro,battle:B,packs:P,evolution:EV,world:W}=window.CallSheet;
 const FX=window.SliceFX,S=FX.sfx,PT=FX.particles,{card,esc}=window.SliceCards;
 const $=s=>document.querySelector(s);
 const STORE='callsheet.slice.v1';
@@ -11,12 +11,15 @@ function loadSave(){try{const t=localStorage.getItem(STORE);if(t)return JSON.par
 function writeSave(){try{localStorage.setItem(STORE,JSON.stringify(save))}catch(e){}}
 let save=loadSave()||{team:null,playbook:P.newPlaybook(),settings:{mode:'key',control:'offense',fast:false,sound:true},combos:[],games:0};
 save.settings??={mode:'key',control:'offense',fast:false,sound:true};save.combos??=[];
+// Saves from before the league existed get one.
+if(save.team&&!save.world)save.world=W.newWorld(save.team,`w${Date.now()%1e6}`);
 
 // ================================================================ state
 let b=null,req=null,seen=0,busy=false,err='',sel={play:null,tac:[]};
 const userSide=()=>b.user;
 const teamOf=s=>b.teams[s];
-const oppPreset=()=>{const ids=Object.keys(Ro.PRESETS).filter(k=>k!==save.team);return ids[save.games%ids.length]};
+const oppId=()=>W.opponentOf(save.world);
+const specOf=id=>W.SPECS[id];
 
 // ================================================================ field
 const YD=10,MIDY=266;
@@ -189,7 +192,7 @@ function renderHand(){
   const fanP=document.createElement('div');fanP.className='fan';fanP.style.position='relative';fanP.innerHTML='<span class="fanlab">CALL SHEET</span>';
   o.plays.forEach((p,i)=>{
     const c=p.card,notch=lean&&(c.punishes===lean||(c.id==='vertical_shot'&&lean==='quick'));
-    const el=card(p.id,{cost:p.cost,base:p.base,blocked:!!p.blocked,selected:sel.play===p.id,why:p.blocked,notch});
+    const el=card(p.id,{cost:p.cost,base:p.base,blocked:!!p.blocked,selected:sel.play===p.id,why:p.blocked,notch,mastery:req.side===b.user?EV.progress(save.playbook,p.id):null});
     const n=o.plays.length,mid=(n-1)/2;el.style.setProperty('--rot',`${(i-mid)*4}deg`);el.style.setProperty('--arc',`${Math.abs(i-mid)**2*3}px`);el.style.zIndex=i;
     wirePlayCard(el,p);fanP.appendChild(el);
   });
@@ -416,7 +419,7 @@ function fourthModal(){
 function finalScreen(){
   $('#hand').classList.add('away');$('#look').innerHTML='';renderBug();
   const won=b.game.score[b.user]>b.game.score[b.user==='home'?'away':'home'];
-  if(!b._recorded){b._recorded=true;save.playbook.record[won?'w':'l']++;save.games++;writeSave()}
+  if(!b._recorded){b._recorded=true;save.playbook.record[won?'w':'l']++;save.games++;b._gained=EV.recordReps(save.playbook,b.log,b.user);save.pending={won,userTendency:b.tend[b.user]};writeSave()}
   const top=Object.values(b.players).filter(p=>p.side===b.user).sort((a,c)=>(c.passYds+c.rushYds*1.6+c.recYds*1.6+c.sacks*30+c.intDef*35)-(a.passYds+a.rushYds*1.6+a.recYds*1.6+a.sacks*30+a.intDef*35)).slice(0,3);
   const line=p=>[p.passAtt?`${p.comp}/${p.passAtt} · ${p.passYds} yds · ${p.passTD} TD`:'',p.rushAtt?`${p.rushAtt} car · ${p.rushYds} yds`:'',p.rec?`${p.rec} rec · ${p.recYds} yds`:'',p.sacks?`${p.sacks} sacks`:'',p.intDef?`${p.intDef} INT`:''].filter(Boolean).join(' · ');
   const m=$('#modal');
@@ -431,7 +434,7 @@ function finalScreen(){
 async function packScreen(won){
   S.init();
   const opp=b.user==='home'?'away':'home';
-  const pack=P.openPack(save.playbook,{won,seed:`${save.team}:${save.games}`,oppTendency:b.tend[opp]});
+  const pack=P.openPack(save.playbook,{won,seed:`${save.team}:${save.games}`,oppTendency:b.tend[opp],worldTaken:W.takenLegendaries(save.world,save.playbook,'user')});
   const m=$('#modal');
   m.innerHTML=`<div class="mwrap"><p class="big ${won?'gold':''}" style="font-size:clamp(40px,7vw,80px)">${esc(pack.title.toUpperCase())}</p><p class="statline">${esc(pack.subtitle)}</p>
     <div class="pack" id="pk" style="--pa:${won?'#ffcc33':'#3f8fe0'};--pb:${won?'#7a4a00':'#0d2a55'}"><div class="pt">${won?'VICTORY':'FILM<br>STUDY'}</div><div class="ps">TAP TO OPEN</div></div>
@@ -496,46 +499,124 @@ async function cutScreen(over,added){
     const again=P.overCapacity(pb);if(again)cutScreen(again,added);else afterPack();
   };g.appendChild(w)});
 }
-function afterPack(){
-  const btns=$('#pkBtns')||(()=>{const m=$('#modal');m.innerHTML='<div class="mwrap"><div id="pkBtns"></div></div>';return $('#pkBtns')})();
-  btns.innerHTML=`<button class="btn go" id="nextG">NEXT GAME</button><button class="btn" id="toTitle">PROGRAM</button>`;
-  $('#nextG').onclick=()=>{$('#modal').classList.remove('on');startGame()};
-  $('#toTitle').onclick=title;
+async function afterPack(){
+  await FX.wait(900);
+  const r=EV.ready(save.playbook);
+  if(r.length){evolutionScreen(r[0]);return}
+  leagueScreen();
 }
 
-// ================================================================ title + playbook
+// ================================================================ title, league and playbooks
+const identity=s=>{const pr=s.passRate??.5;return`${pr<=.42?'Run-heavy':pr>=.56?'Air raid':'Balanced'} · ${(s.discipline??4)<=3?'aggressive':(s.discipline??4)>=5?'disciplined':'steady'} defense`};
+function standingsHTML(){
+  if(!save.world)return'';
+  const rows=W.standings(save.world,save.playbook,specOf(save.team).name);
+  return`<table class="stand"><tr><th></th><th>Program</th><th>W-L</th><th>Notable</th></tr>${rows.map((r,i)=>`<tr class="${r.you?'you':''}" ${r.you?'':`data-prog="${r.id}"`}><td>${i+1}</td><td><b>${esc(r.name)}</b>${r.you?' <span class="mini">(you)</span>':''}</td><td>${r.w}-${r.l}</td><td class="mini">${r.legendaries.map(id=>`<span class="leg">★ ${esc(P.cardDef(id).name)}</span>`).join(' ')} ${r.evolved.length?`${r.evolved.length} evolved`:''}</td></tr>`).join('')}</table>`;
+}
 function title(){
   const m=$('#modal'),pb=save.playbook,st=save.settings;
   const opt=(k,v,l)=>`<button class="opt ${st[k]===v?'on':''}" data-k="${k}" data-v="${v}">${l}</button>`;
-  m.innerHTML=`<div class="mwrap"><p class="big gold">CALL SHEET</p><p class="statline">VERTICAL SLICE · ONE SNAP, ONE GAME, ONE PACK</p>
-    ${save.team?`<p class="statline">${esc(Ro.PRESETS[save.team].name)} · RECORD <b>${pb.record.w}-${pb.record.l}</b> · PACKS <b>${pb.packsOpened}</b>${pb.legendaries.length?` · LEGENDARIES <b>${pb.legendaries.length}</b>`:''}</p>`:'<p class="statline">CHOOSE YOUR PROGRAM</p>'}
-    <div class="teams">${Object.entries(Ro.PRESETS).map(([k,p])=>`<button class="tcard ${save.team===k?'sel':''}" data-team="${k}"><div class="tn">${esc(p.name)}</div><div class="ts" style="background:linear-gradient(90deg,${p.colors[0]},${p.colors[1]})"></div><div class="mini">${esc(p.coach)}${p.archetypes?' · QB '+esc(p.archetypes.QB||'')+(p.archetypes.RB?' · RB '+esc(p.archetypes.RB):''):''}</div></button>`).join('')}</div>
+  const picker=!save.team;
+  m.innerHTML=`<div class="mwrap"><p class="big gold">CALL SHEET</p><p class="statline">${picker?'CHOOSE YOUR PROGRAM':`${esc(specOf(save.team).name)} · SEASON <b>${save.world.season}</b> · WEEK <b>${save.world.week%save.world.order.length+1}</b> · RECORD <b>${pb.record.w}-${pb.record.l}</b> · PACKS <b>${pb.packsOpened}</b>`}</p>
+    ${picker?`<div class="teams">${Object.entries(W.SPECS).map(([k,p])=>`<button class="tcard" data-team="${k}"><div class="tn">${esc(p.name)}</div><div class="ts" style="background:linear-gradient(90deg,${p.colors[0]},${p.colors[1]})"></div><div class="mini">${esc(identity(p))}<br>Coordinator ${esc(p.coach)}</div></button>`).join('')}</div>`
+      :`<div class="box" style="text-align:left;margin:14px auto;max-width:720px"><h3>The league</h3>${standingsHTML()}<div class="mini" style="margin-top:6px">Tap a program to scout its playbook. AI programs open packs, cut cards and evolve plays every week too.</div></div>`}
     <div class="opts">${opt('mode','key','Key moments')}${opt('mode','snap','Every snap')}</div>
     <div class="opts">${opt('control','offense','Coach offense')}${opt('control','both','Coach both sides')}</div>
-    <div>${save.team?`<button class="btn go" id="play">PLAY · vs ${esc(Ro.PRESETS[oppPreset()].name)}</button><button class="btn" id="pbv">PLAYBOOK</button><button class="btn" id="reset">NEW DYNASTY</button>`:''}</div>
-    <p class="mini" style="margin-top:14px">Sandbox progress stays in this browser only.</p></div>`;
+    <div>${save.team?`<button class="btn go" id="play">PLAY · vs ${esc(specOf(oppId()).name)}</button><button class="btn" id="pbv">YOUR PLAYBOOK</button><button class="btn" id="reset">NEW DYNASTY</button>`:''}</div>
+    <p class="mini" style="margin-top:14px">Progress stays in this browser only.</p></div>`;
   m.classList.add('on');
-  m.querySelectorAll('[data-team]').forEach(el=>el.onclick=()=>{S.init();if(save.team&&save.team!==el.dataset.team&&save.playbook.packsOpened&&!confirm('Switching programs starts a new dynasty. Continue?'))return;if(save.team!==el.dataset.team){save.playbook=P.newPlaybook();save.combos=[];save.games=0}save.team=el.dataset.team;writeSave();S.tick(8);title()});
+  m.querySelectorAll('[data-team]').forEach(el=>el.onclick=()=>{S.init();save.team=el.dataset.team;save.playbook=P.newPlaybook();save.combos=[];save.games=0;save.world=W.newWorld(save.team,`w${Date.now()%1e6}`);writeSave();S.chime();title()});
+  m.querySelectorAll('[data-prog]').forEach(el=>el.onclick=()=>{S.tick(6);playbookView(save.world.programs[el.dataset.prog].playbook,specOf(el.dataset.prog).name,el.dataset.prog)});
   m.querySelectorAll('[data-k]').forEach(el=>el.onclick=()=>{st[el.dataset.k]=el.dataset.v;writeSave();S.tick(5);title()});
-  const p=$('#play');if(p)p.onclick=()=>{S.init();m.classList.remove('on');startGame()};
-  const v=$('#pbv');if(v)v.onclick=playbookView;
-  const r=$('#reset');if(r)r.onclick=()=>{if(!confirm('Start a new dynasty? Your playbook and record reset.'))return;save={team:null,playbook:P.newPlaybook(),settings:st,combos:[],games:0};writeSave();title()};
+  const p=$('#play');if(p)p.onclick=()=>{S.init();scoutingReport()};
+  const v=$('#pbv');if(v)v.onclick=()=>playbookView(save.playbook,'Your playbook',null);
+  const r=$('#reset');if(r)r.onclick=()=>{if(!confirm('Start a new dynasty? Your playbook, record and league reset.'))return;save={team:null,playbook:P.newPlaybook(),settings:st,combos:[],games:0};writeSave();title()};
 }
-function playbookView(){
-  const pb=save.playbook,m=$('#modal');
-  const group=(lab,ids)=>{const counts={};for(const id of ids)counts[id]=(counts[id]||0)+1;return`<p class="statline" style="margin-top:16px">${lab} · <b>${ids.length}</b></p><div class="pbgrid">${Object.entries(counts).map(([id,n])=>`<div style="position:relative" data-c="${id}"><span class="statline" style="position:absolute;top:-8px;left:-6px;z-index:3;background:#000;border-radius:8px;padding:0 6px">×${n}</span></div>`).join('')}</div>`};
-  m.innerHTML=`<div class="mwrap"><p class="big gold" style="font-size:clamp(40px,7vw,80px)">PLAYBOOK</p>
-    ${group('OFFENSE · CALL SHEET (always available)',pb.off.base)}${group(`OFFENSE · PLAY PILE (max ${pb.capacity.wrinkles})`,pb.off.wrinkles)}${group(`OFFENSE · TACTICS (max ${pb.capacity.tactics})`,pb.off.tactics)}
+function playbookView(pb,name,progId){
+  const m=$('#modal');
+  const group=(lab,ids)=>{const counts={};for(const id of ids)counts[id]=(counts[id]||0)+1;return`<p class="statline" style="margin-top:16px">${lab} · <b>${ids.length}</b></p><div class="pbgrid">${Object.entries(counts).map(([id,n])=>`<div style="position:relative" data-c="${id}">${n>1?`<span class="statline" style="position:absolute;top:-8px;left:-6px;z-index:3;background:#000;border-radius:8px;padding:0 6px">×${n}</span>`:''}</div>`).join('')}</div>`};
+  const spec=progId?specOf(progId):null;
+  m.innerHTML=`<div class="mwrap"><p class="big gold" style="font-size:clamp(36px,6vw,72px)">${esc(name.toUpperCase())}</p>
+    ${spec?`<p class="statline">${esc(identity(spec))} · coordinator ${esc(spec.coach)} · record <b>${save.world.programs[progId].record.w}-${save.world.programs[progId].record.l}</b></p>`:''}
+    ${group('OFFENSE · CALL SHEET',pb.off.base)}${group(`OFFENSE · PLAY PILE (max ${pb.capacity.wrinkles})`,pb.off.wrinkles)}${group(`OFFENSE · TACTICS (max ${pb.capacity.tactics})`,pb.off.tactics)}
     ${group('DEFENSE · CALL SHEET',pb.def.base)}${group(`DEFENSE · CALL PILE (max ${pb.capacity.wrinkles})`,pb.def.wrinkles)}${group(`DEFENSE · TACTICS (max ${pb.capacity.tactics})`,pb.def.tactics)}
     <button class="btn go" id="back">BACK</button></div>`;
-  m.querySelectorAll('[data-c]').forEach(w=>w.appendChild(card(w.dataset.c,{small:true})));
+  m.querySelectorAll('[data-c]').forEach(w=>w.appendChild(card(w.dataset.c,{small:true,mastery:progId?null:EV.progress(pb,w.dataset.c)})));
   $('#back').onclick=title;
+}
+// Before kickoff: what this opponent has built.
+function scoutingReport(){
+  const oid=oppId(),spec=specOf(oid),prog=save.world.programs[oid],pb=prog.playbook;
+  const watch=[...pb.legendaries,...Object.values(pb.evolved||{}),...pb.history.filter(h=>h.kind!=='evolution').slice(-3).map(h=>h.id)];
+  const uniq=[...new Set(watch)].filter(id=>[...pb.off.base,...pb.off.wrinkles,...pb.off.tactics,...pb.def.base,...pb.def.wrinkles,...pb.def.tactics].includes(id)).slice(0,6);
+  const m=$('#modal');
+  m.innerHTML=`<div class="mwrap"><p class="statline">SCOUTING REPORT · WEEK ${save.world.week%save.world.order.length+1}</p>
+    <p class="big" style="font-size:clamp(40px,8vw,96px);color:${spec.colors[0]};-webkit-text-stroke:2px #fff">${esc(spec.name.toUpperCase())}</p>
+    <p class="statline">${esc(identity(spec))} · coordinator <b>${esc(spec.coach)}</b> · record <b>${prog.record.w}-${prog.record.l}</b> · ${pb.packsOpened} packs opened</p>
+    <p class="statline" style="margin-top:14px">${uniq.length?'WATCH FOR':'A STOCK PLAYBOOK. THEY HAVEN\'T BUILT ANYTHING YET.'}</p>
+    <div class="pbgrid" id="watch"></div>
+    <button class="btn go" id="kick">KICKOFF</button><button class="btn" id="back">BACK</button></div>`;
+  const g=$('#watch');
+  for(const id of uniq){const w=document.createElement('div');w.appendChild(card(id,{small:true}));g.appendChild(w);FX.anim(w,[{opacity:0,transform:'translateY(30px) scale(.8)'},{opacity:1,transform:'none'}],{duration:350,delay:120*g.children.length,easing:'cubic-bezier(.2,1.4,.4,1)'})}
+  m.classList.add('on');
+  $('#kick').onclick=()=>{m.classList.remove('on');S.whistle();startGame()};
+  $('#back').onclick=title;
+}
+// A card has enough reps: pick its future.
+function evolutionScreen(r){
+  const pb=save.playbook,m=$('#modal'),from=r.rootId,held=[...pb[r.side].base,...pb[r.side].wrinkles].find(id=>EV.rootOf(id)===from)||from;
+  m.innerHTML=`<div class="mwrap"><p class="big gold">EVOLUTION</p>
+    <p class="statline"><b>${esc(P.cardDef(held).name)}</b> has <b>${pb.mastery[from]}</b> reps. Your program has mastered it. <b>Choose its future.</b> This is permanent.</p>
+    <div class="evo"><div class="evoRoot" id="evoRoot"></div></div>
+    <div class="branches">${r.options.map(id=>`<div class="branch" data-b="${id}"><div class="btag">${esc(EV.branchTag(id).toUpperCase())}</div></div>`).join('')}</div></div>`;
+  m.classList.add('on');
+  const root=card(held,{});$('#evoRoot').appendChild(root);
+  $('#rays').classList.add('on');S.fire();
+  m.querySelectorAll('.branch').forEach((w,i)=>{const c=card(w.dataset.b,{});w.appendChild(c);
+    FX.anim(w,[{opacity:0,transform:`translate(${i?'-':''}160px,-160px) scale(.3)`},{opacity:1,transform:'none'}],{duration:520,delay:300+i*160,easing:'cubic-bezier(.2,1.4,.4,1)'});
+    w.onclick=async()=>{
+      m.querySelectorAll('.branch').forEach(x=>x.onclick=null);
+      S.fanfare();FX.anim($('#flash'),[{opacity:.9},{opacity:0}],450);FX.shake(m,1.6);
+      const rr=w.getBoundingClientRect();PT.burst(rr.left+rr.width/2,rr.top+rr.height/2,{n:140,speed:12,colors:['#3cf0c0','#c8fff0','#ffe066','#fff']});
+      m.querySelectorAll('.branch').forEach(x=>{if(x!==w)FX.anim(x,[{opacity:1},{opacity:0,transform:'scale(.7) translateY(40px)'}],400)});
+      FX.anim($('#evoRoot'),[{opacity:1,filter:'brightness(1)'},{opacity:0,filter:'brightness(3)',transform:'scale(1.3)'}],450);
+      await FX.anim(w,[{transform:'none'},{transform:'scale(1.25) translateY(-20px)'}],{duration:500,easing:'cubic-bezier(.2,1.4,.4,1)'});
+      EV.evolve(pb,from,w.dataset.b);writeSave();
+      w.insertAdjacentHTML('beforeend','<div class="evostamp">EVOLVED</div>');
+      await FX.wait(1300);$('#rays').classList.remove('on');
+      const more=EV.ready(pb);if(more.length)evolutionScreen(more[0]);else leagueScreen();
+    };
+  });
+}
+// Close out the week: the AI programs play, open packs, cut and evolve.
+function leagueScreen(){
+  if(save.pending){W.advanceWeek(save.world,save.playbook,save.pending);save.pending=null;writeSave()}
+  const news=save.world.news||[],name=id=>id==='user'?specOf(save.team).name:specOf(id).name;
+  const pulls=news.filter(n=>n.type==='pick'),evos=news.filter(n=>n.type==='evolve'),results=news.filter(n=>n.type==='result');
+  const m=$('#modal');
+  m.innerHTML=`<div class="mwrap"><p class="big gold" style="font-size:clamp(40px,7vw,84px)">AROUND THE LEAGUE</p>
+    <p class="statline">${results.map(r=>`<b>${esc(specOf(r.winner).short)}</b> def. ${esc(specOf(r.loser).short)}`).join(' · ')}</p>
+    ${news.some(n=>n.type==='season')?`<p class="statline" style="color:var(--gold)">A NEW SEASON BEGINS · SEASON ${save.world.season}</p>`:''}
+    <div class="news" id="news"></div>
+    <div class="box" style="text-align:left;margin:14px auto;max-width:720px"><h3>Standings</h3>${standingsHTML()}</div>
+    <button class="btn go" id="nextG">NEXT · vs ${esc(specOf(oppId()).name)}</button><button class="btn" id="toTitle">PROGRAM</button></div>`;
+  m.classList.add('on');
+  const g=$('#news');
+  const items=[...pulls.sort((a,c)=>({legendary:0,rare:1,common:2}[a.rarity]-{legendary:0,rare:1,common:2}[c.rarity])).map(n=>({id:n.card,txt:`${name(n.program)} pulled`,leg:n.rarity==='legendary'})),...evos.map(n=>({id:n.to,txt:`${name(n.program)} evolved ${P.cardDef(n.from).name} into`}))];
+  items.slice(0,8).forEach((it,i)=>{
+    const w=document.createElement('div');w.className=`nitem ${it.leg?'legpull':''}`;w.innerHTML=`<div class="ntxt">${esc(it.txt)}</div>`;w.appendChild(card(it.id,{small:true}));g.appendChild(w);
+    FX.anim(w,[{opacity:0,transform:'translateY(40px) rotate(-6deg)'},{opacity:1,transform:'none'}],{duration:380,delay:140*i,easing:'cubic-bezier(.2,1.4,.4,1)'});
+    if(it.leg)setTimeout(()=>{S.groan();FX.shake(m,1)},140*i+300);
+  });
+  if(!items.length)g.innerHTML='<p class="mini">A quiet week around the league.</p>';
+  $('#nextG').onclick=()=>scoutingReport();
+  $('#toTitle').onclick=title;
+  m.querySelectorAll('[data-prog]').forEach(el=>el.onclick=()=>playbookView(save.world.programs[el.dataset.prog].playbook,specOf(el.dataset.prog).name,el.dataset.prog));
 }
 
 // ================================================================ start
 function startGame(){
-  const me=Ro.preset(save.team),opp=Ro.preset(oppPreset());
-  me.decks=P.decksOf(save.playbook);
+  const oid=oppId(),me=W.teamFor(save.team,save.playbook),opp=W.teamFor(oid,save.world.programs[oid].playbook);
   b=B.create({home:me,away:opp,user:'home',mode:save.settings.mode,control:save.settings.control,seed:`slice:${save.team}:${save.games}`});
   seen=0;sel={play:null,tac:[]};err='';lastLook={};b._lastScore={home:0,away:0};
   drawField();renderBug();setMarkers(null);
@@ -547,6 +628,6 @@ $('#stage').addEventListener('click',()=>{if(busy&&$('#skip').classList.contains
 FX.speed=save.settings.fast?.45:1;S.on=save.settings.sound!==false;
 PT.mount($('#fx'));
 // Test hook: lets automated checks drive the slice without pixel hunting.
-window.__slice={get b(){return b},get req(){return req},get busy(){return busy},save:()=>save,go,startGame,title};
+window.__slice={get b(){return b},get req(){return req},get busy(){return busy},save:()=>save,go,startGame,title,evolutionScreen,leagueScreen};
 title();
 })();

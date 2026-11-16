@@ -8,6 +8,8 @@ const R=require(path.join(__dirname,'../core/resolver.js'));
 const Ro=require(path.join(__dirname,'../core/roster.js'));
 const D=require(path.join(__dirname,'../core/data.js'));
 const P=require(path.join(__dirname,'../core/packs.js'));
+const EV=require(path.join(__dirname,'../core/evolution.js'));
+const W=require(path.join(__dirname,'../core/world.js'));
 
 let passed=0;const failures=[];
 function test(name,fn){try{fn();passed++;console.log(`  ok  ${name}`)}catch(e){failures.push(name);console.log(`  FAIL ${name}\n       ${e.stack.split('\n').slice(0,3).join('\n       ')}`)}}
@@ -182,6 +184,52 @@ test('packs: film study counters, pick-one, capacity cuts, one legendary per wor
   // Picked cards play in a real battle.
   const team=Ro.preset('aerial');team.decks=P.decksOf(pb);
   const b=B.simulate({home:team,away:Ro.preset('ground'),seed:'pb-game'});assert.equal(b.game.status,'final');
+});
+
+test('evolution: reps from real games, two permanent branches, evolved cards play',()=>{
+  const pb=P.newPlaybook();
+  const b=B.simulate({home:Ro.preset('ground'),away:Ro.preset('control'),seed:'evo'});
+  const gained=EV.recordReps(pb,b.log,'home');
+  assert.ok(Object.values(gained).reduce((s,v)=>s+v,0)>40,'a game should earn reps');
+  assert.equal(EV.ready(pb).length,0,'nothing evolves after a single game');
+  pb.mastery.inside_zone=EV.BASE_REPS;
+  const r=EV.ready(pb).find(x=>x.rootId==='inside_zone');assert.deepEqual(r.options,['duo','split_zone']);
+  EV.evolve(pb,'inside_zone','duo');
+  assert.ok(pb.off.base.includes('duo')&&!pb.off.base.includes('inside_zone'));
+  assert.ok(!EV.ready(pb).some(x=>x.rootId==='inside_zone'),'a card evolves once');
+  assert.throws(()=>EV.evolve(pb,'outside_zone','duo'));
+  // An upgraded card evolves too, keeping one root.
+  const pb2=P.newPlaybook();P.applyPick(pb2,{id:'pa_boot_plus',kind:'upgrade',side:'off',replaces:'pa_boot',rarity:'rare'});
+  pb2.mastery={pa_boot:EV.WRINKLE_REPS};assert.ok(EV.ready(pb2).some(x=>x.rootId==='pa_boot'));
+  EV.evolve(pb2,'pa_boot','pa_shot');assert.ok(pb2.off.wrinkles.includes('pa_shot')&&!pb2.off.wrinkles.some(id=>id.startsWith('pa_boot')));
+  // Evolved offense and defense cards resolve in a real battle without breaking the stats.
+  const t=Ro.preset('ground');t.decks=P.decksOf(pb);EV.evolve(t.decks?pb:pb,'two_high','cover6');t.decks=P.decksOf(pb);
+  const g=B.simulate({home:t,away:Ro.preset('tempo'),seed:'evo-game'});
+  assert.equal(g.game.status,'final');assert.ok(g.log.some(l=>l.play==='duo'),'Duo should get called');
+});
+
+test('league: AI programs open packs, cut to capacity, evolve, and never share a legendary',()=>{
+  const pb=P.newPlaybook(),w=W.newWorld('aerial','league-test');
+  assert.equal(Object.keys(w.programs).length,7);assert.ok(!w.programs.aerial);
+  const opp0=W.opponentOf(w);
+  for(let wk=0;wk<21;wk++)W.advanceWeek(w,pb,{won:wk%2===0,userTendency:{run:5,quick:3,deep:2,constraint:1}});
+  assert.equal(w.week,21);assert.equal(w.season,4);assert.equal(W.opponentOf(w),w.order[0]);assert.equal(opp0,w.order[0]);
+  const all=[];let evolved=0,games=0;
+  for(const p of Object.values(w.programs)){
+    games+=p.record.w+p.record.l;evolved+=Object.keys(p.playbook.evolved||{}).length;all.push(...p.playbook.legendaries);
+    assert.equal(P.overCapacity(p.playbook),null,'AI programs must stay within capacity');
+    assert.ok(p.playbook.packsOpened>=18,'every AI program opens a pack each week');
+  }
+  assert.equal(new Set(all).size,all.length,'a legendary exists once per world');
+  assert.ok(evolved>0,'AI programs evolve cards');
+  // Programs diverge: no two AI playbooks are identical.
+  const sigs=Object.values(w.programs).map(p=>JSON.stringify([p.playbook.off,p.playbook.def]));
+  assert.equal(new Set(sigs).size,sigs.length);
+  // Your legendary is excluded from every AI pack.
+  pb.legendaries.push('statue_left');assert.ok(W.takenLegendaries(w,pb,'lakeshore').includes('statue_left'));
+  // An AI team plays with its built playbook.
+  const id=W.opponentOf(w),g=B.simulate({home:W.teamFor('aerial',pb),away:W.teamFor(id,w.programs[id].playbook),seed:'ai-deck'});
+  assert.equal(g.game.status,'final');
 });
 
 console.log(`\n${passed} passed, ${failures.length} failed`);
